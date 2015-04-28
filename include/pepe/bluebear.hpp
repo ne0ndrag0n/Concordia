@@ -2,7 +2,7 @@
 #define BLUEBEAR
 
 #include <squirrel.h>
-
+#include <string>
 #define INITIAL_SQVM_STACK_SIZE 1024
 
 /**
@@ -11,13 +11,24 @@
  *
  */
 namespace BlueBear {
-	class BlueBearVM {
+	class Engine {
 		private:
 			HSQUIRRELVM sqvm;
+
+		public:
+			Engine();
+	};
+
+	class BBObject {
+		private:
+			std::string fileName;
+		public:
+			BBObject(std::string fileName);
 	};
 }
 
-namespace SquirrelExamples {
+
+namespace SquirrelUtils {
 	void squirrel_print_last_error(HSQUIRRELVM sqvm);
 
 	void squirrel_print_function(HSQUIRRELVM sqvm, const SQChar *format, ...);

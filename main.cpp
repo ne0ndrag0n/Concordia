@@ -8,7 +8,7 @@
 int main() {
 	HSQUIRRELVM sqvm = sq_open(INITIAL_SQVM_STACK_SIZE);
 
-	sq_setprintfunc(sqvm, SquirrelExamples::squirrel_print_function, NULL);
+	sq_setprintfunc(sqvm, SquirrelUtils::squirrel_print_function, NULL);
 	const SQChar *program = "print(\"Hello World!\\n\");";
 
 	if (
@@ -22,7 +22,7 @@ int main() {
 			)
 		)
 	) {
-        SquirrelExamples::squirrel_print_last_error(sqvm);
+        SquirrelUtils::squirrel_print_last_error(sqvm);
         return 1;
     }
 
@@ -32,7 +32,7 @@ int main() {
 			sq_call(sqvm, 1, SQFalse, SQFalse)
 		)
 	) {
-		 SquirrelExamples::squirrel_print_last_error(sqvm);
+		 SquirrelUtils::squirrel_print_last_error(sqvm);
 		 return 1;
 	}
 

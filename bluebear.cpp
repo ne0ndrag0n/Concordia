@@ -2,7 +2,7 @@
 #include <cstdio>
 #include <cstdarg>
 
-void SquirrelExamples::squirrel_print_last_error(HSQUIRRELVM sqvm) {
+void SquirrelUtils::squirrel_print_last_error(HSQUIRRELVM sqvm) {
 	const SQChar *error;
 	sq_getlasterror(sqvm);
 	if (SQ_SUCCEEDED(sq_getstring(sqvm, -1, &error))) {
@@ -10,9 +10,19 @@ void SquirrelExamples::squirrel_print_last_error(HSQUIRRELVM sqvm) {
 	}
 }
 
-void SquirrelExamples::squirrel_print_function(HSQUIRRELVM sqvm, const SQChar *format, ...) {
+void SquirrelUtils::squirrel_print_function(HSQUIRRELVM sqvm, const SQChar *format, ...) {
 	va_list args;
 	va_start(args, format);
 	vfprintf(stdout, format, args);
 	va_end(args);
+}
+
+BlueBear::Engine::Engine() {
+	HSQUIRRELVM sqvm = sq_open(INITIAL_SQVM_STACK_SIZE);
+
+	sq_setprintfunc(sqvm, SquirrelUtils::squirrel_print_function, NULL);
+}
+
+BlueBear::BBObject::BBObject(std::string fileName) {
+	this->fileName = fileName;
 }
