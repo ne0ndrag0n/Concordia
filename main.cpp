@@ -6,6 +6,9 @@
 #include <squirrel.h>
 
 int main() {
+	
+
+	/*
 	HSQUIRRELVM sqvm = sq_open(INITIAL_SQVM_STACK_SIZE);
 
 	sq_setprintfunc(sqvm, SquirrelUtils::squirrel_print_function, NULL);
@@ -37,5 +40,6 @@ int main() {
 	}
 
 	sq_close(sqvm);
+	*/
 	return 0;
 }
