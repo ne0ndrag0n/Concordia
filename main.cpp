@@ -1,13 +1,11 @@
 #include "bluebear.hpp"
 #include <iostream>
-#include <cstdio>
-#include <cstdarg>
-#include <cstring>
 #include <squirrel.h>
 
 int main() {
+	BlueBear::Engine engine;
+	BlueBear::BBObject test = engine.getObjectFromFile( "hello.sq" );
 	
-
 	/*
 	HSQUIRRELVM sqvm = sq_open(INITIAL_SQVM_STACK_SIZE);
 

@@ -4,6 +4,7 @@
 #include <squirrel.h>
 #include <string>
 #include <vector>
+#include <fstream>
 #define INITIAL_SQVM_STACK_SIZE 1024
 
 /**
@@ -12,23 +13,28 @@
  *
  */
 namespace BlueBear {
+	
 	class BBObject {
 		private:
 			const char* fileName;
 			const char* fileContents;
 		public:
-			BBObject(char* fileName);
+			BBObject( const char* fileName );
+			bool good();
+			const char* getFileContents();
 	};
 
 	class Engine {
 		private:
 			HSQUIRRELVM sqvm;
-			std::vector<BlueBear::BBObject> objects;
+			std::vector< BlueBear::BBObject > objects;
 
 		public:
 			Engine();
 			~Engine();
+			BlueBear::BBObject getObjectFromFile( const char* fileName );
 	};
+	
 }
 
 
