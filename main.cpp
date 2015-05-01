@@ -4,7 +4,7 @@
 
 int main() {
 	BlueBear::Engine engine;
-	BlueBear::BBObject test = engine.getObjectFromFile( "hello.sq" );
+	BlueBear::BBObject test = engine.getObjectFromFile( "hello.nut" );
 	
 	/*
 	HSQUIRRELVM sqvm = sq_open(INITIAL_SQVM_STACK_SIZE);
