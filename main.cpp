@@ -10,7 +10,7 @@ extern "C" {
 
 int main() {
 	
-	const char* script = "print(\"Hello BlueBear!\")";
+	const char* script = "print(hello)";
 	
 	lua_State* L = luaL_newstate();
 	luaL_openlibs( L );
@@ -19,6 +19,9 @@ int main() {
 		fprintf( stderr, "Couldn't process script: %s\n", lua_tostring( L, -1 ) );
 		return 1;
 	}
+	
+	lua_pushstring( L, "Hello, BlueBear!!" );
+	lua_setglobal( L, "hello" );
 	
 	if ( lua_pcall( L, 0, LUA_MULTRET, 0 ) ) {
 		fprintf( stderr, "Failed to run script: %s\n", lua_tostring( L, -1 ) );
