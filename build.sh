@@ -1,2 +1,2 @@
 #!/bin/bash
-g++ -g bluebear.cpp main.cpp -Iinclude/squirrel3 -Iinclude/pepe -Llib -lsqstdlib -lsquirrel -o bluebear
+g++ -g bluebear.cpp main.cpp -Iinclude/lua -Iinclude/pepe -Llib -llua -o bluebear

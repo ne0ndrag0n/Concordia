@@ -1,7 +1,6 @@
 #ifndef BLUEBEAR
 #define BLUEBEAR
 
-#include <squirrel.h>
 #include <string>
 #include <vector>
 #include <fstream>
@@ -26,7 +25,6 @@ namespace BlueBear {
 
 	class Engine {
 		private:
-			HSQUIRRELVM sqvm;
 			std::vector< BlueBear::BBObject > objects;
 
 		public:
@@ -35,13 +33,6 @@ namespace BlueBear {
 			BlueBear::BBObject getObjectFromFile( const char* fileName );
 	};
 	
-}
-
-
-namespace SquirrelUtils {
-	void squirrel_print_last_error(HSQUIRRELVM sqvm);
-
-	void squirrel_print_function(HSQUIRRELVM sqvm, const SQChar *format, ...);
 }
 
 #endif
