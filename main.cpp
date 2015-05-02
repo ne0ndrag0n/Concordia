@@ -9,11 +9,14 @@ extern "C" {
 }
 
 int main() {
+	
+	const char* script = "print(\"Hello BlueBear!\")";
+	
 	lua_State* L = luaL_newstate();
 	luaL_openlibs( L );
 	
-	if ( luaL_loadfile( L, "hello.lua" ) ) {
-		fprintf( stderr, "Couldn't load file: %s\n", lua_tostring( L, -1 ) );
+	if ( luaL_loadstring( L, script ) ) {
+		fprintf( stderr, "Couldn't process script: %s\n", lua_tostring( L, -1 ) );
 		return 1;
 	}
 	
