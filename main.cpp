@@ -10,7 +10,12 @@ extern "C" {
 
 int main() {
 	
-	const char* script = "print(hello)";
+	const char* script =
+		"print(hello)\n"
+		"function run_object(x)\n"
+		"    print(\"x^2 in lua: \" .. x^2)\n"
+		"    return x^2\n"
+		"end";
 	
 	lua_State* L = luaL_newstate();
 	luaL_openlibs( L );

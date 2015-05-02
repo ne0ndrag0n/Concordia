@@ -15,6 +15,7 @@ extern "C" {
 
 BlueBear::Engine::Engine() {
 	L = luaL_newstate();
+	luaL_openlibs( L );
 }
 
 BlueBear::Engine::~Engine() {
