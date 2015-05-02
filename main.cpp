@@ -1,6 +1,27 @@
 #include "bluebear.hpp"
 #include <iostream>
+#include <cstdio>
+
+extern "C" {
+	#include "lua.h"
+	#include "lualib.h"
+	#include "lauxlib.h"
+}
 
 int main() {
+	lua_State* L = luaL_newstate();
+	luaL_openlibs( L );
+	
+	if ( luaL_loadfile( L, "hello.lua" ) ) {
+		fprintf( stderr, "Couldn't load file: %s\n", lua_tostring( L, -1 ) );
+		return 1;
+	}
+	
+	if ( lua_pcall( L, 0, LUA_MULTRET, 0 ) ) {
+		fprintf( stderr, "Failed to run script: %s\n", lua_tostring( L, -1 ) );
+        return 1;
+	}
+	
+	lua_close( L );
 	return 0;
 }
