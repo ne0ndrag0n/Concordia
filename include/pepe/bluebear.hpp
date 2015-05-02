@@ -6,6 +6,12 @@
 #include <fstream>
 #define INITIAL_SQVM_STACK_SIZE 1024
 
+extern "C" {
+	#include "lua.h"
+	#include "lualib.h"
+	#include "lauxlib.h"
+}
+
 /**
  * BlueBear objects
  *
@@ -25,6 +31,7 @@ namespace BlueBear {
 
 	class Engine {
 		private:
+			lua_State* L;
 			std::vector< BlueBear::BBObject > objects;
 
 		public:

@@ -7,12 +7,18 @@
 #include <vector>
 #include <iostream>
 
-BlueBear::Engine::Engine() {
+extern "C" {
+	#include "lua.h"
+	#include "lualib.h"
+	#include "lauxlib.h"
+}
 
+BlueBear::Engine::Engine() {
+	L = luaL_newstate();
 }
 
 BlueBear::Engine::~Engine() {
-	
+	lua_close( L );
 }
 
 BlueBear::BBObject::BBObject( const char* fileName ) {
