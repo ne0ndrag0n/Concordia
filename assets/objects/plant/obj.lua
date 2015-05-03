@@ -50,5 +50,5 @@ local flowers = {
 }
 
 
-
-bluebear.register_object( flowers )
+-- Register your object by calling register_object on the global bluebear object, and passing in the table containing the required values
+bluebear.register_object( "mipani.flowers", flowers )

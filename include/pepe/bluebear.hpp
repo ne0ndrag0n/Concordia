@@ -5,7 +5,6 @@
 #include <vector>
 #include <cstdio>
 #include <fstream>
-#define INITIAL_SQVM_STACK_SIZE 1024
 
 extern "C" {
 	#include "lua.h"
@@ -19,26 +18,15 @@ extern "C" {
  *
  */
 namespace BlueBear {
-	
-	class BBObject {
-		private:
-			const char* fileName;
-			const char* fileContents;
-		public:
-			BBObject( const char* fileName );
-			bool good();
-			const char* getFileContents();
-	};
 
 	class Engine {
 		private:
 			lua_State* L;
-			std::vector< BlueBear::BBObject > objects;
 
 		public:
 			Engine();
 			~Engine();
-			BlueBear::BBObject getObjectFromFile( const char* fileName );
+			bool setupRootEnvironment();
 	};
 	
 	namespace Utility {

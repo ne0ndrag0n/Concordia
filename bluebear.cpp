@@ -24,42 +24,20 @@ namespace BlueBear {
 		lua_close( L );
 	}
 	
-	BBObject::BBObject( const char* fileName ) {
-		this->fileName = fileName;
-		this->fileContents = NULL;
-
-		std::ifstream fileStream( fileName );
-		if( fileStream.good() ) {
-			std::string content( 
-				( std::istreambuf_iterator< char >( fileStream ) ),
-				( std::istreambuf_iterator< char >()    	     ) 
-			);
-			this->fileContents = content.c_str();
+	/**
+	 * Setup the global environment all Engine mods will run within. This method sets up required global objects used by each mod.
+	 */
+	bool Engine::setupRootEnvironment() {
+		// TODO: The root script should not be a user-modifiable file, but rather a hardcoded minified string. This script sets up
+		// the root Lua environment all mods (including pack-ins) run from, and is NOT to be changed by the user.
+		if ( luaL_dofile( L, "system/root.lua" ) ) {
+			printf( "Failed to set up BlueBear root environment: %s\n", lua_tostring( L, -1 ) );
+			return false;
 		}
 		
-		fileStream.close();
+		return true;
 	}
 	
-	
-	bool BBObject::good() {
-		return this->fileContents != NULL;
-	}
-	
-	const char* BBObject::getFileContents() {
-		return this->fileContents;
-	}
-
-	BBObject Engine::getObjectFromFile( const char* fileName ) {
-		BlueBear::BBObject bbObject( fileName );
-		
-		if( bbObject.good() ) {
-			this->objects.push_back( bbObject );
-			return bbObject;
-		}
-		
-		return NULL;
-	}
-
 	namespace Utility {
 		static void stackDump( lua_State* L ) {
 			  int i;
