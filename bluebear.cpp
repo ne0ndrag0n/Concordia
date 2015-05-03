@@ -13,49 +13,51 @@ extern "C" {
 	#include "lauxlib.h"
 }
 
-BlueBear::Engine::Engine() {
-	L = luaL_newstate();
-	luaL_openlibs( L );
-}
-
-BlueBear::Engine::~Engine() {
-	lua_close( L );
-}
-
-BlueBear::BBObject::BBObject( const char* fileName ) {
-	this->fileName = fileName;
-	this->fileContents = NULL;
-
-	std::ifstream fileStream( fileName );
-	if( fileStream.good() ) {
-		std::string content( 
-			( std::istreambuf_iterator< char >( fileStream ) ),
-			( std::istreambuf_iterator< char >()    	     ) 
-		);
-		this->fileContents = content.c_str();
+namespace BlueBear {
+	
+	Engine::Engine() {
+		L = luaL_newstate();
+		luaL_openlibs( L );
 	}
 	
-	fileStream.close();
-}
-
-bool BlueBear::BBObject::good() {
-	return this->fileContents != NULL;
-}
-
-const char* BlueBear::BBObject::getFileContents() {
-	return this->fileContents;
-}
-
-/**
- * Instantiate a BlueBear BBObject and add it to the vector
- */
-BlueBear::BBObject BlueBear::Engine::getObjectFromFile( const char* fileName ) {
-	BlueBear::BBObject bbObject( fileName );
-	
-	if( bbObject.good() ) {
-		this->objects.push_back( bbObject );
-		return bbObject;
+	Engine::~Engine() {
+		lua_close( L );
 	}
 	
-	return NULL;
+	BBObject::BBObject( const char* fileName ) {
+		this->fileName = fileName;
+		this->fileContents = NULL;
+
+		std::ifstream fileStream( fileName );
+		if( fileStream.good() ) {
+			std::string content( 
+				( std::istreambuf_iterator< char >( fileStream ) ),
+				( std::istreambuf_iterator< char >()    	     ) 
+			);
+			this->fileContents = content.c_str();
+		}
+		
+		fileStream.close();
+	}
+	
+	
+	bool BBObject::good() {
+		return this->fileContents != NULL;
+	}
+	
+	const char* BBObject::getFileContents() {
+		return this->fileContents;
+	}
+
+	BBObject Engine::getObjectFromFile( const char* fileName ) {
+		BlueBear::BBObject bbObject( fileName );
+		
+		if( bbObject.good() ) {
+			this->objects.push_back( bbObject );
+			return bbObject;
+		}
+		
+		return NULL;
+	}
+
 }

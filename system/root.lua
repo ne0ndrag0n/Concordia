@@ -1,4 +1,5 @@
 -- Provides the root environment for Lua scripts within the BlueBear engine
+-- DO NOT MODIFY THIS FILE
 
 _bbobjects = {};
 
