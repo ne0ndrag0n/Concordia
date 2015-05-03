@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <cstdio>
 #include <fstream>
 #define INITIAL_SQVM_STACK_SIZE 1024
 
@@ -40,6 +41,9 @@ namespace BlueBear {
 			BlueBear::BBObject getObjectFromFile( const char* fileName );
 	};
 	
+	namespace Utility {
+		static void stackDump( lua_State* L );
+	};
 }
 
 #endif
