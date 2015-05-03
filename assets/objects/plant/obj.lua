@@ -56,7 +56,7 @@ local flowers = {
 	end,
 	
 	-- This function will run when the object is scheduled to update its status.
-	main = function( self, lot ) {
+	main = function( self, lot ) 
 		if self.water_level = 0 && self.dead == false
 			self.props.AESTHETIC_SCORE = -50
 			bluebear.set_object_image_state( "mipani_flowers", self.assets.image.FLOWERS_DEAD )
@@ -71,7 +71,7 @@ local flowers = {
 		
 		-- Do not re-execute for at least 43200 game ticks (12 simulated game hours)
 		return 43200
-	}
+	end
 }
 
 
