@@ -12,6 +12,8 @@ extern "C" {
 	#include "lauxlib.h"
 }
 
+#define BLUEBEAR_OBJECTS_DIRECTORY "assets/objects/"
+
 /**
  * BlueBear objects
  *
@@ -27,10 +29,13 @@ namespace BlueBear {
 			Engine();
 			~Engine();
 			bool setupRootEnvironment();
+			void objectLoop();
 	};
 	
 	namespace Utility {
 		static void stackDump( lua_State* L );
+		
+		std::vector< std::string > getSubdirectoryList( const char* rootSubDirectory );
 	};
 }
 

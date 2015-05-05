@@ -1,11 +1,16 @@
 #include "bluebear.hpp"
 #include <cstdio>
 #include <cstdarg>
+#include <cstring>
 #include <fstream>
 #include <iterator>
 #include <string>
 #include <vector>
 #include <iostream>
+#include <algorithm>
+
+// Not X-Platform
+#include <dirent.h>
 
 extern "C" {
 	#include "lua.h"
@@ -35,10 +40,27 @@ namespace BlueBear {
 			return false;
 		}
 		
+		// Setup the root environment by loading in and "class-ifying" all objects used by the game
+		
+		// Gets a list of all directories in the "assets/objects" folder. Each folder holds everything required for a BlueBear object.
+		std::vector< std::string > directories = Utility::getSubdirectoryList( BLUEBEAR_OBJECTS_DIRECTORY );
+		
+		// For each of these subdirectories, do the obj.lua file within our lua scope
+		for ( std::vector< std::string >::iterator directory = directories.begin(); directory != directories.end(); directory++ ) {
+			std::string scriptPath = BLUEBEAR_OBJECTS_DIRECTORY + *directory + "/obj.lua";
+			if( luaL_dofile( L, scriptPath.c_str() ) ) {
+				printf( "Error in BlueBear object: %s\n", lua_tostring( L, -1 ) );
+			}
+		}
+		
 		return true;
 	}
 	
 	namespace Utility {
+		
+		/**
+		 * Dump the Lua stack out to terminal
+		 */
 		static void stackDump( lua_State* L ) {
 			  int i;
 			  int top = lua_gettop(L);
@@ -66,6 +88,36 @@ namespace BlueBear {
 				printf("  ");  /* put a separator */
 			  }
 			  printf("\n");  /* end the listing */
+		}
+		
+		/**
+		 * @noxplatform
+		 * 
+		 * Gets a collection of subdirectories for the given directory
+		 */
+		std::vector< std::string > getSubdirectoryList( const char* rootSubDirectory ) {
+			std::vector< std::string > directories;
+			
+			DIR *dir = opendir( rootSubDirectory );
+
+			struct dirent* entry = readdir( dir );
+
+			while ( entry != NULL ) {
+				if ( entry->d_type == DT_DIR && strcmp( entry->d_name, "." ) != 0 && strcmp( entry->d_name, ".." ) != 0 )
+					directories.push_back( entry->d_name );
+					
+				entry = readdir( dir );
+			}
+
+			
+			return directories;
+		}
+		
+		/**
+		 * Used for testing purposes 
+		 */
+		void simpleStringPrinter( std::string string ) {
+			std::cerr << string << std::endl; 
 		}
 	}
 }

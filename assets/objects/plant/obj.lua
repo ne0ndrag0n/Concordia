@@ -3,11 +3,18 @@
 -- Objects must take the form of a table passed to bluebear.register_object with at least the following properties:
 -- init: This function is run when the object is first placed on the lot. Sets crucial attributes about the object
 -- main: This function is called when the object is due to be refreshed. It returns the amount to sleep for at least, in world seconds.
+-- catalog: This table contains the catalog properties (must contain at least name, description, price)
 -- The following are optional properties
 -- actions: If not nil, a table of actions taking the form { label, condition, action } where label is the pie menu label, condition is when the option appears, and action is the action taken
 local flowers = {
 
 	water_level = nil,
+
+	catalog = {
+		name = "bluebear flowers",
+		description = "these are bluebear flowers",
+		price = 19.99
+	},
 
 	actions = {
 		{
@@ -40,7 +47,7 @@ local flowers = {
 	
 	-- This function will run when the object is scheduled to update its status.
 	main = function( self, lot ) 
-		if self.water_level > 0 
+		if self.water_level > 0 then
 			self.water_level = self.water_level - 10
 		end
 		
