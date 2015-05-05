@@ -6,6 +6,7 @@
 -- catalog: This table contains the catalog properties (must contain at least name, description, price)
 -- The following are optional properties
 -- actions: If not nil, a table of actions taking the form { label, condition, action } where label is the pie menu label, condition is when the option appears, and action is the action taken
+-- marshal/unmarshal: save and load a table that sets the object state when the game is saved or loaded
 local flowers = {
 
 	water_level = nil,
@@ -53,9 +54,22 @@ local flowers = {
 		
 		-- Do not re-execute for at least 43200 game ticks (12 simulated game hours)
 		return 43200
+	end,
+	
+	marshal = function( self )
+		local state = {
+			water_level = self.water_level
+		}
+		
+		return state
+	end,
+	
+	unmarshal = function( self, data ) 
+		self.water_level = data.water_level
 	end
 }
 
 
 -- Register your object by calling register_object on the global bluebear object, and passing in the table containing the required values
+-- BlueBear enforces unique object names in a convention: author.object
 bluebear.register_object( "mipani.flowers", flowers )
