@@ -12,11 +12,7 @@ end
 _bbobjects = {};
 
 --[[
-	Object "instances" that are used by the currently loaded lot go here. They take the following form:
-	{
-		instance = <table> The encapsulated bbobject from _bbobjects
-		deadline = <number> The number of ticks this main function is due to repeat at
-	}
+	Object "instances" that are used by the currently loaded lot go here
 ]]--
 _lotobjects = {};
 
