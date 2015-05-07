@@ -22,6 +22,7 @@ extern "C" {
 namespace BlueBear {
 
 	class Engine {
+		
 		private:
 			lua_State* L;
 
@@ -30,13 +31,15 @@ namespace BlueBear {
 			~Engine();
 			bool setupRootEnvironment();
 			void objectLoop();
+		
 	};
-	
+
 	namespace Utility {
 		static void stackDump( lua_State* L );
 		
 		std::vector< std::string > getSubdirectoryList( const char* rootSubDirectory );
 	};
+	
 }
 
 #endif
