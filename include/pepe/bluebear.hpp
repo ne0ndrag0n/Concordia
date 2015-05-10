@@ -21,6 +21,8 @@ extern "C" {
  */
 namespace BlueBear {
 
+	enum TerrainType { TERRAIN_GRASS, TERRAIN_DIRT, TERRAIN_SNOW, TERAIN_SAND, TERRAIN_MOON };
+
 	class Engine {
 		
 		private:
@@ -30,8 +32,7 @@ namespace BlueBear {
 			Engine();
 			~Engine();
 			bool setupRootEnvironment();
-			void objectLoop();
-		
+					
 	};
 
 	namespace Utility {
