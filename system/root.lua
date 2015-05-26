@@ -84,6 +84,10 @@ bluebear = {
 		-- Slap the class into the _bbobjects table, a central registry of all objects available to the game
 		_bbobjects[ identifier ] = object_table
 		print( "Loaded object "..identifier )
+	end,
+	
+	_serialize = function( table ) 
+	
 	end
 
 };
