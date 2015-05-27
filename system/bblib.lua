@@ -18,9 +18,12 @@ _bblib = {
 			-- get key by starting at cursor, breaking out when we see a null terminator
 			local key = ""
 			
-			for cursor = cursor, #bytes do
-				local c = bytes:sub( cursor, cursor )
-				if c == "\x00" then break end
+			for i = cursor, #bytes do
+				local c = bytes:sub( i, i )
+				if c == "\x00" then
+					cursor = i
+					break
+				end
 				key = key..c
 			end
 			cursor = cursor + 1
@@ -36,13 +39,16 @@ _bblib = {
 			elseif signal == "\x01" or signal == "\x02" then
 				-- type number or string
 				value = ""
-				for cursor = cursor, #bytes do
-					local c = bytes:sub( cursor, cursor )
-					if c == "\x00" then break end
+				for i = cursor, #bytes do
+					local c = bytes:sub( i, i )
+					if c == "\x00" then
+						cursor = i
+						break
+					end
 					value = value..c
 				end
 				cursor = cursor + 1
-				
+
 				-- if we got here from a number, convert it to number type. else, leave it go!
 				if signal == "\x01" then
 					value = tonumber( value )
