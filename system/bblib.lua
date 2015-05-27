@@ -1,5 +1,7 @@
 _bblib = {
-	serialise_table = function( table ) 
-	
+	serialise = function( table, content ) 
+		local table_count
+		
+		
 	end
 };

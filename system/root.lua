@@ -1,7 +1,7 @@
 -- Provides the root environment for Lua scripts within the BlueBear engine
 -- DO NOT MODIFY THIS FILE, or else everything will get goofy
 
-dofile( 'system/bblib.lua' )
+dofile( "system/bblib.lua" )
 
 function string:split(sep)
 	local sep, fields = sep or ":", {}
