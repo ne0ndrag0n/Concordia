@@ -1,6 +1,8 @@
 -- Provides the root environment for Lua scripts within the BlueBear engine
 -- DO NOT MODIFY THIS FILE, or else everything will get goofy
 
+dofile( 'system/bblib.lua' )
+
 function string:split(sep)
 	local sep, fields = sep or ":", {}
 	local pattern = string.format("([^%s]+)", sep)
@@ -84,10 +86,6 @@ bluebear = {
 		-- Slap the class into the _bbobjects table, a central registry of all objects available to the game
 		_bbobjects[ identifier ] = object_table
 		print( "Loaded object "..identifier )
-	end,
-	
-	_serialize = function( table ) 
-	
 	end
 
 };
