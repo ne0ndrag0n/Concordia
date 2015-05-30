@@ -11,8 +11,8 @@ local flowers = {
 
 	-- Don't specify this manually: this represents what the BlueBear VM adds to every object
 	_sys = {
-		-- Object execution deadline
-		_deadline = nil
+		-- Object execution schedule
+		_schedule = nil
 	},
 
 	water_level = nil,

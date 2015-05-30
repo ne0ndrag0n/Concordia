@@ -13,7 +13,11 @@ int main() {
 	
 	if ( !engine.setupRootEnvironment() ) {
 		std::cerr << "Failed to load BlueBear!" << std::endl;
+		return 1;
 	}
+	
+	// Setup a loop!
+	engine.objectLoop();
 	
 	return 0;
 }

@@ -56,6 +56,13 @@ namespace BlueBear {
 		return true;
 	}
 	
+	/**
+	 * Where the magic happens 
+	 */
+	void Engine::objectLoop() {
+		
+	}
+	
 	namespace Utility {
 		
 		/**
