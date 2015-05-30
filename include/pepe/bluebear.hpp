@@ -36,31 +36,18 @@ namespace BlueBear {
 		
 	};
 	
-	class Floor {
-		
-		private:
-			std::vector< Object > objects;
-		
-		public:
-			Floor();
-			~Floor();
-			std::vector< Object > getObjects();
-		
-	};
-	
 	class Lot {
 		
 		private:
 			int floorX;
 			int floorY;
 			int undergroundStories;
-			std::vector< Floor > floors;
+			std::vector< Object > objects;
 			TerrainType terrainType;
 		
 		public:
 			Lot();
 			~Lot();
-			std::vector< Floor > getFloors();
 
 	};
 
@@ -75,6 +62,7 @@ namespace BlueBear {
 			Engine();
 			~Engine();
 			bool setupRootEnvironment();
+			void objectLoop();
 					
 	};
 
