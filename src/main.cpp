@@ -15,7 +15,7 @@ int main() {
 		std::cerr << "Failed to load BlueBear!" << std::endl;
 		return 1;
 	}
-	
+
 	// Load a lot object
 	engine.loadLot( "lots/lot01.bbl" );
 	

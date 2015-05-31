@@ -1,4 +1,5 @@
 #include "bluebear.hpp"
+#include "bbtypes.hpp"
 #include <cstdio>
 #include <cstdarg>
 #include <cstring>
@@ -56,7 +57,7 @@ namespace BlueBear {
 		return true;
 	}
 	
-	void loadLot( const char* lotPath ) {
+	void Engine::loadLot( const char* lotPath ) {
 		
 	}
 	
