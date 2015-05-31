@@ -17,10 +17,10 @@ int main() {
 	}
 
 	// Load a lot object
-	engine.loadLot( "lots/lot01.bbl" );
-	
-	// Setup a loop!
-	engine.objectLoop();
+	if( engine.loadLot( "lots/lot01.bbl" ) ) {
+		// Setup a loop!
+		engine.objectLoop();
+	}
 	
 	return 0;
 }

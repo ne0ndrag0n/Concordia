@@ -1,5 +1,4 @@
 #include "bluebear.hpp"
-#include "bbtypes.hpp"
 #include <cstdio>
 #include <cstdarg>
 #include <cstring>
@@ -9,6 +8,7 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
+#include <cstdint>
 
 // Not X-Platform
 #include <dirent.h>
@@ -57,18 +57,62 @@ namespace BlueBear {
 		return true;
 	}
 	
-	void Engine::loadLot( const char* lotPath ) {
+	bool Engine::loadLot( const char* lotPath ) {
+		std::ifstream lot( lotPath, std::ifstream::binary );
 		
+		if( lot.is_open() && lot.good() ) {
+			// Read in unsigned int and verify magic ID
+			uint32_t magicID;
+			lot.read( ( char* )&magicID, 4 );
+			
+			if( Utility::swap_uint32( magicID ) == BLUEBEAR_LOT_MAGIC_ID ) {
+				std::cout << "Valid BlueBear lot.\n";
+				return true;
+			} else {
+				std::cout << "This doesn't appear to be a valid BlueBear lot.\n";
+			}
+		}
+		
+		std::cerr << "Couldn't load lot!\n";
+		return false;
 	}
 	
 	/**
 	 * Where the magic happens 
 	 */
 	void Engine::objectLoop() {
+		std::cout << "Starting object loop...\n";
+	}
+	
+	Lot::Lot( int floorX, int floorY, int stories, int undergroundStories, BlueBear::TerrainType terrainType ) {
+		this->floorX = floorX;
+		this->floorY = floorY;
 		
+		this->stories = stories;
+		this->undergroundStories = undergroundStories;
+		
+		this->terrainType = terrainType;
 	}
 	
 	namespace Utility {
+		
+		uint16_t swap_uint16( uint16_t val ) {
+			return (val << 8) | (val >> 8 );
+		}
+
+		int16_t swap_int16( int16_t val ) {
+			return (val << 8) | ((val >> 8) & 0xFF);
+		}
+
+		uint32_t swap_uint32( uint32_t val ) {
+			val = ((val << 8) & 0xFF00FF00 ) | ((val >> 8) & 0xFF00FF ); 
+			return (val << 16) | (val >> 16);
+		}
+
+		int32_t swap_int32( int32_t val ) {
+			val = ((val << 8) & 0xFF00FF00) | ((val >> 8) & 0xFF00FF ); 
+			return (val << 16) | ((val >> 16) & 0xFFFF);
+		}
 		
 		/**
 		 * Dump the Lua stack out to terminal

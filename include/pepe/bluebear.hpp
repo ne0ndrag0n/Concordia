@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <cstdio>
+#include <cstdint>
 #include <fstream>
 
 extern "C" {
@@ -13,6 +14,7 @@ extern "C" {
 }
 
 #define BLUEBEAR_OBJECTS_DIRECTORY "assets/objects/"
+#define BLUEBEAR_LOT_MAGIC_ID 		0x42424C54
 
 /**
  * BlueBear objects
@@ -38,16 +40,16 @@ namespace BlueBear {
 	
 	class Lot {
 		
+		public:
+			Lot( int floorX, int floorY, int stories, int undergroundStories, TerrainType terrainType );
+			
 		private:
 			int floorX;
 			int floorY;
+			int stories;
 			int undergroundStories;
 			std::vector< Object > objects;
 			TerrainType terrainType;
-		
-		public:
-			Lot();
-			~Lot();
 
 	};
 
@@ -63,13 +65,17 @@ namespace BlueBear {
 			~Engine();
 			bool setupRootEnvironment();
 			void objectLoop();
-			void loadLot( const char* lotPath );
+			bool loadLot( const char* lotPath );
 					
 	};
 
 	namespace Utility {
-		static void stackDump( lua_State* L );
 		
+		uint16_t swap_uint16( uint16_t val );
+		int16_t swap_int16( int16_t val );
+		uint32_t swap_uint32( uint32_t val );
+		int32_t swap_int32( int32_t val );
+		static void stackDump( lua_State* L );
 		std::vector< std::string > getSubdirectoryList( const char* rootSubDirectory );
 	};
 	
