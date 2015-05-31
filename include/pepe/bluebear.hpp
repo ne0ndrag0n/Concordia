@@ -63,6 +63,7 @@ namespace BlueBear {
 			~Engine();
 			bool setupRootEnvironment();
 			void objectLoop();
+			void loadLot( const char* lotPath );
 					
 	};
 

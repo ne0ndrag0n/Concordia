@@ -56,6 +56,10 @@ namespace BlueBear {
 		return true;
 	}
 	
+	void loadLot( const char* lotPath ) {
+		
+	}
+	
 	/**
 	 * Where the magic happens 
 	 */

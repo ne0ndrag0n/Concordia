@@ -16,6 +16,9 @@ int main() {
 		return 1;
 	}
 	
+	// Load a lot object
+	engine.loadLot( "lots/lot01.bbl" );
+	
 	// Setup a loop!
 	engine.objectLoop();
 	
