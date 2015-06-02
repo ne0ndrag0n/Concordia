@@ -61,12 +61,15 @@ namespace BlueBear {
 		std::ifstream lot( lotPath, std::ifstream::binary );
 		
 		if( lot.is_open() && lot.good() ) {
-			// Read in unsigned int and verify magic ID
-			uint32_t magicID;
-			lot.read( ( char* )&magicID, 4 );
+			BlueBear::BBLTLotHeader lotHeader;
+			lot.read( ( char* )&lotHeader, 10 );
 			
-			if( Utility::swap_uint32( magicID ) == BLUEBEAR_LOT_MAGIC_ID ) {
-				std::cout << "Valid BlueBear lot.\n";
+			if( Utility::swap_uint32( lotHeader.magicID ) == BLUEBEAR_LOT_MAGIC_ID ) {
+				std::cout << 
+					"Valid BlueBear lot.\nLot version: " << (int)lotHeader.formatRevision << "\n" <<
+					"Lot X dimension: " << (int)lotHeader.lotX << "\n" << 
+					"Lot Y dimension: " << (int)lotHeader.lotY << "\n";
+				this->currentLot = new BlueBear::Lot();
 				return true;
 			} else {
 				std::cout << "This doesn't appear to be a valid BlueBear lot.\n";
@@ -82,6 +85,10 @@ namespace BlueBear {
 	 */
 	void Engine::objectLoop() {
 		std::cout << "Starting object loop...\n";
+	}
+	
+	Lot::Lot() {
+		
 	}
 	
 	Lot::Lot( int floorX, int floorY, int stories, int undergroundStories, BlueBear::TerrainType terrainType ) {

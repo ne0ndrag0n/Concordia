@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <cstdint>
 #include <fstream>
+#include <cstdint>
 
 extern "C" {
 	#include "lua.h"
@@ -41,9 +42,8 @@ namespace BlueBear {
 	class Lot {
 		
 		public:
+			Lot();
 			Lot( int floorX, int floorY, int stories, int undergroundStories, TerrainType terrainType );
-			
-		private:
 			int floorX;
 			int floorY;
 			int stories;
@@ -68,6 +68,21 @@ namespace BlueBear {
 			bool loadLot( const char* lotPath );
 					
 	};
+	
+	typedef struct {
+		
+		uint32_t magicID;
+		uint8_t formatRevision;
+		
+		uint8_t lotX;
+		uint8_t lotY;
+		
+		uint8_t numStories;
+		uint8_t basementStories;
+		
+		uint8_t terrainType;
+		
+	} BBLTLotHeader;
 
 	namespace Utility {
 		
