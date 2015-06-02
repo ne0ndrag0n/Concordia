@@ -66,10 +66,16 @@ namespace BlueBear {
 			
 			if( Utility::swap_uint32( lotHeader.magicID ) == BLUEBEAR_LOT_MAGIC_ID ) {
 				std::cout << 
-					"Valid BlueBear lot.\nLot version: " << (int)lotHeader.formatRevision << "\n" <<
-					"Lot X dimension: " << (int)lotHeader.lotX << "\n" << 
-					"Lot Y dimension: " << (int)lotHeader.lotY << "\n";
-				this->currentLot = new BlueBear::Lot();
+					"Valid BlueBear lot.\nLot version: " << ( int )lotHeader.formatRevision << "\n" <<
+					"Lot X dimension: " << ( int )lotHeader.lotX << "\n" << 
+					"Lot Y dimension: " << ( int )lotHeader.lotY << "\n";
+				this->currentLot = new BlueBear::Lot(
+					( int )lotHeader.lotX,
+					( int )lotHeader.lotY,
+					( int )lotHeader.numStories,
+					( int )lotHeader.undergroundStories,
+					static_cast< BlueBear::TerrainType >( lotHeader.terrainType )
+				);
 				return true;
 			} else {
 				std::cout << "This doesn't appear to be a valid BlueBear lot.\n";

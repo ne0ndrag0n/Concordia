@@ -78,7 +78,7 @@ namespace BlueBear {
 		uint8_t lotY;
 		
 		uint8_t numStories;
-		uint8_t basementStories;
+		uint8_t undergroundStories;
 		
 		uint8_t terrainType;
 		
