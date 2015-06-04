@@ -16,7 +16,7 @@ _bbobjects = {};
 --[[
 	Object "instances" that are used by the currently loaded lot go here
 ]]--
-_lotobjects = {};
+_lotinsts = {};
 
 bluebear = {
 

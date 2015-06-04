@@ -33,8 +33,6 @@ namespace BlueBear {
 			long nextExecution;
 		
 		public:
-			Object();
-			~Object();
 			void execute( long worldTicks );
 		
 	};
@@ -48,7 +46,7 @@ namespace BlueBear {
 			int floorY;
 			int stories;
 			int undergroundStories;
-			std::vector< Object > objects;
+			std::vector< BlueBear::Object > objects;
 			TerrainType terrainType;
 
 	};
@@ -57,6 +55,7 @@ namespace BlueBear {
 		
 		private:
 			lua_State* L;
+			std::vector< BlueBear::Object > objects;
 			long startTicks;
 			Lot* currentLot;
 			bool verifyODT( std::vector< std::string > odt );

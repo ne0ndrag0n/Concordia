@@ -9,17 +9,11 @@
 -- marshal/unmarshal: save and load a table that sets the object state when the game is saved or loaded
 local flowers = {
 
-	-- Don't specify this manually: this represents what the BlueBear VM adds to every object
-	_sys = {
-		-- Object execution schedule
-		_schedule = nil
-	},
-
 	water_level = nil,
 
 	catalog = {
-		name = "bluebear flowers",
-		description = "these are bluebear flowers",
+		name = "Testico Violets",
+		description = "Plant these beautiful flowers into your home!",
 		price = 19.99
 	},
 

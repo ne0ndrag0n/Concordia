@@ -102,6 +102,13 @@ namespace BlueBear {
 					std::cout << "An object in this lot does not exist in the global ODT!" << std::endl;
 					return false;
 				}
+				
+				// Get size of the OIT
+				uint32_t oitSize;
+				lot.read( ( char* )&oitSize, 4 );
+				oitSize = Utility::swap_uint32( oitSize );
+
+				
 
 				return true;
 			} else {
@@ -124,12 +131,18 @@ namespace BlueBear {
 		
 		// Push _bbobjects onto Lua API stack
 		lua_getglobal( this->L, "_bbobjects" );
-		
-		std::cout << odt.size() << std::endl;
-		
+
 		for ( std::vector< std::string >::iterator odtEntry = odt.begin(); odtEntry != odt.end(); odtEntry++ ) {
-			std::cout << *odtEntry << std::endl;
+			Utility::getTableValue( this->L, odtEntry->c_str() );
+			if( !lua_istable( this->L, -1 ) ) {
+				std::cout << "Not a table!" << std::endl;
+				lua_pop( L, 1 );
+				return false;
+			}
+			lua_pop( L, 1 );
 		}
+		
+		return true;
 	}
 	
 	/**
