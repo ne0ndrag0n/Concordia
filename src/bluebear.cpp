@@ -91,14 +91,17 @@ namespace BlueBear {
 				// Create ODT table
 				char* odtPtr = odt;
 				int index = 0;
-				do {
+				while ( index < static_cast< int >( odtSize ) ) {
 					objectIDs.push_back( std::string( odtPtr ) );
 					index = index + objectIDs.back().size() + 1;
 					odtPtr += objectIDs.back().size() + 1;
-				} while ( index <= static_cast< int >( odtSize ) );
+				}
 				
 				// Verify each object exists
-				
+				if( !( this->verifyODT( objectIDs ) ) ) {
+					std::cout << "An object in this lot does not exist in the global ODT!" << std::endl;
+					return false;
+				}
 
 				return true;
 			} else {
@@ -111,12 +114,22 @@ namespace BlueBear {
 	}
 	
 	/**
+	 * @private
 	 * Verify that the Object Definition Table entries have corresponding objects in the Luasphere
 	 * 
 	 * @param		{std::vector< std::string >}	odt		The object definition table
 	 */
 	bool Engine::verifyODT( std::vector< std::string > odt ) {
+		Utility::clearLuaStack( this->L );
 		
+		// Push _bbobjects onto Lua API stack
+		lua_getglobal( this->L, "_bbobjects" );
+		
+		std::cout << odt.size() << std::endl;
+		
+		for ( std::vector< std::string >::iterator odtEntry = odt.begin(); odtEntry != odt.end(); odtEntry++ ) {
+			std::cout << *odtEntry << std::endl;
+		}
 	}
 	
 	/**
@@ -213,6 +226,18 @@ namespace BlueBear {
 
 			
 			return directories;
+		}
+		
+		void clearLuaStack( lua_State* L ) {
+			lua_settop( L, 0 );
+		}
+	
+		void getTableValue( lua_State* L, const char* key ) {
+			// Push the desired key onto the stack
+			lua_pushstring( L, key );
+			
+			// Push table[key] onto the stack
+			lua_gettable( L, -2 );
 		}
 	}
 }

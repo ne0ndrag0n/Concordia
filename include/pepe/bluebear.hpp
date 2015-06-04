@@ -59,6 +59,7 @@ namespace BlueBear {
 			lua_State* L;
 			long startTicks;
 			Lot* currentLot;
+			bool verifyODT( std::vector< std::string > odt );
 
 		public:
 			Engine();
@@ -85,13 +86,21 @@ namespace BlueBear {
 	} BBLTLotHeader;
 
 	namespace Utility {
-		
 		uint16_t swap_uint16( uint16_t val );
+
 		int16_t swap_int16( int16_t val );
+
 		uint32_t swap_uint32( uint32_t val );
+
 		int32_t swap_int32( int32_t val );
+
 		static void stackDump( lua_State* L );
+
 		std::vector< std::string > getSubdirectoryList( const char* rootSubDirectory );
+
+		void clearLuaStack( lua_State* L );
+
+		void getTableValue( lua_State* L, const char* key );
 	};
 	
 }
