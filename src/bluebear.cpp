@@ -57,6 +57,9 @@ namespace BlueBear {
 		return true;
 	}
 	
+	/**
+	 * Load a lot
+	 */ 
 	bool Engine::loadLot( const char* lotPath ) {
 		std::ifstream lot( lotPath, std::ifstream::binary );
 		
@@ -85,6 +88,7 @@ namespace BlueBear {
 				lot.read( odt, static_cast< int >( odtSize ) );
 				std::vector< std::string > objectIDs;
 				
+				// Create ODT table
 				char* odtPtr = odt;
 				int index = 0;
 				do {
@@ -93,7 +97,8 @@ namespace BlueBear {
 					odtPtr += objectIDs.back().size() + 1;
 				} while ( index <= static_cast< int >( odtSize ) );
 				
-						
+				// Verify each object exists
+				
 
 				return true;
 			} else {
@@ -103,6 +108,15 @@ namespace BlueBear {
 		
 		std::cerr << "Couldn't load lot!\n";
 		return false;
+	}
+	
+	/**
+	 * Verify that the Object Definition Table entries have corresponding objects in the Luasphere
+	 * 
+	 * @param		{std::vector< std::string >}	odt		The object definition table
+	 */
+	bool Engine::verifyODT( std::vector< std::string > odt ) {
+		
 	}
 	
 	/**
