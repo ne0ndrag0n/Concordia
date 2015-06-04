@@ -65,17 +65,36 @@ namespace BlueBear {
 			lot.read( ( char* )&lotHeader, 10 );
 			
 			if( Utility::swap_uint32( lotHeader.magicID ) == BLUEBEAR_LOT_MAGIC_ID ) {
-				std::cout << 
-					"Valid BlueBear lot.\nLot version: " << ( int )lotHeader.formatRevision << "\n" <<
-					"Lot X dimension: " << ( int )lotHeader.lotX << "\n" << 
-					"Lot Y dimension: " << ( int )lotHeader.lotY << "\n";
+				
+				// Instantiate the lot
 				this->currentLot = new BlueBear::Lot(
-					( int )lotHeader.lotX,
-					( int )lotHeader.lotY,
-					( int )lotHeader.numStories,
-					( int )lotHeader.undergroundStories,
+					static_cast< int >( lotHeader.lotX ),
+					static_cast< int >( lotHeader.lotY ),
+					static_cast< int >( lotHeader.numStories ),
+					static_cast< int >( lotHeader.undergroundStories ),
 					static_cast< BlueBear::TerrainType >( lotHeader.terrainType )
 				);
+				
+				// Load length of Object Definition Table (ODT)
+				uint32_t odtSize;
+				lot.read( ( char* )&odtSize, 4 );
+				odtSize = Utility::swap_uint32( odtSize );
+
+				// Read in the ODT
+				char odt[ odtSize ] = { 0 };
+				lot.read( odt, static_cast< int >( odtSize ) );
+				std::vector< std::string > objectIDs;
+				
+				char* odtPtr = odt;
+				int index = 0;
+				do {
+					objectIDs.push_back( std::string( odtPtr ) );
+					index = index + objectIDs.back().size() + 1;
+					odtPtr += objectIDs.back().size() + 1;
+				} while ( index <= static_cast< int >( odtSize ) );
+				
+						
+
 				return true;
 			} else {
 				std::cout << "This doesn't appear to be a valid BlueBear lot.\n";
@@ -180,13 +199,6 @@ namespace BlueBear {
 
 			
 			return directories;
-		}
-		
-		/**
-		 * Used for testing purposes 
-		 */
-		void simpleStringPrinter( std::string string ) {
-			std::cerr << string << std::endl; 
 		}
 	}
 }
