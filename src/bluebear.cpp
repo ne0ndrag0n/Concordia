@@ -65,7 +65,7 @@ namespace BlueBear {
 		
 		if( lot.is_open() && lot.good() ) {
 			BlueBear::BBLTLotHeader lotHeader;
-			lot.read( ( char* )&lotHeader, 10 );
+			lot.read( reinterpret_cast< char* >( &lotHeader ), 10 );
 			
 			if( Utility::swap_uint32( lotHeader.magicID ) == BLUEBEAR_LOT_MAGIC_ID ) {
 				
@@ -80,7 +80,7 @@ namespace BlueBear {
 				
 				// Load length of Object Definition Table (ODT)
 				uint32_t odtSize;
-				lot.read( ( char* )&odtSize, 4 );
+				lot.read( reinterpret_cast< char* >( &odtSize ), 4 );
 				odtSize = Utility::swap_uint32( odtSize );
 
 				// Read in the ODT
@@ -105,7 +105,7 @@ namespace BlueBear {
 				
 				// Get size of the OIT
 				uint32_t oitSize;
-				lot.read( ( char* )&oitSize, 4 );
+				lot.read( reinterpret_cast< char* >( &oitSize ), 4 );
 				oitSize = Utility::swap_uint32( oitSize );
 
 				
