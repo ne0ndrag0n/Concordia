@@ -90,8 +90,8 @@ namespace BlueBear {
 				
 				// Create ODT table
 				char* odtPtr = odt;
-				int index = 0;
-				while ( index < static_cast< int >( odtSize ) ) {
+				size_t index = 0;
+				while ( index < static_cast< size_t >( odtSize ) ) {
 					objectIDs.push_back( std::string( odtPtr ) );
 					index = index + objectIDs.back().size() + 1;
 					odtPtr += objectIDs.back().size() + 1;
