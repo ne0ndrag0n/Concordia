@@ -30,10 +30,11 @@ namespace BlueBear {
 		
 		private:
 			int luaVMInstance;
-			long nextExecution;
 		
 		public:
 			void execute( long worldTicks );
+			char* save();
+			void load( char* pickledObject );
 		
 	};
 	
