@@ -3,13 +3,6 @@
 
 dofile( "system/bblib.lua" )
 
-function string:split(sep)
-	local sep, fields = sep or ":", {}
-	local pattern = string.format("([^%s]+)", sep)
-	self:gsub(pattern, function(c) fields[#fields+1] = c end)
-	return fields
-end
-
 -- Central registry of bbobjects (not the object instances used per-lot)
 _bbobjects = {};
 
@@ -86,11 +79,7 @@ bluebear = {
 		-- Slap the class into the _bbobjects table, a central registry of all objects available to the game
 		_bbobjects[ identifier ] = object_table
 		print( "Loaded object "..identifier )
-	end,
-	
-	instantiate_object = function( id ) 
-	
 	end
-
+	
 };
 

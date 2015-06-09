@@ -28,10 +28,10 @@ namespace BlueBear {
 	
 	class Object {
 		
-		private:
-			int luaVMInstance;
-		
 		public:
+			Object( lua_State* L, const char* idKey );
+			Object( lua_State* L, const char* idKey, char* popPackage );
+			int luaVMInstance;
 			void execute( long worldTicks );
 			char* save();
 			void load( char* pickledObject );

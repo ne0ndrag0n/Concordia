@@ -21,6 +21,30 @@ extern "C" {
 
 namespace BlueBear {
 	
+	/**
+	 * Every BlueBear::Object is tied to its Lua instance in the _lotinsts table
+	 */
+	Object::Object( lua_State* L, const char* idKey, char* popPackage ) {
+		
+		// Get fresh start with the Lua stack
+		Utility::clearLuaStack( L );
+		
+		// Push _bblib onto Lua API stack
+		lua_getglobal( L, "_bblib" );
+		
+		// Get instantiate_pop method
+		Utility::getTableValue( L, "instantiate_pop" );
+		
+		// Push _bbobject key and POP package
+		lua_pushstring( L, idKey );
+		lua_pushstring( L, popPackage );
+		
+		// Call instantiate_pop
+		lua_pcall( L, 2, 0, 0 );
+		
+		// This will return a reference to the entry in _bblib - Pop and use this to store a reference to this function in this->luaVMInstance
+	}
+	
 	Engine::Engine() {
 		L = luaL_newstate();
 		luaL_openlibs( L );
@@ -59,6 +83,8 @@ namespace BlueBear {
 	
 	/**
 	 * Load a lot
+	 * 
+	 * TODO: wtf do we do with these goddamn type mismatches
 	 */ 
 	bool Engine::loadLot( const char* lotPath ) {
 		std::ifstream lot( lotPath, std::ifstream::binary );
@@ -103,10 +129,25 @@ namespace BlueBear {
 				
 				// Get size of the OIT
 				uint32_t oitSize = Utility::getuint32_t( &lot );
+				
+				this->objects.clear();
 
 				// Create BBObjects
 				for( size_t i = 0; i != oitSize; i++ ) {
+					// Each POP begins with an index of the item in the OIT
+					uint16_t odtIndex = Utility::getuint16_t( &lot );
 					
+					// This is the size of the POP
+					uint16_t popSize = Utility::getuint16_t( &lot );
+					
+					// Create POP
+					char pop[ popSize ] = { 0 };
+					lot.read( pop, static_cast< int >( popSize ) );
+					
+					// Add object to Engine objects vector
+					// BlueBear::Object instances are wrappers around the Lua instances of the object
+					BlueBear::Object obj( this->L, objectIDs.at( odtIndex ).c_str(), pop );
+					this->objects.push_back( obj );
 				}
 
 				return true;

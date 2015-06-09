@@ -1,3 +1,10 @@
+function string:split(sep)
+	local sep, fields = sep or ":", {}
+	local pattern = string.format("([^%s]+)", sep)
+	self:gsub(pattern, function(c) fields[#fields+1] = c end)
+	return fields
+end
+
 _bblib = {
 	serialise = function( table, content ) 
 		-- TODO
@@ -65,5 +72,20 @@ _bblib = {
 		end
 		
 		return tbl
+	end,
+	
+	clear_objects = function() 
+		print( "Clearing Objects..." )
+		_lotinsts = {};
+	end,
+	
+	instantiate_pop = function( id, pop ) 
+		-- Testing for now
+		_bblib.clear_objects()
+		
+		print( "Crafting object instance..........." )
+		print( id )
+		print( pop:byte( 1, 4 ) )
 	end
+
 };
