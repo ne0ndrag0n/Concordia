@@ -86,6 +86,10 @@ bluebear = {
 		-- Slap the class into the _bbobjects table, a central registry of all objects available to the game
 		_bbobjects[ identifier ] = object_table
 		print( "Loaded object "..identifier )
+	end,
+	
+	instantiate_object = function( id ) 
+	
 	end
 
 };

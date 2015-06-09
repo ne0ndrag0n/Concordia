@@ -79,9 +79,7 @@ namespace BlueBear {
 				);
 				
 				// Load length of Object Definition Table (ODT)
-				uint32_t odtSize;
-				lot.read( reinterpret_cast< char* >( &odtSize ), 4 );
-				odtSize = Utility::swap_uint32( odtSize );
+				uint32_t odtSize = Utility::getuint32_t( &lot );
 
 				// Read in the ODT
 				char odt[ odtSize ] = { 0 };
@@ -104,11 +102,12 @@ namespace BlueBear {
 				}
 				
 				// Get size of the OIT
-				uint32_t oitSize;
-				lot.read( reinterpret_cast< char* >( &oitSize ), 4 );
-				oitSize = Utility::swap_uint32( oitSize );
+				uint32_t oitSize = Utility::getuint32_t( &lot );
 
-				
+				// Create BBObjects
+				for( size_t i = 0; i != oitSize; i++ ) {
+					
+				}
 
 				return true;
 			} else {
@@ -251,6 +250,24 @@ namespace BlueBear {
 			
 			// Push table[key] onto the stack
 			lua_gettable( L, -2 );
+		}
+		
+		inline uint8_t getuint8_t( std::ifstream* istream ) {
+			uint8_t num;
+			istream->read( reinterpret_cast< char* >( &num ), 1 );
+			return num;
+		}
+		
+		inline uint16_t getuint16_t( std::ifstream* istream ) {
+			uint16_t num;
+			istream->read( reinterpret_cast< char* >( &num ), 2 );
+			return Utility::swap_uint16( num );
+		}
+		
+		inline uint32_t getuint32_t( std::ifstream* istream ) {
+			uint32_t num;
+			istream->read( reinterpret_cast< char* >( &num ), 4 );
+			return Utility::swap_uint32( num );
 		}
 	}
 }

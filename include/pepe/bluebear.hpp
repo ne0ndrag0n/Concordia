@@ -101,6 +101,12 @@ namespace BlueBear {
 		void clearLuaStack( lua_State* L );
 
 		void getTableValue( lua_State* L, const char* key );
+		
+		inline uint8_t getuint8_t( std::ifstream* istream );
+		
+		inline uint16_t getuint16_t( std::ifstream* istream );
+		
+		inline uint32_t getuint32_t( std::ifstream* istream );
 	};
 	
 }
