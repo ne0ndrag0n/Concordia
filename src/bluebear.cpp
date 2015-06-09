@@ -24,7 +24,7 @@ namespace BlueBear {
 	/**
 	 * Every BlueBear::Object is tied to its Lua instance in the _lotinsts table
 	 */
-	Object::Object( lua_State* L, const char* idKey, char* popPackage ) {
+	Object::Object( lua_State* L, const char* idKey, char* popPackage, int popSize ) {
 		
 		// Get fresh start with the Lua stack
 		Utility::clearLuaStack( L );
@@ -37,7 +37,7 @@ namespace BlueBear {
 		
 		// Push _bbobject key and POP package
 		lua_pushstring( L, idKey );
-		lua_pushstring( L, popPackage );
+		lua_pushlstring( L, popPackage, popSize );
 		
 		// Call instantiate_pop
 		lua_pcall( L, 2, 0, 0 );
@@ -146,7 +146,7 @@ namespace BlueBear {
 					
 					// Add object to Engine objects vector
 					// BlueBear::Object instances are wrappers around the Lua instances of the object
-					BlueBear::Object obj( this->L, objectIDs.at( odtIndex ).c_str(), pop );
+					BlueBear::Object obj( this->L, objectIDs.at( odtIndex ).c_str(), pop, popSize );
 					this->objects.push_back( obj );
 				}
 

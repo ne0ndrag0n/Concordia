@@ -75,7 +75,6 @@ _bblib = {
 	end,
 	
 	clear_objects = function() 
-		print( "Clearing Objects..." )
 		_lotinsts = {};
 	end,
 	
@@ -85,7 +84,7 @@ _bblib = {
 		
 		print( "Crafting object instance..........." )
 		print( id )
-		print( pop:byte( 1, 4 ) )
+		print( pop:byte( 1, 65535 ) )
 	end
 
 };

@@ -30,7 +30,7 @@ namespace BlueBear {
 		
 		public:
 			Object( lua_State* L, const char* idKey );
-			Object( lua_State* L, const char* idKey, char* popPackage );
+			Object( lua_State* L, const char* idKey, char* popPackage, int popSize );
 			int luaVMInstance;
 			void execute( long worldTicks );
 			char* save();
