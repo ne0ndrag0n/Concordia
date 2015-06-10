@@ -28,6 +28,8 @@ namespace BlueBear {
 	
 	class Object {
 		
+		private:
+			bool ok;
 		public:
 			Object( lua_State* L, const char* idKey );
 			Object( lua_State* L, const char* idKey, char* popPackage, int popSize );
@@ -35,6 +37,7 @@ namespace BlueBear {
 			void execute( long worldTicks );
 			char* save();
 			void load( char* pickledObject );
+			bool good();
 		
 	};
 	

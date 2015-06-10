@@ -70,10 +70,9 @@ bluebear = {
 		-- Table fits the expected pattern!
 		-- "Class-ify" the object_table into something we can instantiate
 		object_table.__index = object_table
-		object_table.instantiate = function() 
-			local instance = {}
-			setmetatable( instance, object_table )
-			return instance
+		object_table.new = function() 
+			local self = setmetatable( {}, object_table )
+			return self
 		end
 		
 		-- Slap the class into the _bbobjects table, a central registry of all objects available to the game

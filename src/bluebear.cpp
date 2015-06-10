@@ -40,9 +40,13 @@ namespace BlueBear {
 		lua_pushlstring( L, popPackage, popSize );
 		
 		// Call instantiate_pop
-		lua_pcall( L, 2, 0, 0 );
+		if( lua_pcall( L, 2, 1, 0 ) == 0 ) {
+			this->ok = true;
+			
+			// This will return a reference to the entry in _bblib - Pop and use this to store a reference to this function in this->luaVMInstance
+			this->luaVMInstance = luaL_ref( L, LUA_REGISTRYINDEX );
+		}
 		
-		// This will return a reference to the entry in _bblib - Pop and use this to store a reference to this function in this->luaVMInstance
 	}
 	
 	Engine::Engine() {
