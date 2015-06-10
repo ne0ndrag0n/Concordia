@@ -48,6 +48,8 @@ local flowers = {
 	
 	-- This function will run when the object is scheduled to update its status.
 	main = function( self, lot ) 
+		print( "Hello from the flowers object!" )
+	
 		if self.water_level > 0 then
 			self.water_level = self.water_level - 10
 		end

@@ -26,6 +26,9 @@ namespace BlueBear {
 	 */
 	Object::Object( lua_State* L, const char* idKey, char* popPackage, int popSize ) {
 		
+		// Store pointer to Luasphere on this object
+		this->L = L;
+		
 		// Get fresh start with the Lua stack
 		Utility::clearLuaStack( L );
 		
@@ -47,6 +50,20 @@ namespace BlueBear {
 			this->luaVMInstance = luaL_ref( L, LUA_REGISTRYINDEX );
 		}
 		
+	}
+	
+	void Object::execute( long worldTicks ) {
+		// Push this object's table onto the API stack
+		lua_rawgeti( this->L, LUA_REGISTRYINDEX, this->luaVMInstance );
+		
+		// Push the object's "main" method
+		Utility::getTableValue( this->L, "main" );
+		
+		// Re-push table onto stack as argument 
+		lua_pushvalue( this->L, -2 );
+		
+		// Run function
+		lua_pcall( this->L, 1, 0, 0 );
 	}
 	
 	Engine::Engine() {
@@ -193,7 +210,11 @@ namespace BlueBear {
 	 * Where the magic happens 
 	 */
 	void Engine::objectLoop() {
-		std::cout << "Starting object loop...\n";
+		std::cout << "Running single iteration of item in first position of this->objects...\n";
+		
+		// Get object wrapper
+		BlueBear::Object testObject = this->objects.at( 0 );
+		testObject.execute( 0 );
 	}
 	
 	Lot::Lot() {

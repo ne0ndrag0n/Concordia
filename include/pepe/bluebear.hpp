@@ -30,6 +30,7 @@ namespace BlueBear {
 		
 		private:
 			bool ok;
+			lua_State* L;
 		public:
 			Object( lua_State* L, const char* idKey );
 			Object( lua_State* L, const char* idKey, char* popPackage, int popSize );
