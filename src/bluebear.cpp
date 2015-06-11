@@ -127,7 +127,7 @@ namespace BlueBear {
 				
 				// This doesn't seem to work properly as part of the struct. don't know why, so get it separately instead
 				uint32_t lotTime = Utility::getuint32_t( &lot );
-				this->worldTicks = static_cast< int >( lotTime );
+				this->worldTicks = static_cast< unsigned int >( lotTime );
 				
 				// Load length of Object Definition Table (ODT)
 				uint32_t odtSize = Utility::getuint32_t( &lot );
