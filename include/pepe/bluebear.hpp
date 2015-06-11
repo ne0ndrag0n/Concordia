@@ -61,7 +61,7 @@ namespace BlueBear {
 		private:
 			lua_State* L;
 			std::vector< BlueBear::Object > objects;
-			long startTicks;
+			unsigned int worldTicks;
 			Lot* currentLot;
 			bool verifyODT( std::vector< std::string > odt );
 
