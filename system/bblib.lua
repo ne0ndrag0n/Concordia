@@ -97,8 +97,11 @@ _bblib = {
 		local bbobject = _bbobjects[ id ].new()
 		bbobject._cid = _bblib:get_cid()
 		
+		-- Every object has a poptable, if anything just to contain the _sys table
+		local poptable = _bblib.deserialise( pop )
+		bbobject._sys = poptable._sys
+		
 		if type( bbobject.marshal ) == "function" then
-			local poptable = _bblib.deserialise( pop )
 			bbobject:unmarshal( poptable )
 		end
 		
