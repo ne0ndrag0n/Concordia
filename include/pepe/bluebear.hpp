@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <fstream>
 #include <cstdint>
+#include <chrono>
 
 extern "C" {
 	#include "lua.h"
@@ -16,6 +17,7 @@ extern "C" {
 
 #define BLUEBEAR_OBJECTS_DIRECTORY "assets/objects/"
 #define BLUEBEAR_LOT_MAGIC_ID 		0x42424C54
+#define WORLD_TICKS_MAX				604800000
 
 /**
  * BlueBear objects

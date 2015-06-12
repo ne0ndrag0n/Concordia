@@ -100,7 +100,7 @@ _bblib = {
 		-- Every object has a poptable, if anything just to contain the _sys table
 		local poptable = _bblib.deserialise( pop )
 		bbobject._sys = poptable._sys
-		
+
 		if type( bbobject.marshal ) == "function" then
 			bbobject:unmarshal( poptable )
 		end

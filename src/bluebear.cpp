@@ -1,4 +1,6 @@
 #include "bluebear.hpp"
+#include "bbtypes.hpp"
+#include <chrono>
 #include <cstdio>
 #include <cstdarg>
 #include <cstring>
@@ -214,11 +216,16 @@ namespace BlueBear {
 	 * Where the magic happens 
 	 */
 	void Engine::objectLoop() {
-		std::cout << "Running single iteration of item in first position of this->objects...\n";
+		std::cout << "Starting world engine with a tick count of " << this->worldTicks << "\n";
+
+		for( ; this->worldTicks != 50000; this->worldTicks++ ) {
+			
+			for( std::vector< BlueBear::Object >::iterator object = this->objects.begin(); object != this->objects.end(); object++ ) {
+				object->execute( this->worldTicks );
+			}
+		}
 		
-		// Get object wrapper
-		BlueBear::Object testObject = this->objects.at( 0 );
-		testObject.execute( 0 );
+		std::cout << std::endl;
 	}
 	
 	Lot::Lot() {
