@@ -37,7 +37,7 @@ namespace BlueBear {
 			Object( lua_State* L, const char* idKey );
 			Object( lua_State* L, const char* idKey, char* popPackage, int popSize );
 			int luaVMInstance;
-			void execute( long worldTicks );
+			void execute( unsigned int worldTicks );
 			char* save();
 			void load( char* pickledObject );
 			bool good();
@@ -107,6 +107,8 @@ namespace BlueBear {
 		void clearLuaStack( lua_State* L );
 
 		void getTableValue( lua_State* L, const char* key );
+		
+		void setTableIntValue( lua_State* L, const char* key, int value );
 		
 		inline uint8_t getuint8_t( std::ifstream* istream );
 		

@@ -54,18 +54,53 @@ namespace BlueBear {
 		
 	}
 	
-	void Object::execute( long worldTicks ) {
+	void Object::execute( unsigned int worldTicks ) {
+		unsigned int nextTickSchedule;
+		
+		// Start with a fresh stack
+		Utility::clearLuaStack( this->L );
+		
 		// Push this object's table onto the API stack
 		lua_rawgeti( this->L, LUA_REGISTRYINDEX, this->luaVMInstance );
 		
-		// Push the object's "main" method
-		Utility::getTableValue( this->L, "main" );
+		// First, we need to push a reference to the _sys table
+		Utility::getTableValue( this->L, "_sys" );
 		
-		// Re-push table onto stack as argument 
-		lua_pushvalue( this->L, -2 );
+		// Next, push the value of _sched within _sys
+		Utility::getTableValue( this->L, "_sched" );
 		
-		// Run function
-		lua_pcall( this->L, 1, 0, 0 );
+		// Extract and pop int (and _sys table) from top of stack
+		nextTickSchedule = lua_tonumber( this->L, -1 );
+		lua_pop( this->L, 2 );
+		
+		// Execute only if the amount of ticks is just right (worldTicks >= nextTickSchedule)
+		if( worldTicks >= nextTickSchedule ) {
+			
+			std::cout << "Running new iteration, current worldTicks is " << worldTicks << " and this object's nextTickSchedule is " << nextTickSchedule << "\n";
+			
+			// Push the object's "main" method
+			Utility::getTableValue( this->L, "main" );
+			
+			// Re-push table onto stack as argument 
+			lua_pushvalue( this->L, -2 );
+			
+			// Run function
+			lua_pcall( this->L, 1, 1, 0 );
+			
+			// This function returns a tick amount. The next execution is current world ticks + this amount
+			// Set this object's _sys._sched to worldTicks + nextTickSchedule
+			nextTickSchedule = lua_tonumber( this->L, -1 );
+			lua_pop( this->L, 1 );
+			
+			std::cout << "Object will rerun in " << nextTickSchedule << " ticks at " << worldTicks + nextTickSchedule << "\n";
+			
+			// The function and its arguments should be popped, leaving the object itself
+			// Get the _sys table
+			Utility::getTableValue( this->L, "_sys" );
+
+			// Set the _sched value
+			Utility::setTableIntValue( this->L, "_sched", worldTicks + nextTickSchedule );
+		}
 	}
 	
 	Engine::Engine() {
@@ -327,6 +362,12 @@ namespace BlueBear {
 			
 			// Push table[key] onto the stack
 			lua_gettable( L, -2 );
+		}
+		
+		void setTableIntValue( lua_State* L, const char* key, int value ) {
+			lua_pushstring( L, key );
+			lua_pushnumber( L, (double) value );
+			lua_settable( L, -3 );
 		}
 		
 		inline uint8_t getuint8_t( std::ifstream* istream ) {
