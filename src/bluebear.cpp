@@ -56,6 +56,9 @@ namespace BlueBear {
 	
 	void Object::execute( unsigned int worldTicks ) {
 		unsigned int nextTickSchedule;
+		
+		// Clear the API stack of the Luasphere
+		Utility::clearLuaStack( this->L );
 
 		// Push this object's table onto the API stack
 		lua_rawgeti( this->L, LUA_REGISTRYINDEX, this->luaVMInstance );
@@ -259,13 +262,6 @@ namespace BlueBear {
 	}
 	
 	/**
-	 * Grab this->lotTableIndex and push it onto the stack 
-	 */
-	void Engine::pushLotTable() {
-		
-	}
-	
-	/**
 	 * Where the magic happens 
 	 */
 	void Engine::objectLoop() {
@@ -276,13 +272,7 @@ namespace BlueBear {
 
 		for( ; this->worldTicks != 50000; this->worldTicks++ ) {
 			
-			for( std::vector< BlueBear::Object >::iterator object = this->objects.begin(); object != this->objects.end(); object++ ) {
-				// Clear the API stack of the Luasphere
-				Utility::clearLuaStack( this->L );
-				
-				// Push the player and lot tables to the Luasphere API. These will be added as arguments when calling the main() function on the Luasphere object
-				this->pushLotTable();
-				
+			for( std::vector< BlueBear::Object >::iterator object = this->objects.begin(); object != this->objects.end(); object++ ) {	
 				object->execute( this->worldTicks );
 			}
 		}
