@@ -55,7 +55,7 @@ namespace BlueBear {
 			int undergroundStories;
 			std::vector< BlueBear::Object > objects;
 			TerrainType terrainType;
-			int lua_getLotObjects( lua_State* L );
+			static int lua_getLotObjects( lua_State* L );
 
 	};
 
@@ -113,6 +113,10 @@ namespace BlueBear {
 		void getTableValue( lua_State* L, const char* key );
 		
 		void setTableIntValue( lua_State* L, const char* key, int value );
+		
+		void setTableStringValue( lua_State* L, const char* key, const char* value );
+		
+		void setTableFunctionValue( lua_State* L, const char* key, lua_CFunction value );
 		
 		inline uint8_t getuint8_t( std::ifstream* istream );
 		

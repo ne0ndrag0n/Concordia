@@ -248,9 +248,14 @@ namespace BlueBear {
 	 * We do this once; create the lot table and assign it a lot instance 
 	 */
 	void Engine::createLotTable() {
-		lua_createtable( this->L, 0, 4 );
+		// Push new, blank table
+		lua_createtable( this->L, 0, 1 );
 		
+		// Grab the lua_getLotObjects function on this->currentLot and assign it to the table
+		Utility::setTableFunctionValue( this->L, "get_all_objects", this->currentLot->lua_getLotObjects );
 		
+		// Save the reference to this table 
+		this->lotTableRef = luaL_ref( L, LUA_REGISTRYINDEX );
 	}
 	
 	/**
@@ -267,6 +272,7 @@ namespace BlueBear {
 		std::cout << "Starting world engine with a tick count of " << this->worldTicks << "\n";
 		
 		// Create the lot table and store its reference
+		this->createLotTable();
 
 		for( ; this->worldTicks != 50000; this->worldTicks++ ) {
 			
@@ -400,6 +406,12 @@ namespace BlueBear {
 		void setTableStringValue( lua_State* L, const char* key, const char* value ) {
 			lua_pushstring( L, key );
 			lua_pushstring( L, value );
+			lua_settable( L, -3 );
+		}
+		
+		void setTableFunctionValue( lua_State* L, const char* key, lua_CFunction value ) {
+			lua_pushstring( L, key );
+			lua_pushcfunction( L, value );
 			lua_settable( L, -3 );
 		}
 		
