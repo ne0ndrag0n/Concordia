@@ -55,6 +55,7 @@ namespace BlueBear {
 			int undergroundStories;
 			std::vector< BlueBear::Object > objects;
 			TerrainType terrainType;
+			int lua_getLotObjects( lua_State* L );
 
 	};
 

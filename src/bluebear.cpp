@@ -277,6 +277,10 @@ namespace BlueBear {
 		this->terrainType = terrainType;
 	}
 	
+	int Lot::lua_getLotObjects( lua_State* L ) {
+		
+	}
+	
 	namespace Utility {
 		
 		uint16_t swap_uint16( uint16_t val ) {
