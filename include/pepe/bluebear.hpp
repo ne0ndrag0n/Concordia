@@ -66,7 +66,10 @@ namespace BlueBear {
 			std::vector< BlueBear::Object > objects;
 			unsigned int worldTicks;
 			Lot* currentLot;
+			int lotTableRef;
 			bool verifyODT( std::vector< std::string > odt );
+			void createLotTable();
+			void pushLotTable();
 
 		public:
 			Engine();

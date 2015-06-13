@@ -56,10 +56,7 @@ namespace BlueBear {
 	
 	void Object::execute( unsigned int worldTicks ) {
 		unsigned int nextTickSchedule;
-		
-		// Start with a fresh stack
-		Utility::clearLuaStack( this->L );
-		
+
 		// Push this object's table onto the API stack
 		lua_rawgeti( this->L, LUA_REGISTRYINDEX, this->luaVMInstance );
 		
@@ -248,14 +245,38 @@ namespace BlueBear {
 	}
 	
 	/**
+	 * We do this once; create the lot table and assign it a lot instance 
+	 */
+	void Engine::createLotTable() {
+		lua_createtable( this->L, 0, 4 );
+		
+		
+	}
+	
+	/**
+	 * Grab this->lotTableIndex and push it onto the stack 
+	 */
+	void Engine::pushLotTable() {
+		
+	}
+	
+	/**
 	 * Where the magic happens 
 	 */
 	void Engine::objectLoop() {
 		std::cout << "Starting world engine with a tick count of " << this->worldTicks << "\n";
+		
+		// Create the lot table and store its reference
 
 		for( ; this->worldTicks != 50000; this->worldTicks++ ) {
 			
 			for( std::vector< BlueBear::Object >::iterator object = this->objects.begin(); object != this->objects.end(); object++ ) {
+				// Clear the API stack of the Luasphere
+				Utility::clearLuaStack( this->L );
+				
+				// Push the player and lot tables to the Luasphere API. These will be added as arguments when calling the main() function on the Luasphere object
+				this->pushLotTable();
+				
 				object->execute( this->worldTicks );
 			}
 		}
@@ -278,7 +299,9 @@ namespace BlueBear {
 	}
 	
 	int Lot::lua_getLotObjects( lua_State* L ) {
+		Utility::stackDump( L );
 		
+		return 0;
 	}
 	
 	namespace Utility {
@@ -371,6 +394,12 @@ namespace BlueBear {
 		void setTableIntValue( lua_State* L, const char* key, int value ) {
 			lua_pushstring( L, key );
 			lua_pushnumber( L, (double) value );
+			lua_settable( L, -3 );
+		}
+		
+		void setTableStringValue( lua_State* L, const char* key, const char* value ) {
+			lua_pushstring( L, key );
+			lua_pushstring( L, value );
 			lua_settable( L, -3 );
 		}
 		
