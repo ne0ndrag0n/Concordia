@@ -37,6 +37,7 @@ namespace BlueBear {
 			Object( lua_State* L, const char* idKey );
 			Object( lua_State* L, const char* idKey, char* popPackage, int popSize );
 			int luaVMInstance;
+			int lotTableRef;
 			void execute( unsigned int worldTicks );
 			char* save();
 			void load( char* pickledObject );
@@ -66,9 +67,8 @@ namespace BlueBear {
 			std::vector< BlueBear::Object > objects;
 			unsigned int worldTicks;
 			Lot* currentLot;
-			int lotTableRef;
 			bool verifyODT( std::vector< std::string > odt );
-			void createLotTable();
+			int createLotTable();
 
 		public:
 			Engine();

@@ -84,8 +84,11 @@ namespace BlueBear {
 			// Re-push table onto stack as argument 
 			lua_pushvalue( this->L, -2 );
 			
+			// Get lot table and push this as the second argument
+			lua_rawgeti( this->L, LUA_REGISTRYINDEX, this->lotTableRef );
+			
 			// Run function
-			lua_pcall( this->L, 1, 1, 0 );
+			lua_pcall( this->L, 2, 1, 0 );
 			
 			// This function returns a tick amount. The next execution is current world ticks + this amount
 			// Set this object's _sys._sched to worldTicks + nextTickSchedule
@@ -145,6 +148,7 @@ namespace BlueBear {
 	 * TODO: wtf do we do with these goddamn type mismatches
 	 */ 
 	bool Engine::loadLot( const char* lotPath ) {
+		int lotTableRef;
 		std::ifstream lot( lotPath, std::ifstream::binary );
 		
 		if( lot.is_open() && lot.good() ) {
@@ -161,6 +165,9 @@ namespace BlueBear {
 					static_cast< int >( lotHeader.undergroundStories ),
 					static_cast< BlueBear::TerrainType >( lotHeader.terrainType )
 				);
+				
+				// Create one lot table for the Luasphere - contains functions that we call on this->currentLot to do things like get other objects on the lot and trigger events
+				lotTableRef = this->createLotTable();
 				
 				// This doesn't seem to work properly as part of the struct. don't know why, so get it separately instead
 				uint32_t lotTime = Utility::getuint32_t( &lot );
@@ -209,6 +216,8 @@ namespace BlueBear {
 					// Add object to Engine objects vector
 					// BlueBear::Object instances are wrappers around the Lua instances of the object
 					BlueBear::Object obj( this->L, objectIDs.at( odtIndex ).c_str(), pop, popSize );
+					// Set a reference to the lot table on this object
+					obj.lotTableRef = lotTableRef;
 					this->objects.push_back( obj );
 				}
 
@@ -250,7 +259,7 @@ namespace BlueBear {
 	/**
 	 * We do this once; create the lot table and assign it a lot instance 
 	 */
-	void Engine::createLotTable() {
+	int Engine::createLotTable() {
 		// Push new, blank table
 		lua_createtable( this->L, 0, 1 );
 		
@@ -258,7 +267,7 @@ namespace BlueBear {
 		Utility::setTableFunctionValue( this->L, "get_all_objects", this->currentLot->lua_getLotObjects );
 		
 		// Save the reference to this table 
-		this->lotTableRef = luaL_ref( L, LUA_REGISTRYINDEX );
+		return luaL_ref( L, LUA_REGISTRYINDEX );
 	}
 	
 	/**
@@ -266,12 +275,9 @@ namespace BlueBear {
 	 */
 	void Engine::objectLoop() {
 		std::cout << "Starting world engine with a tick count of " << this->worldTicks << "\n";
-		
-		// Create the lot table and store its reference
-		this->createLotTable();
 
+		// Iterate for an entire week of ticks
 		for( ; this->worldTicks != 50000; this->worldTicks++ ) {
-			
 			for( std::vector< BlueBear::Object >::iterator object = this->objects.begin(); object != this->objects.end(); object++ ) {	
 				object->execute( this->worldTicks );
 			}
@@ -295,7 +301,7 @@ namespace BlueBear {
 	}
 	
 	int Lot::lua_getLotObjects( lua_State* L ) {
-		Utility::stackDump( L );
+		std::cout << "Hello from C++! This is Lot::lua_getLotObjects!\n";
 		
 		return 0;
 	}
