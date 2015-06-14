@@ -300,9 +300,22 @@ namespace BlueBear {
 		this->terrainType = terrainType;
 	}
 	
+	// major design problem - methods apparently can only be static when using lua pushcfunction
 	int Lot::lua_getLotObjects( lua_State* L ) {
-		std::cout << "Hello from C++! This is Lot::lua_getLotObjects!\n";
 		
+		/*
+		size_t objectsLength = this->objects.size();
+
+		// Create an array table with as many entries as the size of this->objects
+		lua_createtable( L, objectsLength, 0 );
+		
+		for( size_t index = 0; index != objectsLength; index++ ) {
+			lua_rawgeti( L, LUA_REGISTRYINDEX, this->objects.at( index ).luaVMInstance );
+			lua_rawseti( L, -2, index );
+		}
+		
+		return 1;
+		*/
 		return 0;
 	}
 	
