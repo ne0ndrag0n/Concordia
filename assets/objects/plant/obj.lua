@@ -50,8 +50,6 @@ local flowers = {
 	main = function( self, lot ) 
 	
 		print( "Hello from Lua! I am object instance ("..self._cid..") and my water level is now "..self.water_level )
-		
-		lot.get_all_objects()
 
 		if self.water_level > 0 then
 			self.water_level = self.water_level - 10

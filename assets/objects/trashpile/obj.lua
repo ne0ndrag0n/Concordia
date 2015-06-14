@@ -17,8 +17,8 @@ local trashpile = {
 	
 	-- This function will run when the object is scheduled to update its status.
 	main = function( self, lot ) 
-		-- Do not re-execute for at least 43200 game ticks (12 simulated game hours)
-		return 43200
+		print( "Hello from Lua! I am object instance ("..self._cid..")" )
+		return 86400
 	end
 }
 
