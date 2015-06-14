@@ -200,7 +200,7 @@ namespace BlueBear {
 				// Get size of the OIT
 				uint32_t oitSize = Utility::getuint32_t( &lot );
 				
-				this->objects.clear();
+				this->currentLot->objects.clear();
 
 				// Create BBObjects
 				for( size_t i = 0; i != oitSize; i++ ) {
@@ -219,7 +219,7 @@ namespace BlueBear {
 					BlueBear::Object obj( this->L, objectIDs.at( odtIndex ).c_str(), pop, popSize );
 					// Set a reference to the lot table on this object
 					obj.lotTableRef = lotTableRef;
-					this->objects.push_back( obj );
+					this->currentLot->objects.push_back( obj );
 				}
 
 				return true;
@@ -283,7 +283,7 @@ namespace BlueBear {
 
 		// Iterate for an entire week of ticks
 		for( ; this->worldTicks != 50000; this->worldTicks++ ) {
-			for( std::vector< BlueBear::Object >::iterator object = this->objects.begin(); object != this->objects.end(); object++ ) {	
+			for( std::vector< BlueBear::Object >::iterator object = this->currentLot->objects.begin(); object != this->currentLot->objects.end(); object++ ) {	
 				object->execute( this->worldTicks );
 			}
 		}
