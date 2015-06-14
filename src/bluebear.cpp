@@ -76,7 +76,7 @@ namespace BlueBear {
 		// Execute only if the amount of ticks is just right (worldTicks >= nextTickSchedule)
 		if( worldTicks >= nextTickSchedule ) {
 			
-			std::cout << "Running new iteration, current worldTicks is " << worldTicks << " and this object's nextTickSchedule is " << nextTickSchedule << "\n";
+			std::cout << "Running new iteration for luaVMInstance " << this->luaVMInstance << ", current worldTicks is " << worldTicks << " and this object's nextTickSchedule is " << nextTickSchedule << "\n";
 			
 			// Push the object's "main" method
 			Utility::getTableValue( this->L, "main" );
@@ -165,9 +165,10 @@ namespace BlueBear {
 					static_cast< int >( lotHeader.undergroundStories ),
 					static_cast< BlueBear::TerrainType >( lotHeader.terrainType )
 				);
+
 				
 				// Create one lot table for the Luasphere - contains functions that we call on this->currentLot to do things like get other objects on the lot and trigger events
-				lotTableRef = this->createLotTable();
+				lotTableRef = this->createLotTable( this->currentLot );
 				
 				// This doesn't seem to work properly as part of the struct. don't know why, so get it separately instead
 				uint32_t lotTime = Utility::getuint32_t( &lot );
@@ -259,12 +260,16 @@ namespace BlueBear {
 	/**
 	 * We do this once; create the lot table and assign it a lot instance 
 	 */
-	int Engine::createLotTable() {
+	int Engine::createLotTable( Lot* lot ) {
 		// Push new, blank table
 		lua_createtable( this->L, 0, 1 );
 		
 		// Grab the lua_getLotObjects function on this->currentLot and assign it to the table
-		Utility::setTableFunctionValue( this->L, "get_all_objects", this->currentLot->lua_getLotObjects );
+		//Utility::setTableFunctionValue( this->L, "get_all_objects", this->currentLot->lua_getLotObjects );
+		lua_pushstring( L, "get_all_objects" );
+		lua_pushlightuserdata( L, lot );
+		lua_pushcclosure( L, &Lot::lua_getLotObjects, 1 );
+		lua_settable( L, -3 );
 		
 		// Save the reference to this table 
 		return luaL_ref( L, LUA_REGISTRYINDEX );
@@ -302,6 +307,10 @@ namespace BlueBear {
 	
 	// major design problem - methods apparently can only be static when using lua pushcfunction
 	int Lot::lua_getLotObjects( lua_State* L ) {
+		
+		BlueBear::Lot* lot = ( BlueBear::Lot* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+		
+		std::cout << lot->floorX << std::endl;
 		
 		/*
 		size_t objectsLength = this->objects.size();
