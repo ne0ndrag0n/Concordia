@@ -308,24 +308,22 @@ namespace BlueBear {
 	// major design problem - methods apparently can only be static when using lua pushcfunction
 	int Lot::lua_getLotObjects( lua_State* L ) {
 		
+		// Pop the lot off the stack
 		BlueBear::Lot* lot = ( BlueBear::Lot* )lua_touserdata( L, lua_upvalueindex( 1 ) );
 		
-		std::cout << lot->floorX << std::endl;
-		
-		/*
-		size_t objectsLength = this->objects.size();
+		size_t objectsLength = lot->objects.size();
 
 		// Create an array table with as many entries as the size of this->objects
 		lua_createtable( L, objectsLength, 0 );
 		
+		// Push 'em on!
 		for( size_t index = 0; index != objectsLength; index++ ) {
-			lua_rawgeti( L, LUA_REGISTRYINDEX, this->objects.at( index ).luaVMInstance );
+			lua_rawgeti( L, LUA_REGISTRYINDEX, lot->objects.at( index ).luaVMInstance );
 			lua_rawseti( L, -2, index );
 		}
 		
 		return 1;
-		*/
-		return 0;
+
 	}
 	
 	namespace Utility {

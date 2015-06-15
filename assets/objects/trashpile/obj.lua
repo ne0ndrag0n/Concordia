@@ -18,7 +18,8 @@ local trashpile = {
 	-- This function will run when the object is scheduled to update its status.
 	main = function( self, lot ) 
 		print( "Hello from Lua! I am object instance ("..self._cid..")" )
-		print( lot.get_all_objects() )
+		
+		local all_objects = lot.get_all_objects()
 		
 		return 86400
 	end
