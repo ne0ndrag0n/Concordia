@@ -95,6 +95,7 @@ _bblib = {
 		_bblib.clear_objects()
 		
 		local bbobject = _bbobjects[ id ].new()
+		bbobject.type = id 
 		bbobject._cid = _bblib:get_cid()
 		
 		-- Every object has a poptable, if anything just to contain the _sys table
