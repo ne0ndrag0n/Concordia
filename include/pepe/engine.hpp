@@ -1,5 +1,5 @@
-#ifndef BLUEBEAR
-#define BLUEBEAR
+#ifndef ENGINE
+#define ENGINE
 
 #include "bbtypes.hpp"
 #include "object.hpp"
@@ -22,11 +22,6 @@ extern "C" {
 #define BLUEBEAR_LOT_MAGIC_ID 		0x42424C54
 #define WORLD_TICKS_MAX				604800000
 
-/**
- * BlueBear objects
- *
- *
- */
 namespace BlueBear {
 
 	class Engine {
