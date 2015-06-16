@@ -1,6 +1,7 @@
 #ifndef BLUEBEAR
 #define BLUEBEAR
 
+#include "object.hpp"
 #include <string>
 #include <vector>
 #include <cstdio>
@@ -27,24 +28,6 @@ extern "C" {
 namespace BlueBear {
 
 	enum TerrainType { TERRAIN_GRASS, TERRAIN_DIRT, TERRAIN_SNOW, TERAIN_SAND, TERRAIN_MOON, TERRAIN_UNDERGROUND };
-	
-	class Object {
-		
-		private:
-			bool ok;
-			lua_State* L;
-		public:
-			Object( lua_State* L, const char* idKey );
-			Object( lua_State* L, const char* idKey, char* popPackage, int popSize );
-			int luaVMInstance;
-			int lotTableRef;
-			const char* objType;
-			void execute( unsigned int worldTicks );
-			char* save();
-			void load( char* pickledObject );
-			bool good();
-		
-	};
 	
 	class Lot {
 		
