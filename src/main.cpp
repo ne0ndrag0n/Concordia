@@ -1,6 +1,5 @@
 #include "engine.hpp"
 #include <iostream>
-#include <cstdio>
 
 extern "C" {
 	#include "lua.h"

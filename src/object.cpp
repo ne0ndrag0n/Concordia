@@ -1,6 +1,5 @@
 #include "object.hpp"
 #include "utility.hpp"
-#include <cstdio>
 #include <iostream>
 
 extern "C" {

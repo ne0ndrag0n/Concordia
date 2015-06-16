@@ -3,20 +3,10 @@
 #include "object.hpp"
 #include "lot.hpp"
 #include "engine.hpp"
-#include <chrono>
-#include <cstdio>
-#include <cstdarg>
-#include <cstring>
-#include <fstream>
 #include <iterator>
 #include <string>
 #include <vector>
 #include <iostream>
-#include <algorithm>
-#include <cstdint>
-
-// Not X-Platform
-#include <dirent.h>
 
 extern "C" {
 	#include "lua.h"

@@ -2,7 +2,6 @@
 #include "lot.hpp"
 #include <vector>
 #include <cstring>
-#include <cstdint>
 
 extern "C" {
 	#include "lua.h"

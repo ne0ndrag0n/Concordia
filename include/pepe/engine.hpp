@@ -6,11 +6,6 @@
 #include "lot.hpp"
 #include <string>
 #include <vector>
-#include <cstdio>
-#include <cstdint>
-#include <fstream>
-#include <cstdint>
-#include <chrono>
 
 extern "C" {
 	#include "lua.h"
