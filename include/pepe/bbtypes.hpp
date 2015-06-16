@@ -14,4 +14,25 @@ typedef int					s32;
 
 typedef std::chrono::duration< uint32_t, std::milli > millisecond_t;
 
+namespace BlueBear {
+	
+	enum TerrainType { TERRAIN_GRASS, TERRAIN_DIRT, TERRAIN_SNOW, TERAIN_SAND, TERRAIN_MOON, TERRAIN_UNDERGROUND };
+	
+	typedef struct {
+		
+		uint32_t magicID;
+		uint8_t formatRevision;
+		
+		uint8_t lotX;
+		uint8_t lotY;
+		
+		uint8_t numStories;
+		uint8_t undergroundStories;
+		
+		uint8_t terrainType;
+		
+	} BBLTLotHeader;
+	
+}
+
 #endif

@@ -1,7 +1,9 @@
 #ifndef BLUEBEAR
 #define BLUEBEAR
 
+#include "bbtypes.hpp"
 #include "object.hpp"
+#include "lot.hpp"
 #include <string>
 #include <vector>
 #include <cstdio>
@@ -27,24 +29,6 @@ extern "C" {
  */
 namespace BlueBear {
 
-	enum TerrainType { TERRAIN_GRASS, TERRAIN_DIRT, TERRAIN_SNOW, TERAIN_SAND, TERRAIN_MOON, TERRAIN_UNDERGROUND };
-	
-	class Lot {
-		
-		public:
-			Lot();
-			Lot( int floorX, int floorY, int stories, int undergroundStories, TerrainType terrainType );
-			int floorX;
-			int floorY;
-			int stories;
-			int undergroundStories;
-			std::vector< BlueBear::Object > objects;
-			TerrainType terrainType;
-			static int lua_getLotObjects( lua_State* L );
-			static int lua_getLotObjectsByType( lua_State* L );
-
-	};
-
 	class Engine {
 		
 		private:
@@ -62,21 +46,6 @@ namespace BlueBear {
 			bool loadLot( const char* lotPath );
 					
 	};
-	
-	typedef struct {
-		
-		uint32_t magicID;
-		uint8_t formatRevision;
-		
-		uint8_t lotX;
-		uint8_t lotY;
-		
-		uint8_t numStories;
-		uint8_t undergroundStories;
-		
-		uint8_t terrainType;
-		
-	} BBLTLotHeader;
 	
 }
 
