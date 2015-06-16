@@ -19,7 +19,10 @@ local trashpile = {
 	main = function( self, lot ) 
 		print( "Hello from Lua! I am object instance ("..self._cid..")" )
 		
-		local all_objects = lot.get_all_objects()
+		local all_objects = lot.get_objects_by_type( "mipani.flowers" )
+		
+		print( "I will deduct water_level in BlueBear object instance "..all_objects[1]._cid.." down to 50." )
+		all_objects[1].water_level = 50
 		
 		return 86400
 	end

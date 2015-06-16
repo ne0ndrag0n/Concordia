@@ -38,6 +38,7 @@ namespace BlueBear {
 			Object( lua_State* L, const char* idKey, char* popPackage, int popSize );
 			int luaVMInstance;
 			int lotTableRef;
+			const char* objType;
 			void execute( unsigned int worldTicks );
 			char* save();
 			void load( char* pickledObject );
@@ -57,6 +58,7 @@ namespace BlueBear {
 			std::vector< BlueBear::Object > objects;
 			TerrainType terrainType;
 			static int lua_getLotObjects( lua_State* L );
+			static int lua_getLotObjectsByType( lua_State* L );
 
 	};
 

@@ -31,6 +31,9 @@ namespace BlueBear {
 		// Store pointer to Luasphere on this object
 		this->L = L;
 		
+		// Store id key onto this object so we can reference it by type without delving into the Lua object
+		this->objType = idKey;
+		
 		// Get fresh start with the Lua stack
 		Utility::clearLuaStack( L );
 		
@@ -94,8 +97,6 @@ namespace BlueBear {
 			// Set this object's _sys._sched to worldTicks + nextTickSchedule
 			nextTickSchedule = lua_tonumber( this->L, -1 );
 			lua_pop( this->L, 1 );
-			
-			std::cout << "Object will rerun in " << nextTickSchedule << " ticks at " << worldTicks + nextTickSchedule << "\n";
 			
 			// The function and its arguments should be popped, leaving the object itself
 			// Get the _sys table
@@ -264,11 +265,16 @@ namespace BlueBear {
 		// Push new, blank table
 		lua_createtable( this->L, 0, 1 );
 		
-		// Grab the lua_getLotObjects function on this->currentLot and assign it to the table
-		//Utility::setTableFunctionValue( this->L, "get_all_objects", this->currentLot->lua_getLotObjects );
+		// get_all_objects retrieves all objects
 		lua_pushstring( L, "get_all_objects" );
 		lua_pushlightuserdata( L, lot );
 		lua_pushcclosure( L, &Lot::lua_getLotObjects, 1 );
+		lua_settable( L, -3 );
+		
+		// get_objects_by_type gets all objects on the lot of a specific type
+		lua_pushstring( L, "get_objects_by_type" );
+		lua_pushlightuserdata( L, lot );
+		lua_pushcclosure( L, &Lot::lua_getLotObjectsByType, 1 );
 		lua_settable( L, -3 );
 		
 		// Save the reference to this table 
@@ -305,7 +311,6 @@ namespace BlueBear {
 		this->terrainType = terrainType;
 	}
 	
-	// major design problem - methods apparently can only be static when using lua pushcfunction
 	int Lot::lua_getLotObjects( lua_State* L ) {
 		
 		// Pop the lot off the stack
@@ -319,11 +324,39 @@ namespace BlueBear {
 		// Push 'em on!
 		for( size_t index = 0; index != objectsLength; index++ ) {
 			lua_rawgeti( L, LUA_REGISTRYINDEX, lot->objects.at( index ).luaVMInstance );
-			lua_rawseti( L, -2, index );
+			lua_rawseti( L, -2, index + 1 );
 		}
 		
 		return 1;
 
+	}
+	
+	int Lot::lua_getLotObjectsByType( lua_State* L ) {
+		
+		BlueBear::Lot* lot = ( BlueBear::Lot* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+		
+		// Get argument
+		const char* idKey = lua_tostring( L, -1 );
+		lua_pop( L, 1 );
+		
+		lua_newtable( L );
+		
+		// Push all matching objects on
+		size_t objectsLength = lot->objects.size();
+		size_t tableIndex = 1;
+		
+		for( size_t index = 0; index != objectsLength; index++ ) {
+			BlueBear::Object object = lot->objects.at( index );
+			
+			if( strcmp( idKey, object.objType ) == 0 ) {
+				lua_rawgeti( L, LUA_REGISTRYINDEX, object.luaVMInstance );
+				lua_rawseti( L, -2, tableIndex );
+				tableIndex++;
+			}
+		}
+		
+		return 1;
+		
 	}
 	
 	namespace Utility {
@@ -369,7 +402,7 @@ namespace BlueBear {
 					break;
 			
 				  default:  /* other values */
-					printf("%s", lua_typename(L, t));
+					printf("other type:%s", lua_typename(L, t));
 					break;
 			
 				}
