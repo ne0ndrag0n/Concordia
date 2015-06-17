@@ -37,17 +37,10 @@ namespace BlueBear {
 		}
 		
 		// Setup the root environment by loading in and "class-ifying" all objects used by the game
-		
-		// Gets a list of all directories in the "assets/objects" folder. Each folder holds everything required for a BlueBear object.
-		std::vector< std::string > directories = Utility::getSubdirectoryList( BLUEBEAR_OBJECTS_DIRECTORY );
-		
-		// For each of these subdirectories, do the obj.lua file within our lua scope
-		for ( std::vector< std::string >::iterator directory = directories.begin(); directory != directories.end(); directory++ ) {
-			std::string scriptPath = BLUEBEAR_OBJECTS_DIRECTORY + *directory + "/obj.lua";
-			if( luaL_dofile( L, scriptPath.c_str() ) ) {
-				printf( "Error in BlueBear object: %s\n", lua_tostring( L, -1 ) );
-			}
-		}
+		// Start with templates
+		Utility::doDirectories( L, BLUEBEAR_TEMPLATES_DIRECTORY );
+		// Now do the objects
+		Utility::doDirectories( L, BLUEBEAR_OBJECTS_DIRECTORY );
 		
 		return true;
 	}

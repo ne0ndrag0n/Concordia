@@ -37,7 +37,9 @@ namespace BlueBear {
 		
 		void setTableFunctionValue( lua_State* L, const char* key, lua_CFunction value );
 		
-		inline uint8_t getuint8_t( std::ifstream* istream ) {
+		void doDirectories( lua_State* L, const char* directory );
+		
+		inline uint8_t getuint8_t( lua_State* L, std::ifstream* istream ) {
 			uint8_t num;
 			istream->read( reinterpret_cast< char* >( &num ), 1 );
 			return num;

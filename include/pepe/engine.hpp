@@ -13,9 +13,10 @@ extern "C" {
 	#include "lauxlib.h"
 }
 
-#define BLUEBEAR_OBJECTS_DIRECTORY "assets/objects/"
-#define BLUEBEAR_LOT_MAGIC_ID 		0x42424C54
-#define WORLD_TICKS_MAX				604800000
+#define BLUEBEAR_OBJECTS_DIRECTORY   "assets/objects/"
+#define BLUEBEAR_TEMPLATES_DIRECTORY "assets/templates/"
+#define BLUEBEAR_LOT_MAGIC_ID 		 0x42424C54
+#define WORLD_TICKS_MAX				 604800000
 
 namespace BlueBear {
 
