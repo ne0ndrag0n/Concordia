@@ -6,6 +6,9 @@ dofile( "system/bblib.lua" )
 -- Central registry of bbobjects (not the object instances used per-lot)
 _bbobjects = {};
 
+-- Central registry of bluebear templates
+_obj_templates = {};
+
 --[[
 	Object "instances" that are used by the currently loaded lot go here
 ]]--
@@ -78,6 +81,44 @@ bluebear = {
 		-- Slap the class into the _bbobjects table, a central registry of all objects available to the game
 		_bbobjects[ identifier ] = object_table
 		print( "Loaded object "..identifier )
+	end,
+	
+	-- No verification is being done here - that'll be caught by bluebear.register_object
+	register_object_template = function( identifier, template_table ) 
+		if template_table ~= nil then
+			_obj_templates[ identifier ] = template_table
+			print( "Registered object template "..identifier )
+			return _obj_templates[ identifier ]
+		else
+			print( "Invalid template table for identifier "..identifier )
+			return false
+		end
+	end,
+	
+	register_object_from_template = function( template_key, identifier, object_table )
+		local template_obj = _obj_templates[ template_key ]
+		
+		-- If there is no template object, we cannot continue
+		if template_obj == nil then
+			print( "Template "..template_key.." was not found!" )
+			return false
+		end
+		
+		-- Step 1: Simple extend
+		local extended = _bblib.extend_object( template_obj, object_table )
+				
+		-- Step 2: Concatenate the actions array, if it exists in both template_actions and object_table.actions
+		-- If we don't define a new set of actions, use the actions available in the template
+		if object_table.actions ~= nil then
+			if template_obj.actions ~= nil then
+				extended.actions = _bblib.concatenate_arrays( template_obj.actions, object_table.actions )
+			end
+		else
+			extended.actions = template_obj.actions
+		end
+		
+		-- Step 3: Register the object we just extended
+		--bluebear.register_object( identifier, extended )
 	end
 	
 };

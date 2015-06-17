@@ -8,12 +8,34 @@ end
 _bblib = {
 	lastcid = 0,
 
-	extend_object = function( destination, source )
-		for k,v in pairs( source ) do
-			destination[ k ] = v
+	extend_object = function( parent, subclass )
+		local new_table = {}
+		
+		-- Shallow copy parent to new_table
+		for k,v in pairs( parent ) do
+			new_table[ k ] = v
+		end
+	
+		-- Overwrite with shallow references to subclass
+		for k,v in pairs( subclass ) do
+			new_table[ k ] = v
 		end
 		
-		return destination
+		return new_table
+	end,
+	
+	concatenate_arrays = function( first, last ) 
+		local new_table = {}
+		
+		for k,v in pairs( first ) do
+			table.insert( new_table, v )
+		end
+		
+		for k,v in pairs( last ) do
+			table.insert( new_table, v )
+		end
+		
+		return new_table
 	end,
 
 	serialise = function( table, content ) 
