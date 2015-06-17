@@ -1,13 +1,9 @@
-local flowers = {
+-- This is an example BlueBear template. BlueBear templates are classes designed to be extended by your own objects.
+
+local template = {
 
 	water_level = nil,
-
-	catalog = {
-		name = "Testico Violets",
-		description = "Plant these beautiful flowers into your home!",
-		price = 19.99
-	},
-
+	
 	actions = {
 		{
 			label = "Water",
@@ -32,7 +28,6 @@ local flowers = {
 		}
 	},
 	
-
 	init = function( self, lot )
 		self.water_level = 100
 	end,
@@ -60,7 +55,7 @@ local flowers = {
 	unmarshal = function( self, data ) 
 		self.water_level = data.water_level
 	end
+
 }
 
-
-bluebear.register_object( "mipani.flowers", flowers )
+bluebear.register_object_template( "flowers", template )

@@ -8,6 +8,14 @@ end
 _bblib = {
 	lastcid = 0,
 
+	extend_object = function( destination, source )
+		for k,v in pairs( source ) do
+			destination[ k ] = v
+		end
+		
+		return destination
+	end,
+
 	serialise = function( table, content ) 
 		-- TODO
 	end,
