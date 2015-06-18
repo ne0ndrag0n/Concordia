@@ -91,6 +91,8 @@ namespace BlueBear {
 
 			// Set the _sched value
 			Utility::setTableIntValue( this->L, "_sched", worldTicks + nextTickSchedule );
+			
+			std::cout << "Run finished! Rerunning at tick " << worldTicks + nextTickSchedule << "\n";
 		}
 	}
 }
