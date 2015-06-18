@@ -73,7 +73,6 @@ namespace BlueBear {
 			}
 		}
 		
-		std::cout << "Returning from call\n";
 		return 1;
 		
 	}

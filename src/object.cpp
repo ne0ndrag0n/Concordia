@@ -15,13 +15,10 @@ namespace BlueBear {
 	/**
 	 * Every BlueBear::Object is tied to its Lua instance in the _lotinsts table
 	 */
-	Object::Object( lua_State* L, const char* idKey, char* popPackage, int popSize ) {
+	Object::Object( lua_State* L, const char* idKey, char* popPackage, int popSize ) : objType( idKey ) {
 		
 		// Store pointer to Luasphere on this object
 		this->L = L;
-		
-		// Store id key onto this object so we can reference it by type without delving into the Lua object
-		this->objType = std::string( idKey );
 		
 		// Get fresh start with the Lua stack
 		Utility::clearLuaStack( L );
@@ -101,8 +98,6 @@ namespace BlueBear {
 
 			// Set the _sched value
 			Utility::setTableIntValue( this->L, "_sched", worldTicks + nextTickSchedule );
-			
-			std::cout << "Run finished! Rerunning at tick " << worldTicks + nextTickSchedule << "\n";
 		}
 	}
 }

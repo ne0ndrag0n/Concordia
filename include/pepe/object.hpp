@@ -17,11 +17,11 @@ namespace BlueBear {
 			bool ok;
 			lua_State* L;
 		public:
-			Object( lua_State* L, const char* idKey );
-			Object( lua_State* L, const char* idKey, char* popPackage, int popSize );
 			int luaVMInstance;
 			int lotTableRef;
 			std::string objType;
+			Object( lua_State* L, const char* idKey );
+			Object( lua_State* L, const char* idKey, char* popPackage, int popSize );
 			void execute( unsigned int worldTicks );
 			char* save();
 			void load( char* pickledObject );
