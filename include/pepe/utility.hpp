@@ -6,6 +6,9 @@
 #include <vector>
 #include <string>
 
+// Not X-Compiler
+#include <execinfo.h>
+
 extern "C" {
 	#include "lua.h"
 	#include "lualib.h"
@@ -38,6 +41,8 @@ namespace BlueBear {
 		void setTableFunctionValue( lua_State* L, const char* key, lua_CFunction value );
 		
 		void doDirectories( lua_State* L, const char* directory );
+		
+		void strace();
 		
 		inline uint8_t getuint8_t( lua_State* L, std::ifstream* istream ) {
 			uint8_t num;

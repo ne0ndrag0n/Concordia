@@ -9,6 +9,10 @@
 
 // Not X-Platform
 #include <dirent.h>
+#include <unistd.h>
+
+// Not X-Compiler
+#include <execinfo.h>
 
 
 extern "C" {
@@ -137,6 +141,17 @@ namespace BlueBear {
 				}
 			}
 		
+		}
+		
+		void strace() {
+			void *array[10];
+			size_t size;
+
+			// get void*'s for all entries on the stack
+			size = backtrace(array, 10);
+
+			// print out all the frames to stderr
+			backtrace_symbols_fd(array, size, STDERR_FILENO);
 		}
 	}
 }
