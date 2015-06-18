@@ -2,6 +2,8 @@
 #include "lot.hpp"
 #include <vector>
 #include <cstring>
+#include <string>
+#include <iostream>
 
 extern "C" {
 	#include "lua.h"
@@ -49,11 +51,11 @@ namespace BlueBear {
 	int Lot::lua_getLotObjectsByType( lua_State* L ) {
 		
 		BlueBear::Lot* lot = ( BlueBear::Lot* )lua_touserdata( L, lua_upvalueindex( 1 ) );
-		
+				
 		// Get argument
-		const char* idKey = lua_tostring( L, -1 );
+		std::string idKey( lua_tostring( L, -1 ) );
 		lua_pop( L, 1 );
-		
+
 		lua_newtable( L );
 		
 		// Push all matching objects on
@@ -63,13 +65,15 @@ namespace BlueBear {
 		for( size_t index = 0; index != objectsLength; index++ ) {
 			BlueBear::Object object = lot->objects.at( index );
 			
-			if( strcmp( idKey, object.objType ) == 0 ) {
+			if( idKey == object.objType ) {
+				//std::cout << object.objType << "\n";
 				lua_rawgeti( L, LUA_REGISTRYINDEX, object.luaVMInstance );
 				lua_rawseti( L, -2, tableIndex );
 				tableIndex++;
 			}
 		}
 		
+		std::cout << "Returning from call\n";
 		return 1;
 		
 	}

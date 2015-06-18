@@ -118,7 +118,7 @@ bluebear = {
 		end
 		
 		-- Step 3: Register the object we just extended
-		--bluebear.register_object( identifier, extended )
+		bluebear.register_object( identifier, extended )
 	end
 	
 };

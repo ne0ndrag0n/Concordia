@@ -1,6 +1,8 @@
 #include "object.hpp"
 #include "utility.hpp"
 #include <iostream>
+#include <cstring>
+#include <string>
 
 extern "C" {
 	#include "lua.h"
@@ -19,7 +21,7 @@ namespace BlueBear {
 		this->L = L;
 		
 		// Store id key onto this object so we can reference it by type without delving into the Lua object
-		this->objType = idKey;
+		this->objType = std::string( idKey );
 		
 		// Get fresh start with the Lua stack
 		Utility::clearLuaStack( L );
@@ -45,6 +47,11 @@ namespace BlueBear {
 	}
 	
 	void Object::execute( unsigned int worldTicks ) {
+		
+		if( this->ok == false ) {
+			return;
+		}
+		
 		unsigned int nextTickSchedule;
 		
 		// Clear the API stack of the Luasphere
@@ -65,7 +72,7 @@ namespace BlueBear {
 		
 		// Execute only if the amount of ticks is just right (worldTicks >= nextTickSchedule)
 		if( worldTicks >= nextTickSchedule ) {
-			
+
 			std::cout << "Running new iteration for luaVMInstance " << this->luaVMInstance << ", current worldTicks is " << worldTicks << " and this object's nextTickSchedule is " << nextTickSchedule << "\n";
 			
 			// Push the object's "main" method
@@ -78,7 +85,10 @@ namespace BlueBear {
 			lua_rawgeti( this->L, LUA_REGISTRYINDEX, this->lotTableRef );
 			
 			// Run function
-			lua_pcall( this->L, 2, 1, 0 );
+			if( lua_pcall( this->L, 2, 1, 0 ) != 0 ) {
+				std::cerr << lua_tostring( this->L, -1 ) << "\n";
+				this->ok = false;
+			}
 			
 			// This function returns a tick amount. The next execution is current world ticks + this amount
 			// Set this object's _sys._sched to worldTicks + nextTickSchedule

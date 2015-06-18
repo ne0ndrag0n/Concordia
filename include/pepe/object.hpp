@@ -1,6 +1,8 @@
 #ifndef BBOBJECT
 #define BBOBJECT
 
+#include <string>
+
 extern "C" {
 	#include "lua.h"
 	#include "lualib.h"
@@ -19,7 +21,7 @@ namespace BlueBear {
 			Object( lua_State* L, const char* idKey, char* popPackage, int popSize );
 			int luaVMInstance;
 			int lotTableRef;
-			const char* objType;
+			std::string objType;
 			void execute( unsigned int worldTicks );
 			char* save();
 			void load( char* pickledObject );
