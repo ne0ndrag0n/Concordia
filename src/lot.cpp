@@ -40,7 +40,7 @@ namespace BlueBear {
 		
 		// Push 'em on!
 		for( size_t index = 0; index != objectsLength; index++ ) {
-			lua_rawgeti( L, LUA_REGISTRYINDEX, lot->objects.at( index ).luaVMInstance );
+			lua_rawgeti( L, LUA_REGISTRYINDEX, lot->objects[ index ].luaVMInstance );
 			lua_rawseti( L, -2, index + 1 );
 		}
 		
@@ -63,7 +63,7 @@ namespace BlueBear {
 		size_t tableIndex = 1;
 		
 		for( size_t index = 0; index != objectsLength; index++ ) {
-			BlueBear::Object object = lot->objects.at( index );
+			BlueBear::Object object = lot->objects[ index ];
 			
 			if( idKey == object.objType ) {
 				//std::cout << object.objType << "\n";
