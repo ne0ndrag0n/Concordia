@@ -44,7 +44,7 @@ namespace BlueBear {
 		
 		void strace();
 		
-		inline uint8_t getuint8_t( lua_State* L, std::ifstream* istream ) {
+		inline uint8_t getuint8_t( std::ifstream* istream ) {
 			uint8_t num;
 			istream->read( reinterpret_cast< char* >( &num ), 1 );
 			return num;

@@ -107,7 +107,10 @@ namespace BlueBear {
 
 				// Create BBObjects
 				for( size_t i = 0; i != oitSize; i++ ) {
-					// Each POP begins with an index of the item in the OIT
+					// Each POP begins with the category flag
+					uint8_t categoryFlag = Utility::getuint8_t( &lot );
+					
+					// Each POP also begins with an index of the item in the OIT
 					uint16_t odtIndex = Utility::getuint16_t( &lot );
 					
 					// This is the size of the POP
