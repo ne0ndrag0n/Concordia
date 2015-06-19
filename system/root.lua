@@ -117,7 +117,10 @@ bluebear = {
 			extended.actions = template_obj.actions
 		end
 		
-		-- Step 3: Register the object we just extended
+		-- Step 3: Create superclass references on the new object
+		extended.super = template_obj
+		
+		-- Step 4: Register the object we just extended
 		bluebear.register_object( identifier, extended )
 	end
 	
