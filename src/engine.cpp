@@ -62,10 +62,10 @@ namespace BlueBear {
 				
 				// Instantiate the lot
 				this->currentLot = new BlueBear::Lot(
-					static_cast< int >( lotHeader.lotX ),
-					static_cast< int >( lotHeader.lotY ),
-					static_cast< int >( lotHeader.numStories ),
-					static_cast< int >( lotHeader.undergroundStories ),
+					lotHeader.lotX,
+					lotHeader.lotY,
+					lotHeader.numStories,
+					lotHeader.undergroundStories,
 					static_cast< BlueBear::TerrainType >( lotHeader.terrainType )
 				);
 
