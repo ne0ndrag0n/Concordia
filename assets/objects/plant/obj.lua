@@ -7,11 +7,9 @@ local flowers = {
 	},
 	
 	main = function( self, lot ) 
-		local rv = self.super.main( self, lot )
+		local ticks_delay = self.super.main( self, lot )
 		
-		print( "meep" )
-		
-		return rv
+		return ticks_delay
 	end
 }
 

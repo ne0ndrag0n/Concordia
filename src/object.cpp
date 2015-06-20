@@ -1,5 +1,6 @@
 #include "object.hpp"
 #include "utility.hpp"
+#include "bbtypes.hpp"
 #include <iostream>
 #include <cstring>
 #include <string>
@@ -15,7 +16,7 @@ namespace BlueBear {
 	/**
 	 * Every BlueBear::Object is tied to its Lua instance in the _lotinsts table
 	 */
-	Object::Object( lua_State* L, const char* idKey, char* popPackage, int popSize ) : objType( idKey ) {
+	Object::Object( lua_State* L, const char* idKey, char* popPackage, int popSize, int categoryID ) : objType( idKey ) {
 		
 		// Store pointer to Luasphere on this object
 		this->L = L;
@@ -29,16 +30,19 @@ namespace BlueBear {
 		// Get instantiate_pop method
 		Utility::getTableValue( L, "instantiate_pop" );
 		
-		// Push _bbobject key and POP package
+		// Push _bbobject key and POP package. Push whether or not this object is a plain object or a player character
 		lua_pushstring( L, idKey );
 		lua_pushlstring( L, popPackage, popSize );
+		lua_pushnumber( L, categoryID );
 		
 		// Call instantiate_pop
-		if( lua_pcall( L, 2, 1, 0 ) == 0 ) {
+		if( lua_pcall( L, 3, 1, 0 ) == 0 ) {
 			this->ok = true;
 			
 			// This will return a reference to the entry in _bblib - Pop and use this to store a reference to this function in this->luaVMInstance
 			this->luaVMInstance = luaL_ref( L, LUA_REGISTRYINDEX );
+		} else {
+			std::cout << lua_tostring( L, -1 ) << "\n";
 		}
 		
 	}

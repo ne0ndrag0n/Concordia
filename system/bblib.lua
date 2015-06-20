@@ -120,11 +120,14 @@ _bblib = {
 		return "bb"..self.lastcid
 	end,
 	
-	instantiate_pop = function( id, pop ) 
+	instantiate_pop = function( id, pop, pop_category ) 
 		-- Testing for now
 		_bblib.clear_objects()
 		
-		local bbobject = _bbobjects[ id ].new()
+		-- Lookup pop category
+		local table_lookup = _G[ bluebear.Constants.POPTYPES[ pop_category + 1 ] ]
+		
+		local bbobject = table_lookup[ id ].new()
 		bbobject.type = id 
 		bbobject._cid = _bblib:get_cid()
 		
@@ -136,10 +139,9 @@ _bblib = {
 			bbobject:unmarshal( poptable )
 		end
 		
-		_lotinsts[ bbobject._cid ] = bbobject
 		print( "instantiated lot bbobject ("..bbobject._cid.."): "..bbobject.catalog.name )
 		
-		return _lotinsts[ bbobject._cid ]
+		return bbobject
 	end
 
 };

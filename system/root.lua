@@ -9,12 +9,14 @@ _bbobjects = {};
 -- Central registry of bluebear templates
 _obj_templates = {};
 
---[[
-	Object "instances" that are used by the currently loaded lot go here
-]]--
-_lotinsts = {};
-
 bluebear = {
+
+	Constants = {
+		POPTYPES = {
+			"_bbobjects",
+			"_bbplayers"
+		}
+	},
 
 	register_object = function( identifier, object_table ) 
 		
