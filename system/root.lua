@@ -123,7 +123,7 @@ bluebear = {
 		bluebear.register_object( identifier, extended )
 	end,
 	
-	super_object = function( id, func_id, is_template ) 
+	call_super_object = function( id, func_id, is_template ) 
 		local returned_func
 		
 		if is_template == true then
@@ -137,7 +137,7 @@ bluebear = {
 		end
 	end,
 	
-	super_player = function( id, func_id, is_template )
+	call_super_player = function( id, func_id, is_template )
 		local returned_func
 	
 		if is_template == true then
