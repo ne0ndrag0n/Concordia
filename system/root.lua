@@ -124,6 +124,22 @@ bluebear = {
 		
 		-- Step 4: Register the object we just extended
 		bluebear.register_object( identifier, extended )
+	end,
+	
+	get_object_class = function( id, is_template ) 
+		if is_template == true then
+			return _obj_templates[ id ]
+		else
+			return _bbobjects[ id ]
+		end
+	end,
+	
+	get_player_class = function( id, is_template )
+		if is_template == true then
+			return _plr_templates[ id ]
+		else 
+			return _bbplayers[ id ]
+		end
 	end
 	
 };
