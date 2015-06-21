@@ -7,7 +7,7 @@ local flowers = {
 	},
 	
 	main = function( self, lot ) 
-		local ticks_delay = bluebear.get_object_class( 'potted_plant', true ).main( self, lot )
+		local ticks_delay = bluebear.super_object( 'potted_plant', 'main', true )( self, lot )
 		
 		return ticks_delay
 	end

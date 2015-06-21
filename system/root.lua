@@ -123,19 +123,31 @@ bluebear = {
 		bluebear.register_object( identifier, extended )
 	end,
 	
-	get_object_class = function( id, is_template ) 
+	super_object = function( id, func_id, is_template ) 
+		local returned_func
+		
 		if is_template == true then
-			return _obj_templates[ id ]
+			returned_func = _obj_templates[ id ][ func_id ]
 		else
-			return _bbobjects[ id ]
+			returned_func = _bbobjects[ id ][ func_id ]
+		end
+		
+		if type( returned_func ) == "function" then
+			return returned_func
 		end
 	end,
 	
-	get_player_class = function( id, is_template )
+	super_player = function( id, func_id, is_template )
+		local returned_func
+	
 		if is_template == true then
-			return _plr_templates[ id ]
+			return _plr_templates[ id ][ func_id ]
 		else 
-			return _bbplayers[ id ]
+			return _bbplayers[ id ][ func_id ]
+		end
+		
+		if type( returned_func ) == "function" then
+			return returned_func
 		end
 	end
 	
