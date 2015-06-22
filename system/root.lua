@@ -11,13 +11,6 @@ _obj_templates = {};
 
 bluebear = {
 
-	Constants = {
-		POPTYPES = {
-			"_bbobjects",
-			"_bbplayers"
-		}
-	},
-
 	register_object = function( identifier, object_table ) 
 		
 		local id = identifier:split( '.' )
