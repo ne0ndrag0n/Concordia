@@ -33,10 +33,9 @@ namespace BlueBear {
 		// Push _bbobject key and POP package. Push whether or not this object is a plain object or a player character
 		lua_pushstring( L, idKey );
 		lua_pushlstring( L, popPackage, popSize );
-		lua_pushnumber( L, categoryID );
-		
+
 		// Call instantiate_pop
-		if( lua_pcall( L, 3, 1, 0 ) == 0 ) {
+		if( lua_pcall( L, 2, 1, 0 ) == 0 ) {
 			this->ok = true;
 			
 			// This will return a reference to the entry in _bblib - Pop and use this to store a reference to this function in this->luaVMInstance

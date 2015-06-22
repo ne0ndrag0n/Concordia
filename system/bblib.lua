@@ -120,14 +120,11 @@ _bblib = {
 		return "bb"..self.lastcid
 	end,
 	
-	instantiate_pop = function( id, pop, pop_category ) 
+	instantiate_pop = function( id, pop ) 
 		-- Testing for now
 		_bblib.clear_objects()
 		
-		-- Lookup pop category
-		local table_lookup = _G[ bluebear.Constants.POPTYPES[ pop_category + 1 ] ]
-		
-		local bbobject = table_lookup[ id ].new()
+		local bbobject = _bbobjects[ id ].new()
 		bbobject.type = id 
 		bbobject._cid = _bblib:get_cid()
 		
