@@ -116,9 +116,10 @@ bluebear = {
 		bluebear.register_object( identifier, extended )
 	end,
 	
-	call_super = function( id, func_id, is_template ) 
+	call_super = function( id, func_id ) 
 		local returned_func
-		
+		local is_template = id:find( "%." ) == nil
+
 		if is_template == true then
 			returned_func = _obj_templates[ id ][ func_id ]
 		else
@@ -131,4 +132,3 @@ bluebear = {
 	end
 	
 };
-
