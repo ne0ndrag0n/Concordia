@@ -1,5 +1,7 @@
 -- Base Types
 
+-- Register default traits
+
 local base_player = {
 
 	motives = {

@@ -9,6 +9,21 @@ _bbobjects = {};
 -- Central registry of bluebear templates
 _obj_templates = {};
 
+-- TODO: Start moving everything (bbobjects, obj_templates) into this object
+_classes = {
+	objects = {
+	
+	},
+	
+	obj_templates = {
+	
+	},
+	
+	traits = {
+	
+	}
+};
+
 bluebear = {
 
 	register_object = function( identifier, object_table ) 
@@ -114,6 +129,18 @@ bluebear = {
 		
 		-- Step 3: Register the object we just extended
 		bluebear.register_object( identifier, extended )
+	end,
+	
+	register_motive = function( motive_key, motive_table )
+		local class_lookup = _classes.traits[ motive_key ]
+		
+		if class_lookup == nil then
+			_classes.traits[ motive_key ] = motive_table
+			return _classes.traits[ motive_key ]
+		else
+			print( "Motive "..motive_key.." already registered." )
+			return false
+		end
 	end,
 	
 	call_super = function( id, func_id ) 
