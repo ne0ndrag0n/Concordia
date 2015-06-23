@@ -132,3 +132,5 @@ bluebear = {
 	end
 	
 };
+
+dofile( "system/basetype.lua" )
