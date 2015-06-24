@@ -111,19 +111,12 @@ _bblib = {
 		return tbl
 	end,
 	
-	clear_objects = function() 
-		_lotinsts = {};
-	end,
-	
 	get_cid = function( self ) 
 		self.lastcid = self.lastcid + 1
 		return "bb"..self.lastcid
 	end,
 	
-	instantiate_pop = function( id, pop ) 
-		-- Testing for now
-		_bblib.clear_objects()
-		
+	instantiate_pop = function( id, pop ) 		
 		local bbobject = _classes.objects[ id ].new()
 		bbobject.type = id 
 		bbobject._cid = _bblib:get_cid()

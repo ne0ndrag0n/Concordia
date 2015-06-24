@@ -4,17 +4,15 @@
 dofile( "system/bblib.lua" )
 
 _classes = {
-	objects = {
+	objects = {},
 	
-	},
+	object_templates = {},
 	
-	object_templates = {
+	traits = {},
 	
-	},
+	players = {},
 	
-	traits = {
-	
-	}
+	player_templates = {}
 };
 
 bluebear = {
