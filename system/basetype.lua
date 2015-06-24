@@ -65,7 +65,13 @@ local base_player = {
 		hygiene = bluebear.get_motive_table( "hygiene" ),
 		bladder = bluebear.get_motive_table( "bladder" ),
 		energy = bluebear.get_motive_table( "energy" )
-	}
+	},
+	
+	main = function( self, lot ) 
+		print( "Player runs" )
+		
+		return 43200
+	end
 
 }
 
