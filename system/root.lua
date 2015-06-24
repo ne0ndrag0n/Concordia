@@ -132,15 +132,12 @@ bluebear = {
 	end,
 	
 	register_motive = function( motive_key, motive_table )
-		local class_lookup = _classes.traits[ motive_key ]
-		
-		if class_lookup == nil then
-			_classes.traits[ motive_key ] = motive_table
-			return _classes.traits[ motive_key ]
-		else
-			print( "Motive "..motive_key.." already registered." )
-			return false
-		end
+		_classes.traits[ motive_key ] = motive_table
+		return _classes.traits[ motive_key ]
+	end,
+	
+	get_motive_table = function( motive_id ) 
+		return _classes.traits[ motive_id ]
 	end,
 	
 	call_super = function( id, func_id ) 
