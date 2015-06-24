@@ -124,7 +124,7 @@ _bblib = {
 		-- Testing for now
 		_bblib.clear_objects()
 		
-		local bbobject = _bbobjects[ id ].new()
+		local bbobject = _classes.objects[ id ].new()
 		bbobject.type = id 
 		bbobject._cid = _bblib:get_cid()
 		

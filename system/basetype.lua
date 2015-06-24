@@ -74,5 +74,3 @@ local base_player = {
 	end
 
 }
-
-_obj_templates[ "base_player" ] = base_player

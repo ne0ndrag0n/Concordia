@@ -3,19 +3,12 @@
 
 dofile( "system/bblib.lua" )
 
--- Central registry of bbobjects (not the object instances used per-lot)
-_bbobjects = {};
-
--- Central registry of bluebear templates
-_obj_templates = {};
-
--- TODO: Start moving everything (bbobjects, obj_templates) into this object
 _classes = {
 	objects = {
 	
 	},
 	
-	obj_templates = {
+	object_templates = {
 	
 	},
 	
@@ -38,7 +31,7 @@ bluebear = {
 		end
 		
 		-- Object must not already be loaded (or identifier must not be used)
-		if type( _bbobjects[ identifier ] ) ~= "nil" then
+		if type( _classes.objects[ identifier ] ) ~= "nil" then
 			print( "Could not load BBObject \""..identifier.."\": Namespace collision!" )
 			return false
 		end
@@ -88,17 +81,17 @@ bluebear = {
 			return self
 		end
 		
-		-- Slap the class into the _bbobjects table, a central registry of all objects available to the game
-		_bbobjects[ identifier ] = object_table
+		-- Slap the class into the _classes.objects table, a central registry of all objects available to the game
+		_classes.objects[ identifier ] = object_table
 		print( "Loaded object "..identifier )
 	end,
 	
 	-- No verification is being done here - that'll be caught by bluebear.register_object
 	register_object_template = function( identifier, template_table ) 
 		if template_table ~= nil then
-			_obj_templates[ identifier ] = template_table
+			_classes.object_templates[ identifier ] = template_table
 			print( "Registered object template "..identifier )
-			return _obj_templates[ identifier ]
+			return _classes.object_templates[ identifier ]
 		else
 			print( "Invalid template table for identifier "..identifier )
 			return false
@@ -106,7 +99,7 @@ bluebear = {
 	end,
 	
 	register_object_from_template = function( template_key, identifier, object_table )
-		local template_obj = _obj_templates[ template_key ]
+		local template_obj = _classes.object_templates[ template_key ]
 		
 		-- If there is no template object, we cannot continue
 		if template_obj == nil then
@@ -145,9 +138,9 @@ bluebear = {
 		local is_template = id:find( "%." ) == nil
 
 		if is_template == true then
-			returned_func = _obj_templates[ id ][ func_id ]
+			returned_func = _classes.object_templates[ id ][ func_id ]
 		else
-			returned_func = _bbobjects[ id ][ func_id ]
+			returned_func = _classes.objects[ id ][ func_id ]
 		end
 		
 		if type( returned_func ) == "function" then

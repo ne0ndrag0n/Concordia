@@ -147,8 +147,11 @@ namespace BlueBear {
 	bool Engine::verifyODT( std::vector< std::string > odt ) {
 		Utility::clearLuaStack( this->L );
 		
-		// Push _bbobjects onto Lua API stack
-		lua_getglobal( this->L, "_bbobjects" );
+		// Push _classes onto Lua API stack
+		lua_getglobal( this->L, "_classes" );
+		
+		// Get "objects" within classes
+		Utility::getTableValue( this->L, "objects" );
 
 		for ( std::vector< std::string >::iterator odtEntry = odt.begin(); odtEntry != odt.end(); odtEntry++ ) {
 			Utility::getTableValue( this->L, odtEntry->c_str() );
