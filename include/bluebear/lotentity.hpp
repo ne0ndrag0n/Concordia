@@ -12,7 +12,7 @@ extern "C" {
 
 namespace BlueBear {
 	
-	class Object {
+	class LotEntity {
 		
 		private:
 			bool ok = false;
@@ -21,8 +21,8 @@ namespace BlueBear {
 			int luaVMInstance;
 			int lotTableRef;
 			std::string objType;
-			Object( lua_State* L, const char* idKey );
-			Object( lua_State* L, const char* idKey, char* popPackage, int popSize, int categoryID );
+			LotEntity( lua_State* L, const char* idKey );
+			LotEntity( lua_State* L, const char* idKey, char* popPackage, int popSize, int categoryID );
 			void execute( unsigned int worldTicks );
 			char* save();
 			void load( char* pickledObject );

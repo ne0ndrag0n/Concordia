@@ -2,7 +2,7 @@
 #define LOT
 
 #include "bbtypes.hpp"
-#include "object.hpp"
+#include "lotentity.hpp"
 #include <vector>
 
 extern "C" {
@@ -22,7 +22,7 @@ namespace BlueBear {
 			int floorY;
 			int stories;
 			int undergroundStories;
-			std::vector< BlueBear::Object > objects;
+			std::vector< BlueBear::LotEntity > objects;
 			BlueBear::TerrainType terrainType;
 			static int lua_getLotObjects( lua_State* L );
 			static int lua_getLotObjectsByType( lua_State* L );

@@ -2,7 +2,6 @@
 #define ENGINE
 
 #include "bbtypes.hpp"
-#include "object.hpp"
 #include "lot.hpp"
 #include <string>
 #include <vector>

@@ -1,4 +1,5 @@
 #include "bbtypes.hpp"
+#include "lotentity.hpp"
 #include "lot.hpp"
 #include <vector>
 #include <cstring>
@@ -63,7 +64,7 @@ namespace BlueBear {
 		size_t tableIndex = 1;
 		
 		for( size_t index = 0; index != objectsLength; index++ ) {
-			BlueBear::Object object = lot->objects[ index ];
+			BlueBear::LotEntity object = lot->objects[ index ];
 			
 			if( idKey == object.objType ) {
 				//std::cout << object.objType << "\n";

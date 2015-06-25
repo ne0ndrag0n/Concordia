@@ -1,6 +1,6 @@
 #include "bbtypes.hpp"
 #include "utility.hpp"
-#include "object.hpp"
+#include "lotentity.hpp"
 #include "lot.hpp"
 #include "engine.hpp"
 #include <iterator>
@@ -77,7 +77,7 @@ namespace BlueBear {
 				uint32_t lotTime = Utility::getuint32_t( &lot );
 				this->worldTicks = static_cast< unsigned int >( lotTime );
 				
-				// Load length of Object Definition Table (ODT)
+				// Load length of LotEntity Definition Table (ODT)
 				uint32_t odtSize = Utility::getuint32_t( &lot );
 
 				// Read in the ODT
@@ -105,7 +105,7 @@ namespace BlueBear {
 				
 				this->currentLot->objects.clear();
 
-				// Create BBObjects
+				// Create BBLotEntitys
 				for( size_t i = 0; i != oitSize; i++ ) {
 					// Each POP begins with the category flag
 					uint8_t categoryFlag = Utility::getuint8_t( &lot );
@@ -121,8 +121,8 @@ namespace BlueBear {
 					lot.read( pop, static_cast< int >( popSize ) );
 					
 					// Add object to Engine objects vector
-					// BlueBear::Object instances are wrappers around the Lua instances of the object
-					BlueBear::Object obj( this->L, objectIDs.at( odtIndex ).c_str(), pop, popSize, categoryFlag );
+					// BlueBear::LotEntity instances are wrappers around the Lua instances of the object
+					BlueBear::LotEntity obj( this->L, objectIDs.at( odtIndex ).c_str(), pop, popSize, categoryFlag );
 					// Set a reference to the lot table on this object
 					obj.lotTableRef = lotTableRef;
 					this->currentLot->objects.push_back( obj );
@@ -140,7 +140,7 @@ namespace BlueBear {
 	
 	/**
 	 * @private
-	 * Verify that the Object Definition Table entries have corresponding objects in the Luasphere
+	 * Verify that the LotEntity Definition Table entries have corresponding objects in the Luasphere
 	 * 
 	 * @param		{std::vector< std::string >}	odt		The object definition table
 	 */
@@ -197,7 +197,7 @@ namespace BlueBear {
 
 		// Iterate for an entire week of ticks
 		for( ; this->worldTicks != 50000; this->worldTicks++ ) {
-			for( std::vector< BlueBear::Object >::iterator object = this->currentLot->objects.begin(); object != this->currentLot->objects.end(); object++ ) {	
+			for( std::vector< BlueBear::LotEntity >::iterator object = this->currentLot->objects.begin(); object != this->currentLot->objects.end(); object++ ) {	
 				object->execute( this->worldTicks );
 			}
 		}

@@ -1,4 +1,4 @@
-#include "object.hpp"
+#include "lotentity.hpp"
 #include "utility.hpp"
 #include "bbtypes.hpp"
 #include <iostream>
@@ -14,9 +14,9 @@ extern "C" {
 namespace BlueBear {
 	
 	/**
-	 * Every BlueBear::Object is tied to its Lua instance in the _lotinsts table
+	 * Every BlueBear::LotEntity is tied to its Lua instance in the _lotinsts table
 	 */
-	Object::Object( lua_State* L, const char* idKey, char* popPackage, int popSize, int categoryID ) : objType( idKey ) {
+	LotEntity::LotEntity( lua_State* L, const char* idKey, char* popPackage, int popSize, int categoryID ) : objType( idKey ) {
 		
 		// Store pointer to Luasphere on this object
 		this->L = L;
@@ -46,7 +46,7 @@ namespace BlueBear {
 		
 	}
 	
-	void Object::execute( unsigned int worldTicks ) {
+	void LotEntity::execute( unsigned int worldTicks ) {
 		
 		if( this->ok == false ) {
 			return;
