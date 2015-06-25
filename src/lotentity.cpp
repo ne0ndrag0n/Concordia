@@ -16,10 +16,13 @@ namespace BlueBear {
 	/**
 	 * Every BlueBear::LotEntity is tied to its Lua instance in the _lotinsts table
 	 */
-	LotEntity::LotEntity( lua_State* L, const char* idKey, char* popPackage, int popSize, int categoryID ) : objType( idKey ) {
+	LotEntity::LotEntity( lua_State* L, const char* idKey, char* popPackage, int popSize, BlueBear::LotEntityType lotEntityType ) : objType( idKey ) {
 		
 		// Store pointer to Luasphere on this object
 		this->L = L;
+		
+		// Store lot entity type
+		this->lotEntityType = lotEntityType;
 		
 		// Get fresh start with the Lua stack
 		Utility::clearLuaStack( L );
@@ -33,9 +36,10 @@ namespace BlueBear {
 		// Push _bbobject key and POP package. Push whether or not this object is a plain object or a player character
 		lua_pushstring( L, idKey );
 		lua_pushlstring( L, popPackage, popSize );
+		lua_pushnumber( L, static_cast< lua_Number >( lotEntityType ) + 1 );
 
 		// Call instantiate_pop
-		if( lua_pcall( L, 2, 1, 0 ) == 0 ) {
+		if( lua_pcall( L, 3, 1, 0 ) == 0 ) {
 			this->ok = true;
 			
 			// This will return a reference to the entry in _bblib - Pop and use this to store a reference to this function in this->luaVMInstance

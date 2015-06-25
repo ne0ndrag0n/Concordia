@@ -16,6 +16,10 @@ _classes = {
 };
 
 bluebear = {
+	
+	Constants = {
+		LOT_ENTITY_TYPES = { "objects", "players" }
+	},
 
 	register_object = function( identifier, object_table ) 
 		

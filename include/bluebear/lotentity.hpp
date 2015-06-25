@@ -21,8 +21,9 @@ namespace BlueBear {
 			int luaVMInstance;
 			int lotTableRef;
 			std::string objType;
+			BlueBear::LotEntityType lotEntityType;
 			LotEntity( lua_State* L, const char* idKey );
-			LotEntity( lua_State* L, const char* idKey, char* popPackage, int popSize, int categoryID );
+			LotEntity( lua_State* L, const char* idKey, char* popPackage, int popSize, BlueBear::LotEntityType lotEntityType );
 			void execute( unsigned int worldTicks );
 			char* save();
 			void load( char* pickledObject );

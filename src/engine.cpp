@@ -122,7 +122,7 @@ namespace BlueBear {
 					
 					// Add object to Engine objects vector
 					// BlueBear::LotEntity instances are wrappers around the Lua instances of the object
-					BlueBear::LotEntity obj( this->L, objectIDs.at( odtIndex ).c_str(), pop, popSize, categoryFlag );
+					BlueBear::LotEntity obj( this->L, objectIDs.at( odtIndex ).c_str(), pop, popSize, static_cast< BlueBear::LotEntityType >( categoryFlag ) );
 					// Set a reference to the lot table on this object
 					obj.lotTableRef = lotTableRef;
 					this->currentLot->objects.push_back( obj );
