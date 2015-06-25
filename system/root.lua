@@ -8,7 +8,7 @@ _classes = {
 	
 	object_templates = {},
 	
-	traits = {},
+	motives = {},
 	
 	players = {},
 	
@@ -123,12 +123,12 @@ bluebear = {
 	end,
 	
 	register_motive = function( motive_key, motive_table )
-		_classes.traits[ motive_key ] = motive_table
-		return _classes.traits[ motive_key ]
+		_classes.motives[ motive_key ] = motive_table
+		return _classes.motives[ motive_key ]
 	end,
 	
 	get_motive_table = function( motive_id ) 
-		return _classes.traits[ motive_id ]
+		return _classes.motives[ motive_id ]
 	end,
 	
 	call_super = function( id, func_id ) 
