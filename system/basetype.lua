@@ -2,6 +2,17 @@
 
 -- Register default traits
 
+local base_object = {
+	
+	main = function( self, lot ) 
+		-- Do nothing: sleep 24 hours (86400000 game ticks)
+		return 86400000
+	end
+	
+}
+base_object.__index = base_object
+_classes.objects[ 'base_object' ] = base_object
+
 bluebear.register_motive( "hunger", {
 	name = "Hunger",
 	decay_rate = 10,

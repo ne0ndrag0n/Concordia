@@ -21,7 +21,7 @@ bluebear = {
 		LOT_ENTITY_TYPES = { "objects", "players" }
 	},
 
-	register_object = function( identifier, object_table ) 
+	register_object = function( identifier, object_table, _skip_inheritance ) 
 		
 		local id = identifier:split( '.' )
 		
@@ -153,3 +153,4 @@ bluebear = {
 };
 
 dofile( "system/basetype.lua" )
+
