@@ -21,7 +21,7 @@ bluebear = {
 		LOT_ENTITY_TYPES = { "objects", "players" }
 	},
 
-	register_object = function( identifier, object_table, _skip_inheritance ) 
+	register_object = function( identifier, object_table, skip_default_mixin ) 
 		
 		local id = identifier:split( '.' )
 		
@@ -76,6 +76,12 @@ bluebear = {
 		end
 		
 		-- Table fits the expected pattern!
+		
+		-- Unless we already did so, mix-in base_object
+		if skip_default_mixin ~= true then
+			object_table = _bblib.extend_object( _classes.objects[ 'base_object' ], object_table )
+		end
+		
 		-- "Class-ify" the object_table into something we can instantiate
 		object_table.new = function() 
 			local self = setmetatable( {}, { __index = object_table } )
@@ -90,6 +96,8 @@ bluebear = {
 	-- No verification is being done here - that'll be caught by bluebear.register_object
 	register_object_template = function( identifier, template_table ) 
 		if template_table ~= nil then
+			-- Extend base_object into all templates
+			local extended = _bblib.extend_object( _classes.objects[ 'base_object' ], template_table )
 			_classes.object_templates[ identifier ] = template_table
 			print( "Registered object template "..identifier )
 			return _classes.object_templates[ identifier ]

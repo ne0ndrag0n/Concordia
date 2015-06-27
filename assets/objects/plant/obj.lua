@@ -8,7 +8,7 @@ local flowers = {
 	
 	main = function( self, lot ) 
 		local ticks_delay = bluebear.call_super( 'potted_plant', 'main' )( self, lot )
-		
+
 		return ticks_delay
 	end
 }
