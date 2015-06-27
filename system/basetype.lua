@@ -26,7 +26,6 @@ bluebear.register_motive( "hunger", {
 		}
 	}
 } )
-
 bluebear.register_motive( "hygiene", {
 	name = "Hygiene",
 	decay_rate = 10,
