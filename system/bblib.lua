@@ -28,7 +28,7 @@ _bblib = {
 		local copy = {}
 		
 		for k,v in pairs( original ) do
-			if type( v ) == "taable" then
+			if type( v ) == "table" then
 				copy[ k ] = _bblib.deep_copy_table( v )
 			else
 				copy[ k ] = v
