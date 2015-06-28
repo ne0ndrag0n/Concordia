@@ -24,21 +24,14 @@ _bblib = {
 		return new_table
 	end,
 	
-	deep_copy_table = function( original )
-		local copy = {}
-		
-		for k,v in pairs( original ) do
-			if type( v ) == "table" then
-				copy[ k ] = _bblib.deep_copy_table( v )
-			else
-				copy[ k ] = v
-			end
-		end
-		
-		-- don't deep copy userdata
-		-- don't deep copy metatables
-		
-		return copy
+	deep_copy_table = function( obj, seen )
+	  if type( obj ) ~= 'table' then return obj end
+	  if seen and seen[ obj ] then return seen[ obj ] end
+	  local s = seen or {}
+	  local res = setmetatable( {}, getmetatable( obj ) )
+	  s[ obj ] = res
+	  for k, v in pairs( obj ) do res[ _bblib.deep_copy_table( k, s ) ] = _bblib.deep_copy_table( v, s ) end
+	  return res
 	end,
 	
 	concatenate_arrays = function( first, last ) 
