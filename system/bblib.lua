@@ -24,6 +24,23 @@ _bblib = {
 		return new_table
 	end,
 	
+	deep_copy_table = function( original )
+		local copy = {}
+		
+		for k,v in pairs( original ) do
+			if type( v ) == "taable" then
+				copy[ k ] = _bblib.deep_copy_table( v )
+			else
+				copy[ k ] = v
+			end
+		end
+		
+		-- don't deep copy userdata
+		-- don't deep copy metatables
+		
+		return copy
+	end,
+	
 	concatenate_arrays = function( first, last ) 
 		local new_table = {}
 		
@@ -135,3 +152,30 @@ _bblib = {
 	end
 
 };
+
+-- testing some new shit for the object model
+local Object = {
+	
+	a = 1,
+	
+	c = {
+		b = 2
+	}
+	
+}
+
+local Object1 = {
+	
+	b = 2
+	
+}
+
+local Object2 = {
+	
+	a = 3
+	
+}
+
+setmetatable( Object, { __index = Object } )
+setmetatable( Object1, { __index = Object } )
+setmetatable( Object2, { __index = Object1 } )
