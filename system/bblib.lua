@@ -8,17 +8,25 @@ end
 _bblib = {
 	lastcid = 0,
 
-	extend_object = function( parent, subclass )
+	extend_object = function( parent, subclass, deep_tables )
 		local new_table = {}
 		
-		-- Shallow copy parent to new_table
+		-- Shallow (or deep) copy parent to new_table
 		for k,v in pairs( parent ) do
-			new_table[ k ] = v
+			if deep_tables == true and type( v ) == "table" then
+				new_table[ k ] = _bblib.deep_copy_table( v )
+			else
+				new_table[ k ] = v
+			end
 		end
 	
 		-- Overwrite with shallow references to subclass
 		for k,v in pairs( subclass ) do
-			new_table[ k ] = v
+			if deep_tables == true and type( v ) == "table" then
+				new_table[ k ] = v
+			else
+				new_table[ k ] = v
+			end
 		end
 		
 		return new_table

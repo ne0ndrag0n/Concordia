@@ -79,7 +79,7 @@ bluebear = {
 		
 		-- Unless we already did so, mix-in base_object
 		if skip_default_mixin ~= true then
-			object_table = _bblib.extend_object( _classes.objects[ 'base_object' ], object_table )
+			object_table = _bblib.extend_object( _classes.objects[ 'base_object' ], object_table, true )
 		end
 		
 		-- "Class-ify" the object_table into something we can instantiate
@@ -97,7 +97,7 @@ bluebear = {
 	register_object_template = function( identifier, template_table ) 
 		if template_table ~= nil then
 			-- Extend base_object into all templates
-			local extended = _bblib.extend_object( _classes.objects[ 'base_object' ], template_table )
+			local extended = _bblib.extend_object( _classes.objects[ 'base_object' ], template_table, true )
 			_classes.object_templates[ identifier ] = template_table
 			print( "Registered object template "..identifier )
 			return _classes.object_templates[ identifier ]
