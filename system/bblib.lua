@@ -145,30 +145,3 @@ _bblib = {
 	end
 
 };
-
--- testing some new shit for the object model
-local Object = {
-	
-	a = 1,
-	
-	c = {
-		b = 2
-	}
-	
-}
-
-local Object1 = {
-	
-	b = 2
-	
-}
-
-local Object2 = {
-	
-	a = 3
-	
-}
-
-setmetatable( Object, { __index = Object } )
-setmetatable( Object1, { __index = Object } )
-setmetatable( Object2, { __index = Object1 } )
