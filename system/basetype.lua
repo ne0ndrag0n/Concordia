@@ -3,8 +3,6 @@
 -- Register default traits
 
 local base_object = {
-
-	_BAOBVER = { test = 0.1 },
 	
 	main = function( self, lot ) 
 		-- Do nothing: sleep 24 hours (86400000 game ticks)
