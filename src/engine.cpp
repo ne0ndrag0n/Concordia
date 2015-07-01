@@ -89,8 +89,15 @@ namespace BlueBear {
 				char* odtPtr = odt;
 				size_t index = 0;
 				while ( index < static_cast< size_t >( odtSize ) ) {
-					objectIDs.push_back( { BlueBear::LotEntityType::TYPE_OBJECT, std::string( odtPtr ) } );
-					index = index + objectIDs.back().typeKey.size() + 1;
+					// Get the type of this object
+					BlueBear::LotEntityType lotEntityType = static_cast< BlueBear::LotEntityType >( odtPtr[ 0 ] );
+					
+					// Control for ODT type header
+					odtPtr++;
+					
+					objectIDs.push_back( { lotEntityType, std::string( odtPtr ) } );
+					
+					index = index + objectIDs.back().typeKey.size() + 2;
 					odtPtr += objectIDs.back().typeKey.size() + 1;
 				}
 				
@@ -106,10 +113,7 @@ namespace BlueBear {
 				this->currentLot->objects.clear();
 
 				// Create BBLotEntitys
-				for( size_t i = 0; i != oitSize; i++ ) {
-					// Each POP begins with the category flag
-					uint8_t categoryFlag = 0;
-					
+				for( size_t i = 0; i != oitSize; i++ ) {					
 					// Each POP also begins with an index of the item in the OIT
 					uint16_t odtIndex = Utility::getuint16_t( &lot );
 					
@@ -122,7 +126,7 @@ namespace BlueBear {
 					
 					// Add object to Engine objects vector
 					// BlueBear::LotEntity instances are wrappers around the Lua instances of the object
-					BlueBear::LotEntity obj( this->L, objectIDs.at( odtIndex ).typeKey.c_str(), pop, popSize, static_cast< BlueBear::LotEntityType >( categoryFlag ) );
+					BlueBear::LotEntity obj( this->L, objectIDs[ odtIndex ].typeKey.c_str(), pop, popSize, objectIDs[ odtIndex ].lotEntityType );
 					// Set a reference to the lot table on this object
 					obj.lotTableRef = lotTableRef;
 					this->currentLot->objects.push_back( obj );
