@@ -108,7 +108,7 @@ namespace BlueBear {
 				// Create BBLotEntitys
 				for( size_t i = 0; i != oitSize; i++ ) {
 					// Each POP begins with the category flag
-					uint8_t categoryFlag = Utility::getuint8_t( &lot );
+					uint8_t categoryFlag = 0;
 					
 					// Each POP also begins with an index of the item in the OIT
 					uint16_t odtIndex = Utility::getuint16_t( &lot );
