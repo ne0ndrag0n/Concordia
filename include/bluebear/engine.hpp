@@ -25,7 +25,7 @@ namespace BlueBear {
 			lua_State* L;
 			unsigned int worldTicks;
 			Lot* currentLot;
-			bool verifyODT( std::vector< std::string > odt );
+			bool verifyODT( std::vector< BlueBear::OdtEntry > odt );
 			int createLotTable( Lot* lot );
 
 		public:

@@ -83,15 +83,15 @@ namespace BlueBear {
 				// Read in the ODT
 				char odt[ odtSize ] = { 0 };
 				lot.read( odt, static_cast< int >( odtSize ) );
-				std::vector< std::string > objectIDs;
+				std::vector< BlueBear::OdtEntry > objectIDs;
 				
 				// Create ODT table
 				char* odtPtr = odt;
 				size_t index = 0;
 				while ( index < static_cast< size_t >( odtSize ) ) {
-					objectIDs.push_back( std::string( odtPtr ) );
-					index = index + objectIDs.back().size() + 1;
-					odtPtr += objectIDs.back().size() + 1;
+					objectIDs.push_back( { BlueBear::LotEntityType::TYPE_OBJECT, std::string( odtPtr ) } );
+					index = index + objectIDs.back().typeKey.size() + 1;
+					odtPtr += objectIDs.back().typeKey.size() + 1;
 				}
 				
 				// Verify each object exists
@@ -122,7 +122,7 @@ namespace BlueBear {
 					
 					// Add object to Engine objects vector
 					// BlueBear::LotEntity instances are wrappers around the Lua instances of the object
-					BlueBear::LotEntity obj( this->L, objectIDs.at( odtIndex ).c_str(), pop, popSize, static_cast< BlueBear::LotEntityType >( categoryFlag ) );
+					BlueBear::LotEntity obj( this->L, objectIDs.at( odtIndex ).typeKey.c_str(), pop, popSize, static_cast< BlueBear::LotEntityType >( categoryFlag ) );
 					// Set a reference to the lot table on this object
 					obj.lotTableRef = lotTableRef;
 					this->currentLot->objects.push_back( obj );
@@ -144,7 +144,7 @@ namespace BlueBear {
 	 * 
 	 * @param		{std::vector< std::string >}	odt		The object definition table
 	 */
-	bool Engine::verifyODT( std::vector< std::string > odt ) {
+	bool Engine::verifyODT( std::vector< BlueBear::OdtEntry > odt ) {
 		Utility::clearLuaStack( this->L );
 		
 		// Push _classes onto Lua API stack
@@ -153,8 +153,8 @@ namespace BlueBear {
 		// Get "objects" within classes
 		Utility::getTableValue( this->L, "objects" );
 
-		for ( std::vector< std::string >::iterator odtEntry = odt.begin(); odtEntry != odt.end(); odtEntry++ ) {
-			Utility::getTableValue( this->L, odtEntry->c_str() );
+		for ( std::vector< BlueBear::OdtEntry >::iterator odtEntry = odt.begin(); odtEntry != odt.end(); odtEntry++ ) {
+			Utility::getTableValue( this->L, odtEntry->typeKey.c_str() );
 			if( !lua_istable( this->L, -1 ) ) {
 				std::cout << "Not a table!" << std::endl;
 				lua_pop( L, 1 );

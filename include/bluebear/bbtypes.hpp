@@ -3,6 +3,7 @@
 
 #include <chrono>
 #include <cstdint>
+#include <string>
 
 typedef unsigned char		u8;
 typedef unsigned short		u16;
@@ -34,6 +35,11 @@ namespace BlueBear {
 		uint8_t terrainType;
 		
 	} BBLTLotHeader;
+	
+	typedef struct {
+		LotEntityType lotEntityType;
+		std::string	typeKey;
+	} OdtEntry;
 	
 }
 
