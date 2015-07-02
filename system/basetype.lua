@@ -7,6 +7,10 @@ local base_object = {
 	main = function( self, lot ) 
 		-- Do nothing: sleep 24 hours (86400000 game ticks)
 		return 86400000
+	end,
+	
+	in_use = function( self )
+		return not not self._sys.locked
 	end
 	
 }
