@@ -134,7 +134,7 @@ _bblib = {
 		return "bb"..self.lastcid
 	end,
 	
-	instantiate_pop = function( id, pop, entity_type )	
+	instantiate_pop = function( id, pop, entity_type )
 		local bbobject = _classes[ bluebear.Constants.LOT_ENTITY_TYPES[ entity_type ] ][ id ].new()
 		bbobject.type = id 
 		bbobject._cid = _bblib:get_cid()
