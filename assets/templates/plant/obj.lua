@@ -9,9 +9,8 @@ local template = {
 				return self.water_level ~= 0
 			end,
 			action = function( self, player, lot ) 
-				print( "Watering" )
 				self.water_level = 100
-				print( "Watered" )
+				print( "Watered. Water level now "..self.water_level )
 			end
 		},
 		{

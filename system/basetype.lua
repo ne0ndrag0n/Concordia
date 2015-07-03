@@ -5,8 +5,9 @@
 local base_object = {
 	
 	main = function( self, lot ) 
-		-- Do nothing: sleep 24 hours (86400000 game ticks)
-		return 86400000
+		-- Do nothing: sleep 1 minute
+		print( "This is a lot player!" )
+		return 60000
 	end,
 	
 	in_use = function( self )
