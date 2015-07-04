@@ -16,6 +16,8 @@ extern "C" {
 #define BLUEBEAR_TEMPLATES_DIRECTORY "assets/templates/"
 #define BLUEBEAR_LOT_MAGIC_ID 		 0x42424C54
 #define WORLD_TICKS_MAX				 604800000
+#define	LUASPHERE_OBJECTS_TABLE		 "objects"
+#define LUASPHERE_PLAYERS_TABLE		 "players"
 
 namespace BlueBear {
 
@@ -27,6 +29,7 @@ namespace BlueBear {
 			Lot* currentLot;
 			bool verifyODT( std::vector< BlueBear::OdtEntry > odt );
 			int createLotTable( Lot* lot );
+			std::string getTitleFromPopType( BlueBear::LotEntityType lotEntityType );
 
 		public:
 			Engine();

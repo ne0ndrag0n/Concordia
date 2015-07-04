@@ -153,21 +153,40 @@ namespace BlueBear {
 		
 		// Push _classes onto Lua API stack
 		lua_getglobal( this->L, "_classes" );
-		
-		// Get "objects" within classes
-		Utility::getTableValue( this->L, "objects" );
 
 		for ( std::vector< BlueBear::OdtEntry >::iterator odtEntry = odt.begin(); odtEntry != odt.end(); odtEntry++ ) {
+			// Determine poptable type and push this table onto the stack
+			Utility::getTableValue( this->L, this->getTitleFromPopType( odtEntry->lotEntityType ).c_str() );
+			
 			Utility::getTableValue( this->L, odtEntry->typeKey.c_str() );
 			if( !lua_istable( this->L, -1 ) ) {
 				std::cout << "Not a table!" << std::endl;
-				lua_pop( L, 1 );
+				lua_pop( L, 2 );
 				return false;
 			}
-			lua_pop( L, 1 );
+			
+			// Pop both the value and lookup off the stack
+			lua_pop( L, 2 );
 		}
 		
 		return true;
+	}
+	
+	/**
+	 * Translate the lot entity type to a table title that we can use to grab the object in the Luasphere 
+	 * 
+	 * This returns std::string to avoid heap corruption crap
+	 */
+	std::string Engine::getTitleFromPopType( BlueBear::LotEntityType lotEntityType ) {
+		switch( lotEntityType ) {
+			case BlueBear::LotEntityType::TYPE_OBJECT:
+				return std::string( LUASPHERE_OBJECTS_TABLE );
+			case BlueBear::LotEntityType::TYPE_CHARACTER:
+				return std::string( LUASPHERE_PLAYERS_TABLE );
+			default:
+				// Fallback on objects? this should never happen
+				return std::string( LUASPHERE_OBJECTS_TABLE );
+		}
 	}
 	
 	/**
