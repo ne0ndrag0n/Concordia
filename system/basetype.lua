@@ -14,6 +14,10 @@ local base_object = {
 	end
 	
 }
+base_object.new = function()
+	local self = setmetatable( {}, { __index = base_object } )
+	return self
+end
 _classes.objects[ 'base_object' ] = base_object
 
 bluebear.register_motive( "hunger", {
@@ -80,6 +84,10 @@ local base_player = {
 		energy = bluebear.get_motive_table( "energy" )
 	},
 	
+	catalog = {
+		name = "base player"
+	},
+	
 	main = function( self, lot ) 
 		print( "Player runs" )
 		
@@ -87,4 +95,8 @@ local base_player = {
 	end
 
 }
+base_player.new = function()
+	local self = setmetatable( {}, { __index = base_player } )
+	return self
+end
 _classes.players[ 'base_player' ] = base_player
