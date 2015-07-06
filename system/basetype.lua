@@ -89,7 +89,7 @@ local base_player = {
 	},
 	
 	main = function( self, lot ) 
-		print( "Player runs" )
+		print( "Hello from Lua! I am player instance ("..self._cid..")" )
 		
 		return 43200
 	end
