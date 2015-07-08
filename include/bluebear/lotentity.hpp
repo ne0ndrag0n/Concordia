@@ -28,6 +28,8 @@ namespace BlueBear {
 			char* save();
 			void load( char* pickledObject );
 			bool good();
+			
+			static int lua_getLotEntityObject( lua_State* L );
 		
 	};
 	
