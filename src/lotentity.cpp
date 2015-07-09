@@ -107,4 +107,8 @@ namespace BlueBear {
 			Utility::setTableIntValue( this->L, "_sched", worldTicks + nextTickSchedule );
 		}
 	}
+	
+	int LotEntity::lua_getLotEntityObject( lua_State* L ) {
+		
+	}
 }
