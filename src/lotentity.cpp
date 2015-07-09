@@ -109,6 +109,8 @@ namespace BlueBear {
 	}
 	
 	int LotEntity::lua_getLotEntityObject( lua_State* L ) {
+		BlueBear::LotEntity* lotEntity = ( BlueBear::LotEntity* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+		
 		
 	}
 }
