@@ -30,6 +30,7 @@ namespace BlueBear {
 			bool verifyODT( std::vector< BlueBear::OdtEntry > odt );
 			int createLotTable( Lot* lot );
 			std::string getTitleFromPopType( BlueBear::LotEntityType lotEntityType );
+			void callActionOnObject( const char* playerId, const char* obejctId, const char* method );
 
 		public:
 			Engine();

@@ -227,5 +227,13 @@ namespace BlueBear {
 		
 		std::cout << std::endl;
 	}
+	
+	/**
+	 * Given the cid of a player, the cid of an object, and its desired action, call the action method on the LotEntity
+	 * by passing the player identified by playerId as the "player" argument.
+	 */
+	void Engine::callActionOnObject( const char* playerId, const char* obejctId, const char* method ) {
+		
+	}
 
 }
