@@ -11,8 +11,6 @@ local template = {
 			action = function( self, player, lot ) 
 				self.water_level = 100
 				print( "Watered. Water level now "..self.water_level )
-				
-				return nil
 			end
 		},
 		{
