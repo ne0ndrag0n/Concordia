@@ -11,13 +11,6 @@ local base_object = {
 	
 	in_use = function( self )
 		return not not self._sys.locked
-	end,
-	
-	--[[
-		This function releases the action lock placed on an object by the process of calling an action via the C++ engine. 
-	]]
-	release_action_lock = function( self )
-		self._sys._actionlock = nil
 	end
 	
 }
