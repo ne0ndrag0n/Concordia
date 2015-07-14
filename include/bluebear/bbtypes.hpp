@@ -41,6 +41,10 @@ namespace BlueBear {
 		std::string	typeKey;
 	} OdtEntry;
 	
+	typedef struct {
+		int playerVMInstance;
+		std::string functionName;
+	} ActionDescriptor;
 }
 
 #endif
