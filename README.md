@@ -1,6 +1,8 @@
 Project BlueBear
 ================
 
+## This repository is no longer maintained. The project has been restarted using the C# language and is available at mipani/BlueBear.
+
 # Introduction
 
 Project **BlueBear** is a game for PC and Linux that lets you create and run your own dollhouse! Build a home for your people, place them inside, and preside over their lives to lead them to success!
