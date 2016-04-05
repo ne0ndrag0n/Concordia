@@ -1,0 +1,24 @@
+{
+	"rev": 0,
+	"floorx": 3,
+	"floory": 3,
+	"stories": 1,
+	"subtr": 0,
+	"terrain": "normal",
+	"ticks": 10,
+	"objs": [
+		{
+			"classID": "mipani.flowers",
+			"_sys": {
+				"_sched": 1337
+			},
+			"water_level": 100
+		},
+		{
+			"classID": "mipani.trashpile",
+			"_sys": {
+				"_sched": 2674
+			}
+		}
+	]
+}
