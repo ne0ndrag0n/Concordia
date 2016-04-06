@@ -4,7 +4,7 @@
 	"floory": 3,
 	"stories": 1,
 	"subtr": 0,
-	"terrain": "normal",
+	"terrain": 1,
 	"ticks": 10,
 	"objs": [
 		{

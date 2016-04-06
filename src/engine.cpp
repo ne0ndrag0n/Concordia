@@ -58,18 +58,27 @@ namespace BlueBear {
 		std::ifstream lot( lotPath );
 
 		if( lot.is_open() && lot.good() ) {
-			json serialLot( lot );
 
+			// Shitty library using exceptions!!
+			try {
+				json lotJSON( lot );
+
+				std::cout << "[" << lotPath << "] " << "Lot revision: " << lotJSON[ "rev" ] << std::endl;
+
+				// Instantiate the lot
+				int terrain = lotJSON[ "terrain" ];
+				this->currentLot = new BlueBear::Lot(
+					lotJSON[ "floorx" ],
+					lotJSON[ "floory" ],
+					lotJSON[ "stories" ],
+					lotJSON[ "subtr" ],
+					BlueBear::TerrainType( terrain )
+				);
+			} catch( ... ) {
+				std::cout <<  "Failed to parse JSON object: " << lotPath <<  std::endl;
+				return false;
+			}
 			/*
-			// Instantiate the lot
-			this->currentLot = new BlueBear::Lot(
-				lotHeader.lotX,
-				lotHeader.lotY,
-				lotHeader.numStories,
-				lotHeader.undergroundStories,
-				static_cast< BlueBear::TerrainType >( lotHeader.terrainType )
-			);
-
 
 			// Create one lot table for the Luasphere - contains functions that we call on this->currentLot to do things like get other objects on the lot and trigger events
 			lotTableRef = this->createLotTable( this->currentLot );
