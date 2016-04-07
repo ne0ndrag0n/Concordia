@@ -49,4 +49,4 @@ local flowers = {
 }
 
 
-bluebear.register_object( "mipani.flowers", flowers )
+bluebear.register_class( "mipani.flowers", flowers )

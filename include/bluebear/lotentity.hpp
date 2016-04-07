@@ -2,6 +2,7 @@
 #define BBOBJECT
 
 #include "bbtypes.hpp"
+#include "json.hpp"
 #include <string>
 #include <queue>
 
@@ -11,10 +12,12 @@ extern "C" {
 	#include "lauxlib.h"
 }
 
+using json = nlohmann::json;
+
 namespace BlueBear {
-	
+
 	class LotEntity {
-		
+
 		private:
 			bool ok = false;
 			lua_State* L;
@@ -24,17 +27,16 @@ namespace BlueBear {
 			std::string objType;
 			BlueBear::LotEntityType lotEntityType;
 			std::queue< BlueBear::ActionDescriptor > actionQueue;
-			LotEntity( lua_State* L, const char* idKey );
-			LotEntity( lua_State* L, const char* idKey, char* popPackage, int popSize, BlueBear::LotEntityType lotEntityType );
+			LotEntity( lua_State* L, json savedTable );
 			void execute( unsigned int worldTicks );
 			char* save();
 			void load( char* pickledObject );
 			bool good();
-			
+
 			static int lua_getLotEntityObject( lua_State* L );
-		
+
 	};
-	
+
 }
 
 #endif

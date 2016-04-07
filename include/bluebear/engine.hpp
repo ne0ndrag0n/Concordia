@@ -17,6 +17,8 @@ extern "C" {
 #define	LUASPHERE_OBJECTS_TABLE		 "objects"
 #define LUASPHERE_PLAYERS_TABLE		 "players"
 
+using json = nlohmann::json;
+
 namespace BlueBear {
 
 	class Engine {

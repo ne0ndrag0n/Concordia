@@ -15,8 +15,6 @@ extern "C" {
 	#include "lauxlib.h"
 }
 
-using json = nlohmann::json;
-
 namespace BlueBear {
 
 	Engine::Engine() {
@@ -80,6 +78,10 @@ namespace BlueBear {
 				this->currentLot->objects.clear();
 
 				// Iterate through the "entities" array: each object within is a serialised LotEntity
+				json entities = lotJSON[ "entities" ];
+				for( json element : entities ) {
+					std::cout << "New object, its classID: " << element[ "classID" ] << std::endl;
+				}
 			} catch( ... ) {
 				std::cout <<  "Failed to parse JSON object: " << lotPath <<  std::endl;
 				return false;
