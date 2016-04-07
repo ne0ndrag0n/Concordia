@@ -40,9 +40,6 @@ namespace BlueBear {
 		}
 
 		// Setup the root environment by loading in and "class-ifying" all objects used by the game
-		// Start with templates
-		Utility::doDirectories( L, BLUEBEAR_TEMPLATES_DIRECTORY );
-		// Now do the objects
 		Utility::doDirectories( L, BLUEBEAR_OBJECTS_DIRECTORY );
 
 		return true;
@@ -74,54 +71,21 @@ namespace BlueBear {
 					lotJSON[ "subtr" ],
 					BlueBear::TerrainType( terrain )
 				);
+
+				// Create one lot table for the Luasphere - contains functions that we call on this->currentLot to do things like get other objects on the lot and trigger events
+				lotTableRef = this->createLotTable( this->currentLot );
+
+				this->worldTicks = lotJSON[ "ticks" ];
+
+				this->currentLot->objects.clear();
+
+				// Iterate through the "entities" array: each object within is a serialised LotEntity
 			} catch( ... ) {
 				std::cout <<  "Failed to parse JSON object: " << lotPath <<  std::endl;
 				return false;
 			}
+
 			/*
-
-			// Create one lot table for the Luasphere - contains functions that we call on this->currentLot to do things like get other objects on the lot and trigger events
-			lotTableRef = this->createLotTable( this->currentLot );
-
-			// This doesn't seem to work properly as part of the struct. don't know why, so get it separately instead
-			uint32_t lotTime = Utility::getuint32_t( &lot );
-			this->worldTicks = static_cast< unsigned int >( lotTime );
-
-			// Load length of LotEntity Definition Table (ODT)
-			uint32_t odtSize = Utility::getuint32_t( &lot );
-
-			// Read in the ODT
-			char odt[ odtSize ] = { 0 };
-			lot.read( odt, static_cast< int >( odtSize ) );
-			std::vector< BlueBear::OdtEntry > objectIDs;
-
-			// Create ODT table
-			char* odtPtr = odt;
-			size_t index = 0;
-			while ( index < static_cast< size_t >( odtSize ) ) {
-				// Get the type of this object
-				BlueBear::LotEntityType lotEntityType = static_cast< BlueBear::LotEntityType >( odtPtr[ 0 ] );
-
-				// Control for ODT type header
-				odtPtr++;
-
-				objectIDs.push_back( { lotEntityType, std::string( odtPtr ) } );
-
-				index = index + objectIDs.back().typeKey.size() + 2;
-				odtPtr += objectIDs.back().typeKey.size() + 1;
-			}
-
-			// Verify each object exists
-			if( !( this->verifyODT( objectIDs ) ) ) {
-				std::cout << "An object in this lot does not exist in the global ODT!" << std::endl;
-				return false;
-			}
-
-			// Get size of the OIT
-			uint32_t oitSize = Utility::getuint32_t( &lot );
-
-			this->currentLot->objects.clear();
-
 			// Create BBLotEntitys
 			for( size_t i = 0; i != oitSize; i++ ) {
 				// Each POP also begins with an index of the item in the OIT
@@ -145,53 +109,6 @@ namespace BlueBear {
 		}
 
 		return false;
-	}
-
-	/**
-	 * @private
-	 * Verify that the LotEntity Definition Table entries have corresponding objects in the Luasphere
-	 *
-	 * @param		{std::vector< std::string >}	odt		The object definition table
-	 */
-	bool Engine::verifyODT( std::vector< BlueBear::OdtEntry > odt ) {
-		Utility::clearLuaStack( this->L );
-
-		// Push _classes onto Lua API stack
-		lua_getglobal( this->L, "_classes" );
-
-		for ( std::vector< BlueBear::OdtEntry >::iterator odtEntry = odt.begin(); odtEntry != odt.end(); odtEntry++ ) {
-			// Determine poptable type and push this table onto the stack
-			Utility::getTableValue( this->L, this->getTitleFromPopType( odtEntry->lotEntityType ).c_str() );
-
-			Utility::getTableValue( this->L, odtEntry->typeKey.c_str() );
-			if( !lua_istable( this->L, -1 ) ) {
-				std::cout << "Not a table!" << std::endl;
-				lua_pop( L, 2 );
-				return false;
-			}
-
-			// Pop both the value and lookup off the stack
-			lua_pop( L, 2 );
-		}
-
-		return true;
-	}
-
-	/**
-	 * Translate the lot entity type to a table title that we can use to grab the object in the Luasphere
-	 *
-	 * This returns std::string to avoid heap corruption crap
-	 */
-	std::string Engine::getTitleFromPopType( BlueBear::LotEntityType lotEntityType ) {
-		switch( lotEntityType ) {
-			case BlueBear::LotEntityType::TYPE_OBJECT:
-				return std::string( LUASPHERE_OBJECTS_TABLE );
-			case BlueBear::LotEntityType::TYPE_CHARACTER:
-				return std::string( LUASPHERE_PLAYERS_TABLE );
-			default:
-				// Fallback on objects? this should never happen
-				return std::string( LUASPHERE_OBJECTS_TABLE );
-		}
 	}
 
 	/**

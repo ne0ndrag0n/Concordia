@@ -6,7 +6,7 @@
 	"subtr": 0,
 	"terrain": 1,
 	"ticks": 10,
-	"objs": [
+	"entities": [
 		{
 			"classID": "mipani.flowers",
 			"_sys": {
