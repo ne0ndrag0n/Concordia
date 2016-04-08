@@ -29,4 +29,4 @@ local trashpile = {
 }
 
 
-bluebear.register_class( "mipani.trashpile", trashpile )
+bluebear.register_class( "game.trashpile", trashpile )

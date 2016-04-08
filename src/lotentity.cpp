@@ -17,7 +17,7 @@ namespace BlueBear {
 	/**
 	 * Every BlueBear::LotEntity is tied to its Lua instance in the _lotinsts table
 	 */
-	LotEntity::LotEntity( lua_State* L, json savedTable ) {
+	LotEntity::LotEntity( lua_State* L, json savedTable, int lotTableRef ) : lotTableRef( lotTableRef ) {
 
 		// Store pointer to Luasphere on this object
 		this->L = L;
@@ -29,9 +29,6 @@ namespace BlueBear {
 		lua_getglobal( L, "_bblib" );
 
 		/*
-		// Store lot entity type
-		this->lotEntityType = lotEntityType;
-
 		// Get instantiate_pop method
 		Utility::getTableValue( L, "instantiate_pop" );
 

@@ -19,15 +19,15 @@ namespace BlueBear {
 	class LotEntity {
 
 		private:
-			bool ok = false;
 			lua_State* L;
 		public:
+			bool ok = false;
 			int luaVMInstance;
 			int lotTableRef;
 			std::string objType;
 			BlueBear::LotEntityType lotEntityType;
 			std::queue< BlueBear::ActionDescriptor > actionQueue;
-			LotEntity( lua_State* L, json savedTable );
+			LotEntity( lua_State* L, json savedTable, int lotTableRef );
 			void execute( unsigned int worldTicks );
 			char* save();
 			void load( char* pickledObject );

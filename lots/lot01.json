@@ -9,15 +9,19 @@
 	"entities": [
 		{
 			"classID": "mipani.flowers",
-			"_sys": {
-				"_sched": 1337
-			},
-			"water_level": 100
+			"instance": {
+				"_sys": {
+					"_sched": 1337
+				},
+				"water_level": 100
+			}
 		},
 		{
 			"classID": "mipani.trashpile",
-			"_sys": {
-				"_sched": 2674
+			"instance": {
+				"_sys": {
+					"_sched": 2674
+				}
 			}
 		}
 	]

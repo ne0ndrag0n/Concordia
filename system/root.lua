@@ -1,7 +1,9 @@
 -- Provides the root environment for Lua scripts within the BlueBear engine
 -- DO NOT MODIFY THIS FILE, or else everything will get goofy
 
+-- Import base library and subsequent libraries
 dofile( "system/bblib.lua" )
+JSON = require( "system/JSON" )
 
 _classes = {};
 

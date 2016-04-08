@@ -80,7 +80,14 @@ namespace BlueBear {
 				// Iterate through the "entities" array: each object within is a serialised LotEntity
 				json entities = lotJSON[ "entities" ];
 				for( json element : entities ) {
-					std::cout << "New object, its classID: " << element[ "classID" ] << std::endl;
+					BlueBear::LotEntity obj( this->L, element, lotTableRef );
+					//std::cout << "New object, its classID: " << element[ "classID" ] << std::endl;
+					if( obj.ok == true ) {
+						this->currentLot->objects.push_back( obj );
+					} else {
+						// TODO: standard console log needed with cross-platform color abstraction required
+						std::cout << "\033[1;33m" << "Warning: Failed to instantiate lot object " << element[ "classID" ] << "\033[0m" << std::endl;
+					}
 				}
 			} catch( ... ) {
 				std::cout <<  "Failed to parse JSON object: " << lotPath <<  std::endl;
