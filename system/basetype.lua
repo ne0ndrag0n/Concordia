@@ -21,11 +21,17 @@ bluebear.register_motive( "hunger", {
 
 _classes.object = newclass();
 function _classes.object:load( saved )
-	print( "Warning: Object did not implement the load() method!" )
+	local data = saved or {}
+
+	self._sys = data._sys
 end
 
 function _classes.object:save()
-	return "{}";
+	local out = {
+		_sys = self._sys
+	}
+
+	return out
 end
 
 function _classes.object:setup()
