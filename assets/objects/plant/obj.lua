@@ -31,7 +31,7 @@ local Class = bluebear.extend( 'object', {
 		}
 	},
 
-	init = function( self, lot )
+	setup = function( self, lot )
 		self.water_level = 100
 	end,
 

@@ -11,7 +11,7 @@ local Class = bluebear.extend( 'object', {
 	},
 
 	-- This function will run when the object is first placed on the lot
-	init = function( self, lot )
+	setup = function( self, lot )
 		self.stink = 0
 	end,
 
