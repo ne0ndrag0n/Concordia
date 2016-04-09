@@ -80,8 +80,10 @@ namespace BlueBear {
 				// Iterate through the "entities" array: each object within is a serialised LotEntity
 				json entities = lotJSON[ "entities" ];
 				for( json element : entities ) {
-					BlueBear::LotEntity obj( this->L, element, lotTableRef );
-					//std::cout << "New object, its classID: " << element[ "classID" ] << std::endl;
+					// Dump JSON to string for Luasphere to create into new object and extend over
+					BlueBear::LotEntity obj( this->L, element.dump(), lotTableRef );
+
+					// obj.ok will be true if we completed successfully
 					if( obj.ok == true ) {
 						this->currentLot->objects.push_back( obj );
 					} else {
@@ -90,7 +92,7 @@ namespace BlueBear {
 					}
 				}
 			} catch( ... ) {
-				std::cout <<  "Failed to parse JSON object: " << lotPath <<  std::endl;
+				std::cout <<  "Failed to load lot: Library threw exception for lot " << lotPath <<  std::endl;
 				return false;
 			}
 

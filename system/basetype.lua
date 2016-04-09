@@ -18,3 +18,16 @@ bluebear.register_motive( "hunger", {
 	}
 } )
 --]]
+
+_classes.object = newclass();
+function _classes.object:load( saved )
+	print( "Warning: Object did not implement the load() method!" )
+end
+
+function _classes.object:save()
+	return "{}";
+end
+
+function _classes.object:setup()
+	self.cid = _bblib.get_cid()
+end

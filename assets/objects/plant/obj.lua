@@ -1,4 +1,4 @@
-local flowers = {
+local Class = bluebear.extend( 'object', {
 
 	water_level = nil,
 
@@ -46,7 +46,7 @@ local flowers = {
 		-- Do not re-execute for at least 43200 game ticks (12 simulated game hours)
 		return 43200
 	end
-}
+} )
 
 
-bluebear.register_class( "game.flowers.basic", flowers )
+bluebear.register_class( "game.flowers.base", Class )

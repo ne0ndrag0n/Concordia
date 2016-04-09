@@ -8,38 +8,33 @@ end
 _bblib = {
 	lastcid = 0,
 
-	extend_object = function( parent, subclass, deep_tables )
-		local new_table = {}
+	extend = function( destination, ... )
+		local arg = { ... }
 
-		-- Shallow (or deep) copy parent to new_table
-		for k,v in pairs( parent ) do
-			if deep_tables == true and type( v ) == "table" then
-				new_table[ k ] = _bblib.deep_copy_table( v )
-			else
-				new_table[ k ] = v
+		-- Overwrite with shallow references to each source
+		for index, source in ipairs( arg ) do
+			for key, value in pairs( source ) do
+				destination[ key ] = value
 			end
 		end
 
-		-- Overwrite with shallow references to subclass
-		for k,v in pairs( subclass ) do
-			if deep_tables == true and type( v ) == "table" then
-				new_table[ k ] = v
-			else
-				new_table[ k ] = v
-			end
-		end
-
-		return new_table
+		return destination
 	end,
 
-	deep_copy_table = function( obj, seen )
-	  if type( obj ) ~= 'table' then return obj end
-	  if seen and seen[ obj ] then return seen[ obj ] end
-	  local s = seen or {}
-	  local res = setmetatable( {}, getmetatable( obj ) )
-	  s[ obj ] = res
-	  for k, v in pairs( obj ) do res[ _bblib.deep_copy_table( k, s ) ] = _bblib.deep_copy_table( v, s ) end
-	  return res
+	-- Courtesy lua-users wiki: Copy Table - http://lua-users.org/wiki/CopyTable
+	deep_copy = function( orig )
+	    local orig_type = type(orig)
+	    local copy
+	    if orig_type == 'table' then
+	        copy = {}
+	        for orig_key, orig_value in next, orig, nil do
+	            copy[_bblib.deep_copy(orig_key)] = _bblib.deep_copy(orig_value)
+	        end
+	        setmetatable(copy, _bblib.deep_copy(getmetatable(orig)))
+	    else -- number, string, boolean, etc
+	        copy = orig
+	    end
+	    return copy
 	end,
 
 	concatenate_arrays = function( first, last )
@@ -56,9 +51,9 @@ _bblib = {
 		return new_table
 	end,
 
-	get_cid = function( self )
-		self.lastcid = self.lastcid + 1
-		return "bb"..self.lastcid
+	get_cid = function()
+		_bblib.lastcid = _bblib.lastcid + 1
+		return "bb".._bblib.lastcid
 	end
 
 };

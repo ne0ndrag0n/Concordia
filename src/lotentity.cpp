@@ -17,7 +17,7 @@ namespace BlueBear {
 	/**
 	 * Every BlueBear::LotEntity is tied to its Lua instance in the _lotinsts table
 	 */
-	LotEntity::LotEntity( lua_State* L, json savedTable, int lotTableRef ) : lotTableRef( lotTableRef ) {
+	LotEntity::LotEntity( lua_State* L, std::string jsonString, int lotTableRef ) : lotTableRef( lotTableRef ) {
 
 		// Store pointer to Luasphere on this object
 		this->L = L;

@@ -1,4 +1,4 @@
-local trashpile = {
+local Class = bluebear.extend( 'object', {
 
 	catalog = {
 		name = "bluebear trashpile",
@@ -26,7 +26,7 @@ local trashpile = {
 
 		return 86400
 	end
-}
+} )
 
 
-bluebear.register_class( "game.trashpile", trashpile )
+bluebear.register_class( "game.household.trashpile.base", Class )
