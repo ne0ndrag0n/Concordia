@@ -35,5 +35,5 @@ function _classes.object:save()
 end
 
 function _classes.object:setup()
-	self.cid = _bblib.get_cid()
+	self._cid = _bblib.get_cid()
 end

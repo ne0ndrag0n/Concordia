@@ -20,7 +20,7 @@ int main() {
 	// Load a lot object
 	if( engine.loadLot( "lots/lot01.json" ) ) {
 		// Setup a loop!
-		//engine.objectLoop();
+		engine.objectLoop();
 	}
 
 	return 0;

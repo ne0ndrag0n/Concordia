@@ -45,8 +45,6 @@ namespace BlueBear {
 
 	/**
 	 * Load a lot
-	 *
-	 * TODO: wtf do we do with these goddamn type mismatches
 	 */
 	bool Engine::loadLot( const char* lotPath ) {
 		int lotTableRef;
@@ -98,31 +96,9 @@ namespace BlueBear {
 				std::cout <<  "Failed to load lot: Library threw exception for lot " << lotPath <<  std::endl;
 				return false;
 			}
-
-			/*
-			// Create BBLotEntitys
-			for( size_t i = 0; i != oitSize; i++ ) {
-				// Each POP also begins with an index of the item in the OIT
-				uint16_t odtIndex = Utility::getuint16_t( &lot );
-
-				// This is the size of the POP
-				uint16_t popSize = Utility::getuint16_t( &lot );
-
-				// Create POP
-				char pop[ popSize ] = { 0 };
-				lot.read( pop, static_cast< int >( popSize ) );
-
-				// Add object to Engine objects vector
-				// BlueBear::LotEntity instances are wrappers around the Lua instances of the object
-				BlueBear::LotEntity obj( this->L, objectIDs[ odtIndex ].typeKey.c_str(), pop, popSize, objectIDs[ odtIndex ].lotEntityType );
-				// Set a reference to the lot table on this object
-				obj.lotTableRef = lotTableRef;
-				this->currentLot->objects.push_back( obj );
-			}
-			*/
 		}
 
-		return false;
+		return true;
 	}
 
 	/**
