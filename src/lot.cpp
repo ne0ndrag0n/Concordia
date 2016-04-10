@@ -1,6 +1,7 @@
 #include "bbtypes.hpp"
 #include "lotentity.hpp"
 #include "lot.hpp"
+#include "utility.hpp"
 #include <vector>
 #include <cstring>
 #include <string>
@@ -42,10 +43,10 @@ namespace BlueBear {
 		// Push 'em on!
 		size_t arrIndex = 1;
 		for( size_t index = 0; index != objectsLength; index++ ) {
-			if( lot->objects[ index ].lotEntityType == BlueBear::LotEntityType::TYPE_OBJECT ) {
-				lua_rawgeti( L, LUA_REGISTRYINDEX, lot->objects[ index ].luaVMInstance );
-				lua_rawseti( L, -2, arrIndex++ );
-			}
+			//if( lot->objects[ index ].lotEntityType == BlueBear::LotEntityType::TYPE_OBJECT ) {
+			//	lua_rawgeti( L, LUA_REGISTRYINDEX, lot->objects[ index ].luaVMInstance );
+			//	lua_rawseti( L, -2, arrIndex++ );
+			//}
 		}
 
 		return 1;
@@ -56,23 +57,51 @@ namespace BlueBear {
 
 		BlueBear::Lot* lot = ( BlueBear::Lot* )lua_touserdata( L, lua_upvalueindex( 1 ) );
 
-		// Get argument
-		std::string idKey( lua_tostring( L, -1 ) );
+		// Get argument (the class we are looking for) and remove it from the stack
+		// Copy using modern C++ string methods into archaic, unsafe C-string format used by Lua API
+		std::string keystring( lua_tostring( L, -1 ) );
+		const char* idKey = keystring.c_str();
 		lua_pop( L, 1 );
 
+		// This table will be the array of matching lot objects
 		lua_newtable( L );
 
-		// Push all matching objects on
-		size_t objectsLength = lot->objects.size();
+		// Start at index number 1 - Lua arrays (tables) start at 1
 		size_t tableIndex = 1;
 
-		for( size_t index = 0; index != objectsLength; index++ ) {
-			BlueBear::LotEntity object = lot->objects[ index ];
+		// Iterate through each object on the lot, checking to see if each is an instance of "idKey"
+		for( BlueBear::LotEntity object : lot->objects ) {
+			std::cout << "Starting loop checking on object " << object.classID << std::endl;
 
-			if( idKey == object.objType && object.lotEntityType == BlueBear::LotEntityType::TYPE_OBJECT ) {
-				lua_rawgeti( L, LUA_REGISTRYINDEX, object.luaVMInstance );
-				lua_rawseti( L, -2, tableIndex );
-				tableIndex++;
+			// Push bluebear global
+			lua_getglobal( L, "bluebear" );
+
+			// Push instance_of utility function
+			Utility::getTableValue( L, "instance_of" );
+
+			// Push the two arguments: identifier, and instance
+			lua_pushstring( L, idKey );
+			lua_rawgeti( L, LUA_REGISTRYINDEX, object.luaVMInstance );
+
+			// We're ready to call instance_of on object!
+			if( lua_pcall( L, 2, 1, 0 ) == 0 ) {
+				// Read the answer left on the stack as a boolean
+				// lua_getboolean actually returns an int, which we'll need interpreted as a bool
+				bool isInstance = !!lua_toboolean( L, -1 );
+
+				// Before we do anything else, get rid of the result, the instance_of function
+				// and the bluebear tableIndex from the stack - we don't need them anymore
+				// until the loop restarts, and this will put our return table back at the top
+				// of the stack.
+				lua_pop( L, 2 );
+
+				// If this object is a descendant of idKey, push it onto the table
+				if( isInstance ) {
+					// Re-push the instance onto the stack
+					lua_rawgeti( L, LUA_REGISTRYINDEX, object.luaVMInstance );
+					// Push it onto the table on our stack
+					lua_rawseti( L, -2, tableIndex++ );
+				}
 			}
 		}
 

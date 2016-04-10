@@ -22,6 +22,9 @@ namespace BlueBear {
 		// Store pointer to Luasphere on this object
 		this->L = L;
 
+		// Store classID in this->classID
+		this->classID = classID;
+
 		// Get fresh start with the Lua stack
 		Utility::clearLuaStack( L );
 

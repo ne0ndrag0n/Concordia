@@ -75,7 +75,7 @@ bluebear = {
 
 			-- deep copy all tables
 			for key, value in pairs( instance ) do
-				if key ~= "super" and type( value ) == 'table' then
+				if key ~= 'super' and type( value ) == 'table' then
 					instance[ key ] = _bblib.deep_copy( value )
 				end
 			end
@@ -105,6 +105,22 @@ bluebear = {
 
 		-- and that's it!
 		return instance
+	end,
+
+	--[[
+		Check if a given object is an instance of "identifier"
+
+		@param		{String}		identifier		The identifier for the class to compare to
+		@param		{Object}		instance		An instance of at least 'object'
+	--]]
+	instance_of = function( identifier, instance )
+		local Class = bluebear.get_class( identifier )
+
+		if Class == nil then
+			return false
+		end
+
+		return Class:made( instance )
 	end
 };
 
