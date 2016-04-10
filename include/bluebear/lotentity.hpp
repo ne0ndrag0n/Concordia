@@ -27,7 +27,7 @@ namespace BlueBear {
 			std::string objType;
 			BlueBear::LotEntityType lotEntityType;
 			std::queue< BlueBear::ActionDescriptor > actionQueue;
-			LotEntity( lua_State* L, std::string jsonString, int lotTableRef );
+			LotEntity( lua_State* L, const char* classID, const char* instance, int lotTableRef );
 			void execute( unsigned int worldTicks );
 			char* save();
 			void load( char* pickledObject );

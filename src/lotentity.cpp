@@ -17,7 +17,7 @@ namespace BlueBear {
 	/**
 	 * Every BlueBear::LotEntity is tied to its Lua instance in the _lotinsts table
 	 */
-	LotEntity::LotEntity( lua_State* L, std::string jsonString, int lotTableRef ) : lotTableRef( lotTableRef ) {
+	LotEntity::LotEntity( lua_State* L, const char* classID, const char* instance, int lotTableRef ) : lotTableRef( lotTableRef ) {
 
 		// Store pointer to Luasphere on this object
 		this->L = L;
@@ -25,29 +25,26 @@ namespace BlueBear {
 		// Get fresh start with the Lua stack
 		Utility::clearLuaStack( L );
 
-		// Push _bblib onto Lua API stack
-		lua_getglobal( L, "_bblib" );
+		// Push bluebear onto Lua API stack
+		lua_getglobal( L, "bluebear" );
 
-		/*
-		// Get instantiate_pop method
-		Utility::getTableValue( L, "instantiate_pop" );
+		// Get new_instance_from_file method. This method will not only create a new instance, but also deserialise
+		// the object provided, creating an instance that should be identical to what was saved previously
+		Utility::getTableValue( L, "new_instance_from_file" );
 
-		// Push _bbobject key and POP package. Push whether or not this object is a plain object or a player character
-		lua_pushstring( L, idKey );
-		lua_pushlstring( L, popPackage, popSize );
-		lua_pushnumber( L, static_cast< lua_Number >( lotEntityType ) + 1 );
+		// Push identifier and instance string
+		lua_pushstring( L, classID );
+		lua_pushstring( L, instance );
 
-		// Call instantiate_pop
-		if( lua_pcall( L, 3, 1, 0 ) == 0 ) {
+		// Call new_instance_from_file
+		if( lua_pcall( L, 2, 1, 0 ) == 0 ) {
 			this->ok = true;
 
 			// This will return a reference to the entry in _bblib - Pop and use this to store a reference to this function in this->luaVMInstance
 			this->luaVMInstance = luaL_ref( L, LUA_REGISTRYINDEX );
 		} else {
-			std::cout << lua_tostring( L, -1 ) << "\n";
+			std::cout << lua_tostring( L, -1 ) << std::endl;
 		}
-		*/
-
 	}
 
 	void LotEntity::execute( unsigned int worldTicks ) {

@@ -80,8 +80,11 @@ namespace BlueBear {
 				// Iterate through the "entities" array: each object within is a serialised LotEntity
 				json entities = lotJSON[ "entities" ];
 				for( json element : entities ) {
+					std::string classID = element[ "classID" ];
+					std::string instance = element[ "instance" ].dump();
+
 					// Dump JSON to string for Luasphere to create into new object and extend over
-					BlueBear::LotEntity obj( this->L, element.dump(), lotTableRef );
+					BlueBear::LotEntity obj( this->L, classID.c_str(), instance.c_str(), lotTableRef );
 
 					// obj.ok will be true if we completed successfully
 					if( obj.ok == true ) {

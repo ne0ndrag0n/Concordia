@@ -85,6 +85,26 @@ bluebear = {
 		end
 
 		return instance
+	end,
+
+	--[[
+		Create a new instance from a serialised version of the object.
+
+		@param		{String}		identifier		The object class which will be selected from _classes
+		@param		{String}		savedInstance	The saved instance that will need to be converted back to a Lua table
+	--]]
+	new_instance_from_file = function( identifier, savedInstance )
+		-- May use JSON or a Lua string table serialisation (I'm thinking of getting rid of JSON)
+		local savedInstanceTable = JSON:decode( savedInstance )
+		local instance = bluebear.new_instance( identifier )
+
+		if instance == nil then error( identifier.." is not a registered class. (did you install the mod under the assets/ directory?)" ) end
+
+		-- deserialise
+		instance:load( savedInstanceTable )
+
+		-- and that's it!
+		return instance
 	end
 };
 
