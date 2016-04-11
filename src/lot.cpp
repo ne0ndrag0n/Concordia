@@ -71,8 +71,6 @@ namespace BlueBear {
 
 		// Iterate through each object on the lot, checking to see if each is an instance of "idKey"
 		for( BlueBear::LotEntity object : lot->objects ) {
-			std::cout << "Starting loop checking on object " << object.classID << std::endl;
-
 			// Push bluebear global
 			lua_getglobal( L, "bluebear" );
 
