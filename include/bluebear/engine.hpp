@@ -27,7 +27,7 @@ namespace BlueBear {
 			lua_State* L;
 			unsigned int worldTicks;
 			Lot* currentLot;
-			int createLotTable( Lot* lot );
+			void createLotTable( Lot* lot );
 			void callActionOnObject( const char* playerId, const char* obejctId, const char* method );
 
 		public:

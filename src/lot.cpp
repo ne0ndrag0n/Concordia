@@ -55,6 +55,7 @@ namespace BlueBear {
 
 	int Lot::lua_getLotObjectsByType( lua_State* L ) {
 
+		// Because Lua requires methods be static in C closure, pop the first argument: the "this" pointer
 		BlueBear::Lot* lot = ( BlueBear::Lot* )lua_touserdata( L, lua_upvalueindex( 1 ) );
 
 		// Get argument (the class we are looking for) and remove it from the stack

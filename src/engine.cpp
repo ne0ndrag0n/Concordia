@@ -47,7 +47,6 @@ namespace BlueBear {
 	 * Load a lot
 	 */
 	bool Engine::loadLot( const char* lotPath ) {
-		int lotTableRef;
 		std::ifstream lot( lotPath );
 
 		if( lot.is_open() && lot.good() ) {
@@ -69,7 +68,7 @@ namespace BlueBear {
 				);
 
 				// Create one lot table for the Luasphere - contains functions that we call on this->currentLot to do things like get other objects on the lot and trigger events
-				lotTableRef = this->createLotTable( this->currentLot );
+				this->createLotTable( this->currentLot );
 
 				this->worldTicks = lotJSON[ "ticks" ];
 
@@ -82,7 +81,7 @@ namespace BlueBear {
 					std::string instance = element[ "instance" ].dump();
 
 					// Dump JSON to string for Luasphere to create into new object and extend over
-					BlueBear::LotEntity obj( this->L, classID.c_str(), instance.c_str(), lotTableRef );
+					BlueBear::LotEntity obj( this->L, classID.c_str(), instance.c_str() );
 
 					// obj.ok will be true if we completed successfully
 					if( obj.ok == true ) {
@@ -104,7 +103,12 @@ namespace BlueBear {
 	/**
 	 * We do this once; create the lot table and assign it a lot instance
 	 */
-	int Engine::createLotTable( Lot* lot ) {
+	void Engine::createLotTable( Lot* lot ) {
+		// Push the "bluebear" global onto the stack, then push the "lot" identifier
+		// We will set this at the very end of the function
+		lua_getglobal( L, "bluebear" );
+		lua_pushstring( L, "lot" );
+
 		// Push new, blank table
 		lua_createtable( this->L, 0, 1 );
 
@@ -120,8 +124,9 @@ namespace BlueBear {
 		lua_pushcclosure( L, &Lot::lua_getLotObjectsByType, 1 );
 		lua_settable( L, -3 );
 
-		// Save the reference to this table
-		return luaL_ref( L, LUA_REGISTRYINDEX );
+		// Remember pushing the bluebear table, then lot? Stack should now have the lot table,
+		// the "lot" identifier, then the bluebear global. Go ahead and set "lot" to this table.
+		lua_settable( L, -3 );
 	}
 
 	/**

@@ -17,7 +17,7 @@ namespace BlueBear {
 	/**
 	 * Every BlueBear::LotEntity is tied to its Lua instance in the _lotinsts table
 	 */
-	LotEntity::LotEntity( lua_State* L, const char* classID, const char* instance, int lotTableRef ) : lotTableRef( lotTableRef ) {
+	LotEntity::LotEntity( lua_State* L, const char* classID, const char* instance ) {
 
 		// Store pointer to Luasphere on this object
 		this->L = L;
@@ -85,11 +85,8 @@ namespace BlueBear {
 			// Re-push table onto stack as argument
 			lua_pushvalue( this->L, -2 );
 
-			// Get lot table and push this as the second argument
-			lua_rawgeti( this->L, LUA_REGISTRYINDEX, this->lotTableRef );
-
 			// Run function
-			if( lua_pcall( this->L, 2, 1, 0 ) != 0 ) {
+			if( lua_pcall( this->L, 1, 1, 0 ) != 0 ) {
 				std::cerr << lua_tostring( this->L, -1 ) << "\n";
 				this->ok = false;
 			}

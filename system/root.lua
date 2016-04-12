@@ -10,6 +10,9 @@ _classes = {};
 
 bluebear = {
 
+	-- Table containing methods to interface with the BlueBear lot (a primarily C++ construct)
+	lot = nil,
+
 	register_class = function( identifier, class_table )
 
 		local id = identifier:split( '.' )

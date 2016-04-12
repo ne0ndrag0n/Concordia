@@ -11,33 +11,33 @@ local Class = bluebear.extend( 'object', {
 	actions = {
 		{
 			label = "Water",
-			condition = function( self, player, lot )
+			condition = function( self )
 				return self.water_level ~= 0
 			end,
-			action = function( self, player, lot )
+			action = function( self )
 				self.water_level = 100
 				print( "Watered. Water level now "..self.water_level )
 			end
 		},
 		{
 			label = "Replant",
-			condition = function( self, player, lot )
+			condition = function( self )
 				return self.water_level == 0
 			end,
-			action = function( self, player, lot )
+			action = function( self )
 				self.water_level = 100
 				print( "Replanted" )
 			end
 		}
 	},
 
-	setup = function( self, lot )
+	setup = function( self )
 		self.super:setup()
 
 		self.water_level = 100
 	end,
 
-	main = function( self, lot )
+	main = function( self )
 
 		print( "Hello from Lua! I am object instance ("..self._cid..") and my water level is now "..self.water_level )
 
