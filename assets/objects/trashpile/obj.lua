@@ -10,13 +10,6 @@ local Class = bluebear.extend( 'object', {
 
 	},
 
-	-- This function will run when the object is first placed on the lot
-	setup = function( self )
-		self.super:setup()
-
-		self.stink = 0
-	end,
-
 	-- This function will run when the object is scheduled to update its status.
 	main = function( self )
 		print( "Hello from Lua! I am object instance ("..self._cid..")" )
@@ -27,6 +20,12 @@ local Class = bluebear.extend( 'object', {
 		all_objects[1].water_level = 50
 
 		return 86400
+	end,
+
+	load = function( self, saved )
+		self.super:load( saved )
+
+		self.stink = saved.stink
 	end
 } )
 

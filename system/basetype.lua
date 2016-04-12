@@ -20,20 +20,23 @@ bluebear.register_motive( "hunger", {
 --]]
 
 _classes.object = newclass();
+
 function _classes.object:load( saved )
 	local data = saved or {}
 
+	self._cid = data._cid
 	self._sys = data._sys
 end
 
 function _classes.object:save()
 	local out = {
-		_sys = self._sys
+		_sys = self._sys,
+		_cid = self._cid
 	}
 
 	return out
 end
 
 function _classes.object:setup()
-	self._cid = _bblib.get_cid()
+	-- abstract - This is the "real" constructor of objects
 end

@@ -10,6 +10,7 @@
 		{
 			"classID": "game.flowers.base",
 			"instance": {
+				"_cid": "bb1",
 				"_sys": {
 					"_sched": 1337
 				},
@@ -19,9 +20,11 @@
 		{
 			"classID": "game.household.trashpile.base",
 			"instance": {
+				"_cid": "bb2",
 				"_sys": {
 					"_sched": 2674
-				}
+				},
+				"stink": 0
 			}
 		}
 	]

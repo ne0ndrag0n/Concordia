@@ -31,12 +31,6 @@ local Class = bluebear.extend( 'object', {
 		}
 	},
 
-	setup = function( self )
-		self.super:setup()
-
-		self.water_level = 100
-	end,
-
 	main = function( self )
 
 		print( "Hello from Lua! I am object instance ("..self._cid..") and my water level is now "..self.water_level )
@@ -47,6 +41,12 @@ local Class = bluebear.extend( 'object', {
 
 		-- Do not re-execute for at least 43200 game ticks (12 simulated game hours)
 		return 43200
+	end,
+
+	load = function( self, saved )
+		self.super:load( saved )
+
+		self.water_level = saved.water_level
 	end
 } )
 
