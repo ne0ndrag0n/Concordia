@@ -21,6 +21,7 @@ namespace BlueBear {
 		private:
 			lua_State* L;
 		public:
+			std::string cid;
 			bool ok = false;
 			int luaVMInstance;
 			std::string classID;

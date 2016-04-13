@@ -76,20 +76,12 @@ namespace BlueBear {
 
 				// Iterate through the "entities" array: each object within is a serialised LotEntity
 				json entities = lotJSON[ "entities" ];
-				for( json element : entities ) {
+				for( json& element : entities ) {
 					std::string classID = element[ "classID" ];
 					std::string instance = element[ "instance" ].dump();
+					std::string cid = element[ "instance" ][ "_cid" ];
 
-					// Dump JSON to string for Luasphere to create into new object and extend over
-					BlueBear::LotEntity obj( this->L, classID.c_str(), instance.c_str() );
-
-					// obj.ok will be true if we completed successfully
-					if( obj.ok == true ) {
-						this->currentLot->objects.push_back( obj );
-					} else {
-						// TODO: standard console log needed with cross-platform color abstraction required
-						std::cout << "\033[1;33m" << "Warning: Failed to instantiate lot object " << element[ "classID" ] << "\033[0m" << std::endl;
-					}
+					this->currentLot->objects.emplace( cid, BlueBear::LotEntity( this->L, classID.c_str(), instance.c_str() ) );
 				}
 			} catch( ... ) {
 				std::cout <<  "Failed to load lot: Library threw exception for lot " << lotPath <<  std::endl;
@@ -137,8 +129,8 @@ namespace BlueBear {
 
 		// Iterate for an entire week of ticks
 		for( ; this->worldTicks != 50000; this->worldTicks++ ) {
-			for( std::vector< BlueBear::LotEntity >::iterator object = this->currentLot->objects.begin(); object != this->currentLot->objects.end(); object++ ) {
-				object->execute( this->worldTicks );
+			for( auto& keyValuePair : this->currentLot->objects ) {
+				keyValuePair.second.execute( this->worldTicks );
 			}
 		}
 

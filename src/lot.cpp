@@ -71,7 +71,7 @@ namespace BlueBear {
 		size_t tableIndex = 1;
 
 		// Iterate through each object on the lot, checking to see if each is an instance of "idKey"
-		for( BlueBear::LotEntity object : lot->objects ) {
+		for( auto& keyValuePair : lot->objects ) {
 			// Push bluebear global
 			lua_getglobal( L, "bluebear" );
 
@@ -80,7 +80,7 @@ namespace BlueBear {
 
 			// Push the two arguments: identifier, and instance
 			lua_pushstring( L, idKey );
-			lua_rawgeti( L, LUA_REGISTRYINDEX, object.luaVMInstance );
+			lua_rawgeti( L, LUA_REGISTRYINDEX, keyValuePair.second.luaVMInstance );
 
 			// We're ready to call instance_of on object!
 			if( lua_pcall( L, 2, 1, 0 ) == 0 ) {
@@ -97,7 +97,7 @@ namespace BlueBear {
 				// If this object is a descendant of idKey, push it onto the table
 				if( isInstance ) {
 					// Re-push the instance onto the stack
-					lua_rawgeti( L, LUA_REGISTRYINDEX, object.luaVMInstance );
+					lua_rawgeti( L, LUA_REGISTRYINDEX, keyValuePair.second.luaVMInstance );
 					// Push it onto the table on our stack
 					lua_rawseti( L, -2, tableIndex++ );
 				}

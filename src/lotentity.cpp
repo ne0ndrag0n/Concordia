@@ -41,9 +41,16 @@ namespace BlueBear {
 
 		// Call new_instance_from_file
 		if( lua_pcall( L, 2, 1, 0 ) == 0 ) {
+			// Mark this LotEntity as OK to run
 			this->ok = true;
 
-			// This will return a reference to the entry in _bblib - Pop and use this to store a reference to this function in this->luaVMInstance
+			// Grab the _cid of the LotEntity and set the public "cid" property to this value
+			Utility::getTableValue( L, "_cid" );
+			this->cid = lua_tostring( L, -1 );
+			// Then, clear the value off the stack, ensuring the instance is at the top of the stack
+			lua_pop( L, 1 );
+			
+			// this->luaVMInstance holds a Lua registry index to the table returned by this function
 			this->luaVMInstance = luaL_ref( L, LUA_REGISTRYINDEX );
 		} else {
 			std::cout << lua_tostring( L, -1 ) << std::endl;
