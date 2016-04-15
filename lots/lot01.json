@@ -12,7 +12,14 @@
 			"instance": {
 				"_cid": "bb1",
 				"_sys": {
-					"_sched": 1337
+					"_sched": {
+						"1337.0": [
+							{
+								"method": "main",
+								"arguments": []
+							}
+						]
+					}
 				},
 				"water_level": 100
 			}
@@ -22,7 +29,14 @@
 			"instance": {
 				"_cid": "bb2",
 				"_sys": {
-					"_sched": 2674
+					"_sched": {
+						"2674.0": [
+							{
+								"method": "main",
+								"arguments": []
+							}
+						]
+					}
 				},
 				"stink": 0
 			}

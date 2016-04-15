@@ -129,6 +129,10 @@ namespace BlueBear {
 
 		// Iterate for an entire week of ticks
 		for( ; this->worldTicks != 50000; this->worldTicks++ ) {
+
+			// Clear the API stack of the Luasphere
+			Utility::clearLuaStack( this->L );
+
 			// Make note of current tick for all objects on the bluebear.engine status table
 			lua_getglobal( L, "bluebear" );
 			Utility::getTableValue( L, "engine" );
@@ -137,11 +141,11 @@ namespace BlueBear {
 			lua_settable( L, -3 );
 
 			for( auto& keyValuePair : this->currentLot->objects ) {
-				keyValuePair.second.execute( this->worldTicks );
+				keyValuePair.second.execute();
 			}
 		}
 
-		std::cout << std::endl;
+		std::cout << "Finished!" << std::endl;
 	}
 
 	/**

@@ -14,12 +14,7 @@ local Class = bluebear.extend( 'object', {
 	main = function( self )
 		print( "Hello from Lua! I am object instance ("..self._cid..")" )
 
-		local all_objects = bluebear.lot.get_objects_by_type( "game.flowers.base" )
-
-		print( "I will deduct water_level in BlueBear object instance "..all_objects[1]._cid.." down to 50." )
-		all_objects[1].water_level = 50
-
-		return 86400
+		self:sleep( 'main', 86400 )
 	end,
 
 	load = function( self, saved )

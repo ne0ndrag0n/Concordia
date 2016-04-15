@@ -18,7 +18,6 @@ namespace BlueBear {
 	 * Every BlueBear::LotEntity is tied to its Lua instance in the _lotinsts table
 	 */
 	LotEntity::LotEntity( lua_State* L, const char* classID, const char* instance ) {
-
 		// Store pointer to Luasphere on this object
 		this->L = L;
 
@@ -49,7 +48,7 @@ namespace BlueBear {
 			this->cid = lua_tostring( L, -1 );
 			// Then, clear the value off the stack, ensuring the instance is at the top of the stack
 			lua_pop( L, 1 );
-			
+
 			// this->luaVMInstance holds a Lua registry index to the table returned by this function
 			this->luaVMInstance = luaL_ref( L, LUA_REGISTRYINDEX );
 		} else {
@@ -57,58 +56,25 @@ namespace BlueBear {
 		}
 	}
 
-	void LotEntity::execute( unsigned int worldTicks ) {
+	void LotEntity::execute() {
 
 		if( this->ok == false ) {
 			return;
 		}
 
-		unsigned int nextTickSchedule;
-
-		// Clear the API stack of the Luasphere
-		Utility::clearLuaStack( this->L );
-
 		// Push this object's table onto the API stack
 		lua_rawgeti( this->L, LUA_REGISTRYINDEX, this->luaVMInstance );
 
-		// First, we need to push a reference to the _sys table
-		Utility::getTableValue( this->L, "_sys" );
+		// Push the table's _run method
+		Utility::getTableValue( this->L, "_run" );
 
-		// Next, push the value of _sched within _sys
-		Utility::getTableValue( this->L, "_sched" );
+		// Push the table itself
+		lua_pushvalue( this->L, -2 );
 
-		// Extract and pop int (and _sys table) from top of stack
-		nextTickSchedule = lua_tonumber( this->L, -1 );
-		lua_pop( this->L, 2 );
-
-		// Execute only if the amount of ticks is just right (worldTicks >= nextTickSchedule)
-		if( worldTicks >= nextTickSchedule ) {
-
-			std::cout << "Running new iteration for luaVMInstance " << this->luaVMInstance << ", current worldTicks is " << worldTicks << " and this object's nextTickSchedule is " << nextTickSchedule << "\n";
-
-			// Push the object's "main" method
-			Utility::getTableValue( this->L, "main" );
-
-			// Re-push table onto stack as argument
-			lua_pushvalue( this->L, -2 );
-
-			// Run function
-			if( lua_pcall( this->L, 1, 1, 0 ) != 0 ) {
-				std::cerr << lua_tostring( this->L, -1 ) << "\n";
-				this->ok = false;
-			}
-
-			// This function returns a tick amount. The next execution is current world ticks + this amount
-			// Set this object's _sys._sched to worldTicks + nextTickSchedule
-			nextTickSchedule = lua_tonumber( this->L, -1 );
-			lua_pop( this->L, 1 );
-
-			// The function and its arguments should be popped, leaving the object itself
-			// Get the _sys table
-			Utility::getTableValue( this->L, "_sys" );
-
-			// Set the _sched value
-			Utility::setTableIntValue( this->L, "_sched", worldTicks + nextTickSchedule );
+		// Run the _run method
+		if( lua_pcall( this->L, 1, 0, 0 ) != 0 ) {
+			std::cerr << lua_tostring( this->L, -1 ) << std::endl;
+			this->ok = false;
 		}
 	}
 

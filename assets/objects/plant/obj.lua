@@ -40,7 +40,7 @@ local Class = bluebear.extend( 'object', {
 		end
 
 		-- Do not re-execute for at least 43200 game ticks (12 simulated game hours)
-		return 43200
+		self:sleep( 'main', 43200 )
 	end,
 
 	load = function( self, saved )
@@ -49,6 +49,5 @@ local Class = bluebear.extend( 'object', {
 		self.water_level = saved.water_level
 	end
 } )
-
 
 bluebear.register_class( "game.flowers.base", Class )
