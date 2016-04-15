@@ -13,6 +13,11 @@ bluebear = {
 	-- Table containing methods to interface with the BlueBear lot (a primarily C++ construct)
 	lot = nil,
 
+	-- Table containing properties of the current engine (for now, just the current tick) usable by internal methods
+	engine = {
+		current_tick = 0
+	},
+
 	register_class = function( identifier, class_table )
 
 		local id = identifier:split( '.' )

@@ -129,6 +129,13 @@ namespace BlueBear {
 
 		// Iterate for an entire week of ticks
 		for( ; this->worldTicks != 50000; this->worldTicks++ ) {
+			// Make note of current tick for all objects on the bluebear.engine status table
+			lua_getglobal( L, "bluebear" );
+			Utility::getTableValue( L, "engine" );
+			lua_pushstring( L, "current_tick" );
+			lua_pushnumber( L, this->worldTicks );
+			lua_settable( L, -3 );
+
 			for( auto& keyValuePair : this->currentLot->objects ) {
 				keyValuePair.second.execute( this->worldTicks );
 			}
