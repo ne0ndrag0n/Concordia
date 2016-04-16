@@ -128,7 +128,7 @@ namespace BlueBear {
 		std::cout << "Starting world engine with a tick count of " << this->worldTicks << "\n";
 
 		// Iterate for an entire week of ticks
-		for( ; this->worldTicks != 50000; this->worldTicks++ ) {
+		for( ; this->worldTicks != 150000; this->worldTicks++ ) {
 
 			// Clear the API stack of the Luasphere
 			Utility::clearLuaStack( this->L );

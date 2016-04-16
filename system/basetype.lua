@@ -26,18 +26,25 @@ end
 	Sleep numTicks amount of ticks and then call the function on this object named by functionName
 --]]
 function _classes.object:sleep( method, numTicks, ... )
-	local ticksKey = tostring( numTicks + bluebear.engine.current_tick )
-	local ticksTable = self._sys._sched[ ticksKey ]
-	local arguments = { ... }
+	local ticks = numTicks + bluebear.engine.current_tick
 
-	-- If the ticksTable does not exist, create it
-	if ticksTable == nil then
-		self._sys._sched[ ticksKey ] = {}
-		ticksTable = self._sys._sched[ ticksKey ]
+	self:register_callback( ticks, method, { ... } )
+end
+
+--[[
+	Enter in a callback on this object's _sys._sched table for the destination tick
+--]]
+function _classes.object:register_callback( tick, method, wrapped_arguments )
+	local ticks_key = tostring( tick )
+	local ticks_table
+
+	if self._sys._sched[ ticks_key ] == nil then
+		self._sys._sched[ ticks_key ] = {}
 	end
 
-	-- Add this to the list of callbacks due for that tick
-	table.insert( ticksTable, { method = method, arguments = arguments } )
+	ticks_table = self._sys._sched[ ticks_key ]
+
+	table.insert( ticks_table, { method = method, arguments = wrapped_arguments } )
 end
 
 -- Private methods (do not override these!)
@@ -62,3 +69,18 @@ end
 -- all methods should be made virtual by default by some type of modification to the yaci lib
 _classes.object:virtual( "sleep" )
 _classes.object:virtual( "_run" )
+
+-- define promises: there may be several kinds of promises (e.g. timebased promises in pure Lua,
+-- or engine-based promises that require the C++ engine to signal for the callback)
+_classes.promise = {
+	base = newclass()
+}
+
+function _classes.promise.base:init( obj_ref, start_ticks )
+	self.object = obj_ref
+	self.next_tick = start_ticks
+end
+
+function _classes.promise.base:then_call( func_name )
+
+end
