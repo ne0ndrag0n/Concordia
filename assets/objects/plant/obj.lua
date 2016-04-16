@@ -39,8 +39,7 @@ local Class = bluebear.extend( 'object', {
 			self.water_level = self.water_level - 10
 		end
 
-		-- Do not re-execute for at least 43200 game ticks (12 simulated game hours)
-		self:sleep( 'main', 43200 )
+		self:sleep( 43200 ):then_call( 'main' )
 	end,
 
 	load = function( self, saved )

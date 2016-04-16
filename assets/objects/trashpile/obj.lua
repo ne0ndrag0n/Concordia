@@ -14,7 +14,7 @@ local Class = bluebear.extend( 'object', {
 	main = function( self )
 		print( "Hello from Lua! I am object instance ("..self._cid..")" )
 
-		self:sleep( 'main', 86400 )
+		self:sleep( 86400 ):then_call( 'main' )
 	end,
 
 	load = function( self, saved )

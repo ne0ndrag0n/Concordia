@@ -25,10 +25,11 @@ end
 --[[
 	Sleep numTicks amount of ticks and then call the function on this object named by functionName
 --]]
-function _classes.object:sleep( method, numTicks, ... )
+function _classes.object:sleep( numTicks )
 	local ticks = numTicks + bluebear.engine.current_tick
 
-	self:register_callback( ticks, method, { ... } )
+	-- do nothing but return a new promise with the ticks set to "ticks"
+	return _classes.promise.base( self, ticks )
 end
 
 --[[
@@ -76,11 +77,16 @@ _classes.promise = {
 	base = newclass()
 }
 
-function _classes.promise.base:init( obj_ref, start_ticks )
+function _classes.promise.base:init( obj_ref, start_tick )
 	self.object = obj_ref
-	self.next_tick = start_ticks
+	self.next_tick = start_tick
 end
 
-function _classes.promise.base:then_call( func_name )
+function _classes.promise.base:then_call( func_name, ... )
+	self.object:register_callback( self.next_tick, func_name, { ... } )
 
+	-- any future "then_call" statements will be called tick per tick
+	self.next_tick = self.next_tick + 1
+
+	return self
 end
