@@ -59,16 +59,18 @@ namespace BlueBear {
 
 				// Instantiate the lot
 				int terrain = lotJSON[ "terrain" ];
-				this->currentLot = new BlueBear::Lot(
-					lotJSON[ "floorx" ],
-					lotJSON[ "floory" ],
-					lotJSON[ "stories" ],
-					lotJSON[ "subtr" ],
-					BlueBear::TerrainType( terrain )
+				this->currentLot.reset(
+					new BlueBear::Lot(
+						lotJSON[ "floorx" ],
+						lotJSON[ "floory" ],
+						lotJSON[ "stories" ],
+						lotJSON[ "subtr" ],
+						BlueBear::TerrainType( terrain )
+					)
 				);
 
 				// Create one lot table for the Luasphere - contains functions that we call on this->currentLot to do things like get other objects on the lot and trigger events
-				this->createLotTable( this->currentLot );
+				this->createLotTable();
 
 				this->worldTicks = lotJSON[ "ticks" ];
 
@@ -95,7 +97,11 @@ namespace BlueBear {
 	/**
 	 * We do this once; create the lot table and assign it a lot instance
 	 */
-	void Engine::createLotTable( Lot* lot ) {
+	void Engine::createLotTable() {
+
+		// Get "dumb pointer" from smart pointer
+		Lot* lot = this->currentLot.get();
+
 		// Push the "bluebear" global onto the stack, then push the "lot" identifier
 		// We will set this at the very end of the function
 		lua_getglobal( L, "bluebear" );

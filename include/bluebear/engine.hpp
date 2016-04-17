@@ -4,6 +4,7 @@
 #include "bbtypes.hpp"
 #include "lot.hpp"
 #include <string>
+#include <memory>
 #include <vector>
 
 extern "C" {
@@ -26,8 +27,8 @@ namespace BlueBear {
 		private:
 			lua_State* L;
 			unsigned int worldTicks;
-			Lot* currentLot;
-			void createLotTable( Lot* lot );
+			std::unique_ptr< Lot > currentLot;
+			void createLotTable();
 			void callActionOnObject( const char* playerId, const char* obejctId, const char* method );
 
 		public:
