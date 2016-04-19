@@ -35,18 +35,14 @@ namespace BlueBear {
 		// Pop the lot off the stack
 		BlueBear::Lot* lot = ( BlueBear::Lot* )lua_touserdata( L, lua_upvalueindex( 1 ) );
 
-		size_t objectsLength = lot->objects.size();
-
 		// Create an array table with as many entries as the size of this->objects
-		lua_createtable( L, objectsLength, 0 );
+		lua_createtable( L, lot->objects.size(), 0 );
 
 		// Push 'em on!
-		size_t arrIndex = 1;
-		for( size_t index = 0; index != objectsLength; index++ ) {
-			//if( lot->objects[ index ].lotEntityType == BlueBear::LotEntityType::TYPE_OBJECT ) {
-			//	lua_rawgeti( L, LUA_REGISTRYINDEX, lot->objects[ index ].luaVMInstance );
-			//	lua_rawseti( L, -2, arrIndex++ );
-			//}
+		size_t tableIndex = 1;
+		for( auto& keyValuePair : lot->objects ) {
+			lua_rawgeti( L, LUA_REGISTRYINDEX, keyValuePair.second.luaVMInstance );
+			lua_rawseti( L, -2, tableIndex++ );
 		}
 
 		return 1;
