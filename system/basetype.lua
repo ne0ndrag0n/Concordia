@@ -15,6 +15,23 @@ function _classes.object:save()
 		_cid = self._cid
 	}
 
+	-- When serialising, iterate through the _sys._sched table in out and
+	-- replace table references to anything containing a bbXXX _cid with
+	-- the serial format
+
+	-- jesus christ what a fright
+	for time, callbacks in pairs( out._sys._sched ) do
+		for index, callback in ipairs( callbacks ) do
+			for argumentIndex, argument in ipairs( callback.arguments ) do
+				-- If type of argument is a table, check if it has a _cid property
+				-- If it does, this argument will be replaced by the serialised version
+				if type( argument ) == "table" and string.match( argument._cid, "bb%d" ) then
+					callback.arguments[ argumentIndex ] = "t/"..argument._cid
+				end
+			end
+		end
+	end
+
 	return out
 end
 
