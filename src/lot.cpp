@@ -103,4 +103,27 @@ namespace BlueBear {
 		return 1;
 
 	}
+
+	int Lot::lua_getLotObjectByCid( lua_State* L ) {
+
+		// Because Lua requires methods be static in C closure, pop the first argument: the "this" pointer
+		BlueBear::Lot* lot = ( BlueBear::Lot* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+
+		// Get argument (the class we are looking for) and remove it from the stack
+		std::string keystring( lua_tostring( L, -1 ) );
+		lua_pop( L, 1 );
+
+		// Go looking for the item
+		auto object = lot->objects.find( keystring );
+
+		if( object != lot->objects.end() ) {
+			// Push table on the stack
+			lua_rawgeti( L, LUA_REGISTRYINDEX, object->second.luaVMInstance );
+		} else {
+			// The object wasn't found, push the nil value
+			lua_pushnil( L );
+		}
+
+		return 1;
+	}
 }

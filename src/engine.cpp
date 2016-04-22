@@ -122,6 +122,12 @@ namespace BlueBear {
 		lua_pushcclosure( L, &Lot::lua_getLotObjectsByType, 1 );
 		lua_settable( L, -3 );
 
+		// get_object_by_cid retrieves a specific object by its cid
+		lua_pushstring( L, "get_object_by_cid" );
+		lua_pushlightuserdata( L, lot );
+		lua_pushcclosure( L, &Lot::lua_getLotObjectByCid, 1 );
+		lua_settable( L, -3 );
+
 		// Remember pushing the bluebear table, then lot? Stack should now have the lot table,
 		// the "lot" identifier, then the bluebear global. Go ahead and set "lot" to this table.
 		lua_settable( L, -3 );
