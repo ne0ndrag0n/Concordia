@@ -30,6 +30,7 @@ namespace BlueBear {
 			std::unique_ptr< Lot > currentLot;
 			void createLotTable();
 			void callActionOnObject( const char* playerId, const char* obejctId, const char* method );
+			void deserializeFunctionRefs();
 
 		public:
 			Engine();

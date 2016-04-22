@@ -83,6 +83,15 @@ function _classes.object:_run()
 	end
 
 end
+
+--[[
+	This function is only to be called on each object after all objects are finished loading. Basically,
+	deserialize all references to bluebear objects which take the form "t/"..self._cid
+--]]
+function _classes.object:_deserialize_function_refs()
+	print( self._cid.." is gonna deserialize" )
+end
+
 -- be careful: if the methods are NOT virtual, "self" will not be the same self when you call it!
 -- all methods should be made virtual by default by some type of modification to the yaci lib
 _classes.object:virtual( "sleep" )

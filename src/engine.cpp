@@ -89,9 +89,40 @@ namespace BlueBear {
 				std::cout <<  "Failed to load lot: Library threw exception for lot " << lotPath <<  std::endl;
 				return false;
 			}
+
+			// After the lot has all its LotEntities loaded, let's fix those serialized function references
+			this->deserializeFunctionRefs();
 		}
 
 		return true;
+	}
+
+	/**
+	 * For all serialized curried functions in _sys._sched, ask each object to deserialize the reference to another LotEntity
+	 */
+	void Engine::deserializeFunctionRefs() {
+
+		// Get fresh Lua stack
+		Utility::clearLuaStack( this->L );
+
+		for( auto& keyValuePair : this->currentLot->objects ) {
+			BlueBear::LotEntity& currentEntity = keyValuePair.second;
+
+			// Push this object's table onto the API stack
+			lua_rawgeti( this->L, LUA_REGISTRYINDEX, currentEntity.luaVMInstance );
+			// Get the reserved function "_deserialize_function_refs"
+			Utility::getTableValue( this->L, "_deserialize_function_refs" );
+			// First argument is that same table (the context)
+			lua_pushvalue( this->L, -2 );
+
+			// Call _deserialize_function_refs: The rest is done in Lua
+			if( lua_pcall( this->L, 1, 0, 0 ) != 0 ) {
+				std::cout << lua_tostring( L, -1 ) << std::endl;
+			}
+		}
+
+		// Clear stack when done
+		Utility::clearLuaStack( this->L );
 	}
 
 	/**
@@ -152,7 +183,9 @@ namespace BlueBear {
 			lua_settable( L, -3 );
 
 			for( auto& keyValuePair : this->currentLot->objects ) {
-				keyValuePair.second.execute();
+				BlueBear::LotEntity& currentEntity = keyValuePair.second;
+
+				currentEntity.execute();
 			}
 		}
 
