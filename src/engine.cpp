@@ -118,6 +118,7 @@ namespace BlueBear {
 			// Call _deserialize_function_refs: The rest is done in Lua
 			if( lua_pcall( this->L, 1, 0, 0 ) != 0 ) {
 				std::cout << lua_tostring( L, -1 ) << std::endl;
+				currentEntity.ok = false;
 			}
 		}
 
