@@ -185,7 +185,7 @@ namespace BlueBear {
 		// Push table value "current_tick" onto the stack - leave it there too
 		Utility::getTableValue( L, "engine" );
 
-		for( ; worldTicks != 500000; worldTicks++ ) {
+		for( ; worldTicks != WORLD_TICKS_MAX; worldTicks++ ) {
 			// Set current_tick on bluebear.lot (inside the Luasphere, system/root.lua) to the current tick
 			Utility::setTableIntValue( L, "current_tick", worldTicks );
 

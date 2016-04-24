@@ -13,17 +13,15 @@ extern "C" {
 	#include "lauxlib.h"
 }
 
-#define BLUEBEAR_OBJECTS_DIRECTORY   "assets/objects/"
-#define WORLD_TICKS_MAX				 604800000
-#define	LUASPHERE_OBJECTS_TABLE		 "objects"
-#define LUASPHERE_PLAYERS_TABLE		 "players"
-
 namespace BlueBear {
 
 	class Engine {
 
 		private:
 			static constexpr const char* LUASPHERE_MAIN = "system/main.lua";
+			static constexpr const char* BLUEBEAR_OBJECTS_DIRECTORY = "assets/objects/";
+			static constexpr const unsigned int WORLD_TICKS_MAX = 500000;
+
 			lua_State* L;
 			unsigned int worldTicks;
 			std::unique_ptr< Lot > currentLot;
