@@ -3,7 +3,7 @@
 #include "lotentity.hpp"
 #include "lot.hpp"
 #include "engine.hpp"
-#include "json.hpp"
+#include "json/json.h"
 #include <iterator>
 #include <string>
 #include <vector>
@@ -47,51 +47,63 @@ namespace BlueBear {
 	 * Load a lot
 	 */
 	bool Engine::loadLot( const char* lotPath ) {
+		// Get an ifstream from the given lot
 		std::ifstream lot( lotPath );
 
+		// Verify it is both open and good
 		if( lot.is_open() && lot.good() ) {
 
-			// Shitty library using exceptions!!
-			try {
-				json lotJSON( lot );
+			// Set up JsonCpp options
+			// lotJSON is the root JSON object for the lot
+			Json::Value lotJSON;
+			// reader is an object used to parse the std::ifstream file into a JSON object
+			Json::Reader reader;
+			bool parseSuccessful = reader.parse( lot, lotJSON );
 
+			// If parse was successful, begin loading the lot
+			if( parseSuccessful ) {
+				// Log some basic information about the loading of the lot
 				std::cout << "[" << lotPath << "] " << "Lot revision: " << lotJSON[ "rev" ] << std::endl;
 
 				// Instantiate the lot
-				int terrain = lotJSON[ "terrain" ];
 				this->currentLot.reset(
 					new BlueBear::Lot(
-						lotJSON[ "floorx" ],
-						lotJSON[ "floory" ],
-						lotJSON[ "stories" ],
-						lotJSON[ "subtr" ],
-						BlueBear::TerrainType( terrain )
+						lotJSON[ "floorx" ].asInt(),
+						lotJSON[ "floory" ].asInt(),
+						lotJSON[ "stories" ].asInt(),
+						lotJSON[ "subtr" ].asInt(),
+						BlueBear::TerrainType( lotJSON[ "terrain" ].asInt() )
 					)
 				);
 
 				// Create one lot table for the Luasphere - contains functions that we call on this->currentLot to do things like get other objects on the lot and trigger events
 				this->createLotTable();
 
-				this->worldTicks = lotJSON[ "ticks" ];
+				// Set world ticks to the one saved in the file
+				this->worldTicks = lotJSON[ "ticks" ].asInt();
 
+				// Clear the std::map containing all objects
 				this->currentLot->objects.clear();
 
-				// Iterate through the "entities" array: each object within is a serialised LotEntity
-				json entities = lotJSON[ "entities" ];
-				for( json& element : entities ) {
-					std::string classID = element[ "classID" ];
-					std::string instance = element[ "instance" ].dump();
-					std::string cid = element[ "instance" ][ "_cid" ];
+				// Iterate through the "entities" array
+				Json::Value entities = lotJSON[ "entities" ];
+				Json::FastWriter writer;
+				for( Json::Value& entity : entities ) {
+					std::string classID = entity[ "classID" ].asString();
+					// Dump JSON to string (LotEntity requires strings in its constructor)
+					std::string instance = writer.write( entity[ "instance" ] );
+					std::string cid = entity[ "instance" ][ "_cid" ].asString();
 
+					// Emplace the object into the std::map (insert the new object as we create it)
 					this->currentLot->objects.emplace( cid, BlueBear::LotEntity( this->L, classID.c_str(), instance.c_str() ) );
 				}
-			} catch( ... ) {
-				std::cout <<  "Failed to load lot: Library threw exception for lot " << lotPath <<  std::endl;
-				return false;
-			}
 
-			// After the lot has all its LotEntities loaded, let's fix those serialized function references
-			this->deserializeFunctionRefs();
+				// After the lot has all its LotEntities loaded, let's fix those serialized function references
+				this->deserializeFunctionRefs();
+			}
+		} else {
+			std::cout << "Unable to load lot: " << lotPath << std::endl;
+			return false;
 		}
 
 		return true;

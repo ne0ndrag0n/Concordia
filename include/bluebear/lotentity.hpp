@@ -2,7 +2,6 @@
 #define BBOBJECT
 
 #include "bbtypes.hpp"
-#include "json.hpp"
 #include <string>
 #include <queue>
 
@@ -11,8 +10,6 @@ extern "C" {
 	#include "lualib.h"
 	#include "lauxlib.h"
 }
-
-using json = nlohmann::json;
 
 namespace BlueBear {
 
