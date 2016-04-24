@@ -40,16 +40,16 @@ namespace BlueBear {
 		// Call new_instance_from_file
 		if( lua_pcall( L, 2, 1, 0 ) == 0 ) {
 			// Mark this LotEntity as OK to run
-			this->ok = true;
+			ok = true;
 
 			// Grab the _cid of the LotEntity and set the public "cid" property to this value
 			Utility::getTableValue( L, "_cid" );
-			this->cid = lua_tostring( L, -1 );
+			cid = lua_tostring( L, -1 );
 			// Then, clear the value off the stack, ensuring the instance is at the top of the stack
 			lua_pop( L, 1 );
 
 			// this->luaVMInstance holds a Lua registry index to the table returned by this function
-			this->luaVMInstance = luaL_ref( L, LUA_REGISTRYINDEX );
+			luaVMInstance = luaL_ref( L, LUA_REGISTRYINDEX );
 		} else {
 			std::cout << lua_tostring( L, -1 ) << std::endl;
 		}
@@ -57,26 +57,26 @@ namespace BlueBear {
 
 	void LotEntity::execute() {
 		// Push this object's table onto the API stack
-		lua_rawgeti( this->L, LUA_REGISTRYINDEX, this->luaVMInstance );
+		lua_rawgeti( L, LUA_REGISTRYINDEX, luaVMInstance );
 
 		// Push the table's _run method
-		Utility::getTableValue( this->L, "_run" );
+		Utility::getTableValue( L, "_run" );
 
 		// Push the table itself
-		lua_pushvalue( this->L, -2 );
+		lua_pushvalue( L, -2 );
 
 		// Run the _run method
-		if( lua_pcall( this->L, 1, 0, 0 ) != 0 ) {
+		if( lua_pcall( L, 1, 0, 0 ) != 0 ) {
 			// If there is an error, print error to console and pop it
-			std::cerr << lua_tostring( this->L, -1 ) << std::endl;
-			lua_pop( this->L, 1 );
+			std::cerr << lua_tostring( L, -1 ) << std::endl;
+			lua_pop( L, 1 );
 
 			// Mark object as bad - don't run it anymore!
-			this->ok = false;
+			ok = false;
 		}
 
 		// Pop the object table
-		lua_pop( this->L, 1 );
+		lua_pop( L, 1 );
 	}
 
 	int LotEntity::lua_getLotEntityObject( lua_State* L ) {

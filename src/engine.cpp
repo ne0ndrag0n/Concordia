@@ -66,7 +66,7 @@ namespace BlueBear {
 				std::cout << "[" << lotPath << "] " << "Lot revision: " << lotJSON[ "rev" ] << std::endl;
 
 				// Instantiate the lot
-				this->currentLot.reset(
+				currentLot.reset(
 					new BlueBear::Lot(
 						lotJSON[ "floorx" ].asInt(),
 						lotJSON[ "floory" ].asInt(),
@@ -77,13 +77,13 @@ namespace BlueBear {
 				);
 
 				// Create one lot table for the Luasphere - contains functions that we call on this->currentLot to do things like get other objects on the lot and trigger events
-				this->createLotTable();
+				createLotTable();
 
 				// Set world ticks to the one saved in the file
-				this->worldTicks = lotJSON[ "ticks" ].asInt();
+				worldTicks = lotJSON[ "ticks" ].asInt();
 
 				// Clear the std::map containing all objects
-				this->currentLot->objects.clear();
+				currentLot->objects.clear();
 
 				// Iterate through the "entities" array
 				Json::Value entities = lotJSON[ "entities" ];
@@ -95,11 +95,11 @@ namespace BlueBear {
 					std::string cid = entity[ "instance" ][ "_cid" ].asString();
 
 					// Emplace the object into the std::map (insert the new object as we create it)
-					this->currentLot->objects.emplace( cid, BlueBear::LotEntity( this->L, classID, instance ) );
+					currentLot->objects.emplace( cid, BlueBear::LotEntity( L, classID, instance ) );
 				}
 
 				// After the lot has all its LotEntities loaded, let's fix those serialized function references
-				this->deserializeFunctionRefs();
+				deserializeFunctionRefs();
 			}
 		} else {
 			std::cout << "Unable to load lot: " << lotPath << std::endl;
@@ -115,20 +115,20 @@ namespace BlueBear {
 	void Engine::deserializeFunctionRefs() {
 
 		// Get fresh Lua stack
-		Utility::clearLuaStack( this->L );
+		Utility::clearLuaStack( L );
 
-		for( auto& keyValuePair : this->currentLot->objects ) {
+		for( auto& keyValuePair : currentLot->objects ) {
 			BlueBear::LotEntity& currentEntity = keyValuePair.second;
 
 			// Push this object's table onto the API stack
-			lua_rawgeti( this->L, LUA_REGISTRYINDEX, currentEntity.luaVMInstance );
+			lua_rawgeti( L, LUA_REGISTRYINDEX, currentEntity.luaVMInstance );
 			// Get the reserved function "_deserialize_function_refs"
-			Utility::getTableValue( this->L, "_deserialize_function_refs" );
+			Utility::getTableValue( L, "_deserialize_function_refs" );
 			// First argument is that same table (the context)
-			lua_pushvalue( this->L, -2 );
+			lua_pushvalue( L, -2 );
 
 			// Call _deserialize_function_refs: The rest is done in Lua
-			if( lua_pcall( this->L, 1, 0, 0 ) != 0 ) {
+			if( lua_pcall( L, 1, 0, 0 ) != 0 ) {
 				std::cout << lua_tostring( L, -1 ) << std::endl;
 				currentEntity.ok = false;
 			}
@@ -141,7 +141,7 @@ namespace BlueBear {
 	void Engine::createLotTable() {
 
 		// Get "dumb pointer" from smart pointer
-		Lot* lot = this->currentLot.get();
+		Lot* lot = currentLot.get();
 
 		// Push the "bluebear" global onto the stack, then push the "lot" identifier
 		// We will set this at the very end of the function
@@ -149,7 +149,7 @@ namespace BlueBear {
 		lua_pushstring( L, "lot" );
 
 		// Push new, blank table
-		lua_createtable( this->L, 0, 1 );
+		lua_createtable( L, 0, 1 );
 
 		// get_all_objects retrieves all objects
 		lua_pushstring( L, "get_all_objects" );
@@ -178,18 +178,18 @@ namespace BlueBear {
 	 * Where the magic happens
 	 */
 	void Engine::objectLoop() {
-		std::cout << "Starting world engine with a tick count of " << this->worldTicks << "\n";
+		std::cout << "Starting world engine with a tick count of " << worldTicks << "\n";
 
 		// Push the bluebear global onto the stack - leave it there
 		lua_getglobal( L, "bluebear" );
 		// Push table value "current_tick" onto the stack - leave it there too
 		Utility::getTableValue( L, "engine" );
 
-		for( ; this->worldTicks != 500000; this->worldTicks++ ) {
+		for( ; worldTicks != 500000; worldTicks++ ) {
 			// Set current_tick on bluebear.lot (inside the Luasphere, system/root.lua) to the current tick
-			Utility::setTableIntValue( L, "current_tick", this->worldTicks );
+			Utility::setTableIntValue( L, "current_tick", worldTicks );
 
-			for( auto& keyValuePair : this->currentLot->objects ) {
+			for( auto& keyValuePair : currentLot->objects ) {
 				BlueBear::LotEntity& currentEntity = keyValuePair.second;
 
 				// Execute object if it is "ok"
