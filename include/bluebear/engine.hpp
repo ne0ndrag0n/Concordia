@@ -23,6 +23,7 @@ namespace BlueBear {
 	class Engine {
 
 		private:
+			static constexpr const char* LUASPHERE_MAIN = "system/main.lua";
 			lua_State* L;
 			unsigned int worldTicks;
 			std::unique_ptr< Lot > currentLot;

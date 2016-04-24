@@ -2,9 +2,8 @@
 -- DO NOT MODIFY THIS FILE, or else everything will get goofy
 
 -- Import base library and subsequent libraries
-JSON = require( "system/JSON" )
-dofile( "system/yaci.lua" )
-dofile( "system/bblib.lua" )
+JSON = require( "system/lib/JSON" )
+dofile( "system/lib/yaci.lua" )
 
 _classes = {};
 
@@ -18,9 +17,69 @@ bluebear = {
 		current_tick = 0
 	},
 
+	-- Contains utility functions (formerly _bblib)
+	util = {
+		lastcid = 0,
+
+		extend = function( destination, ... )
+			local arg = { ... }
+
+			-- Overwrite with shallow references to each source
+			for index, source in ipairs( arg ) do
+				for key, value in pairs( source ) do
+					destination[ key ] = value
+				end
+			end
+
+			return destination
+		end,
+
+		-- Courtesy lua-users wiki: Copy Table - http://lua-users.org/wiki/CopyTable
+		deep_copy = function( orig )
+		    local orig_type = type(orig)
+		    local copy
+		    if orig_type == 'table' then
+		        copy = {}
+		        for orig_key, orig_value in next, orig, nil do
+		            copy[bluebear.util.deep_copy(orig_key)] = bluebear.util.deep_copy(orig_value)
+		        end
+		        setmetatable(copy, bluebear.util.deep_copy(getmetatable(orig)))
+		    else -- number, string, boolean, etc
+		        copy = orig
+		    end
+		    return copy
+		end,
+
+		concatenate_arrays = function( first, last )
+			local new_table = {}
+
+			for k,v in pairs( first ) do
+				table.insert( new_table, v )
+			end
+
+			for k,v in pairs( last ) do
+				table.insert( new_table, v )
+			end
+
+			return new_table
+		end,
+
+		get_cid = function()
+			bluebear.util.lastcid = bluebear.util.lastcid + 1
+			return "bb"..bluebear.util.lastcid
+		end,
+
+		split = function( str, delimiter )
+			local delimiter, fields = delimiter or ":", {}
+			local pattern = string.format("([^%s]+)", delimiter)
+			str:gsub(pattern, function(c) fields[#fields+1] = c end)
+			return fields
+		end
+	},
+
 	register_class = function( identifier, class_table )
 
-		local id = identifier:split( '.' )
+		local id = bluebear.util.split( identifier, '.' )
 
 		if #id == 0 then
 			print( "Could not load class  \""..identifier.."\": Invalid identifier!" )
@@ -46,7 +105,7 @@ bluebear = {
 	end,
 
 	get_class = function( identifier )
-		local id = identifier:split( '.' )
+		local id = bluebear.util.split( identifier, '.' )
 		local currentObject = _classes
 		local max = #id
 
@@ -67,7 +126,7 @@ bluebear = {
 		local SubClass = nil
 
 		if Class ~= nil then
-			SubClass = _bblib.extend( Class:subclass(), class_table )
+			SubClass = bluebear.util.extend( Class:subclass(), class_table )
 		end
 
 		return SubClass
@@ -84,7 +143,7 @@ bluebear = {
 			-- deep copy all tables
 			for key, value in pairs( instance ) do
 				if key ~= 'super' and type( value ) == 'table' then
-					instance[ key ] = _bblib.deep_copy( value )
+					instance[ key ] = bluebear.util.deep_copy( value )
 				end
 			end
 			-- call the "setup" function as constructor
@@ -132,6 +191,5 @@ bluebear = {
 	end
 };
 
-dofile( "system/basetype.lua" )
--- this is where we verify functions are written properly
-dofile( "system/debugtests.lua" )
+-- Define basic types
+dofile( "system/base_game.lua" )
