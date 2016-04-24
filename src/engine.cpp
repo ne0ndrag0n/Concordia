@@ -38,7 +38,7 @@ namespace BlueBear {
 		}
 
 		// Setup the root environment by loading in and "class-ifying" all objects used by the game
-		Utility::doDirectories( L, BLUEBEAR_OBJECTS_DIRECTORY );
+		Utility::doDirectories( L, BLUEBEAR_MODPACK_DIRECTORY );
 
 		return true;
 	}
