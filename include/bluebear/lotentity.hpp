@@ -23,7 +23,7 @@ namespace BlueBear {
 			int luaVMInstance;
 			std::string classID;
 			std::queue< BlueBear::ActionDescriptor > actionQueue;
-			LotEntity( lua_State* L, const char* classID, const char* instance );
+			LotEntity( lua_State* L, std::string& classID, std::string& instance );
 			void execute();
 			char* save();
 			void load( char* pickledObject );

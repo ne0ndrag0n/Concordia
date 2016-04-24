@@ -16,7 +16,7 @@ namespace BlueBear {
 	/**
 	 * Every BlueBear::LotEntity is tied to its Lua instance in the _lotinsts table
 	 */
-	LotEntity::LotEntity( lua_State* L, const char* classID, const char* instance ) {
+	LotEntity::LotEntity( lua_State* L, std::string& classID, std::string& instance ) {
 		// Store pointer to Luasphere on this object
 		this->L = L;
 
@@ -34,8 +34,8 @@ namespace BlueBear {
 		Utility::getTableValue( L, "new_instance_from_file" );
 
 		// Push identifier and instance string
-		lua_pushstring( L, classID );
-		lua_pushstring( L, instance );
+		lua_pushstring( L, classID.c_str() );
+		lua_pushstring( L, instance.c_str() );
 
 		// Call new_instance_from_file
 		if( lua_pcall( L, 2, 1, 0 ) == 0 ) {

@@ -95,7 +95,7 @@ namespace BlueBear {
 					std::string cid = entity[ "instance" ][ "_cid" ].asString();
 
 					// Emplace the object into the std::map (insert the new object as we create it)
-					this->currentLot->objects.emplace( cid, BlueBear::LotEntity( this->L, classID.c_str(), instance.c_str() ) );
+					this->currentLot->objects.emplace( cid, BlueBear::LotEntity( this->L, classID, instance ) );
 				}
 
 				// After the lot has all its LotEntities loaded, let's fix those serialized function references
