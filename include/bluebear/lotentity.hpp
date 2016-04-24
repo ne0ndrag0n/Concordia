@@ -1,9 +1,7 @@
 #ifndef BBOBJECT
 #define BBOBJECT
 
-#include "bbtypes.hpp"
 #include <string>
-#include <queue>
 
 extern "C" {
 	#include "lua.h"
@@ -22,15 +20,11 @@ namespace BlueBear {
 			bool ok = false;
 			int luaVMInstance;
 			std::string classID;
-			std::queue< BlueBear::ActionDescriptor > actionQueue;
 			LotEntity( lua_State* L, std::string& classID, std::string& instance );
 			void execute();
 			char* save();
 			void load( char* pickledObject );
 			bool good();
-
-			static int lua_getLotEntityObject( lua_State* L );
-
 	};
 
 }

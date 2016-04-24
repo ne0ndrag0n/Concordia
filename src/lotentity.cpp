@@ -1,6 +1,5 @@
 #include "lotentity.hpp"
 #include "utility.hpp"
-#include "bbtypes.hpp"
 #include <iostream>
 #include <cstring>
 #include <string>
@@ -77,11 +76,5 @@ namespace BlueBear {
 
 		// Pop the object table
 		lua_pop( L, 1 );
-	}
-
-	int LotEntity::lua_getLotEntityObject( lua_State* L ) {
-		BlueBear::LotEntity* lotEntity = ( BlueBear::LotEntity* )lua_touserdata( L, lua_upvalueindex( 1 ) );
-
-
 	}
 }
