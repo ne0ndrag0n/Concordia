@@ -133,9 +133,6 @@ namespace BlueBear {
 				currentEntity.ok = false;
 			}
 		}
-
-		// Clear stack when done
-		Utility::clearLuaStack( this->L );
 	}
 
 	/**
@@ -183,22 +180,23 @@ namespace BlueBear {
 	void Engine::objectLoop() {
 		std::cout << "Starting world engine with a tick count of " << this->worldTicks << "\n";
 
+		// Push the bluebear global onto the stack - leave it there
+		lua_getglobal( L, "bluebear" );
+		// Push table value "current_tick" onto the stack - leave it there too
+		Utility::getTableValue( L, "engine" );
+
 		for( ; this->worldTicks != 500000; this->worldTicks++ ) {
-
-			// Clear the API stack of the Luasphere
-			Utility::clearLuaStack( this->L );
-
-			// Make note of current tick for all objects on the bluebear.engine status table
-			lua_getglobal( L, "bluebear" );
-			Utility::getTableValue( L, "engine" );
-			lua_pushstring( L, "current_tick" );
-			lua_pushnumber( L, this->worldTicks );
-			lua_settable( L, -3 );
+			// Set current_tick on bluebear.lot (inside the Luasphere, system/root.lua) to the current tick
+			Utility::setTableIntValue( L, "current_tick", this->worldTicks );
 
 			for( auto& keyValuePair : this->currentLot->objects ) {
 				BlueBear::LotEntity& currentEntity = keyValuePair.second;
 
-				currentEntity.execute();
+				// Execute object if it is "ok"
+				if( currentEntity.ok == true ) {
+					// currentEntity.execute should leave the stack as it was when it was called!!
+					currentEntity.execute();
+				}
 			}
 		}
 

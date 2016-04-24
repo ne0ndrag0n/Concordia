@@ -56,11 +56,6 @@ namespace BlueBear {
 	}
 
 	void LotEntity::execute() {
-
-		if( this->ok == false ) {
-			return;
-		}
-
 		// Push this object's table onto the API stack
 		lua_rawgeti( this->L, LUA_REGISTRYINDEX, this->luaVMInstance );
 
@@ -72,9 +67,16 @@ namespace BlueBear {
 
 		// Run the _run method
 		if( lua_pcall( this->L, 1, 0, 0 ) != 0 ) {
+			// If there is an error, print error to console and pop it
 			std::cerr << lua_tostring( this->L, -1 ) << std::endl;
+			lua_pop( this->L, 1 );
+
+			// Mark object as bad - don't run it anymore!
 			this->ok = false;
 		}
+
+		// Pop the object table
+		lua_pop( this->L, 1 );
 	}
 
 	int LotEntity::lua_getLotEntityObject( lua_State* L ) {
