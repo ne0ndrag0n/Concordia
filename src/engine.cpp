@@ -31,6 +31,7 @@ namespace BlueBear {
 		// the root Lua environment all mods (including pack-ins) run from, and is NOT to be changed by the user.
 		if ( luaL_dofile( L, LUASPHERE_MAIN ) ) {
 			printf( "Failed to set up BlueBear root environment: %s\n", lua_tostring( L, -1 ) );
+			lua_pop( L, 1 );
 			return false;
 		}
 
@@ -38,6 +39,45 @@ namespace BlueBear {
 		Utility::doDirectories( L, BLUEBEAR_MODPACK_DIRECTORY );
 
 		return true;
+	}
+
+	/**
+	 * Load a Modpack. The mod name will be prepended with BLUEBEAR_MODPACK_DIRECTORY.
+	 * @param		{std::string}		name
+	 */
+	bool Engine::loadModpack( std::string& name ) {
+		std::string path = BLUEBEAR_MODPACK_DIRECTORY + name + "/" + MODPACK_MAIN_SCRIPT;
+
+		// dofile pointed to by path
+		if( luaL_dofile( L, path.c_str() ) ) {
+			// Exception occurred during the integration of this modpack
+			std::cout << "Failed to integrate modpack " << name << ": " << lua_tostring( L, -1 ) << std::endl;
+			lua_pop( L, 1 );
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Lua C++ binding to Engine::loadModpack
+	 */
+	int Engine::lua_loadModpack( lua_State* L ) {
+		// Because Lua requires methods be static in C closure, pop the first argument: the "this" pointer
+		BlueBear::Engine* engine = ( BlueBear::Engine* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+
+		// Get the modpack name
+		std::string modpack( lua_tostring( L, -1 ) );
+		lua_pop( L, 1 );
+
+		// If loadModpack fails, throw an exception and fail this entire attempt at loading a modpack
+		// loadModpack will return false if the dependency is circular, or the dependency is not found.
+		// loadModpack will return true if the dependency was loaded successfully one time.
+		if( !engine->loadModpack( modpack ) ) {
+			return luaL_error( L, "Failed to load modpack: %s", modpack.c_str() );
+		}
+
+		return 0;
 	}
 
 	/**

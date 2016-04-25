@@ -19,6 +19,7 @@ namespace BlueBear {
 
 	enum TerrainType { TERRAIN_GRASS, TERRAIN_DIRT, TERRAIN_SNOW, TERAIN_SAND, TERRAIN_MOON, TERRAIN_UNDERGROUND };
 
+	enum ModpackStatus { LOAD_SUCCESSFUL, LOADING, LOAD_FAILED };
 }
 
 #endif

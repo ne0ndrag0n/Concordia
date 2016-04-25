@@ -9,6 +9,7 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <map>
 
 
 namespace BlueBear {
@@ -18,11 +19,14 @@ namespace BlueBear {
 		private:
 			static constexpr const char* LUASPHERE_MAIN = "system/main.lua";
 			static constexpr const char* BLUEBEAR_MODPACK_DIRECTORY = "assets/modpacks/";
+			static constexpr const char* MODPACK_MAIN_SCRIPT = "obj.lua";
 			static constexpr const unsigned int WORLD_TICKS_MAX = 500000;
 
 			lua_State* L;
 			unsigned int worldTicks;
 			std::unique_ptr< Lot > currentLot;
+			std::map< std::string, BlueBear::ModpackStatus > loadedModpacks;
+
 			void createLotTable();
 			void callActionOnObject( const char* playerId, const char* obejctId, const char* method );
 			void deserializeFunctionRefs();
@@ -33,6 +37,10 @@ namespace BlueBear {
 			bool setupRootEnvironment();
 			void objectLoop();
 			bool loadLot( const char* lotPath );
+
+			bool loadModpack( std::string& name );
+			static int lua_loadModpack( lua_State* L );
+
 
 	};
 
