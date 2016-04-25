@@ -1,13 +1,10 @@
 #ifndef BBOBJECT
 #define BBOBJECT
 
+#include "lua.h"
+#include "lualib.h"
+#include "lauxlib.h"
 #include <string>
-
-extern "C" {
-	#include "lua.h"
-	#include "lualib.h"
-	#include "lauxlib.h"
-}
 
 namespace BlueBear {
 

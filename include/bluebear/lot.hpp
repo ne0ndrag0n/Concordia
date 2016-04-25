@@ -1,16 +1,13 @@
 #ifndef LOT
 #define LOT
 
+#include "lua.h"
+#include "lualib.h"
+#include "lauxlib.h"
 #include "bbtypes.hpp"
 #include "lotentity.hpp"
 #include <vector>
 #include <map>
-
-extern "C" {
-	#include "lua.h"
-	#include "lualib.h"
-	#include "lauxlib.h"
-}
 
 namespace BlueBear {
 

@@ -1,14 +1,11 @@
 #include "lotentity.hpp"
+#include "lua.h"
+#include "lualib.h"
+#include "lauxlib.h"
 #include "utility.hpp"
 #include <iostream>
 #include <cstring>
 #include <string>
-
-extern "C" {
-	#include "lua.h"
-	#include "lualib.h"
-	#include "lauxlib.h"
-}
 
 namespace BlueBear {
 

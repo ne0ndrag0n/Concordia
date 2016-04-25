@@ -1,5 +1,7 @@
 #include "utility.hpp"
-
+#include "lua.h"
+#include "lualib.h"
+#include "lauxlib.h"
 #include <cstdint>
 #include <cstdio>
 #include <string>
@@ -16,13 +18,6 @@
 
 // Not X-Compiler
 #include <execinfo.h>
-
-
-extern "C" {
-	#include "lua.h"
-	#include "lualib.h"
-	#include "lauxlib.h"
-}
 
 
 namespace BlueBear {

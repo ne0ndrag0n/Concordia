@@ -1,17 +1,15 @@
 #ifndef ENGINE
 #define ENGINE
 
+#include "lua.h"
+#include "lualib.h"
+#include "lauxlib.h"
 #include "bbtypes.hpp"
 #include "lot.hpp"
 #include <string>
 #include <memory>
 #include <vector>
 
-extern "C" {
-	#include "lua.h"
-	#include "lualib.h"
-	#include "lauxlib.h"
-}
 
 namespace BlueBear {
 

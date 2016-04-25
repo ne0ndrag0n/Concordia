@@ -1,6 +1,9 @@
 #ifndef UTILITY
 #define UTILITY
 
+#include "lua.h"
+#include "lualib.h"
+#include "lauxlib.h"
 #include <cstdint>
 #include <fstream>
 #include <vector>
@@ -8,12 +11,6 @@
 
 // Not X-Compiler
 #include <execinfo.h>
-
-extern "C" {
-	#include "lua.h"
-	#include "lualib.h"
-	#include "lauxlib.h"
-}
 
 
 namespace BlueBear {

@@ -1,4 +1,7 @@
 #include "bbtypes.hpp"
+#include "lua.h"
+#include "lualib.h"
+#include "lauxlib.h"
 #include "utility.hpp"
 #include "lotentity.hpp"
 #include "lot.hpp"
@@ -8,12 +11,6 @@
 #include <string>
 #include <vector>
 #include <iostream>
-
-extern "C" {
-	#include "lua.h"
-	#include "lualib.h"
-	#include "lauxlib.h"
-}
 
 namespace BlueBear {
 
