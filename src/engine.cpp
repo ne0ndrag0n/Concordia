@@ -35,6 +35,14 @@ namespace BlueBear {
 			return false;
 		}
 
+		// Link the require_modpack method into Luasphere bluebear.engine
+		lua_getglobal( L, "bluebear" );
+		Utility::getTableValue( L, "engine" );
+		lua_pushstring( L, "require_modpack" );
+		lua_pushlightuserdata( L, this );
+		lua_pushcclosure( L, &Engine::lua_loadModpack, 1 );
+		lua_settable( L, -3 );
+
 		// Setup the root environment by loading in and "class-ifying" all objects used by the game
 		Utility::doDirectories( L, BLUEBEAR_MODPACK_DIRECTORY );
 
