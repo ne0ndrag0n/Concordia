@@ -44,7 +44,16 @@ namespace BlueBear {
 		lua_settable( L, -3 );
 
 		// Setup the root environment by loading in and "class-ifying" all objects used by the game
-		Utility::doDirectories( L, BLUEBEAR_MODPACK_DIRECTORY );
+		auto modpacks = Utility::getSubdirectoryList( BLUEBEAR_MODPACK_DIRECTORY );
+		for( auto modpack : modpacks ) {
+			if( loadModpack( modpack ) ) {
+				// Modpack loaded successfully
+				loadedModpacks[ modpack ] = BlueBear::ModpackStatus::LOAD_SUCCESSFUL;
+			} else {
+				// Modpack failed to load
+				loadedModpacks[ modpack ] = BlueBear::ModpackStatus::LOAD_FAILED;
+			}
+		}
 
 		return true;
 	}
@@ -52,9 +61,17 @@ namespace BlueBear {
 	/**
 	 * Load a Modpack. The mod name will be prepended with BLUEBEAR_MODPACK_DIRECTORY.
 	 * @param		{std::string}		name
+	 * @returns	{bool}		True if the modpack was or is integrated successfully: false otherwise.
 	 */
 	bool Engine::loadModpack( std::string& name ) {
+		// Assemble the fully-qualified pathname for this modpack
 		std::string path = BLUEBEAR_MODPACK_DIRECTORY + name + "/" + MODPACK_MAIN_SCRIPT;
+
+		// Don't load another modpack twice. Another script might have already loaded this modpack. Just go "uh-huh" and
+		// remind the source call that this modpack was already loaded.
+		if( loadedModpacks[ name ] == BlueBear::ModpackStatus::LOAD_SUCCESSFUL ) {
+			return true;
+		}
 
 		// dofile pointed to by path
 		if( luaL_dofile( L, path.c_str() ) ) {
