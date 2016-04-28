@@ -46,13 +46,7 @@ namespace BlueBear {
 		// Setup the root environment by loading in and "class-ifying" all objects used by the game
 		auto modpacks = Utility::getSubdirectoryList( BLUEBEAR_MODPACK_DIRECTORY );
 		for( auto modpack : modpacks ) {
-			if( loadModpack( modpack ) ) {
-				// Modpack loaded successfully
-				loadedModpacks[ modpack ] = BlueBear::ModpackStatus::LOAD_SUCCESSFUL;
-			} else {
-				// Modpack failed to load
-				loadedModpacks[ modpack ] = BlueBear::ModpackStatus::LOAD_FAILED;
-			}
+			loadModpack( modpack );
 		}
 
 		return true;
@@ -87,9 +81,11 @@ namespace BlueBear {
 			// Exception occurred during the integration of this modpack
 			std::cout << "Failed to integrate modpack " << name << ": " << lua_tostring( L, -1 ) << std::endl;
 			lua_pop( L, 1 );
+			loadedModpacks[ name ] = BlueBear::ModpackStatus::LOAD_FAILED;
 			return false;
 		}
 
+		loadedModpacks[ name ] = BlueBear::ModpackStatus::LOAD_SUCCESSFUL;
 		return true;
 	}
 
