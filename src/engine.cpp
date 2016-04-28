@@ -101,6 +101,11 @@ namespace BlueBear {
 		std::string modpack( lua_tostring( L, -1 ) );
 		lua_pop( L, 1 );
 
+		// Modpack name can't be blank
+		if( modpack == "" ) {
+			return luaL_error( L, "Modpack name not specified!" );
+		}
+
 		// If loadModpack fails, throw an exception and fail this entire attempt at loading a modpack
 		// loadModpack will return false if the dependency is circular, or the dependency is not found.
 		// loadModpack will return true if the dependency was loaded successfully one time.
