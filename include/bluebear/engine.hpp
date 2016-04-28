@@ -17,7 +17,7 @@ namespace BlueBear {
 	class Engine {
 
 		private:
-			static constexpr const char* LUASPHERE_MAIN = "system/main.lua";
+			static constexpr const char* LUASPHERE_MAIN = "system/root.lua";
 			static constexpr const char* BLUEBEAR_MODPACK_DIRECTORY = "assets/modpacks/";
 			static constexpr const char* MODPACK_MAIN_SCRIPT = "obj.lua";
 			static constexpr const unsigned int WORLD_TICKS_MAX = 500000;
