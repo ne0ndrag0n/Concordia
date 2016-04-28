@@ -186,10 +186,3 @@ bluebear = {
 		return Class:made( instance )
 	end
 };
-
--- Import base library and subsequent libraries
-dofile( "system/json/obj.lua" )
-dofile( "system/yaci/obj.lua" )
-
--- Define basic types
-dofile( "system/base_game/obj.lua" )

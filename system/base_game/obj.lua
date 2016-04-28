@@ -1,3 +1,5 @@
+bluebear.engine.require_modpack( "yaci" );
+
 -- Base Types
 
 _classes.object = newclass();
