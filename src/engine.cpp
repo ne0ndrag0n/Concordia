@@ -64,14 +64,23 @@ namespace BlueBear {
 	 * @returns	{bool}		True if the modpack was or is integrated successfully: false otherwise.
 	 */
 	bool Engine::loadModpack( std::string& name ) {
-		// Assemble the fully-qualified pathname for this modpack
-		std::string path = BLUEBEAR_MODPACK_DIRECTORY + name + "/" + MODPACK_MAIN_SCRIPT;
+		// If this modpack is LOADING, don't load it twice! This is a circular dependency; a modpack being imported by another modpack called
+		// to load the first modpack (which was still LOADING)! Fail immediately.
+		if( loadedModpacks[ name ] == BlueBear::ModpackStatus::LOADING ) {
+			return false;
+		}
 
 		// Don't load another modpack twice. Another script might have already loaded this modpack. Just go "uh-huh" and
 		// remind the source call that this modpack was already loaded.
 		if( loadedModpacks[ name ] == BlueBear::ModpackStatus::LOAD_SUCCESSFUL ) {
 			return true;
 		}
+
+		// Assemble the fully-qualified pathname for this modpack
+		std::string path = BLUEBEAR_MODPACK_DIRECTORY + name + "/" + MODPACK_MAIN_SCRIPT;
+
+		// Mark the module as LOADING - first if should catch this module if it's called again without completing
+		loadedModpacks[ name ] = BlueBear::ModpackStatus::LOADING;
 
 		// dofile pointed to by path
 		if( luaL_dofile( L, path.c_str() ) ) {
