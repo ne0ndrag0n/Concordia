@@ -60,7 +60,8 @@ namespace BlueBear {
 	bool Engine::loadModpack( std::string& name ) {
 		// If this modpack is LOADING, don't load it twice! This is a circular dependency; a modpack being imported by another modpack called
 		// to load the first modpack (which was still LOADING)! Fail immediately.
-		if( loadedModpacks[ name ] == BlueBear::ModpackStatus::LOADING ) {
+		// Fail immediately if it already failed (don't waste time loading it again)
+		if( loadedModpacks[ name ] == BlueBear::ModpackStatus::LOADING || loadedModpacks[ name ] == BlueBear::ModpackStatus::LOAD_FAILED ) {
 			return false;
 		}
 
