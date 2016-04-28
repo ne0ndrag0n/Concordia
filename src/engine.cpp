@@ -45,7 +45,7 @@ namespace BlueBear {
 
 		// Setup the root environment by loading in and "class-ifying" all objects used by the game
 		auto modpacks = Utility::getSubdirectoryList( BLUEBEAR_MODPACK_DIRECTORY );
-		for( auto modpack : modpacks ) {
+		for( auto& modpack : modpacks ) {
 			loadModpack( modpack );
 		}
 
