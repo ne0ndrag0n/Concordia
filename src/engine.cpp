@@ -17,6 +17,8 @@ namespace BlueBear {
 	Engine::Engine() {
 		L = luaL_newstate();
 		luaL_openlibs( L );
+
+		currentModpackDirectory = NULL;
 	}
 
 	Engine::~Engine() {
@@ -43,13 +45,25 @@ namespace BlueBear {
 		lua_pushcclosure( L, &Engine::lua_loadModpack, 1 );
 		lua_settable( L, -3 );
 
-		// Setup the root environment by loading in and "class-ifying" all objects used by the game
-		auto modpacks = Utility::getSubdirectoryList( BLUEBEAR_MODPACK_DIRECTORY );
+		// Integrate system modpacks
+		loadModpackSet( SYSTEM_MODPACK_DIRECTORY );
+		// Integrate standard objects
+		loadModpackSet( BLUEBEAR_MODPACK_DIRECTORY );
+
+		return true;
+	}
+
+	/**
+	 * Load a set of modpacks given a parent directory (const char* as they are ROM constants)
+	 */
+	void Engine::loadModpackSet( const char* modpackDirectory ) {
+		currentModpackDirectory = modpackDirectory;
+
+		auto modpacks = Utility::getSubdirectoryList( modpackDirectory );
+
 		for( auto& modpack : modpacks ) {
 			loadModpack( modpack );
 		}
-
-		return true;
 	}
 
 	/**
@@ -72,7 +86,7 @@ namespace BlueBear {
 		}
 
 		// Assemble the fully-qualified pathname for this modpack
-		std::string path = BLUEBEAR_MODPACK_DIRECTORY + name + "/" + MODPACK_MAIN_SCRIPT;
+		std::string path = currentModpackDirectory + name + "/" + MODPACK_MAIN_SCRIPT;
 
 		// Mark the module as LOADING - first if should catch this module if it's called again without completing
 		loadedModpacks[ name ] = BlueBear::ModpackStatus::LOADING;
