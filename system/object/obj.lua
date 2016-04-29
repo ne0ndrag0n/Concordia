@@ -1,6 +1,10 @@
-bluebear.engine.require_modpack( "yaci" );
+--[[
+	BlueBear base object
+	This object is the object that all other Luasphere objects descend from - the base object
+	Anything that can be placed on a lot and ran as an entity is an "object"
+--]]
 
--- Base Types
+bluebear.engine.require_modpack( "yaci" )
 
 _classes.object = newclass();
 
@@ -107,23 +111,3 @@ end
 -- all methods should be made virtual by default by some type of modification to the yaci lib
 _classes.object:virtual( "sleep" )
 _classes.object:virtual( "_run" )
-
--- define promises: there may be several kinds of promises (e.g. timebased promises in pure Lua,
--- or engine-based promises that require the C++ engine to signal for the callback)
-_classes.promise = {
-	base = newclass()
-}
-
-function _classes.promise.base:init( obj_ref, start_tick )
-	self.object = obj_ref
-	self.next_tick = start_tick
-end
-
-function _classes.promise.base:then_call( func_name, ... )
-	self.object:register_callback( self.next_tick, func_name, { ... } )
-
-	-- any future "then_call" statements will be called tick per tick
-	self.next_tick = self.next_tick + 1
-
-	return self
-end

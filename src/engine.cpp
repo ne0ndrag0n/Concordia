@@ -47,6 +47,7 @@ namespace BlueBear {
 
 		// Integrate system modpacks
 		loadModpackSet( SYSTEM_MODPACK_DIRECTORY );
+		// System modpacks should not remain part of the modpack list
 		loadedModpacks.clear();
 		// Integrate standard objects
 		loadModpackSet( BLUEBEAR_MODPACK_DIRECTORY );
