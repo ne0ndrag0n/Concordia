@@ -1,6 +1,6 @@
 bluebear.engine.require_modpack( "trashpile" )
 
-local Class = bluebear.extend( 'object', {
+local Class = bluebear.extend( "system.object.base", {
 
 	water_level = nil,
 

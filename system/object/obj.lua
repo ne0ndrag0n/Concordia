@@ -6,16 +6,16 @@
 
 bluebear.engine.require_modpack( "yaci" )
 
-_classes.object = newclass();
+local Object = newclass()
 
-function _classes.object:load( saved )
+function Object:load( saved )
 	local data = saved or {}
 
 	self._cid = data._cid
 	self._sys = data._sys
 end
 
-function _classes.object:save()
+function Object:save()
 	local out = {
 		_sys = self._sys,
 		_cid = self._cid
@@ -41,24 +41,24 @@ function _classes.object:save()
 	return out
 end
 
-function _classes.object:setup()
+function Object:setup()
 	-- abstract - This is the "real" constructor of objects
 end
 
 --[[
 	Sleep numTicks amount of ticks and then call the function on this object named by functionName
 --]]
-function _classes.object:sleep( numTicks )
+function Object:sleep( numTicks )
 	local ticks = numTicks + bluebear.engine.current_tick
 
 	-- do nothing but return a new promise with the ticks set to "ticks"
-	return _classes.promise.base( self, ticks )
+	return _classes.system.promise.base( self, ticks )
 end
 
 --[[
 	Enter in a callback on this object's _sys._sched table for the destination tick
 --]]
-function _classes.object:register_callback( tick, method, wrapped_arguments )
+function Object:register_callback( tick, method, wrapped_arguments )
 	local ticks_key = tostring( tick )
 	local ticks_table
 
@@ -73,7 +73,7 @@ end
 
 -- Private methods (do not override these!)
 -- Called by the engine, runs all callbacks due for the given ticks
-function _classes.object:_run()
+function Object:_run()
 	-- Is there a _sys._sched entry for currentTick?
 	local currentTick = tostring( bluebear.engine.current_tick )
 	local callbackList = self._sys._sched[ currentTick ]
@@ -94,7 +94,7 @@ end
 	This function is only to be called on each object after all objects are finished loading. Basically,
 	deserialize all references to bluebear objects which take the form "t/"..self._cid
 --]]
-function _classes.object:_deserialize_function_refs()
+function Object:_deserialize_function_refs()
 	for time, callbacks in pairs( self._sys._sched ) do
 		for index, callback in ipairs( callbacks ) do
 			for argumentIndex, argument in ipairs( callback.arguments ) do
@@ -109,5 +109,7 @@ end
 
 -- be careful: if the methods are NOT virtual, "self" will not be the same self when you call it!
 -- all methods should be made virtual by default by some type of modification to the yaci lib
-_classes.object:virtual( "sleep" )
-_classes.object:virtual( "_run" )
+Object:virtual( "sleep" )
+Object:virtual( "_run" )
+
+bluebear.register_class( "system.object.base", Object )

@@ -1,4 +1,4 @@
-local Class = bluebear.extend( 'object', {
+local Class = bluebear.extend( "system.object.base", {
 
 	catalog = {
 		name = "bluebear trashpile",

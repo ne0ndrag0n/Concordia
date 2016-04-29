@@ -5,16 +5,14 @@
 
 bluebear.engine.require_modpack( "yaci" )
 
-_classes.promise = {
-	base = newclass()
-}
+local Promise = newclass()
 
-function _classes.promise.base:init( obj_ref, start_tick )
+function Promise:init( obj_ref, start_tick )
 	self.object = obj_ref
 	self.next_tick = start_tick
 end
 
-function _classes.promise.base:then_call( func_name, ... )
+function Promise:then_call( func_name, ... )
 	self.object:register_callback( self.next_tick, func_name, { ... } )
 
 	-- any future "then_call" statements will be called tick per tick
@@ -22,3 +20,5 @@ function _classes.promise.base:then_call( func_name, ... )
 
 	return self
 end
+
+bluebear.register_class( "system.promise.base", Promise )
