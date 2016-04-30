@@ -48,14 +48,6 @@ bluebear.register_motive = function( class_name, Motive )
   -- Register the motive as an ordinary class
   bluebear.register_class( class_name, Motive )
 
-  -- Make sure that an array exists in bluebear.motives for the motive's group
-  if bluebear.motives[ Motive.static.motive_group ] == nil then
-    bluebear.motives[ Motive.static.motive_group ] = {}
-  end
-
-  -- Insert this class name into that table. On init, dolls create a table full
-  -- of keys that represent the motive groups, pointing to tables holding the
-  -- submotives for that group. Each of *those* tables has keys as the given
-  -- name of the motive, and the values as new motive instances.
-  bluebear.motives[ Motive.static.motive_group ][ Motive.static.motive_name ] = Motive
+  -- Push the class onto the table
+  table.insert( bluebear.motives, Motive )
 end

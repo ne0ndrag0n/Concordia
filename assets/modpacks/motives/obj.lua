@@ -7,12 +7,13 @@ local HUNGER_MOTIVE_GROUP = "Hunger"
 
 local Food = bluebear.extend( "system.motive.base", {
   motive_name = "Food",
-  motive_group = HUNGER_MOTIVE_GROUP,
-
-  decay = function( self )
-    -- If doll has a high "active" motive, decrement faster
-    self.super:decay()
-  end
+  motive_group = HUNGER_MOTIVE_GROUP
 } )
 
-bluebear.register_motive( "game.motive.food", Food )
+local Drink = bluebear.extend( "system.motive.base", {
+  motive_name = "Drink",
+  motive_gruop = HUNGER_MOTIVE_GROUP
+} )
+
+bluebear.register_motive( "game.motive.hunger.food", Food )
+bluebear.register_motive( "game.motive.hunger.drink", Drink )
