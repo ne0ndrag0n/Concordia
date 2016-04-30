@@ -12,7 +12,7 @@ local Food = bluebear.extend( "system.motive.base", {
 
 local Drink = bluebear.extend( "system.motive.base", {
   motive_name = "Drink",
-  motive_gruop = HUNGER_MOTIVE_GROUP
+  motive_group = HUNGER_MOTIVE_GROUP
 } )
 
 bluebear.register_motive( "game.motive.hunger.food", Food )
