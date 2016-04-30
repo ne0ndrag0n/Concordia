@@ -8,8 +8,8 @@ bluebear.engine.require_modpack( "class" )
 
 local Motive = newclass()
 
-Motive.name = "Root Motive"
-Motive.group = "Motive Group"
+Motive.motive_name = "Root Motive"
+Motive.motive_group = "Motive Group"
 
 function Motive:init( doll )
   self.doll = doll
@@ -49,13 +49,13 @@ bluebear.register_motive = function( class_name, Motive )
   bluebear.register_class( class_name, Motive )
 
   -- Make sure that an array exists in bluebear.motives for the motive's group
-  if bluebear.motives[ Motive.group ] == nil then
-    bluebear.motives[ Motive.group ] = {}
+  if bluebear.motives[ Motive.motive_group ] == nil then
+    bluebear.motives[ Motive.motive_group ] = {}
   end
 
   -- Insert this class name into that table. On init, dolls create a table full
   -- of keys that represent the motive groups, pointing to tables holding the
   -- submotives for that group. Each of *those* tables has keys as the given
   -- name of the motive, and the values as new motive instances.
-  table.insert( bluebear.motives[ Motive.group ], class_name )
+  table.insert( bluebear.motives[ Motive.motive_group ], class_name )
 end
