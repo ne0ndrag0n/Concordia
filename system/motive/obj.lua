@@ -39,3 +39,18 @@ function Motive:set_value( value )
 end
 
 bluebear.register_class( "system.motive.base", Motive )
+
+-- Convience methods that are set up on the BlueBear object
+-- Set up an array of class names - this saves time when constructing Dolls
+-- USE bluebear.register_motive WHEN REGISTERING MOTIVE CLASSES SO YOUR DOLLS
+-- CAN USE THE MOTIVES!
+bluebear.motives = {}
+bluebear.register_motive = function( class_name, motive )
+  -- Register the motive as an ordinary class
+  bluebear.register_class( class_name, motive )
+
+  -- Save the class name on bluebear.motives array: This is a simple optimisation
+  -- that allows Doll objects to construct quickly (they need to create instances
+  -- of each registered motive)
+  table.insert( bluebear.motives, class_name )
+end
