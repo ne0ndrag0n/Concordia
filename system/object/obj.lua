@@ -5,6 +5,7 @@
 --]]
 
 bluebear.engine.require_modpack( "yaci" )
+bluebear.engine.require_modpack( "class" )
 
 local Object = newclass()
 

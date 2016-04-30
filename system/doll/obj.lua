@@ -4,7 +4,7 @@
   Requires the motives system modpack
 --]]
 
-bluebear.engine.require_modpack( "yaci" )
+bluebear.engine.require_modpack( "class" )
 bluebear.engine.require_modpack( "object" )
 bluebear.engine.require_modpack( "motive" )
 
