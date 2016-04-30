@@ -43,16 +43,19 @@ end
 bluebear.register_class( "system.motive.base", Motive )
 
 -- Convience methods that are set up on the BlueBear object
--- Set up an array of class names - this saves time when constructing Dolls
--- USE bluebear.register_motive WHEN REGISTERING MOTIVE CLASSES SO YOUR DOLLS
--- CAN USE THE MOTIVES!
 bluebear.motives = {}
-bluebear.register_motive = function( class_name, motive )
+bluebear.register_motive = function( class_name, Motive )
   -- Register the motive as an ordinary class
-  bluebear.register_class( class_name, motive )
+  bluebear.register_class( class_name, Motive )
 
-  -- Save the class name on bluebear.motives array: This is a simple optimisation
-  -- that allows Doll objects to construct quickly (they need to create instances
-  -- of each registered motive)
-  table.insert( bluebear.motives, class_name )
+  -- Make sure that an array exists in bluebear.motives for the motive's group
+  if bluebear.motives[ Motive.group ] == nil then
+    bluebear.motives[ Motive.group ] = {}
+  end
+
+  -- Insert this class name into that table. On init, dolls create a table full
+  -- of keys that represent the motive groups, pointing to tables holding the
+  -- submotives for that group. Each of *those* tables has keys as the given
+  -- name of the motive, and the values as new motive instances.
+  table.insert( bluebear.motives[ Motive.group ], class_name )
 end
