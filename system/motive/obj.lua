@@ -9,6 +9,7 @@ bluebear.engine.require_modpack( "class" )
 local Motive = newclass()
 
 Motive.name = "Root Motive"
+Motive.group = "Motive Group"
 
 function Motive:init( doll )
   self.doll = doll
