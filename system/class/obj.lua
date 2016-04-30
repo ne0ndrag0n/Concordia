@@ -6,7 +6,8 @@ bluebear.engine.require_modpack( "yaci" )
 bluebear.engine.require_modpack( "util" )
 bluebear.engine.require_modpack( "json" )
 
-_classes = {}
+-- Container for registered classes in Luasphere
+bluebear.classes = {}
 
 bluebear.register_class = function( identifier, class_table )
 	local id = bluebear.util.split( identifier, '.' )
@@ -16,8 +17,8 @@ bluebear.register_class = function( identifier, class_table )
 		return false
 	end
 
-	-- Slap the class into the _classes table, a central registry of all types of classes available to the game
-	local currentObject = _classes
+	-- Slap the class into the bluebear.classes table, a central registry of all types of classes available to the game
+	local currentObject = bluebear.classes
 	local max = #id - 1
 
 	for i = 1, max, 1 do
@@ -36,7 +37,7 @@ end
 
 bluebear.get_class = function( identifier )
 	local id = bluebear.util.split( identifier, '.' )
-	local currentObject = _classes
+	local currentObject = bluebear.classes
 	local max = #id
 
 	for i = 1, max, 1 do
@@ -87,7 +88,7 @@ end
 --[[
   Create a new instance from a serialised version of the object.
 
-  @param		{String}		identifier		The object class which will be selected from _classes
+  @param		{String}		identifier		The object class which will be selected from bluebear.classes
   @param		{String}		savedInstance	The saved instance that will need to be converted back to a Lua table
 --]]
 bluebear.new_instance_from_file = function( identifier, savedInstance )

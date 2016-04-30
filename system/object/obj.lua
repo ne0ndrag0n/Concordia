@@ -6,6 +6,7 @@
 
 bluebear.engine.require_modpack( "yaci" )
 bluebear.engine.require_modpack( "class" )
+bluebear.engine.require_modpack( "promise" )
 
 local Object = newclass()
 
@@ -53,7 +54,7 @@ function Object:sleep( numTicks )
 	local ticks = numTicks + bluebear.engine.current_tick
 
 	-- do nothing but return a new promise with the ticks set to "ticks"
-	return _classes.system.promise.base( self, ticks )
+	return bluebear.classes.system.promise.base( self, ticks )
 end
 
 --[[
