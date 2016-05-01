@@ -11,7 +11,7 @@ local Motive = newclass()
 Motive.motive_name = "Root Motive"
 Motive.motive_group = "Motive Group"
 Motive.decay_calls = 0
-Motive.standard_decay_rate = 1
+Motive.decay_rate = 1
 
 function Motive:init( doll )
   self.doll = doll
@@ -20,7 +20,7 @@ end
 
 function Motive:decay()
   if self.value > 0 then
-    self.value = self.value - self.standard_decay_rate
+    self.value = self.value - self.decay_rate
   end
 end
 
