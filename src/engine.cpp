@@ -29,21 +29,24 @@ namespace BlueBear {
 	 * Setup the global environment all Engine mods will run within. This method sets up required global objects used by each mod.
 	 */
 	bool Engine::setupRootEnvironment() {
-		// TODO: The root script should not be a user-modifiable file, but rather a hardcoded minified string. This script sets up
-		// the root Lua environment all mods (including pack-ins) run from, and is NOT to be changed by the user.
-		if ( luaL_dofile( L, LUASPHERE_MAIN ) ) {
-			printf( "Failed to set up BlueBear root environment: %s\n", lua_tostring( L, -1 ) );
-			lua_pop( L, 1 );
-			return false;
-		}
 
-		// Link the require_modpack method into Luasphere bluebear.engine
-		lua_getglobal( L, "bluebear" );
-		Utility::getTableValue( L, "engine" );
+		// bluebear
+		lua_newtable( L );
+
+		// bluebear.engine
+		lua_pushstring( L, "engine" );
+		lua_newtable( L );
+		// bluebear.engine.require_modpack
 		lua_pushstring( L, "require_modpack" );
 		lua_pushlightuserdata( L, this );
 		lua_pushcclosure( L, &Engine::lua_loadModpack, 1 );
 		lua_settable( L, -3 );
+
+		// Set the engine table on "bluebear"
+		lua_settable( L, -3 );
+
+		// Set the table as "bluebear"
+		lua_setglobal( L, "bluebear" );
 
 		// Integrate system modpacks
 		loadModpackSet( SYSTEM_MODPACK_DIRECTORY );
