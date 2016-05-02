@@ -45,7 +45,7 @@ local Class = bluebear.extend( "system.object.base", {
 	end,
 
 	load = function( self, saved )
-		self.super:load( saved )
+		bluebear.get_class( 'system.object.base' ).load( self, saved )
 
 		self.water_level = saved.water_level
 	end
