@@ -2,7 +2,7 @@
   Set up the class system used by the game
 --]]
 
-bluebear.engine.require_modpack( "yaci" )
+bluebear.engine.require_modpack( "middleclass" )
 bluebear.engine.require_modpack( "util" )
 bluebear.engine.require_modpack( "json" )
 
@@ -57,7 +57,7 @@ bluebear.extend = function( identifier, class_table )
   local SubClass = nil
 
   if Class ~= nil then
-    SubClass = bluebear.util.extend( Class:subclass(), class_table )
+    SubClass = bluebear.util.extend( Class:subclass( identifier ), class_table )
   end
 
   return SubClass
@@ -69,16 +69,9 @@ bluebear.new_instance = function( identifier )
 
   if Class ~= nil then
     -- new instance
-    instance = Class();
+    instance = Class:new();
 
-    -- deep copy all tables
-    for key, value in pairs( instance ) do
-      if key ~= 'super' and type( value ) == 'table' then
-        instance[ key ] = bluebear.util.deep_copy( value )
-      end
-    end
-    -- call the "setup" function as constructor
-    -- which makes up for the crappiness of metatable inheritance
+    -- call the "setup" function as "actual" constructor
     instance:setup()
   end
 
@@ -109,7 +102,7 @@ end
   Check if a given object is an instance of "identifier"
 
   @param		{String}		identifier		The identifier for the class to compare to
-  @param		{Object}		instance		An instance of at least 'object'
+  @param		{Object}		instance			An instance of at least 'system.object.base'
 --]]
 bluebear.instance_of = function( identifier, instance )
   local Class = bluebear.get_class( identifier )
@@ -118,5 +111,5 @@ bluebear.instance_of = function( identifier, instance )
     return false
   end
 
-  return Class:made( instance )
+  return instance:isInstanceOf( Class )
 end

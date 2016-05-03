@@ -3,17 +3,17 @@
   basic motives.
 --]]
 
-bluebear.engine.require_modpack( "yaci" )
+bluebear.engine.require_modpack( "middleclass" )
 bluebear.engine.require_modpack( "class" )
 
-local Motive = newclass()
+local Motive = class( 'system.motive.base' )
 
 Motive.motive_name = "Root Motive"
 Motive.motive_group = "Motive Group"
 Motive.decay_calls = 0
 Motive.decay_rate = 1
 
-function Motive:init( doll )
+function Motive:initialize( doll )
   self.doll = doll
   self.value = 50
 end

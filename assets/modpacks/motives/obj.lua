@@ -28,7 +28,7 @@ local Food = bluebear.extend( "system.motive.base", {
     if self.decay_calls >= 10 then
       self.decay_calls = 0
 
-	  bluebear.get_class( 'system.motive.base' ).decay( self )
+      bluebear.get_class( 'system.motive.base' ).decay( self )
       self:check_starve()
     else
       self.decay_calls = self.decay_calls + 1

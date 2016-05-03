@@ -1,1 +1,1 @@
-__class = require( "system/middleclass/middleclass" )
+class = require( "system/middleclass/middleclass" )

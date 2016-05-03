@@ -4,11 +4,11 @@
 	Anything that can be placed on a lot and ran as an entity is an "object"
 --]]
 
-bluebear.engine.require_modpack( "yaci" )
+bluebear.engine.require_modpack( "middleclass" )
 bluebear.engine.require_modpack( "class" )
 bluebear.engine.require_modpack( "promise" )
 
-local Object = newclass()
+local Object = class( 'system.object.base' )
 
 function Object:load( saved )
 	local data = saved or {}
@@ -108,10 +108,5 @@ function Object:_deserialize_function_refs()
 		end
 	end
 end
-
--- be careful: if the methods are NOT virtual, "self" will not be the same self when you call it!
--- all methods should be made virtual by default by some type of modification to the yaci lib
-Object:virtual( "sleep" )
-Object:virtual( "_run" )
 
 bluebear.register_class( "system.object.base", Object )

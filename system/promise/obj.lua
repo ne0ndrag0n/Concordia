@@ -3,12 +3,12 @@
 	or engine-based promises that require the C++ engine to signal for the callback)
 --]]
 
-bluebear.engine.require_modpack( "yaci" )
+bluebear.engine.require_modpack( "middleclass" )
 bluebear.engine.require_modpack( "class" )
 
-local Promise = newclass()
+local Promise = class( 'system.promise.base' )
 
-function Promise:init( obj_ref, start_tick )
+function Promise:initialize( obj_ref, start_tick )
 	self.object = obj_ref
 	self.next_tick = start_tick
 end
