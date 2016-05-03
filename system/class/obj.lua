@@ -9,11 +9,16 @@ bluebear.engine.require_modpack( "json" )
 -- Container for registered classes in Luasphere
 bluebear.classes = {}
 
-bluebear.register_class = function( identifier, class_table )
-	local id = bluebear.util.split( identifier, '.' )
+--[[
+	Register a new class in the bluebear system
+
+	@param		{Class}			Class			A class.
+--]]
+bluebear.register_class = function( Class )
+	local id = bluebear.util.split( Class.name, '.' )
 
 	if #id == 0 then
-		print( "Could not load class  \""..identifier.."\": Invalid identifier!" )
+		print( "Could not load class  \""..Class.name.."\": Invalid identifier!" )
 		return false
 	end
 
@@ -30,9 +35,9 @@ bluebear.register_class = function( identifier, class_table )
 		currentObject = currentObject[ id[ i ] ]
 	end
 
-	currentObject[ id[ #id ] ] = class_table
+	currentObject[ id[ #id ] ] = Class
 
-	print( "Registered class "..identifier )
+	print( "Registered class "..Class.name )
 end
 
 bluebear.get_class = function( identifier )
@@ -52,12 +57,19 @@ bluebear.get_class = function( identifier )
 	return currentObject
 end
 
-bluebear.extend = function( identifier, class_table )
+--[[
+	Extend a class registered using bluebear.register_class
+
+	@param	{String}		identifier		The class you wish to extend
+	@param	{String}		new_name			The name of the new class
+	@param	{Table}			class_table		The class table
+--]]
+bluebear.extend = function( identifier, new_name, class_table )
   local Class = bluebear.get_class( identifier )
   local SubClass = nil
 
   if Class ~= nil then
-    SubClass = bluebear.util.extend( Class:subclass( identifier ), class_table )
+    SubClass = bluebear.util.extend( Class:subclass( new_name ), class_table )
   end
 
   return SubClass

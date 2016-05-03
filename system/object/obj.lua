@@ -105,4 +105,4 @@ function Object:_deserialize_function_refs()
 	end
 end
 
-bluebear.register_class( "system.object.base", Object )
+bluebear.register_class( Object )

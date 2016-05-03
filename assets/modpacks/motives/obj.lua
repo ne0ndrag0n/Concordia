@@ -5,7 +5,7 @@
 -- Hunger motive group
 local HUNGER_MOTIVE_GROUP = "Hunger"
 
-local Food = bluebear.extend( "system.motive.base", {
+local Food = bluebear.extend( "system.motive.base", "game.motive.hunger.food", {
   motive_name = "Food",
   motive_group = HUNGER_MOTIVE_GROUP,
   decay_rate = 6,
@@ -65,4 +65,4 @@ local Food = bluebear.extend( "system.motive.base", {
   end
 } )
 
-bluebear.register_motive( "game.motive.hunger.food", Food )
+bluebear.register_motive( Food )

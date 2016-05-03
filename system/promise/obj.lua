@@ -22,4 +22,4 @@ function Promise:then_call( func_name, ... )
 	return self
 end
 
-bluebear.register_class( "system.promise.base", Promise )
+bluebear.register_class( Promise )

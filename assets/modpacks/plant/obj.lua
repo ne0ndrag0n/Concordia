@@ -1,6 +1,6 @@
 bluebear.engine.require_modpack( "trashpile" )
 
-local Class = bluebear.extend( "system.object.base", {
+local Class = bluebear.extend( "system.object.base", "game.flowers.base", {
 
 	water_level = nil,
 
@@ -51,4 +51,4 @@ local Class = bluebear.extend( "system.object.base", {
 	end
 } )
 
-bluebear.register_class( "game.flowers.base", Class )
+bluebear.register_class( Class )
