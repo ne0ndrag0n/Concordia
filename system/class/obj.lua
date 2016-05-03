@@ -70,9 +70,6 @@ bluebear.new_instance = function( identifier )
   if Class ~= nil then
     -- new instance
     instance = Class:new();
-
-    -- call the "setup" function as "actual" constructor
-    instance:setup()
   end
 
   return instance

@@ -43,10 +43,6 @@ function Object:save()
 	return out
 end
 
-function Object:setup()
-	-- abstract - This is the "real" constructor of objects
-end
-
 --[[
 	Sleep numTicks amount of ticks and then call the function on this object named by functionName
 --]]
