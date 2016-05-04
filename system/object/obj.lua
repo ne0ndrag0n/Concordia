@@ -15,6 +15,13 @@ function Object:load( saved )
 
 	self._cid = data._cid
 	self._sys = data._sys
+
+	-- Every object needs to track cid on bluebear.util.lastcid
+	-- when deserialising: the largest one we find is the new lastcid!
+	local numericCid = tonumber( string.match( self._cid or "", "%d+" ) )
+	if numericCid > bluebear.util.lastcid then
+		bluebear.util.lastcid = numericCid
+	end
 end
 
 function Object:save()
