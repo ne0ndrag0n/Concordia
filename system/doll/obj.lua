@@ -5,10 +5,9 @@
 --]]
 
 bluebear.engine.require_modpack( "class" )
-bluebear.engine.require_modpack( "object" )
-bluebear.engine.require_modpack( "motive" )
+bluebear.engine.require_modpack( "entity" )
 
-local Doll = bluebear.extend( "system.object.base", "system.doll.base", {
+local Doll = bluebear.extend( "system.entity.base", "system.doll.base", {
   motives = {}
 } )
 

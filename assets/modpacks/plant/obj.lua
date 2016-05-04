@@ -1,6 +1,6 @@
 bluebear.engine.require_modpack( "trashpile" )
 
-local Class = bluebear.extend( "system.object.base", "game.flowers.base", {
+local Class = bluebear.extend( "system.entity.base", "game.flowers.base", {
 
 	water_level = nil,
 
@@ -45,7 +45,7 @@ local Class = bluebear.extend( "system.object.base", "game.flowers.base", {
 	end,
 
 	load = function( self, saved )
-		bluebear.get_class( 'system.object.base' ).load( self, saved )
+		bluebear.get_class( 'system.entity.base' ).load( self, saved )
 
 		self.water_level = saved.water_level
 	end

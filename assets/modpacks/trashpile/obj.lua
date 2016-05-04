@@ -1,4 +1,4 @@
-local Class = bluebear.extend( "system.object.base", "game.household.trashpile.base", {
+local Class = bluebear.extend( "system.entity.base", "game.household.trashpile.base", {
 
 	catalog = {
 		name = "bluebear trashpile",
@@ -18,7 +18,7 @@ local Class = bluebear.extend( "system.object.base", "game.household.trashpile.b
 	end,
 
 	load = function( self, saved )
-		bluebear.get_class( 'system.object.base' ).load( self, saved )
+		bluebear.get_class( 'system.entity.base' ).load( self, saved )
 
 		self.stink = saved.stink
 	end

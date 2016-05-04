@@ -52,7 +52,7 @@ function Entity:sleep( numTicks )
 	local ticks = numTicks + bluebear.engine.current_tick
 
 	-- do nothing but return a new promise with the ticks set to "ticks"
-	return bluebear.classes.system.promise.base( self, ticks )
+	return bluebear.get_class( 'system.promise.base' ):new( self, ticks )
 end
 
 --[[
