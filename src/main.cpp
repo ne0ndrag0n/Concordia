@@ -5,7 +5,7 @@
 #include <iostream>
 
 int main() {
-	std::cout << "BlueBear v0.0.1 (c) 2015-2016 oaktree" << std::endl;
+	std::cout << "BlueBear v0.0.1 (c) 2015-2016 ne0ndrag0n" << std::endl;
 
 	BlueBear::Engine engine;
 
