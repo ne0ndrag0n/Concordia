@@ -65,11 +65,12 @@ namespace BlueBear {
 
 		// Check if tickKey has an associated value in _sched
 		Utility::getTableValue( L, tickKey.c_str() );
+
 		if( lua_istable( L, -1 ) ) {
 			// There's functions that need to be executed
 			// Use lua_next to get the objects that describe how to call these functions
 			lua_pushnil( L );
-			while( lua_next( L, -2 ) ) {
+			while( lua_next( L, -2 ) != 0 ) {
 				// The Serialised Function Table (SFT) is the value, available on -1
 				// The key is the index position, available on -2
 
@@ -86,7 +87,7 @@ namespace BlueBear {
 				// e. Remember the object that we just used? Re-push it as the first object argument (self)
 				lua_pushvalue( L, -2 );
 
-				// STEP 2: Push all the function's arguments
+				// STEP 2: Push all the function's arguments and call!
 				// a. Re-grab the SFT: it should be at position -4
 				lua_pushvalue( L, -4 );
 				// b. Grab the "arguments" array-table
@@ -94,21 +95,40 @@ namespace BlueBear {
 				// c. Now, time to start keeping the Lua stack cleaned up a bit; REMOVE the SFT now at position -2
 				lua_remove( L, -2 );
 				// d. The arguments array is now at the top of the stack. How many are in it?
-				int argumentsLength = lua_rawlen( L, -1 );
+				// This will always be at least 1 (because of self)
+				int totalArguments = lua_rawlen( L, -1 ) + 1;
 
+				// Without accounting for self, count the number of arguments that need to be unrolled
+				if( totalArguments - 1 > 0 ) {
+					// e. Use this lovely loop to spit everything in the array out onto the stack
+					for( int i = 1; i != totalArguments; i++ ) {
+						lua_rawgeti( L, -i, i );
+					};
+				}
 
+				// f. Remove the actual array, which should be at -totalArguments
+				// In the case of empty array - totalArguments should be 1 (0+1, the "self" arg)
+				// In other cases, it should just be the negative of the length of the array
+				lua_remove( L, -totalArguments );
 
-				// Value has to be removed from the stack after we're done,
+				// g. Call that sumbitch!
+				if( lua_pcall( L, totalArguments, 0, 0 ) != 0 ) {
+					// We only get here if the function bombs out
+					std::cout << "Error in lot entity: " << lua_tostring( L, -1 ) << std::endl;
+					lua_pop( L, 1 );
+
+					ok = false;
+				}
+
+				// h. There's two junk items remaining on the stack; clean 'em up!
+				// These two items should be the object table, followed by the SFT
 				// leaving the key at -1 and the table at -2 (see how the loop restarts?)
-				lua_pop( L, 1 );
+				lua_pop( L, 2 );
 			}
-		} else {
-			// There's no functions marked for this tick
-			// Start popping all this crap off the stack
-			lua_pop( L, 3 );
 		}
 
-		// Pop the object table
-		lua_pop( L, 1 );
+		// Start popping all this crap off the stack
+		// The remaining items should always be the tick array table (or nil), _sys._sched, _sys, and the object table
+		lua_pop( L, 4 );
 	}
 }

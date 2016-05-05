@@ -75,24 +75,6 @@ function Entity:register_callback( tick, method, wrapped_arguments )
 end
 
 -- Private methods (do not override these!)
--- Called by the engine, runs all callbacks due for the given ticks
-function Entity:_run()
-	-- Is there a _sys._sched entry for currentTick?
-	local currentTick = tostring( bluebear.engine.current_tick )
-	local callbackList = self._sys._sched[ currentTick ]
-
-	if type( callbackList ) == "table" then
-		-- Clear the callback table from self._sys._sched
-		self._sys._sched[ currentTick ] = nil
-
-		-- Fire each callback in the table
-		for index, callbackTable in ipairs( callbackList ) do
-			self[ callbackTable.method ]( self, table.unpack( callbackTable.arguments ) )
-		end
-	end
-
-end
-
 --[[
 	This function is only to be called on each object after all objects are finished loading. Basically,
 	deserialize all references to bluebear objects which take the form "t/"..self._cid
