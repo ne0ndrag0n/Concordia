@@ -12,7 +12,7 @@ Version 0.0.2a - Milestone "ET2"
 * Dolls featuring artificial intelligence: can you guide their lives better than they can, or do you prefer to let them live hands-off?
 * Scenarios for your household: start off healthy, wealthy and privileged...or disabled, poor, and minority. Your life experience is dictated by the family you create and the traits you select in each individual doll!
 * Select any one of your dolls and accompany them to work: guide your household to success within any one of seven career paths!
-* Tend to their emotional well-being and fulfill one of four personal aspirations. They can't do it alone!
+* Tend to their physical well-being by fulfilling five motive groups, and their emotional well-being in one of four personal aspirations. They can't do it alone!
 * Extend the game and its features with the **BlueBear Construction Kit**: create new scenarios, needs & wants, dolls, traits, objects, and so much more!
 
 ## Technical Highlights
