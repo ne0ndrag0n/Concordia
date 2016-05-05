@@ -51,24 +51,61 @@ namespace BlueBear {
 		}
 	}
 
-	void LotEntity::execute() {
+	void LotEntity::execute( unsigned int currentTick ) {
 		// Push this object's table onto the API stack
 		lua_rawgeti( L, LUA_REGISTRYINDEX, luaVMInstance );
 
-		// Push the table's _run method
-		Utility::getTableValue( L, "_run" );
+		// Get the object's _sys table
+		Utility::getTableValue( L, "_sys" );
+		// Get the nested _sched table
+		Utility::getTableValue( L, "_sched" );
 
-		// Push the table itself
-		lua_pushvalue( L, -2 );
+		// Create the key we will need from worldTicks
+		std::string tickKey = std::to_string( currentTick ) + ".0";
 
-		// Run the _run method
-		if( lua_pcall( L, 1, 0, 0 ) != 0 ) {
-			// If there is an error, print error to console and pop it
-			std::cerr << lua_tostring( L, -1 ) << std::endl;
-			lua_pop( L, 1 );
+		// Check if tickKey has an associated value in _sched
+		Utility::getTableValue( L, tickKey.c_str() );
+		if( lua_istable( L, -1 ) ) {
+			// There's functions that need to be executed
+			// Use lua_next to get the objects that describe how to call these functions
+			lua_pushnil( L );
+			while( lua_next( L, -2 ) ) {
+				// The Serialised Function Table (SFT) is the value, available on -1
+				// The key is the index position, available on -2
 
-			// Mark object as bad - don't run it anymore!
-			ok = false;
+				// STEP 1: Get the named function and push a closure with "self"
+				// a. Push the name of the function onto the stack ( SFT[ "method" ] )
+				Utility::getTableValue( L, "method" );
+				// b. Save this result, then pop it
+				std::string functionName = lua_tostring( L, -1 );
+				lua_pop( L, 1 );
+				// c. Re-push object (it is currently at -6)
+				lua_pushvalue( L, -6 );
+				// d. Get the function out of the object
+				Utility::getTableValue( L, functionName.c_str() );
+				// e. Remember the object that we just used? Re-push it as the first object argument (self)
+				lua_pushvalue( L, -2 );
+
+				// STEP 2: Push all the function's arguments
+				// a. Re-grab the SFT: it should be at position -4
+				lua_pushvalue( L, -4 );
+				// b. Grab the "arguments" array-table
+				Utility::getTableValue( L, "arguments" );
+				// c. Now, time to start keeping the Lua stack cleaned up a bit; REMOVE the SFT now at position -2
+				lua_remove( L, -2 );
+				// d. The arguments array is now at the top of the stack. How many are in it?
+				int argumentsLength = lua_rawlen( L, -1 );
+
+
+
+				// Value has to be removed from the stack after we're done,
+				// leaving the key at -1 and the table at -2 (see how the loop restarts?)
+				lua_pop( L, 1 );
+			}
+		} else {
+			// There's no functions marked for this tick
+			// Start popping all this crap off the stack
+			lua_pop( L, 3 );
 		}
 
 		// Pop the object table

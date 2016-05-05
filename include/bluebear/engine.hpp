@@ -30,7 +30,7 @@ namespace BlueBear {
 			std::map< std::string, BlueBear::ModpackStatus > loadedModpacks;
 
 			void createLotTable();
-			void callActionOnObject( const char* playerId, const char* obejctId, const char* method );
+			void callActionOnObject( const char* playerId, const char* objectId, const char* method );
 			void deserializeFunctionRefs();
 
 		public:

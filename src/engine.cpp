@@ -287,7 +287,7 @@ namespace BlueBear {
 				// Execute object if it is "ok"
 				if( currentEntity.ok == true ) {
 					// currentEntity.execute should leave the stack as it was when it was called!!
-					currentEntity.execute();
+					currentEntity.execute( worldTicks );
 				}
 			}
 		}
