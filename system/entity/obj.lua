@@ -39,6 +39,16 @@ function Entity:save()
 end
 
 --[[
+  Set up a system.entity.base. This object ALWAYS, ALWAYS has a _sys table, containing
+  at least the sub-table _sched.
+]]
+function Entity:initialize()
+  self._sys = {
+    _sched = {}
+  }
+end
+
+--[[
 	Sleep numTicks amount of ticks and then call the function on this object named by functionName
 --]]
 function Entity:sleep( numTicks )
