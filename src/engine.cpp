@@ -289,7 +289,8 @@ namespace BlueBear {
 			auto endTime = startTime + std::chrono::seconds( 1 );
 
 			// Complete a tick set: worldTicks up to the next time it is evenly divisible by ticksPerSecond
-			do {
+			int ticksRemaining = ticksPerSecond;
+			while( ticksRemaining-- ) {
 				// On every tick, increment worldTicks
 				worldTicks++;
 
@@ -305,7 +306,7 @@ namespace BlueBear {
 						currentEntity.execute( worldTicks );
 					}
 				}
-			} while ( worldTicks % ticksPerSecond != 0 );
+			}
 
 			// Wait the difference between one second, and however long it took for this shit to finish
 			// Guarantees that one second will elapse every "ticksPerSecond" ticks
