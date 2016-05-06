@@ -11,6 +11,9 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <chrono>
+#include <ratio>
+#include <thread>
 
 namespace BlueBear {
 
@@ -19,6 +22,7 @@ namespace BlueBear {
 		luaL_openlibs( L );
 
 		currentModpackDirectory = NULL;
+		ticksPerSecond = 30;
 	}
 
 	Engine::~Engine() {
@@ -277,19 +281,35 @@ namespace BlueBear {
 		// Push table value "current_tick" onto the stack - leave it there too
 		Utility::getTableValue( L, "engine" );
 
-		for( ; worldTicks != WORLD_TICKS_MAX; worldTicks++ ) {
-			// Set current_tick on bluebear.lot (inside the Luasphere, system/root.lua) to the current tick
-			Utility::setTableIntValue( L, "current_tick", worldTicks );
+		// This outer loop is a preliminary feature, the engine shouldn't stop until it's instructed to
+		// We'll need to account for integer overflow in both here and Lua
+		while( worldTicks <= WORLD_TICKS_MAX ) {
+			// Let's set up a start and end duration
+			auto startTime = std::chrono::steady_clock::now();
+			auto endTime = startTime + std::chrono::seconds( 1 );
 
-			for( auto& keyValuePair : currentLot->objects ) {
-				BlueBear::LotEntity& currentEntity = keyValuePair.second;
+			// Complete a tick set: worldTicks up to the next time it is evenly divisible by ticksPerSecond
+			do {
+				// On every tick, increment worldTicks
+				worldTicks++;
 
-				// Execute object if it is "ok"
-				if( currentEntity.ok == true ) {
-					// currentEntity.execute should leave the stack as it was when it was called!!
-					currentEntity.execute( worldTicks );
+				// Set current_tick on bluebear.lot (inside the Luasphere, system/root.lua) to the current tick
+				Utility::setTableIntValue( L, "current_tick", worldTicks );
+
+				for( auto& keyValuePair : currentLot->objects ) {
+					BlueBear::LotEntity& currentEntity = keyValuePair.second;
+
+					// Execute object if it is "ok"
+					if( currentEntity.ok == true ) {
+						// currentEntity.execute should leave the stack as it was when it was called!!
+						currentEntity.execute( worldTicks );
+					}
 				}
-			}
+			} while ( worldTicks % ticksPerSecond != 0 );
+
+			// Wait the difference between one second, and however long it took for this shit to finish
+			// Guarantees that one second will elapse every "ticksPerSecond" ticks
+			std::this_thread::sleep_until( endTime );
 		}
 
 		std::cout << "Finished!" << std::endl;

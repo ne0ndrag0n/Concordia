@@ -28,6 +28,7 @@ namespace BlueBear {
 			std::unique_ptr< Lot > currentLot;
 			const char* currentModpackDirectory;
 			std::map< std::string, BlueBear::ModpackStatus > loadedModpacks;
+			unsigned int ticksPerSecond;
 
 			void createLotTable();
 			void callActionOnObject( const char* playerId, const char* objectId, const char* method );
