@@ -111,16 +111,32 @@ namespace BlueBear {
 		lua_pop( L, 1 );
 
 		// Go looking for the item
-		auto object = lot->objects.find( keystring );
+		int reference = lot->getLotObjectByCid( keystring );
 
-		if( object != lot->objects.end() ) {
+		if( reference != -1 ) {
 			// Push table on the stack
-			lua_rawgeti( L, LUA_REGISTRYINDEX, object->second.luaVMInstance );
+			lua_rawgeti( L, LUA_REGISTRYINDEX, reference );
 		} else {
 			// The object wasn't found, push the nil value
 			lua_pushnil( L );
 		}
 
 		return 1;
+	}
+
+	/**
+	 * Get a lot object by its cid. cid takes the form of "bbXXX".
+	 * @returns		-1 if the object wasn't found, the numeric object if it was
+	 */
+	int Lot::getLotObjectByCid( std::string& cid ) {
+		// lot->objects is a map, reducing the cost of this operation
+		auto object = objects.find( cid );
+
+		if( object != objects.end() ) {
+			// You can use this with lua_rawgeti( L, LUA_REGISTRYINDEX, <returned id> );
+			return object->second.luaVMInstance;
+		}
+
+		return -1;
 	}
 }

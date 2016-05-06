@@ -8,6 +8,7 @@
 #include "lotentity.hpp"
 #include <vector>
 #include <map>
+#include <string>
 
 namespace BlueBear {
 
@@ -22,6 +23,8 @@ namespace BlueBear {
 			int undergroundStories;
 			std::map< std::string, BlueBear::LotEntity > objects;
 			BlueBear::TerrainType terrainType;
+			int getLotObjectByCid( std::string& cid );
+
 			static int lua_getLotObjects( lua_State* L );
 			static int lua_getLotObjectsByType( lua_State* L );
 			static int lua_getLotObjectByCid( lua_State* L );

@@ -14,6 +14,7 @@
 #include <chrono>
 #include <ratio>
 #include <thread>
+#include <regex>
 
 namespace BlueBear {
 
@@ -215,6 +216,9 @@ namespace BlueBear {
 	 */
 	void Engine::deserializeFunctionRefs() {
 
+		// Set up the regex
+		std::regex serialTableReference( "^t\\/bb\\d+$" );
+
 		// Get fresh Lua stack
 		Utility::clearLuaStack( L );
 
@@ -223,15 +227,53 @@ namespace BlueBear {
 
 			// Push this object's table onto the API stack
 			lua_rawgeti( L, LUA_REGISTRYINDEX, currentEntity.luaVMInstance );
-			// Get the reserved function "_deserialize_function_refs"
-			Utility::getTableValue( L, "_deserialize_function_refs" );
-			// First argument is that same table (the context)
-			lua_pushvalue( L, -2 );
 
-			// Call _deserialize_function_refs: The rest is done in Lua
-			if( lua_pcall( L, 1, 0, 0 ) != 0 ) {
-				std::cout << lua_tostring( L, -1 ) << std::endl;
-				currentEntity.ok = false;
+			// Start with a new adventure in the stack!
+			// a. Get system table
+			Utility::getTableValue( L, "_sys" );
+			// b. Get schedule table inside
+			Utility::getTableValue( L, "_sched" );
+
+			// c. For each key-value pair in _sys._sched, grab the arrays
+			lua_pushnil( L );
+			while( lua_next( L, -2 ) != 0 ) {
+					// -1: the actual array, -2: the tick these functions have to execute
+
+					// d. Now that we have an array of Serialised Function Tables (SFTs)
+					// start conducting what needs to be done on *those*
+					lua_pushnil( L );
+					while( lua_next( L, -2 ) != 0 ) {
+							// -1: the SFT, -2: its position
+
+							// e. Grab the "arguments" array from the SFT
+							Utility::getTableValue( L, "arguments" );
+
+							// f. One more...go through THAT array
+							lua_pushnil( L );
+							while( lua_next( L, -2 ) != 0 ) {
+								// -1: the argument, -2: its position
+
+								// g. If the argument is a string, check if it fits the pattern "^t/bb\d+$"
+								// and if it does, replace the value in that array with a dereferenced table
+								if( lua_isstring( L, -1 ) ) {
+									std::string argument( lua_tostring( L, -1 ) );
+
+									if( std::regex_match( argument, serialTableReference ) ) {
+										// Ask lot for numeric index of desired cid
+										std::string bbId = argument.substr( 2 );
+										int reference = currentLot->getLotObjectByCid( bbId );
+										if( reference != -1 ) {
+											// Push that object onto the stack
+											lua_rawgeti( L, LUA_REGISTRYINDEX, reference );
+											// Get our current index at -3 and replace the value in table (at -4)
+											lua_rawseti( L, -4, lua_tointeger( L, -3 ) );
+										} else {
+											// TODO: Fault tolerance. Very bad scenario! Game cannot continue...fail?
+										}
+									}
+								}
+							}
+					}
 			}
 		}
 	}
