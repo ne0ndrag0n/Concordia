@@ -41,8 +41,8 @@ local Class = bluebear.extend( "system.entity.base", "game.flowers.base", {
 			self.water_level = self.water_level - 10
 		end
 
-		print( "Sleeping for 30 game minutes..." )
-		self:sleep( 900 ):then_call( 'main' )
+		print( "Sleeping for 5 game minutes..." )
+		self:sleep( 150 ):then_call( 'main' )
 	end,
 
 	load = function( self, saved )

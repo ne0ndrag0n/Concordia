@@ -13,9 +13,9 @@ local Class = bluebear.extend( "system.entity.base", "game.household.trashpile.b
 	-- This function will run when the object is scheduled to update its status.
 	main = function( self )
 		print( "Hello from Lua! I am object instance ("..self._cid..")" )
-		print( "Sleeping for 10 game minutes..." )
+		print( "Sleeping for 1 game minute..." )
 
-		self:sleep( 300 ):then_call( 'main' )
+		self:sleep( 30 ):then_call( 'main' )
 	end,
 
 	load = function( self, saved )
