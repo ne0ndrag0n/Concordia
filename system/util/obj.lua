@@ -58,5 +58,15 @@ bluebear.util = {
     local pattern = string.format("([^%s]+)", delimiter)
     str:gsub(pattern, function(c) fields[#fields+1] = c end)
     return fields
-  end
+  end,
+
+  time = {
+    minutes_to_ticks = function( minutes )
+      return bluebear.engine.tick_rate * minutes
+    end,
+
+    seconds_to_ticks = function( seconds )
+      return bluebear.util.time.minutes_to_ticks( seconds / 60 )
+    end
+  }
 }

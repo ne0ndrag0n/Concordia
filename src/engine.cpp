@@ -46,6 +46,11 @@ namespace BlueBear {
 		lua_pushcclosure( L, &Engine::lua_loadModpack, 1 );
 		lua_settable( L, -3 );
 
+		// bluebear.engine.tick_rate
+		lua_pushstring( L, "tick_rate" );
+		lua_pushnumber( L, ticksPerSecond );
+		lua_settable( L, -3 );
+
 		// Set the engine table on "bluebear"
 		lua_settable( L, -3 );
 

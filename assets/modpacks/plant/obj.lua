@@ -42,7 +42,7 @@ local Class = bluebear.extend( "system.entity.base", "game.flowers.base", {
 		end
 
 		print( "Sleeping for 5 game minutes..." )
-		self:sleep( 150 ):then_call( 'main' )
+		self:sleep( bluebear.util.time.minutes_to_ticks( 5 ) ):then_call( 'main' )
 	end,
 
 	load = function( self, saved )

@@ -15,7 +15,7 @@ local Class = bluebear.extend( "system.entity.base", "game.household.trashpile.b
 		print( "Hello from Lua! I am object instance ("..self._cid..")" )
 		print( "Sleeping for 1 game minute..." )
 
-		self:sleep( 30 ):then_call( 'main' )
+		self:sleep( bluebear.util.time.minutes_to_ticks( 1 ) ):then_call( 'main' )
 	end,
 
 	load = function( self, saved )
