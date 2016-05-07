@@ -74,22 +74,4 @@ function Entity:register_callback( tick, method, wrapped_arguments )
 	table.insert( ticks_table, { method = method, arguments = wrapped_arguments } )
 end
 
--- Private methods (do not override these!)
---[[
-	This function is only to be called on each object after all objects are finished loading. Basically,
-	deserialize all references to bluebear objects which take the form "t/"..self._cid
---]]
-function Entity:_deserialize_function_refs()
-	for time, callbacks in pairs( self._sys._sched ) do
-		for index, callback in ipairs( callbacks ) do
-			for argumentIndex, argument in ipairs( callback.arguments ) do
-				-- if this argment is a string and it takes the form "bb%d", deserialize with reference to actual object
-				if type( argument ) == "string" and string.match( argument, "^t/bb%d$" ) then
-					callback.arguments[ argumentIndex ] = bluebear.lot.get_object_by_cid( string.sub( argument, 3, string.len( argument ) ) )
-				end
-			end
-		end
-	end
-end
-
 bluebear.register_class( Entity )

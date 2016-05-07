@@ -229,31 +229,40 @@ namespace BlueBear {
 			lua_rawgeti( L, LUA_REGISTRYINDEX, currentEntity.luaVMInstance );
 
 			// Start with a new adventure in the stack!
-			// a. Get system table
+			// Get system table
+			// _sys
 			Utility::getTableValue( L, "_sys" );
-			// b. Get schedule table inside
+			// Get schedule table inside
+			// _sys._sched _sys
 			Utility::getTableValue( L, "_sched" );
 
-			// c. For each key-value pair in _sys._sched, grab the arrays
+			// For each key-value pair in _sys._sched, grab the arrays
+			// nil _sys._sched _sys
 			lua_pushnil( L );
 			while( lua_next( L, -2 ) != 0 ) {
 					// -1: the actual array, -2: the tick these functions have to execute
+					// [SFTs] "1337.0" _sys._sched _sys
 
-					// d. Now that we have an array of Serialised Function Tables (SFTs)
+					// Now that we have an array of Serialised Function Tables (SFTs)
 					// start conducting what needs to be done on *those*
+					// nil [SFTs] "1337.0" _sys._sched _sys
 					lua_pushnil( L );
 					while( lua_next( L, -2 ) != 0 ) {
 							// -1: the SFT, -2: its position
+							// {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
 
-							// e. Grab the "arguments" array from the SFT
+							// Grab the "arguments" array from the SFT
+							// [arguments] {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
 							Utility::getTableValue( L, "arguments" );
 
-							// f. One more...go through THAT array
+							// One more...go through THAT array
+							// nil [arguments] {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
 							lua_pushnil( L );
 							while( lua_next( L, -2 ) != 0 ) {
 								// -1: the argument, -2: its position
+								// argument 1 [arguments] {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
 
-								// g. If the argument is a string, check if it fits the pattern "^t/bb\d+$"
+								// If the argument is a string, check if it fits the pattern "^t/bb\d+$"
 								// and if it does, replace the value in that array with a dereferenced table
 								if( lua_isstring( L, -1 ) ) {
 									std::string argument( lua_tostring( L, -1 ) );
@@ -264,17 +273,39 @@ namespace BlueBear {
 										int reference = currentLot->getLotObjectByCid( bbId );
 										if( reference != -1 ) {
 											// Push that object onto the stack
+											// object_table argument 1 [arguments] {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
 											lua_rawgeti( L, LUA_REGISTRYINDEX, reference );
 											// Get our current index at -3 and replace the value in table (at -4)
+											// argument 1 [arguments] {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
 											lua_rawseti( L, -4, lua_tointeger( L, -3 ) );
 										} else {
 											// TODO: Fault tolerance. Very bad scenario! Game cannot continue...fail?
 										}
 									}
 								}
+
+								// Get rid of the argument, leaving the index for the next iteration of this table
+								// 1 [arguments] {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
+								lua_pop( L, 1 );
 							}
+							// [arguments] {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
+
+							// Pop the arguments table and SFT; we're done and ready for the next SFT
+							// 1 [SFTs] "1337.0" _sys._sched _sys
+							lua_pop( L, 2 );
 					}
+					// [SFTs] "1337.0" _sys._sched _sys
+
+					// Pop the array of SFTs, and leave the previous key so we can work on the next one
+					// "1337.0" _sys._sched _sys
+					lua_pop( L, 1 );
 			}
+			// _sys.sched _sys
+
+			// Pop these two; we don't need 'em anymore
+			// <empty stack>
+			lua_pop( L, 2 );
+
 		}
 	}
 
