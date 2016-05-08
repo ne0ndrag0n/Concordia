@@ -215,6 +215,7 @@ namespace BlueBear {
 				if( !deserializeFunctionRefs() ) {
 					// If we're not able to deserialise a function ref, this lot is broken, and cannot be used
 					std::cout << "Unable to load lot " << lotPath << " : This lot contains a missing entity" << std::endl;
+					return false;
 				}
 			}
 		} else {
