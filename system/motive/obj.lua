@@ -43,13 +43,3 @@ function Motive:set_value( value )
 end
 
 bluebear.register_class( Motive )
-
--- Convience methods that are set up on the BlueBear object
-bluebear.motives = {}
-bluebear.register_motive = function( Motive )
-  -- Register the motive as an ordinary class
-  bluebear.register_class( Motive )
-
-  -- Push the class onto the table
-  table.insert( bluebear.motives, Motive )
-end

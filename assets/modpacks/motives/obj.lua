@@ -65,4 +65,4 @@ local Food = bluebear.extend( "system.motive.base", "game.motive.hunger.food", {
   end
 } )
 
-bluebear.register_motive( Food )
+bluebear.register_class( Food )
