@@ -69,18 +69,16 @@ end
 
 	@param	{String}		identifier		The base class
 --]]
-local recursive_helper = function( node, Needle, found_classes )
+local function recursive_helper( node, Needle, found_classes )
 	-- Leaf node
-	if node.__middleclass and node:isSubclassOf( Needle ) then
-		table.insert( found_classes, node )
+	if node.__middleclass then
+		if node:isSubclassOf( Needle ) then table.insert( found_classes, node ) end
 	else
 		-- Ordinary node
 		for key, value in pairs( node ) do
 			recursive_helper( value, Needle, found_classes )
 		end
 	end
-
-
 end
 bluebear.get_classes_of_type = function( identifier )
 	-- Get the class to compare to
