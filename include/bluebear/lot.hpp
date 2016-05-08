@@ -9,6 +9,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <memory>
 
 namespace BlueBear {
 
@@ -21,7 +22,7 @@ namespace BlueBear {
 			int floorY;
 			int stories;
 			int undergroundStories;
-			std::map< std::string, BlueBear::LotEntity > objects;
+			std::map< std::string, std::unique_ptr< BlueBear::LotEntity > > objects;
 			BlueBear::TerrainType terrainType;
 			int getLotObjectByCid( std::string& cid );
 

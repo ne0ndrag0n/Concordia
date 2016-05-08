@@ -15,6 +15,7 @@
 #include <ratio>
 #include <thread>
 #include <regex>
+#include <memory>
 
 namespace BlueBear {
 
@@ -197,7 +198,9 @@ namespace BlueBear {
 					std::string cid = entity[ "instance" ][ "_cid" ].asString();
 
 					// Emplace the object into the std::map (insert the new object as we create it)
-					currentLot->objects.emplace( cid, BlueBear::LotEntity( L, classID, instance ) );
+					currentLot->objects[ cid ] = std::unique_ptr< BlueBear::LotEntity >(
+						new BlueBear::LotEntity( L, classID, instance )
+					);
 				}
 
 				// After the lot has all its LotEntities loaded, let's fix those serialized function references
@@ -223,7 +226,8 @@ namespace BlueBear {
 		Utility::clearLuaStack( L );
 
 		for( auto& keyValuePair : currentLot->objects ) {
-			BlueBear::LotEntity& currentEntity = keyValuePair.second;
+			// Dereference the pointer to the BlueBear::LotEntity
+			BlueBear::LotEntity& currentEntity = *( keyValuePair.second );
 
 			// Push this object's table onto the API stack
 			lua_rawgeti( L, LUA_REGISTRYINDEX, currentEntity.luaVMInstance );
@@ -376,7 +380,7 @@ namespace BlueBear {
 				Utility::setTableIntValue( L, "current_tick", worldTicks );
 
 				for( auto& keyValuePair : currentLot->objects ) {
-					BlueBear::LotEntity& currentEntity = keyValuePair.second;
+					BlueBear::LotEntity& currentEntity = *( keyValuePair.second );
 
 					// Execute object if it is "ok"
 					if( currentEntity.ok == true ) {

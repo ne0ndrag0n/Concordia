@@ -38,7 +38,9 @@ namespace BlueBear {
 		// Push 'em on!
 		size_t tableIndex = 1;
 		for( auto& keyValuePair : lot->objects ) {
-			lua_rawgeti( L, LUA_REGISTRYINDEX, keyValuePair.second.luaVMInstance );
+			BlueBear::LotEntity& lotEntity = *( keyValuePair.second );
+
+			lua_rawgeti( L, LUA_REGISTRYINDEX, lotEntity.luaVMInstance );
 			lua_rawseti( L, -2, tableIndex++ );
 		}
 
@@ -65,6 +67,8 @@ namespace BlueBear {
 
 		// Iterate through each object on the lot, checking to see if each is an instance of "idKey"
 		for( auto& keyValuePair : lot->objects ) {
+			BlueBear::LotEntity& lotEntity = *( keyValuePair.second );
+
 			// Push bluebear global
 			lua_getglobal( L, "bluebear" );
 
@@ -73,7 +77,7 @@ namespace BlueBear {
 
 			// Push the two arguments: identifier, and instance
 			lua_pushstring( L, idKey );
-			lua_rawgeti( L, LUA_REGISTRYINDEX, keyValuePair.second.luaVMInstance );
+			lua_rawgeti( L, LUA_REGISTRYINDEX, lotEntity.luaVMInstance );
 
 			// We're ready to call instance_of on object!
 			if( lua_pcall( L, 2, 1, 0 ) == 0 ) {
@@ -90,7 +94,7 @@ namespace BlueBear {
 				// If this object is a descendant of idKey, push it onto the table
 				if( isInstance ) {
 					// Re-push the instance onto the stack
-					lua_rawgeti( L, LUA_REGISTRYINDEX, keyValuePair.second.luaVMInstance );
+					lua_rawgeti( L, LUA_REGISTRYINDEX, lotEntity.luaVMInstance );
 					// Push it onto the table on our stack
 					lua_rawseti( L, -2, tableIndex++ );
 				}
@@ -134,7 +138,7 @@ namespace BlueBear {
 
 		if( object != objects.end() ) {
 			// You can use this with lua_rawgeti( L, LUA_REGISTRYINDEX, <returned id> );
-			return object->second.luaVMInstance;
+			return object->second->luaVMInstance;
 		}
 
 		return -1;
