@@ -60,11 +60,15 @@ namespace BlueBear {
 		lua_setglobal( L, "bluebear" );
 
 		// Integrate system modpacks
-		loadModpackSet( SYSTEM_MODPACK_DIRECTORY );
+		if( !loadModpackSet( SYSTEM_MODPACK_DIRECTORY ) ) {
+			return false;
+		}
 		// System modpacks should not remain part of the modpack list
 		loadedModpacks.clear();
 		// Integrate standard objects
-		loadModpackSet( BLUEBEAR_MODPACK_DIRECTORY );
+		if( !loadModpackSet( BLUEBEAR_MODPACK_DIRECTORY ) ) {
+			return false;
+		}
 
 		return true;
 	}
@@ -72,14 +76,18 @@ namespace BlueBear {
 	/**
 	 * Load a set of modpacks given a parent directory (const char* as they are ROM constants)
 	 */
-	void Engine::loadModpackSet( const char* modpackDirectory ) {
+	bool Engine::loadModpackSet( const char* modpackDirectory ) {
 		currentModpackDirectory = modpackDirectory;
 
 		auto modpacks = Utility::getSubdirectoryList( modpackDirectory );
 
 		for( auto& modpack : modpacks ) {
-			loadModpack( modpack );
+			if( !loadModpack( modpack ) ) {
+				return false;
+			}
 		}
+
+		return true;
 	}
 
 	/**
