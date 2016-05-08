@@ -32,7 +32,7 @@ namespace BlueBear {
 
 			void createLotTable();
 			void callActionOnObject( const char* playerId, const char* objectId, const char* method );
-			void deserializeFunctionRefs();
+			bool deserializeFunctionRefs();
 
 		public:
 			Engine();

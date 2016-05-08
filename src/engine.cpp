@@ -212,7 +212,10 @@ namespace BlueBear {
 				}
 
 				// After the lot has all its LotEntities loaded, let's fix those serialized function references
-				deserializeFunctionRefs();
+				if( !deserializeFunctionRefs() ) {
+					// If we're not able to deserialise a function ref, this lot is broken, and cannot be used
+					std::cout << "Unable to load lot " << lotPath << " : This lot contains a missing entity" << std::endl;
+				}
 			}
 		} else {
 			std::cout << "Unable to load lot: " << lotPath << std::endl;
@@ -225,7 +228,7 @@ namespace BlueBear {
 	/**
 	 * For all serialized curried functions in _sys._sched, ask each object to deserialize the reference to another LotEntity
 	 */
-	void Engine::deserializeFunctionRefs() {
+	bool Engine::deserializeFunctionRefs() {
 
 		// Set up the regex
 		std::regex serialTableReference( "^t\\/bb\\d+$" );
@@ -291,7 +294,10 @@ namespace BlueBear {
 											// argument 1 [arguments] {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
 											lua_rawseti( L, -4, lua_tointeger( L, -3 ) );
 										} else {
-											// TODO: Fault tolerance. Very bad scenario! Game cannot continue...fail?
+											// Fault tolerance. Very bad scenario! Game cannot continue...fail
+											// Pop everything we've been doing...
+											Utility::clearLuaStack( L );
+											return false;
 										}
 									}
 								}
@@ -319,6 +325,8 @@ namespace BlueBear {
 			lua_pop( L, 2 );
 
 		}
+
+		return true;
 	}
 
 	/**
