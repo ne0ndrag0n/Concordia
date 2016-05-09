@@ -8,6 +8,8 @@ bluebear.engine.require_modpack( "class" )
 bluebear.engine.require_modpack( "entity" )
 bluebear.engine.require_modpack( "motive" )
 
+local motives_list = nil
+
 local Doll = bluebear.extend( "system.entity.base", "system.doll.base", {
 
   --[[
@@ -30,7 +32,8 @@ local Doll = bluebear.extend( "system.entity.base", "system.doll.base", {
 --]]
 function Doll:create_motives()
   -- Get list of motives, all classes deriving frmo system.motive.base
-  local motive_classes = bluebear.get_classes_of_type( system.doll.base )
+  -- USE cached list if provided, this is an expensive operation
+  motives_list = motives_list or bluebear.get_classes_of_type( 'system.motive.base' )
 end
 
 function Doll:initialize()
