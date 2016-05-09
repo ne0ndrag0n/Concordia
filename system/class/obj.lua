@@ -68,6 +68,7 @@ end
 	a game.)
 
 	@param	{String}		identifier		The base class
+	@param	{Boolean}		include_base	Include the base class in the list of returned classes
 --]]
 local function recursive_helper( node, Needle, found_classes )
 	-- Leaf node
@@ -80,7 +81,7 @@ local function recursive_helper( node, Needle, found_classes )
 		end
 	end
 end
-bluebear.get_classes_of_type = function( identifier )
+bluebear.get_classes_of_type = function( identifier, include_base )
 	-- Get the class to compare to
 	local Needle = bluebear.get_class( identifier )
 
@@ -90,7 +91,7 @@ bluebear.get_classes_of_type = function( identifier )
 	-- Use the recursive_helper function to navigate bluebear.classes,
 	-- placing the results in at every step of the direction.
 	local found_classes = {}
-	table.insert( found_classes, Needle )
+	if include_base == true then table.insert( found_classes, Needle ) end
 	recursive_helper( bluebear.classes, Needle, found_classes )
 
 	return found_classes
