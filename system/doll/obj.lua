@@ -28,12 +28,32 @@ local Doll = bluebear.extend( "system.entity.base", "system.doll.base", {
 } )
 
 --[[
-  Populate the doll with the same motives all dolls have.
+  Populate the doll with its motives
 --]]
 function Doll:create_motives()
   -- Get list of motives, all classes deriving frmo system.motive.base
   -- USE cached list if provided, this is an expensive operation
+  local motive_classes = self:get_usable_motives()
+
+  local motives = {}
+  for index, Class in ipairs( motive_classes ) do
+    local motive_instance = Class:new( self )
+
+    if motives[ motive_instance.motive_group ] == nil then motives[ motive_instance.motive_group ] = {} end
+
+    motives[ motive_instance.motive_group ][ Class.name ] = motive_instance
+  end
+
+  self.motives = motives
+end
+
+--[[
+  Override this function to control which motives are visible to your doll class.
+--]]
+function Doll:get_usable_motives()
   motives_list = motives_list or bluebear.get_classes_of_type( 'system.motive.base' )
+
+  return motives_list
 end
 
 function Doll:initialize()
