@@ -74,4 +74,10 @@ function Entity:register_callback( tick, method, wrapped_arguments )
 	table.insert( ticks_table, { method = method, arguments = wrapped_arguments } )
 end
 
+--[[
+  Provide interfaces for objects placed on a lot
+--]]
+function Entity:on_create() end
+function Entity:on_destroy() end
+
 bluebear.register_class( Entity )
