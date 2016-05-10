@@ -59,6 +59,13 @@ function Entity:sleep( numTicks )
 end
 
 --[[
+  Simple defer (schedule this for the next available tick, without increment)
+--]]
+function Entity:defer()
+  return bluebear.get_class( 'system.promise.base' ):new( self )
+end
+
+--[[
 	Enter in a callback on this object's _sys._sched table for the destination tick
 --]]
 function Entity:register_callback( tick, method, wrapped_arguments )

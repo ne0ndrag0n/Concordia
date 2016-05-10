@@ -13,7 +13,9 @@ function Promise:initialize( obj_ref )
 end
 
 function Promise:then_call( func_name, ... )
-	error( "This class did not implement Promise:then_call" )
+	self.object:register_callback( bluebear.engine.current_tick + 1, func_name, { ... } )
+
+	return self
 end
 
 bluebear.register_class( Promise )

@@ -60,4 +60,15 @@ function Doll:initialize()
   self:create_motives()
 end
 
+--[[
+  Kick off the virtual thread that decays this doll's motives.
+--]]
+function Doll:on_create()
+  self:defer():then_call( 'decay' )
+end
+
+function Doll:decay()
+  
+end
+
 bluebear.register_class( Doll )
