@@ -13,8 +13,7 @@ function Promise:initialize( obj_ref )
 end
 
 function Promise:then_call( func_name, ... )
-	-- abstract
-	return self
+	error( "This class did not implement Promise:then_call" )
 end
 
 bluebear.register_class( Promise )
