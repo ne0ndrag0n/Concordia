@@ -81,4 +81,13 @@ function Doll:decay_my_motives()
   self:sleep( bluebear.util.time.minutes_to_ticks( 1 ) ):then_call( 'decay_my_motives' )
 end
 
+--[[
+  Play the death animation, display a death dialog box, remove the doll from the lot,
+  and replace it with an urn entity.
+--]]
+function Doll:die()
+  print( "Doll died!" )
+  -- TODO
+end
+
 bluebear.register_class( Doll )
