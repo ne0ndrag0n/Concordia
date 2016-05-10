@@ -40,8 +40,7 @@ local Class = bluebear.extend( "system.entity.base", "game.flowers.base", {
 		if self.water_level > 0 then
 			self.water_level = self.water_level - 10
 		end
-
-		print( "Sleeping for 5 game minutes..." )
+		
 		self:sleep( bluebear.util.time.minutes_to_ticks( 5 ) ):then_call( 'main' )
 	end,
 

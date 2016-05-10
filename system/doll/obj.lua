@@ -85,7 +85,7 @@ end
   Play the death animation, display a death dialog box, remove the doll from the lot,
   and replace it with an urn entity.
 --]]
-function Doll:die()
+function Doll:kill()
   print( "Doll died!" )
   -- TODO
 end

@@ -66,6 +66,10 @@ bluebear.util = {
   end,
 
   time = {
+    hours_to_ticks = function( hours )
+      return bluebear.util.time.minutes_to_ticks( hours * 60 )
+    end,
+
     minutes_to_ticks = function( minutes )
       return bluebear.util.round( bluebear.engine.tick_rate * minutes )
     end,
