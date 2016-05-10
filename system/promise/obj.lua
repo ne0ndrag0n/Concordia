@@ -8,13 +8,31 @@ bluebear.engine.require_modpack( "class" )
 
 local Promise = class( 'system.promise.base' )
 
-function Promise:initialize( obj_ref, start_tick )
+function Promise:initialize( obj_ref )
 	self.object = obj_ref
-	self.next_tick = start_tick
 end
 
 function Promise:then_call( func_name, ... )
 	self.object:register_callback( self.next_tick, func_name, { ... } )
+
+	-- abstract
+	return self
+end
+
+bluebear.register_class( Promise )
+
+--------------------------------------------------------------------------------
+
+local TimedPromise = bluebear.extend( 'system.promise.base', 'system.promise.timer' )
+
+function TimedPromise:initialize( obj_ref, start_tick )
+	Promise.initialize( self, obj_ref )
+
+	self.next_tick = start_tick
+end
+
+function TimedPromise:then_call( func_name, ... )
+	Promise.then_call( self, func_name, ... )
 
 	-- any future "then_call" statements will be called tick per tick
 	self.next_tick = self.next_tick + 1
@@ -22,4 +40,4 @@ function Promise:then_call( func_name, ... )
 	return self
 end
 
-bluebear.register_class( Promise )
+bluebear.register_class( TimedPromise )
