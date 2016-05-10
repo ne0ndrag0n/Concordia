@@ -64,11 +64,21 @@ end
   Kick off the virtual thread that decays this doll's motives.
 --]]
 function Doll:on_create()
-  self:defer():then_call( 'decay' )
+  self:defer():then_call( 'decay_my_motives' )
 end
 
-function Doll:decay()
-  
+--[[
+  This function is designed to run in a loop and decay all motives once per game minute.
+--]]
+function Doll:decay_my_motives()
+
+  for group_name, group in pairs( self.motives ) do
+    for class_id, motive in pairs( group ) do
+      motive:decay()
+    end
+  end
+
+  self:sleep( bluebear.util.time.minutes_to_ticks( 1 ) ):then_call( 'decay_my_motives' )
 end
 
 bluebear.register_class( Doll )

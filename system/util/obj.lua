@@ -60,9 +60,14 @@ bluebear.util = {
     return fields
   end,
 
+  round = function(num, idp)
+    local mult = 10^(idp or 0)
+    return math.floor(num * mult + 0.5) / mult
+  end,
+
   time = {
     minutes_to_ticks = function( minutes )
-      return bluebear.engine.tick_rate * minutes
+      return bluebear.util.round( bluebear.engine.tick_rate * minutes )
     end,
 
     seconds_to_ticks = function( seconds )
