@@ -13,8 +13,6 @@ function Promise:initialize( obj_ref )
 end
 
 function Promise:then_call( func_name, ... )
-	self.object:register_callback( self.next_tick, func_name, { ... } )
-
 	-- abstract
 	return self
 end
@@ -32,7 +30,7 @@ function TimedPromise:initialize( obj_ref, start_tick )
 end
 
 function TimedPromise:then_call( func_name, ... )
-	Promise.then_call( self, func_name, ... )
+	self.object:register_callback( self.next_tick, func_name, { ... } )
 
 	-- any future "then_call" statements will be called tick per tick
 	self.next_tick = self.next_tick + 1
