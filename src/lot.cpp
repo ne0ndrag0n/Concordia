@@ -13,19 +13,8 @@
 
 namespace BlueBear {
 
-	Lot::Lot() {
-
-	}
-
-	Lot::Lot( int floorX, int floorY, int stories, int undergroundStories, BlueBear::TerrainType terrainType ) {
-		this->floorX = floorX;
-		this->floorY = floorY;
-
-		this->stories = stories;
-		this->undergroundStories = undergroundStories;
-
-		this->terrainType = terrainType;
-	}
+	Lot::Lot( lua_State* L, int floorX, int floorY, int stories, int undergroundStories, BlueBear::TerrainType terrainType ) :
+		L( L ), floorX( floorX ), floorY( floorY ), stories( stories ), undergroundStories( undergroundStories ), terrainType( terrainType ) {}
 
 	int Lot::lua_getLotObjects( lua_State* L ) {
 

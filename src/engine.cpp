@@ -177,14 +177,13 @@ namespace BlueBear {
 				std::cout << "[" << lotPath << "] " << "Lot revision: " << lotJSON[ "rev" ] << std::endl;
 
 				// Instantiate the lot
-				currentLot.reset(
-					new BlueBear::Lot(
-						lotJSON[ "floorx" ].asInt(),
-						lotJSON[ "floory" ].asInt(),
-						lotJSON[ "stories" ].asInt(),
-						lotJSON[ "subtr" ].asInt(),
-						BlueBear::TerrainType( lotJSON[ "terrain" ].asInt() )
-					)
+				currentLot = std::make_unique< BlueBear::Lot >(
+					L,
+					lotJSON[ "floorx" ].asInt(),
+					lotJSON[ "floory" ].asInt(),
+					lotJSON[ "stories" ].asInt(),
+					lotJSON[ "subtr" ].asInt(),
+					BlueBear::TerrainType( lotJSON[ "terrain" ].asInt() )
 				);
 
 				// Create one lot table for the Luasphere - contains functions that we call on this->currentLot to do things like get other objects on the lot and trigger events
