@@ -6,6 +6,7 @@
 #include "lauxlib.h"
 #include "bbtypes.hpp"
 #include "lotentity.hpp"
+#include "json/json.h"
 #include <vector>
 #include <map>
 #include <string>
@@ -26,7 +27,7 @@ namespace BlueBear {
 			BlueBear::TerrainType terrainType;
 			int getLotObjectByCid( std::string& cid );
 			void createLotEntity();
-			void createLotEntityFromJSON();
+			void createLotEntityFromJSON( Json::Value& serialEntity );
 
 			static int lua_getLotObjects( lua_State* L );
 			static int lua_getLotObjectsByType( lua_State* L );

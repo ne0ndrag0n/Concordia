@@ -5,6 +5,8 @@
 #include "lotentity.hpp"
 #include "lot.hpp"
 #include "utility.hpp"
+#include "json/json.h"
+#include <memory>
 #include <vector>
 #include <cstring>
 #include <string>
@@ -131,5 +133,13 @@ namespace BlueBear {
 		}
 
 		return -1;
+	}
+
+	/**
+	 * Create a lot entity from a JSON value
+	 */
+	void Lot::createLotEntityFromJSON( Json::Value& serialEntity ) {
+		// Simple proxy to LotEntity's JSON constructor
+		objects[ serialEntity[ "instance" ][ "_cid" ].asString() ] = std::make_unique< BlueBear::LotEntity >( L, serialEntity );
 	}
 }
