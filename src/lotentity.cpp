@@ -3,21 +3,21 @@
 #include "lualib.h"
 #include "lauxlib.h"
 #include "utility.hpp"
+#include "json/json.h"
 #include <iostream>
 #include <cstring>
 #include <string>
 
 namespace BlueBear {
 
-	/**
-	 * Every BlueBear::LotEntity is tied to its Lua instance in the _lotinsts table
-	 */
-	LotEntity::LotEntity( lua_State* L, std::string& classID, std::string& instance ) {
+	Json::FastWriter LotEntity::writer;
+
+	LotEntity::LotEntity( lua_State* L, Json::Value& serialEntity ) {
 		// Store pointer to Luasphere on this object
 		this->L = L;
 
 		// Store classID in this->classID
-		this->classID = classID;
+		classID = serialEntity[ "classID" ].asString();
 
 		// Get fresh start with the Lua stack
 		Utility::clearLuaStack( L );
@@ -31,7 +31,7 @@ namespace BlueBear {
 
 		// Push identifier and instance string
 		lua_pushstring( L, classID.c_str() );
-		lua_pushstring( L, instance.c_str() );
+		lua_pushstring( L, writer.write( serialEntity[ "instance" ] ).c_str() );
 
 		// Call new_instance_from_file
 		if( lua_pcall( L, 2, 1, 0 ) == 0 ) {

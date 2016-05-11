@@ -4,6 +4,7 @@
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
+#include "json/json.h"
 #include <string>
 
 namespace BlueBear {
@@ -12,12 +13,13 @@ namespace BlueBear {
 
 		private:
 			lua_State* L;
+			static Json::FastWriter writer;
 		public:
 			std::string cid;
 			bool ok = false;
 			int luaVMInstance;
 			std::string classID;
-			LotEntity( lua_State* L, std::string& classID, std::string& instance );
+			LotEntity( lua_State* L, Json::Value& serialEntity );
 			void execute( unsigned int currentTick );
 			char* save();
 			void load( char* pickledObject );
