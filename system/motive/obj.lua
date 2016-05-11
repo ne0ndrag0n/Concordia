@@ -13,6 +13,12 @@ Motive.motive_group = "Motive Group"
 Motive.decay_calls = 0
 Motive.decay_rate = 1
 
+function Motive:load( data )
+  bluebear.get_class( 'system.object.base' ).load( self, data )
+
+  self.value = data.value
+end
+
 function Motive:initialize( doll )
   self.doll = doll
   self.value = 50

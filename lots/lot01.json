@@ -40,6 +40,29 @@
 				},
 				"stink": 0
 			}
+		},
+		{
+			"classID": "game.doll.player",
+			"instance": {
+				"_cid": "bb3",
+				"_sys": {
+					"_sched": {
+						"30.0": [
+							{
+								"method": "decay_my_motives",
+								"arguments": []
+							}
+						]
+					}
+				},
+				"saved_motives": {
+					"Hunger": {
+						"game.motive.hunger.food": {
+							"value": 100
+						}
+					}
+				}
+			}
 		}
 	]
 }
