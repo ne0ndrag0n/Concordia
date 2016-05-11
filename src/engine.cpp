@@ -196,8 +196,7 @@ namespace BlueBear {
 				currentLot->objects.clear();
 
 				// Iterate through the "entities" array
-				Json::Value entities = lotJSON[ "entities" ];
-				for( Json::Value& entity : entities ) {
+				for( Json::Value& entity : lotJSON[ "entities" ] ) {
 					currentLot->createLotEntityFromJSON( entity );
 				}
 
