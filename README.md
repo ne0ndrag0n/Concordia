@@ -21,4 +21,4 @@ Version 0.0.2a - Milestone "ET2"
 * Lua 5.3 scripting system: everything the game uses outside of its base structure as a dollhouse game is designed as an extensible script (e.g. all objects and types of objects are defined as Lua classes)
 * Isometric, sprite-based 2.5D presentation with a retro-inspired pixel art look-and-feel
 * SFML-powered multimedia framework featuring the SFGUI widget toolkit
-* Multi-threaded architecture, using modern C++11 to make the most of your multi-core CPU
+* Multi-threaded architecture, using modern C++14 to make the most of your multi-core CPU
