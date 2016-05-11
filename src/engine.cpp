@@ -202,7 +202,7 @@ namespace BlueBear {
 					std::string cid = entity[ "instance" ][ "_cid" ].asString();
 
 					// Emplace the object into the std::map (insert the new object as we create it)
-					currentLot->objects[ cid ] = std::unique_ptr< BlueBear::LotEntity >( new BlueBear::LotEntity( L, entity ) );
+					currentLot->objects[ cid ] = std::make_unique< BlueBear::LotEntity >( L, entity );
 				}
 
 				// After the lot has all its LotEntities loaded, let's fix those serialized function references
