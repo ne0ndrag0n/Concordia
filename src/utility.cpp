@@ -3,6 +3,7 @@
 #include "lualib.h"
 #include "lauxlib.h"
 #include <cstdint>
+#include <cstddef>
 #include <cstdio>
 #include <string>
 #include <cstring>
@@ -10,6 +11,7 @@
 #include <iterator>
 #include <fstream>
 #include <iostream>
+#include <vector>
 
 // Not X-Platform
 #include <dirent.h>
@@ -45,7 +47,7 @@ namespace BlueBear {
 		/**
 		 * Dump the Lua stack out to terminal
 		 */
-		static void stackDump( lua_State* L ) {
+		void stackDump( lua_State* L ) {
 			  int i;
 			  int top = lua_gettop(L);
 			  for (i = 1; i <= top; i++) {  /* repeat for each level */
@@ -62,6 +64,18 @@ namespace BlueBear {
 
 				  case LUA_TNUMBER:  /* numbers */
 					printf("%g", lua_tonumber(L, i));
+					break;
+
+					case LUA_TNIL: /* nils */
+					printf("nil");
+					break;
+
+					case LUA_TTABLE: /* table */
+					printf("table");
+					break;
+
+					case LUA_TFUNCTION: /* function */
+					printf("function");
 					break;
 
 				  default:  /* other values */
@@ -165,6 +179,55 @@ namespace BlueBear {
 
 			// print out all the frames to stderr
 			backtrace_symbols_fd(array, size, STDERR_FILENO);
+		}
+
+		/**
+		 * Tokenise a std::string based on a char value
+		 */
+		std::vector<std::string> split(const std::string &text, char sep) {
+		  std::vector<std::string> tokens;
+		  std::size_t start = 0, end = 0;
+		  while ((end = text.find(sep, start)) != std::string::npos) {
+		    tokens.push_back(text.substr(start, end - start));
+		    start = end + 1;
+		  }
+		  tokens.push_back(text.substr(start));
+		  return tokens;
+		}
+
+		/**
+		 * Traverse and retrieve a value stored in a Lua table as a tree structure.
+		 * Leaves the found value on the top of the stack; leaves nil if the value was not found.
+		 * Always pops the original table.
+		 */
+		void getTableTreeValue( lua_State* L, std::string& treeValue ) {
+			// start with <table>
+
+			// Get tokens
+			auto treeTokens = Utility::split( treeValue, '.' );
+
+			for( const auto& token : treeTokens ) {
+				// <subtable> <table> if subtable found
+				Utility::getTableValue( L, token.c_str() );
+
+				// If this is not a table, we cannot continue
+				if( !lua_istable( L, -1 ) ) {
+					// Pop what's on top and whatever's underneath
+					// EMPTY
+					lua_pop( L, 2 );
+
+					// nil
+					lua_pushnil( L );
+
+					return;
+				}
+
+				// Pop the table under this table
+				// <subtable>
+				lua_remove( L, -2 );
+			}
+
+			// <desired table>
 		}
 	}
 }

@@ -5,6 +5,7 @@
 #include "lualib.h"
 #include "lauxlib.h"
 #include <cstdint>
+#include <cstddef>
 #include <fstream>
 #include <vector>
 #include <string>
@@ -23,7 +24,7 @@ namespace BlueBear {
 
 		int32_t swap_int32( int32_t val );
 
-		static void stackDump( lua_State* L );
+		void stackDump( lua_State* L );
 
 		std::vector< std::string > getSubdirectoryList( const char* rootSubDirectory );
 
@@ -41,6 +42,9 @@ namespace BlueBear {
 
 		void strace();
 
+		std::vector<std::string> split(const std::string &text, char sep);
+
+		void getTableTreeValue( lua_State* L, std::string& treeValue );
 	};
 }
 

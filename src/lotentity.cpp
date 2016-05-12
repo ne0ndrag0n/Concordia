@@ -23,35 +23,95 @@ namespace BlueBear {
 		// Store classID in this->classID
 		classID = serialEntity[ "classID" ].asString();
 
-		// Get fresh start with the Lua stack
-		Utility::clearLuaStack( L );
-
-		// Push bluebear onto Lua API stack
+		// Get bluebear.classes
+		// bluebear
 		lua_getglobal( L, "bluebear" );
 
-		// Get new_instance_from_file method. This method will not only create a new instance, but also deserialise
-		// the object provided, creating an instance that should be identical to what was saved previously
-		Utility::getTableValue( L, "new_instance_from_file" );
+		// bluebear.classes bluebear
+		Utility::getTableValue( L, "classes" );
 
-		// Push identifier and instance string
-		lua_pushstring( L, classID.c_str() );
-		lua_pushstring( L, writer.write( serialEntity[ "instance" ] ).c_str() );
+		// Get the actual class referred to by this classID
+		// Class bluebear
+		Utility::getTableTreeValue( L, classID );
 
-		// Call new_instance_from_file
-		if( lua_pcall( L, 2, 1, 0 ) == 0 ) {
-			// Mark this LotEntity as OK to run
-			ok = true;
+		// If "nil bluebear": Cannot continue: the class was not found
+		if( lua_istable( L, -1 ) ) {
+			// Class is at the top of the stack
+			// Let's start by creating a new instance
 
-			// Grab the _cid of the LotEntity and set the public "cid" property to this value
-			Utility::getTableValue( L, "_cid" );
-			cid = lua_tostring( L, -1 );
-			// Then, clear the value off the stack, ensuring the instance is at the top of the stack
-			lua_pop( L, 1 );
+			// <new> Class bluebear
+			Utility::getTableValue( L, "new" );
 
-			// this->luaVMInstance holds a Lua registry index to the table returned by this function
-			luaVMInstance = luaL_ref( L, LUA_REGISTRYINDEX );
+			// Class <new> Class bluebear
+			lua_pushvalue( L, -2 );
+
+			// instance Class bluebear
+			if( lua_pcall( L, 1, 1, 0 ) == 0 ) {
+				// Now use the load method to deserialise
+				// <load> instance Class bluebear
+				Utility::getTableValue( L, "load" );
+
+				// instance <load> instance Class bluebear
+				lua_pushvalue( L, -2 );
+
+				// Use JSON.decode( JSON, "serialisedInstance" ) to transform the serialised instance to a table
+				// JSON instance <load> instance Class bluebear
+				lua_getglobal( L, "JSON" );
+
+				// <decode> JSON instance <load> instance Class bluebear
+				Utility::getTableValue( L, "decode" );
+
+				// JSON <decode> JSON instance <load> instance Class bluebear
+				lua_pushvalue( L, -2 );
+
+				// "serialisedInstance" JSON <decode> JSON instance <load> instance Class bluebear
+				lua_pushstring( L, writer.write( serialEntity[ "instance" ] ).c_str() );
+
+				// deserialisedTable JSON instance <load> instance Class bluebear
+				if( lua_pcall( L, 2, 1, 0 ) == 0 ) {
+					// Prepare for the pcall that loads
+					// deserialisedTable instance <load> instance Class bluebear
+					lua_remove( L, -2 );
+				} else {
+					// error JSON instance <load> instance Class bluebear
+					std::cout << "Problem deserialising using Lua JSON lib on " << classID << std::endl;
+					lua_pop( L, 7 );
+					return;
+				}
+
+				// instance Class bluebear
+				if( lua_pcall( L, 2, 0, 0 ) == 0 ) {
+					// Everything's ok!
+					ok = true;
+
+					// Grab the _cid of the LotEntity and set the public "cid" property to this value
+					// cid instance Class bluebear
+					Utility::getTableValue( L, "_cid" );
+					cid = lua_tostring( L, -1 );
+					// Then, clear the value off the stack, ensuring the instance is at the top of the stack
+					// instance Class bluebear
+					lua_pop( L, 1 );
+
+					// this->luaVMInstance holds a Lua registry index to the table returned by this function
+					// Class bluebear
+					luaVMInstance = luaL_ref( L, LUA_REGISTRYINDEX );
+
+					// empty the stack
+					// EMPTY
+					lua_pop( L, 2 );
+				} else {
+					// error instance Class bluebear
+					std::cout << lua_tostring( L, -1 ) << std::endl;
+					lua_pop( L, 4 );
+				}
+			} else {
+				// error instance Class bluebear
+				std::cout << lua_tostring( L, -1 ) << std::endl;
+				lua_pop( L, 4 );
+			}
 		} else {
-			std::cout << lua_tostring( L, -1 ) << std::endl;
+			std::cout << "Could not find class " << classID << std::endl;
+			lua_pop( L, 2 );
 		}
 	}
 
