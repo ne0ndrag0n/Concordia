@@ -12,6 +12,10 @@ namespace BlueBear {
 
 	Json::FastWriter LotEntity::writer;
 
+	LotEntity::LotEntity( lua_State* L, std::string& classID ) {
+
+	}
+
 	LotEntity::LotEntity( lua_State* L, Json::Value& serialEntity ) {
 		// Store pointer to Luasphere on this object
 		this->L = L;

@@ -20,6 +20,7 @@ namespace BlueBear {
 			int luaVMInstance;
 			std::string classID;
 			LotEntity( lua_State* L, Json::Value& serialEntity );
+			LotEntity( lua_State* L, std::string& classID );
 			void execute( unsigned int currentTick );
 			char* save();
 			void load( char* pickledObject );
