@@ -11,7 +11,7 @@
 #include <cstring>
 #include <string>
 #include <iostream>
-
+#include <utility>
 
 namespace BlueBear {
 
@@ -140,6 +140,10 @@ namespace BlueBear {
 	 */
 	void Lot::createLotEntityFromJSON( Json::Value& serialEntity ) {
 		// Simple proxy to LotEntity's JSON constructor
-		objects[ serialEntity[ "instance" ][ "_cid" ].asString() ] = std::make_unique< BlueBear::LotEntity >( L, serialEntity );
+		std::unique_ptr< BlueBear::LotEntity > entity = std::make_unique< BlueBear::LotEntity >( L, serialEntity );
+
+		if( entity->ok ) {
+			objects[ entity->cid ] = std::move( entity );
+		}
 	}
 }
