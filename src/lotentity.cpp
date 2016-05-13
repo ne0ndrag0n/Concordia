@@ -12,17 +12,22 @@ namespace BlueBear {
 
 	Json::FastWriter LotEntity::writer;
 
-	LotEntity::LotEntity( lua_State* L, std::string& classID ) {
-
+	LotEntity::LotEntity( lua_State* L, std::string& classID )
+		: L( L ), classID( classID ) {
+			createEntityTable();
 	}
 
-	LotEntity::LotEntity( lua_State* L, Json::Value& serialEntity ) {
-		// Store pointer to Luasphere on this object
-		this->L = L;
+	LotEntity::LotEntity( lua_State* L, Json::Value& serialEntity )
+		: L( L ), classID( serialEntity[ "classID" ].asString() ) {
+		createEntityTable();
+		if( ok ) {
+			ok = false;
 
-		// Store classID in this->classID
-		classID = serialEntity[ "classID" ].asString();
+			deserializeEntity( serialEntity );
+		}
+	}
 
+	void LotEntity::createEntityTable() {
 		// Get bluebear.classes
 		// bluebear
 		lua_getglobal( L, "bluebear" );
@@ -47,63 +52,15 @@ namespace BlueBear {
 
 			// instance Class bluebear
 			if( lua_pcall( L, 1, 1, 0 ) == 0 ) {
-				// Now use the load method to deserialise
-				// <load> instance Class bluebear
-				Utility::getTableValue( L, "load" );
+				// Instance is created!
+				ok = true;
 
-				// instance <load> instance Class bluebear
-				lua_pushvalue( L, -2 );
+				// this->luaVMInstance holds a Lua registry index to the table returned by this function
+				// Class bluebear
+				luaVMInstance = luaL_ref( L, LUA_REGISTRYINDEX );
 
-				// Use JSON.decode( JSON, "serialisedInstance" ) to transform the serialised instance to a table
-				// JSON instance <load> instance Class bluebear
-				lua_getglobal( L, "JSON" );
-
-				// <decode> JSON instance <load> instance Class bluebear
-				Utility::getTableValue( L, "decode" );
-
-				// JSON <decode> JSON instance <load> instance Class bluebear
-				lua_pushvalue( L, -2 );
-
-				// "serialisedInstance" JSON <decode> JSON instance <load> instance Class bluebear
-				lua_pushstring( L, writer.write( serialEntity[ "instance" ] ).c_str() );
-
-				// deserialisedTable JSON instance <load> instance Class bluebear
-				if( lua_pcall( L, 2, 1, 0 ) == 0 ) {
-					// Prepare for the pcall that loads
-					// deserialisedTable instance <load> instance Class bluebear
-					lua_remove( L, -2 );
-				} else {
-					// error JSON instance <load> instance Class bluebear
-					std::cout << "Problem deserialising using Lua JSON lib on " << classID << std::endl;
-					lua_pop( L, 7 );
-					return;
-				}
-
-				// instance Class bluebear
-				if( lua_pcall( L, 2, 0, 0 ) == 0 ) {
-					// Everything's ok!
-					ok = true;
-
-					// Grab the _cid of the LotEntity and set the public "cid" property to this value
-					// cid instance Class bluebear
-					Utility::getTableValue( L, "_cid" );
-					cid = lua_tostring( L, -1 );
-					// Then, clear the value off the stack, ensuring the instance is at the top of the stack
-					// instance Class bluebear
-					lua_pop( L, 1 );
-
-					// this->luaVMInstance holds a Lua registry index to the table returned by this function
-					// Class bluebear
-					luaVMInstance = luaL_ref( L, LUA_REGISTRYINDEX );
-
-					// empty the stack
-					// EMPTY
-					lua_pop( L, 2 );
-				} else {
-					// error instance Class bluebear
-					std::cout << lua_tostring( L, -1 ) << std::endl;
-					lua_pop( L, 4 );
-				}
+				// EMPTY
+				lua_pop( L, 2 );
 			} else {
 				// error instance Class bluebear
 				std::cout << lua_tostring( L, -1 ) << std::endl;
@@ -111,6 +68,66 @@ namespace BlueBear {
 			}
 		} else {
 			std::cout << "Could not find class " << classID << std::endl;
+			lua_pop( L, 2 );
+		}
+	}
+
+	/**
+	 * Load from JSON or other saved format.
+	 */
+	void LotEntity::deserializeEntity( Json::Value& serialEntity ) {
+
+		// Grab a reference to the instance table
+		// instance
+		lua_rawgeti( L, LUA_REGISTRYINDEX, luaVMInstance );
+
+		// Use the load method to deserialise
+		// <load> instance
+		Utility::getTableValue( L, "load" );
+
+		// instance <load> instance
+		lua_pushvalue( L, -2 );
+
+		// Use JSON.decode( JSON, "serialisedInstance" ) to transform the serialised instance to a table
+		// JSON instance <load> instance
+		lua_getglobal( L, "JSON" );
+
+		// <decode> JSON instance <load> instance
+		Utility::getTableValue( L, "decode" );
+
+		// JSON <decode> JSON instance <load> instance
+		lua_pushvalue( L, -2 );
+
+		// "serialisedInstance" JSON <decode> JSON instance <load> instance
+		lua_pushstring( L, writer.write( serialEntity[ "instance" ] ).c_str() );
+
+		// deserialisedTable JSON instance <load> instance
+		if( lua_pcall( L, 2, 1, 0 ) == 0 ) {
+			// Prepare for the pcall that loads
+			// deserialisedTable instance <load> instance
+			lua_remove( L, -2 );
+		} else {
+			// error JSON instance <load> instance
+			std::cout << "Problem deserialising using Lua JSON lib on " << classID << std::endl;
+			lua_pop( L, 5 );
+			return;
+		}
+
+		// instance
+		if( lua_pcall( L, 2, 0, 0 ) == 0 ) {
+			// Everything's ok!
+			ok = true;
+
+			// Grab the _cid of the LotEntity and set the public "cid" property to this value
+			// cid instance
+			Utility::getTableValue( L, "_cid" );
+			cid = lua_tostring( L, -1 );
+			// Then, clear the value off the stack, ensuring the instance is at the top of the stack
+			// EMPTY
+			lua_pop( L, 2 );
+		} else {
+			// error instance
+			std::cout << lua_tostring( L, -1 ) << std::endl;
 			lua_pop( L, 2 );
 		}
 	}

@@ -21,6 +21,9 @@ namespace BlueBear {
 			std::string classID;
 			LotEntity( lua_State* L, Json::Value& serialEntity );
 			LotEntity( lua_State* L, std::string& classID );
+
+			void createEntityTable();
+			void deserializeEntity( Json::Value& serialEntity );
 			void execute( unsigned int currentTick );
 			char* save();
 			void load( char* pickledObject );
