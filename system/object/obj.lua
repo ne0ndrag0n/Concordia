@@ -14,7 +14,7 @@ function Object:load( saved )
 
 	self._cid = data._cid
 
-	if type( self._cid ) == 'number' then
+	if type( self._cid ) == 'string' then
 		-- Every object needs to track cid on bluebear.util.lastcid
 		-- when deserialising: the largest one we find is the new lastcid!
 		local numericCid = tonumber( string.match( self._cid or "", "%d+" ) )
