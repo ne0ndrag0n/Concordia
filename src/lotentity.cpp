@@ -48,15 +48,21 @@ namespace BlueBear {
 		// instance <on_create> instance
 		lua_pushvalue( L, -2 );
 
-		// instance
 		if( lua_pcall( L, 1, 0, 0 ) != 0 ) {
 			// error instance
 			std::cout << lua_tostring( L, -1 ) << std::endl;
-			ok = false;
-			lua_pop( L, 2 );
 		} else {
-			lua_pop( L, 1 );
+			// instance
+
+			// cid instance
+			Utility::getTableValue( L, "_cid" );
+			if( lua_isstring( L, -1 ) ) {
+				cid = lua_tostring( L, -1 );
+				ok = true;
+			}
 		}
+
+		lua_pop( L, 2 );
 	}
 
 	void LotEntity::createEntityTable() {
@@ -147,21 +153,20 @@ namespace BlueBear {
 
 		// instance
 		if( lua_pcall( L, 2, 0, 0 ) == 0 ) {
-			// Everything's ok!
-			ok = true;
-
 			// Grab the _cid of the LotEntity and set the public "cid" property to this value
 			// cid instance
 			Utility::getTableValue( L, "_cid" );
-			cid = lua_tostring( L, -1 );
-			// Then, clear the value off the stack, ensuring the instance is at the top of the stack
-			// EMPTY
-			lua_pop( L, 2 );
+			if( lua_isstring( L, -1 ) ) {
+				cid = lua_tostring( L, -1 );
+				ok = true;
+			}
 		} else {
 			// error instance
 			std::cout << lua_tostring( L, -1 ) << std::endl;
-			lua_pop( L, 2 );
 		}
+
+		// EMPTY
+		lua_pop( L, 2 );
 	}
 
 	void LotEntity::execute( unsigned int currentTick ) {

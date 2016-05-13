@@ -140,13 +140,60 @@ namespace BlueBear {
 	/**
 	 * Create a lot entity from a JSON value
 	 */
-	void Lot::createLotEntityFromJSON( Json::Value& serialEntity ) {
+	int Lot::createLotEntityFromJSON( Json::Value& serialEntity ) {
 		// Simple proxy to LotEntity's JSON constructor
 		std::unique_ptr< BlueBear::LotEntity > entity = std::make_unique< BlueBear::LotEntity >( L, serialEntity );
 
 		if( entity->ok ) {
+			int ref = entity->luaVMInstance;
 			objects[ entity->cid ] = std::move( entity );
+			return ref;
 		}
+
+		// Entity didn't build successfully
+		return -1;
+	}
+
+	/**
+	 * Create a new instance of "classID" from scratch
+	 */
+	int Lot::createLotEntity( std::string& classID ) {
+		std::unique_ptr< BlueBear::LotEntity > entity = std::make_unique< BlueBear::LotEntity >( L, classID );
+
+		// Add the pointer to our objects map if everything is A-OK
+		if( entity->ok ) {
+			int ref = entity->luaVMInstance;
+			objects[ entity->cid ] = std::move( entity );
+			return ref;
+		}
+
+		// Entity didn't build successfully
+		return -1;
+	}
+
+	/**
+	 * Proxies to Lot::createLotEntity
+	 */
+	int Lot::lua_createLotEntity( lua_State* L ) {
+
+		BlueBear::Lot* lot = ( BlueBear::Lot* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+
+		// Get argument (the class we are looking for) and remove it from the stack
+		std::string classID( lua_tostring( L, -1 ) );
+		lua_pop( L, 1 );
+
+		// Create the lot entity itself
+		int reference = lot->createLotEntity( classID );
+
+		if( reference != -1 ) {
+			// Push instance on the stack
+			lua_rawgeti( L, LUA_REGISTRYINDEX, reference );
+		} else {
+			// Object didn't build successfully, there's no instance to return
+			lua_pushnil( L );
+		}
+
+		return 1;
 	}
 
 	/**
@@ -159,7 +206,7 @@ namespace BlueBear {
 		lua_pushstring( L, "lot" );
 
 		// Push new, blank table
-		lua_createtable( L, 0, 3 );
+		lua_createtable( L, 0, 4 );
 
 		// get_all_objects retrieves all objects
 		lua_pushstring( L, "get_all_objects" );
@@ -177,6 +224,12 @@ namespace BlueBear {
 		lua_pushstring( L, "get_object_by_cid" );
 		lua_pushlightuserdata( L, this );
 		lua_pushcclosure( L, &Lot::lua_getLotObjectByCid, 1 );
+		lua_settable( L, -3 );
+
+		// create_new_instance creates a new instance of an entity and registers it with the lot engine
+		lua_pushstring( L, "create_new_instance" );
+		lua_pushlightuserdata( L, this );
+		lua_pushcclosure( L, &Lot::lua_createLotEntity, 1 );
 		lua_settable( L, -3 );
 
 		// Remember pushing the bluebear table, then lot? Stack should now have the lot table,

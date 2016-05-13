@@ -84,7 +84,11 @@ end
 --[[
   Provide interfaces for objects placed on a lot
 --]]
-function Entity:on_create() end
+function Entity:on_create()
+  -- This function will be called when an Entity is created and placed on a lot. Load will not be called.
+  -- Assign a generated cid.
+  self._cid = bluebear.util.get_cid()
+end
 function Entity:on_destroy() end
 
 bluebear.register_class( Entity )

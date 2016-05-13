@@ -26,14 +26,14 @@ namespace BlueBear {
 			std::map< std::string, std::unique_ptr< BlueBear::LotEntity > > objects;
 			BlueBear::TerrainType terrainType;
 			int getLotObjectByCid( std::string& cid );
-			void createLotEntity();
-			void createLotEntityFromJSON( Json::Value& serialEntity );
+			int createLotEntity( std::string& classID );
+			int createLotEntityFromJSON( Json::Value& serialEntity );
 			void buildLuaInterface();
 
 			static int lua_getLotObjects( lua_State* L );
 			static int lua_getLotObjectsByType( lua_State* L );
 			static int lua_getLotObjectByCid( lua_State* L );
-
+			static int lua_createLotEntity( lua_State* L );
 	};
 
 }
