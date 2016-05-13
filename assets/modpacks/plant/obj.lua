@@ -1,6 +1,6 @@
 bluebear.engine.require_modpack( "trashpile" )
 
-local Class = bluebear.extend( "system.entity.base", "game.flowers.base", {
+local Flowers = bluebear.extend( "system.entity.base", "game.flowers.base", {
 
 	water_level = nil,
 
@@ -31,24 +31,23 @@ local Class = bluebear.extend( "system.entity.base", "game.flowers.base", {
 				print( "Replanted" )
 			end
 		}
-	},
-
-	main = function( self )
-
-		print( "Hello from Lua! I am object instance ("..self._cid..") and my water level is now "..self.water_level )
-
-		if self.water_level > 0 then
-			self.water_level = self.water_level - 10
-		end
-		
-		self:sleep( bluebear.util.time.minutes_to_ticks( 5 ) ):then_call( 'main' )
-	end,
-
-	load = function( self, saved )
-		bluebear.get_class( 'system.entity.base' ).load( self, saved )
-
-		self.water_level = saved.water_level
-	end
+	}
 } )
 
-bluebear.register_class( Class )
+function Flowers:main()
+	print( "Hello from Lua! I am object instance ("..self._cid..") and my water level is now "..self.water_level )
+
+	if self.water_level > 0 then
+		self.water_level = self.water_level - 10
+	end
+
+	self:sleep( bluebear.util.time.minutes_to_ticks( 5 ) ):then_call( 'main' )
+end
+
+function Flowers:load( saved )
+	bluebear.get_class( 'system.entity.base' ).load( self, saved )
+
+	self.water_level = saved.water_level
+end
+
+bluebear.register_class( Flowers )
