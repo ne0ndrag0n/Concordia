@@ -24,6 +24,7 @@ namespace BlueBear {
 
 			void createEntityTable();
 			void deserializeEntity( Json::Value& serialEntity );
+			void onCreate();
 			void execute( unsigned int currentTick );
 			char* save();
 			void load( char* pickledObject );

@@ -15,6 +15,14 @@ namespace BlueBear {
 	LotEntity::LotEntity( lua_State* L, std::string& classID )
 		: L( L ), classID( classID ) {
 			createEntityTable();
+
+			// When creating a plain LotEntity (one that is not loaded from JSON)
+			// call its on_create() method
+			if( ok ) {
+				ok = false;
+
+				onCreate();
+			}
 	}
 
 	LotEntity::LotEntity( lua_State* L, Json::Value& serialEntity )
@@ -24,6 +32,30 @@ namespace BlueBear {
 			ok = false;
 
 			deserializeEntity( serialEntity );
+		}
+	}
+
+	/**
+	 * Call the on_create method of this Lua instance
+	 */
+	void LotEntity::onCreate() {
+		// instance
+		lua_rawgeti( L, LUA_REGISTRYINDEX, luaVMInstance );
+
+		// <on_create> instance
+		Utility::getTableValue( L, "on_create" );
+
+		// instance <on_create> instance
+		lua_pushvalue( L, -2 );
+
+		// instance
+		if( lua_pcall( L, 1, 0, 0 ) != 0 ) {
+			// error instance
+			std::cout << lua_tostring( L, -1 ) << std::endl;
+			ok = false;
+			lua_pop( L, 2 );
+		} else {
+			lua_pop( L, 1 );
 		}
 	}
 
