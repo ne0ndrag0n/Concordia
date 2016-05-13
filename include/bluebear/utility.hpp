@@ -26,6 +26,8 @@ namespace BlueBear {
 
 		void stackDump( lua_State* L );
 
+		void stackDumpAt( lua_State* L, int pos );
+
 		std::vector< std::string > getSubdirectoryList( const char* rootSubDirectory );
 
 		void clearLuaStack( lua_State* L );

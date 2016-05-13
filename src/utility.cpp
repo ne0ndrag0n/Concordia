@@ -51,41 +51,46 @@ namespace BlueBear {
 			  int i;
 			  int top = lua_gettop(L);
 			  for (i = 1; i <= top; i++) {  /* repeat for each level */
-				int t = lua_type(L, i);
-				switch (t) {
-
-				  case LUA_TSTRING:  /* strings */
-					printf("`%s'", lua_tostring(L, i));
-					break;
-
-				  case LUA_TBOOLEAN:  /* booleans */
-					printf(lua_toboolean(L, i) ? "true" : "false");
-					break;
-
-				  case LUA_TNUMBER:  /* numbers */
-					printf("%g", lua_tonumber(L, i));
-					break;
-
-					case LUA_TNIL: /* nils */
-					printf("nil");
-					break;
-
-					case LUA_TTABLE: /* table */
-					printf("table");
-					break;
-
-					case LUA_TFUNCTION: /* function */
-					printf("function");
-					break;
-
-				  default:  /* other values */
-					printf("other type:%s", lua_typename(L, t));
-					break;
-
-				}
-				printf("  ");  /* put a separator */
+					Utility::stackDumpAt( L, -i );
+					printf("  ");  /* put a separator */
 			  }
+
 			  printf("\n");  /* end the listing */
+		}
+
+		void stackDumpAt( lua_State* L, int pos ) {
+			int t = lua_type(L, pos);
+			switch (t) {
+
+				case LUA_TSTRING:  /* strings */
+				printf("`%s'", lua_tostring(L, pos));
+				break;
+
+				case LUA_TBOOLEAN:  /* booleans */
+				printf(lua_toboolean(L, pos) ? "true" : "false");
+				break;
+
+				case LUA_TNUMBER:  /* numbers */
+				printf("%g", lua_tonumber(L, pos));
+				break;
+
+				case LUA_TNIL: /* nils */
+				printf("nil");
+				break;
+
+				case LUA_TTABLE: /* table */
+				printf("table");
+				break;
+
+				case LUA_TFUNCTION: /* function */
+				printf("function");
+				break;
+
+				default:  /* other values */
+				printf("other type:%s", lua_typename(L, t));
+				break;
+
+			}
 		}
 
 		/**
