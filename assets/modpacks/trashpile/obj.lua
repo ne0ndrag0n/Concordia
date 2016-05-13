@@ -1,4 +1,4 @@
-local Class = bluebear.extend( "system.entity.base", "game.household.trashpile.base", {
+local TrashPile = bluebear.extend( "system.entity.base", "game.household.trashpile.base", {
 
 	catalog = {
 		name = "bluebear trashpile",
@@ -9,20 +9,19 @@ local Class = bluebear.extend( "system.entity.base", "game.household.trashpile.b
 	actions = {
 
 	},
-
-	-- This function will run when the object is scheduled to update its status.
-	main = function( self )
-		print( "Hello from Lua! I am object instance ("..self._cid..")" )
-
-		self:sleep( bluebear.util.time.minutes_to_ticks( 1 ) ):then_call( 'main' )
-	end,
-
-	load = function( self, saved )
-		bluebear.get_class( 'system.entity.base' ).load( self, saved )
-
-		self.stink = saved.stink
-	end
 } )
 
+-- This function will run when the object is scheduled to update its status.
+function TrashPile:main()
+	print( "Hello from Lua! I am object instance ("..self._cid..")" )
 
-bluebear.register_class( Class )
+	self:sleep( bluebear.util.time.minutes_to_ticks( 1 ) ):then_call( 'main' )
+end
+
+function TrashPile:load( saved )
+	bluebear.get_class( 'system.entity.base' ).load( self, saved )
+
+	self.stink = saved.stink
+end
+
+bluebear.register_class( TrashPile )
