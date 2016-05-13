@@ -186,9 +186,6 @@ namespace BlueBear {
 					BlueBear::TerrainType( lotJSON[ "terrain" ].asInt() )
 				);
 
-				// Create one lot table for the Luasphere - contains functions that we call on this->currentLot to do things like get other objects on the lot and trigger events
-				createLotTable();
-
 				// Set world ticks to the one saved in the file
 				worldTicks = lotJSON[ "ticks" ].asInt();
 
@@ -317,45 +314,6 @@ namespace BlueBear {
 		}
 
 		return true;
-	}
-
-	/**
-	 * We do this once; create the lot table and assign it a lot instance
-	 */
-	void Engine::createLotTable() {
-
-		// Get "dumb pointer" from smart pointer
-		Lot* lot = currentLot.get();
-
-		// Push the "bluebear" global onto the stack, then push the "lot" identifier
-		// We will set this at the very end of the function
-		lua_getglobal( L, "bluebear" );
-		lua_pushstring( L, "lot" );
-
-		// Push new, blank table
-		lua_createtable( L, 0, 1 );
-
-		// get_all_objects retrieves all objects
-		lua_pushstring( L, "get_all_objects" );
-		lua_pushlightuserdata( L, lot );
-		lua_pushcclosure( L, &Lot::lua_getLotObjects, 1 );
-		lua_settable( L, -3 );
-
-		// get_objects_by_type gets all objects on the lot of a specific type
-		lua_pushstring( L, "get_objects_by_type" );
-		lua_pushlightuserdata( L, lot );
-		lua_pushcclosure( L, &Lot::lua_getLotObjectsByType, 1 );
-		lua_settable( L, -3 );
-
-		// get_object_by_cid retrieves a specific object by its cid
-		lua_pushstring( L, "get_object_by_cid" );
-		lua_pushlightuserdata( L, lot );
-		lua_pushcclosure( L, &Lot::lua_getLotObjectByCid, 1 );
-		lua_settable( L, -3 );
-
-		// Remember pushing the bluebear table, then lot? Stack should now have the lot table,
-		// the "lot" identifier, then the bluebear global. Go ahead and set "lot" to this table.
-		lua_settable( L, -3 );
 	}
 
 	/**

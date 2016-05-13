@@ -30,7 +30,6 @@ namespace BlueBear {
 			std::map< std::string, BlueBear::ModpackStatus > loadedModpacks;
 			unsigned int ticksPerSecond;
 
-			void createLotTable();
 			void callActionOnObject( const char* playerId, const char* objectId, const char* method );
 			bool deserializeFunctionRefs();
 
