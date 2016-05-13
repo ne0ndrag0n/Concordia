@@ -146,8 +146,10 @@ namespace BlueBear {
 
 		if( entity->ok ) {
 			int ref = entity->luaVMInstance;
-			objects[ entity->cid ] = std::move( entity );
-			return ref;
+			if( !objects.count( entity->cid ) ) {
+				objects[ entity->cid ] = std::move( entity );
+				return ref;
+			}
 		}
 
 		// Entity didn't build successfully
@@ -163,8 +165,10 @@ namespace BlueBear {
 		// Add the pointer to our objects map if everything is A-OK
 		if( entity->ok ) {
 			int ref = entity->luaVMInstance;
-			objects[ entity->cid ] = std::move( entity );
-			return ref;
+			if( !objects.count( entity->cid ) ) {
+				objects[ entity->cid ] = std::move( entity );
+				return ref;
+			}
 		}
 
 		// Entity didn't build successfully
