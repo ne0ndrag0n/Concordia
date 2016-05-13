@@ -50,4 +50,10 @@ function Flowers:load( saved )
 	self.water_level = saved.water_level
 end
 
+-- Test function - the flowers turn into a trashpile if not watered
+function Flowers:create_trashpile()
+	local instance = bluebear.lot.create_new_instance( 'game.household.trashpile.base' )
+
+	print( "Instance "..instance._cid.." created!" )
+end
 bluebear.register_class( Flowers )

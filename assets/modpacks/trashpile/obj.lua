@@ -24,4 +24,10 @@ function TrashPile:load( saved )
 	self.stink = saved.stink
 end
 
+function TrashPile:on_create()
+	bluebear.get_class( 'system.entity.base' ).on_create( self )
+
+	print( "Hello from Lua! I am a SECOND trashpile - ("..self._cid..")" )
+end
+
 bluebear.register_class( TrashPile )
