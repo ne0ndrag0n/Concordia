@@ -18,12 +18,6 @@
 								"method": "main",
 								"arguments": []
 							}
-						],
-						"100.0": [
-							{
-								"method": "create_trashpile",
-								"arguments": []
-							}
 						]
 					}
 				},
