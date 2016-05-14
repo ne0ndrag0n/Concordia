@@ -243,6 +243,17 @@ namespace BlueBear {
 				// leaving the key at -1 and the table at -2 (see how the loop restarts?)
 				lua_pop( L, 2 );
 			}
+
+			// After we're done, the below four items will be left on the stack
+			// tick_array_table/nil _sys._sched _sys instance
+			// Clear out the tick_array_table so it can be garbage collected
+
+			// tickKey tick_array_table/nil _sys._sched _sys instance
+			lua_pushstring( L, tickKey.c_str() );
+			// nil tickKey tick_array_table/nil _sys._sched _sys instance
+			lua_pushnil( L );
+			// tick_array_table/nil _sys._sched _sys instance
+			lua_settable( L, -4 );
 		}
 
 		// Start popping all this crap off the stack
