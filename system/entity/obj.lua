@@ -78,7 +78,24 @@ function Entity:register_callback( tick, method, wrapped_arguments )
 
 	ticks_table = self._sys._sched[ ticks_key ]
 
-	table.insert( ticks_table, { method = method, arguments = wrapped_arguments } )
+  local descriptor = {
+    method = method,
+    arguments = wrapped_arguments
+  }
+
+	table.insert( ticks_table, descriptor )
+
+  return descriptor
+end
+
+--[[
+  Given a cancelable, cancel an upcoming callback before it happens.
+--]]
+function Entity:cancel_callback( cancelable )
+  -- Find the callback using the information provided in the cancelable
+  local array = self._sys._sched[ cancelable.tick ]
+
+  table.remove( array, bluebear.util.array_index_of( array, cancelable.callback ) )
 end
 
 --[[

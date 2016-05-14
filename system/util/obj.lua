@@ -65,6 +65,20 @@ bluebear.util = {
     return math.floor(num * mult + 0.5) / mult
   end,
 
+  --[[
+    Gets the index of "needle" in the "collection". If the needle is not
+    in the collection, return 0.
+  --]]
+  array_index_of = function( collection, needle )
+    for index, value in ipairs( collection ) do
+      if needle == value then
+        return index
+      end
+    end
+
+    return 0
+  end,
+
   time = {
     hours_to_ticks = function( hours )
       return bluebear.util.time.minutes_to_ticks( hours * 60 )
