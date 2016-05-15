@@ -19,7 +19,10 @@ local Flowers = bluebear.extend( "system.entity.base", "game.flowers.base", {
 			action = function( doll, object )
 				object.water_level = 100
 				print( "Watered. Water level now "..self.water_level )
-			end
+			end,
+			advertisements = {
+				['game.motive.emotion.belonging'] = 20
+			}
 		},
 		{
 			label = function( doll, object )
@@ -34,6 +37,18 @@ local Flowers = bluebear.extend( "system.entity.base", "game.flowers.base", {
 				object.water_level = 100
 				print( "Replanted" )
 			end
+		},
+		{
+			label = "Admire",
+			-- use this flag to denote an interaction that is hidden from the player
+			-- on the object click menu
+			hidden = true,
+			action = function( doll, object )
+				-- stuff goes here
+			end,
+			advertisements = {
+				['game.motive.emotion.environment'] = 50
+			}
 		}
 	}
 } )
