@@ -205,7 +205,7 @@ namespace BlueBear {
 		 * Leaves the found value on the top of the stack; leaves nil if the value was not found.
 		 * Always pops the original table.
 		 */
-		void getTableTreeValue( lua_State* L, std::string& treeValue ) {
+		void getTableTreeValue( lua_State* L, const std::string& treeValue ) {
 			// start with <table>
 
 			// Get tokens

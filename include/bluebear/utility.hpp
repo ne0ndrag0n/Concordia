@@ -46,7 +46,7 @@ namespace BlueBear {
 
 		std::vector<std::string> split(const std::string &text, char sep);
 
-		void getTableTreeValue( lua_State* L, std::string& treeValue );
+		void getTableTreeValue( lua_State* L, const std::string& treeValue );
 	};
 }
 
