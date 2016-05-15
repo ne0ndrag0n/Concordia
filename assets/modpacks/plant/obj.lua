@@ -10,24 +10,28 @@ local Flowers = bluebear.extend( "system.entity.base", "game.flowers.base", {
 		price = 19.99
 	},
 
-	actions = {
+	interactions = {
 		{
 			label = "Water",
-			condition = function( self )
-				return self.water_level ~= 0
+			condition = function( doll, object )
+				return object.water_level ~= 0
 			end,
-			action = function( self )
-				self.water_level = 100
+			action = function( doll, object )
+				object.water_level = 100
 				print( "Watered. Water level now "..self.water_level )
 			end
 		},
 		{
-			label = "Replant",
-			condition = function( self )
-				return self.water_level == 0
+			label = function( doll, object )
+				-- Interaction labels can take the form of functions to generate strings
+				-- e.g. "Water Ashley's Fish", "Pay Bills ($250)"
+				return "Replant"
 			end,
-			action = function( self )
-				self.water_level = 100
+			condition = function( doll, object )
+				return object.water_level == 0
+			end,
+			action = function( doll, object )
+				object.water_level = 100
 				print( "Replanted" )
 			end
 		}

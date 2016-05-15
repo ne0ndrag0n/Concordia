@@ -89,6 +89,25 @@ function Entity:register_callback( tick, method, wrapped_arguments )
 end
 
 --[[
+  Gets a curated list of interactions visible to the passed-in player.
+
+  Probably something we can do in C++ during the Picasso milestone. This will
+  have to stay in Lua, if we want NPC dolls to call on objects to list their
+  interactions.
+--]]
+function Entity:get_interactions( player )
+  local eligible_interactions = {}
+
+  for index, interaction in ipairs( self.interactions ) do
+    if interaction.condition( player, self ) then
+      table.insert( eligible_interactions, interaction )
+    end
+  end
+
+  return eligible_interactions
+end
+
+--[[
   Given a cancelable, cancel an upcoming callback before it happens.
 --]]
 function Entity:cancel_callback( cancelable )

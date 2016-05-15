@@ -4,11 +4,7 @@ local TrashPile = bluebear.extend( "system.entity.base", "game.household.trashpi
 		name = "bluebear trashpile",
 		description = "static tile of a trashpile",
 		price = 0
-	},
-
-	actions = {
-
-	},
+	}
 } )
 
 -- This function will run when the object is scheduled to update its status.
