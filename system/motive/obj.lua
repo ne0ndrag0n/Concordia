@@ -48,4 +48,8 @@ function Motive:set_value( value )
   end
 end
 
+function Motive:get_importance()
+  return 1.0
+end
+
 bluebear.register_class( Motive )
