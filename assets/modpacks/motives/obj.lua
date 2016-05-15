@@ -87,4 +87,18 @@ function Food:check_starve()
   end
 end
 
+--[[
+  Gets the importance of the Food motive. Food is more important the closer it is
+  to zero. If the motive is zero, it is full importance. If the motive is full,
+  the motive is not particularly important (as you just ate!).
+
+  Motive importance has an impact on a doll's greater mood. Food has a dramatic
+  impact on mood as it is lesser and lesser.
+--]]
+function Food:get_importance()
+  local percentage = self.value / 100
+
+  -- Check the graph of (1/32)^x to see how Food is vastly more important as it is less
+  return (1/32)^percentage
+end
 bluebear.register_class( Food )
