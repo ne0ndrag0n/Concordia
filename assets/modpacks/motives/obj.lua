@@ -99,6 +99,6 @@ function Food:get_importance()
   local percentage = self.value / 100
 
   -- Check the graph of (1/32)^x to see how Food is vastly more important as it is less
-  return (1/32)^percentage
+  return 0.03125^percentage
 end
 bluebear.register_class( Food )
