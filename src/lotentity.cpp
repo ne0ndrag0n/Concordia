@@ -12,7 +12,7 @@ namespace BlueBear {
 
 	Json::FastWriter LotEntity::writer;
 
-	LotEntity::LotEntity( lua_State* L, std::string& classID )
+	LotEntity::LotEntity( lua_State* L, const std::string& classID )
 		: L( L ), classID( classID ) {
 			createEntityTable();
 
@@ -25,7 +25,7 @@ namespace BlueBear {
 			}
 	}
 
-	LotEntity::LotEntity( lua_State* L, Json::Value& serialEntity )
+	LotEntity::LotEntity( lua_State* L, const Json::Value& serialEntity )
 		: L( L ), classID( serialEntity[ "classID" ].asString() ) {
 		createEntityTable();
 		if( ok ) {
@@ -113,7 +113,7 @@ namespace BlueBear {
 	/**
 	 * Load from JSON or other saved format.
 	 */
-	void LotEntity::deserializeEntity( Json::Value& serialEntity ) {
+	void LotEntity::deserializeEntity( const Json::Value& serialEntity ) {
 
 		// Grab a reference to the instance table
 		// instance

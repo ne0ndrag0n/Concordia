@@ -25,9 +25,9 @@ namespace BlueBear {
 			int undergroundStories;
 			std::map< std::string, std::unique_ptr< BlueBear::LotEntity > > objects;
 			BlueBear::TerrainType terrainType;
-			int getLotObjectByCid( std::string& cid );
-			int createLotEntity( std::string& classID );
-			int createLotEntityFromJSON( Json::Value& serialEntity );
+			int getLotObjectByCid( const std::string& cid );
+			int createLotEntity( const std::string& classID );
+			int createLotEntityFromJSON( const Json::Value& serialEntity );
 			void buildLuaInterface();
 
 			static int lua_getLotObjects( lua_State* L );

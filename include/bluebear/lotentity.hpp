@@ -19,11 +19,11 @@ namespace BlueBear {
 			bool ok = false;
 			int luaVMInstance;
 			std::string classID;
-			LotEntity( lua_State* L, Json::Value& serialEntity );
-			LotEntity( lua_State* L, std::string& classID );
+			LotEntity( lua_State* L, const Json::Value& serialEntity );
+			LotEntity( lua_State* L, const std::string& classID );
 
 			void createEntityTable();
-			void deserializeEntity( Json::Value& serialEntity );
+			void deserializeEntity( const Json::Value& serialEntity );
 			void onCreate();
 			void execute( unsigned int currentTick );
 			char* save();

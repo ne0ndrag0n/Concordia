@@ -41,7 +41,7 @@ namespace BlueBear {
 			bool loadLot( const char* lotPath );
 
 			bool loadModpackSet( const char* modpackDirectory );
-			bool loadModpack( std::string& name );
+			bool loadModpack( const std::string& name );
 			static int lua_loadModpack( lua_State* L );
 
 

@@ -125,7 +125,7 @@ namespace BlueBear {
 	 * Get a lot object by its cid. cid takes the form of "bbXXX".
 	 * @returns		-1 if the object wasn't found, the numeric object if it was
 	 */
-	int Lot::getLotObjectByCid( std::string& cid ) {
+	int Lot::getLotObjectByCid( const std::string& cid ) {
 		// lot->objects is a map, reducing the cost of this operation
 		auto object = objects.find( cid );
 
@@ -140,7 +140,7 @@ namespace BlueBear {
 	/**
 	 * Create a lot entity from a JSON value
 	 */
-	int Lot::createLotEntityFromJSON( Json::Value& serialEntity ) {
+	int Lot::createLotEntityFromJSON( const Json::Value& serialEntity ) {
 		// Simple proxy to LotEntity's JSON constructor
 		std::unique_ptr< BlueBear::LotEntity > entity = std::make_unique< BlueBear::LotEntity >( L, serialEntity );
 
@@ -159,7 +159,7 @@ namespace BlueBear {
 	/**
 	 * Create a new instance of "classID" from scratch
 	 */
-	int Lot::createLotEntity( std::string& classID ) {
+	int Lot::createLotEntity( const std::string& classID ) {
 		std::unique_ptr< BlueBear::LotEntity > entity = std::make_unique< BlueBear::LotEntity >( L, classID );
 
 		// Add the pointer to our objects map if everything is A-OK

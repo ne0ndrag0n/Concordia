@@ -95,7 +95,7 @@ namespace BlueBear {
 	 * @param		{std::string}		name
 	 * @returns	{bool}		True if the modpack was or is integrated successfully: false otherwise.
 	 */
-	bool Engine::loadModpack( std::string& name ) {
+	bool Engine::loadModpack( const std::string& name ) {
 		// If this modpack is LOADING, don't load it twice! This is a circular dependency; a modpack being imported by another modpack called
 		// to load the first modpack (which was still LOADING)! Fail immediately.
 		// Fail immediately if it already failed (don't waste time loading it again)
