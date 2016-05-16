@@ -51,6 +51,10 @@
 							{
 								"method": "decay_my_motives",
 								"arguments": []
+							},
+							{
+								"method": "main",
+								"arguments": []
 							}
 						]
 					}

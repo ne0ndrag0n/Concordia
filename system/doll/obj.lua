@@ -9,6 +9,18 @@ bluebear.engine.require_modpack( "entity" )
 bluebear.engine.require_modpack( "motive" )
 
 local motives_list = nil
+local STATES = {
+  -- The doll is not currently doing anything interaction-related
+  IDLE = 'idle',
+  -- The doll is in the process of prearing for the interaction at the top of the queue
+  PREPARING = 'preparing',
+  -- The doll is currently engaged in the interaction at the top of the queue
+  INTERACTING = 'interacting',
+  -- The doll is wrapping up its interaction
+  CONCLUDING = 'concluding',
+  -- The player chose to abort this interaction early, and we need to jump to CONCLUDING state early
+  ABORTING = 'aborting'
+}
 
 local Doll = bluebear.extend( "system.entity.base", "system.doll.base", {
 
@@ -32,7 +44,7 @@ local Doll = bluebear.extend( "system.entity.base", "system.doll.base", {
 
   --[[
     This table holds all interactions due for the doll. The interactions are processed first-in,
-    first-out. Therefore, the element at the top of this table (#interaction_queue), # > 0, is
+    first-out. Therefore, the element at the top of this table (1), # > 0, is
     the one that is always processed.
   --]]
   interaction_queue = nil,
@@ -40,18 +52,19 @@ local Doll = bluebear.extend( "system.entity.base", "system.doll.base", {
   --[[
     These are the five states your doll can be in at any given time.
   --]]
-  STATES = {
-    -- The doll is not currently doing anything interaction-related
-    IDLE = 'idle',
-    -- The doll is in the process of prearing for the interaction at the top of the queue
-    PREPARING = 'preparing',
-    -- The doll is currently engaged in the interaction at the top of the queue
-    INTERACTING = 'interacting',
-    -- The doll is wrapping up its interaction
-    CONCLUDING = 'concluding',
-    -- The player chose to abort this interaction early, and we need to jump to CONCLUDING state early
-    ABORTING = 'aborting'
-  }
+  STATES = STATES,
+
+  --[[
+    Table containing functions of state transitions
+  --]]
+  STATE_TRANSITIONS = {
+    [STATES.PREPARING] = 'start_interaction'
+  },
+
+  --[[
+    Number of ticks a doll should wait between checking for new interactions
+  --]]
+  HEARTBEAT_INTERVAL = 15
 
 } )
 
@@ -110,14 +123,40 @@ end
   when a state transition is triggered.
 --]]
 function Doll:change_state( new_state )
+  local state_transition = Doll.STATE_TRANSITIONS[ new_state ]
   self.current_state = new_state
+
+  if state_transition then
+    self[ state_transition ]( self )
+  end
+end
+
+--[[
+  State transition that handles the engagement of the interaction next up
+--]]
+function Doll:start_interaction()
+  -- Take from the top of the queue
+  local interaction = self.interaction_queue[ 1 ]
 end
 
 --[[
   Kick off the virtual thread that decays this doll's motives.
 --]]
 function Doll:on_create()
+  self:defer():then_call( 'main' )
   self:defer():then_call( 'decay_my_motives' )
+end
+
+--[[
+  This vthread handles interactions that appear in the interaction queue
+--]]
+function Doll:main()
+  -- check the interaction queue if we are in IDLE state
+  if self.current_state == Doll.STATES.IDLE and #self.interaction_queue > 0 then
+    -- take next item from queue and process it
+    self:change_state( Doll.STATES.PREPARING )
+  end
+  self:sleep( Doll.HEARTBEAT_INTERVAL ):then_call( 'main' )
 end
 
 --[[
