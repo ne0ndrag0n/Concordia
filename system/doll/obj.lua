@@ -31,6 +31,13 @@ local Doll = bluebear.extend( "system.entity.base", "system.doll.base", {
   current_state = nil,
 
   --[[
+    This table holds all interactions due for the doll. The interactions are processed first-in,
+    first-out. Therefore, the element at the top of this table (#interaction_queue), # > 0, is
+    the one that is always processed.
+  --]]
+  interaction_queue = nil,
+
+  --[[
     These are the five states your doll can be in at any given time.
   --]]
   STATES = {
@@ -93,6 +100,7 @@ function Doll:get_usable_motives()
 end
 
 function Doll:initialize()
+  self.interaction_queue = {}
   self:create_motives()
   self:change_state( Doll.STATES.IDLE )
 end
