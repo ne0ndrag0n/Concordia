@@ -20,8 +20,12 @@ function Promise:initialize( obj_ref )
 end
 
 function Promise:then_call( func_name, ... )
+	self:then_call_on( self.object, func_name, ... )
+end
+
+function Promise:then_call_on( entity, func_name, ... )
 	local desired_tick = bluebear.engine.current_tick + 1
-	local descriptor = self.object:register_callback( desired_tick, func_name, { ... } )
+	local descriptor = entity:register_callback( desired_tick, func_name, { ... } )
 
 	self.last.tick = desired_tick
 	self.last.callback = descriptor
@@ -48,8 +52,8 @@ function TimedPromise:initialize( obj_ref, start_tick )
 	self.next_tick = start_tick
 end
 
-function TimedPromise:then_call( func_name, ... )
-	local descriptor = self.object:register_callback( self.next_tick, func_name, { ... } )
+function TimedPromise:then_call_on( entity, func_name, ... )
+	local descriptor = entity:register_callback( self.next_tick, func_name, { ... } )
 
 	self.last.tick = self.next_tick
 	self.last.callback = descriptor
