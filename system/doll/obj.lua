@@ -23,7 +23,28 @@ local Doll = bluebear.extend( "system.entity.base", "system.doll.base", {
     for NPCs which must "live forever" in some scenarios (e.g. maid or pizza boy shouldn't
     be able to die). This may be changed on runtime as well.
   --]]
-  no_decay = false
+  no_decay = false,
+
+  --[[
+    The current state of the doll
+  --]]
+  current_state = nil,
+
+  --[[
+    These are the five states your doll can be in at any given time.
+  --]]
+  STATES = {
+    -- The doll is not currently doing anything interaction-related
+    IDLE = 'idle',
+    -- The doll is in the process of prearing for the interaction at the top of the queue
+    PREPARING = 'preparing',
+    -- The doll is currently engaged in the interaction at the top of the queue
+    INTERACTING = 'interacting',
+    -- The doll is wrapping up its interaction
+    CONCLUDING = 'concluding',
+    -- The player chose to abort this interaction early, and we need to jump to CONCLUDING state early
+    ABORTING = 'aborting'
+  }
 
 } )
 
@@ -73,6 +94,15 @@ end
 
 function Doll:initialize()
   self:create_motives()
+  self:change_state( Doll.STATES.IDLE )
+end
+
+--[[
+  Change the state of the doll. If necessary, call functions on interactions that are due to be called
+  when a state transition is triggered.
+--]]
+function Doll:change_state( new_state )
+  self.current_state = new_state
 end
 
 --[[
