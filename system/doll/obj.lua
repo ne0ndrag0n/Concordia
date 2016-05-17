@@ -7,6 +7,7 @@
 bluebear.engine.require_modpack( "class" )
 bluebear.engine.require_modpack( "entity" )
 bluebear.engine.require_modpack( "motive" )
+bluebear.engine.require_modpack( "util" )
 
 local motives_list = nil
 local STATES = {
@@ -137,6 +138,20 @@ end
 function Doll:start_interaction()
   -- Take from the top of the queue
   local interaction = self.interaction_queue[ 1 ]
+end
+
+--[[
+  Copy the interaction object and add it to this doll's interaction queue.
+--]]
+function Doll:enqueue_interaction( entity, interaction )
+  -- push a queued_interaction, which is a container table holding
+  -- the object instance and interaction
+  local queued_interaction = {
+    entity = entity,
+    interaction = interaction
+  }
+
+  table.insert( self.interaction_queue, queued_interaction )
 end
 
 --[[
