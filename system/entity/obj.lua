@@ -118,6 +118,14 @@ function Entity:cancel_callback( cancelable )
 end
 
 --[[
+  Change the sprite(s) of this entity. tile_x and tile_y select a tile
+  relative to the object's origin tile (upper left relative to rotation state 0)
+--]]
+function Entity:change_graphic( tile_x, tile_y, graphic )
+  -- TODO: Change the graphic of this entity
+end
+
+--[[
   Provide interfaces for objects placed on a lot
 --]]
 function Entity:on_create()
