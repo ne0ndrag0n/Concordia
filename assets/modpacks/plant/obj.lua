@@ -58,7 +58,8 @@ local Flowers = bluebear.extend( "system.entity.base", "game.flowers.base", {
 			conclude = function( doll, object )
 				-- Reward the user with a few small points of belonging. Notice how the advertised belonging (see below)
 				-- can differ from the actual belonging rewarded.
-				doll:update_motive( 'game.motive.emotion.belonging', 5 ):then_call( 'change_state', Doll.STATES.IDLE )
+				doll:update_motive( 'game.motive.emotion.belonging', 5 )
+				doll:change_state( Doll.STATES.IDLE )
 			end,
 			-- This function aborts an interaction. An interaction is aborted only when the user clicks an active
 			-- interaction in the game UI, signaling to the doll that it needs to cancel immediately and return to

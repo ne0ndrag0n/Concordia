@@ -113,6 +113,14 @@ function Doll:get_usable_motives()
   return motives_list
 end
 
+--[[
+  Retrieve the motive class given by motive_id and change its value by "value"
+--]]
+function Doll:update_motive( motive_id, value )
+  -- TODO: find the motive in the motive classes table and apply value to set_value
+  -- Do nothing if the motive was not found on this doll - accounts for unique dolls that lack the motive
+end
+
 function Doll:initialize()
   self.interaction_queue = {}
   self:create_motives()
