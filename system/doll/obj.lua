@@ -59,7 +59,10 @@ local Doll = bluebear.extend( "system.entity.base", "system.doll.base", {
     Table containing functions of state transitions
   --]]
   STATE_TRANSITIONS = {
-    [STATES.PREPARING] = 'start_interaction'
+    [STATES.PREPARING] = 'prepare',
+    [STATES.INTERACTING] = 'interact',
+    [STATES.CONCLUDING] = 'conclude',
+    [STATES.ABORTING] = 'abort'
   },
 
   --[[
@@ -132,20 +135,14 @@ end
   when a state transition is triggered.
 --]]
 function Doll:change_state( new_state )
-  local state_transition = Doll.STATE_TRANSITIONS[ new_state ]
   self.current_state = new_state
 
-  if state_transition then
-    self[ state_transition ]( self )
-  end
-end
+  local state_transition = Doll.STATE_TRANSITIONS[ new_state ]
 
---[[
-  State transition that handles the engagement of the interaction next up
---]]
-function Doll:start_interaction()
-  -- Take from the top of the queue
-  local interaction = self.interaction_queue[ 1 ]
+  if state_transition then
+    local queue_top = self.interaction_queue[1]
+    queue_top.interaction[ state_transition ]( self, queue_top.entity )
+  end
 end
 
 --[[
