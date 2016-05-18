@@ -60,10 +60,8 @@
 					}
 				},
 				"saved_motives": {
-					"Hunger": {
-						"game.motive.hunger.food": {
-							"value": 100
-						}
+					"game.motive.hunger.food": {
+						"value": 100
 					}
 				}
 			}

@@ -79,11 +79,9 @@ function Doll:load( data )
   bluebear.get_class( 'system.entity.base' ).load( self, data )
 
   -- Load motives
-  for group_name, group in pairs( data.saved_motives ) do
-    for class_name, serial_instance in pairs( group ) do
-      -- Deserialise the nested motive data
-      self.motives[ group_name ][ class_name ]:load( serial_instance )
-    end
+  for class_name, serial_instance in pairs( data.saved_motives ) do
+    -- Deserialise the nested motive data
+    self.motives[ class_name ]:load( serial_instance )
   end
 end
 
@@ -97,11 +95,7 @@ function Doll:create_motives()
 
   local motives = {}
   for index, Class in ipairs( motive_classes ) do
-    local motive_instance = Class:new( self )
-
-    if motives[ motive_instance.motive_group ] == nil then motives[ motive_instance.motive_group ] = {} end
-
-    motives[ motive_instance.motive_group ][ Class.name ] = motive_instance
+    motives[ Class.name ] = Class:new( self )
   end
 
   self.motives = motives
@@ -191,10 +185,8 @@ end
 --]]
 function Doll:decay_my_motives()
 
-  for group_name, group in pairs( self.motives ) do
-    for class_id, motive in pairs( group ) do
+  for class_id, motive in pairs( self.motives ) do
       motive:decay()
-    end
   end
 
   self:sleep( bluebear.util.time.minutes_to_ticks( 1 ) ):then_call( 'decay_my_motives' )
