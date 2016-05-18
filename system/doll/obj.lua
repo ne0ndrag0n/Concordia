@@ -155,6 +155,13 @@ function Doll:enqueue_interaction( entity, interaction )
 end
 
 --[[
+  Return a system.promise.pathfinder
+--]]
+function Doll:walk_to( object )
+  return bluebear.get_class( 'system.promise.pathfinder' ):new( self, object )
+end
+
+--[[
   Kick off the virtual thread that decays this doll's motives.
 --]]
 function Doll:on_create()
