@@ -114,8 +114,7 @@ end
   Retrieve the motive class given by motive_id and change its value by "value"
 --]]
 function Doll:update_motive( motive_id, value )
-  -- TODO: find the motive in the motive classes table and apply value to set_value
-  -- Do nothing if the motive was not found on this doll - accounts for unique dolls that lack the motive
+  self.motives[ motive_id ]:add_to_value( value )
 end
 
 function Doll:initialize()
@@ -173,9 +172,15 @@ end
 --]]
 function Doll:main()
   -- check the interaction queue if we are in IDLE state
-  if self.current_state == Doll.STATES.IDLE and #self.interaction_queue > 0 then
-    -- take next item from queue and process it
-    self:change_state( Doll.STATES.PREPARING )
+  if self.current_state == Doll.STATES.IDLE then
+    if #self.interaction_queue > 0 then
+      -- take next item from queue and process it
+      self:change_state( Doll.STATES.PREPARING )
+    else
+      -- TODO for ET3, the main() vthread should look around its environment
+      -- for things that satisfy its needs if it has nothing to do
+      -- Account for waiting (the doll should be able to just stand there for a bit)
+    end
   end
   self:sleep( Doll.HEARTBEAT_INTERVAL ):then_call( 'main' )
 end

@@ -30,12 +30,8 @@ function Motive:decay()
   end
 end
 
-function Motive:increment_by( value )
+function Motive:add_to_value( value )
   self:set_value( self.value + value )
-end
-
-function Motive:decrement_by( value )
-  self:set_value( self.value - value )
 end
 
 function Motive:set_value( value )
