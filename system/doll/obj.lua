@@ -130,11 +130,19 @@ end
 function Doll:change_state( new_state )
   self.current_state = new_state
 
-  local state_transition = Doll.STATE_TRANSITIONS[ new_state ]
+  -- idle is a special case: when transitioning to idle, the assumption is that
+  -- there is a previous interaction which needs to be removed from the queue
+  -- Therefore, remove it
+  if new_state == Doll.STATES.IDLE then
+    -- Remove the element furthest in the queue
+    table.remove( self.interaction_queue, 1 )
+  else
+    local state_transition = Doll.STATE_TRANSITIONS[ new_state ]
 
-  if state_transition then
-    local queue_top = self.interaction_queue[1]
-    queue_top.interaction[ state_transition ]( self, queue_top.entity )
+    if state_transition then
+      local queue_top = self.interaction_queue[1]
+      queue_top.interaction[ state_transition ]( self, queue_top.entity )
+    end
   end
 end
 
