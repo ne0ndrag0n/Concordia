@@ -2,6 +2,8 @@
   Set up the "util" Underscore-like functionality available in BlueBear
 --]]
 
+math.randomseed(os.time())
+
 bluebear.util = {
   lastcid = 0,
 
