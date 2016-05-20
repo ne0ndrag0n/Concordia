@@ -68,7 +68,12 @@ local Doll = bluebear.extend( "system.entity.base", "system.doll.base", {
   --[[
     Number of ticks a doll should wait between checking for new interactions
   --]]
-  HEARTBEAT_INTERVAL = 15
+  HEARTBEAT_INTERVAL = 15,
+
+  --[[
+    TODO: Placeholder for BlueBear Picasso milestone
+  --]]
+  ANIMATIONS = {}
 
 } )
 
@@ -111,10 +116,17 @@ function Doll:get_usable_motives()
 end
 
 --[[
-  Retrieve the motive class given by motive_id and change its value by "value"
+  Retrieve the motive class given by motive_id and change its value by "value". Only perform
+  this action if the given motive exists on this type of doll; if it doesn't, there is nothing
+  to adjust.
 --]]
 function Doll:update_motive( motive_id, value )
-  self.motives[ motive_id ]:add_to_value( value )
+  print( "Updating motive "..motive_id )
+  local motive = self.motives[ motive_id ]
+
+  if motive then
+    self.motives[ motive_id ]:add_to_value( value )
+  end
 end
 
 function Doll:initialize()
@@ -135,6 +147,7 @@ function Doll:change_state( new_state )
   -- Therefore, remove it
   if new_state == Doll.STATES.IDLE then
     -- Remove the element furthest in the queue
+    print( "Removing interaction "..tostring( self.interaction_queue[1] ) )
     table.remove( self.interaction_queue, 1 )
   else
     local state_transition = Doll.STATE_TRANSITIONS[ new_state ]
@@ -157,6 +170,7 @@ function Doll:enqueue_interaction( entity, interaction )
     interaction = interaction
   }
 
+  print( "Enqueueing interaction table "..tostring( queued_interaction ) )
   table.insert( self.interaction_queue, queued_interaction )
 end
 
