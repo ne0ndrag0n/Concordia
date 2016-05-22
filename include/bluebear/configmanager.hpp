@@ -16,6 +16,8 @@ namespace BlueBear {
       std::string getValue( const std::string& key );
       int getIntValue( const std::string& key );
     private:
+      static constexpr const char* SETTINGS_PATH = "settings.json";
+
       ConfigManager();
       ConfigManager( ConfigManager const& );
       void operator=( ConfigManager const& );

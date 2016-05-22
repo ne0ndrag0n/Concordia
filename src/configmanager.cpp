@@ -1,6 +1,8 @@
 #include "configmanager.hpp"
 
 #include "json/json.h"
+#include <iostream>
+#include <fstream>
 
 namespace BlueBear {
 
@@ -10,6 +12,26 @@ namespace BlueBear {
    */
   ConfigManager::ConfigManager() {
     configRoot[ "ticks_per_second" ] = 30;
+
+    // Load settings.json from file
+    std::ifstream settingsFile( SETTINGS_PATH );
+    Json::Value settingsJSON;
+    Json::Reader reader;
+
+    if( reader.parse( settingsFile, settingsJSON ) ) {
+      // Override defaults
+      // iterators - barf
+      for( Json::Value::iterator jsonIterator = settingsJSON.begin(); jsonIterator != settingsJSON.end(); ++jsonIterator ) {
+        // BARF
+        Json::Value key = jsonIterator.key();
+        Json::Value value = *jsonIterator;
+
+        std::cout << "ConfigManager: Overriding settings default [" << key << "] " << value << std::endl;
+
+        // Store every value as a string because strong typing is a PITA
+        configRoot[ key.asString() ] = value;
+      }
+    }
   }
 
   std::string ConfigManager::getValue( const std::string& key ) {
