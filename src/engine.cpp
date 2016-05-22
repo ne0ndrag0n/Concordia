@@ -6,6 +6,7 @@
 #include "lotentity.hpp"
 #include "lot.hpp"
 #include "engine.hpp"
+#include "configmanager.hpp"
 #include "json/json.h"
 #include <iterator>
 #include <string>
@@ -24,7 +25,7 @@ namespace BlueBear {
 		luaL_openlibs( L );
 
 		currentModpackDirectory = NULL;
-		ticksPerSecond = 30;
+		ticksPerSecond = ConfigManager::getInstance().getIntValue( "ticks_per_second" );
 	}
 
 	Engine::~Engine() {
