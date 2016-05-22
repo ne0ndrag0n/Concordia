@@ -17,10 +17,6 @@
 							{
 								"method": "main",
 								"arguments": []
-							},
-							{
-								"method": "test_create_interaction",
-								"arguments": []
 							}
 						]
 					}
