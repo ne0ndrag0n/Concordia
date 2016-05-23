@@ -223,6 +223,7 @@ namespace BlueBear {
 			std::string eventKey( lua_tostring( L, -3 ) );
 			std::string cid( lua_tostring( L, -2 ) );
 			std::string callback( lua_tostring( L, -1 ) );
+			lua_pop( L, 3 );
 
 			// Only if the objects map contains the given cid
 			if( lot->objects.count( cid ) ) {
