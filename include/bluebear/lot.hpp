@@ -17,13 +17,13 @@ namespace BlueBear {
 	class Lot {
 
 		private:
-			class EventRegistration {
+			struct EventRegistration {
 				int instance;
 				std::string callbackFunction;
 			};
 
 			lua_State* L;
-			std::map< std::string, std::vector<Lot::EventRegistration> > events;
+			std::map< std::string, std::vector<EventRegistration> > events;
 
 		public:
 			std::map< std::string, std::unique_ptr< BlueBear::LotEntity > > objects;
@@ -38,7 +38,7 @@ namespace BlueBear {
 			int createLotEntity( const std::string& classID );
 			int createLotEntityFromJSON( const Json::Value& serialEntity );
 			void buildLuaInterface();
-			void registerEvent( std::string& eventKey, int luaVMInstance );
+			void registerEvent( const std::string& eventKey, int luaVMInstance, const std::string& callback );
 			void unregisterEvent( std::string& eventKey, int luaVMInstance );
 			void broadcastEvent( std::string& eventKey );
 

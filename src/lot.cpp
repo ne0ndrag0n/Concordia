@@ -203,8 +203,13 @@ namespace BlueBear {
 	/**
 	 * Register an event on the Lot event bus.
 	 */
-	void Lot::registerEvent( std::string& eventKey, int luaVMInstance ) {
+	void Lot::registerEvent( const std::string& eventKey, int luaVMInstance, const std::string& callback ) {
+		if( !events.count( eventKey ) ) {
+			// Vector does not exist
+			events[ eventKey ] = std::vector< EventRegistration >();
+		}
 
+		events[ eventKey ].push_back( EventRegistration{ luaVMInstance, callback } );
 	}
 
 	/**
@@ -213,6 +218,12 @@ namespace BlueBear {
 	int Lot::lua_registerEvent( lua_State* L ) {
 		BlueBear::Lot* lot = ( BlueBear::Lot* )lua_touserdata( L, lua_upvalueindex( 1 ) );
 
+		if( lua_isstring( L, -1 ) && lua_isstring( L, -3 ) ) {
+
+			std::string eventKey( lua_tostring( L, -3 ) );
+			std::string callback( lua_tostring( L, -1 ) );
+
+		}
 
 		return 0;
 	}

@@ -117,10 +117,8 @@ function Flowers:replenish_water()
 	self:change_graphic( 0, 0, Flowers.GRAPHICS.ALIVE )
 end
 
-function Flowers:test_create_interaction()
-	local doll = bluebear.lot.get_object_by_cid( 'bb3' )
-
-	doll:enqueue_interaction( self, self.interactions[ 1 ] )
+function Flowers:test_new_funcs()
+	--bluebear.lot.listen_for( "e", self, "c" )
 end
 
 bluebear.register_class( Flowers )

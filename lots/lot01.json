@@ -17,6 +17,10 @@
 							{
 								"method": "main",
 								"arguments": []
+							},
+							{
+								"method": "test_new_funcs",
+								"arguments": []
 							}
 						]
 					}
