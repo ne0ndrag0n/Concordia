@@ -213,16 +213,24 @@ namespace BlueBear {
 	}
 
 	/**
-	 * bluebear.lot.listen_for( "fully-qualified-event-key", self, "func_name" )
+	 * bluebear.lot.listen_for( "fully-qualified-event-key", self._cid, "func_name" )
 	 */
 	int Lot::lua_registerEvent( lua_State* L ) {
 		BlueBear::Lot* lot = ( BlueBear::Lot* )lua_touserdata( L, lua_upvalueindex( 1 ) );
 
-		if( lua_isstring( L, -1 ) && lua_isstring( L, -3 ) ) {
+		if( lua_isstring( L, -1 ) && lua_isstring( L, -2 ) && lua_isstring( L, -3 ) ) {
 
 			std::string eventKey( lua_tostring( L, -3 ) );
+			std::string cid( lua_tostring( L, -2 ) );
 			std::string callback( lua_tostring( L, -1 ) );
 
+			// Only if the objects map contains the given cid
+			if( lot->objects.count( cid ) ) {
+				const auto& object = *( lot->objects[ cid ] );
+
+				// Register this event
+				lot->registerEvent( eventKey, object.luaVMInstance, callback );
+			}
 		}
 
 		return 0;

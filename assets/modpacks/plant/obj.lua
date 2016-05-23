@@ -118,7 +118,7 @@ function Flowers:replenish_water()
 end
 
 function Flowers:test_new_funcs()
-	--bluebear.lot.listen_for( "e", self, "c" )
+	--bluebear.lot.listen_for( "e", self._cid, "c" )
 end
 
 bluebear.register_class( Flowers )
