@@ -241,7 +241,17 @@ namespace BlueBear {
 	 * Unregister this object from the given event
 	 */
 	void Lot::unregisterEvent( std::string& eventKey, int luaVMInstance ) {
+		if( events.count( eventKey ) ) {
+			auto eventMap = events[ eventKey ];
 
+			eventMap.erase( luaVMInstance );
+
+			// If we removed the last event in eventsMap
+			// erase the eventsMap
+			if( eventMap.size() == 0 ) {
+				events.erase( eventKey );
+			}
+		}
 	}
 
 	/**
