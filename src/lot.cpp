@@ -205,11 +205,11 @@ namespace BlueBear {
 	 */
 	void Lot::registerEvent( const std::string& eventKey, int luaVMInstance, const std::string& callback ) {
 		if( !events.count( eventKey ) ) {
-			// Vector does not exist
-			events[ eventKey ] = std::vector< EventRegistration >();
+			// Nested map not created
+			events[ eventKey ] = EventMap();
 		}
 
-		events[ eventKey ].push_back( EventRegistration{ luaVMInstance, callback } );
+		events[ eventKey ][ luaVMInstance ] = callback;
 	}
 
 	/**

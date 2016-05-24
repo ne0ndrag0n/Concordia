@@ -16,14 +16,11 @@ namespace BlueBear {
 
 	class Lot {
 
-		private:
-			struct EventRegistration {
-				int instance;
-				std::string callbackFunction;
-			};
+		using EventMap = std::map< int, std::string >;
 
+		private:
 			lua_State* L;
-			std::map< std::string, std::vector<EventRegistration> > events;
+			std::map< std::string, EventMap > events;
 
 		public:
 			std::map< std::string, std::unique_ptr< BlueBear::LotEntity > > objects;
