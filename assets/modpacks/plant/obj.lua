@@ -119,6 +119,7 @@ end
 
 function Flowers:test_new_funcs()
 	--bluebear.lot.listen_for( "e", self._cid, "c" )
+	--bluebear.lot.stop_listening_for( "e", self._cid )
 end
 
 bluebear.register_class( Flowers )
