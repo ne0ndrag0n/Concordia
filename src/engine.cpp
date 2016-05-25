@@ -43,10 +43,17 @@ namespace BlueBear {
 		// bluebear.engine
 		lua_pushstring( L, "engine" );
 		lua_newtable( L );
+
 		// bluebear.engine.require_modpack
 		lua_pushstring( L, "require_modpack" );
 		lua_pushlightuserdata( L, this );
 		lua_pushcclosure( L, &Engine::lua_loadModpack, 1 );
+		lua_settable( L, -3 );
+
+		// bluebear.engine.setup_stemcell
+		lua_pushstring( L, "setup_stemcell" );
+		lua_pushlightuserdata( L, this );
+		lua_pushcclosure( L, &Engine::lua_setupStemcell, 1 );
 		lua_settable( L, -3 );
 
 		// bluebear.engine.tick_rate
@@ -154,6 +161,28 @@ namespace BlueBear {
 
 		return 0;
 	}
+
+	/**
+	 * Lua C++ binding to create a stemcell
+	 */
+	 int Engine::lua_setupStemcell( lua_State* L ) {
+		 	BlueBear::Engine* engine = ( BlueBear::Engine* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+
+			// Expected stack: stemcell_type stemcell
+			if( lua_isstring( L, -1 ) ) {
+				std::string stemcellType( lua_tostring( L, -1 ) );
+				lua_pop( L, 1 );
+
+				// This leaves a lot to be desired
+				if( stemcellType == "event-manager" ) {
+
+				} else {
+					return luaL_error( L, "'%s' is not a valid stemcell type.", stemcellType.c_str() );
+				}
+			}
+
+			return 0;
+	 }
 
 	/**
 	 * Load a lot
