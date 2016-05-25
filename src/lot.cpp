@@ -212,13 +212,7 @@ namespace BlueBear {
 			std::string cid( lua_tostring( L, -2 ) );
 			std::string callback( lua_tostring( L, -1 ) );
 
-			// Only if the objects map contains the given cid
-			if( lot->objects.count( cid ) ) {
-				const auto& object = *( lot->objects[ cid ] );
-
-				// Register this event
-				lot->eventManager.registerEvent( eventKey, object.luaVMInstance, callback );
-			}
+			lot->eventManager.registerEvent( eventKey, cid, callback );
 		}
 
 		return 0;
@@ -235,11 +229,7 @@ namespace BlueBear {
 			std::string eventKey( lua_tostring( L, -2 ) );
 			std::string cid( lua_tostring( L, -1 ) );
 
-			if( lot->objects.count( cid ) ) {
-				const auto& object = *( lot->objects[ cid ] );
-
-				lot->eventManager.unregisterEvent( eventKey, object.luaVMInstance );
-			}
+			lot->eventManager.unregisterEvent( eventKey, cid );
 		}
 
 		return 0;
