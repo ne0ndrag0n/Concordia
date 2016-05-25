@@ -7,6 +7,7 @@
 #include "lot.hpp"
 #include "engine.hpp"
 #include "configmanager.hpp"
+#include "eventmanager.hpp"
 #include "json/json.h"
 #include <iterator>
 #include <string>
@@ -175,6 +176,47 @@ namespace BlueBear {
 
 				// This leaves a lot to be desired
 				if( stemcellType == "event-manager" ) {
+					// "_inst" stemcell
+					lua_pushstring( L, "_inst" );
+
+					// ud "_inst" stemcell
+ 					EventManager** userdata = ( EventManager** )lua_newuserdata( L, sizeof( EventManager* ) );
+					*userdata = new EventManager( L );
+
+					// table ud "_inst" stemcell
+					lua_newtable( L );
+
+					// "_gc" table ud "_inst" stemcell
+					lua_pushstring( L, "__gc" );
+					// lud "_gc" table ud "_inst" stemcell
+					lua_pushlightuserdata( L, *userdata );
+					// closure(lud) "_gc" table ud "_inst" stemcell
+					lua_pushcclosure( L, &EventManager::lua_gc, 1 );
+					// table ud "_inst" stemcell
+					lua_settable( L, -3 );
+
+					// ud "_inst" stemcell
+					lua_setmetatable( L, -1 );
+
+					// Set self._inst to the userdata
+					// stemcell
+					lua_settable( L, -3 );
+
+					// Transform the stemcell to an EventMAnager
+					lua_pushstring( L, "listen_for" );
+					lua_pushlightuserdata( L, *userdata );
+					lua_pushcclosure( L, &EventManager::lua_registerEvent, 1 );
+					lua_settable( L, -3 );
+
+					lua_pushstring( L, "stop_listening_for" );
+					lua_pushlightuserdata( L, *userdata );
+					lua_pushcclosure( L, &EventManager::lua_unregisterEvent, 1 );
+					lua_settable( L, -3 );
+
+					lua_pushstring( L, "broadcast" );
+					lua_pushlightuserdata( L, *userdata );
+					lua_pushcclosure( L, &EventManager::lua_broadcastEvent, 1 );
+					lua_settable( L, -3 );
 
 				} else {
 					return luaL_error( L, "'%s' is not a valid stemcell type.", stemcellType.c_str() );

@@ -4,6 +4,7 @@
 #include "lauxlib.h"
 #include <map>
 #include <string>
+#include <iostream>
 
 namespace BlueBear {
 
@@ -85,5 +86,15 @@ namespace BlueBear {
 
 		return 0;
 	}
+
+  /**
+   * Stemcell stores this on the userdata metatable in __gc to ensure the instance gets deleted
+   */
+   int EventManager::lua_gc( lua_State* L ) {
+     EventManager** eventManager = ( EventManager** )lua_touserdata( L, 1 );
+     delete *eventManager;
+     std::cout << "Garbage collected an EventManager object" << std::endl;
+     return 0;
+   }
 
 }

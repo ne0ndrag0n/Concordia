@@ -44,7 +44,6 @@ namespace BlueBear {
 			bool loadModpack( const std::string& name );
 			static int lua_loadModpack( lua_State* L );
 			static int lua_setupStemcell( lua_State* L );
-
 	};
 
 }

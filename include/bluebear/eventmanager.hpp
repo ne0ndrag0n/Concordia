@@ -26,6 +26,7 @@ namespace BlueBear {
       static int lua_registerEvent( lua_State* L );
       static int lua_unregisterEvent( lua_State* L );
       static int lua_broadcastEvent( lua_State* L );
+      static int lua_gc( lua_State* L );
   };
 
 }
