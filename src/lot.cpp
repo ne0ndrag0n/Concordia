@@ -16,7 +16,7 @@
 namespace BlueBear {
 
 	Lot::Lot( lua_State* L, int floorX, int floorY, int stories, int undergroundStories, BlueBear::TerrainType terrainType ) :
-		L( L ), floorX( floorX ), floorY( floorY ), stories( stories ), undergroundStories( undergroundStories ), terrainType( terrainType ) {
+		L( L ), floorX( floorX ), floorY( floorY ), stories( stories ), undergroundStories( undergroundStories ), terrainType( terrainType ), eventManager( L ) {
 			buildLuaInterface();
 	}
 
@@ -201,18 +201,6 @@ namespace BlueBear {
 	}
 
 	/**
-	 * Register an event on the Lot event bus.
-	 */
-	void Lot::registerEvent( const std::string& eventKey, int luaVMInstance, const std::string& callback ) {
-		if( !events.count( eventKey ) ) {
-			// Nested map not created
-			events[ eventKey ] = EventMap();
-		}
-
-		events[ eventKey ][ luaVMInstance ] = callback;
-	}
-
-	/**
 	 * bluebear.lot.listen_for( "fully-qualified-event-key", self._cid, "func_name" )
 	 */
 	int Lot::lua_registerEvent( lua_State* L ) {
@@ -229,28 +217,11 @@ namespace BlueBear {
 				const auto& object = *( lot->objects[ cid ] );
 
 				// Register this event
-				lot->registerEvent( eventKey, object.luaVMInstance, callback );
+				lot->eventManager.registerEvent( eventKey, object.luaVMInstance, callback );
 			}
 		}
 
 		return 0;
-	}
-
-	/**
-	 * Unregister this object from the given event
-	 */
-	void Lot::unregisterEvent( std::string& eventKey, int luaVMInstance ) {
-		if( events.count( eventKey ) ) {
-			auto eventMap = events[ eventKey ];
-
-			eventMap.erase( luaVMInstance );
-
-			// If we removed the last event in eventsMap
-			// erase the eventsMap
-			if( eventMap.size() == 0 ) {
-				events.erase( eventKey );
-			}
-		}
 	}
 
 	/**
@@ -267,20 +238,11 @@ namespace BlueBear {
 			if( lot->objects.count( cid ) ) {
 				const auto& object = *( lot->objects[ cid ] );
 
-				lot->unregisterEvent( eventKey, object.luaVMInstance );
+				lot->eventManager.unregisterEvent( eventKey, object.luaVMInstance );
 			}
 		}
 
 		return 0;
-	}
-
-	/**
-	 * Broadcast event on the event bus to any registered listeners.
-	 */
-	void Lot::broadcastEvent( std::string& eventKey ) {
-		if( events.count( eventKey ) ) {
-			auto listeners = events[ eventKey ];
-		}
 	}
 
 	/**

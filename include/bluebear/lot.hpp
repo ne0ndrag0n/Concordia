@@ -7,6 +7,7 @@
 #include "bbtypes.hpp"
 #include "lotentity.hpp"
 #include "json/json.h"
+#include "eventmanager.hpp"
 #include <vector>
 #include <map>
 #include <string>
@@ -16,11 +17,9 @@ namespace BlueBear {
 
 	class Lot {
 
-		using EventMap = std::map< int, std::string >;
-
 		private:
 			lua_State* L;
-			std::map< std::string, EventMap > events;
+			EventManager eventManager;
 
 		public:
 			std::map< std::string, std::unique_ptr< BlueBear::LotEntity > > objects;
@@ -35,9 +34,6 @@ namespace BlueBear {
 			int createLotEntity( const std::string& classID );
 			int createLotEntityFromJSON( const Json::Value& serialEntity );
 			void buildLuaInterface();
-			void registerEvent( const std::string& eventKey, int luaVMInstance, const std::string& callback );
-			void unregisterEvent( std::string& eventKey, int luaVMInstance );
-			void broadcastEvent( std::string& eventKey );
 
 			static int lua_registerEvent( lua_State* L );
 			static int lua_unregisterEvent( lua_State* L );
