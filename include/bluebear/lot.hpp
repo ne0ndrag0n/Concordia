@@ -35,9 +35,6 @@ namespace BlueBear {
 			int createLotEntityFromJSON( const Json::Value& serialEntity );
 			void buildLuaInterface();
 
-			static int lua_registerEvent( lua_State* L );
-			static int lua_unregisterEvent( lua_State* L );
-			static int lua_broadcastEvent( lua_State* L );
 			static int lua_getLotObjects( lua_State* L );
 			static int lua_getLotObjectsByType( lua_State* L );
 			static int lua_getLotObjectByCid( lua_State* L );

@@ -23,6 +23,9 @@ namespace BlueBear {
       void unregisterEvent( const std::string& eventKey, const std::string& cid );
       void broadcastEvent( const std::string& eventKey );
 
+      static int lua_registerEvent( lua_State* L );
+      static int lua_unregisterEvent( lua_State* L );
+      static int lua_broadcastEvent( lua_State* L );
   };
 
 }

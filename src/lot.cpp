@@ -6,6 +6,7 @@
 #include "lot.hpp"
 #include "utility.hpp"
 #include "json/json.h"
+#include "eventmanager.hpp"
 #include <memory>
 #include <vector>
 #include <cstring>
@@ -201,50 +202,6 @@ namespace BlueBear {
 	}
 
 	/**
-	 * bluebear.lot.listen_for( "fully-qualified-event-key", self._cid, "func_name" )
-	 */
-	int Lot::lua_registerEvent( lua_State* L ) {
-		BlueBear::Lot* lot = ( BlueBear::Lot* )lua_touserdata( L, lua_upvalueindex( 1 ) );
-
-		if( lua_isstring( L, -1 ) && lua_isstring( L, -2 ) && lua_isstring( L, -3 ) ) {
-
-			std::string eventKey( lua_tostring( L, -3 ) );
-			std::string cid( lua_tostring( L, -2 ) );
-			std::string callback( lua_tostring( L, -1 ) );
-
-			lot->eventManager.registerEvent( eventKey, cid, callback );
-		}
-
-		return 0;
-	}
-
-	/**
-	 * bluebear.lot.stop_listening_for( "fully-qualified-event-key", self._cid )
-	 */
-	int Lot::lua_unregisterEvent( lua_State* L ) {
-		BlueBear::Lot* lot = ( BlueBear::Lot* )lua_touserdata( L, lua_upvalueindex( 1 ) );
-
-		if( lua_isstring( L, -2 ) && lua_isstring( L, -1 ) ) {
-
-			std::string eventKey( lua_tostring( L, -2 ) );
-			std::string cid( lua_tostring( L, -1 ) );
-
-			lot->eventManager.unregisterEvent( eventKey, cid );
-		}
-
-		return 0;
-	}
-
-	/**
-	 * bluebear.lot.broadcast( "fully-qualified-event-key", ... )
-	 */
-	int Lot::lua_broadcastEvent( lua_State* L ) {
-		BlueBear::Lot* lot = ( BlueBear::Lot* )lua_touserdata( L, lua_upvalueindex( 1 ) );
-
-		return 0;
-	}
-
-	/**
 	 * Rebuild the Lua interface to Lot, connecting it to this Lot instance
 	 */
 	void Lot::buildLuaInterface() {
@@ -282,20 +239,20 @@ namespace BlueBear {
 
 		// listen_for instructs the Lot to listen for a specific broadcast for a specific object
 		lua_pushstring( L, "listen_for" );
-		lua_pushlightuserdata( L, this );
-		lua_pushcclosure( L, &Lot::lua_registerEvent, 1 );
+		lua_pushlightuserdata( L, &eventManager );
+		lua_pushcclosure( L, &EventManager::lua_registerEvent, 1 );
 		lua_settable( L, -3 );
 
 		// stop_listening_for instructs the Lot that an object is no longer listening for this broadcast
 		lua_pushstring( L, "stop_listening_for" );
-		lua_pushlightuserdata( L, this );
-		lua_pushcclosure( L, &Lot::lua_unregisterEvent, 1 );
+		lua_pushlightuserdata( L, &eventManager );
+		lua_pushcclosure( L, &EventManager::lua_unregisterEvent, 1 );
 		lua_settable( L, -3 );
 
 		// broadcast instructs the Lot to wake up all objects listening for the message that is broadcasted
 		lua_pushstring( L, "broadcast" );
-		lua_pushlightuserdata( L, this );
-		lua_pushcclosure( L, &Lot::lua_broadcastEvent, 1 );
+		lua_pushlightuserdata( L, &eventManager );
+		lua_pushcclosure( L, &EventManager::lua_broadcastEvent, 1 );
 		lua_settable( L, -3 );
 
 		// Remember pushing the bluebear table, then lot? Stack should now have the lot table,

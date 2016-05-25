@@ -41,4 +41,49 @@ namespace BlueBear {
       auto listeners = events[ eventKey ];
     }
   }
+
+  /**
+   * listen_for( "fully-qualified-event-key", self._cid, "func_name" )
+   */
+  int EventManager::lua_registerEvent( lua_State* L ) {
+    EventManager& eventManager = *( ( EventManager* )lua_touserdata( L, lua_upvalueindex( 1 ) ) );
+
+    if( lua_isstring( L, -1 ) && lua_isstring( L, -2 ) && lua_isstring( L, -3 ) ) {
+
+      std::string eventKey( lua_tostring( L, -3 ) );
+      std::string cid( lua_tostring( L, -2 ) );
+      std::string callback( lua_tostring( L, -1 ) );
+
+      eventManager.registerEvent( eventKey, cid, callback );
+    }
+
+    return 0;
+  }
+
+  /**
+	 * stop_listening_for( "fully-qualified-event-key", self._cid )
+	 */
+	int EventManager::lua_unregisterEvent( lua_State* L ) {
+    EventManager& eventManager = *( ( EventManager* )lua_touserdata( L, lua_upvalueindex( 1 ) ) );
+
+		if( lua_isstring( L, -2 ) && lua_isstring( L, -1 ) ) {
+
+			std::string eventKey( lua_tostring( L, -2 ) );
+			std::string cid( lua_tostring( L, -1 ) );
+
+			eventManager.unregisterEvent( eventKey, cid );
+		}
+
+		return 0;
+	}
+
+  /**
+	 * broadcast( "fully-qualified-event-key", ... )
+	 */
+	int EventManager::lua_broadcastEvent( lua_State* L ) {
+    EventManager& eventManager = *( ( EventManager* )lua_touserdata( L, lua_upvalueindex( 1 ) ) );
+
+		return 0;
+	}
+
 }
