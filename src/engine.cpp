@@ -188,15 +188,13 @@ namespace BlueBear {
 
 					// "_gc" table ud "_inst" stemcell
 					lua_pushstring( L, "__gc" );
-					// lud "_gc" table ud "_inst" stemcell
-					lua_pushlightuserdata( L, *userdata );
-					// closure(lud) "_gc" table ud "_inst" stemcell
-					lua_pushcclosure( L, &EventManager::lua_gc, 1 );
+					// closure() "_gc" table ud "_inst" stemcell
+					lua_pushcfunction( L, EventManager::lua_gc );
 					// table ud "_inst" stemcell
 					lua_settable( L, -3 );
 
 					// ud "_inst" stemcell
-					lua_setmetatable( L, -1 );
+					lua_setmetatable( L, -2 );
 
 					// Set self._inst to the userdata
 					// stemcell
