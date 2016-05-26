@@ -17,24 +17,34 @@ namespace BlueBear {
   }
 
   void EventManager::registerEvent( const std::string& eventKey, const std::string& cid, const std::string& callback ) {
-    if( !events.count( eventKey ) ) {
-			// Nested map not created
-			events[ eventKey ] = EventMap();
-		}
+    int object = currentLot->getLotObjectByCid( cid );
 
-		events[ eventKey ][ cid ] = callback;
+    // Can't do anything without a valid object ID
+    if( object != -1 ) {
+      if( !events.count( eventKey ) ) {
+        // Nested map not created
+        events[ eventKey ] = EventMap();
+      }
+
+      events[ eventKey ][ object ] = callback;
+    }
   }
 
   void EventManager::unregisterEvent( const std::string& eventKey, const std::string& cid ) {
-    if( events.count( eventKey ) ) {
-      auto eventMap = events[ eventKey ];
+    int object = currentLot->getLotObjectByCid( cid );
 
-      eventMap.erase( cid );
+    // Can't do anything without a valid object ID
+    if( object != -1 ) {
+      if( events.count( eventKey ) ) {
+        auto eventMap = events[ eventKey ];
 
-      // If we removed the last event in eventsMap
-      // erase the eventsMap
-      if( eventMap.size() == 0 ) {
-        events.erase( eventKey );
+        eventMap.erase( object );
+
+        // If we removed the last event in eventsMap
+        // erase the eventsMap
+        if( eventMap.size() == 0 ) {
+          events.erase( eventKey );
+        }
       }
     }
   }
