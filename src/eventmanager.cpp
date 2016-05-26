@@ -3,13 +3,14 @@
 #include "lualib.h"
 #include "lauxlib.h"
 #include "utility.hpp"
+#include "lot.hpp"
 #include <map>
 #include <string>
 #include <iostream>
 
 namespace BlueBear {
 
-  EventManager::EventManager( lua_State* L ) : L( L ) {}
+  EventManager::EventManager( lua_State* L, std::shared_ptr< Lot > currentLot ) : L( L ), currentLot( currentLot ) {}
 
   void EventManager::reset() {
     events.clear();

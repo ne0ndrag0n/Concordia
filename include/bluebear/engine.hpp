@@ -26,11 +26,11 @@ namespace BlueBear {
 
 			lua_State* L;
 			unsigned int worldTicks;
-			std::unique_ptr< Lot > currentLot;
+			std::shared_ptr< Lot > currentLot;
+			std::unique_ptr< EventManager > eventManager;
 			const char* currentModpackDirectory;
 			std::map< std::string, BlueBear::ModpackStatus > loadedModpacks;
 			unsigned int ticksPerSecond;
-			EventManager eventManager;
 
 			void callActionOnObject( const char* playerId, const char* objectId, const char* method );
 			bool deserializeFunctionRefs();

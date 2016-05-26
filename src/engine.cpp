@@ -22,7 +22,7 @@
 namespace BlueBear {
 
 	Engine::Engine() :
-	 L( luaL_newstate() ), eventManager( L ), currentModpackDirectory( nullptr ), ticksPerSecond( ConfigManager::getInstance().getIntValue( "ticks_per_second" ) ) {
+	 L( luaL_newstate() ), currentModpackDirectory( nullptr ), ticksPerSecond( ConfigManager::getInstance().getIntValue( "ticks_per_second" ) ) {
 		luaL_openlibs( L );
 	}
 
@@ -84,6 +84,7 @@ namespace BlueBear {
 	 */
 	void Engine::setupLotEnvironment() {
 		Lot* lot = currentLot.get();
+		EventManager* globalEventManager = eventManager.get();
 
 		// Push the "bluebear" global onto the stack, then push the "lot" identifier
 		// We will set this at the very end of the function
@@ -119,19 +120,19 @@ namespace BlueBear {
 
 		// listen_for instructs the Lot to listen for a specific broadcast for a specific object
 		lua_pushstring( L, "listen_for" );
-		lua_pushlightuserdata( L, &eventManager );
+		lua_pushlightuserdata( L, globalEventManager );
 		lua_pushcclosure( L, &EventManager::lua_registerEvent, 1 );
 		lua_settable( L, -3 );
 
 		// stop_listening_for instructs the Lot that an object is no longer listening for this broadcast
 		lua_pushstring( L, "stop_listening_for" );
-		lua_pushlightuserdata( L, &eventManager );
+		lua_pushlightuserdata( L, globalEventManager );
 		lua_pushcclosure( L, &EventManager::lua_unregisterEvent, 1 );
 		lua_settable( L, -3 );
 
 		// broadcast instructs the Lot to wake up all objects listening for the message that is broadcasted
 		lua_pushstring( L, "broadcast" );
-		lua_pushlightuserdata( L, &eventManager );
+		lua_pushlightuserdata( L, globalEventManager );
 		lua_pushcclosure( L, &EventManager::lua_broadcastEvent, 1 );
 		lua_settable( L, -3 );
 
@@ -242,7 +243,7 @@ namespace BlueBear {
 
 					// ud "_inst" stemcell
  					EventManager** userdata = ( EventManager** )lua_newuserdata( L, sizeof( EventManager* ) );
-					*userdata = new EventManager( L );
+					*userdata = new EventManager( L, engine->currentLot );
 
 					// table ud "_inst" stemcell
 					lua_newtable( L );
@@ -308,7 +309,7 @@ namespace BlueBear {
 				std::cout << "[" << lotPath << "] " << "Lot revision: " << lotJSON[ "rev" ] << std::endl;
 
 				// Instantiate the lot
-				currentLot = std::make_unique< BlueBear::Lot >(
+				currentLot = std::make_shared< BlueBear::Lot >(
 					L,
 					lotJSON[ "floorx" ].asInt(),
 					lotJSON[ "floory" ].asInt(),
@@ -317,8 +318,10 @@ namespace BlueBear {
 					BlueBear::TerrainType( lotJSON[ "terrain" ].asInt() )
 				);
 
+				// Setup global event manager
+				eventManager = std::make_unique< BlueBear::EventManager >( L, currentLot );
+
 				// Expose the lot and eventmanager methods to luasphere
-				eventManager.reset();
 				setupLotEnvironment();
 
 				// Set world ticks to the one saved in the file
