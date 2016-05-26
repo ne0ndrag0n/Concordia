@@ -6,6 +6,7 @@
 #include "lauxlib.h"
 #include "bbtypes.hpp"
 #include "lot.hpp"
+#include "eventmanager.hpp"
 #include <string>
 #include <memory>
 #include <vector>
@@ -29,16 +30,18 @@ namespace BlueBear {
 			const char* currentModpackDirectory;
 			std::map< std::string, BlueBear::ModpackStatus > loadedModpacks;
 			unsigned int ticksPerSecond;
+			EventManager eventManager;
 
 			void callActionOnObject( const char* playerId, const char* objectId, const char* method );
 			bool deserializeFunctionRefs();
+			void setupLotEnvironment();
 
 		public:
 			Engine();
 			~Engine();
-			bool setupRootEnvironment();
 			void objectLoop();
 			bool loadLot( const char* lotPath );
+			bool setupRootEnvironment();
 
 			bool loadModpackSet( const char* modpackDirectory );
 			bool loadModpack( const std::string& name );

@@ -21,12 +21,9 @@
 
 namespace BlueBear {
 
-	Engine::Engine() {
-		L = luaL_newstate();
+	Engine::Engine() :
+	 L( luaL_newstate() ), eventManager( L ), currentModpackDirectory( nullptr ), ticksPerSecond( ConfigManager::getInstance().getIntValue( "ticks_per_second" ) ) {
 		luaL_openlibs( L );
-
-		currentModpackDirectory = NULL;
-		ticksPerSecond = ConfigManager::getInstance().getIntValue( "ticks_per_second" );
 	}
 
 	Engine::~Engine() {
@@ -80,6 +77,70 @@ namespace BlueBear {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Expose pieces of lot and eventmanager to the Luasphere
+	 */
+	void Engine::setupLotEnvironment() {
+		Lot* lot = currentLot.get();
+
+		// Push the "bluebear" global onto the stack, then push the "lot" identifier
+		// We will set this at the very end of the function
+		lua_getglobal( L, "bluebear" );
+		lua_pushstring( L, "lot" );
+
+		// Push new, blank table
+		lua_createtable( L, 0, 7 );
+
+		// get_all_objects retrieves all objects
+		lua_pushstring( L, "get_all_objects" );
+		lua_pushlightuserdata( L, lot );
+		lua_pushcclosure( L, &Lot::lua_getLotObjects, 1 );
+		lua_settable( L, -3 );
+
+		// get_objects_by_type gets all objects on the lot of a specific type
+		lua_pushstring( L, "get_objects_by_type" );
+		lua_pushlightuserdata( L, lot );
+		lua_pushcclosure( L, &Lot::lua_getLotObjectsByType, 1 );
+		lua_settable( L, -3 );
+
+		// get_object_by_cid retrieves a specific object by its cid
+		lua_pushstring( L, "get_object_by_cid" );
+		lua_pushlightuserdata( L, lot );
+		lua_pushcclosure( L, &Lot::lua_getLotObjectByCid, 1 );
+		lua_settable( L, -3 );
+
+		// create_new_instance creates a new instance of an entity and registers it with the lot engine
+		lua_pushstring( L, "create_new_instance" );
+		lua_pushlightuserdata( L, lot );
+		lua_pushcclosure( L, &Lot::lua_createLotEntity, 1 );
+		lua_settable( L, -3 );
+
+		// listen_for instructs the Lot to listen for a specific broadcast for a specific object
+		lua_pushstring( L, "listen_for" );
+		lua_pushlightuserdata( L, &eventManager );
+		lua_pushcclosure( L, &EventManager::lua_registerEvent, 1 );
+		lua_settable( L, -3 );
+
+		// stop_listening_for instructs the Lot that an object is no longer listening for this broadcast
+		lua_pushstring( L, "stop_listening_for" );
+		lua_pushlightuserdata( L, &eventManager );
+		lua_pushcclosure( L, &EventManager::lua_unregisterEvent, 1 );
+		lua_settable( L, -3 );
+
+		// broadcast instructs the Lot to wake up all objects listening for the message that is broadcasted
+		lua_pushstring( L, "broadcast" );
+		lua_pushlightuserdata( L, &eventManager );
+		lua_pushcclosure( L, &EventManager::lua_broadcastEvent, 1 );
+		lua_settable( L, -3 );
+
+		// Remember pushing the bluebear table, then lot? Stack should now have the lot table,
+		// the "lot" identifier, then the bluebear global. Go ahead and set "lot" to this table.
+		lua_settable( L, -3 );
+
+		// Pop bluebear
+		lua_pop( L, 1 );
 	}
 
 	/**
@@ -255,6 +316,10 @@ namespace BlueBear {
 					lotJSON[ "subtr" ].asInt(),
 					BlueBear::TerrainType( lotJSON[ "terrain" ].asInt() )
 				);
+
+				// Expose the lot and eventmanager methods to luasphere
+				eventManager.reset();
+				setupLotEnvironment();
 
 				// Set world ticks to the one saved in the file
 				worldTicks = lotJSON[ "ticks" ].asInt();
