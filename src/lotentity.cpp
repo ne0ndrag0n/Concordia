@@ -169,6 +169,48 @@ namespace BlueBear {
 		lua_pop( L, 2 );
 	}
 
+	/**
+	 * Registers a callback to occur on the given tick. Call this function with a table full of
+	 * arguments pushed onto the stack to pass along arguments to your callback as well. If you
+	 * don't wish to call any arguments, push nil. Either push nil, or a table, because this
+	 * function pops whatever is on the top of the stack.
+	 *
+	 * TODO: This function merely proxies into system.entity.base:register_callback. When
+	 * we're ready to make system.entity.base more of a LotEntity, this function should
+	 * serve as the only way to register a callback (and not be overridden on system.entity.base).
+	 */
+	void LotEntity::registerCallback( const std::string& callback, Tick tick ) {
+		// Arguments on system.entity.base:register_callback are (self, tick, method, wrapped_arguments)
+
+		// instance table/nil
+		lua_rawgeti( L, LUA_REGISTRYINDEX, luaVMInstance );
+
+		// register_callback() instance table/nil
+		Utility::getTableValue( L, "register_callback" );
+
+		// instance register_callback() instance table/nil
+		lua_pushvalue( L, -2 );
+
+		// tick instance register_callback() instance table/nil
+		lua_pushinteger( L, tick );
+
+		// method tick instance register_callback() instance table/nil
+		lua_pushstring( L, callback.c_str() );
+
+		// table/nil method tick instance register_callback() instance table/nil
+		lua_pushvalue( L, -6 );
+
+		// instance table/nil
+		if( lua_pcall( L, 4, 0, 0 ) ) {
+			// error instance table/nil
+			std::cout << lua_tostring( L, -1 ) << std::endl;
+			lua_pop( L, 1 );
+		}
+
+		// EMPTY
+		lua_pop( L, 2 );
+	}
+
 	void LotEntity::execute() {
 		// Push this object's table onto the API stack
 		lua_rawgeti( L, LUA_REGISTRYINDEX, luaVMInstance );

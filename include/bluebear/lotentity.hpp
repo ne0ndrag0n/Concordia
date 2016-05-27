@@ -29,6 +29,7 @@ namespace BlueBear {
 
 			void createEntityTable();
 			void deserializeEntity( const Json::Value& serialEntity );
+			void registerCallback( const std::string& callback, Tick tick );
 			void onCreate();
 			void execute();
 			char* save();
