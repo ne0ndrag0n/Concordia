@@ -308,9 +308,13 @@ namespace BlueBear {
 				// Log some basic information about the loading of the lot
 				std::cout << "[" << lotPath << "] " << "Lot revision: " << lotJSON[ "rev" ] << std::endl;
 
+				// Set world ticks to the one saved in the file
+				currentTick = lotJSON[ "ticks" ].asInt();
+
 				// Instantiate the lot
 				currentLot = std::make_shared< BlueBear::Lot >(
 					L,
+					currentTick,
 					lotJSON[ "floorx" ].asInt(),
 					lotJSON[ "floory" ].asInt(),
 					lotJSON[ "stories" ].asInt(),
@@ -323,9 +327,6 @@ namespace BlueBear {
 
 				// Expose the lot and eventmanager methods to luasphere
 				setupLotEnvironment();
-
-				// Set world ticks to the one saved in the file
-				currentTick = lotJSON[ "ticks" ].asInt();
 
 				// Clear the std::map containing all objects
 				currentLot->objects.clear();
@@ -487,7 +488,7 @@ namespace BlueBear {
 					// Execute object if it is "ok"
 					if( currentEntity.ok == true ) {
 						// currentEntity.execute should leave the stack as it was when it was called!!
-						currentEntity.execute( currentTick );
+						currentEntity.execute();
 					}
 				}
 			}

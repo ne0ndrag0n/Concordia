@@ -16,8 +16,8 @@
 
 namespace BlueBear {
 
-	Lot::Lot( lua_State* L, int floorX, int floorY, int stories, int undergroundStories, BlueBear::TerrainType terrainType ) :
-		L( L ), floorX( floorX ), floorY( floorY ), stories( stories ), undergroundStories( undergroundStories ), terrainType( terrainType ) {}
+	Lot::Lot( lua_State* L, const Tick& currentTickReference, int floorX, int floorY, int stories, int undergroundStories, BlueBear::TerrainType terrainType ) :
+		L( L ), currentTickReference( currentTickReference ), floorX( floorX ), floorY( floorY ), stories( stories ), undergroundStories( undergroundStories ), terrainType( terrainType ) {}
 
 	int Lot::lua_getLotObjects( lua_State* L ) {
 
@@ -141,7 +141,7 @@ namespace BlueBear {
 	 */
 	int Lot::createLotEntityFromJSON( const Json::Value& serialEntity ) {
 		// Simple proxy to LotEntity's JSON constructor
-		std::unique_ptr< BlueBear::LotEntity > entity = std::make_unique< BlueBear::LotEntity >( L, serialEntity );
+		std::unique_ptr< BlueBear::LotEntity > entity = std::make_unique< BlueBear::LotEntity >( L, currentTickReference, serialEntity );
 
 		if( entity->ok ) {
 			int ref = entity->luaVMInstance;
@@ -159,7 +159,7 @@ namespace BlueBear {
 	 * Create a new instance of "classID" from scratch
 	 */
 	int Lot::createLotEntity( const std::string& classID ) {
-		std::unique_ptr< BlueBear::LotEntity > entity = std::make_unique< BlueBear::LotEntity >( L, classID );
+		std::unique_ptr< BlueBear::LotEntity > entity = std::make_unique< BlueBear::LotEntity >( L, currentTickReference, classID );
 
 		// Add the pointer to our objects map if everything is A-OK
 		if( entity->ok ) {

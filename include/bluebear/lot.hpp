@@ -18,6 +18,7 @@ namespace BlueBear {
 
 		private:
 			lua_State* L;
+			const Tick& currentTickReference;
 
 		public:
 			std::map< std::string, std::unique_ptr< BlueBear::LotEntity > > objects;
@@ -27,7 +28,7 @@ namespace BlueBear {
 			int undergroundStories;
 			BlueBear::TerrainType terrainType;
 
-			Lot( lua_State* L, int floorX, int floorY, int stories, int undergroundStories, BlueBear::TerrainType terrainType );
+			Lot( lua_State* L, const Tick& currentTickReference, int floorX, int floorY, int stories, int undergroundStories, BlueBear::TerrainType terrainType );
 			int getLotObjectByCid( const std::string& cid );
 			int createLotEntity( const std::string& classID );
 			int createLotEntityFromJSON( const Json::Value& serialEntity );

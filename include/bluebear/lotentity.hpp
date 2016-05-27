@@ -15,18 +15,22 @@ namespace BlueBear {
 		private:
 			lua_State* L;
 			static Json::FastWriter writer;
+			// Don't you EVER modify this value this outside of Engine! EVER!!
+			// Read-only!! Do not TOUCH!
+			const Tick& currentTickReference;
+
 		public:
 			std::string cid;
 			bool ok = false;
 			int luaVMInstance;
 			std::string classID;
-			LotEntity( lua_State* L, const Json::Value& serialEntity );
-			LotEntity( lua_State* L, const std::string& classID );
+			LotEntity( lua_State* L, const Tick& currentTickReference, const Json::Value& serialEntity );
+			LotEntity( lua_State* L, const Tick& currentTickReference, const std::string& classID );
 
 			void createEntityTable();
 			void deserializeEntity( const Json::Value& serialEntity );
 			void onCreate();
-			void execute( Tick currentTick );
+			void execute();
 			char* save();
 			void load( char* pickledObject );
 			bool good();

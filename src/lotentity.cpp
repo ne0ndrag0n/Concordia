@@ -12,8 +12,8 @@ namespace BlueBear {
 
 	Json::FastWriter LotEntity::writer;
 
-	LotEntity::LotEntity( lua_State* L, const std::string& classID )
-		: L( L ), classID( classID ) {
+	LotEntity::LotEntity( lua_State* L, const Tick& currentTickReference, const std::string& classID )
+		: L( L ), currentTickReference( currentTickReference ), classID( classID ) {
 			createEntityTable();
 
 			// When creating a plain LotEntity (one that is not loaded from JSON)
@@ -25,8 +25,8 @@ namespace BlueBear {
 			}
 	}
 
-	LotEntity::LotEntity( lua_State* L, const Json::Value& serialEntity )
-		: L( L ), classID( serialEntity[ "classID" ].asString() ) {
+	LotEntity::LotEntity( lua_State* L, const Tick& currentTickReference, const Json::Value& serialEntity )
+		: L( L ), currentTickReference( currentTickReference ), classID( serialEntity[ "classID" ].asString() ) {
 		createEntityTable();
 		if( ok ) {
 			ok = false;
@@ -169,7 +169,7 @@ namespace BlueBear {
 		lua_pop( L, 2 );
 	}
 
-	void LotEntity::execute( Tick currentTick ) {
+	void LotEntity::execute() {
 		// Push this object's table onto the API stack
 		lua_rawgeti( L, LUA_REGISTRYINDEX, luaVMInstance );
 
@@ -179,7 +179,7 @@ namespace BlueBear {
 		Utility::getTableValue( L, "_sched" );
 
 		// Create the key we will need from currentTick
-		std::string tickKey = std::to_string( currentTick ) + ".0";
+		std::string tickKey = std::to_string( currentTickReference ) + ".0";
 
 		// Check if tickKey has an associated value in _sched
 		Utility::getTableValue( L, tickKey.c_str() );
