@@ -169,7 +169,7 @@ namespace BlueBear {
 		lua_pop( L, 2 );
 	}
 
-	void LotEntity::execute( unsigned int currentTick ) {
+	void LotEntity::execute( Tick currentTick ) {
 		// Push this object's table onto the API stack
 		lua_rawgeti( L, LUA_REGISTRYINDEX, luaVMInstance );
 
@@ -178,7 +178,7 @@ namespace BlueBear {
 		// Get the nested _sched table
 		Utility::getTableValue( L, "_sched" );
 
-		// Create the key we will need from worldTicks
+		// Create the key we will need from currentTick
 		std::string tickKey = std::to_string( currentTick ) + ".0";
 
 		// Check if tickKey has an associated value in _sched

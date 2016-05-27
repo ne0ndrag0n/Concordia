@@ -325,7 +325,7 @@ namespace BlueBear {
 				setupLotEnvironment();
 
 				// Set world ticks to the one saved in the file
-				worldTicks = lotJSON[ "ticks" ].asInt();
+				currentTick = lotJSON[ "ticks" ].asInt();
 
 				// Clear the std::map containing all objects
 				currentLot->objects.clear();
@@ -458,7 +458,7 @@ namespace BlueBear {
 	 * Where the magic happens
 	 */
 	void Engine::objectLoop() {
-		std::cout << "Starting world engine with a tick count of " << worldTicks << "\n";
+		std::cout << "Starting world engine with a tick count of " << currentTick << "\n";
 
 		// Push the bluebear global onto the stack - leave it there
 		lua_getglobal( L, "bluebear" );
@@ -467,19 +467,19 @@ namespace BlueBear {
 
 		// This outer loop is a preliminary feature, the engine shouldn't stop until it's instructed to
 		// We'll need to account for integer overflow in both here and Lua
-		while( worldTicks <= WORLD_TICKS_MAX ) {
+		while( currentTick <= WORLD_TICKS_MAX ) {
 			// Let's set up a start and end duration
 			auto startTime = std::chrono::steady_clock::now();
 			auto endTime = startTime + std::chrono::seconds( 1 );
 
-			// Complete a tick set: worldTicks up to the next time it is evenly divisible by ticksPerSecond
+			// Complete a tick set: currentTick up to the next time it is evenly divisible by ticksPerSecond
 			int ticksRemaining = ticksPerSecond;
 			while( ticksRemaining-- ) {
-				// On every tick, increment worldTicks
-				worldTicks++;
+				// On every tick, increment currentTick
+				currentTick++;
 
 				// Set current_tick on bluebear.lot (inside the Luasphere, system/root.lua) to the current tick
-				Utility::setTableIntValue( L, "current_tick", worldTicks );
+				Utility::setTableIntValue( L, "current_tick", currentTick );
 
 				for( auto& keyValuePair : currentLot->objects ) {
 					BlueBear::LotEntity& currentEntity = *( keyValuePair.second );
@@ -487,7 +487,7 @@ namespace BlueBear {
 					// Execute object if it is "ok"
 					if( currentEntity.ok == true ) {
 						// currentEntity.execute should leave the stack as it was when it was called!!
-						currentEntity.execute( worldTicks );
+						currentEntity.execute( currentTick );
 					}
 				}
 			}

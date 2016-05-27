@@ -5,6 +5,7 @@
 #include "lualib.h"
 #include "lauxlib.h"
 #include "json/json.h"
+#include "bbtypes.hpp"
 #include <string>
 
 namespace BlueBear {
@@ -25,7 +26,7 @@ namespace BlueBear {
 			void createEntityTable();
 			void deserializeEntity( const Json::Value& serialEntity );
 			void onCreate();
-			void execute( unsigned int currentTick );
+			void execute( Tick currentTick );
 			char* save();
 			void load( char* pickledObject );
 			bool good();

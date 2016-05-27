@@ -22,15 +22,15 @@ namespace BlueBear {
 			static constexpr const char* BLUEBEAR_MODPACK_DIRECTORY = "assets/modpacks/";
 			static constexpr const char* SYSTEM_MODPACK_DIRECTORY = "system/";
 			static constexpr const char* MODPACK_MAIN_SCRIPT = "obj.lua";
-			static constexpr const unsigned int WORLD_TICKS_MAX = 300;
+			static constexpr const Tick WORLD_TICKS_MAX = 300;
 
 			lua_State* L;
-			unsigned int worldTicks;
+			Tick currentTick;
+			Tick ticksPerSecond;
 			std::shared_ptr< Lot > currentLot;
 			std::unique_ptr< EventManager > eventManager;
 			const char* currentModpackDirectory;
 			std::map< std::string, BlueBear::ModpackStatus > loadedModpacks;
-			unsigned int ticksPerSecond;
 
 			void callActionOnObject( const char* playerId, const char* objectId, const char* method );
 			bool deserializeFunctionRefs();
