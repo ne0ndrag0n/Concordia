@@ -5,7 +5,6 @@
 #include "lualib.h"
 #include "lauxlib.h"
 #include "bbtypes.hpp"
-#include "lotentity.hpp"
 #include "json/json.h"
 #include <vector>
 #include <map>
@@ -13,6 +12,7 @@
 #include <memory>
 
 namespace BlueBear {
+	class LotEntity;
 
 	class Lot {
 
