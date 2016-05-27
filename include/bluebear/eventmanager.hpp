@@ -4,12 +4,13 @@
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
-#include "lot.hpp"
 #include <map>
 #include <string>
 #include <memory>
 
 namespace BlueBear {
+  class Lot;
+
   class EventManager {
 
     using EventMap = std::map< int, std::string >;

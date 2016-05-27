@@ -5,8 +5,6 @@
 #include "lualib.h"
 #include "lauxlib.h"
 #include "bbtypes.hpp"
-#include "lot.hpp"
-#include "eventmanager.hpp"
 #include <string>
 #include <memory>
 #include <vector>
@@ -14,6 +12,8 @@
 
 
 namespace BlueBear {
+	class Lot;
+	class EventManager;
 
 	class Engine {
 
