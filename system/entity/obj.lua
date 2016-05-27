@@ -1,14 +1,14 @@
 bluebear.engine.require_modpack( "class" )
-bluebear.engine.require_modpack( "object" )
+bluebear.engine.require_modpack( "serializable" )
 bluebear.engine.require_modpack( "util" )
 bluebear.engine.require_modpack( "promise" )
 bluebear.engine.require_modpack( "stemcell" )
 
-local Entity = bluebear.extend( 'system.object.base', 'system.entity.base' )
+local Entity = bluebear.extend( 'system.serializable.base', 'system.entity.base' )
 local Stemcell = bluebear.get_class( "system.stemcell" )
 
 function Entity:load( saved )
-  bluebear.get_class( 'system.object.base' ).load( self, saved )
+  bluebear.get_class( 'system.serializable.base' ).load( self, saved )
 
   local data = saved or {}
 
@@ -16,7 +16,7 @@ function Entity:load( saved )
 end
 
 function Entity:save()
-	local out = bluebear.get_class( 'system.object.base' ).save( self )
+	local out = bluebear.get_class( 'system.serializable.base' ).save( self )
 
   out._sys = self._sys
 

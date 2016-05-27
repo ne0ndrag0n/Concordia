@@ -1,5 +1,5 @@
 --[[
-  Defines the Doll entity for BlueBear (system.doll.base : system.object.base)
+  Defines the Doll entity for BlueBear (system.doll.base : system.entity.base)
 
   Requires the motives system modpack
 --]]

@@ -4,9 +4,9 @@
 --]]
 
 bluebear.engine.require_modpack( "class" )
-bluebear.engine.require_modpack( "object" )
+bluebear.engine.require_modpack( "serializable" )
 
-local Motive = bluebear.extend( 'system.object.base', 'system.motive.base' )
+local Motive = bluebear.extend( 'system.serializable.base', 'system.motive.base' )
 
 Motive.motive_name = "Root Motive"
 Motive.motive_group = "Motive Group"
@@ -14,7 +14,7 @@ Motive.decay_calls = 0
 Motive.decay_rate = 1
 
 function Motive:load( data )
-  bluebear.get_class( 'system.object.base' ).load( self, data )
+  bluebear.get_class( 'system.serializable.base' ).load( self, data )
 
   self.value = data.value
 end

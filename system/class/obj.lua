@@ -119,7 +119,7 @@ end
   Check if a given object is an instance of "identifier"
 
   @param		{String}		identifier		The identifier for the class to compare to
-  @param		{Object}		instance			An instance of at least 'system.object.base'
+  @param		{Object}		instance			
 --]]
 bluebear.instance_of = function( identifier, instance )
   local Class = bluebear.get_class( identifier )

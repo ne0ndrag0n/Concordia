@@ -7,7 +7,7 @@
 bluebear.engine.require_modpack( "middleclass" )
 bluebear.engine.require_modpack( "class" )
 
-local Object = class( 'system.object.base' )
+local Object = class( 'system.serializable.base' )
 
 function Object:load( saved )
 	local data = saved or {}
