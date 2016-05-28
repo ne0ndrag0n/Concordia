@@ -17,38 +17,35 @@ namespace BlueBear {
   }
 
   void EventManager::registerEvent( const std::string& eventKey, const std::string& cid, const std::string& callback ) {
-    int object = currentLot->getLotObjectByCid( cid );
-
-    // Can't do anything without a valid object ID
-    if( object != -1 ) {
       if( !events.count( eventKey ) ) {
         // Nested map not created
         events[ eventKey ] = EventMap();
       }
 
-      events[ eventKey ][ object ] = callback;
-    }
+      events[ eventKey ][ cid ] = callback;
   }
 
   void EventManager::unregisterEvent( const std::string& eventKey, const std::string& cid ) {
-    int object = currentLot->getLotObjectByCid( cid );
+    if( events.count( eventKey ) ) {
+      auto eventMap = events[ eventKey ];
 
-    // Can't do anything without a valid object ID
-    if( object != -1 ) {
-      if( events.count( eventKey ) ) {
-        auto eventMap = events[ eventKey ];
+      eventMap.erase( cid );
 
-        eventMap.erase( object );
-
-        // If we removed the last event in eventsMap
-        // erase the eventsMap
-        if( eventMap.size() == 0 ) {
-          events.erase( eventKey );
-        }
+      // If we removed the last event in eventsMap
+      // erase the eventsMap
+      if( eventMap.size() == 0 ) {
+        events.erase( eventKey );
       }
     }
   }
 
+  /**
+   * This function assumes you have pushed either nil or a table onto the Lua stack. This represents the "arguments"
+   * passed along to each event.
+   *
+   * If there is no callback to be called, the value will simply be popped whenever LotEntity::registerCallback
+   * is called. Therefore, these two values must be copied on the stack every time a registerCallback call is made.
+   */
   void EventManager::broadcastEvent( const std::string& eventKey ) {
     if( events.count( eventKey ) ) {
       auto listeners = events[ eventKey ];

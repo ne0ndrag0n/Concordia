@@ -13,7 +13,7 @@ namespace BlueBear {
 
   class EventManager {
 
-    using EventMap = std::map< int, std::string >;
+    using EventMap = std::map< std::string, std::string >;
 
     private:
       lua_State* L;
