@@ -211,6 +211,15 @@ namespace BlueBear {
 		lua_pop( L, 2 );
 	}
 
+	/**
+	 * Defers to the next tick. Simply call registerCallback with the next tick. All the same stuff
+	 * with pushing a nil or table applies.
+	 */
+	void LotEntity::deferCallback( const std::string& callback ) {
+		Tick nextTick = currentTickReference + 1;
+		registerCallback( callback, nextTick );
+	}
+
 	void LotEntity::execute() {
 		// Push this object's table onto the API stack
 		lua_rawgeti( L, LUA_REGISTRYINDEX, luaVMInstance );
