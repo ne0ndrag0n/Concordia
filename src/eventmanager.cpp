@@ -5,6 +5,7 @@
 #include "utility.hpp"
 #include "lot.hpp"
 #include "lotentity.hpp"
+#include <cstddef>
 #include <vector>
 #include <map>
 #include <string>
@@ -125,6 +126,34 @@ namespace BlueBear {
 	 */
 	int EventManager::lua_broadcastEvent( lua_State* L ) {
     EventManager& eventManager = *( ( EventManager* )lua_touserdata( L, lua_upvalueindex( 1 ) ) );
+
+    // The item way at the bottom of the stack has the event and should be a string
+    int arguments = lua_gettop( L );
+    if( !arguments || !lua_isstring( L, -arguments ) ) {
+      return luaL_error( L, "Did not provide an event key to broadcast()!" );
+    }
+
+    std::string eventKey = lua_tostring( L, -arguments );
+
+    // Decide whether or not we need to push a nil, or push a table packed with arguments
+    if( arguments == 1 ) {
+      // If there are no arguments, don't waste time
+      lua_pushnil( L );
+    } else {
+      // If there are arguments, package them up
+      lua_newtable( L );
+      arguments++;
+      for( int stackIndex = -arguments + 1; stackIndex != -1; stackIndex++ ) {
+        // Bring the value to the top
+        lua_pushvalue( L, stackIndex );
+
+        // Push the value onto the table below
+        lua_rawseti( L, -2, arguments + stackIndex );
+      }
+    }
+
+    // Broadcasts an async event where listeners will be executed on the next tick
+    eventManager.broadcastEvent( eventKey );
 
 		return 0;
 	}
