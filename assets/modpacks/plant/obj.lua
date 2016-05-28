@@ -117,9 +117,9 @@ function Flowers:replenish_water()
 	self:change_graphic( 0, 0, Flowers.GRAPHICS.ALIVE )
 end
 
-function Flowers:test_new_funcs()
-	--bluebear.lot.listen_for( "e", self._cid, "c" )
-	--bluebear.lot.stop_listening_for( "e", self._cid )
+function Flowers:test_trigger_listener()
+	print( self._cid.." is triggering the test_event and it is currently tick "..tostring( bluebear.engine.current_tick ) )
+	bluebear.lot.broadcast( "test_event" )
 end
 
 bluebear.register_class( Flowers )

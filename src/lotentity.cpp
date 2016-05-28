@@ -192,7 +192,7 @@ namespace BlueBear {
 		lua_pushvalue( L, -2 );
 
 		// tick instance register_callback() instance table/nil
-		lua_pushinteger( L, tick );
+		lua_pushnumber( L, ( double ) tick );
 
 		// method tick instance register_callback() instance table/nil
 		lua_pushstring( L, callback.c_str() );

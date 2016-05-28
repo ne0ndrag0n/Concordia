@@ -19,7 +19,7 @@
 								"arguments": []
 							},
 							{
-								"method": "test_new_funcs",
+								"method": "test_trigger_listener",
 								"arguments": []
 							}
 						]
@@ -37,6 +37,10 @@
 						"30.0": [
 							{
 								"method": "main",
+								"arguments": []
+							},
+							{
+								"method": "test_register_listener",
 								"arguments": []
 							}
 						]
