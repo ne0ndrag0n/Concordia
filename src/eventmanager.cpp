@@ -5,6 +5,7 @@
 #include "utility.hpp"
 #include "lot.hpp"
 #include "lotentity.hpp"
+#include <vector>
 #include <map>
 #include <string>
 #include <iostream>
@@ -50,22 +51,33 @@ namespace BlueBear {
   void EventManager::broadcastEvent( const std::string& eventKey ) {
     if( events.count( eventKey ) ) {
       auto listeners = events[ eventKey ];
+      std::vector< std::string > deletions;
 
       for( const auto& keyValuePairs : listeners ) {
         const std::string& cid = keyValuePairs.first;
         const std::string& callback = keyValuePairs.second;
 
-        // This should always succeed - if it doesn't, arguably the application is not in a stable state
-        // When a lot entity gets deleted, the deleter should cancel all its event listeners.
-        LotEntity& entity = *( currentLot->objects[ cid ] );
+        // On a global event manager, this should always succeed, but it may not succeed on an individual event manager.
+        // If it doesn't succeed, the object no longer exists, and we should simply let this drop off.
+        if( currentLot->objects.count( cid ) ) {
+          LotEntity& entity = *( currentLot->objects[ cid ] );
 
-        // Copy the item at the top of stack. It should be either table or nil, but there should have been
-        // something you put here before calling broadcastEvent. If you don't push something, the behaviour
-        // is undefined.
-        lua_pushvalue( L, -1 );
+          // Copy the item at the top of stack. It should be either table or nil, but there should have been
+          // something you put here before calling broadcastEvent. If you don't push something, the behaviour
+          // is undefined.
+          lua_pushvalue( L, -1 );
 
-        // This call will consume the copied item.
-        entity.deferCallback( callback );
+          // This call will consume the copied item.
+          entity.deferCallback( callback );
+        } else {
+          // This has to be deleted later.
+          deletions.push_back( cid );
+        }
+      }
+
+      // After we're done with that, delete what is due to be deleted (we couldn't do it *in* the loop)
+      for( std::string& deletion : deletions ) {
+        listeners.erase( deletion );
       }
     }
 
