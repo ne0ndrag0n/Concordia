@@ -5,6 +5,7 @@
 #include "utility.hpp"
 #include "lot.hpp"
 #include "lotentity.hpp"
+#include "json/json.h"
 #include <cstddef>
 #include <vector>
 #include <map>
@@ -84,6 +85,26 @@ namespace BlueBear {
 
     // Remember that nil or table that you pushed?
     lua_pop( L, 1 );
+  }
+
+  /**
+   * Create the EventManager state from a serialised EventManager. Easy enough, we store them in a map format similar to how
+   * you'd otherwise represent it in JSON.
+   */
+  void EventManager::load( Json::Value& serializedEventManager ) {
+    // top level: event: callbackset, event: callbackset, ...
+    for( Json::Value::iterator jsonIterator = serializedEventManager.begin(); jsonIterator != serializedEventManager.end(); ++jsonIterator ) {
+      std::string eventKey = jsonIterator.key().asString();
+      Json::Value eventMap = *jsonIterator;
+
+      // second level: instance: callback, instance: callback, ...
+      for( Json::Value::iterator innerIterator = eventMap.begin(); innerIterator != eventMap.end(); ++innerIterator ) {
+        std::string cid = innerIterator.key().asString();
+        std::string callback = ( *innerIterator ).asString();
+
+        registerEvent( eventKey, cid, callback );
+      }
+    }
   }
 
   /**

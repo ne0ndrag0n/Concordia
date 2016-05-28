@@ -20,11 +20,6 @@ function TrashPile:load( saved )
 	self.stink = saved.stink
 end
 
-function TrashPile:test_register_listener()
-	bluebear.lot.listen_for( "test_event", self._cid, "test_callback" )
-	print( "Registered test_event callback on "..self._cid )
-end
-
 function TrashPile:test_callback()
 	print( "Instance "..self._cid.." had callback triggered successfully at tick "..tostring( bluebear.engine.current_tick ) )
 end

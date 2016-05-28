@@ -4,6 +4,7 @@
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
+#include "json/json.h"
 #include <map>
 #include <string>
 #include <memory>
@@ -26,6 +27,8 @@ namespace BlueBear {
       void registerEvent( const std::string& eventKey, const std::string& cid, const std::string& callback );
       void unregisterEvent( const std::string& eventKey, const std::string& cid );
       void broadcastEvent( const std::string& eventKey );
+      Json::Value save();
+      void load( Json::Value& serializedEventManager );
 
       static int lua_registerEvent( lua_State* L );
       static int lua_unregisterEvent( lua_State* L );
