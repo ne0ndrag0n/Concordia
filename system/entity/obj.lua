@@ -13,6 +13,11 @@ function Entity:load( saved )
   local data = saved or {}
 
   self._sys = data._sys
+
+  -- deserialise for event manager
+  if type( data._events ) == 'table' then
+    self.event_manager.load( data._events )
+  end
 end
 
 function Entity:save()

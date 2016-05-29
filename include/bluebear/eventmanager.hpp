@@ -30,6 +30,8 @@ namespace BlueBear {
       Json::Value save();
       void load( Json::Value& serializedEventManager );
 
+      static int lua_save( lua_State* L );
+      static int lua_load( lua_State* L );
       static int lua_registerEvent( lua_State* L );
       static int lua_unregisterEvent( lua_State* L );
       static int lua_broadcastEvent( lua_State* L );

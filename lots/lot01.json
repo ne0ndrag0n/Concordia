@@ -27,7 +27,18 @@
 								"method": "test_trigger_listener",
 								"arguments": []
 							}
+						],
+						"120.0": [
+							{
+								"method": "test_trigger_listener_on_self",
+								"arguments": []
+							}
 						]
+					}
+				},
+				"_events": {
+					"test_event_on_myself": {
+						"bb2": "test_callback_individual"
 					}
 				},
 				"water_level": 100

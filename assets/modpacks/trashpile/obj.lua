@@ -24,4 +24,8 @@ function TrashPile:test_callback()
 	print( "Instance "..self._cid.." had callback triggered successfully at tick "..tostring( bluebear.engine.current_tick ) )
 end
 
+function TrashPile:test_callback_individual()
+	print( "Instance "..self._cid.." was listening to bb1 and got triggered from that object successfully, tick is "..tostring( bluebear.engine.current_tick ) )
+end
+
 bluebear.register_class( TrashPile )

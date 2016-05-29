@@ -122,4 +122,9 @@ function Flowers:test_trigger_listener()
 	bluebear.lot.broadcast( "test_event" )
 end
 
+function Flowers:test_trigger_listener_on_self()
+	print( self._cid.." is triggering test_event_on_myself on itself to bug the trashpile...and it is now tick "..tostring( bluebear.engine.current_tick ) )
+	self.event_manager.broadcast( "test_event_on_myself" )
+end
+
 bluebear.register_class( Flowers )

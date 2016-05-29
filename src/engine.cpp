@@ -262,7 +262,7 @@ namespace BlueBear {
 					// stemcell
 					lua_settable( L, -3 );
 
-					// Transform the stemcell to an EventMAnager
+					// Transform the stemcell to an EventManager
 					lua_pushstring( L, "listen_for" );
 					lua_pushlightuserdata( L, *userdata );
 					lua_pushcclosure( L, &EventManager::lua_registerEvent, 1 );
@@ -276,6 +276,11 @@ namespace BlueBear {
 					lua_pushstring( L, "broadcast" );
 					lua_pushlightuserdata( L, *userdata );
 					lua_pushcclosure( L, &EventManager::lua_broadcastEvent, 1 );
+					lua_settable( L, -3 );
+
+					lua_pushstring( L, "load" );
+					lua_pushlightuserdata( L, *userdata );
+					lua_pushcclosure( L, &EventManager::lua_load, 1 );
 					lua_settable( L, -3 );
 
 				} else {

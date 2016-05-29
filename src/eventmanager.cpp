@@ -108,6 +108,50 @@ namespace BlueBear {
   }
 
   /**
+   * load( table )
+   */
+   int EventManager::lua_load( lua_State* L ) {
+     EventManager& eventManager = *( ( EventManager* )lua_touserdata( L, lua_upvalueindex( 1 ) ) );
+
+     // Here, we'll need to leverage the JSON lib to convert the lua table provided to JSON, then
+     // convert that string representation to a Json::Value and hand that into eventManager.load
+
+     // table
+     if( lua_istable( L, -1 ) ) {
+       // JSON table
+       lua_getglobal( L, "JSON" );
+
+       // encode() JSON table
+       Utility::getTableValue( L, "encode" );
+
+       // JSON encode() JSON table
+       lua_pushvalue( L, -2 );
+
+       // table JSON encode() JSON table
+       lua_pushvalue( L, -4 );
+
+       if( !lua_pcall( L, 2, 1, 0 ) ) {
+         // "table as json string" JSON table
+         // just a test for now...
+         Json::Value json;
+         static Json::Reader reader;
+         if( reader.parse( lua_tostring( L, -1 ), json ) ) {
+           eventManager.load( json );
+         } else {
+           return luaL_error( L, "EventManager: Failed to parse JSON for serialised EventManager." );
+         }
+       } else {
+         // error JSON table
+         return luaL_error( L, "EventManager: Failed to convert table to JSON: %s", lua_tostring( L, -1 ) );
+       }
+     } else {
+       return luaL_error( L, "EventManager: Did not provide a valid serialised instance to load()!" );
+     }
+
+     return 0;
+   }
+
+  /**
    * listen_for( "fully-qualified-event-key", self._cid, "func_name" )
    */
   int EventManager::lua_registerEvent( lua_State* L ) {
