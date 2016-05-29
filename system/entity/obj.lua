@@ -146,6 +146,21 @@ function Entity:animate( sequence )
 end
 
 --[[
+  Proxy to self.event_manager
+--]]
+function Entity:listen_for( event, instance, callback )
+  return self.event_manager.listen_for( event, instance._cid, callback )
+end
+
+function Entity:stop_listenening_for( event, instance )
+  return self.event_manger.stop_listening_for( event, instance._cid )
+end
+
+function Entity:trigger( event, ... )
+  return self.event_manager.broadcast( event, ... )
+end
+
+--[[
   Provide interfaces for objects placed on a lot
 --]]
 function Entity:on_create()
