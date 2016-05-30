@@ -1,6 +1,7 @@
 #!/bin/bash
 g++ -std=c++14 -g -rdynamic \
 include/json/jsoncpp.cpp \
+src/log.cpp \
 src/utility.cpp \
 src/lotentity.cpp \
 src/eventmanager.cpp \
