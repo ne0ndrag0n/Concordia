@@ -1,5 +1,8 @@
 #include "configmanager.hpp"
 
+#include "lua.h"
+#include "lualib.h"
+#include "lauxlib.h"
 #include "json/json.h"
 #include <iostream>
 #include <fstream>
@@ -40,5 +43,24 @@ namespace BlueBear {
 
   int ConfigManager::getIntValue( const std::string& key ) {
     return configRoot[ key ].asInt();
+  }
+
+  /**
+   * Get a value. This always returns a string. If you want an int, use to_number
+   * inside lua.
+   */
+  int ConfigManager::lua_getValue( lua_State* L ) {
+    // Linker errors when using the singleton directly, I don't know why.
+    ConfigManager& self = *( ( ConfigManager* )lua_touserdata( L, lua_upvalueindex( 1 ) ) );
+
+    if( lua_isstring( L, -1 ) ) {
+      std::string key = lua_tostring( L, -1 );
+
+      lua_pushstring( L, self.getValue( key ).c_str() );
+
+      return 1;
+    } else {
+      return luaL_error( L, "ConfigManager: Failed to provide a string key." );
+    }
   }
 }

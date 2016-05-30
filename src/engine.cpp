@@ -62,6 +62,19 @@ namespace BlueBear {
 		// Set the engine table on "bluebear"
 		lua_settable( L, -3 );
 
+		// bluebear.config
+		lua_pushstring( L, "config" );
+		lua_newtable( L );
+
+		// bluebear.config.get_value
+		lua_pushstring( L, "get_value" );
+		lua_pushlightuserdata( L, &( ConfigManager::getInstance() ) );
+		lua_pushcclosure( L, &ConfigManager::lua_getValue, 1 );
+		lua_settable( L, -3 );
+
+		// Set the config table on "bluebear"
+		lua_settable( L, -3 );
+
 		// Set the table as "bluebear"
 		lua_setglobal( L, "bluebear" );
 
