@@ -55,8 +55,14 @@ namespace BlueBear {
 
     if( lua_isstring( L, -1 ) ) {
       std::string key = lua_tostring( L, -1 );
+      std::string result = self.getValue( key );
 
-      lua_pushstring( L, self.getValue( key ).c_str() );
+      if( result == "" ) {
+        // Looked up an invalid key
+        lua_pushnil( L );
+      } else {
+        lua_pushstring( L, result.c_str() );
+      }
 
       return 1;
     } else {
