@@ -6,11 +6,6 @@
 	"subtr": 0,
 	"terrain": 1,
 	"ticks": 10,
-	"global_events": {
-		"test_event": {
-			"bb2": "test_callback"
-		}
-	},
 	"entities": [
 		{
 			"classID": "game.flowers.base",

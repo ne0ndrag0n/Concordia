@@ -342,7 +342,9 @@ namespace BlueBear {
 
 				// Setup global event manager
 				eventManager = std::make_unique< BlueBear::EventManager >( L, currentLot );
-				eventManager->load( lotJSON[ "global_events" ] );
+				if( lotJSON.isMember( "global_events" ) ) {
+					eventManager->load( lotJSON[ "global_events" ] );
+				}
 
 				// Expose the lot and eventmanager methods to luasphere
 				setupLotEnvironment();
