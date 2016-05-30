@@ -117,14 +117,9 @@ function Flowers:replenish_water()
 	self:change_graphic( 0, 0, Flowers.GRAPHICS.ALIVE )
 end
 
-function Flowers:test_trigger_listener()
-	print( self._cid.." is triggering the test_event and it is currently tick "..tostring( bluebear.engine.current_tick ) )
-	bluebear.lot.broadcast( "test_event" )
-end
-
-function Flowers:test_trigger_listener_on_self()
-	print( self._cid.." is triggering test_event_on_myself on itself to bug the trashpile...and it is now tick "..tostring( bluebear.engine.current_tick ) )
-	self:trigger( "test_event_on_myself" )
+function Flowers:test_config()
+	local ticks_per_second = bluebear.config.get_value( "ticks_per_second" )
+	print( ticks_per_second )
 end
 
 bluebear.register_class( Flowers )

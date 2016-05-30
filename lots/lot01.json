@@ -19,13 +19,7 @@
 								"arguments": []
 							},
 							{
-								"method": "test_trigger_listener",
-								"arguments": []
-							}
-						],
-						"120.0": [
-							{
-								"method": "test_trigger_listener_on_self",
+								"method": "test_config",
 								"arguments": []
 							}
 						]
