@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
 
 namespace BlueBear {
 
@@ -13,8 +14,15 @@ namespace BlueBear {
   class Log {
 
     private:
+      static constexpr const char* ANSI_RESET = "\033[0m";
+      static constexpr const char* ANSI_RED = "\033[31m";
+      static constexpr const char* ANSI_YELLOW = "\033[33m";
+      static constexpr const char* ANSI_BLUE = "\033[36m";
+
       enum class LogMode { CONSOLE, FILE, BOTH };
       enum class LogLevel { DEBUG, INFO, WARN, ERROR };
+      static std::map< LogLevel, std::string > Colors;
+      static std::map< LogLevel, std::string > StringTypes;
 
       struct LogMessage {
         std::string tag;

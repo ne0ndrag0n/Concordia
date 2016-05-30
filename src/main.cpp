@@ -2,10 +2,11 @@
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
+#include "log.hpp"
 #include <iostream>
 
 int main() {
-	std::cout << "BlueBear v0.0.1 (c) 2015-2016 ne0ndrag0n" << std::endl;
+	BlueBear::Log::getInstance().info( "Main", "BlueBear ET2 (c) 2015-2016 ne0ndrag0n" );
 
 	BlueBear::Engine engine;
 
