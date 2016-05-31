@@ -9,7 +9,7 @@ namespace BlueBear {
   Log::Log() {}
 
   std::map< Log::LogLevel, std::string > Log::Colors = {
-    { LogLevel::DEBUG, std::string( Log::ANSI_RESET ) },
+    { LogLevel::DEBUG, std::string( Log::ANSI_GREEN ) },
     { LogLevel::INFO, std::string( Log::ANSI_BLUE ) },
     { LogLevel::WARN, std::string( Log::ANSI_YELLOW ) },
     { LogLevel::ERROR, std::string( Log::ANSI_RED ) }

@@ -18,6 +18,7 @@ namespace BlueBear {
       static constexpr const char* ANSI_RED = "\033[31m";
       static constexpr const char* ANSI_YELLOW = "\033[33m";
       static constexpr const char* ANSI_BLUE = "\033[36m";
+      static constexpr const char* ANSI_GREEN = "\033[32m";
 
       enum class LogMode { CONSOLE, FILE, BOTH };
       enum class LogLevel { DEBUG, INFO, WARN, ERROR };
