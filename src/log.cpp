@@ -1,4 +1,5 @@
 #include "log.hpp"
+#include "configmanager.hpp"
 #include <string>
 #include <map>
 #include <iomanip>
@@ -6,7 +7,10 @@
 
 namespace BlueBear {
 
-  Log::Log() {}
+  Log::Log() {
+    // The ConfigManager can now never ever log anything
+    minimumReportableLevel = ( LogLevel )ConfigManager::getInstance().getIntValue( "min_log_level" );
+  }
 
   std::map< Log::LogLevel, std::string > Log::Colors = {
     { LogLevel::DEBUG, std::string( Log::ANSI_GREEN ) },
@@ -25,12 +29,14 @@ namespace BlueBear {
   void Log::out( const LogMessage& message ) {
     messages.push_back( message );
 
-    // sucks
-    if( mode == LogMode::CONSOLE || mode == LogMode::BOTH ) {
-      outToConsole( message );
-    }
-    if( mode == LogMode::FILE || mode == LogMode::BOTH ) {
-      outToFile( message );
+    if( message.level >= minimumReportableLevel ) {
+      // sucks
+      if( mode == LogMode::CONSOLE || mode == LogMode::BOTH ) {
+        outToConsole( message );
+      }
+      if( mode == LogMode::FILE || mode == LogMode::BOTH ) {
+        outToFile( message );
+      }
     }
   }
 

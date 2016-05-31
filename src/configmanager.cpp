@@ -4,7 +4,6 @@
 #include "lualib.h"
 #include "lauxlib.h"
 #include "json/json.h"
-#include "log.hpp"
 #include <iostream>
 #include <fstream>
 
@@ -16,6 +15,7 @@ namespace BlueBear {
    */
   ConfigManager::ConfigManager() {
     configRoot[ "ticks_per_second" ] = 30;
+    configRoot[ "min_log_level" ] = 0;
 
     // Load settings.json from file
     std::ifstream settingsFile( SETTINGS_PATH );
@@ -29,8 +29,6 @@ namespace BlueBear {
         // BARF
         Json::Value key = jsonIterator.key();
         Json::Value value = *jsonIterator;
-
-        Log::getInstance().info( "ConfigManager", "Overriding settings default [" + key.asString() + "] " + value.asString() );
 
         // Store every value as a string because strong typing is a PITA
         configRoot[ key.asString() ] = value;
