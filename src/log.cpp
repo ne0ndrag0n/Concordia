@@ -4,12 +4,15 @@
 #include <map>
 #include <iomanip>
 #include <ctime>
+#include <fstream>
 
 namespace BlueBear {
 
   Log::Log() {
     // The ConfigManager can now never ever log anything
     minimumReportableLevel = ( LogLevel )ConfigManager::getInstance().getIntValue( "min_log_level" );
+    logFile.open( ConfigManager::getInstance().getValue( "logfile_path" ), std::ios_base::app );
+    logFile << std::endl;
   }
 
   std::map< Log::LogLevel, std::string > Log::Colors = {
@@ -54,7 +57,10 @@ namespace BlueBear {
   }
 
   void Log::outToFile( const LogMessage& message ) {
-    // STUB !!
+    auto time = std::time( nullptr );
+    auto localtime = *std::localtime( &time );
+
+    logFile << "(" << Log::StringTypes[ message.level ] << ") " << std::put_time( &localtime, "%Y-%m-%d %H:%M:%S: " ) << "[" << message.tag << "] " << message.message << std::endl;
   }
 
   void Log::debug( const std::string& tag, const std::string& message ) {
