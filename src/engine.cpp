@@ -538,6 +538,11 @@ namespace BlueBear {
 			 Log::getInstance().debug( "LuaScript", lua_tostring( L, -1 ) );
 		 }
 
+		 // print( "tag", "message" )
+		 else if( numArgs == 2 ) {
+			 Log::getInstance().debug( lua_tostring( L, -2 ), lua_tostring( L, -1 ) );
+		 }
+
 		 return 0;
 	 }
 

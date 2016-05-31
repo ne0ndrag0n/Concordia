@@ -121,7 +121,7 @@ end
   to adjust.
 --]]
 function Doll:update_motive( motive_id, value )
-  print( "Updating motive "..motive_id )
+  print( Doll.name, "Updating motive "..motive_id )
   local motive = self.motives[ motive_id ]
 
   if motive then
@@ -149,7 +149,7 @@ function Doll:change_state( new_state )
   -- Therefore, remove it
   if new_state == Doll.STATES.IDLE then
     -- Remove the element furthest in the queue
-    print( "Removing interaction "..tostring( self.interaction_queue[1] ) )
+    print( Doll.name, "Removing interaction "..tostring( self.interaction_queue[1] ) )
     table.remove( self.interaction_queue, 1 )
   else
     local state_transition = Doll.STATE_TRANSITIONS[ new_state ]
@@ -172,7 +172,7 @@ function Doll:enqueue_interaction( entity, interaction )
     interaction = interaction
   }
 
-  print( "Enqueueing interaction table "..tostring( queued_interaction ) )
+  print( Doll.name, "Enqueueing interaction table "..tostring( queued_interaction ) )
   table.insert( self.interaction_queue, queued_interaction )
 end
 
@@ -226,7 +226,7 @@ end
   and replace it with an urn entity.
 --]]
 function Doll:kill()
-  print( "Doll died!" )
+  print( Doll.name, "Doll died!" )
   -- TODO
 end
 

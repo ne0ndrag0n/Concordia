@@ -35,7 +35,6 @@ local Flowers = bluebear.extend( "system.entity.base", "game.flowers.base", {
 				-- walk_to returns a promise that makes a request to the C++ Engine to find a path. Engine
 				-- will use a thread pool to find the path, and the callback will be fired on the tick
 				-- that is after the current tick when the thread pool task completes.
-				print( "Prepare" )
 				doll:walk_to( object ):then_call( 'change_state', Doll.STATES.INTERACTING )
 			end,
 			-- This function is called once when the interacting doll switches its state to Doll.STATES.INTERACTING
@@ -49,7 +48,6 @@ local Flowers = bluebear.extend( "system.entity.base", "game.flowers.base", {
 				-- After those animations are played, call the replenish_water method which will increase the water_level
 				-- back to 100 and then change the object frame to healthy plants if necessary. After *that* completes,
 				-- call change_state on the doll to CONCLUDING to give the doll its reward
-				print( "Interact" )
 				doll:animate( Doll.ANIMATIONS.WATERING_CAN )
 					:then_call_on( object, 'replenish_water' )
 					:then_call( 'change_state', Doll.STATES.CONCLUDING )
@@ -60,7 +58,6 @@ local Flowers = bluebear.extend( "system.entity.base", "game.flowers.base", {
 			conclude = function( doll, object )
 				-- Reward the user with a few small points of belonging. Notice how the advertised belonging (see below)
 				-- can differ from the actual belonging rewarded.
-				print( "Conclude" )
 				doll:update_motive( 'game.motive.emotion.belonging', 5 )
 				doll:change_state( Doll.STATES.IDLE )
 			end,
@@ -100,7 +97,7 @@ function Flowers:main()
 		self.water_level = self.water_level - 10
 	end
 
-	print( "Hello from Lua! I am object instance ("..self._cid..") and my water level is now "..self.water_level )
+	print( Flowers.name, "Hello from Lua! I am object instance ("..self._cid..") and my water level is now "..self.water_level )
 
 	self:sleep( bluebear.util.time.minutes_to_ticks( 5 ) ):then_call( 'main' )
 end
@@ -112,14 +109,14 @@ function Flowers:load( saved )
 end
 
 function Flowers:replenish_water()
-	print( "Replenishing water" )
+	print( Flowers.name, "Replenishing water" )
 	self.water_level = 100
 	self:change_graphic( 0, 0, Flowers.GRAPHICS.ALIVE )
 end
 
 function Flowers:test_config()
 	local ticks_per_second = bluebear.config.get_value( "ticks_per_second" )
-	print( ticks_per_second )
+	print( Flowers.name, ticks_per_second )
 end
 
 bluebear.register_class( Flowers )

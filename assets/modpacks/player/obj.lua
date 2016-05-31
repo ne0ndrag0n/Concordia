@@ -11,7 +11,7 @@ local Player = bluebear.extend( 'system.doll.base', 'game.doll.player' )
 
 -- debug stuff
 function Player:decay_my_motives()
-  print( 'Hello from Lua! I am doll ('..self._cid..') and I am decaying my motives!' )
+  print( Player.name, 'Hello from Lua! I am doll ('..self._cid..') and I am decaying my motives!' )
 
   bluebear.get_class( 'system.doll.base' ).decay_my_motives( self )
 end

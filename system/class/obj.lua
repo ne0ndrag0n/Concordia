@@ -18,7 +18,7 @@ bluebear.register_class = function( Class )
 	local id = bluebear.util.split( Class.name, '.' )
 
 	if #id == 0 then
-		print( "Could not load class  \""..Class.name.."\": Invalid identifier!" )
+		print( "bluebear.register_class", "Could not load class  \""..Class.name.."\": Invalid identifier!" )
 		return false
 	end
 
@@ -41,7 +41,7 @@ bluebear.register_class = function( Class )
 
 	currentObject[ id[ #id ] ] = Class
 
-	print( "Registered class "..Class.name )
+	print( "bluebear.register_class", "Registered class "..Class.name )
 end
 
 bluebear.get_class = function( identifier )
@@ -119,7 +119,7 @@ end
   Check if a given object is an instance of "identifier"
 
   @param		{String}		identifier		The identifier for the class to compare to
-  @param		{Object}		instance			
+  @param		{Object}		instance
 --]]
 bluebear.instance_of = function( identifier, instance )
   local Class = bluebear.get_class( identifier )
