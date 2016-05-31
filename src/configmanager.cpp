@@ -4,6 +4,7 @@
 #include "lualib.h"
 #include "lauxlib.h"
 #include "json/json.h"
+#include "log.hpp"
 #include <iostream>
 #include <fstream>
 
@@ -29,7 +30,7 @@ namespace BlueBear {
         Json::Value key = jsonIterator.key();
         Json::Value value = *jsonIterator;
 
-        std::cout << "ConfigManager: Overriding settings default [" << key << "] " << value << std::endl;
+        Log::getInstance().info( "ConfigManager", "Overriding settings default [" + key.asString() + "] " + value.asString() );
 
         // Store every value as a string because strong typing is a PITA
         configRoot[ key.asString() ] = value;

@@ -8,6 +8,7 @@
 #include "engine.hpp"
 #include "configmanager.hpp"
 #include "eventmanager.hpp"
+#include "log.hpp"
 #include "json/json.h"
 #include <iterator>
 #include <string>
@@ -202,7 +203,7 @@ namespace BlueBear {
 		// dofile pointed to by path
 		if( luaL_dofile( L, path.c_str() ) ) {
 			// Exception occurred during the integration of this modpack
-			std::cout << "Failed to integrate modpack " << name << ": " << lua_tostring( L, -1 ) << std::endl;
+			Log::getInstance().error( "Engine::loadModpack", "Failed to integrate modpack " + name + ": " + lua_tostring( L, -1 ) );
 			lua_pop( L, 1 );
 			loadedModpacks[ name ] = BlueBear::ModpackStatus::LOAD_FAILED;
 			return false;
@@ -324,7 +325,7 @@ namespace BlueBear {
 			// If parse was successful, begin loading the lot
 			if( parseSuccessful ) {
 				// Log some basic information about the loading of the lot
-				std::cout << "[" << lotPath << "] " << "Lot revision: " << lotJSON[ "rev" ] << std::endl;
+				Log::getInstance().info( "Engine::loadLot", "[" + std::string( lotPath ) + "] Lot revision: " + lotJSON[ "rev" ].asString() );
 
 				// Set world ticks to the one saved in the file
 				currentTick = lotJSON[ "ticks" ].asInt();
@@ -360,12 +361,12 @@ namespace BlueBear {
 				// After the lot has all its LotEntities loaded, let's fix those serialized function references
 				if( !deserializeFunctionRefs() ) {
 					// If we're not able to deserialise a function ref, this lot is broken, and cannot be used
-					std::cout << "Unable to load lot " << lotPath << " : This lot contains a missing entity" << std::endl;
+					Log::getInstance().error( "Engine::loadLot", "Unable to load lot " + std::string( lotPath ) + ": This lot contains a missing entity." );
 					return false;
 				}
 			}
 		} else {
-			std::cout << "Unable to load lot: " << lotPath << std::endl;
+			Log::getInstance().error( "Engine::loadLot", "Unable to parse " + std::string( lotPath ) );
 			return false;
 		}
 
@@ -480,7 +481,7 @@ namespace BlueBear {
 	 * Where the magic happens
 	 */
 	void Engine::objectLoop() {
-		std::cout << "Starting world engine with a tick count of " << currentTick << "\n";
+		Log::getInstance().debug( "Engine::objectLoop", "Starting world engine with a tick count of " + std::to_string( currentTick ) );
 
 		// Push the bluebear global onto the stack - leave it there
 		lua_getglobal( L, "bluebear" );
@@ -519,7 +520,7 @@ namespace BlueBear {
 			std::this_thread::sleep_until( endTime );
 		}
 
-		std::cout << "Finished!" << std::endl;
+		Log::getInstance().debug( "Engine::objectLoop", "Finished!" );
 	}
 
 	/**

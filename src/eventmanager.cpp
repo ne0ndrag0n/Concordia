@@ -5,6 +5,7 @@
 #include "utility.hpp"
 #include "lot.hpp"
 #include "lotentity.hpp"
+#include "log.hpp"
 #include "json/json.h"
 #include <cstddef>
 #include <vector>
@@ -229,7 +230,7 @@ namespace BlueBear {
    int EventManager::lua_gc( lua_State* L ) {
      EventManager** eventManager = ( EventManager** )lua_touserdata( L, 1 );
      delete *eventManager;
-     std::cout << "Garbage collected an EventManager object" << std::endl;
+     Log::getInstance().debug( "EventManager::lua_gc", "Garbage collected an EventManager object" );
      return 0;
    }
 

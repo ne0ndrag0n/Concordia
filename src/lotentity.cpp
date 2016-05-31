@@ -3,6 +3,7 @@
 #include "lualib.h"
 #include "lauxlib.h"
 #include "utility.hpp"
+#include "log.hpp"
 #include "json/json.h"
 #include <iostream>
 #include <cstring>
@@ -50,7 +51,7 @@ namespace BlueBear {
 
 		if( lua_pcall( L, 1, 0, 0 ) != 0 ) {
 			// error instance
-			std::cout << lua_tostring( L, -1 ) << std::endl;
+			Log::getInstance().error( "LotEntity::onCreate", std::string( lua_tostring( L, -1 ) ) );
 		} else {
 			// instance
 
@@ -101,11 +102,12 @@ namespace BlueBear {
 				lua_pop( L, 2 );
 			} else {
 				// error instance Class bluebear
-				std::cout << lua_tostring( L, -1 ) << std::endl;
+				Log::getInstance().error( "LotEntity::createEntityTable", std::string( lua_tostring( L, -1 ) ) );
 				lua_pop( L, 4 );
 			}
 		} else {
-			std::cout << "Could not find class " << classID << std::endl;
+			Log::getInstance().error( "LotEntity::createEntityTable", "Could not find class " + classID );
+
 			lua_pop( L, 2 );
 		}
 	}
@@ -146,7 +148,8 @@ namespace BlueBear {
 			lua_remove( L, -2 );
 		} else {
 			// error JSON instance <load> instance
-			std::cout << "Problem deserialising using Lua JSON lib on " << classID << std::endl;
+			Log::getInstance().error( "LotEntity::deserializeEntity", "Problem deserialising using Lua JSON lib on " + classID );
+
 			lua_pop( L, 5 );
 			return;
 		}
@@ -162,7 +165,7 @@ namespace BlueBear {
 			}
 		} else {
 			// error instance
-			std::cout << lua_tostring( L, -1 ) << std::endl;
+			Log::getInstance().error( "LotEntity::deserializeEntity", std::string( lua_tostring( L, -1 ) ) );
 		}
 
 		// EMPTY
@@ -203,7 +206,7 @@ namespace BlueBear {
 		// instance table/nil
 		if( lua_pcall( L, 4, 0, 0 ) ) {
 			// error instance table/nil
-			std::cout << lua_tostring( L, -1 ) << std::endl;
+			Log::getInstance().error( "LotEntity::registerCallback", std::string( lua_tostring( L, -1 ) ) );
 			lua_pop( L, 1 );
 		}
 
@@ -283,7 +286,8 @@ namespace BlueBear {
 				// g. Call that sumbitch!
 				if( lua_pcall( L, totalArguments, 0, 0 ) != 0 ) {
 					// We only get here if the function bombs out
-					std::cout << "Error in lot entity: " << lua_tostring( L, -1 ) << std::endl;
+					Log::getInstance().error( "LotEntity::execute", "Error in lot entity: " + std::string( lua_tostring( L, -1 ) ) );
+
 					lua_pop( L, 1 );
 
 					ok = false;
