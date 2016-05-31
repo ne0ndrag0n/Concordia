@@ -79,6 +79,9 @@ namespace BlueBear {
 		// Set the table as "bluebear"
 		lua_setglobal( L, "bluebear" );
 
+		// Override the default print function
+		lua_register( L, "print", &Engine::lua_print );
+
 		// Integrate system modpacks
 		if( !loadModpackSet( SYSTEM_MODPACK_DIRECTORY ) ) {
 			return false;
@@ -522,6 +525,21 @@ namespace BlueBear {
 
 		Log::getInstance().debug( "Engine::objectLoop", "Finished!" );
 	}
+
+	/**
+	 * Overrides the default Lua print() function to go through the logger
+	 */
+	 int Engine::lua_print( lua_State* L ) {
+
+		 int numArgs = lua_gettop( L );
+
+		 // print( "message" )
+		 if( numArgs == 1 ) {
+			 Log::getInstance().debug( "LuaScript", lua_tostring( L, -1 ) );
+		 }
+
+		 return 0;
+	 }
 
 	/**
 	 * Given the cid of a player, the cid of an object, and its desired action, call the action method on the LotEntity
