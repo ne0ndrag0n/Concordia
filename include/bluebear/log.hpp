@@ -41,8 +41,9 @@ namespace BlueBear {
       Log( Log const& );
       void operator=( Log const& );
       void out( const LogMessage& message );
-      void outToConsole( const LogMessage& message );
-      void outToFile( const LogMessage& message );
+      void outToConsole( const std::string& text );
+      void outToFile( const std::string& text );
+      std::string messageToString( const LogMessage& message, bool accent );
 
     public:
       static Log& getInstance() {

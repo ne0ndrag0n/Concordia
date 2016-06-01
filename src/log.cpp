@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <ctime>
 #include <fstream>
+#include <sstream>
 
 namespace BlueBear {
 
@@ -35,32 +36,39 @@ namespace BlueBear {
     if( message.level >= minimumReportableLevel ) {
       // sucks
       if( mode == LogMode::CONSOLE || mode == LogMode::BOTH ) {
-        outToConsole( message );
+        outToConsole( messageToString( message, true ) );
       }
       if( mode == LogMode::FILE || mode == LogMode::BOTH ) {
-        outToFile( message );
+        outToFile( messageToString( message, false ) );
       }
     }
   }
 
-  void Log::outToConsole( const LogMessage& message ) {
-    auto time = std::time( nullptr );
-    auto localtime = *std::localtime( &time );
-
-    //(i)[EventManager] 2016-01-01 23:59:59: Event Noted
-    // LOOK AT THIS FUCKING DISASTER!
-    #ifdef _WIN32
-      std::cout << "(" << Log::StringTypes[ message.level ] << ") " << std::put_time( &localtime, "%Y-%m-%d %H:%M:%S: " ) << "[" << message.tag << "] " << message.message << std::endl;
-    #else
-      std::cout << Log::Colors[ message.level ] << "(" << Log::StringTypes[ message.level ] << ") " << std::put_time( &localtime, "%Y-%m-%d %H:%M:%S: " ) << Log::ANSI_RESET << "[" << message.tag << "] " << message.message << std::endl;
-    #endif
+  void Log::outToConsole( const std::string& text ) {
+    std::cout << text << std::endl;
   }
 
-  void Log::outToFile( const LogMessage& message ) {
+  void Log::outToFile( const std::string& text ) {
+    logFile << text << std::endl;
+  }
+
+  std::string Log::messageToString( const LogMessage& message, bool accent ) {
     auto time = std::time( nullptr );
     auto localtime = *std::localtime( &time );
+    std::stringstream stream;
 
-    logFile << "(" << Log::StringTypes[ message.level ] << ") " << std::put_time( &localtime, "%Y-%m-%d %H:%M:%S: " ) << "[" << message.tag << "] " << message.message << std::endl;
+    if( accent ) {
+      #ifdef _WIN32
+        // TODO: MS-DOS console colors
+        stream << "(" << Log::StringTypes[ message.level ] << ") " << std::put_time( &localtime, "%Y-%m-%d %H:%M:%S: " ) << "[" << message.tag << "] " << message.message;
+      #else
+        stream << Log::Colors[ message.level ] << "(" << Log::StringTypes[ message.level ] << ") " << std::put_time( &localtime, "%Y-%m-%d %H:%M:%S: " ) << Log::ANSI_RESET << "[" << message.tag << "] " << message.message;
+      #endif
+    } else {
+      stream << "(" << Log::StringTypes[ message.level ] << ") " << std::put_time( &localtime, "%Y-%m-%d %H:%M:%S: " ) << "[" << message.tag << "] " << message.message;
+    }
+
+    return stream.str();
   }
 
   void Log::debug( const std::string& tag, const std::string& message ) {
