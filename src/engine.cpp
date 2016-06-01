@@ -198,13 +198,15 @@ namespace BlueBear {
 		}
 
 		// Assemble the fully-qualified pathname for this modpack
-		std::string path = currentModpackDirectory + name + "/" + MODPACK_MAIN_SCRIPT;
+		std::string path = currentModpackDirectory + name;
+		std::string fullPath = path + "/" + MODPACK_MAIN_SCRIPT;
 
 		// Mark the module as LOADING - first if should catch this module if it's called again without completing
 		loadedModpacks[ name ] = BlueBear::ModpackStatus::LOADING;
 
 		// dofile pointed to by path
-		if( luaL_dofile( L, path.c_str() ) ) {
+		if( luaL_loadfile( L, fullPath.c_str() ) || !lua_pushstring( L, path.c_str() ) || lua_pcall( L, 1, LUA_MULTRET, 0 ) ) {
+			// Exception occurred during opening the modpack
 			// Exception occurred during the integration of this modpack
 			Log::getInstance().error( "Engine::loadModpack", "Failed to integrate modpack " + name + ": " + lua_tostring( L, -1 ) );
 			lua_pop( L, 1 );

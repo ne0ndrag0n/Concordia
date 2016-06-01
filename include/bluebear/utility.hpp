@@ -40,8 +40,6 @@ namespace BlueBear {
 
 		void setTableFunctionValue( lua_State* L, const char* key, lua_CFunction value );
 
-		void doDirectories( lua_State* L, const char* directory );
-
 		void strace();
 
 		std::vector<std::string> split(const std::string &text, char sep);

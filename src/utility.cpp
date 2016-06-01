@@ -161,20 +161,6 @@ namespace BlueBear {
 			lua_settable( L, -3 );
 		}
 
-		void doDirectories( lua_State* L, const char* directoryTitle ) {
-
-			std::vector< std::string > directories = Utility::getSubdirectoryList( directoryTitle );
-
-			// For each of these subdirectories, do the obj.lua file within our lua scope
-			for ( std::vector< std::string >::iterator directory = directories.begin(); directory != directories.end(); directory++ ) {
-				std::string scriptPath = directoryTitle + *directory + "/obj.lua";
-				if( luaL_dofile( L, scriptPath.c_str() ) ) {
-					printf( "Error in BlueBear object: %s\n", lua_tostring( L, -1 ) );
-				}
-			}
-
-		}
-
 		void strace() {
 			void *array[10];
 			size_t size;
