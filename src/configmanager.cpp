@@ -17,6 +17,7 @@ namespace BlueBear {
     configRoot[ "ticks_per_second" ] = 30;
     configRoot[ "min_log_level" ] = 0;
     configRoot[ "logfile_path" ] = "bluebear.log";
+    configRoot[ "logger_mode" ] = 0;
 
     // Load settings.json from file
     std::ifstream settingsFile( SETTINGS_PATH );

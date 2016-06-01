@@ -12,6 +12,7 @@ namespace BlueBear {
   Log::Log() {
     // The ConfigManager can now never ever log anything
     minimumReportableLevel = ( LogLevel )ConfigManager::getInstance().getIntValue( "min_log_level" );
+    mode = ( LogMode )ConfigManager::getInstance().getIntValue( "logger_mode" );
     logFile.open( ConfigManager::getInstance().getValue( "logfile_path" ), std::ios_base::app );
     logFile << std::endl;
   }
