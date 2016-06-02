@@ -15,36 +15,29 @@
 
 
 namespace BlueBear {
-	namespace Utility {
-		uint16_t swap_uint16( uint16_t val );
+	class Utility {
+		public:
+			static void stackDump( lua_State* L );
 
-		int16_t swap_int16( int16_t val );
+			static void stackDumpAt( lua_State* L, int pos );
 
-		uint32_t swap_uint32( uint32_t val );
+			static std::vector< std::string > getSubdirectoryList( const char* rootSubDirectory );
 
-		int32_t swap_int32( int32_t val );
+			static void clearLuaStack( lua_State* L );
 
-		void stackDump( lua_State* L );
+			static void getTableValue( lua_State* L, const char* key );
 
-		void stackDumpAt( lua_State* L, int pos );
+			static void setTableIntValue( lua_State* L, const char* key, int value );
 
-		std::vector< std::string > getSubdirectoryList( const char* rootSubDirectory );
+			static void setTableStringValue( lua_State* L, const char* key, const char* value );
 
-		void clearLuaStack( lua_State* L );
+			static void setTableFunctionValue( lua_State* L, const char* key, lua_CFunction value );
 
-		void getTableValue( lua_State* L, const char* key );
+			static void strace();
 
-		void setTableIntValue( lua_State* L, const char* key, int value );
+			static std::vector<std::string> split(const std::string &text, char sep);
 
-		void setTableStringValue( lua_State* L, const char* key, const char* value );
-
-		void setTableFunctionValue( lua_State* L, const char* key, lua_CFunction value );
-
-		void strace();
-
-		std::vector<std::string> split(const std::string &text, char sep);
-
-		void getTableTreeValue( lua_State* L, const std::string& treeValue );
+			static void getTableTreeValue( lua_State* L, const std::string& treeValue );
 	};
 }
 

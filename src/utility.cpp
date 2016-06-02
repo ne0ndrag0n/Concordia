@@ -24,30 +24,10 @@
 
 namespace BlueBear {
 
-	namespace Utility {
-
-		uint16_t swap_uint16( uint16_t val ) {
-			return (val << 8) | (val >> 8 );
-		}
-
-		int16_t swap_int16( int16_t val ) {
-			return (val << 8) | ((val >> 8) & 0xFF);
-		}
-
-		uint32_t swap_uint32( uint32_t val ) {
-			val = ((val << 8) & 0xFF00FF00 ) | ((val >> 8) & 0xFF00FF );
-			return (val << 16) | (val >> 16);
-		}
-
-		int32_t swap_int32( int32_t val ) {
-			val = ((val << 8) & 0xFF00FF00) | ((val >> 8) & 0xFF00FF );
-			return (val << 16) | ((val >> 16) & 0xFFFF);
-		}
-
 		/**
 		 * Dump the Lua stack out to terminal
 		 */
-		void stackDump( lua_State* L ) {
+		void Utility::stackDump( lua_State* L ) {
 			  int i;
 			  int top = lua_gettop(L);
 			  for (i = 1; i <= top; i++) {  /* repeat for each level */
@@ -58,7 +38,7 @@ namespace BlueBear {
 			  printf("\n");  /* end the listing */
 		}
 
-		void stackDumpAt( lua_State* L, int pos ) {
+		void Utility::stackDumpAt( lua_State* L, int pos ) {
 			int t = lua_type(L, pos);
 			switch (t) {
 
@@ -98,7 +78,7 @@ namespace BlueBear {
 		 *
 		 * Gets a collection of subdirectories for the given directory
 		 */
-		std::vector< std::string > getSubdirectoryList( const char* rootSubDirectory ) {
+		std::vector< std::string > Utility::getSubdirectoryList( const char* rootSubDirectory ) {
 			std::vector< std::string > directories;
 
 			DIR *dir = opendir( rootSubDirectory );
@@ -131,11 +111,11 @@ namespace BlueBear {
 			return directories;
 		}
 
-		void clearLuaStack( lua_State* L ) {
+		void Utility::clearLuaStack( lua_State* L ) {
 			lua_settop( L, 0 );
 		}
 
-		void getTableValue( lua_State* L, const char* key ) {
+		void Utility::getTableValue( lua_State* L, const char* key ) {
 			// Push the desired key onto the stack
 			lua_pushstring( L, key );
 
@@ -143,25 +123,25 @@ namespace BlueBear {
 			lua_gettable( L, -2 );
 		}
 
-		void setTableIntValue( lua_State* L, const char* key, int value ) {
+		void Utility::setTableIntValue( lua_State* L, const char* key, int value ) {
 			lua_pushstring( L, key );
 			lua_pushnumber( L, (double) value );
 			lua_settable( L, -3 );
 		}
 
-		void setTableStringValue( lua_State* L, const char* key, const char* value ) {
+		void Utility::setTableStringValue( lua_State* L, const char* key, const char* value ) {
 			lua_pushstring( L, key );
 			lua_pushstring( L, value );
 			lua_settable( L, -3 );
 		}
 
-		void setTableFunctionValue( lua_State* L, const char* key, lua_CFunction value ) {
+		void Utility::setTableFunctionValue( lua_State* L, const char* key, lua_CFunction value ) {
 			lua_pushstring( L, key );
 			lua_pushcfunction( L, value );
 			lua_settable( L, -3 );
 		}
 
-		void strace() {
+		void Utility::strace() {
 			void *array[10];
 			size_t size;
 
@@ -175,7 +155,7 @@ namespace BlueBear {
 		/**
 		 * Tokenise a std::string based on a char value
 		 */
-		std::vector<std::string> split(const std::string &text, char sep) {
+		std::vector<std::string> Utility::split(const std::string &text, char sep) {
 		  std::vector<std::string> tokens;
 		  std::size_t start = 0, end = 0;
 		  while ((end = text.find(sep, start)) != std::string::npos) {
@@ -191,7 +171,7 @@ namespace BlueBear {
 		 * Leaves the found value on the top of the stack; leaves nil if the value was not found.
 		 * Always pops the original table.
 		 */
-		void getTableTreeValue( lua_State* L, const std::string& treeValue ) {
+		void Utility::getTableTreeValue( lua_State* L, const std::string& treeValue ) {
 			// start with <table>
 
 			// Get tokens
@@ -220,5 +200,4 @@ namespace BlueBear {
 
 			// <desired table>
 		}
-	}
 }
