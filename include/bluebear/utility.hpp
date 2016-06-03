@@ -11,13 +11,23 @@
 #include <string>
 
 namespace BlueBear {
+
 	class Utility {
+
 		public:
+			enum class FilesystemType { UNKNOWN, DIRECTORY, FILE };
+			class DirectoryEntry {
+				FilesystemType type;
+				std::string name;
+			};
+
 			static void stackDump( lua_State* L );
 
 			static void stackDumpAt( lua_State* L, int pos );
 
 			static std::vector< std::string > getSubdirectoryList( const char* rootSubDirectory );
+
+			static std::vector< DirectoryEntry > getFileList( const std::string& parent );
 
 			static void clearLuaStack( lua_State* L );
 

@@ -113,6 +113,22 @@ namespace BlueBear {
 			return directories;
 		}
 
+		/**
+		 * Returns not only a list of subdirectories, but also files included.
+		 */
+		std::vector< Utility::DirectoryEntry > Utility::getFileList( const std::string& parent ) {
+			std::vector< Utility::DirectoryEntry > files;
+
+			#ifndef _WIN32
+
+			#else
+				// STUB !!
+				// TODO: Windows file listing
+			#endif
+
+			return files;
+		}
+
 		void Utility::clearLuaStack( lua_State* L ) {
 			lua_settop( L, 0 );
 		}
