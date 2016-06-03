@@ -15,8 +15,8 @@ namespace BlueBear {
 	class Utility {
 
 		public:
-			enum class FilesystemType { UNKNOWN, DIRECTORY, FILE };
-			class DirectoryEntry {
+			enum class FilesystemType : int { UNKNOWN, DIRECTORY, FILE };
+			struct DirectoryEntry {
 				FilesystemType type;
 				std::string name;
 			};

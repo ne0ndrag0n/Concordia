@@ -114,13 +114,41 @@ namespace BlueBear {
 		}
 
 		/**
-		 * Returns not only a list of subdirectories, but also files included.
+		 * Returns not only a list of subdirectories, but also files included. This really should be combined
+		 * with the older function above.
 		 */
 		std::vector< Utility::DirectoryEntry > Utility::getFileList( const std::string& parent ) {
 			std::vector< Utility::DirectoryEntry > files;
 
 			#ifndef _WIN32
 
+			DIR* dir = opendir( parent.c_str() );
+			struct dirent* entry = readdir( dir );
+
+			while( entry != NULL ) {
+				// exclude current directory and parent directory
+				if( strcmp( entry->d_name, "." ) != 0 && strcmp( entry->d_name, ".." ) != 0 ) {
+
+					Utility::FilesystemType fsType;
+					switch( entry->d_type ) {
+						case DT_DIR:
+							fsType = Utility::FilesystemType::DIRECTORY;
+							break;
+						case DT_REG:
+							fsType = Utility::FilesystemType::FILE;
+							break;
+						default:
+							// Set it unknown for now. If you get problems, a check will need to be done similar above
+							// because some network-mounted filesystems may report DT_UNKNOWN as the file type.
+							//
+							// TODO: Enter this as a task now! Symlinks will fall back to FileystemType::UNKNOWN!!
+							break;
+					}
+
+					// Goddamn initializer list fails to work for precisely no reason
+					files.push_back( Utility::DirectoryEntry{ fsType, std::string( entry->d_name ) } );
+				}
+			}
 			#else
 				// STUB !!
 				// TODO: Windows file listing
