@@ -18,9 +18,6 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
-// Not X-Compiler
-#include <execinfo.h>
-
 
 namespace BlueBear {
 
@@ -139,17 +136,6 @@ namespace BlueBear {
 			lua_pushstring( L, key );
 			lua_pushcfunction( L, value );
 			lua_settable( L, -3 );
-		}
-
-		void Utility::strace() {
-			void *array[10];
-			size_t size;
-
-			// get void*'s for all entries on the stack
-			size = backtrace(array, 10);
-
-			// print out all the frames to stderr
-			backtrace_symbols_fd(array, size, STDERR_FILENO);
 		}
 
 		/**

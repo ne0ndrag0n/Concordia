@@ -10,10 +10,6 @@
 #include <vector>
 #include <string>
 
-// Not X-Compiler
-#include <execinfo.h>
-
-
 namespace BlueBear {
 	class Utility {
 		public:
@@ -32,8 +28,6 @@ namespace BlueBear {
 			static void setTableStringValue( lua_State* L, const char* key, const char* value );
 
 			static void setTableFunctionValue( lua_State* L, const char* key, lua_CFunction value );
-
-			static void strace();
 
 			static std::vector<std::string> split(const std::string &text, char sep);
 
