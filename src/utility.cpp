@@ -14,10 +14,11 @@
 #include <vector>
 
 // Not X-Platform
-#include <dirent.h>
-#include <unistd.h>
-#include <sys/stat.h>
-
+#ifndef _WIN32
+	#include <dirent.h>
+	#include <unistd.h>
+	#include <sys/stat.h>
+#endif
 
 namespace BlueBear {
 
@@ -78,6 +79,7 @@ namespace BlueBear {
 		std::vector< std::string > Utility::getSubdirectoryList( const char* rootSubDirectory ) {
 			std::vector< std::string > directories;
 
+			#ifndef _WIN32
 			DIR *dir = opendir( rootSubDirectory );
 
 			struct dirent* entry = readdir( dir );
@@ -103,7 +105,10 @@ namespace BlueBear {
 
 				entry = readdir( dir );
 			}
-
+			#else
+				// STUB !!
+				// TODO: Windows directory listing
+			#endif
 
 			return directories;
 		}
