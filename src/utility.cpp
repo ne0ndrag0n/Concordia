@@ -110,6 +110,7 @@ namespace BlueBear {
 				// TODO: Windows directory listing
 			#endif
 
+			closedir( dir );
 			return directories;
 		}
 
@@ -154,6 +155,7 @@ namespace BlueBear {
 				// TODO: Windows file listing
 			#endif
 
+			closedir( dir );
 			return files;
 		}
 
