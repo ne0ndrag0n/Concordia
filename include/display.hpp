@@ -16,6 +16,7 @@ namespace BlueBear {
       ViewportDimension x;
       ViewportDimension y;
       sf::RenderWindow mainWindow;
+      void main();
 
     public:
       // RAII style

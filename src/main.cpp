@@ -5,12 +5,15 @@
 #include "log.hpp"
 #include "display.hpp"
 #include <iostream>
+#include <thread>
 
 int main() {
-	BlueBear::Log::getInstance().info( "Main", "BlueBear ET2 (c) 2015-2016 ne0ndrag0n" );
+	BlueBear::Log::getInstance().info( "Main", "BlueBear Picasso (c) 2015-2016 ne0ndrag0n" );
 
-	BlueBear::Display display;
-	display.showDisplay();
+	std::thread windowThread( []() {
+		BlueBear::Display display;
+		display.showDisplay();
+	} );
 
 	BlueBear::Engine engine;
 
@@ -24,6 +27,10 @@ int main() {
 		// Setup a loop!
 		engine.objectLoop();
 	}
+
+	// Thread should take it from here
+	BlueBear::Log::getInstance().warn( "Main", "Program execution has completed, please close the SFML window." );
+	windowThread.join();
 
 	return 0;
 }

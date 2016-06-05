@@ -1,7 +1,7 @@
 CC = g++
 CFLAGS = -std=c++14 -g -rdynamic
 INCLUDES = -Iinclude
-LIBS = -lGL -lsfml-graphics -lsfml-window -lsfml-system -ljsoncpp -llua -ldl
+LIBS = -lpthread -lGL -lsfml-graphics -lsfml-window -lsfml-system -ljsoncpp -llua -ldl
 
 SRCS = $(wildcard src/*.cpp)
 OBJS = $(SRCS:.c=.o)

@@ -15,7 +15,21 @@ namespace BlueBear {
   void Display::showDisplay() {
     // TODO: Localiser!
     mainWindow.create( sf::VideoMode( x, y ), "ne0ndrag0n BlueBear v0.0.3 \"Picasso\"", sf::Style::Close );
-    mainWindow.clear( sf::Color::Black );
-    mainWindow.display();
+    main();
+  }
+
+  void Display::main() {
+    while( mainWindow.isOpen() ) {
+      // Handle events
+      sf::Event event;
+      while( mainWindow.pollEvent( event ) ) {
+        if( event.type == sf::Event::Closed ) {
+          mainWindow.close();
+        }
+      }
+
+      mainWindow.clear( sf::Color::Black );
+      mainWindow.display();
+    }
   }
 }
