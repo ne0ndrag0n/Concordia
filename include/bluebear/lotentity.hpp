@@ -1,9 +1,9 @@
 #ifndef BBOBJECT
 #define BBOBJECT
 
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
 #include "json/json.h"
 #include "bbtypes.hpp"
 #include <string>

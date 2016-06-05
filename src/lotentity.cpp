@@ -1,7 +1,7 @@
 #include "lotentity.hpp"
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
 #include "utility.hpp"
 #include "log.hpp"
 #include "json/json.h"

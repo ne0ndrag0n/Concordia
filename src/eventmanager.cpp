@@ -1,7 +1,7 @@
 #include "eventmanager.hpp"
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
 #include "utility.hpp"
 #include "lot.hpp"
 #include "lotentity.hpp"

@@ -1,7 +1,6 @@
 CC = g++
 CFLAGS = -std=c++14 -g -rdynamic
-INCLUDES = -Iinclude/json -Iinclude/json/json -Iinclude/lua -Iinclude/bluebear
-LFLAGS = -Llib
+INCLUDES = -Iinclude/json -Iinclude/json/json -Iinclude/bluebear
 LIBS = -llua -ldl
 
 SRCS = $(wildcard src/*.cpp)

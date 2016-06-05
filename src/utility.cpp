@@ -1,7 +1,7 @@
 #include "utility.hpp"
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
 #include <cstdint>
 #include <cstddef>
 #include <cstdio>

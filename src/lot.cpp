@@ -1,7 +1,7 @@
 #include "bbtypes.hpp"
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
 #include "lotentity.hpp"
 #include "lot.hpp"
 #include "utility.hpp"

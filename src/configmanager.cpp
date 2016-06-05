@@ -1,8 +1,8 @@
 #include "configmanager.hpp"
 
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
 #include "json/json.h"
 #include <iostream>
 #include <fstream>
