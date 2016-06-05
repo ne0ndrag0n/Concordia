@@ -76,6 +76,18 @@ namespace BlueBear {
 		// Set the config table on "bluebear"
 		lua_settable( L, -3 );
 
+		// bluebear.util
+		lua_pushstring( L, "util" );
+		lua_newtable( L );
+
+		// bluebear.util.get_directory_list
+		lua_pushstring( L, "get_directory_list" );
+		lua_pushcfunction( L, &Utility::lua_getFileList );
+		lua_settable( L, -3 );
+
+		// Set the util table on "bluebear"
+		lua_settable( L, -3 );
+
 		// Set the table as "bluebear"
 		lua_setglobal( L, "bluebear" );
 
