@@ -18,6 +18,8 @@ namespace BlueBear {
     configRoot[ "min_log_level" ] = 0;
     configRoot[ "logfile_path" ] = "bluebear.log";
     configRoot[ "logger_mode" ] = 0;
+    configRoot[ "viewport_x" ] = 1024;
+    configRoot[ "viewport_y" ] = 768;
 
     // Load settings.json from file
     std::ifstream settingsFile( SETTINGS_PATH );
