@@ -15,6 +15,7 @@ namespace BlueBear {
   void Display::showDisplay() {
     // TODO: Localiser!
     mainWindow.create( sf::VideoMode( x, y ), "ne0ndrag0n BlueBear v0.0.3 \"Picasso\"", sf::Style::Close );
+    mainWindow.setVerticalSyncEnabled( true );
     main();
   }
 
