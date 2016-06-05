@@ -183,38 +183,40 @@ namespace BlueBear {
 				int currentIndex = 1;
 				for( auto directoryEntry : fileList ) {
 
-					// entrytable array
-					lua_newtable( L );
+					if( directoryEntry.type != Utility::FilesystemType::UNKNOWN ) {
 
-					// "type" entrytable array
-					lua_pushstring( L, "type" );
+						// entrytable array
+						lua_newtable( L );
 
-					// type "type" entrytable array
-					switch( directoryEntry.type ) {
-						case Utility::FilesystemType::DIRECTORY:
-							lua_pushstring( L, Utility::DIRECTORY_STRING );
-							break;
-						case Utility::FilesystemType::FILE:
-							lua_pushstring( L, Utility::FILE_STRING );
-							break;
-						default:
-							lua_pushstring( L, Utility::UNKNOWN_STRING );
+						// "type" entrytable array
+						lua_pushstring( L, "type" );
+
+						// type "type" entrytable array
+						switch( directoryEntry.type ) {
+							case Utility::FilesystemType::DIRECTORY:
+								lua_pushstring( L, Utility::DIRECTORY_STRING );
+								break;
+							case Utility::FilesystemType::FILE:
+								lua_pushstring( L, Utility::FILE_STRING );
+								break;
+						}
+
+						// entrytable array
+						lua_settable( L, -3 );
+
+						// "name" entrytable array
+						lua_pushstring( L, "name" );
+
+						// name "name" entrytable array
+						lua_pushstring( L, directoryEntry.name.c_str() );
+
+						// entrytable array
+						lua_settable( L, -3 );
+
+						// array
+						lua_rawseti( L, -2, currentIndex++ );
+
 					}
-
-					// entrytable array
-					lua_settable( L, -3 );
-
-					// "name" entrytable array
-					lua_pushstring( L, "name" );
-
-					// name "name" entrytable array
-					lua_pushstring( L, directoryEntry.name.c_str() );
-
-					// entrytable array
-					lua_settable( L, -3 );
-
-					// array
-					lua_rawseti( L, -2, currentIndex++ );
 				}
 			}
 
