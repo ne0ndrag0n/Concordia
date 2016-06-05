@@ -20,6 +20,7 @@ namespace BlueBear {
     configRoot[ "logger_mode" ] = 0;
     configRoot[ "viewport_x" ] = 1024;
     configRoot[ "viewport_y" ] = 768;
+    configRoot[ "current_locale" ] = "en_US";
 
     // Load settings.json from file
     std::ifstream settingsFile( SETTINGS_PATH );

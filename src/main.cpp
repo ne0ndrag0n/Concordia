@@ -4,11 +4,12 @@
 #include <lauxlib.h>
 #include "log.hpp"
 #include "display.hpp"
+#include "localemanager.hpp"
 #include <iostream>
 #include <thread>
 
 int main() {
-	BlueBear::Log::getInstance().info( "Main", "BlueBear Picasso (c) 2015-2016 ne0ndrag0n" );
+	BlueBear::Log::getInstance().info( "Main",  BlueBear::LocaleManager::getInstance().getString( "BLUEBEAR_WELCOME_MESSAGE" ) );
 
 	std::thread windowThread( []() {
 		BlueBear::Display display;
