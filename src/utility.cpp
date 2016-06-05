@@ -146,7 +146,6 @@ namespace BlueBear {
 							break;
 					}
 
-					// Goddamn initializer list fails to work for precisely no reason
 					files.push_back( Utility::DirectoryEntry{ fsType, std::string( entry->d_name ) } );
 				}
 			}
