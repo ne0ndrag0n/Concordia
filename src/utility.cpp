@@ -160,6 +160,68 @@ namespace BlueBear {
 			return files;
 		}
 
+		/**
+		 * Create the file list for lua. Lua changes things a bit:
+		 * The returned array will be a table of tables, each table containing two fields
+		 * type -> "directory" or "file". Unknowns will not be added.
+		 * name -> Straight rip of the name from the Utility::DirectoryEntry
+		 */
+		int Utility::lua_getFileList( lua_State* L ) {
+
+			// String shall be the first argument
+			if( lua_isstring( L, -1 ) ) {
+				// string
+				std::string path = lua_tostring( L, -1 );
+				auto fileList = Utility::getFileList( path );
+
+				// EMPTY
+				lua_pop( L, 1 );
+
+				// array
+				lua_newtable( L );
+
+				int currentIndex = 1;
+				for( auto directoryEntry : fileList ) {
+
+					// entrytable array
+					lua_newtable( L );
+
+					// "type" entrytable array
+					lua_pushstring( L, "type" );
+
+					// type "type" entrytable array
+					switch( directoryEntry.type ) {
+						case Utility::FilesystemType::DIRECTORY:
+							lua_pushstring( L, Utility::DIRECTORY_STRING );
+							break;
+						case Utility::FilesystemType::FILE:
+							lua_pushstring( L, Utility::FILE_STRING );
+							break;
+						default:
+							lua_pushstring( L, Utility::UNKNOWN_STRING );
+					}
+
+					// entrytable array
+					lua_settable( L, -3 );
+
+					// "name" entrytable array
+					lua_pushstring( L, "name" );
+
+					// name "name" entrytable array
+					lua_pushstring( L, directoryEntry.name.c_str() );
+
+					// entrytable array
+					lua_settable( L, -3 );
+
+					// array
+					lua_rawseti( L, -2, currentIndex++ );
+				}
+			}
+
+			// array
+			return 1;
+		}
+
 		void Utility::clearLuaStack( lua_State* L ) {
 			lua_settop( L, 0 );
 		}

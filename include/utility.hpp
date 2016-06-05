@@ -14,6 +14,10 @@ namespace BlueBear {
 
 	class Utility {
 
+		static constexpr const char* UNKNOWN_STRING = "unknown";
+		static constexpr const char* DIRECTORY_STRING = "directory";
+		static constexpr const char* FILE_STRING = "file";
+
 		public:
 			enum class FilesystemType : int { UNKNOWN, DIRECTORY, FILE };
 			struct DirectoryEntry {
@@ -28,6 +32,8 @@ namespace BlueBear {
 			static std::vector< std::string > getSubdirectoryList( const char* rootSubDirectory );
 
 			static std::vector< DirectoryEntry > getFileList( const std::string& parent );
+
+			static int lua_getFileList( lua_State* L );
 
 			static void clearLuaStack( lua_State* L );
 
