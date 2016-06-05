@@ -4,7 +4,7 @@
 #include <lauxlib.h>
 #include "utility.hpp"
 #include "log.hpp"
-#include "json/json.h"
+#include <jsoncpp/json/json.h>
 #include <iostream>
 #include <cstring>
 #include <string>

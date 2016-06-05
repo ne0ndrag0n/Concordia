@@ -5,7 +5,7 @@
 #include <lualib.h>
 #include <lauxlib.h>
 #include "bbtypes.hpp"
-#include "json/json.h"
+#include <jsoncpp/json/json.h>
 #include <vector>
 #include <map>
 #include <string>

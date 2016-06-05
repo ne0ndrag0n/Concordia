@@ -6,7 +6,7 @@
 #include "lot.hpp"
 #include "lotentity.hpp"
 #include "log.hpp"
-#include "json/json.h"
+#include <jsoncpp/json/json.h>
 #include <cstddef>
 #include <vector>
 #include <map>

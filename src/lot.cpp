@@ -5,7 +5,7 @@
 #include "lotentity.hpp"
 #include "lot.hpp"
 #include "utility.hpp"
-#include "json/json.h"
+#include <jsoncpp/json/json.h>
 #include "eventmanager.hpp"
 #include <memory>
 #include <vector>
