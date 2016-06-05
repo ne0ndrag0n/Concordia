@@ -148,6 +148,8 @@ namespace BlueBear {
 
 					files.push_back( Utility::DirectoryEntry{ fsType, std::string( entry->d_name ) } );
 				}
+
+				entry = readdir( dir );
 			}
 			#else
 				// STUB !!
