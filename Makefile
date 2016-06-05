@@ -1,6 +1,6 @@
 CC = g++
 CFLAGS = -std=c++14 -g -rdynamic
-INCLUDES = -Iinclude/bluebear
+INCLUDES = -Iinclude
 LIBS = -ljsoncpp -llua -ldl
 
 SRCS = $(wildcard src/*.cpp)
