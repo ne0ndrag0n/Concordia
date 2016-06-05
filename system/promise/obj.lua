@@ -3,6 +3,7 @@
 	or engine-based promises that require the C++ engine to signal for the callback)
 --]]
 
+
 bluebear.engine.require_modpack( "middleclass" )
 bluebear.engine.require_modpack( "class" )
 
@@ -42,57 +43,10 @@ end
 
 bluebear.register_class( Promise )
 
---------------------------------------------------------------------------------
+-- Now register all the other types (Base Promise had to get done first)
+local modpack_path = ...
+local files = bluebear.util.get_directory_list( modpack_path )
 
-local TimedPromise = bluebear.extend( 'system.promise.base', 'system.promise.timer' )
-
-function TimedPromise:initialize( obj_ref, start_tick )
-	Promise.initialize( self, obj_ref )
-
-	self.next_tick = start_tick
+for index, file in ipairs( files ) do
+	if file.name ~= "obj.lua" then dofile( modpack_path.."/"..file.name ) end
 end
-
-function TimedPromise:then_call_on( entity, func_name, ... )
-	local descriptor = entity:register_callback( self.next_tick, func_name, { ... } )
-
-	self.last.tick = self.next_tick
-	self.last.callback = descriptor
-
-	-- any future "then_call" statements will be called tick per tick
-	self.next_tick = self.next_tick + 1
-
-	return self
-end
-
-bluebear.register_class( TimedPromise )
-
---------------------------------------------------------------------------------
-
--- TODO: PathfinderPromise calls methods on bluebear.engine to find a path and call back
-
-local PathfinderPromise = bluebear.extend( 'system.promise.base', 'system.promise.pathfinder' )
-
-function PathfinderPromise:initialize( origin, target )
-	-- Pathfinder finds path from object (origin) to destination (target)
-	Promise.initialize( self, origin )
-
-	self.destination = target
-
-	-- then_call will put these onto the promise, when the engine gets done finding the path it will
-	-- run through this table and call 'em all, each waiting one tick between them all.
-	self.thens = {}
-
-	-- TODO: the actual thing. right now this just does a simple defer. consider this for Picasso milestone.
-	-- the below snippet doesn't go in this method, it goes somewhere else
-	--[[
-	bluebear.engine.find_path( self.object, self.destination, function( result )
- 		-- do the shit where we unload "result" as a series of object navigations across the map
-		-- now call all your thens
-		for index, callback in ipairs( self.thens ) do
-
-		end
-	end )
-	--]]
-end
-
-bluebear.register_class( PathfinderPromise )
