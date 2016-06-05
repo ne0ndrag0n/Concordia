@@ -22,3 +22,8 @@ Version 0.0.2a - Milestone "ET2"
 * Isometric, sprite-based 2.5D presentation with a retro-inspired pixel art look-and-feel
 * SFML-powered multimedia framework featuring the SFGUI widget toolkit
 * Multi-threaded architecture, using modern C++14 to make the most of your multi-core CPU
+
+## Dependencies
+* SFML
+* Lua 5.3.x
+* JsonCpp 1.7.x
