@@ -3,10 +3,11 @@
 #include <lualib.h>
 #include <lauxlib.h>
 #include "log.hpp"
+#include "localemanager.hpp"
 #include <iostream>
 
 int main() {
-	BlueBear::Log::getInstance().info( "Main", "BlueBear ET2 (c) 2015-2016 ne0ndrag0n" );
+	BlueBear::Log::getInstance().info( "Main", 	BlueBear::LocaleManager::getInstance().getString( "BLUEBEAR_WELCOME_MESSAGE" ) );
 
 	BlueBear::Engine engine;
 
