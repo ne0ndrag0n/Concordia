@@ -1,4 +1,4 @@
-local Promise = bluebear.get_class( 'system.promise.base' )
+local Promise = ...
 local TimedPromise = bluebear.extend( 'system.promise.base', 'system.promise.timer' )
 
 function TimedPromise:initialize( obj_ref, start_tick )

@@ -1,4 +1,4 @@
-local Promise = bluebear.get_class( 'system.promise.base' )
+local Promise = ...
 -- TODO: PathfinderPromise calls methods on bluebear.engine to find a path and call back
 local PathfinderPromise = bluebear.extend( 'system.promise.base', 'system.promise.pathfinder' )
 
