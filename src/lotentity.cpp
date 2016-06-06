@@ -224,12 +224,12 @@ namespace BlueBear {
 	}
 
 	void LotEntity::execute() {
-		// Push this object's table onto the API stack
+		// instance
 		lua_rawgeti( L, LUA_REGISTRYINDEX, luaVMInstance );
 
-		// Get the object's _sys table
+		// _sys instance
 		Utility::getTableValue( L, "_sys" );
-		// Get the nested _sched table
+		// _sys._sched _sys instance
 		Utility::getTableValue( L, "_sched" );
 
 		// Create the key we will need from currentTick
@@ -239,34 +239,42 @@ namespace BlueBear {
 		Utility::getTableValue( L, tickKey.c_str() );
 
 		if( lua_istable( L, -1 ) ) {
+			// tick_array_table _sys._sched _sys instance
+
 			// There's functions that need to be executed
-			// Use lua_next to get the objects that describe how to call these functions
+			// nil tick_array_table _sys._sched _sys instance
 			lua_pushnil( L );
 			while( lua_next( L, -2 ) != 0 ) {
+				// SFT 1 tick_array_table _sys._sched _sys instance
 				// The Serialised Function Table (SFT) is the value, available on -1
 				// The key is the index position, available on -2
 
 				// STEP 1: Get the named function and push a closure with "self"
-				// a. Push the name of the function onto the stack ( SFT[ "method" ] )
+				// "method" SFT 1 tick_array_table _sys._sched _sys instance
 				Utility::getTableValue( L, "method" );
-				// b. Save this result, then pop it
+
 				std::string functionName = lua_tostring( L, -1 );
+				// SFT 1 tick_array_table _sys._sched _sys instance
 				lua_pop( L, 1 );
-				// c. Re-push object (it is currently at -6)
+
+				// object SFT 1 tick_array_table _sys._sched _sys instance
 				lua_pushvalue( L, -6 );
-				// d. Get the function out of the object
+
+				// <function> object SFT 1 tick_array_table _sys._sched _sys instance
 				Utility::getTableValue( L, functionName.c_str() );
-				// e. Remember the object that we just used? Re-push it as the first object argument (self)
+
+				// object <function> object SFT 1 tick_array_table _sys._sched _sys instance
 				lua_pushvalue( L, -2 );
 
 				// STEP 2: Push all the function's arguments and call!
-				// a. Re-grab the SFT: it should be at position -4
+				// SFT object <function> object SFT 1 tick_array_table _sys._sched _sys instance
 				lua_pushvalue( L, -4 );
-				// b. Grab the "arguments" array-table
+				// [argument] SFT object <function> object SFT 1 tick_array_table _sys._sched _sys instance
 				Utility::getTableValue( L, "arguments" );
-				// c. Now, time to start keeping the Lua stack cleaned up a bit; REMOVE the SFT now at position -2
+				// [argument] object <function> object SFT 1 tick_array_table _sys._sched _sys instance
 				lua_remove( L, -2 );
-				// d. The arguments array is now at the top of the stack. How many are in it?
+
+				// The arguments array is now at the top of the stack. How many are in it?
 				// This will always be at least 1 (because of self)
 				int totalArguments = lua_rawlen( L, -1 ) + 1;
 
@@ -274,17 +282,21 @@ namespace BlueBear {
 				if( totalArguments - 1 > 0 ) {
 					// e. Use this lovely loop to spit everything in the array out onto the stack
 					for( int i = 1; i != totalArguments; i++ ) {
+						// argument [argument] object <function> object SFT 1 tick_array_table _sys._sched _sys instance
 						lua_rawgeti( L, -i, i );
 					};
 				}
 
-				// f. Remove the actual array, which should be at -totalArguments
+				// Remove the actual array, which should be at -totalArguments
 				// In the case of empty array - totalArguments should be 1 (0+1, the "self" arg)
 				// In other cases, it should just be the negative of the length of the array
+
+				// argument object <function> object SFT 1 tick_array_table _sys._sched _sys instance
 				lua_remove( L, -totalArguments );
 
-				// g. Call that sumbitch!
+				// Call that sumbitch!
 				if( lua_pcall( L, totalArguments, 0, 0 ) != 0 ) {
+					// error object SFT 1 tick_array_table _sys._sched _sys instance
 					// We only get here if the function bombs out
 					Log::getInstance().error( "LotEntity::execute", "Error in lot entity: " + std::string( lua_tostring( L, -1 ) ) );
 
@@ -293,9 +305,12 @@ namespace BlueBear {
 					ok = false;
 				}
 
-				// h. There's two junk items remaining on the stack; clean 'em up!
+				// object SFT 1 tick_array_table _sys._sched _sys instance
+
+				// There's two junk items remaining on the stack; clean 'em up!
 				// These two items should be the object table, followed by the SFT
 				// leaving the key at -1 and the table at -2 (see how the loop restarts?)
+				// 1 tick_array_table _sys._sched _sys instance
 				lua_pop( L, 2 );
 			}
 
@@ -303,16 +318,19 @@ namespace BlueBear {
 			// tick_array_table/nil _sys._sched _sys instance
 			// Clear out the tick_array_table so it can be garbage collected
 
-			// tickKey tick_array_table/nil _sys._sched _sys instance
+			// "tickKey" tick_array_table/nil _sys._sched _sys instance
 			lua_pushstring( L, tickKey.c_str() );
-			// nil tickKey tick_array_table/nil _sys._sched _sys instance
+			// nil "tickKey" tick_array_table/nil _sys._sched _sys instance
 			lua_pushnil( L );
 			// tick_array_table/nil _sys._sched _sys instance
 			lua_settable( L, -4 );
+		} else {
+			// nil _sys._sched _sys instance
+			// Nothing to do.
 		}
 
 		// Start popping all this crap off the stack
-		// The remaining items should always be the tick array table (or nil), _sys._sched, _sys, and the object table
+		// EMPTY
 		lua_pop( L, 4 );
 	}
 }
