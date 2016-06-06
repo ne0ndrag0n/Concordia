@@ -13,12 +13,7 @@
 				"_cid": "bb1",
 				"_sys": {
 					"_sched": {
-						"40.0": [
-							{
-								"method": "main",
-								"arguments": []
-							}
-						]
+						"40.0": [ { "method": "main" } ]
 					}
 				},
 				"_events": {
@@ -35,12 +30,7 @@
 				"_cid": "bb2",
 				"_sys": {
 					"_sched": {
-						"30.0": [
-							{
-								"method": "main",
-								"arguments": []
-							}
-						]
+						"30.0": [	{ "method": "main" } ]
 					}
 				},
 				"stink": 0
@@ -52,16 +42,7 @@
 				"_cid": "bb3",
 				"_sys": {
 					"_sched": {
-						"30.0": [
-							{
-								"method": "decay_my_motives",
-								"arguments": []
-							},
-							{
-								"method": "main",
-								"arguments": []
-							}
-						]
+						"30.0": [ {	"method": "decay_my_motives" }, {	"method": "main" } ]
 					}
 				},
 				"saved_motives": {

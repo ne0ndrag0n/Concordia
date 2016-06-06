@@ -269,30 +269,43 @@ namespace BlueBear {
 				// STEP 2: Push all the function's arguments and call!
 				// SFT object <function> object SFT 1 tick_array_table _sys._sched _sys instance
 				lua_pushvalue( L, -4 );
-				// [argument] SFT object <function> object SFT 1 tick_array_table _sys._sched _sys instance
+				// [argument]/nil SFT object <function> object SFT 1 tick_array_table _sys._sched _sys instance
 				Utility::getTableValue( L, "arguments" );
-				// [argument] object <function> object SFT 1 tick_array_table _sys._sched _sys instance
+				// [argument]/nil object <function> object SFT 1 tick_array_table _sys._sched _sys instance
 				lua_remove( L, -2 );
 
-				// The arguments array is now at the top of the stack. How many are in it?
-				// This will always be at least 1 (because of self)
-				int totalArguments = lua_rawlen( L, -1 ) + 1;
+				int totalArguments;
 
-				// Without accounting for self, count the number of arguments that need to be unrolled
-				if( totalArguments - 1 > 0 ) {
-					// e. Use this lovely loop to spit everything in the array out onto the stack
-					for( int i = 1; i != totalArguments; i++ ) {
-						// argument [argument] object <function> object SFT 1 tick_array_table _sys._sched _sys instance
-						lua_rawgeti( L, -i, i );
-					};
+				if( lua_istable( L, -1 ) ) {
+					// [argument] object <function> object SFT 1 tick_array_table _sys._sched _sys instance
+
+					// The arguments array is now at the top of the stack. How many are in it?
+					// This will always be at least 1 (because of self)
+					totalArguments = lua_rawlen( L, -1 ) + 1;
+
+					// Without accounting for self, count the number of arguments that need to be unrolled
+					if( totalArguments - 1 > 0 ) {
+						// e. Use this lovely loop to spit everything in the array out onto the stack
+						for( int i = 1; i != totalArguments; i++ ) {
+							// argument [argument] object <function> object SFT 1 tick_array_table _sys._sched _sys instance
+							lua_rawgeti( L, -i, i );
+						};
+					}
+
+					// Remove the actual array, which should be at -totalArguments
+					// In the case of empty array - totalArguments should be 1 (0+1, the "self" arg)
+					// In other cases, it should just be the negative of the length of the array
+
+					// argument object <function> object SFT 1 tick_array_table _sys._sched _sys instance
+					lua_remove( L, -totalArguments );
+				} else {
+					// There are no arguments.
+					// nil object <function> object SFT 1 tick_array_table _sys._sched _sys instance
+
+					totalArguments = 1;
+					// object <function> object SFT 1 tick_array_table _sys._sched _sys instance
+					lua_pop( L, 1 );
 				}
-
-				// Remove the actual array, which should be at -totalArguments
-				// In the case of empty array - totalArguments should be 1 (0+1, the "self" arg)
-				// In other cases, it should just be the negative of the length of the array
-
-				// argument object <function> object SFT 1 tick_array_table _sys._sched _sys instance
-				lua_remove( L, -totalArguments );
 
 				// Call that sumbitch!
 				if( lua_pcall( L, totalArguments, 0, 0 ) != 0 ) {
