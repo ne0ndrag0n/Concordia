@@ -432,46 +432,50 @@ namespace BlueBear {
 							// {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
 
 							// Grab the "arguments" array from the SFT
-							// [arguments] {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
 							Utility::getTableValue( L, "arguments" );
 
-							// One more...go through THAT array
-							// nil [arguments] {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
-							lua_pushnil( L );
-							while( lua_next( L, -2 ) != 0 ) {
-								// -1: the argument, -2: its position
-								// argument 1 [arguments] {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
+							if( lua_istable( L, -1 ) ) {
+								// [arguments] {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
 
-								// If the argument is a string, check if it fits the pattern "^t/bb\d+$"
-								// and if it does, replace the value in that array with a dereferenced table
-								if( lua_isstring( L, -1 ) ) {
-									std::string argument( lua_tostring( L, -1 ) );
+								// One more...go through THAT array
+								// nil [arguments] {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
+								lua_pushnil( L );
+								while( lua_next( L, -2 ) != 0 ) {
+									// -1: the argument, -2: its position
+									// argument 1 [arguments] {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
 
-									if( std::regex_match( argument, serialTableReference ) ) {
-										// Ask lot for numeric index of desired cid
-										std::string bbId = argument.substr( 2 );
-										int reference = currentLot->getLotObjectByCid( bbId );
-										if( reference != -1 ) {
-											// Push that object onto the stack
-											// object_table argument 1 [arguments] {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
-											lua_rawgeti( L, LUA_REGISTRYINDEX, reference );
-											// Get our current index at -3 and replace the value in table (at -4)
-											// argument 1 [arguments] {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
-											lua_rawseti( L, -4, lua_tointeger( L, -3 ) );
-										} else {
-											// Fault tolerance. Very bad scenario! Game cannot continue...fail
-											// Pop everything we've been doing...
-											Utility::clearLuaStack( L );
-											return false;
+									// If the argument is a string, check if it fits the pattern "^t/bb\d+$"
+									// and if it does, replace the value in that array with a dereferenced table
+									if( lua_isstring( L, -1 ) ) {
+										std::string argument( lua_tostring( L, -1 ) );
+
+										if( std::regex_match( argument, serialTableReference ) ) {
+											// Ask lot for numeric index of desired cid
+											std::string bbId = argument.substr( 2 );
+											int reference = currentLot->getLotObjectByCid( bbId );
+											if( reference != -1 ) {
+												// Push that object onto the stack
+												// object_table argument 1 [arguments] {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
+												lua_rawgeti( L, LUA_REGISTRYINDEX, reference );
+												// Get our current index at -3 and replace the value in table (at -4)
+												// argument 1 [arguments] {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
+												lua_rawseti( L, -4, lua_tointeger( L, -3 ) );
+											} else {
+												// Fault tolerance. Very bad scenario! Game cannot continue...fail
+												// Pop everything we've been doing...
+												Utility::clearLuaStack( L );
+												return false;
+											}
 										}
 									}
-								}
 
-								// Get rid of the argument, leaving the index for the next iteration of this table
-								// 1 [arguments] {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
-								lua_pop( L, 1 );
+									// Get rid of the argument, leaving the index for the next iteration of this table
+									// 1 [arguments] {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
+									lua_pop( L, 1 );
+								}
+							} else {
+								// nil {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
 							}
-							// [arguments] {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
 
 							// Pop the arguments table and SFT; we're done and ready for the next SFT
 							// 1 [SFTs] "1337.0" _sys._sched _sys
