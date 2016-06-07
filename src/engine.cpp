@@ -19,6 +19,7 @@
 #include <thread>
 #include <regex>
 #include <memory>
+#include <stdexcept>
 
 namespace BlueBear {
 
@@ -549,16 +550,20 @@ namespace BlueBear {
 	 */
 	 int Engine::lua_print( lua_State* L ) {
 
-		 int numArgs = lua_gettop( L );
+		 try {
+			 int numArgs = lua_gettop( L );
 
-		 // print( "message" )
-		 if( numArgs == 1 ) {
-			 Log::getInstance().debug( "LuaScript", lua_tostring( L, -1 ) );
-		 }
+			 // print( "message" )
+			 if( numArgs == 1 ) {
+				 Log::getInstance().debug( "LuaScript", lua_tostring( L, -1 ) );
+			 }
 
-		 // print( "tag", "message" )
-		 else if( numArgs == 2 ) {
-			 Log::getInstance().debug( lua_tostring( L, -2 ), lua_tostring( L, -1 ) );
+			 // print( "tag", "message" )
+			 else if( numArgs == 2 ) {
+				 Log::getInstance().debug( lua_tostring( L, -2 ), lua_tostring( L, -1 ) );
+			 }
+		 } catch ( std::logic_error e ) {
+			 Log::getInstance().error( "lua_print", "Failed to print() log message (did you use tostring() on non-string objects?)" );
 		 }
 
 		 return 0;
