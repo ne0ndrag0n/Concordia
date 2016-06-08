@@ -341,7 +341,7 @@ namespace BlueBear {
 			bool parseSuccessful = reader.parse( lot, lotJSON );
 
 			// If parse was successful, begin loading the lot
-			if( parseSuccessful ) {
+			if( parseSuccessful && lotJSON.isObject() ) {
 				// Log some basic information about the loading of the lot
 				Log::getInstance().info( "Engine::loadLot", "[" + std::string( lotPath ) + "] Lot revision: " + lotJSON[ "rev" ].asString() );
 
@@ -382,6 +382,9 @@ namespace BlueBear {
 					Log::getInstance().error( "Engine::loadLot", "Unable to load lot " + std::string( lotPath ) + ": This lot contains a missing entity." );
 					return false;
 				}
+			} else {
+				Log::getInstance().error( "Engine::loadLot", "Unable to parse " + std::string( lotPath ) );
+				return false;
 			}
 		} else {
 			Log::getInstance().error( "Engine::loadLot", "Unable to parse " + std::string( lotPath ) );
