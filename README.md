@@ -28,3 +28,4 @@ Version 0.0.2a - Milestone "ET2"
 * Lua 5.3.x
 * JsonCpp 1.7.x
 * GLM
+* GLEW
