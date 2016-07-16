@@ -20,6 +20,7 @@ namespace BlueBear {
 
       std::string getValue( const std::string& key );
       int getIntValue( const std::string& key );
+      bool getBoolValue( const std::string& key );
       static int lua_getValue( lua_State* L );
 
     private:
