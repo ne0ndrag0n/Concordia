@@ -16,13 +16,13 @@
 
 namespace BlueBear {
 
-	Lot::Lot( lua_State* L, const Tick& currentTickReference, int floorX, int floorY, int stories, int undergroundStories, BlueBear::TerrainType terrainType ) :
+	Lot::Lot( lua_State* L, const Tick& currentTickReference, int floorX, int floorY, int stories, int undergroundStories, TerrainType terrainType ) :
 		L( L ), currentTickReference( currentTickReference ), floorX( floorX ), floorY( floorY ), stories( stories ), undergroundStories( undergroundStories ), terrainType( terrainType ) {}
 
 	int Lot::lua_getLotObjects( lua_State* L ) {
 
 		// Pop the lot off the stack
-		BlueBear::Lot* lot = ( BlueBear::Lot* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+		Lot* lot = ( Lot* )lua_touserdata( L, lua_upvalueindex( 1 ) );
 
 		// Create an array table with as many entries as the size of this->objects
 		lua_createtable( L, lot->objects.size(), 0 );
@@ -30,7 +30,7 @@ namespace BlueBear {
 		// Push 'em on!
 		size_t tableIndex = 1;
 		for( auto& keyValuePair : lot->objects ) {
-			BlueBear::LotEntity& lotEntity = *( keyValuePair.second );
+			LotEntity& lotEntity = *( keyValuePair.second );
 
 			lua_rawgeti( L, LUA_REGISTRYINDEX, lotEntity.luaVMInstance );
 			lua_rawseti( L, -2, tableIndex++ );
@@ -43,7 +43,7 @@ namespace BlueBear {
 	int Lot::lua_getLotObjectsByType( lua_State* L ) {
 
 		// Because Lua requires methods be static in C closure, pop the first argument: the "this" pointer
-		BlueBear::Lot* lot = ( BlueBear::Lot* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+		Lot* lot = ( Lot* )lua_touserdata( L, lua_upvalueindex( 1 ) );
 
 		// Get argument (the class we are looking for) and remove it from the stack
 		// Copy using modern C++ string methods into archaic, unsafe C-string format used by Lua API
@@ -59,7 +59,7 @@ namespace BlueBear {
 
 		// Iterate through each object on the lot, checking to see if each is an instance of "idKey"
 		for( auto& keyValuePair : lot->objects ) {
-			BlueBear::LotEntity& lotEntity = *( keyValuePair.second );
+			LotEntity& lotEntity = *( keyValuePair.second );
 
 			// Push bluebear global
 			lua_getglobal( L, "bluebear" );
@@ -100,7 +100,7 @@ namespace BlueBear {
 	int Lot::lua_getLotObjectByCid( lua_State* L ) {
 
 		// Because Lua requires methods be static in C closure, pop the first argument: the "this" pointer
-		BlueBear::Lot* lot = ( BlueBear::Lot* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+		Lot* lot = ( Lot* )lua_touserdata( L, lua_upvalueindex( 1 ) );
 
 		// Get argument (the class we are looking for) and remove it from the stack
 		std::string keystring( lua_tostring( L, -1 ) );
@@ -141,7 +141,7 @@ namespace BlueBear {
 	 */
 	int Lot::createLotEntityFromJSON( const Json::Value& serialEntity ) {
 		// Simple proxy to LotEntity's JSON constructor
-		std::unique_ptr< BlueBear::LotEntity > entity = std::make_unique< BlueBear::LotEntity >( L, currentTickReference, serialEntity );
+		std::unique_ptr< LotEntity > entity = std::make_unique< LotEntity >( L, currentTickReference, serialEntity );
 
 		if( entity->ok ) {
 			int ref = entity->luaVMInstance;
@@ -159,7 +159,7 @@ namespace BlueBear {
 	 * Create a new instance of "classID" from scratch
 	 */
 	int Lot::createLotEntity( const std::string& classID ) {
-		std::unique_ptr< BlueBear::LotEntity > entity = std::make_unique< BlueBear::LotEntity >( L, currentTickReference, classID );
+		std::unique_ptr< LotEntity > entity = std::make_unique< LotEntity >( L, currentTickReference, classID );
 
 		// Add the pointer to our objects map if everything is A-OK
 		if( entity->ok ) {
@@ -179,7 +179,7 @@ namespace BlueBear {
 	 */
 	int Lot::lua_createLotEntity( lua_State* L ) {
 
-		BlueBear::Lot* lot = ( BlueBear::Lot* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+		Lot* lot = ( Lot* )lua_touserdata( L, lua_upvalueindex( 1 ) );
 
 		// Get argument (the class we are looking for) and remove it from the stack
 		std::string classID( lua_tostring( L, -1 ) );

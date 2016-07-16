@@ -200,13 +200,13 @@ namespace BlueBear {
 		// If this modpack is LOADING, don't load it twice! This is a circular dependency; a modpack being imported by another modpack called
 		// to load the first modpack (which was still LOADING)! Fail immediately.
 		// Fail immediately if it already failed (don't waste time loading it again)
-		if( loadedModpacks[ name ] == BlueBear::ModpackStatus::LOADING || loadedModpacks[ name ] == BlueBear::ModpackStatus::LOAD_FAILED ) {
+		if( loadedModpacks[ name ] == ModpackStatus::LOADING || loadedModpacks[ name ] == ModpackStatus::LOAD_FAILED ) {
 			return false;
 		}
 
 		// Don't load another modpack twice. Another script might have already loaded this modpack. Just go "uh-huh" and
 		// remind the source call that this modpack was already loaded.
-		if( loadedModpacks[ name ] == BlueBear::ModpackStatus::LOAD_SUCCESSFUL ) {
+		if( loadedModpacks[ name ] == ModpackStatus::LOAD_SUCCESSFUL ) {
 			return true;
 		}
 
@@ -215,7 +215,7 @@ namespace BlueBear {
 		std::string fullPath = path + "/" + MODPACK_MAIN_SCRIPT;
 
 		// Mark the module as LOADING - first if should catch this module if it's called again without completing
-		loadedModpacks[ name ] = BlueBear::ModpackStatus::LOADING;
+		loadedModpacks[ name ] = ModpackStatus::LOADING;
 
 		// dofile pointed to by path
 		if( luaL_loadfile( L, fullPath.c_str() ) || !lua_pushstring( L, path.c_str() ) || lua_pcall( L, 1, LUA_MULTRET, 0 ) ) {
@@ -223,11 +223,11 @@ namespace BlueBear {
 			// Exception occurred during the integration of this modpack
 			Log::getInstance().error( "Engine::loadModpack", "Failed to integrate modpack " + name + ": " + lua_tostring( L, -1 ) );
 			lua_pop( L, 1 );
-			loadedModpacks[ name ] = BlueBear::ModpackStatus::LOAD_FAILED;
+			loadedModpacks[ name ] = ModpackStatus::LOAD_FAILED;
 			return false;
 		}
 
-		loadedModpacks[ name ] = BlueBear::ModpackStatus::LOAD_SUCCESSFUL;
+		loadedModpacks[ name ] = ModpackStatus::LOAD_SUCCESSFUL;
 		return true;
 	}
 
@@ -236,7 +236,7 @@ namespace BlueBear {
 	 */
 	int Engine::lua_loadModpack( lua_State* L ) {
 		// Because Lua requires methods be static in C closure, pop the first argument: the "this" pointer
-		BlueBear::Engine* engine = ( BlueBear::Engine* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+		Engine* engine = ( Engine* )lua_touserdata( L, lua_upvalueindex( 1 ) );
 
 		// Get the modpack name
 		std::string modpack( lua_tostring( L, -1 ) );
@@ -261,7 +261,7 @@ namespace BlueBear {
 	 * Lua C++ binding to create a stemcell
 	 */
 	 int Engine::lua_setupStemcell( lua_State* L ) {
-		 	BlueBear::Engine* engine = ( BlueBear::Engine* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+		 	Engine* engine = ( Engine* )lua_touserdata( L, lua_upvalueindex( 1 ) );
 
 			// Expected stack: stemcell_type stemcell
 			if( lua_isstring( L, -1 ) ) {
@@ -349,18 +349,18 @@ namespace BlueBear {
 				currentTick = lotJSON[ "ticks" ].asInt();
 
 				// Instantiate the lot
-				currentLot = std::make_shared< BlueBear::Lot >(
+				currentLot = std::make_shared< Lot >(
 					L,
 					currentTick,
 					lotJSON[ "floorx" ].asInt(),
 					lotJSON[ "floory" ].asInt(),
 					lotJSON[ "stories" ].asInt(),
 					lotJSON[ "subtr" ].asInt(),
-					BlueBear::TerrainType( lotJSON[ "terrain" ].asInt() )
+					TerrainType( lotJSON[ "terrain" ].asInt() )
 				);
 
 				// Setup global event manager
-				eventManager = std::make_unique< BlueBear::EventManager >( L, currentLot );
+				eventManager = std::make_unique< EventManager >( L, currentLot );
 				if( lotJSON.isMember( "global_events" ) ) {
 					eventManager->load( lotJSON[ "global_events" ] );
 				}
@@ -406,8 +406,8 @@ namespace BlueBear {
 		Utility::clearLuaStack( L );
 
 		for( auto& keyValuePair : currentLot->objects ) {
-			// Dereference the pointer to the BlueBear::LotEntity
-			BlueBear::LotEntity& currentEntity = *( keyValuePair.second );
+			// Dereference the pointer to the LotEntity
+			LotEntity& currentEntity = *( keyValuePair.second );
 
 			// Push this object's table onto the API stack
 			lua_rawgeti( L, LUA_REGISTRYINDEX, currentEntity.luaVMInstance );
@@ -530,7 +530,7 @@ namespace BlueBear {
 				Utility::setTableIntValue( L, "current_tick", currentTick );
 
 				for( auto& keyValuePair : currentLot->objects ) {
-					BlueBear::LotEntity& currentEntity = *( keyValuePair.second );
+					LotEntity& currentEntity = *( keyValuePair.second );
 
 					// Execute object if it is "ok"
 					if( currentEntity.ok == true ) {
