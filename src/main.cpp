@@ -8,15 +8,17 @@
 #include <iostream>
 #include <thread>
 
+using namespace BlueBear;
+
 int main() {
-	BlueBear::Log::getInstance().info( "Main",  BlueBear::LocaleManager::getInstance().getString( "BLUEBEAR_WELCOME_MESSAGE" ) );
+	Log::getInstance().info( "Main", LocaleManager::getInstance().getString( "BLUEBEAR_WELCOME_MESSAGE" ) );
 
 	std::thread windowThread( []() {
-		BlueBear::Display display;
+		Display display;
 		display.showDisplay();
 	} );
 
-	BlueBear::Engine engine;
+	Engine engine;
 
 	if ( !engine.setupRootEnvironment() ) {
 		std::cerr << "Failed to load BlueBear!" << std::endl;
@@ -30,7 +32,7 @@ int main() {
 	}
 
 	// Thread should take it from here
-	BlueBear::Log::getInstance().warn( "Main", "Program execution has completed, please close the SFML window." );
+	Log::getInstance().warn( "Main", "Program execution has completed, please close the SFML window." );
 	windowThread.join();
 
 	return 0;
