@@ -1,4 +1,5 @@
 #include "graphics/display.hpp"
+#include "localemanager.hpp"
 #include "configmanager.hpp"
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
@@ -13,8 +14,7 @@ namespace BlueBear {
     }
 
     void Display::showDisplay() {
-      // TODO: Localiser!
-      mainWindow.create( sf::VideoMode( x, y ), "ne0ndrag0n BlueBear v0.0.3 \"Picasso\"", sf::Style::Close );
+      mainWindow.create( sf::VideoMode( x, y ), LocaleManager::getInstance().getString( "BLUEBEAR_WINDOW_TITLE" ), sf::Style::Close );
       mainWindow.setVerticalSyncEnabled( true );
       main();
     }
