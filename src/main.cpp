@@ -3,7 +3,7 @@
 #include <lualib.h>
 #include <lauxlib.h>
 #include "log.hpp"
-#include "display.hpp"
+#include "graphics/display.hpp"
 #include "localemanager.hpp"
 #include <iostream>
 #include <thread>
@@ -14,7 +14,7 @@ int main() {
 	Log::getInstance().info( "Main", LocaleManager::getInstance().getString( "BLUEBEAR_WELCOME_MESSAGE" ) );
 
 	std::thread windowThread( []() {
-		Display display;
+		Graphics::Display display;
 		display.showDisplay();
 	} );
 
