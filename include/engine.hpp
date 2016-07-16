@@ -20,7 +20,7 @@ namespace BlueBear {
 		private:
 			static constexpr const char* LUASPHERE_MAIN = "system/root.lua";
 			static constexpr const char* BLUEBEAR_MODPACK_DIRECTORY = "assets/modpacks/";
-			static constexpr const char* SYSTEM_MODPACK_DIRECTORY = "system/";
+			static constexpr const char* SYSTEM_MODPACK_DIRECTORY = "system/modpacks/";
 			static constexpr const char* MODPACK_MAIN_SCRIPT = "obj.lua";
 			static constexpr const Tick WORLD_TICKS_MAX = 300;
 
