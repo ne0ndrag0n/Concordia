@@ -7,7 +7,6 @@
 #include <exception>
 #include <utility>
 #include <memory>
-#include "gfxtexture.hpp"
 
 namespace BlueBear {
   namespace Graphics {
