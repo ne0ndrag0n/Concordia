@@ -5,8 +5,8 @@
 #include <memory>
 #include <GL/glew.h>
 
-class BlueBear {
-  class Graphics {
+namespace BlueBear {
+  namespace Graphics {
     class Texture;
 
     using TextureList = std::vector< std::shared_ptr< Texture > >;
@@ -17,7 +17,7 @@ class BlueBear {
         TextureList diffuseTextures;
         TextureList specularTextures;
 
-        Material() {}
+        Material();
         Material( TextureList diffuseTextures );
         Material( TextureList diffuseTextures, TextureList specularTextures );
 
