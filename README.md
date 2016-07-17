@@ -25,8 +25,9 @@ Version 0.0.3 - Milestone "Picasso"
 
 ## Dependencies
 * SFML 2.3.x
-* SFGUI 
+* SFGUI
 * Lua 5.3.x
 * JsonCpp 1.7.x
 * GLM
 * GLEW
+* Assimp
