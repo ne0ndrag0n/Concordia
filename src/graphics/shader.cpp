@@ -1,4 +1,5 @@
 #include "graphics/shader.hpp"
+#include "log.hpp"
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -39,9 +40,8 @@ namespace BlueBear {
             vertexCode = vShaderStream.str();
             fragmentCode = fShaderStream.str();
         }
-        catch (std::ifstream::failure e)
-        {
-            std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+        catch (std::ifstream::failure e) {
+          Log::getInstance().error( "Shader::Shader", "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" );
         }
         const GLchar* vShaderCode = vertexCode.c_str();
         const GLchar * fShaderCode = fragmentCode.c_str();
@@ -58,7 +58,9 @@ namespace BlueBear {
         if (!success)
         {
             glGetShaderInfoLog(vertex, 512, NULL, infoLog);
-            std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+            std::stringstream stream;
+            stream << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog;
+            Log::getInstance().error( "Shader::Shader", stream.str() );
         }
         // Fragment Shader
         fragment = glCreateShader(GL_FRAGMENT_SHADER);
@@ -69,7 +71,9 @@ namespace BlueBear {
         if (!success)
         {
             glGetShaderInfoLog(fragment, 512, NULL, infoLog);
-            std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+            std::stringstream stream;
+            stream << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog;
+            Log::getInstance().error( "Shader::Shader", stream.str() );
         }
         // Shader Program
         this->Program = glCreateProgram();
@@ -81,7 +85,9 @@ namespace BlueBear {
         if (!success)
         {
             glGetProgramInfoLog(this->Program, 512, NULL, infoLog);
-            std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+            std::stringstream stream;
+            stream << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog;
+            Log::getInstance().error( "Shader::Shader", stream.str() );
         }
         // Delete the shaders as they're linked into our program now and no longer necessery
         glDeleteShader(vertex);

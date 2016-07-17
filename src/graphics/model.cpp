@@ -4,14 +4,15 @@
 #include "graphics/drawable.hpp"
 #include "graphics/texture.hpp"
 #include "utility.hpp"
+#include "log.hpp"
 #include <string>
+#include <sstream>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <iostream>
 #include <memory>
 #include <vector>
 
@@ -54,7 +55,10 @@ namespace BlueBear {
       const aiScene* scene = importer.ReadFile( path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals );
 
       if( !scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode ) {
-        std::cout << "Warning: Could not import file " << path << std::endl;
+        // god this is an abomination fucking piece of shit c++ not having a fucking formatted print for god damn std::string
+        std::stringstream stream( "Warning: Could not import file " );
+        stream << path;
+        Log::getInstance().error( "Model::loadModel", stream.str() );
         return;
       }
 
@@ -69,13 +73,21 @@ namespace BlueBear {
     }
 
     void Model::processNode( aiNode* node, const aiScene* scene, aiMatrix4x4 parentTransform ) {
-      std::cout << "Processing " << node->mName.C_Str() << std::endl;
+      {
+        std::stringstream stream( "Processing " );
+        stream << node->mName.C_Str();
+        Log::getInstance().debug( "Model::processNode", stream.str() );
+      }
 
       aiMatrix4x4 resultantTransform = parentTransform * node->mTransformation;
 
       for( int i = 0; i < node->mNumMeshes; i++ ) {
         aiMesh* mesh = scene->mMeshes[ node->mMeshes[ i ] ];
-        std::cout << '\t' << "Loading mesh " << mesh->mName.C_Str() << std::endl;
+
+        std::stringstream stream;
+        stream << '\t' << "Loading mesh " << mesh->mName.C_Str();
+        Log::getInstance().debug( "Model::processNode", stream.str() );
+
         this->processMesh( mesh, scene, node->mName.C_Str(), aiToGLMmat4( resultantTransform ) );
       }
 
@@ -83,7 +95,11 @@ namespace BlueBear {
         children.emplace( node->mChildren[ i ]->mName.C_Str(), std::make_unique< Model >( node->mChildren[ i ], scene, directory, resultantTransform ) );
       }
 
-      std::cout << "Done with " << node->mName.C_Str() << std::endl;
+      {
+        std::stringstream stream( "Done with " );
+        stream << node->mName.C_Str();
+        Log::getInstance().debug( "Model::processNode", stream.str() );
+      }
     }
 
     void Model::processMesh( aiMesh* mesh, const aiScene* scene, std::string nodeTitle, glm::mat4 transformation ) {

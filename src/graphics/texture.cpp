@@ -1,9 +1,11 @@
 #include "graphics/texture.hpp"
+#include "log.hpp"
 #include <assimp/types.h>
 #include <GL/glew.h>
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <string>
+#include <sstream>
 
 namespace BlueBear {
   namespace Graphics {
@@ -18,7 +20,9 @@ namespace BlueBear {
     Texture::Texture( std::string texFromFile ) {
       sf::Image texture;
       if( !texture.loadFromFile( texFromFile ) ) {
-        std::cout << "Couldn't load texture " << texFromFile << std::endl;
+        std::stringstream stream( "Couldn't load texture " );
+        stream << texFromFile;
+        Log::getInstance().error( "Texture::Texture", stream.str() );
         return;
       }
 
