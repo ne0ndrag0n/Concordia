@@ -1,6 +1,7 @@
 #ifndef MODELINSTANCE
 #define MODELINSTANCE
 
+#include "graphics/transform.hpp"
 #include <string>
 #include <memory>
 #include <map>
