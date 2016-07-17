@@ -43,7 +43,7 @@ namespace BlueBear {
       public:
         glm::vec3 direction = originalDirection;
         bool ortho = true;
-        LotCamera( GLuint program, int screenWidth, int screenHeight );
+        Camera( GLuint program, int screenWidth, int screenHeight );
         void move( GLfloat x, GLfloat y, GLfloat z );
         bool setOrthographic( bool flag );
         float zoomIn();
