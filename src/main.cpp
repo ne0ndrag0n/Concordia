@@ -1,4 +1,4 @@
-#include "engine.hpp"
+#include "scripting/engine.hpp"
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -18,7 +18,7 @@ int main() {
 		display.showDisplay();
 	} );
 
-	Engine engine;
+	Scripting::Engine engine;
 
 	if ( !engine.setupRootEnvironment() ) {
 		std::cerr << "Failed to load BlueBear!" << std::endl;
