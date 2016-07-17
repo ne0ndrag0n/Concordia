@@ -1,7 +1,9 @@
 #ifndef MODEL3D
 #define MODEL3D
 
+#include "graphics/material.hpp"
 #include <string>
+#include <map>
 #include <memory>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -13,7 +15,6 @@
 namespace BlueBear {
   namespace Graphics {
     class Drawable;
-    class TextureList;
 
     class Model {
 
