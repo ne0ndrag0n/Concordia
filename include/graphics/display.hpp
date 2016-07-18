@@ -5,6 +5,8 @@
  * Abstracted class representing the display device that is available to BlueBear.
  */
 #include <SFML/Graphics.hpp>
+#include <vector>
+#include "graphics/entity.hpp"
 
 namespace BlueBear {
   namespace Graphics {
@@ -17,6 +19,7 @@ namespace BlueBear {
         ViewportDimension x;
         ViewportDimension y;
         sf::RenderWindow mainWindow;
+        std::vector< Instance > instances;
         void main();
 
       public:

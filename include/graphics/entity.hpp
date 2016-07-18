@@ -2,6 +2,7 @@
 #define MODELINSTANCE
 
 #include "graphics/transform.hpp"
+#include "graphics/drawable.hpp"
 #include <string>
 #include <memory>
 #include <map>
@@ -12,7 +13,6 @@
 
 namespace BlueBear {
   namespace Graphics {
-    class Drawable;
     class Model;
 
     /**
