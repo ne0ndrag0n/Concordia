@@ -7,33 +7,35 @@
 #include "localemanager.hpp"
 #include <iostream>
 #include <thread>
+#include <SFML/Window.hpp>
 
 using namespace BlueBear;
 
 int main() {
 	Log::getInstance().info( "Main", LocaleManager::getInstance().getString( "BLUEBEAR_WELCOME_MESSAGE" ) );
 
-	std::thread windowThread( []() {
-		Graphics::Display display;
-		display.showDisplay();
-	} );
+	// main() thread is the UI thread, or should be
+	Graphics::Display display;
+	display.openDisplay();
 
 	Scripting::Engine engine;
-
 	if ( !engine.setupRootEnvironment() ) {
 		std::cerr << "Failed to load BlueBear!" << std::endl;
 		return 1;
 	}
-
 	// Load a lot object
+	std::thread engineThread;
 	if( engine.loadLot( "lots/lot01.json" ) ) {
-		// Setup a loop!
-		engine.objectLoop();
+		engineThread = std::thread( [&engine]() {
+			engine.objectLoop();
+		} );
 	}
 
-	// Thread should take it from here
-	Log::getInstance().warn( "Main", "Program execution has completed, please close the SFML window." );
-	windowThread.join();
+	while( display.isOpen() ) {
+		display.render();
+	}
+
+	engineThread.join();
 
 	return 0;
 }

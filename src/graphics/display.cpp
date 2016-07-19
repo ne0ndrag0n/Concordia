@@ -13,25 +13,26 @@ namespace BlueBear {
       y = ConfigManager::getInstance().getIntValue( "viewport_y" );
     }
 
-    void Display::showDisplay() {
+    void Display::openDisplay() {
       mainWindow.create( sf::VideoMode( x, y ), LocaleManager::getInstance().getString( "BLUEBEAR_WINDOW_TITLE" ), sf::Style::Close );
       mainWindow.setVerticalSyncEnabled( true );
-      main();
     }
 
-    void Display::main() {
-      while( mainWindow.isOpen() ) {
-        // Handle events
-        sf::Event event;
-        while( mainWindow.pollEvent( event ) ) {
-          if( event.type == sf::Event::Closed ) {
-            mainWindow.close();
-          }
+    void Display::render() {
+      // Handle events
+      sf::Event event;
+      while( mainWindow.pollEvent( event ) ) {
+        if( event.type == sf::Event::Closed ) {
+          mainWindow.close();
         }
-
-        mainWindow.clear( sf::Color::Black );
-        mainWindow.display();
       }
+
+      mainWindow.clear( sf::Color::Black );
+      mainWindow.display();
+    }
+
+    bool Display::isOpen() {
+      return mainWindow.isOpen();
     }
   }
 }

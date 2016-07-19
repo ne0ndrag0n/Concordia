@@ -18,15 +18,17 @@ namespace BlueBear {
       private:
         ViewportDimension x;
         ViewportDimension y;
-        sf::RenderWindow mainWindow;
         std::vector< Instance > instances;
+        sf::RenderWindow mainWindow;
         void main();
 
       public:
         // RAII style
         Display();
 
-        void showDisplay();
+        void openDisplay();
+        void render();
+        bool isOpen();
     };
 
   }
