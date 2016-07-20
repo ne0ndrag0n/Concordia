@@ -26,9 +26,7 @@ int main() {
 	// Load a lot object
 	std::thread engineThread;
 	if( engine.loadLot( "lots/lot01.json" ) ) {
-		engineThread = std::thread( [&engine]() {
-			engine.objectLoop();
-		} );
+		engineThread = std::thread( &Scripting::Engine::objectLoop, &engine );
 	}
 
 	while( display.isOpen() ) {
