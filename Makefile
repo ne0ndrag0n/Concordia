@@ -6,6 +6,7 @@ LIBS = -lpthread -lassimp -lGLEW -lGL -lsfml-graphics -lsfml-window -lsfml-syste
 SRCS = $(wildcard src/*.cpp)
 SRCS += $(wildcard src/graphics/*.cpp)
 SRCS += $(wildcard src/scripting/*.cpp)
+SRCS += $(wildcard src/threading/*.cpp)
 OBJS = $(SRCS:.c=.o)
 
 MAIN = bbexec

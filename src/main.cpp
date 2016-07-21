@@ -4,6 +4,7 @@
 #include <lauxlib.h>
 #include "log.hpp"
 #include "graphics/display.hpp"
+#include "threading/commandbus.hpp"
 #include "localemanager.hpp"
 #include <iostream>
 #include <thread>
@@ -15,10 +16,11 @@ int main() {
 	Log::getInstance().info( "Main", LocaleManager::getInstance().getString( "BLUEBEAR_WELCOME_MESSAGE" ) );
 
 	// main() thread is the UI thread, or should be
-	Graphics::Display display;
+	Threading::CommandBus commandBus;
+	Graphics::Display display( commandBus );
 	display.openDisplay();
 
-	Scripting::Engine engine;
+	Scripting::Engine engine( commandBus );
 	if ( !engine.setupRootEnvironment() ) {
 		std::cerr << "Failed to load BlueBear!" << std::endl;
 		return 1;

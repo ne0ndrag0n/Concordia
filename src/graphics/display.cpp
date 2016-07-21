@@ -1,4 +1,5 @@
 #include "graphics/display.hpp"
+#include "threading/commandbus.hpp"
 #include "localemanager.hpp"
 #include "configmanager.hpp"
 #include <SFML/Graphics.hpp>
@@ -7,7 +8,7 @@
 
 namespace BlueBear {
   namespace Graphics {
-    Display::Display() {
+    Display::Display( Threading::CommandBus& commandBus ) : commandBus( commandBus ) {
       // Get our settings out of the config manager
       x = ConfigManager::getInstance().getIntValue( "viewport_x" );
       y = ConfigManager::getInstance().getIntValue( "viewport_y" );

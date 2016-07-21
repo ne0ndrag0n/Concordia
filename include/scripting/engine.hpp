@@ -12,6 +12,10 @@
 
 
 namespace BlueBear {
+	namespace Threading {
+		class CommandBus;
+	}
+
 	namespace Scripting {
 		class Lot;
 		class EventManager;
@@ -32,13 +36,14 @@ namespace BlueBear {
 				std::unique_ptr< EventManager > eventManager;
 				const char* currentModpackDirectory;
 				std::map< std::string, BlueBear::ModpackStatus > loadedModpacks;
+				Threading::CommandBus& commandBus;
 
 				void callActionOnObject( const char* playerId, const char* objectId, const char* method );
 				bool deserializeFunctionRefs();
 				void setupLotEnvironment();
 
 			public:
-				Engine();
+				Engine( Threading::CommandBus& commandBus );
 				~Engine();
 				void objectLoop();
 				bool loadLot( const char* lotPath );

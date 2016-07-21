@@ -6,6 +6,7 @@
 #include "scripting/lotentity.hpp"
 #include "scripting/lot.hpp"
 #include "scripting/engine.hpp"
+#include "threading/commandbus.hpp"
 #include "configmanager.hpp"
 #include "scripting/eventmanager.hpp"
 #include "log.hpp"
@@ -24,8 +25,8 @@
 namespace BlueBear {
 	namespace Scripting {
 
-		Engine::Engine() :
-		 L( luaL_newstate() ), currentModpackDirectory( nullptr ), ticksPerSecond( ConfigManager::getInstance().getIntValue( "ticks_per_second" ) ) {
+		Engine::Engine( Threading::CommandBus& commandBus ) :
+		 L( luaL_newstate() ), currentModpackDirectory( nullptr ), ticksPerSecond( ConfigManager::getInstance().getIntValue( "ticks_per_second" ) ), commandBus( commandBus ) {
 			luaL_openlibs( L );
 		}
 
