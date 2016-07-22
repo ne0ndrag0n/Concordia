@@ -6,6 +6,7 @@
 #include <SFML/Window.hpp>
 #include <SFML/OpenGL.hpp>
 #include <memory>
+#include <mutex>
 
 namespace BlueBear {
   namespace Graphics {
@@ -50,7 +51,21 @@ namespace BlueBear {
      * Swap the pointers, and if the resulting list contains any commands, process those commands.
      */
     void Display::processCommands() {
+      // List shall be empty at the beginning of each iteration
+      // Trylock - If successful, swap the pointers and process each command
+      // TODO: Be alert for starvation issues here - introduce a timer?
+      {
+        // Keep this critical section short!
+        std::unique_lock< std::mutex > locker( commandBus.displayMutex, std::try_to_lock );
+        if( locker.owns_lock() ) {
+          // Okay to do the swap!
+          displayCommands.swap( commandBus.displayCommands );
+        }
+      }
 
+      for( Graphics::Display::Command& command : *displayCommands ) {
+        command.execute( *this );
+      }
     }
   }
 }

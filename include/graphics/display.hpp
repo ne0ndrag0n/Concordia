@@ -28,12 +28,14 @@ namespace BlueBear {
       bool isOpen();
 
       class Command {
-        virtual void execute( Display& instance ) = 0;
+        public:
+          virtual void execute( Display& instance ) = 0;
       };
 
       class NewEntityCommand : public Command {
         glm::vec3 position;
-        void execute( Display& instance );
+        public:
+          void execute( Display& instance );
       };
 
       using CommandList = std::vector< Command >;

@@ -21,6 +21,7 @@
 #include <thread>
 #include <regex>
 #include <memory>
+#include <mutex>
 #include <stdexcept>
 
 namespace BlueBear {
@@ -525,6 +526,19 @@ namespace BlueBear {
 				// Let's set up a start and end duration
 				auto startTime = std::chrono::steady_clock::now();
 				auto endTime = startTime + std::chrono::seconds( 1 );
+
+				// Within the time block, determine if there are outgoing displayCommands, and if there are, send them to the CommandBus
+				if( displayCommands->size() > 0 ) {
+					// Swap the pointers (if the item has already been taken by the consuming Display thread)
+					// TODO: starvation, time, etc
+					std::unique_lock< std::mutex > locker( commandBus.displayMutex, std::try_to_lock );
+					if( locker.owns_lock() ) {
+						if( commandBus.displayCommands->size() == 0 ) {
+							// The object was taken already
+							displayCommands.swap( commandBus.displayCommands );
+						}
+					}
+				}
 
 				// Complete a tick set: currentTick up to the next time it is evenly divisible by ticksPerSecond
 				int ticksRemaining = ticksPerSecond;
