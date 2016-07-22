@@ -5,6 +5,7 @@
 #include <lualib.h>
 #include <lauxlib.h>
 #include "bbtypes.hpp"
+#include "graphics/display.hpp"
 #include <string>
 #include <memory>
 #include <vector>
@@ -34,6 +35,7 @@ namespace BlueBear {
 				Tick ticksPerSecond;
 				std::shared_ptr< Lot > currentLot;
 				std::unique_ptr< EventManager > eventManager;
+				std::unique_ptr< Graphics::Display::CommandList > displayCommands;
 				const char* currentModpackDirectory;
 				std::map< std::string, BlueBear::ModpackStatus > loadedModpacks;
 				Threading::CommandBus& commandBus;

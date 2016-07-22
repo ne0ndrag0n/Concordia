@@ -13,7 +13,7 @@ namespace BlueBear {
 
       public:
         std::mutex displayMutex;
-        std::unique_ptr< std::vector< BlueBear::Graphics::Display::Command > > display;
+        std::unique_ptr< Graphics::Display::CommandList > displayCommands;
 
         CommandBus();
     };

@@ -6,6 +6,7 @@
  */
 #include <SFML/Graphics.hpp>
 #include <vector>
+#include <memory>
 #include <glm/glm.hpp>
 #include "graphics/entity.hpp"
 
@@ -15,6 +16,7 @@ namespace BlueBear {
   }
 
   namespace Graphics {
+
     class Display {
 
     public:
@@ -34,6 +36,8 @@ namespace BlueBear {
         void execute( Display& instance );
       };
 
+      using CommandList = std::vector< Command >;
+
       private:
         using ViewportDimension = int;
         ViewportDimension x;
@@ -41,6 +45,7 @@ namespace BlueBear {
         std::vector< Instance > instances;
         sf::RenderWindow mainWindow;
         Threading::CommandBus& commandBus;
+        std::unique_ptr< CommandList > displayCommands;
         void main();
         void processCommands();
     };

@@ -9,6 +9,7 @@
 #include <iostream>
 #include <thread>
 #include <SFML/Window.hpp>
+#include <memory>
 
 using namespace BlueBear;
 

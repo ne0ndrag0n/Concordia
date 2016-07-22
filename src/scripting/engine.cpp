@@ -7,6 +7,7 @@
 #include "scripting/lot.hpp"
 #include "scripting/engine.hpp"
 #include "threading/commandbus.hpp"
+#include "graphics/display.hpp"
 #include "configmanager.hpp"
 #include "scripting/eventmanager.hpp"
 #include "log.hpp"
@@ -509,6 +510,9 @@ namespace BlueBear {
 		 */
 		void Engine::objectLoop() {
 			Log::getInstance().debug( "Engine::objectLoop", "Starting world engine with a tick count of " + std::to_string( currentTick ) );
+
+			// Allocate this pointer to swap at the end of every iteration if required
+			displayCommands = std::make_unique< Graphics::Display::CommandList >();
 
 			// Push the bluebear global onto the stack - leave it there
 			lua_getglobal( L, "bluebear" );
