@@ -16,6 +16,9 @@ namespace BlueBear {
         std::unique_ptr< Graphics::Display::CommandList > displayCommands;
 
         CommandBus();
+
+        void produce( std::unique_ptr< Graphics::Display::CommandList >& source );
+        void consume( std::unique_ptr< Graphics::Display::CommandList >& destination );
     };
 
   }

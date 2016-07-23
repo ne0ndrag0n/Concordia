@@ -531,13 +531,7 @@ namespace BlueBear {
 				if( displayCommands->size() > 0 ) {
 					// Swap the pointers (if the item has already been taken by the consuming Display thread)
 					// TODO: starvation, time, etc
-					std::unique_lock< std::mutex > locker( commandBus.displayMutex, std::try_to_lock );
-					if( locker.owns_lock() ) {
-						if( commandBus.displayCommands->size() == 0 ) {
-							// The object was taken already
-							displayCommands.swap( commandBus.displayCommands );
-						}
-					}
+					commandBus.produce( displayCommands );
 				}
 
 				// Complete a tick set: currentTick up to the next time it is evenly divisible by ticksPerSecond

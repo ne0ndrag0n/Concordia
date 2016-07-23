@@ -54,18 +54,13 @@ namespace BlueBear {
       // List shall be empty at the beginning of each iteration
       // Trylock - If successful, swap the pointers and process each command
       // TODO: Be alert for starvation issues here - introduce a timer?
-      {
-        // Keep this critical section short!
-        std::unique_lock< std::mutex > locker( commandBus.displayMutex, std::try_to_lock );
-        if( locker.owns_lock() ) {
-          // Okay to do the swap!
-          displayCommands.swap( commandBus.displayCommands );
-        }
-      }
+      commandBus.consume( displayCommands );
 
       for( Graphics::Display::Command& command : *displayCommands ) {
         command.execute( *this );
       }
+
+      displayCommands->clear();
     }
   }
 }
