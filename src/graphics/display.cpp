@@ -2,6 +2,7 @@
 #include "threading/commandbus.hpp"
 #include "localemanager.hpp"
 #include "configmanager.hpp"
+#include "log.hpp"
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/OpenGL.hpp>
@@ -12,7 +13,7 @@ namespace BlueBear {
   namespace Graphics {
 
     void Display::NewEntityCommand::execute( Display& instance ) {
-
+      Log::getInstance().debug( "Display::NewEntityCommand", "Successfully ran a task within display." );
     }
 
     Display::Display( Threading::CommandBus& commandBus ) : commandBus( commandBus ) {
@@ -56,8 +57,8 @@ namespace BlueBear {
       // TODO: Be alert for starvation issues here - introduce a timer?
       commandBus.consume( displayCommands );
 
-      for( Graphics::Display::Command& command : *displayCommands ) {
-        command.execute( *this );
+      for( auto& commandPointer : *displayCommands ) {
+        commandPointer->execute( *this );
       }
 
       displayCommands->clear();

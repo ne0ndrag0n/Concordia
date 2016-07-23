@@ -38,7 +38,7 @@ namespace BlueBear {
           void execute( Display& instance );
       };
 
-      using CommandList = std::vector< Command >;
+      using CommandList = std::vector< std::unique_ptr< Command > >;
 
       private:
         using ViewportDimension = int;

@@ -514,6 +514,9 @@ namespace BlueBear {
 
 			// Allocate this pointer to swap at the end of every iteration if required
 			displayCommands = std::make_unique< Graphics::Display::CommandList >();
+			displayCommands->push_back(
+				std::make_unique< Graphics::Display::NewEntityCommand >()
+			);
 
 			// Push the bluebear global onto the stack - leave it there
 			lua_getglobal( L, "bluebear" );
