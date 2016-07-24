@@ -1,7 +1,7 @@
 #ifndef COMMANDBUS
 #define COMMANDBUS
 
-#include "graphics/display.hpp"
+#include "threading/displaycommand.hpp"
 #include <memory>
 #include <vector>
 #include <mutex>
@@ -13,12 +13,12 @@ namespace BlueBear {
 
       public:
         std::mutex displayMutex;
-        std::unique_ptr< Graphics::Display::CommandList > displayCommands;
+        std::unique_ptr< Display::CommandList > displayCommands;
 
         CommandBus();
 
-        void produce( std::unique_ptr< Graphics::Display::CommandList >& source );
-        void consume( std::unique_ptr< Graphics::Display::CommandList >& destination );
+        void produce( std::unique_ptr< Display::CommandList >& source );
+        void consume( std::unique_ptr< Display::CommandList >& destination );
     };
 
   }

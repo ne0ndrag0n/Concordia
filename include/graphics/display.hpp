@@ -9,6 +9,7 @@
 #include <memory>
 #include <glm/glm.hpp>
 #include "graphics/entity.hpp"
+#include "threading/displaycommand.hpp"
 
 namespace BlueBear {
   namespace Threading {
@@ -27,19 +28,6 @@ namespace BlueBear {
       void render();
       bool isOpen();
 
-      class Command {
-        public:
-          virtual void execute( Display& instance ) = 0;
-      };
-
-      class NewEntityCommand : public Command {
-        glm::vec3 position;
-        public:
-          void execute( Display& instance );
-      };
-
-      using CommandList = std::vector< std::unique_ptr< Command > >;
-
       private:
         using ViewportDimension = int;
         ViewportDimension x;
@@ -47,7 +35,7 @@ namespace BlueBear {
         std::vector< Instance > instances;
         sf::RenderWindow mainWindow;
         Threading::CommandBus& commandBus;
-        std::unique_ptr< CommandList > displayCommands;
+        std::unique_ptr< Threading::Display::CommandList > displayCommands;
         void main();
         void processCommands();
     };

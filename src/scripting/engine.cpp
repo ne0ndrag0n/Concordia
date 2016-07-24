@@ -10,6 +10,7 @@
 #include "graphics/display.hpp"
 #include "configmanager.hpp"
 #include "scripting/eventmanager.hpp"
+#include "threading/displaycommand.hpp"
 #include "log.hpp"
 #include <jsoncpp/json/json.h>
 #include <iterator>
@@ -513,9 +514,9 @@ namespace BlueBear {
 			Log::getInstance().debug( "Engine::objectLoop", "Starting world engine with a tick count of " + std::to_string( currentTick ) );
 
 			// Allocate this pointer to swap at the end of every iteration if required
-			displayCommands = std::make_unique< Graphics::Display::CommandList >();
+			displayCommands = std::make_unique< Threading::Display::CommandList >();
 			displayCommands->push_back(
-				std::make_unique< Graphics::Display::NewEntityCommand >()
+				std::make_unique< Threading::Display::NewEntityCommand >()
 			);
 
 			// Push the bluebear global onto the stack - leave it there

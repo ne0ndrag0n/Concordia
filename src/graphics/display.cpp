@@ -1,4 +1,5 @@
 #include "graphics/display.hpp"
+#include "threading/displaycommand.hpp"
 #include "threading/commandbus.hpp"
 #include "localemanager.hpp"
 #include "configmanager.hpp"
@@ -12,10 +13,6 @@
 namespace BlueBear {
   namespace Graphics {
 
-    void Display::NewEntityCommand::execute( Display& instance ) {
-      Log::getInstance().debug( "Display::NewEntityCommand", "Successfully ran a task within display." );
-    }
-
     Display::Display( Threading::CommandBus& commandBus ) : commandBus( commandBus ) {
       // Get our settings out of the config manager
       x = ConfigManager::getInstance().getIntValue( "viewport_x" );
@@ -26,7 +23,7 @@ namespace BlueBear {
       mainWindow.create( sf::VideoMode( x, y ), LocaleManager::getInstance().getString( "BLUEBEAR_WINDOW_TITLE" ), sf::Style::Close );
       mainWindow.setVerticalSyncEnabled( true );
 
-      displayCommands = std::make_unique< Graphics::Display::CommandList >();
+      displayCommands = std::make_unique< Threading::Display::CommandList >();
     }
 
     void Display::render() {
