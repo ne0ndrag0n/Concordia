@@ -2,7 +2,7 @@
 #define DISPLAYCOMMAND
 
 #include <memory>
-#include <vector>
+#include <deque>
 #include <glm/glm.hpp>
 
 namespace BlueBear {
@@ -24,7 +24,8 @@ namespace BlueBear {
           void execute( Graphics::Display& instance );
       };
 
-      using CommandList = std::vector< std::unique_ptr< Command > >;
+      using CommandList = std::deque< std::unique_ptr< Command > >;
+      using CommandSeries = std::deque< std::unique_ptr< CommandList > >;
     }
 
   }
