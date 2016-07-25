@@ -8,17 +8,16 @@ namespace BlueBear {
   namespace Threading {
 
     CommandBus::CommandBus() {
-      displayCommands = std::make_unique< Display::CommandSeries >();
+      displayCommands = std::make_unique< Display::CommandList >();
     }
 
-    void CommandBus::produce( std::unique_ptr< Display::CommandList >& source ) {
+    void CommandBus::attemptProduce( Display::CommandList& source ) {
       std::unique_lock< std::mutex > locker( displayMutex, std::try_to_lock );
       if( locker.owns_lock() ) {
-        // Plop the given Display::CommandList onto the pile (CommandSeries)
-        displayCommands->push_back( std::move( source ) );
+        displayCommands->splice( displayCommands->end(), source );
       }
     }
-    void CommandBus::consume( std::unique_ptr< Display::CommandSeries >& destination ) {
+    void CommandBus::attemptConsume( std::unique_ptr< Display::CommandList >& destination ) {
       // Keep this critical section short!
       std::unique_lock< std::mutex > locker( displayMutex, std::try_to_lock );
       if( locker.owns_lock() ) {

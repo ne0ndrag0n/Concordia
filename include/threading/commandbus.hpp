@@ -13,12 +13,12 @@ namespace BlueBear {
 
       public:
         std::mutex displayMutex;
-        std::unique_ptr< Display::CommandSeries > displayCommands;
+        std::unique_ptr< Display::CommandList > displayCommands;
 
         CommandBus();
 
-        void produce( std::unique_ptr< Display::CommandList >& source );
-        void consume( std::unique_ptr< Display::CommandSeries >& destination );
+        void attemptProduce( Display::CommandList& source );
+        void attemptConsume( std::unique_ptr< Display::CommandList >& destination );
     };
 
   }

@@ -9,6 +9,7 @@
 #include <memory>
 #include <glm/glm.hpp>
 #include "graphics/entity.hpp"
+#include "threading/displaycommand.hpp"
 
 namespace BlueBear {
   namespace Threading {
@@ -34,6 +35,7 @@ namespace BlueBear {
         std::vector< Instance > instances;
         sf::RenderWindow mainWindow;
         Threading::CommandBus& commandBus;
+        std::unique_ptr< Threading::Display::CommandList > commandList;
         void main();
         void processCommands();
     };

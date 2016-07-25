@@ -22,6 +22,8 @@ namespace BlueBear {
     void Display::openDisplay() {
       mainWindow.create( sf::VideoMode( x, y ), LocaleManager::getInstance().getString( "BLUEBEAR_WINDOW_TITLE" ), sf::Style::Close );
       mainWindow.setVerticalSyncEnabled( true );
+
+      commandList = std::make_unique< Threading::Display::CommandList >();
     }
 
     void Display::render() {
@@ -47,16 +49,14 @@ namespace BlueBear {
      * Swap the pointers, and if the resulting list contains any commands, process those commands.
      */
     void Display::processCommands() {
-      std::unique_ptr< Threading::Display::CommandSeries > localCommandSeries = std::make_unique< Threading::Display::CommandSeries >();
-      commandBus.consume( localCommandSeries );
+      // The passed-in list should always be empty
+      commandBus.attemptConsume( commandList );
 
-      for( auto& commandList : *localCommandSeries ) {
-        for( auto& command : *commandList ) {
-          command->execute( *this );
-        }
+      for( auto& command : *commandList ) {
+        command->execute( *this );
       }
 
-      // When this function concludes, the old commandlist and its accompanying commands will fall out of scope and be deallocated
+      commandList->clear();
     }
   }
 }
