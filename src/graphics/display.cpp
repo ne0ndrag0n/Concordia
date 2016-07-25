@@ -22,8 +22,6 @@ namespace BlueBear {
     void Display::openDisplay() {
       mainWindow.create( sf::VideoMode( x, y ), LocaleManager::getInstance().getString( "BLUEBEAR_WINDOW_TITLE" ), sf::Style::Close );
       mainWindow.setVerticalSyncEnabled( true );
-
-      displayCommands = std::make_unique< Threading::Display::CommandList >();
     }
 
     void Display::render() {
@@ -52,13 +50,7 @@ namespace BlueBear {
       // List shall be empty at the beginning of each iteration
       // Trylock - If successful, swap the pointers and process each command
       // TODO: Be alert for starvation issues here - introduce a timer?
-      commandBus.consume( displayCommands );
 
-      for( auto& commandPointer : *displayCommands ) {
-        commandPointer->execute( *this );
-      }
-
-      displayCommands->clear();
     }
   }
 }

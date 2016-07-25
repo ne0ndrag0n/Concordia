@@ -513,12 +513,6 @@ namespace BlueBear {
 		void Engine::objectLoop() {
 			Log::getInstance().debug( "Engine::objectLoop", "Starting world engine with a tick count of " + std::to_string( currentTick ) );
 
-			// Allocate this pointer to swap at the end of every iteration if required
-			displayCommands = std::make_unique< Threading::Display::CommandList >();
-			displayCommands->push_back(
-				std::make_unique< Threading::Display::NewEntityCommand >()
-			);
-
 			// Push the bluebear global onto the stack - leave it there
 			lua_getglobal( L, "bluebear" );
 			// Push table value "current_tick" onto the stack - leave it there too
@@ -530,13 +524,6 @@ namespace BlueBear {
 				// Let's set up a start and end duration
 				auto startTime = std::chrono::steady_clock::now();
 				auto endTime = startTime + std::chrono::seconds( 1 );
-
-				// Within the time block, determine if there are outgoing displayCommands, and if there are, send them to the CommandBus
-				if( displayCommands->size() > 0 ) {
-					// Swap the pointers (if the item has already been taken by the consuming Display thread)
-					// TODO: starvation, time, etc
-					commandBus.produce( displayCommands );
-				}
 
 				// Complete a tick set: currentTick up to the next time it is evenly divisible by ticksPerSecond
 				int ticksRemaining = ticksPerSecond;
