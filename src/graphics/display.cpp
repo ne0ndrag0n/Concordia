@@ -47,10 +47,16 @@ namespace BlueBear {
      * Swap the pointers, and if the resulting list contains any commands, process those commands.
      */
     void Display::processCommands() {
-      // List shall be empty at the beginning of each iteration
-      // Trylock - If successful, swap the pointers and process each command
-      // TODO: Be alert for starvation issues here - introduce a timer?
+      std::unique_ptr< Threading::Display::CommandSeries > localCommandSeries = std::make_unique< Threading::Display::CommandSeries >();
+      commandBus.consume( localCommandSeries );
 
+      for( auto& commandList : *localCommandSeries ) {
+        for( auto& command : *commandList ) {
+          command->execute( *this );
+        }
+      }
+
+      // When this function concludes, the old commandlist and its accompanying commands will fall out of scope and be deallocated
     }
   }
 }

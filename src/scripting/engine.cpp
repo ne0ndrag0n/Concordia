@@ -513,6 +513,8 @@ namespace BlueBear {
 		void Engine::objectLoop() {
 			Log::getInstance().debug( "Engine::objectLoop", "Starting world engine with a tick count of " + std::to_string( currentTick ) );
 
+			std::unique_ptr< Threading::Display::CommandList > displayCommands;
+
 			// Push the bluebear global onto the stack - leave it there
 			lua_getglobal( L, "bluebear" );
 			// Push table value "current_tick" onto the stack - leave it there too
@@ -524,6 +526,11 @@ namespace BlueBear {
 				// Let's set up a start and end duration
 				auto startTime = std::chrono::steady_clock::now();
 				auto endTime = startTime + std::chrono::seconds( 1 );
+
+				// Determine if a new displayCommands needs to be created
+				if( !displayCommands ) {
+					displayCommands = std::make_unique< Threading::Display::CommandList >();
+				}
 
 				// Complete a tick set: currentTick up to the next time it is evenly divisible by ticksPerSecond
 				int ticksRemaining = ticksPerSecond;
@@ -543,6 +550,11 @@ namespace BlueBear {
 							currentEntity.execute();
 						}
 					}
+				}
+
+				// Attempt to send the list of displayCommands to the CommandBus (if there are any)
+				if( displayCommands->size() > 0 ) {
+					commandBus.produce( displayCommands );
 				}
 
 				// Wait the difference between one second, and however long it took for this shit to finish
