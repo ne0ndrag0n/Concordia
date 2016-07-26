@@ -31,3 +31,4 @@ Version 0.0.3 - Milestone "Picasso"
 * GLM
 * GLEW
 * Assimp
+* Amanieu/asyncplusplus (make sure libasync++.so is in /usr/lib)

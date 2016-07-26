@@ -1,7 +1,7 @@
 CC = g++
 CFLAGS = -std=c++14 -g -rdynamic
 INCLUDES = -Iinclude
-LIBS = -lpthread -lassimp -lGLEW -lGL -lsfml-graphics -lsfml-window -lsfml-system -ljsoncpp -llua -ldl
+LIBS = -lpthread -lasync++ -lassimp -lGLEW -lGL -lsfml-graphics -lsfml-window -lsfml-system -ljsoncpp -llua -ldl
 
 SRCS = $(wildcard src/*.cpp)
 SRCS += $(wildcard src/graphics/*.cpp)
