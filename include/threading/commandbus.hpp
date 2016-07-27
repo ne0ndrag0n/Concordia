@@ -17,8 +17,8 @@ namespace BlueBear {
 
         CommandBus();
 
-        void attemptProduce( Display::CommandList& source );
-        void attemptConsume( std::unique_ptr< Display::CommandList >& destination );
+        bool attemptProduce( Display::CommandList& source );
+        bool attemptConsume( std::unique_ptr< Display::CommandList >& destination );
     };
 
   }

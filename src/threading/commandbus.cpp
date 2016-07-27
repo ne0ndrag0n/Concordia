@@ -11,18 +11,24 @@ namespace BlueBear {
       displayCommands = std::make_unique< Display::CommandList >();
     }
 
-    void CommandBus::attemptProduce( Display::CommandList& source ) {
+    bool CommandBus::attemptProduce( Display::CommandList& source ) {
       std::unique_lock< std::mutex > locker( displayMutex, std::try_to_lock );
-      if( locker.owns_lock() ) {
+      bool successful = locker.owns_lock();
+      if( successful ) {
         displayCommands->splice( displayCommands->end(), source );
       }
+
+      return successful;
     }
-    void CommandBus::attemptConsume( std::unique_ptr< Display::CommandList >& destination ) {
+    bool CommandBus::attemptConsume( std::unique_ptr< Display::CommandList >& destination ) {
       // Keep this critical section short!
       std::unique_lock< std::mutex > locker( displayMutex, std::try_to_lock );
-      if( locker.owns_lock() ) {
+      bool successful = locker.owns_lock();
+      if( successful ) {
         displayCommands.swap( destination );
       }
+
+      return successful;
     }
   }
 }
