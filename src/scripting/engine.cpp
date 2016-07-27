@@ -11,6 +11,7 @@
 #include "configmanager.hpp"
 #include "scripting/eventmanager.hpp"
 #include "threading/displaycommand.hpp"
+#include "threading/enginecommand.hpp"
 #include "log.hpp"
 #include <jsoncpp/json/json.h>
 #include <iterator>
@@ -519,8 +520,10 @@ namespace BlueBear {
 			// Push table value "current_tick" onto the stack - leave it there too
 			Utility::getTableValue( L, "engine" );
 
-			// This single container holds our list of commands
-			Threading::Display::CommandList commandList;
+			// This single container holds our list of commands to send to the display
+			Threading::Display::CommandList displayCommandList;
+			// This pointer holds the direction to our list of incoming engine commands
+			std::unique_ptr< Threading::Engine::CommandList > engineCommandList = std::make_unique< Threading::Engine::CommandList >();
 
 			// This outer loop is a preliminary feature, the engine shouldn't stop until it's instructed to
 			// We'll need to account for integer overflow in both here and Lua
@@ -529,6 +532,14 @@ namespace BlueBear {
 				auto startTime = std::chrono::steady_clock::now();
 				auto endTime = startTime + std::chrono::seconds( 1 );
 
+				// Attempt to consume items in the engineCommandList
+				commandBus.attemptConsume( engineCommandList );
+				for( auto& command : *engineCommandList ) {
+	        command->execute( *this );
+	      }
+	      engineCommandList->clear();
+
+				// ** START THE SINGLE TICK LOOP **
 				// Complete a tick set: currentTick up to the next time it is evenly divisible by ticksPerSecond
 				int ticksRemaining = ticksPerSecond;
 				while( ticksRemaining-- ) {
@@ -548,10 +559,11 @@ namespace BlueBear {
 						}
 					}
 				}
+				// ** END THE SINGLE TICK LOOP **
 
 				// Try to empty out the list and send it to the commandbus
-				if( commandList.size() > 0 ) {
-					commandBus.attemptProduce( commandList );
+				if( displayCommandList.size() > 0 ) {
+					commandBus.attemptProduce( displayCommandList );
 				}
 
 				// Wait the difference between one second, and however long it took for this shit to finish

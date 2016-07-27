@@ -41,6 +41,7 @@ namespace BlueBear {
 				void callActionOnObject( const char* playerId, const char* objectId, const char* method );
 				bool deserializeFunctionRefs();
 				void setupLotEnvironment();
+				void processCommands();
 
 			public:
 				Engine( Threading::CommandBus& commandBus );

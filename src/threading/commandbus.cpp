@@ -1,5 +1,6 @@
 #include "threading/commandbus.hpp"
 #include "threading/displaycommand.hpp"
+#include "threading/enginecommand.hpp"
 #include <memory>
 #include <mutex>
 #include <utility>
@@ -9,6 +10,7 @@ namespace BlueBear {
 
     CommandBus::CommandBus() {
       displayCommands = std::make_unique< Display::CommandList >();
+      engineCommands = std::make_unique< Engine::CommandList >();
     }
 
     bool CommandBus::attemptProduce( Display::CommandList& source ) {
@@ -28,6 +30,24 @@ namespace BlueBear {
         displayCommands.swap( destination );
       }
 
+      return successful;
+    }
+
+    bool CommandBus::attemptProduce( Engine::CommandList& source ) {
+      std::unique_lock< std::mutex > locker( engineMutex, std::try_to_lock );
+      bool successful = locker.owns_lock();
+      if( successful ) {
+        engineCommands->splice( engineCommands->end(), source );
+      }
+
+      return successful;
+    }
+    bool CommandBus::attemptConsume( std::unique_ptr< Engine::CommandList >& destination ) {
+      std::unique_lock< std::mutex > locker( engineMutex, std::try_to_lock );
+      bool successful = locker.owns_lock();
+      if( successful ) {
+        engineCommands.swap( destination );
+      }
       return successful;
     }
   }

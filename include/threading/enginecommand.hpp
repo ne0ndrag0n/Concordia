@@ -1,6 +1,9 @@
 #ifndef ENGINECOMMAND
 #define ENGINECOMMAND
 
+#include <list>
+#include <memory>
+
 namespace BlueBear {
   namespace Scripting {
     class Engine;
@@ -26,6 +29,7 @@ namespace BlueBear {
           void execute( Scripting::Engine& instance );
       };
 
+      using CommandList = std::list< std::unique_ptr< Command > >;
     }
   }
 }
