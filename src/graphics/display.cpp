@@ -69,7 +69,7 @@ namespace BlueBear {
     }
 
     void Display::registerNewEntity() {
-
+      engineCommandList.push_back( std::make_unique< Threading::Engine::RegisterInstance >( 42 ) );
     }
   }
 }

@@ -3,6 +3,8 @@
 #include "scripting/engine.hpp"
 #include "log.hpp"
 #include <memory>
+#include <sstream>
+#include <string>
 
 namespace BlueBear {
   namespace Threading {
@@ -12,7 +14,9 @@ namespace BlueBear {
         : instanceId( instanceId ) {}
 
       void RegisterInstance::execute( Scripting::Engine& instance ) {
-        Log::getInstance().info( "RegisterInstance", "Registered this new entity" );
+        std::stringstream ss;
+        ss << "Registered this new entity " << instanceId;
+        Log::getInstance().info( "RegisterInstance", ss.str() );
       }
     }
   }
