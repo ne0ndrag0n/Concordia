@@ -1,5 +1,6 @@
 #include "graphics/display.hpp"
 #include "threading/displaycommand.hpp"
+#include "threading/enginecommand.hpp"
 #include "threading/commandbus.hpp"
 #include "localemanager.hpp"
 #include "configmanager.hpp"
@@ -23,11 +24,11 @@ namespace BlueBear {
       mainWindow.create( sf::VideoMode( x, y ), LocaleManager::getInstance().getString( "BLUEBEAR_WINDOW_TITLE" ), sf::Style::Close );
       mainWindow.setVerticalSyncEnabled( true );
 
-      commandList = std::make_unique< Threading::Display::CommandList >();
+      displayCommandList = std::make_unique< Threading::Display::CommandList >();
     }
 
     void Display::render() {
-      processCommands();
+      processIncomingCommands();
 
       // Handle events
       sf::Event event;
@@ -39,6 +40,8 @@ namespace BlueBear {
 
       mainWindow.clear( sf::Color::Black );
       mainWindow.display();
+
+      processOutgoingCommands();
     }
 
     bool Display::isOpen() {
@@ -48,15 +51,25 @@ namespace BlueBear {
     /**
      * Swap the pointers, and if the resulting list contains any commands, process those commands.
      */
-    void Display::processCommands() {
+    void Display::processIncomingCommands() {
       // The passed-in list should always be empty
-      commandBus.attemptConsume( commandList );
+      commandBus.attemptConsume( displayCommandList );
 
-      for( auto& command : *commandList ) {
+      for( auto& command : *displayCommandList ) {
         command->execute( *this );
       }
 
-      commandList->clear();
+      displayCommandList->clear();
+    }
+
+    void Display::processOutgoingCommands() {
+      if( engineCommandList.size() > 0 ) {
+        commandBus.attemptProduce( engineCommandList );
+      }
+    }
+
+    void Display::registerNewEntity() {
+
     }
   }
 }
