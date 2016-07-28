@@ -25,6 +25,8 @@ namespace BlueBear {
     configRoot[ "viewport_x" ] = 1024;
     configRoot[ "viewport_y" ] = 768;
     configRoot[ "current_locale" ] = "en_US";
+    configRoot[ "threadpool_count" ] = 2;
+    configRoot[ "threadpool_detect" ] = true;
 
     // Load settings.json from file
     std::ifstream settingsFile( SETTINGS_PATH );
