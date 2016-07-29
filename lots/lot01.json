@@ -6,6 +6,12 @@
 	"subtr": 0,
 	"terrain": 1,
 	"ticks": 10,
+	"infr": {
+		"floor": {
+			"dict": [],
+			"levels": []
+		}
+	},
 	"entities": [
 		{
 			"classID": "game.flowers.base",
