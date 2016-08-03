@@ -1,0 +1,9 @@
+{
+  "sound": {
+    "hard": "hard.ogg",
+    "foliage": "foliage.ogg",
+    "carpet": "carpet.ogg",
+    "iron": "iron.ogg",
+    "wet": "wet.ogg"
+  }
+}
