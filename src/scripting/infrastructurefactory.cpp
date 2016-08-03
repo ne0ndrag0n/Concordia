@@ -24,6 +24,8 @@ namespace BlueBear {
         throw InfrastructureFactory::CannotLoadFileException();
       }
 
+      // Now that all constants are loaded, start traversing the directory and get the user-defined packages
+
     }
 
   }

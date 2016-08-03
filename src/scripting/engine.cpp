@@ -12,6 +12,7 @@
 #include "scripting/eventmanager.hpp"
 #include "threading/displaycommand.hpp"
 #include "threading/enginecommand.hpp"
+#include "scripting/infrastructurefactory.hpp"
 #include "log.hpp"
 #include <jsoncpp/json/json.h>
 #include <iterator>
@@ -112,6 +113,9 @@ namespace BlueBear {
 			if( !loadModpackSet( BLUEBEAR_MODPACK_DIRECTORY ) ) {
 				return false;
 			}
+
+			// Set up an InfrastructureFactory to load things like floor tiles and wallpapers
+			infrastructureFactory = std::make_unique< InfrastructureFactory >();
 
 			return true;
 		}

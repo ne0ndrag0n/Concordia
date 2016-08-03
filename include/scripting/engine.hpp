@@ -19,6 +19,7 @@ namespace BlueBear {
 	namespace Scripting {
 		class Lot;
 		class EventManager;
+		class InfrastructureFactory;
 
 		class Engine {
 
@@ -34,6 +35,7 @@ namespace BlueBear {
 				Tick ticksPerSecond;
 				std::shared_ptr< Lot > currentLot;
 				std::unique_ptr< EventManager > eventManager;
+				std::unique_ptr< InfrastructureFactory > infrastructureFactory;
 				const char* currentModpackDirectory;
 				std::map< std::string, BlueBear::ModpackStatus > loadedModpacks;
 				Threading::CommandBus& commandBus;

@@ -8,8 +8,12 @@
 	"ticks": 10,
 	"infr": {
 		"floor": {
-			"dict": [],
-			"levels": []
+			"dict": [ "hardwood1" ],
+			"levels": [
+				0, 0, 0,
+				0, 0, 0,
+				0, 0, 0
+			]
 		}
 	},
 	"entities": [
