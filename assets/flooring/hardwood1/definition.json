@@ -1,6 +1,0 @@
-{
-  "hardwood1": {
-    "extend": "hardwood",
-    "sequence": [ "hardwood.png" ]
-  }
-}

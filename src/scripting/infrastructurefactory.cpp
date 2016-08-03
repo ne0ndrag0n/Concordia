@@ -1,5 +1,5 @@
 #include "scripting/infrastructurefactory.hpp"
-#include "scripting/floortile.hpp"
+#include "scripting/tile.hpp"
 #include <jsoncpp/json/json.h>
 #include <string>
 #include <fstream>
@@ -15,16 +15,15 @@ namespace BlueBear {
      */
     void InfrastructureFactory::registerFloorTiles() {
       // Load the root floor classes
-      std::ifstream classesFile;
-      classesFile.exceptions( std::ios::failbit | std::ios::badbit );
-      classesFile.open( std::string( FLOORTILES_REGISTRY_PATH ) + FLOORTILES_ROOT_FILE );
+      std::ifstream tileConstantsFile;
+      tileConstantsFile.exceptions( std::ios::failbit | std::ios::badbit );
+      tileConstantsFile.open( std::string( TILE_SYSTEM_PATH ) + TILE_SYSTEM_ROOT );
 
       Json::Reader reader;
-      if( !reader.parse( classesFile, rootFloorClasses ) ) {
+      if( !reader.parse( tileConstantsFile, tileConstants ) ) {
         throw InfrastructureFactory::CannotLoadFileException();
       }
 
-      // Traverse directories in FLOORTILES_REGISTRY_PATH, loading definition.json within
     }
 
   }

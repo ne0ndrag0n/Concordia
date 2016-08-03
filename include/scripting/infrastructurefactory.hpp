@@ -8,18 +8,19 @@
 namespace BlueBear {
   namespace Scripting {
 
-    class FloorTile;
+    class Tile;
     class Wallpaper;
 
     class InfrastructureFactory {
-      static constexpr const char* FLOORTILES_REGISTRY_PATH = "assets/flooring/";
-      static constexpr const char* FLOORTILES_ROOT_FILE = "classes.json";
-      Json::Value rootFloorClasses;
+      static constexpr const char* TILE_SYSTEM_PATH = "system/flooring/";
+      static constexpr const char* TILE_ASSETS_PATH = "assets/flooring/";
+      static constexpr const char* TILE_SYSTEM_ROOT = "base.json";
+      Json::Value tileConstants;
 
       public:
         struct CannotLoadFileException : public std::exception { const char* what () const throw () { return "Could not load a required file!"; } };
 
-        FloorTile getFloorTile( const std::string& key );
+        Tile getFloorTile( const std::string& key );
         Wallpaper getWallpaper( const std::string& key );
 
         void registerFloorTiles();
