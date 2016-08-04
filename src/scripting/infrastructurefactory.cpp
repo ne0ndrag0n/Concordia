@@ -1,9 +1,12 @@
 #include "scripting/infrastructurefactory.hpp"
 #include "scripting/tile.hpp"
+#include "log.hpp"
+#include "utility.hpp"
 #include <jsoncpp/json/json.h>
 #include <string>
 #include <fstream>
 #include <exception>
+#include <vector>
 
 namespace BlueBear {
   namespace Scripting {
@@ -26,7 +29,10 @@ namespace BlueBear {
       }
 
       // Now that all constants are loaded, start traversing the directory and get the user-defined packages
-
+      std::vector< std::string > directories = Utility::getSubdirectoryList( TILE_ASSETS_PATH );
+      for( std::string& directory : directories ) {
+        Log::getInstance().debug( "InfrastructureFactory", directory );
+      }
     }
 
   }

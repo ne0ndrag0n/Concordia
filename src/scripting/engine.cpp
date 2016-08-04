@@ -116,6 +116,7 @@ namespace BlueBear {
 
 			// Set up an InfrastructureFactory to load things like floor tiles and wallpapers
 			infrastructureFactory = std::make_unique< InfrastructureFactory >();
+			infrastructureFactory->registerFloorTiles();
 
 			return true;
 		}
