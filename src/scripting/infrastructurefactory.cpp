@@ -15,6 +15,7 @@ namespace BlueBear {
      */
     void InfrastructureFactory::registerFloorTiles() {
       // Load the root floor classes
+      Json::Value tileConstants;
       std::ifstream tileConstantsFile;
       tileConstantsFile.exceptions( std::ios::failbit | std::ios::badbit );
       tileConstantsFile.open( std::string( TILE_SYSTEM_PATH ) + TILE_SYSTEM_ROOT );
