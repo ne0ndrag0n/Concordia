@@ -3,6 +3,7 @@
 
 #include <string>
 #include <exception>
+#include <jsoncpp/json/json.h>
 #include <memory>
 #include <map>
 
@@ -16,7 +17,12 @@ namespace BlueBear {
       static constexpr const char* TILE_SYSTEM_PATH = "system/flooring/";
       static constexpr const char* TILE_ASSETS_PATH = "assets/flooring/";
       static constexpr const char* TILE_SYSTEM_ROOT = "base.json";
+      Json::Value tileConstants;
       std::map< std::string, std::shared_ptr< Tile > > tileRegistry;
+
+      private:
+        void registerFloorTile( const std::string& fullPath );
+        std::string getVariableOrValue( const std::string& key, const std::string& value );
 
       public:
         struct CannotLoadFileException : public std::exception { const char* what () const throw () { return "Could not load a required file!"; } };

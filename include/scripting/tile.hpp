@@ -11,6 +11,8 @@ namespace BlueBear {
     struct Tile {
       std::string soundPath;
       std::string imagePath;
+
+      Tile( const std::string& soundPath, const std::string& imagePath ) : soundPath( soundPath ), imagePath( imagePath ) {} 
     };
 
   }
