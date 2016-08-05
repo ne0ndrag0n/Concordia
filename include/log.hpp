@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <mutex>
 
 namespace BlueBear {
 
@@ -32,6 +33,7 @@ namespace BlueBear {
         LogLevel level;
       };
 
+      std::mutex mutex;
       std::ofstream logFile;
       std::vector< LogMessage > messages;
       LogLevel minimumReportableLevel;

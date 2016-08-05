@@ -6,6 +6,7 @@
 #include <ctime>
 #include <fstream>
 #include <sstream>
+#include <mutex>
 
 namespace BlueBear {
 
@@ -32,6 +33,8 @@ namespace BlueBear {
   };
 
   void Log::out( const LogMessage& message ) {
+    std::unique_lock< std::mutex > lock( mutex );
+
     messages.push_back( message );
 
     if( message.level >= minimumReportableLevel ) {
