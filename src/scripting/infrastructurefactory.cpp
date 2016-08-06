@@ -28,7 +28,8 @@ namespace BlueBear {
       return value;
     }
 
-    void InfrastructureFactory::registerFloorTile( const std::string& fullPath ) {
+    void InfrastructureFactory::registerFloorTile( const std::string& path ) {
+      std::string fullPath = path + "/" + TILE_SYSTEM_ROOT;
       std::ifstream definitionFile;
       definitionFile.exceptions( std::ios::failbit | std::ios::badbit );
       definitionFile.open( fullPath );
@@ -42,9 +43,11 @@ namespace BlueBear {
 
           if( tileDefinition.isMember( "sound" ) && tileDefinition.isMember( "image" ) ) {
             tileRegistry[ key ] = std::make_shared< Tile >(
-              getVariableOrValue( "sound", tileDefinition[ "sound" ].asString() ),
-              getVariableOrValue( "image", tileDefinition[ "image" ].asString() )
+              path + "/" + getVariableOrValue( "sound", tileDefinition[ "sound" ].asString() ),
+              path + "/" + getVariableOrValue( "image", tileDefinition[ "image" ].asString() )
             );
+
+            Log::getInstance().debug( "InfrastructureFactory::registerFloorTile" , "Registered " + fullPath + " " + tileRegistry[ key ]->soundPath + " " + tileRegistry[ key ]->imagePath );
           } else {
             Log::getInstance().error( "InfrastructureFactory::registerFloorTile", "Unable to create floor tile at path " + fullPath + ": missing fields." );
           }
@@ -73,7 +76,7 @@ namespace BlueBear {
       // Now that all constants are loaded, start traversing the directory and get the user-defined packages
       std::vector< std::string > directories = Utility::getSubdirectoryList( TILE_ASSETS_PATH );
       for( std::string& directory : directories ) {
-        registerFloorTile( std::string( TILE_ASSETS_PATH ) + directory + "/base.json" );
+        registerFloorTile( std::string( TILE_ASSETS_PATH ) + directory );
       }
     }
 

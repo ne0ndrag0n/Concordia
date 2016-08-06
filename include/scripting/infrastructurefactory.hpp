@@ -21,7 +21,7 @@ namespace BlueBear {
       std::map< std::string, std::shared_ptr< Tile > > tileRegistry;
 
       private:
-        void registerFloorTile( const std::string& fullPath );
+        void registerFloorTile( const std::string& path );
         std::string getVariableOrValue( const std::string& key, const std::string& value );
 
       public:
