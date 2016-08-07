@@ -47,7 +47,7 @@ namespace BlueBear {
               path + "/" + getVariableOrValue( "image", tileDefinition[ "image" ].asString() )
             );
 
-            Log::getInstance().debug( "InfrastructureFactory::registerFloorTile" , "Registered " + fullPath + " " + tileRegistry[ key ]->soundPath + " " + tileRegistry[ key ]->imagePath );
+            Log::getInstance().debug( "InfrastructureFactory::registerFloorTile" , "Registered " + key + " at " + fullPath );
           } else {
             Log::getInstance().error( "InfrastructureFactory::registerFloorTile", "Unable to create floor tile at path " + fullPath + ": missing fields." );
           }
