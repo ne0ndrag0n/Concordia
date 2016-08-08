@@ -47,12 +47,14 @@ namespace BlueBear {
           Json::Value tileDefinition = *jsonIterator;
 
           if( tileDefinition.isMember( "sound" ) && tileDefinition.isMember( "image" ) ) {
-            std::unique_lock< std::mutex > tileRegistryLock( tileRegistryMutex );
-            tileRegistry[ key ] = std::make_shared< Tile >(
-              key,
-              path + "/" + getVariableOrValue( "sound", tileDefinition[ "sound" ].asString() ),
-              path + "/" + getVariableOrValue( "image", tileDefinition[ "image" ].asString() )
-            );
+            {
+              std::unique_lock< std::mutex > tileRegistryLock( tileRegistryMutex );
+              tileRegistry[ key ] = std::make_shared< Tile >(
+                key,
+                path + "/" + getVariableOrValue( "sound", tileDefinition[ "sound" ].asString() ),
+                path + "/" + getVariableOrValue( "image", tileDefinition[ "image" ].asString() )
+              );
+            }
 
             Log::getInstance().debug( "InfrastructureFactory::registerFloorTile" , "Registered " + key + " at " + fullPath );
           } else {
