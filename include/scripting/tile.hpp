@@ -9,10 +9,11 @@ namespace BlueBear {
   namespace Scripting {
 
     struct Tile {
+      std::string id;
       std::string soundPath;
       std::string imagePath;
 
-      Tile( const std::string& soundPath, const std::string& imagePath ) : soundPath( soundPath ), imagePath( imagePath ) {} 
+      Tile( const std::string& id, const std::string& soundPath, const std::string& imagePath ) : id( id ), soundPath( soundPath ), imagePath( imagePath ) {}
     };
 
   }

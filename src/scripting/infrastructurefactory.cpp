@@ -43,6 +43,7 @@ namespace BlueBear {
 
           if( tileDefinition.isMember( "sound" ) && tileDefinition.isMember( "image" ) ) {
             tileRegistry[ key ] = std::make_shared< Tile >(
+              key,
               path + "/" + getVariableOrValue( "sound", tileDefinition[ "sound" ].asString() ),
               path + "/" + getVariableOrValue( "image", tileDefinition[ "image" ].asString() )
             );
