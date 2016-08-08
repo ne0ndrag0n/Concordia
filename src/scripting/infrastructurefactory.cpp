@@ -2,12 +2,15 @@
 #include "scripting/tile.hpp"
 #include "log.hpp"
 #include "utility.hpp"
+#include "threading/async.hpp"
+#include <async++.h>
 #include <jsoncpp/json/json.h>
 #include <string>
 #include <fstream>
 #include <memory>
 #include <exception>
 #include <vector>
+#include <mutex>
 
 namespace BlueBear {
   namespace Scripting {
@@ -15,6 +18,8 @@ namespace BlueBear {
     /**
      * Given the key and value, check against tileConstants for a value. If the value is present within, return THAT value,
      * otherwise return value.
+     *
+     * JSONCPP MAY NOT BE THREAD SAFE
      */
     std::string InfrastructureFactory::getVariableOrValue( const std::string& key, const std::string& value ) {
       if( tileConstants.isMember( key ) ) {
@@ -42,6 +47,7 @@ namespace BlueBear {
           Json::Value tileDefinition = *jsonIterator;
 
           if( tileDefinition.isMember( "sound" ) && tileDefinition.isMember( "image" ) ) {
+            std::unique_lock< std::mutex > tileRegistryLock( tileRegistryMutex );
             tileRegistry[ key ] = std::make_shared< Tile >(
               key,
               path + "/" + getVariableOrValue( "sound", tileDefinition[ "sound" ].asString() ),
@@ -76,9 +82,9 @@ namespace BlueBear {
 
       // Now that all constants are loaded, start traversing the directory and get the user-defined packages
       std::vector< std::string > directories = Utility::getSubdirectoryList( TILE_ASSETS_PATH );
-      for( std::string& directory : directories ) {
+      async::parallel_for( Threading::AsyncManager::getInstance().getScheduler(), directories, [ & ]( std::string& directory ) {
         registerFloorTile( std::string( TILE_ASSETS_PATH ) + directory );
-      }
+      } );
     }
 
   }

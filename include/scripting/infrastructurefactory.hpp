@@ -6,6 +6,7 @@
 #include <jsoncpp/json/json.h>
 #include <memory>
 #include <map>
+#include <mutex>
 
 namespace BlueBear {
   namespace Scripting {
@@ -18,6 +19,7 @@ namespace BlueBear {
       static constexpr const char* TILE_ASSETS_PATH = "assets/flooring/";
       static constexpr const char* TILE_SYSTEM_ROOT = "base.json";
       Json::Value tileConstants;
+      std::mutex tileRegistryMutex;
       std::map< std::string, std::shared_ptr< Tile > > tileRegistry;
 
       private:
