@@ -1,6 +1,7 @@
 {
   "hardwood1": {
     "sound": "hard",
-    "image": "hardwood1.png"
+    "image": "hardwood1.png",
+    "price": 10
   }
 }

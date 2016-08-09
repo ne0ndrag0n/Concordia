@@ -52,7 +52,8 @@ namespace BlueBear {
               tileRegistry[ key ] = std::make_shared< Tile >(
                 key,
                 path + "/" + getVariableOrValue( "sound", tileDefinition[ "sound" ].asString() ),
-                path + "/" + getVariableOrValue( "image", tileDefinition[ "image" ].asString() )
+                path + "/" + getVariableOrValue( "image", tileDefinition[ "image" ].asString() ),
+                tileDefinition[ "price" ].asDouble()
               );
             }
 
