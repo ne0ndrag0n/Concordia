@@ -29,7 +29,7 @@ namespace BlueBear {
 				int undergroundStories;
 				BlueBear::TerrainType terrainType;
 
-				Lot( lua_State* L, const Tick& currentTickReference, int floorX, int floorY, int stories, int undergroundStories, BlueBear::TerrainType terrainType );
+				Lot( lua_State* L, const Tick& currentTickReference, Json::Value& rootObject );
 				int getLotObjectByCid( const std::string& cid );
 				int createLotEntity( const std::string& classID );
 				int createLotEntityFromJSON( const Json::Value& serialEntity );

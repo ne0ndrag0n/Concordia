@@ -17,8 +17,14 @@
 namespace BlueBear {
 	namespace Scripting {
 
-		Lot::Lot( lua_State* L, const Tick& currentTickReference, int floorX, int floorY, int stories, int undergroundStories, TerrainType terrainType ) :
-			L( L ), currentTickReference( currentTickReference ), floorX( floorX ), floorY( floorY ), stories( stories ), undergroundStories( undergroundStories ), terrainType( terrainType ) {}
+		Lot::Lot( lua_State* L, const Tick& currentTickReference, Json::Value& rootObject ) :
+			L( L ),
+			currentTickReference( currentTickReference ),
+			floorX( rootObject[ "floorx" ].asInt() ),
+			floorY( rootObject[ "floory" ].asInt() ),
+			stories( rootObject[ "stories" ].asInt() ),
+			undergroundStories( rootObject[ "subtr" ].asInt() ),
+			terrainType( TerrainType( rootObject[ "terrain" ].asInt() ) )  {}
 
 		int Lot::lua_getLotObjects( lua_State* L ) {
 
