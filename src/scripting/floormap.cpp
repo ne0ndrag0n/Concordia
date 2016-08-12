@@ -10,7 +10,7 @@ namespace BlueBear {
 
     // Compute the location in this 1D array, then get the tile
     std::shared_ptr< Tile > FloorMap::getTile( unsigned int level, unsigned int x, unsigned int y ) {
-
+      return tiles[ getSingleIndex( level, x, y ) ];
     }
 
     // Get a position from the 3D coordinates
