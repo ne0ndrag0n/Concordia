@@ -90,5 +90,12 @@ namespace BlueBear {
       } );
     }
 
+    /**
+     * Throw an exception if the entry does not exist, crash the game gracefully so there's no undefined behavior.
+     */
+    std::shared_ptr< Tile > InfrastructureFactory::getFloorTile( const std::string& key ) {
+      return tileRegistry.at( key );
+    }
+
   }
 }

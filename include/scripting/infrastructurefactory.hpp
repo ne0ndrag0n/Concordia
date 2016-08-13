@@ -29,7 +29,7 @@ namespace BlueBear {
       public:
         struct CannotLoadFileException : public std::exception { const char* what () const throw () { return "Could not load a required file!"; } };
 
-        Tile getFloorTile( const std::string& key );
+        std::shared_ptr< Tile > getFloorTile( const std::string& key );
         Wallpaper getWallpaper( const std::string& key );
 
         void registerFloorTiles();

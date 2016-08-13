@@ -21,6 +21,7 @@ namespace BlueBear {
         FloorMap( unsigned int levels, unsigned int x, unsigned int y );
         std::shared_ptr< Tile > getTile( unsigned int level, unsigned int x, unsigned int y );
         void setTile( unsigned int level, unsigned int x, unsigned int y, std::shared_ptr< Tile > tile );
+        void pushDirect( std::shared_ptr< Tile > tile );
     };
 
   }

@@ -4,9 +4,11 @@
 #include <lauxlib.h>
 #include "scripting/lotentity.hpp"
 #include "scripting/lot.hpp"
+#include "log.hpp"
 #include "utility.hpp"
 #include <jsoncpp/json/json.h>
 #include "scripting/eventmanager.hpp"
+#include "scripting/tile.hpp"
 #include <memory>
 #include <vector>
 #include <cstring>
@@ -17,7 +19,7 @@
 namespace BlueBear {
 	namespace Scripting {
 
-		Lot::Lot( lua_State* L, const Tick& currentTickReference, const InfrastructureFactory& infrastructureFactory, Json::Value& rootObject ) :
+		Lot::Lot( lua_State* L, const Tick& currentTickReference, InfrastructureFactory& infrastructureFactory, Json::Value& rootObject ) :
 			L( L ),
 			currentTickReference( currentTickReference ),
 			infrastructureFactory( infrastructureFactory ),
@@ -25,21 +27,29 @@ namespace BlueBear {
 			floorY( rootObject[ "floory" ].asInt() ),
 			stories( rootObject[ "stories" ].asInt() ),
 			undergroundStories( rootObject[ "subtr" ].asInt() ),
-			terrainType( TerrainType( rootObject[ "terrain" ].asInt() ) ),
-			floorMap( buildFloorMap( rootObject[ "infr" ][ "floor" ] ) )  {}
+			terrainType( TerrainType( rootObject[ "terrain" ].asInt() ) ) {
+			buildFloorMap( rootObject[ "infr" ][ "floor" ] );
+		}
 
-		std::unique_ptr< FloorMap > Lot::buildFloorMap( Json::Value& floor ) {
-			std::unique_ptr< FloorMap > pointer;
+		void Lot::buildFloorMap( Json::Value& floor ) {
 			Json::Value dict = floor[ "dict" ];
 			Json::Value levels = floor[ "levels" ];
 
 			// Create the vector reference of shared_ptrs by iterating through dict
 			std::vector< std::shared_ptr< Tile > > lookup;
 			for( const Json::Value& dictEntry : dict ) {
-				//lookup.push_back( infrastructureFactory.getFloorTile( dictEntry.asString() ) );
+				auto tile = infrastructureFactory.getFloorTile( dictEntry.asString() );
+				lookup.push_back( tile );
 			}
 
-			return pointer;
+			// Use the pointer lookup to create the floormap
+			Log::getInstance().debug( "Lot::buildFloorMap", "Stories: " + std::to_string( stories ) + " " + std::to_string( floorX ) + "x" + std::to_string( floorY ) );
+			floorMap = std::make_unique< FloorMap >( stories, floorX, floorY );
+
+			for( const Json::Value& level : levels ) {
+				unsigned int entry = level.asUInt();
+				floorMap->pushDirect( lookup.at( entry ) );
+			}
 		}
 
 		int Lot::lua_getLotObjects( lua_State* L ) {

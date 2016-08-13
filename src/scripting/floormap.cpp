@@ -1,12 +1,11 @@
 #include "scripting/floormap.hpp"
+#include "log.hpp"
+#include <string>
 
 namespace BlueBear {
   namespace Scripting {
 
-    FloorMap::FloorMap( unsigned int levels, unsigned int x, unsigned int y ) : levels( levels ), dimensionX( x ), dimensionY( y ) {
-      // Preallocate/reserve the items
-      tiles.resize( levels * x * y );
-    }
+    FloorMap::FloorMap( unsigned int levels, unsigned int x, unsigned int y ) : levels( levels ), dimensionX( x ), dimensionY( y ) {}
 
     // Compute the location in this 1D array, then get the tile
     std::shared_ptr< Tile > FloorMap::getTile( unsigned int level, unsigned int x, unsigned int y ) {
@@ -19,6 +18,10 @@ namespace BlueBear {
 
       // check this formula
       return origin + ( ( dimensionX * y ) + x );
+    }
+
+    void FloorMap::pushDirect( std::shared_ptr< Tile > tile ) {
+      tiles.push_back( tile );
     }
 
   }
