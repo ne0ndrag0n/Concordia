@@ -361,7 +361,7 @@ namespace BlueBear {
 					currentTick = lotJSON[ "ticks" ].asInt();
 
 					// Instantiate the lot
-					currentLot = std::make_shared< Lot >( L, currentTick, lotJSON );
+					currentLot = std::make_shared< Lot >( L, currentTick, *infrastructureFactory, lotJSON );
 
 					// Setup global event manager
 					eventManager = std::make_unique< EventManager >( L, currentLot );

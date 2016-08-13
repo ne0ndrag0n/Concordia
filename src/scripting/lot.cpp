@@ -17,14 +17,30 @@
 namespace BlueBear {
 	namespace Scripting {
 
-		Lot::Lot( lua_State* L, const Tick& currentTickReference, Json::Value& rootObject ) :
+		Lot::Lot( lua_State* L, const Tick& currentTickReference, const InfrastructureFactory& infrastructureFactory, Json::Value& rootObject ) :
 			L( L ),
 			currentTickReference( currentTickReference ),
+			infrastructureFactory( infrastructureFactory ),
 			floorX( rootObject[ "floorx" ].asInt() ),
 			floorY( rootObject[ "floory" ].asInt() ),
 			stories( rootObject[ "stories" ].asInt() ),
 			undergroundStories( rootObject[ "subtr" ].asInt() ),
-			terrainType( TerrainType( rootObject[ "terrain" ].asInt() ) )  {}
+			terrainType( TerrainType( rootObject[ "terrain" ].asInt() ) ),
+			floorMap( buildFloorMap( rootObject[ "infr" ][ "floor" ] ) )  {}
+
+		std::unique_ptr< FloorMap > Lot::buildFloorMap( Json::Value& floor ) {
+			std::unique_ptr< FloorMap > pointer;
+			Json::Value dict = floor[ "dict" ];
+			Json::Value levels = floor[ "levels" ];
+
+			// Create the vector reference of shared_ptrs by iterating through dict
+			std::vector< std::shared_ptr< Tile > > lookup;
+			for( const Json::Value& dictEntry : dict ) {
+				//lookup.push_back( infrastructureFactory.getFloorTile( dictEntry.asString() ) );
+			}
+
+			return pointer;
+		}
 
 		int Lot::lua_getLotObjects( lua_State* L ) {
 
