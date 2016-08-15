@@ -10,6 +10,10 @@ namespace BlueBear {
     class Display;
   }
 
+  namespace Scripting {
+    class Lot;
+  }
+
   namespace Threading {
     namespace Display {
 
@@ -21,6 +25,13 @@ namespace BlueBear {
       class NewEntityCommand : public Command {
         glm::vec3 position;
         public:
+          void execute( Graphics::Display& instance );
+      };
+
+      class SendInfrastructureCommand : public Command {
+        Scripting::Lot& lot;
+        public:
+          SendInfrastructureCommand( Scripting::Lot& lot );
           void execute( Graphics::Display& instance );
       };
 
