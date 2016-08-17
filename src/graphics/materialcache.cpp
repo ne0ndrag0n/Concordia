@@ -20,7 +20,7 @@ namespace BlueBear {
 
       // Need to create
       TextureList texList;
-      texList.push_back( textureCache.get( tile.id, tile.imagePath ) );
+      texList.push_back( textureCache.get( tile.imagePath ) );
 
       auto material = std::make_shared< Material >( texList );
       materialCache[ tile.id ] = material;

@@ -13,7 +13,7 @@ namespace BlueBear {
       std::map< std::string, std::shared_ptr< Texture > > textureCache;
 
       public:
-        std::shared_ptr< Texture > get( const std::string& key, const std::string& path = "" );
+        std::shared_ptr< Texture > get( const std::string& path );
         void prune();
     };
 

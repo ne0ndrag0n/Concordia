@@ -7,8 +7,8 @@
 namespace BlueBear {
   namespace Graphics {
 
-    std::shared_ptr< Texture > TextureCache::get( const std::string& key, const std::string& path ) {
-      auto textureIterator = textureCache.find( key );
+    std::shared_ptr< Texture > TextureCache::get( const std::string& path ) {
+      auto textureIterator = textureCache.find( path );
 
       if( textureIterator != textureCache.end() ) {
         return textureIterator->second;
@@ -16,8 +16,8 @@ namespace BlueBear {
 
       // Value needs to be created
       // This should throw an exception if it fails
-      textureCache[ key ] = std::make_shared< Texture >( path );
-      return textureCache[ key ];
+      textureCache[ path ] = std::make_shared< Texture >( path );
+      return textureCache[ path ];
     }
 
     /**
