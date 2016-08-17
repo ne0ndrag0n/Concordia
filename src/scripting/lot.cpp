@@ -2,6 +2,7 @@
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
+#include "containers/collection3d.hpp"
 #include "scripting/lotentity.hpp"
 #include "scripting/lot.hpp"
 #include "log.hpp"
@@ -44,7 +45,7 @@ namespace BlueBear {
 
 			// Use the pointer lookup to create the floormap
 			Log::getInstance().debug( "Lot::buildFloorMap", "Stories: " + std::to_string( stories ) + " " + std::to_string( floorX ) + "x" + std::to_string( floorY ) );
-			floorMap = std::make_unique< FloorMap >( stories, floorX, floorY );
+			floorMap = std::make_unique< Containers::Collection3D< std::shared_ptr< Tile > > >( stories, floorX, floorY );
 
 			for( const Json::Value& level : levels ) {
 				unsigned int entry = level.asUInt();

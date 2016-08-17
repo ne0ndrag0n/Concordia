@@ -1,7 +1,8 @@
 #ifndef LOT
 #define LOT
 
-#include "scripting/floormap.hpp"
+#include "containers/collection3d.hpp"
+#include "scripting/tile.hpp"
 #include "scripting/infrastructurefactory.hpp"
 #include <lua.h>
 #include <lualib.h>
@@ -27,7 +28,7 @@ namespace BlueBear {
 
 			public:
 				std::map< std::string, std::unique_ptr< LotEntity > > objects;
-				std::unique_ptr< FloorMap > floorMap;
+				std::unique_ptr< Containers::Collection3D< std::shared_ptr< Tile > > > floorMap;
 				int floorX;
 				int floorY;
 				int stories;
