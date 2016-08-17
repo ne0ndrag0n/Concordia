@@ -2,7 +2,6 @@
 #define LOT
 
 #include "containers/collection3d.hpp"
-#include "scripting/tile.hpp"
 #include "scripting/infrastructurefactory.hpp"
 #include <lua.h>
 #include <lualib.h>
@@ -17,6 +16,7 @@
 namespace BlueBear {
 	namespace Scripting {
 		class LotEntity;
+		class Tile;
 
 		class Lot {
 
