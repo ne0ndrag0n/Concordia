@@ -1,4 +1,7 @@
 #include "graphics/display.hpp"
+#include "containers/collection3d.hpp"
+#include "graphics/entity.hpp"
+#include "scripting/lot.hpp"
 #include "threading/displaycommand.hpp"
 #include "threading/enginecommand.hpp"
 #include "threading/commandbus.hpp"
@@ -70,6 +73,16 @@ namespace BlueBear {
 
     void Display::registerNewEntity() {
       engineCommandList.push_back( std::make_unique< Threading::Engine::RegisterInstance >( 42 ) );
+    }
+
+    /**
+     * Given a lot, build instanceCollection and translate the Tiles/Wallpanels to instances on the lot
+     */
+    void Display::loadInfrastructure( Scripting::Lot& lot ) {
+      instanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< Instance > > >( lot.floorMap->levels, lot.floorMap->dimensionX, lot.floorMap->dimensionY );
+
+      // Transform each Tile instance to an entity
+      
     }
   }
 }

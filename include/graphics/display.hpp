@@ -4,6 +4,7 @@
 /**
  * Abstracted class representing the display device that is available to BlueBear.
  */
+#include "containers/collection3d.hpp"
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <memory>
@@ -13,11 +14,16 @@
 #include "threading/enginecommand.hpp"
 
 namespace BlueBear {
+  namespace Scripting {
+    class Lot;
+  }
+
   namespace Threading {
     class CommandBus;
   }
 
   namespace Graphics {
+    class Instance;
 
     class Display {
 
@@ -29,6 +35,7 @@ namespace BlueBear {
       void render();
       bool isOpen();
       void registerNewEntity();
+      void loadInfrastructure( Scripting::Lot& lot );
 
       private:
         using ViewportDimension = int;
@@ -38,6 +45,7 @@ namespace BlueBear {
         sf::RenderWindow mainWindow;
         Threading::CommandBus& commandBus;
         std::unique_ptr< Threading::Display::CommandList > displayCommandList;
+        std::unique_ptr< Containers::Collection3D< std::shared_ptr< Instance > > > instanceCollection;
         Threading::Engine::CommandList engineCommandList;
         void main();
         void processIncomingCommands();

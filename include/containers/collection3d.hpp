@@ -10,9 +10,6 @@ namespace BlueBear {
     template <typename T> class Collection3D {
 
       private:
-        unsigned int dimensionX;
-        unsigned int dimensionY;
-        unsigned int levels;
         std::vector< T > items;
         unsigned int getSingleIndex( unsigned int level, unsigned int x, unsigned int y ) {
           unsigned int origin = level * ( dimensionX * dimensionY );
@@ -22,6 +19,9 @@ namespace BlueBear {
         }
 
       public:
+        unsigned int dimensionX;
+        unsigned int dimensionY;
+        unsigned int levels;
         Collection3D( unsigned int levels, unsigned int x, unsigned int y ) : levels( levels ), dimensionX( x ), dimensionY( y ) {}
         T getItem( unsigned int level, unsigned int x, unsigned int y ) {
           return items[ getSingleIndex( level, x, y ) ];
