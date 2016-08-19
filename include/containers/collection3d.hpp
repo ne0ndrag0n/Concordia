@@ -29,6 +29,9 @@ namespace BlueBear {
         T getItemDirect( unsigned int direct ) {
           return items[ direct ];
         }
+        unsigned int getLength() {
+          return items.size();
+        }
         //void setItem( unsigned int level, unsigned int x, unsigned int y, T item );
         void pushDirect( T item ) {
           items.push_back( item );

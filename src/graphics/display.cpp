@@ -2,6 +2,7 @@
 #include "containers/collection3d.hpp"
 #include "graphics/entity.hpp"
 #include "scripting/lot.hpp"
+#include "scripting/tile.hpp"
 #include "threading/displaycommand.hpp"
 #include "threading/enginecommand.hpp"
 #include "threading/commandbus.hpp"
@@ -82,7 +83,18 @@ namespace BlueBear {
       instanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< Instance > > >( lot.floorMap->levels, lot.floorMap->dimensionX, lot.floorMap->dimensionY );
 
       // Transform each Tile instance to an entity
-      
+      auto size = lot.floorMap->getLength();
+      for( auto i = 0; i != size; i++ ) {
+        auto tilePtr = lot.floorMap->getItemDirect( i );
+        if( tilePtr ) {
+          // There is a floor tile located here which needs to be drawn.
+          auto tile = *tilePtr;
+          
+        } else {
+          // There is no floor tile located here. Consequently, insert an empty Instance pointer here; it will be skipped on draw.
+          instanceCollection->pushDirect( destPtr );
+        }
+      }
     }
   }
 }
