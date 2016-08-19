@@ -89,10 +89,10 @@ namespace BlueBear {
         if( tilePtr ) {
           // There is a floor tile located here which needs to be drawn.
           auto tile = *tilePtr;
-          
+
         } else {
           // There is no floor tile located here. Consequently, insert an empty Instance pointer here; it will be skipped on draw.
-          instanceCollection->pushDirect( destPtr );
+          instanceCollection->pushDirect( std::shared_ptr< Instance >() );
         }
       }
     }

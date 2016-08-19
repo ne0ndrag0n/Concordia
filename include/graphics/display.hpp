@@ -38,6 +38,7 @@ namespace BlueBear {
       void loadInfrastructure( Scripting::Lot& lot );
 
       private:
+        static constexpr const char* FLOOR_MODEL_PATH = "system/models/floor/floor.dae";
         using ViewportDimension = int;
         ViewportDimension x;
         ViewportDimension y;
