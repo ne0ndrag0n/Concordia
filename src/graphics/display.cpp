@@ -1,6 +1,8 @@
 #include "graphics/display.hpp"
 #include "containers/collection3d.hpp"
 #include "graphics/entity.hpp"
+#include "graphics/shader.hpp"
+#include "graphics/model.hpp"
 #include "scripting/lot.hpp"
 #include "scripting/tile.hpp"
 #include "threading/displaycommand.hpp"
@@ -12,8 +14,11 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/OpenGL.hpp>
+#include <GL/glew.h>
 #include <memory>
 #include <mutex>
+#include <string>
+#include <cstdlib>
 
 namespace BlueBear {
   namespace Graphics {
@@ -26,7 +31,35 @@ namespace BlueBear {
 
     void Display::openDisplay() {
       mainWindow.create( sf::VideoMode( x, y ), LocaleManager::getInstance().getString( "BLUEBEAR_WINDOW_TITLE" ), sf::Style::Close );
-      mainWindow.setVerticalSyncEnabled( true );
+
+      // Set sync on window by these params:
+      // vsync_limiter_overview = true or fps_overview
+      if( ConfigManager::getInstance().getBoolValue( "vsync_limiter_overview" ) == true ) {
+        mainWindow.setVerticalSyncEnabled( true );
+      } else {
+        mainWindow.setFramerateLimit( ConfigManager::getInstance().getIntValue( "fps_overview" ) );
+      }
+
+      // Initialize OpenGL using GLEW
+      glewExperimental = true;
+      auto glewStatus = glewInit();
+      if( glewStatus != GLEW_OK ) {
+        // Oh, this piece of shit function. Why the fuck is this GLubyte* when every other god damn string type is const char*?!
+        Log::getInstance().error( "Display::openDisplay", "FATAL: glewInit() did NOT return GLEW_OK! (" + std::string( ( const char* ) glewGetErrorString( glewStatus ) ) + ")" );
+        exit( 1 );
+      }
+
+      // Open default shaders
+      // FIXME: constexpr in g++ is totally, utterly broken and i do not want to use macro constants
+      // because C-style idioms are banned from this project
+      Log::getInstance().debug( "Display::openDisplay", "Loading the default shader..." );
+      defaultShader = std::make_unique< Shader >( "system/shaders/default_vertex.glsl", "system/shaders/default_fragment.glsl" );
+      Log::getInstance().debug( "Display::openDisplay", "Done" );
+
+      // There may be more than just this needed from main.cpp in the area51/sfml_test project
+      glViewport( 0, 0, x, y );
+      glEnable( GL_DEPTH_TEST );
+      glEnable( GL_CULL_FACE );
 
       displayCommandList = std::make_unique< Threading::Display::CommandList >();
     }
@@ -81,6 +114,12 @@ namespace BlueBear {
      */
     void Display::loadInfrastructure( Scripting::Lot& lot ) {
       instanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< Instance > > >( lot.floorMap->levels, lot.floorMap->dimensionX, lot.floorMap->dimensionY );
+
+      // Lazy-load floorPanel and wallPanelModel
+      if( !floorModel ) {
+        // wrapped in std::string - compiler bug causes the constexpr not to be evaluated, and fails in linking
+        floorModel = std::make_unique< Model >( std::string( FLOOR_MODEL_PATH ) );
+      }
 
       // Transform each Tile instance to an entity
       auto size = lot.floorMap->getLength();

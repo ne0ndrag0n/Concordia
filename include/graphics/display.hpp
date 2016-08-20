@@ -12,6 +12,8 @@
 #include "graphics/entity.hpp"
 #include "threading/displaycommand.hpp"
 #include "threading/enginecommand.hpp"
+#include "graphics/model.hpp"
+#include "graphics/shader.hpp"
 
 namespace BlueBear {
   namespace Scripting {
@@ -48,6 +50,12 @@ namespace BlueBear {
         std::unique_ptr< Threading::Display::CommandList > displayCommandList;
         std::unique_ptr< Containers::Collection3D< std::shared_ptr< Instance > > > instanceCollection;
         Threading::Engine::CommandList engineCommandList;
+
+        std::unique_ptr< Model > floorModel;
+        std::unique_ptr< Model > wallPanelModel;
+
+        std::unique_ptr< Shader > defaultShader;
+
         void main();
         void processIncomingCommands();
         void processOutgoingCommands();
