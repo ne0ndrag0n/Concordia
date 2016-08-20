@@ -3,6 +3,7 @@
 #include "graphics/entity.hpp"
 #include "graphics/shader.hpp"
 #include "graphics/model.hpp"
+#include "graphics/drawable.hpp"
 #include "scripting/lot.hpp"
 #include "scripting/tile.hpp"
 #include "threading/displaycommand.hpp"
@@ -129,6 +130,13 @@ namespace BlueBear {
           // There is a floor tile located here which needs to be drawn.
           auto tile = *tilePtr;
 
+          // Create instance from the model, and change its material using the material cache
+          std::shared_ptr< Instance > instance = std::make_shared< Instance >( *floorModel, defaultShader->Program );
+          Drawable& floorDrawable = instance->drawables.at( "Plane" );
+          floorDrawable.material = materialCache.get( tile );
+
+          // The pointer to this floor tile goes into the instanceCollection
+          instanceCollection->pushDirect( instance );
         } else {
           // There is no floor tile located here. Consequently, insert an empty Instance pointer here; it will be skipped on draw.
           instanceCollection->pushDirect( std::shared_ptr< Instance >() );

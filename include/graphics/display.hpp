@@ -10,6 +10,7 @@
 #include <memory>
 #include <glm/glm.hpp>
 #include "graphics/entity.hpp"
+#include "graphics/materialcache.hpp"
 #include "threading/displaycommand.hpp"
 #include "threading/enginecommand.hpp"
 #include "graphics/model.hpp"
@@ -55,6 +56,8 @@ namespace BlueBear {
         std::unique_ptr< Model > wallPanelModel;
 
         std::unique_ptr< Shader > defaultShader;
+
+        MaterialCache materialCache;
 
         void main();
         void processIncomingCommands();
