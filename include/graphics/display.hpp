@@ -30,6 +30,25 @@ namespace BlueBear {
 
     class Display {
 
+      // ---------- STATES ----------
+      class State {
+        public:
+          virtual void execute() = 0;
+      };
+
+      class IdleState : public State {
+        void execute();
+      };
+
+      class TitleState : public State {
+        void execute();
+      };
+
+      class MainGameState : public State {
+        void execute();
+      };
+      // ----------------------------
+
     public:
       // RAII style
       Display( Threading::CommandBus& commandBus );
@@ -56,6 +75,8 @@ namespace BlueBear {
         std::unique_ptr< Model > wallPanelModel;
 
         std::unique_ptr< Shader > defaultShader;
+
+        std::unique_ptr< State > currentState;
 
         MaterialCache materialCache;
 

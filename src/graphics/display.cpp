@@ -28,6 +28,9 @@ namespace BlueBear {
       // Get our settings out of the config manager
       x = ConfigManager::getInstance().getIntValue( "viewport_x" );
       y = ConfigManager::getInstance().getIntValue( "viewport_y" );
+
+      // There must always be a defined State (avoid branch penalty/null check in tight loop)
+      currentState = std::make_unique< IdleState >();
     }
 
     void Display::openDisplay() {
@@ -74,6 +77,8 @@ namespace BlueBear {
         if( event.type == sf::Event::Closed ) {
           mainWindow.close();
         }
+
+        currentState->execute();
       }
 
       mainWindow.clear( sf::Color::Black );
@@ -127,13 +132,10 @@ namespace BlueBear {
       for( auto i = 0; i != size; i++ ) {
         auto tilePtr = lot.floorMap->getItemDirect( i );
         if( tilePtr ) {
-          // There is a floor tile located here which needs to be drawn.
-          auto tile = *tilePtr;
-
           // Create instance from the model, and change its material using the material cache
           std::shared_ptr< Instance > instance = std::make_shared< Instance >( *floorModel, defaultShader->Program );
           Drawable& floorDrawable = instance->drawables.at( "Plane" );
-          floorDrawable.material = materialCache.get( tile );
+          floorDrawable.material = materialCache.get( *tilePtr );
 
           // The pointer to this floor tile goes into the instanceCollection
           instanceCollection->pushDirect( instance );
@@ -142,6 +144,25 @@ namespace BlueBear {
           instanceCollection->pushDirect( std::shared_ptr< Instance >() );
         }
       }
+    }
+
+    // ---------- STATES ----------
+
+    // Does nothing. This is better than a null pointer check in a tight loop.
+    void Display::IdleState::execute() {}
+
+    /**
+     * Display renderer state for the titlescreen
+     */
+    void Display::TitleState::execute() {
+
+    }
+
+    /**
+     * Display renderer state for the main game loop
+     */
+    void Display::MainGameState::execute() {
+
     }
   }
 }
