@@ -15,7 +15,7 @@ namespace BlueBear {
 
       SendInfrastructureCommand::SendInfrastructureCommand( Scripting::Lot& lot ) : lot( lot ) {}
       void SendInfrastructureCommand::execute( Graphics::Display& instance ) {
-        
+        Log::getInstance().info( "SendInfrastructureCommand::execute", "Sending infrastructure to Display..." ); 
       }
 
 

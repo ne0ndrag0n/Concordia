@@ -522,8 +522,6 @@ namespace BlueBear {
 			// This pointer holds the direction to our list of incoming engine commands
 			std::unique_ptr< Threading::Engine::CommandList > engineCommandList = std::make_unique< Threading::Engine::CommandList >();
 
-			displayCommandList.push_back( std::make_unique< Threading::Display::NewEntityCommand >() );
-
 			// This outer loop is a preliminary feature, the engine shouldn't stop until it's instructed to
 			// We'll need to account for integer overflow in both here and Lua
 			while( currentTick <= WORLD_TICKS_MAX ) {
