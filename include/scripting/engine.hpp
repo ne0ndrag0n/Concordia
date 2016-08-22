@@ -39,6 +39,8 @@ namespace BlueBear {
 				const char* currentModpackDirectory;
 				std::map< std::string, BlueBear::ModpackStatus > loadedModpacks;
 				Threading::CommandBus& commandBus;
+				bool active;
+				unsigned int sleepInterval;
 
 				void callActionOnObject( const char* playerId, const char* objectId, const char* method );
 				bool deserializeFunctionRefs();
@@ -51,6 +53,7 @@ namespace BlueBear {
 				void objectLoop();
 				bool loadLot( const char* lotPath );
 				bool setupRootEnvironment();
+				void setActiveState( bool status );
 
 				bool loadModpackSet( const char* modpackDirectory );
 				bool loadModpack( const std::string& name );

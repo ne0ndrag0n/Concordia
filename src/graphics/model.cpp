@@ -73,11 +73,7 @@ namespace BlueBear {
     }
 
     void Model::processNode( aiNode* node, const aiScene* scene, aiMatrix4x4 parentTransform ) {
-      {
-        std::stringstream stream( "Processing " );
-        stream << node->mName.C_Str();
-        Log::getInstance().debug( "Model::processNode", stream.str() );
-      }
+      Log::getInstance().debug( "Model::processNode", "Processing " + std::string( node->mName.C_Str() ) );
 
       aiMatrix4x4 resultantTransform = parentTransform * node->mTransformation;
 
@@ -95,12 +91,8 @@ namespace BlueBear {
         children.emplace( node->mChildren[ i ]->mName.C_Str(), std::make_unique< Model >( node->mChildren[ i ], scene, directory, resultantTransform ) );
       }
 
-      {
-        std::stringstream stream( "Done with " );
-        stream << node->mName.C_Str();
-        Log::getInstance().debug( "Model::processNode", stream.str() );
-      }
-    }
+      Log::getInstance().debug( "Model::processNode", "Done with " + std::string( node->mName.C_Str() ) );
+     }
 
     void Model::processMesh( aiMesh* mesh, const aiScene* scene, std::string nodeTitle, glm::mat4 transformation ) {
       std::vector< Vertex > vertices;

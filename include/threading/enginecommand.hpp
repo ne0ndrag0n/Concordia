@@ -29,6 +29,13 @@ namespace BlueBear {
           void execute( Scripting::Engine& instance );
       };
 
+      class SetLockState : public Command {
+        bool status;
+        public:
+          SetLockState( bool status );
+          void execute( Scripting::Engine& instance );
+      };
+
       using CommandList = std::list< std::unique_ptr< Command > >;
     }
   }

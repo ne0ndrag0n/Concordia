@@ -18,6 +18,11 @@ namespace BlueBear {
         ss << "Registered this new entity " << instanceId;
         Log::getInstance().info( "RegisterInstance", ss.str() );
       }
+
+      SetLockState::SetLockState( bool status ) : status( status ) {}
+      void SetLockState::execute( Scripting::Engine& instance ) {
+        instance.setActiveState( status );
+      }
     }
   }
 }

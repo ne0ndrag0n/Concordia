@@ -144,6 +144,11 @@ namespace BlueBear {
           instanceCollection->pushDirect( std::shared_ptr< Instance >() );
         }
       }
+
+      Log::getInstance().info( "Display::loadInfrastructure", "Finished creating infrastructure instances." );
+
+      // Drop a SetLockState command for Engine
+      engineCommandList.push_back( std::make_unique< Threading::Engine::SetLockState >( true ) );
     }
 
     // ---------- STATES ----------

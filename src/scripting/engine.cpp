@@ -34,6 +34,7 @@ namespace BlueBear {
 		Engine::Engine( Threading::CommandBus& commandBus ) :
 		 L( luaL_newstate() ), currentModpackDirectory( nullptr ), ticksPerSecond( ConfigManager::getInstance().getIntValue( "ticks_per_second" ) ), commandBus( commandBus ) {
 			luaL_openlibs( L );
+			setActiveState( false );
 		}
 
 		Engine::~Engine() {
@@ -507,6 +508,20 @@ namespace BlueBear {
 		}
 
 		/**
+		 * Sets the active state of the loop. Typically done from an EngineCommand.
+		 */
+		void Engine::setActiveState( bool status ) {
+			active = status;
+
+			if( active == true ) {
+				// Cleared for takeoff
+				sleepInterval = 1000;
+			} else {
+				sleepInterval = 300;
+			}
+		}
+
+		/**
 		 * Where the magic happens
 		 */
 		void Engine::objectLoop() {
@@ -522,12 +537,16 @@ namespace BlueBear {
 			// This pointer holds the direction to our list of incoming engine commands
 			std::unique_ptr< Threading::Engine::CommandList > engineCommandList = std::make_unique< Threading::Engine::CommandList >();
 
+			// Send infrastructure. When display is finished loading, it will send back the activation signal, changing the sleepInterval to a full second
+			// and unlocking the main loop to perform other operations.
+			displayCommandList.push_back( std::make_unique< Threading::Display::SendInfrastructureCommand >( *currentLot ) );
+
 			// This outer loop is a preliminary feature, the engine shouldn't stop until it's instructed to
 			// We'll need to account for integer overflow in both here and Lua
 			while( currentTick <= WORLD_TICKS_MAX ) {
 				// Let's set up a start and end duration
 				auto startTime = std::chrono::steady_clock::now();
-				auto endTime = startTime + std::chrono::seconds( 1 );
+				auto endTime = startTime + std::chrono::milliseconds( sleepInterval );
 
 				// Attempt to consume items in the engineCommandList
 				commandBus.attemptConsume( engineCommandList );
@@ -536,27 +555,29 @@ namespace BlueBear {
 	      }
 	      engineCommandList->clear();
 
-				// ** START THE SINGLE TICK LOOP **
-				// Complete a tick set: currentTick up to the next time it is evenly divisible by ticksPerSecond
-				int ticksRemaining = ticksPerSecond;
-				while( ticksRemaining-- ) {
-					// On every tick, increment currentTick
-					currentTick++;
+				if( active == true ) {
+					// ** START THE SINGLE TICK LOOP **
+					// Complete a tick set: currentTick up to the next time it is evenly divisible by ticksPerSecond
+					int ticksRemaining = ticksPerSecond;
+					while( ticksRemaining-- ) {
+						// On every tick, increment currentTick
+						currentTick++;
 
-					// Set current_tick on bluebear.lot (inside the Luasphere, system/root.lua) to the current tick
-					Utility::setTableIntValue( L, "current_tick", currentTick );
+						// Set current_tick on bluebear.lot (inside the Luasphere, system/root.lua) to the current tick
+						Utility::setTableIntValue( L, "current_tick", currentTick );
 
-					for( auto& keyValuePair : currentLot->objects ) {
-						LotEntity& currentEntity = *( keyValuePair.second );
+						for( auto& keyValuePair : currentLot->objects ) {
+							LotEntity& currentEntity = *( keyValuePair.second );
 
-						// Execute object if it is "ok"
-						if( currentEntity.ok == true ) {
-							// currentEntity.execute should leave the stack as it was when it was called!!
-							currentEntity.execute();
+							// Execute object if it is "ok"
+							if( currentEntity.ok == true ) {
+								// currentEntity.execute should leave the stack as it was when it was called!!
+								currentEntity.execute();
+							}
 						}
 					}
+					// ** END THE SINGLE TICK LOOP **
 				}
-				// ** END THE SINGLE TICK LOOP **
 
 				// Try to empty out the list and send it to the commandbus
 				if( displayCommandList.size() > 0 ) {
