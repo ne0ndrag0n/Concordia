@@ -546,7 +546,6 @@ namespace BlueBear {
 			while( currentTick <= WORLD_TICKS_MAX ) {
 				// Let's set up a start and end duration
 				auto startTime = std::chrono::steady_clock::now();
-				auto endTime = startTime + std::chrono::milliseconds( sleepInterval );
 
 				// Attempt to consume items in the engineCommandList
 				commandBus.attemptConsume( engineCommandList );
@@ -586,7 +585,7 @@ namespace BlueBear {
 
 				// Wait the difference between one second, and however long it took for this shit to finish
 				// Guarantees that one second will elapse every "ticksPerSecond" ticks
-				std::this_thread::sleep_until( endTime );
+				std::this_thread::sleep_until( startTime + std::chrono::milliseconds( sleepInterval ) );
 			}
 
 			Log::getInstance().debug( "Engine::objectLoop", "Finished!" );
