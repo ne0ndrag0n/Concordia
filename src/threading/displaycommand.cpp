@@ -8,8 +8,6 @@ namespace BlueBear {
     namespace Display {
 
       void NewEntityCommand::execute( Graphics::Display& instance ) {
-        instance.registerNewEntity();
-
         Log::getInstance().info( "NewEntityCommand", "Called registerNewEntity, hang in there..." );
       }
 

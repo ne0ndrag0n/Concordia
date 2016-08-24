@@ -69,7 +69,14 @@ namespace BlueBear {
     }
 
     void Display::render() {
-      processIncomingCommands();
+      // Process incoming commands - the passed-in list should always be empty
+      commandBus.attemptConsume( displayCommandList );
+
+      for( auto& command : *displayCommandList ) {
+        command->execute( *this );
+      }
+
+      displayCommandList->clear();
 
       // Handle events
       sf::Event event;
@@ -84,35 +91,14 @@ namespace BlueBear {
       mainWindow.clear( sf::Color::Black );
       mainWindow.display();
 
-      processOutgoingCommands();
-    }
-
-    bool Display::isOpen() {
-      return mainWindow.isOpen();
-    }
-
-    /**
-     * Swap the pointers, and if the resulting list contains any commands, process those commands.
-     */
-    void Display::processIncomingCommands() {
-      // The passed-in list should always be empty
-      commandBus.attemptConsume( displayCommandList );
-
-      for( auto& command : *displayCommandList ) {
-        command->execute( *this );
-      }
-
-      displayCommandList->clear();
-    }
-
-    void Display::processOutgoingCommands() {
+      // Process outgoing commands
       if( engineCommandList.size() > 0 ) {
         commandBus.attemptProduce( engineCommandList );
       }
     }
 
-    void Display::registerNewEntity() {
-      engineCommandList.push_back( std::make_unique< Threading::Engine::RegisterInstance >( 42 ) );
+    bool Display::isOpen() {
+      return mainWindow.isOpen();
     }
 
     /**

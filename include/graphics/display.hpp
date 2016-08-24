@@ -56,7 +56,6 @@ namespace BlueBear {
       void openDisplay();
       void render();
       bool isOpen();
-      void registerNewEntity();
       void loadInfrastructure( Scripting::Lot& lot );
 
       private:
@@ -81,8 +80,6 @@ namespace BlueBear {
         MaterialCache materialCache;
 
         void main();
-        void processIncomingCommands();
-        void processOutgoingCommands();
     };
 
   }
