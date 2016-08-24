@@ -64,19 +64,17 @@ namespace BlueBear {
       glViewport( 0, 0, x, y );
       glEnable( GL_DEPTH_TEST );
       glEnable( GL_CULL_FACE );
-
-      displayCommandList = std::make_unique< Threading::Display::CommandList >();
     }
 
     void Display::render() {
       // Process incoming commands - the passed-in list should always be empty
       commandBus.attemptConsume( displayCommandList );
 
-      for( auto& command : *displayCommandList ) {
+      for( auto& command : displayCommandList ) {
         command->execute( *this );
       }
 
-      displayCommandList->clear();
+      displayCommandList.clear();
 
       // Handle events
       sf::Event event;

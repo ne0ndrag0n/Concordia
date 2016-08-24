@@ -24,17 +24,17 @@ namespace BlueBear {
          * Producer/consumer pair for Display::CommandList
          */
         bool attemptProduce( Display::CommandList& source );
-        bool attemptConsume( std::unique_ptr< Display::CommandList >& destination );
+        bool attemptConsume( Display::CommandList& destination );
         void produce( Display::CommandList& source );
-        void consume( std::unique_ptr< Display::CommandList >& destination );
+        void consume( Display::CommandList& destination );
 
         /**
          * Producer/consumer pair for Engine::CommandList
          */
         bool attemptProduce( Engine::CommandList& source );
-        bool attemptConsume( std::unique_ptr< Engine::CommandList >& destination );
+        bool attemptConsume( Engine::CommandList& destination );
         void produce( Engine::CommandList& source );
-        void consume( std::unique_ptr< Engine::CommandList >& destination );
+        void consume( Engine::CommandList& destination );
     };
 
   }

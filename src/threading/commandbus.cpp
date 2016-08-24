@@ -23,12 +23,12 @@ namespace BlueBear {
       return successful;
     }
 
-    bool CommandBus::attemptConsume( std::unique_ptr< Display::CommandList >& destination ) {
+    bool CommandBus::attemptConsume( Display::CommandList& destination ) {
       // Keep this critical section short!
       std::unique_lock< std::mutex > locker( displayMutex, std::try_to_lock );
       bool successful = locker.owns_lock();
       if( successful ) {
-        displayCommands.swap( destination );
+        destination.splice( destination.end(), *displayCommands );
       }
 
       return successful;
@@ -39,9 +39,9 @@ namespace BlueBear {
       displayCommands->splice( displayCommands->end(), source );
     }
 
-    void CommandBus::consume( std::unique_ptr< Display::CommandList >& destination ) {
+    void CommandBus::consume( Display::CommandList& destination ) {
       std::unique_lock< std::mutex > locker( displayMutex );
-      displayCommands.swap( destination );
+      destination.splice( destination.end(), *displayCommands );
     }
 
     bool CommandBus::attemptProduce( Engine::CommandList& source ) {
@@ -53,11 +53,11 @@ namespace BlueBear {
 
       return successful;
     }
-    bool CommandBus::attemptConsume( std::unique_ptr< Engine::CommandList >& destination ) {
+    bool CommandBus::attemptConsume( Engine::CommandList& destination ) {
       std::unique_lock< std::mutex > locker( engineMutex, std::try_to_lock );
       bool successful = locker.owns_lock();
       if( successful ) {
-        engineCommands.swap( destination );
+        destination.splice( destination.end(), *engineCommands );
       }
       return successful;
     }
@@ -67,9 +67,9 @@ namespace BlueBear {
       engineCommands->splice( engineCommands->end(), source );
     }
 
-    void CommandBus::consume( std::unique_ptr< Engine::CommandList >& destination ) {
+    void CommandBus::consume( Engine::CommandList& destination ) {
       std::unique_lock< std::mutex > locker( engineMutex );
-      engineCommands.swap( destination );
+      destination.splice( destination.end(), *engineCommands );
     }
   }
 }

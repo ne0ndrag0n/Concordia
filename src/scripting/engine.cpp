@@ -535,7 +535,7 @@ namespace BlueBear {
 			// This single container holds our list of commands to send to the display
 			Threading::Display::CommandList displayCommandList;
 			// This pointer holds the direction to our list of incoming engine commands
-			std::unique_ptr< Threading::Engine::CommandList > engineCommandList = std::make_unique< Threading::Engine::CommandList >();
+			Threading::Engine::CommandList engineCommandList;
 
 			// Send infrastructure. When display is finished loading, it will send back the activation signal, changing the sleepInterval to a full second
 			// and unlocking the main loop to perform other operations.
@@ -549,10 +549,10 @@ namespace BlueBear {
 
 				// Attempt to consume items in the engineCommandList
 				commandBus.attemptConsume( engineCommandList );
-				for( auto& command : *engineCommandList ) {
+				for( auto& command : engineCommandList ) {
 	        command->execute( *this );
 	      }
-	      engineCommandList->clear();
+	      engineCommandList.clear();
 
 				if( active == true ) {
 					// ** START THE SINGLE TICK LOOP **

@@ -66,9 +66,11 @@ namespace BlueBear {
         std::vector< Instance > instances;
         sf::RenderWindow mainWindow;
         Threading::CommandBus& commandBus;
-        std::unique_ptr< Threading::Display::CommandList > displayCommandList;
-        std::unique_ptr< Containers::Collection3D< std::shared_ptr< Instance > > > instanceCollection;
+
+        Threading::Display::CommandList displayCommandList;
         Threading::Engine::CommandList engineCommandList;
+
+        std::unique_ptr< Containers::Collection3D< std::shared_ptr< Instance > > > instanceCollection;
 
         std::unique_ptr< Model > floorModel;
         std::unique_ptr< Model > wallPanelModel;
