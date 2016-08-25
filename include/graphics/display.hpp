@@ -11,8 +11,6 @@
 #include <glm/glm.hpp>
 #include "graphics/entity.hpp"
 #include "graphics/materialcache.hpp"
-#include "threading/displaycommand.hpp"
-#include "threading/enginecommand.hpp"
 #include "graphics/model.hpp"
 #include "graphics/shader.hpp"
 
@@ -66,9 +64,6 @@ namespace BlueBear {
         std::vector< Instance > instances;
         sf::RenderWindow mainWindow;
         Threading::CommandBus& commandBus;
-
-        Threading::Display::CommandList displayCommandList;
-        Threading::Engine::CommandList engineCommandList;
 
         std::unique_ptr< Containers::Collection3D< std::shared_ptr< Instance > > > instanceCollection;
 

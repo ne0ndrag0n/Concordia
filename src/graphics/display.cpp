@@ -21,6 +21,9 @@
 #include <string>
 #include <cstdlib>
 
+static BlueBear::Threading::Display::CommandList displayCommandList;
+static BlueBear::Threading::Engine::CommandList engineCommandList;
+
 namespace BlueBear {
   namespace Graphics {
 
