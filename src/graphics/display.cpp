@@ -35,6 +35,8 @@ namespace BlueBear {
       currentState = std::make_unique< IdleState >();
     }
 
+    Display::~Display() = default;
+
     void Display::openDisplay() {
       mainWindow.create( sf::VideoMode( x, y ), LocaleManager::getInstance().getString( "BLUEBEAR_WINDOW_TITLE" ), sf::Style::Close );
 

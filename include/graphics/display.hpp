@@ -10,10 +10,7 @@
 #include <memory>
 #include <list>
 #include <glm/glm.hpp>
-#include "graphics/entity.hpp"
 #include "graphics/materialcache.hpp"
-#include "graphics/model.hpp"
-#include "graphics/shader.hpp"
 
 namespace BlueBear {
   namespace Scripting {
@@ -26,6 +23,8 @@ namespace BlueBear {
 
   namespace Graphics {
     class Instance;
+    class Model;
+    class Shader;
 
     class Display {
 
@@ -51,6 +50,7 @@ namespace BlueBear {
     public:
       // RAII style
       Display( Threading::CommandBus& commandBus );
+      ~Display();
 
       void openDisplay();
       void render();
