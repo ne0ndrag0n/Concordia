@@ -1,8 +1,8 @@
 #ifndef COMMANDBUS
 #define COMMANDBUS
 
-#include "threading/displaycommand.hpp"
-#include "threading/enginecommand.hpp"
+#include "graphics/display.hpp"
+#include "scripting/engine.hpp"
 #include <memory>
 #include <vector>
 #include <mutex>
@@ -14,27 +14,27 @@ namespace BlueBear {
 
       public:
         std::mutex displayMutex;
-        std::unique_ptr< Display::CommandList > displayCommands;
+        std::unique_ptr< Graphics::Display::CommandList > displayCommands;
         std::mutex engineMutex;
-        std::unique_ptr< Engine::CommandList > engineCommands;
+        std::unique_ptr< Scripting::Engine::CommandList > engineCommands;
 
         CommandBus();
 
         /**
          * Producer/consumer pair for Display::CommandList
          */
-        bool attemptProduce( Display::CommandList& source );
-        bool attemptConsume( Display::CommandList& destination );
-        void produce( Display::CommandList& source );
-        void consume( Display::CommandList& destination );
+        bool attemptProduce( Graphics::Display::CommandList& source );
+        bool attemptConsume( Graphics::Display::CommandList& destination );
+        void produce( Graphics::Display::CommandList& source );
+        void consume( Graphics::Display::CommandList& destination );
 
         /**
          * Producer/consumer pair for Engine::CommandList
          */
-        bool attemptProduce( Engine::CommandList& source );
-        bool attemptConsume( Engine::CommandList& destination );
-        void produce( Engine::CommandList& source );
-        void consume( Engine::CommandList& destination );
+        bool attemptProduce( Scripting::Engine::CommandList& source );
+        bool attemptConsume( Scripting::Engine::CommandList& destination );
+        void produce( Scripting::Engine::CommandList& source );
+        void consume( Scripting::Engine::CommandList& destination );
     };
 
   }

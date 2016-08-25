@@ -10,13 +10,12 @@
 #include "graphics/display.hpp"
 #include "configmanager.hpp"
 #include "scripting/eventmanager.hpp"
-#include "threading/displaycommand.hpp"
-#include "threading/enginecommand.hpp"
 #include "scripting/infrastructurefactory.hpp"
 #include "log.hpp"
 #include <jsoncpp/json/json.h>
 #include <iterator>
 #include <string>
+#include <sstream>
 #include <vector>
 #include <iostream>
 #include <chrono>
@@ -533,13 +532,13 @@ namespace BlueBear {
 			Utility::getTableValue( L, "engine" );
 
 			// This single container holds our list of commands to send to the display
-			Threading::Display::CommandList displayCommandList;
+			Graphics::Display::CommandList displayCommandList;
 			// This pointer holds the direction to our list of incoming engine commands
-			Threading::Engine::CommandList engineCommandList;
+			Scripting::Engine::CommandList engineCommandList;
 
 			// Send infrastructure. When display is finished loading, it will send back the activation signal, changing the sleepInterval to a full second
 			// and unlocking the main loop to perform other operations.
-			displayCommandList.push_back( std::make_unique< Threading::Display::SendInfrastructureCommand >( *currentLot ) );
+			displayCommandList.push_back( std::make_unique< Graphics::Display::SendInfrastructureCommand >( *currentLot ) );
 
 			// This outer loop is a preliminary feature, the engine shouldn't stop until it's instructed to
 			// We'll need to account for integer overflow in both here and Lua
@@ -615,12 +614,19 @@ namespace BlueBear {
 			 return 0;
 		 }
 
-		/**
-		 * Given the cid of a player, the cid of an object, and its desired action, call the action method on the LotEntity
-		 * by passing the player identified by playerId as the "player" argument.
-		 */
-		void Engine::callActionOnObject( const char* playerId, const char* obejctId, const char* method ) {
+		// ---------- COMMANDS ----------
+		Engine::RegisterInstance::RegisterInstance( unsigned int instanceId )
+			: instanceId( instanceId ) {}
 
+		void Engine::RegisterInstance::execute( Engine& instance ) {
+			std::stringstream ss;
+			ss << "Registered this new entity " << instanceId;
+			Log::getInstance().info( "RegisterInstance", ss.str() );
+		}
+
+		Engine::SetLockState::SetLockState( bool status ) : status( status ) {}
+		void Engine::SetLockState::execute( Engine& instance ) {
+			instance.setActiveState( status );
 		}
 	}
 }

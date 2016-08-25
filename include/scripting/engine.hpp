@@ -9,7 +9,7 @@
 #include <memory>
 #include <vector>
 #include <map>
-
+#include <list>
 
 namespace BlueBear {
 	namespace Threading {
@@ -60,6 +60,28 @@ namespace BlueBear {
 				static int lua_loadModpack( lua_State* L );
 				static int lua_setupStemcell( lua_State* L );
 				static int lua_print( lua_State* L );
+
+				class Command {
+					public:
+						virtual void execute( Engine& instance ) = 0;
+				};
+
+				class RegisterInstance : public Command {
+					unsigned int instanceId;
+
+					public:
+						RegisterInstance( unsigned int instanceId );
+						void execute( Engine& instance );
+				};
+
+				class SetLockState : public Command {
+					bool status;
+					public:
+						SetLockState( bool status );
+						void execute( Engine& instance );
+				};
+
+				using CommandList = std::list< std::unique_ptr< Command > >;
 		};
 	}
 }

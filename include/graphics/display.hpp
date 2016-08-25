@@ -8,6 +8,7 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <memory>
+#include <list>
 #include <glm/glm.hpp>
 #include "graphics/entity.hpp"
 #include "graphics/materialcache.hpp"
@@ -55,6 +56,26 @@ namespace BlueBear {
       void render();
       bool isOpen();
       void loadInfrastructure( Scripting::Lot& lot );
+
+      class Command {
+        public:
+          virtual void execute( Display& instance ) = 0;
+      };
+
+      class NewEntityCommand : public Command {
+        glm::vec3 position;
+        public:
+          void execute( Display& instance );
+      };
+
+      class SendInfrastructureCommand : public Command {
+        Scripting::Lot& lot;
+        public:
+          SendInfrastructureCommand( Scripting::Lot& lot );
+          void execute( Display& instance );
+      };
+
+      using CommandList = std::list< std::unique_ptr< Command > >;
 
       private:
         static constexpr const char* FLOOR_MODEL_PATH = "system/models/floor/floor.dae";

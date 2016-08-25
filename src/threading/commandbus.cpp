@@ -1,6 +1,6 @@
 #include "threading/commandbus.hpp"
-#include "threading/displaycommand.hpp"
-#include "threading/enginecommand.hpp"
+#include "graphics/display.hpp"
+#include "scripting/engine.hpp"
 #include <memory>
 #include <mutex>
 #include <utility>
@@ -9,11 +9,11 @@ namespace BlueBear {
   namespace Threading {
 
     CommandBus::CommandBus() {
-      displayCommands = std::make_unique< Display::CommandList >();
-      engineCommands = std::make_unique< Engine::CommandList >();
+      displayCommands = std::make_unique< Graphics::Display::CommandList >();
+      engineCommands = std::make_unique< Scripting::Engine::CommandList >();
     }
 
-    bool CommandBus::attemptProduce( Display::CommandList& source ) {
+    bool CommandBus::attemptProduce( Graphics::Display::CommandList& source ) {
       std::unique_lock< std::mutex > locker( displayMutex, std::try_to_lock );
       bool successful = locker.owns_lock();
       if( successful ) {
@@ -23,7 +23,7 @@ namespace BlueBear {
       return successful;
     }
 
-    bool CommandBus::attemptConsume( Display::CommandList& destination ) {
+    bool CommandBus::attemptConsume( Graphics::Display::CommandList& destination ) {
       // Keep this critical section short!
       std::unique_lock< std::mutex > locker( displayMutex, std::try_to_lock );
       bool successful = locker.owns_lock();
@@ -34,17 +34,17 @@ namespace BlueBear {
       return successful;
     }
 
-    void CommandBus::produce( Display::CommandList& source ) {
+    void CommandBus::produce( Graphics::Display::CommandList& source ) {
       std::unique_lock< std::mutex > locker( displayMutex );
       displayCommands->splice( displayCommands->end(), source );
     }
 
-    void CommandBus::consume( Display::CommandList& destination ) {
+    void CommandBus::consume( Graphics::Display::CommandList& destination ) {
       std::unique_lock< std::mutex > locker( displayMutex );
       destination.splice( destination.end(), *displayCommands );
     }
 
-    bool CommandBus::attemptProduce( Engine::CommandList& source ) {
+    bool CommandBus::attemptProduce( Scripting::Engine::CommandList& source ) {
       std::unique_lock< std::mutex > locker( engineMutex, std::try_to_lock );
       bool successful = locker.owns_lock();
       if( successful ) {
@@ -53,7 +53,7 @@ namespace BlueBear {
 
       return successful;
     }
-    bool CommandBus::attemptConsume( Engine::CommandList& destination ) {
+    bool CommandBus::attemptConsume( Scripting::Engine::CommandList& destination ) {
       std::unique_lock< std::mutex > locker( engineMutex, std::try_to_lock );
       bool successful = locker.owns_lock();
       if( successful ) {
@@ -62,12 +62,12 @@ namespace BlueBear {
       return successful;
     }
 
-    void CommandBus::produce( Engine::CommandList& source ) {
+    void CommandBus::produce( Scripting::Engine::CommandList& source ) {
       std::unique_lock< std::mutex > locker( engineMutex );
       engineCommands->splice( engineCommands->end(), source );
     }
 
-    void CommandBus::consume( Engine::CommandList& destination ) {
+    void CommandBus::consume( Scripting::Engine::CommandList& destination ) {
       std::unique_lock< std::mutex > locker( engineMutex );
       destination.splice( destination.end(), *engineCommands );
     }

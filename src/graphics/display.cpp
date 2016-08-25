@@ -6,8 +6,7 @@
 #include "graphics/drawable.hpp"
 #include "scripting/lot.hpp"
 #include "scripting/tile.hpp"
-#include "threading/displaycommand.hpp"
-#include "threading/enginecommand.hpp"
+#include "scripting/engine.hpp"
 #include "threading/commandbus.hpp"
 #include "localemanager.hpp"
 #include "configmanager.hpp"
@@ -21,8 +20,8 @@
 #include <string>
 #include <cstdlib>
 
-static BlueBear::Threading::Display::CommandList displayCommandList;
-static BlueBear::Threading::Engine::CommandList engineCommandList;
+static BlueBear::Graphics::Display::CommandList displayCommandList;
+static BlueBear::Scripting::Engine::CommandList engineCommandList;
 
 namespace BlueBear {
   namespace Graphics {
@@ -135,7 +134,7 @@ namespace BlueBear {
       Log::getInstance().info( "Display::loadInfrastructure", "Finished creating infrastructure instances." );
 
       // Drop a SetLockState command for Engine
-      engineCommandList.push_back( std::make_unique< Threading::Engine::SetLockState >( true ) );
+      engineCommandList.push_back( std::make_unique< Scripting::Engine::SetLockState >( true ) );
     }
 
     // ---------- STATES ----------
@@ -155,6 +154,16 @@ namespace BlueBear {
      */
     void Display::MainGameState::execute() {
 
+    }
+
+    // ---------- COMMANDS ----------
+    void Display::NewEntityCommand::execute( Graphics::Display& instance ) {
+      Log::getInstance().info( "NewEntityCommand", "Called registerNewEntity, hang in there..." );
+    }
+
+    Display::SendInfrastructureCommand::SendInfrastructureCommand( Scripting::Lot& lot ) : lot( lot ) {}
+    void Display::SendInfrastructureCommand::execute( Graphics::Display& instance ) {
+      instance.loadInfrastructure( lot );
     }
   }
 }
