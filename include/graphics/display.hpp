@@ -53,8 +53,7 @@ namespace BlueBear {
       ~Display();
 
       void openDisplay();
-      void render();
-      bool isOpen();
+      void start();
       void loadInfrastructure( Scripting::Lot& lot );
 
       class Command {
@@ -95,6 +94,7 @@ namespace BlueBear {
 
         std::unique_ptr< State > currentState;
 
+        // This should last the life of the Display instance.
         MaterialCache materialCache;
 
         void main();

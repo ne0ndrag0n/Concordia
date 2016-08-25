@@ -32,9 +32,7 @@ int main() {
 		engineThread = std::thread( &Scripting::Engine::objectLoop, &engine );
 	}
 
-	while( display.isOpen() ) {
-		display.render();
-	}
+	display.start();
 
 	engineThread.join();
 

@@ -70,37 +70,35 @@ namespace BlueBear {
       glEnable( GL_CULL_FACE );
     }
 
-    void Display::render() {
-      // Process incoming commands - the passed-in list should always be empty
-      commandBus.attemptConsume( displayCommandList );
+    void Display::start() {
+      while( mainWindow.isOpen() ) {
+        // Process incoming commands - the passed-in list should always be empty
+        commandBus.attemptConsume( displayCommandList );
 
-      for( auto& command : displayCommandList ) {
-        command->execute( *this );
-      }
-
-      displayCommandList.clear();
-
-      // Handle events
-      sf::Event event;
-      while( mainWindow.pollEvent( event ) ) {
-        if( event.type == sf::Event::Closed ) {
-          mainWindow.close();
+        for( auto& command : displayCommandList ) {
+          command->execute( *this );
         }
 
-        currentState->execute();
+        displayCommandList.clear();
+
+        // Handle events
+        sf::Event event;
+        while( mainWindow.pollEvent( event ) ) {
+          if( event.type == sf::Event::Closed ) {
+            mainWindow.close();
+          }
+
+          currentState->execute();
+        }
+
+        mainWindow.clear( sf::Color::Black );
+        mainWindow.display();
+
+        // Process outgoing commands
+        if( engineCommandList.size() > 0 ) {
+          commandBus.attemptProduce( engineCommandList );
+        }
       }
-
-      mainWindow.clear( sf::Color::Black );
-      mainWindow.display();
-
-      // Process outgoing commands
-      if( engineCommandList.size() > 0 ) {
-        commandBus.attemptProduce( engineCommandList );
-      }
-    }
-
-    bool Display::isOpen() {
-      return mainWindow.isOpen();
     }
 
     /**
