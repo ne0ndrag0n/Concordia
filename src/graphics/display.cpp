@@ -165,5 +165,20 @@ namespace BlueBear {
     void Display::SendInfrastructureCommand::execute( Graphics::Display& instance ) {
       instance.loadInfrastructure( lot );
     }
+
+    Display::ChangeStateCommand::ChangeStateCommand( Display::ChangeStateCommand::State selectedState ) : selectedState( selectedState ) {}
+    void Display::ChangeStateCommand::execute( Graphics::Display& instance ) {
+      switch( selectedState ) {
+        case State::STATE_TITLESCREEN:
+          instance.currentState = std::make_unique< Display::TitleState >();
+          break;
+        case State::STATE_MAINGAME:
+          instance.currentState = std::make_unique< Display::MainGameState >();
+          break;
+        case State::STATE_IDLE:
+        default:
+          instance.currentState = std::make_unique< Display::IdleState >();
+      }
+    }
   }
 }

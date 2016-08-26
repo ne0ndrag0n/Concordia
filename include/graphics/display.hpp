@@ -74,6 +74,17 @@ namespace BlueBear {
           void execute( Display& instance );
       };
 
+      class ChangeStateCommand : public Command {
+        public:
+          enum class State { STATE_IDLE, STATE_TITLESCREEN, STATE_MAINGAME };
+
+          ChangeStateCommand( State selectedState );
+          void execute( Display& instance );
+
+        private:
+          State selectedState;
+      };
+
       using CommandList = std::list< std::unique_ptr< Command > >;
 
       private:
