@@ -81,18 +81,18 @@ namespace BlueBear {
 
         displayCommandList.clear();
 
+        // Handle rendering
+        mainWindow.clear( sf::Color::Black );
+        currentState->execute();
+        mainWindow.display();
+
         // Handle events
         sf::Event event;
         while( mainWindow.pollEvent( event ) ) {
           if( event.type == sf::Event::Closed ) {
             mainWindow.close();
           }
-
-          currentState->execute();
         }
-
-        mainWindow.clear( sf::Color::Black );
-        mainWindow.display();
 
         // Process outgoing commands
         if( engineCommandList.size() > 0 ) {
