@@ -30,20 +30,29 @@ namespace BlueBear {
 
       // ---------- STATES ----------
       class State {
+        Display& instance;
         public:
+          State( Display& instance );
           virtual void execute() = 0;
       };
 
       class IdleState : public State {
-        void execute();
+        public:
+          IdleState( Display& instance );
+          void execute();
       };
 
       class TitleState : public State {
-        void execute();
+        public:
+          TitleState( Display& instance );
+          void execute();
       };
 
       class MainGameState : public State {
-        void execute();
+        public:
+          void execute();
+          MainGameState( Display& instance );
+          ~MainGameState();
       };
       // ----------------------------
 

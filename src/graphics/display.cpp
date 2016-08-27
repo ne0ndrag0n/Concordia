@@ -32,7 +32,7 @@ namespace BlueBear {
       y = ConfigManager::getInstance().getIntValue( "viewport_y" );
 
       // There must always be a defined State (avoid branch penalty/null check in tight loop)
-      currentState = std::make_unique< IdleState >();
+      currentState = std::make_unique< IdleState >( *this );
     }
 
     Display::~Display() = default;
@@ -139,12 +139,16 @@ namespace BlueBear {
 
     // ---------- STATES ----------
 
+    Display::State::State( Display& instance ) : instance( instance ) {}
+
     // Does nothing. This is better than a null pointer check in a tight loop.
+    Display::IdleState::IdleState( Display& instance ) : Display::State::State( instance ) {}
     void Display::IdleState::execute() {}
 
     /**
      * Display renderer state for the titlescreen
      */
+    Display::TitleState::TitleState( Display& instance ) : Display::State::State( instance ) {}
     void Display::TitleState::execute() {
 
     }
@@ -152,6 +156,12 @@ namespace BlueBear {
     /**
      * Display renderer state for the main game loop
      */
+    Display::MainGameState::MainGameState( Display& instance ) : Display::State::State( instance ) {
+
+    }
+    Display::MainGameState::~MainGameState() {
+
+    }
     void Display::MainGameState::execute() {
 
     }
@@ -170,14 +180,14 @@ namespace BlueBear {
     void Display::ChangeStateCommand::execute( Graphics::Display& instance ) {
       switch( selectedState ) {
         case State::STATE_TITLESCREEN:
-          instance.currentState = std::make_unique< Display::TitleState >();
+          instance.currentState = std::make_unique< Display::TitleState >( instance );
           break;
         case State::STATE_MAINGAME:
-          instance.currentState = std::make_unique< Display::MainGameState >();
+          instance.currentState = std::make_unique< Display::MainGameState >( instance );
           break;
         case State::STATE_IDLE:
         default:
-          instance.currentState = std::make_unique< Display::IdleState >();
+          instance.currentState = std::make_unique< Display::IdleState >( instance );
       }
     }
   }
