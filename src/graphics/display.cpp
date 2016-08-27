@@ -4,6 +4,7 @@
 #include "graphics/shader.hpp"
 #include "graphics/model.hpp"
 #include "graphics/drawable.hpp"
+#include "graphics/camera.hpp"
 #include "scripting/lot.hpp"
 #include "scripting/tile.hpp"
 #include "scripting/engine.hpp"
@@ -157,10 +158,12 @@ namespace BlueBear {
      * Display renderer state for the main game loop
      */
     Display::MainGameState::MainGameState( Display& instance ) : Display::State::State( instance ) {
-
+      // Setup camera
+      instance.camera = std::make_unique< Camera >( instance.defaultShader->Program, instance.x, instance.y );
     }
     Display::MainGameState::~MainGameState() {
-
+      // Remove camera
+      instance.camera = nullptr;
     }
     void Display::MainGameState::execute() {
 

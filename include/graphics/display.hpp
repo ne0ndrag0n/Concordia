@@ -11,6 +11,9 @@
 #include <list>
 #include <glm/glm.hpp>
 #include "graphics/materialcache.hpp"
+// Compiler won't accept an incomplete type for Camera. It accepts EVERY other one.
+// You can be the one to fuckin' tell me why.
+#include "graphics/camera.hpp"
 
 namespace BlueBear {
   namespace Scripting {
@@ -25,13 +28,23 @@ namespace BlueBear {
     class Instance;
     class Model;
     class Shader;
+    //class Camera;
 
     class Display {
 
+    public:
+      // RAII style
+      Display( Threading::CommandBus& commandBus );
+      ~Display();
+
+      void openDisplay();
+      void start();
+      void loadInfrastructure( Scripting::Lot& lot );
+
       // ---------- STATES ----------
       class State {
-        Display& instance;
         public:
+          Display& instance;
           State( Display& instance );
           virtual void execute() = 0;
       };
@@ -55,15 +68,6 @@ namespace BlueBear {
           ~MainGameState();
       };
       // ----------------------------
-
-    public:
-      // RAII style
-      Display( Threading::CommandBus& commandBus );
-      ~Display();
-
-      void openDisplay();
-      void start();
-      void loadInfrastructure( Scripting::Lot& lot );
 
       class Command {
         public:
@@ -110,6 +114,7 @@ namespace BlueBear {
         std::unique_ptr< Model > floorModel;
         std::unique_ptr< Model > wallPanelModel;
 
+        std::unique_ptr< Camera > camera;
         std::unique_ptr< Shader > defaultShader;
 
         std::unique_ptr< State > currentState;
