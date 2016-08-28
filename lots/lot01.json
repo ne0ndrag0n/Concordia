@@ -1,7 +1,7 @@
 {
 	"rev": 0,
-	"floorx": 3,
-	"floory": 3,
+	"floorx": 4,
+	"floory": 4,
 	"stories": 1,
 	"subtr": 0,
 	"terrain": 1,
@@ -10,9 +10,10 @@
 		"floor": {
 			"dict": [ "hardwood1" ],
 			"levels": [
-				0, 0, 0,
-				0, 0, 0,
-				0, 0, 0
+				0, 0, 0, 0,
+				0, 0, 0, 0,
+				0, 0, 0, 0,
+				0, 0, 0, 0
 			]
 		}
 	},

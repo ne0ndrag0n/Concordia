@@ -16,6 +16,7 @@
 #include <SFML/Window.hpp>
 #include <SFML/OpenGL.hpp>
 #include <GL/glew.h>
+#include <glm/glm.hpp>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -116,13 +117,46 @@ namespace BlueBear {
 
       // Transform each Tile instance to an entity
       auto size = lot.floorMap->getLength();
+
+      // TODO: Fix this unholy mess of counters and garbage
+      // Get xPosition and yPosition to determine world space positions of floor tiles
+      int xPosition = -( lot.floorMap->dimensionX / 2 );
+      int yPosition = -( lot.floorMap->dimensionY / 2 );
+      int xCounter = 0;
+      int yCounter = 0;
+      // Determines the floor level
+      int tilesPerLevel = lot.floorMap->dimensionX * lot.floorMap->dimensionY;
+      float floorLevel = -10.0f;
+
       for( auto i = 0; i != size; i++ ) {
+
+        // Increase level every time we exceed the number of tiles per level
+        // Reset the boundaries of the 2D tile map
+        if( i % tilesPerLevel == 0 && i != 0 ) {
+          floorLevel = floorLevel + 5.0f;
+        }
+
         auto tilePtr = lot.floorMap->getItemDirect( i );
         if( tilePtr ) {
           // Create instance from the model, and change its material using the material cache
           std::shared_ptr< Instance > instance = std::make_shared< Instance >( *floorModel, defaultShader->Program );
+
           Drawable& floorDrawable = instance->drawables.at( "Plane" );
           floorDrawable.material = materialCache.get( *tilePtr );
+
+          Log::getInstance().debug( "Display::loadInfrastructure",
+            "x: " + std::to_string( xPosition + xCounter ) + " " +
+            "y: " + std::to_string( yPosition + yCounter ) + " " +
+            "floorLevel: " + std::to_string( floorLevel )
+          );
+          instance->setPosition( glm::vec3( xPosition + xCounter, yPosition + yCounter, floorLevel ) );
+          xCounter++;
+
+          // wrote this shit when i was tired
+          if( xCounter >= lot.floorMap->dimensionX ) {
+            xCounter = 0;
+            yCounter++;
+          }
 
           // The pointer to this floor tile goes into the instanceCollection
           instanceCollection->pushDirect( instance );
