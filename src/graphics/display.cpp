@@ -84,9 +84,7 @@ namespace BlueBear {
         displayCommandList.clear();
 
         // Handle rendering
-        mainWindow.clear( sf::Color::Black );
         currentState->execute();
-        mainWindow.display();
 
         // Handle events
         sf::Event event;
@@ -104,10 +102,10 @@ namespace BlueBear {
     }
 
     /**
-     * Given a lot, build instanceCollection and translate the Tiles/Wallpanels to instances on the lot
+     * Given a lot, build floorInstanceCollection and translate the Tiles/Wallpanels to instances on the lot
      */
     void Display::loadInfrastructure( Scripting::Lot& lot ) {
-      instanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< Instance > > >( lot.floorMap->levels, lot.floorMap->dimensionX, lot.floorMap->dimensionY );
+      floorInstanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< Instance > > >( lot.floorMap->levels, lot.floorMap->dimensionX, lot.floorMap->dimensionY );
 
       // Lazy-load floorPanel and wallPanelModel
       if( !floorModel ) {
@@ -144,11 +142,6 @@ namespace BlueBear {
           Drawable& floorDrawable = instance->drawables.at( "Plane" );
           floorDrawable.material = materialCache.get( *tilePtr );
 
-          Log::getInstance().debug( "Display::loadInfrastructure",
-            "x: " + std::to_string( xPosition + xCounter ) + " " +
-            "y: " + std::to_string( yPosition + yCounter ) + " " +
-            "floorLevel: " + std::to_string( floorLevel )
-          );
           instance->setPosition( glm::vec3( xPosition + xCounter, yPosition + yCounter, floorLevel ) );
           xCounter++;
 
@@ -158,11 +151,11 @@ namespace BlueBear {
             yCounter++;
           }
 
-          // The pointer to this floor tile goes into the instanceCollection
-          instanceCollection->pushDirect( instance );
+          // The pointer to this floor tile goes into the floorInstanceCollection
+          floorInstanceCollection->pushDirect( instance );
         } else {
           // There is no floor tile located here. Consequently, insert an empty Instance pointer here; it will be skipped on draw.
-          instanceCollection->pushDirect( std::shared_ptr< Instance >() );
+          floorInstanceCollection->pushDirect( std::shared_ptr< Instance >() );
         }
       }
 
@@ -178,7 +171,12 @@ namespace BlueBear {
 
     // Does nothing. This is better than a null pointer check in a tight loop.
     Display::IdleState::IdleState( Display& instance ) : Display::State::State( instance ) {}
-    void Display::IdleState::execute() {}
+    void Display::IdleState::execute() {
+      glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+      glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+      instance.mainWindow.display();
+    }
 
     /**
      * Display renderer state for the titlescreen
@@ -200,7 +198,22 @@ namespace BlueBear {
       instance.camera = nullptr;
     }
     void Display::MainGameState::execute() {
+      glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+      glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
+      // Use default shader and position camera
+      instance.defaultShader->use();
+      instance.camera->position();
+
+      // Draw entities of each type
+      // Floor
+      auto length = instance.floorInstanceCollection->getLength();
+      for( auto i = 0; i != length; i++ ) {
+        std::shared_ptr< Instance > floorInstance = instance.floorInstanceCollection->getItemDirect( i );
+
+      }
+
+      instance.mainWindow.display();
     }
 
     // ---------- COMMANDS ----------

@@ -109,7 +109,7 @@ namespace BlueBear {
         sf::RenderWindow mainWindow;
         Threading::CommandBus& commandBus;
 
-        std::unique_ptr< Containers::Collection3D< std::shared_ptr< Instance > > > instanceCollection;
+        std::unique_ptr< Containers::Collection3D< std::shared_ptr< Instance > > > floorInstanceCollection;
 
         std::unique_ptr< Model > floorModel;
         std::unique_ptr< Model > wallPanelModel;
