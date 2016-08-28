@@ -161,6 +161,9 @@ namespace BlueBear {
 
       Log::getInstance().info( "Display::loadInfrastructure", "Finished creating infrastructure instances." );
 
+      // When we're done loading the infrastructure, switch the state of the engine
+      currentState = std::make_unique< Display::MainGameState >( *this );
+
       // Drop a SetLockState command for Engine
       engineCommandList.push_back( std::make_unique< Scripting::Engine::SetLockState >( true ) );
     }
@@ -210,7 +213,7 @@ namespace BlueBear {
       auto length = instance.floorInstanceCollection->getLength();
       for( auto i = 0; i != length; i++ ) {
         std::shared_ptr< Instance > floorInstance = instance.floorInstanceCollection->getItemDirect( i );
-
+        floorInstance->drawEntity();
       }
 
       instance.mainWindow.display();
