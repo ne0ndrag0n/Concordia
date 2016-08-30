@@ -2,7 +2,7 @@
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
-#include "utility.hpp"
+#include "tools/utility.hpp"
 #include "scripting/lotentity.hpp"
 #include "scripting/lot.hpp"
 #include "scripting/engine.hpp"
@@ -91,7 +91,7 @@ namespace BlueBear {
 
 			// bluebear.util.get_directory_list
 			lua_pushstring( L, "get_directory_list" );
-			lua_pushcfunction( L, &Utility::lua_getFileList );
+			lua_pushcfunction( L, &Tools::Utility::lua_getFileList );
 			lua_settable( L, -3 );
 
 			// Set the util table on "bluebear"
@@ -192,7 +192,7 @@ namespace BlueBear {
 		bool Engine::loadModpackSet( const char* modpackDirectory ) {
 			currentModpackDirectory = modpackDirectory;
 
-			auto modpacks = Utility::getSubdirectoryList( modpackDirectory );
+			auto modpacks = Tools::Utility::getSubdirectoryList( modpackDirectory );
 
 			for( auto& modpack : modpacks ) {
 				if( !loadModpack( modpack ) ) {
@@ -407,7 +407,7 @@ namespace BlueBear {
 			std::regex serialTableReference( "^t\\/bb\\d+$" );
 
 			// Get fresh Lua stack
-			Utility::clearLuaStack( L );
+			Tools::Utility::clearLuaStack( L );
 
 			for( auto& keyValuePair : currentLot->objects ) {
 				// Dereference the pointer to the LotEntity
@@ -419,10 +419,10 @@ namespace BlueBear {
 				// Start with a new adventure in the stack!
 				// Get system table
 				// _sys
-				Utility::getTableValue( L, "_sys" );
+				Tools::Utility::getTableValue( L, "_sys" );
 				// Get schedule table inside
 				// _sys._sched _sys
-				Utility::getTableValue( L, "_sched" );
+				Tools::Utility::getTableValue( L, "_sched" );
 
 				// For each key-value pair in _sys._sched, grab the arrays
 				// nil _sys._sched _sys
@@ -440,7 +440,7 @@ namespace BlueBear {
 								// {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
 
 								// Grab the "arguments" array from the SFT
-								Utility::getTableValue( L, "arguments" );
+								Tools::Utility::getTableValue( L, "arguments" );
 
 								if( lua_istable( L, -1 ) ) {
 									// [arguments] {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
@@ -471,7 +471,7 @@ namespace BlueBear {
 												} else {
 													// Fault tolerance. Very bad scenario! Game cannot continue...fail
 													// Pop everything we've been doing...
-													Utility::clearLuaStack( L );
+													Tools::Utility::clearLuaStack( L );
 													return false;
 												}
 											}
@@ -529,7 +529,7 @@ namespace BlueBear {
 			// Push the bluebear global onto the stack - leave it there
 			lua_getglobal( L, "bluebear" );
 			// Push table value "current_tick" onto the stack - leave it there too
-			Utility::getTableValue( L, "engine" );
+			Tools::Utility::getTableValue( L, "engine" );
 
 			// This single container holds our list of commands to send to the display
 			Graphics::Display::CommandList displayCommandList;
@@ -562,7 +562,7 @@ namespace BlueBear {
 						currentTick++;
 
 						// Set current_tick on bluebear.lot (inside the Luasphere, system/root.lua) to the current tick
-						Utility::setTableIntValue( L, "current_tick", currentTick );
+						Tools::Utility::setTableIntValue( L, "current_tick", currentTick );
 
 						for( auto& keyValuePair : currentLot->objects ) {
 							LotEntity& currentEntity = *( keyValuePair.second );

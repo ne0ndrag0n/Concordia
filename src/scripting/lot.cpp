@@ -6,7 +6,7 @@
 #include "scripting/lotentity.hpp"
 #include "scripting/lot.hpp"
 #include "log.hpp"
-#include "utility.hpp"
+#include "tools/utility.hpp"
 #include <jsoncpp/json/json.h>
 #include "scripting/eventmanager.hpp"
 #include "scripting/tile.hpp"
@@ -99,7 +99,7 @@ namespace BlueBear {
 				lua_getglobal( L, "bluebear" );
 
 				// Push instance_of utility function
-				Utility::getTableValue( L, "instance_of" );
+				Tools::Utility::getTableValue( L, "instance_of" );
 
 				// Push the two arguments: identifier, and instance
 				lua_pushstring( L, idKey );

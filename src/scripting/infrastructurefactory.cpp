@@ -1,7 +1,7 @@
 #include "scripting/infrastructurefactory.hpp"
 #include "scripting/tile.hpp"
 #include "log.hpp"
-#include "utility.hpp"
+#include "tools/utility.hpp"
 #include "threading/async.hpp"
 #include <async++.h>
 #include <jsoncpp/json/json.h>
@@ -84,7 +84,7 @@ namespace BlueBear {
       }
 
       // Now that all constants are loaded, start traversing the directory and get the user-defined packages
-      std::vector< std::string > directories = Utility::getSubdirectoryList( TILE_ASSETS_PATH );
+      std::vector< std::string > directories = Tools::Utility::getSubdirectoryList( TILE_ASSETS_PATH );
       async::parallel_for( Threading::AsyncManager::getInstance().getScheduler(), directories, [ & ]( std::string& directory ) {
         registerFloorTile( std::string( TILE_ASSETS_PATH ) + directory );
       } );

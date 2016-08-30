@@ -2,7 +2,7 @@
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
-#include "utility.hpp"
+#include "tools/utility.hpp"
 #include "log.hpp"
 #include <jsoncpp/json/json.h>
 #include <iostream>
@@ -44,7 +44,7 @@ namespace BlueBear {
 			lua_rawgeti( L, LUA_REGISTRYINDEX, luaVMInstance );
 
 			// <on_create> instance
-			Utility::getTableValue( L, "on_create" );
+			Tools::Utility::getTableValue( L, "on_create" );
 
 			// instance <on_create> instance
 			lua_pushvalue( L, -2 );
@@ -56,7 +56,7 @@ namespace BlueBear {
 				// instance
 
 				// cid instance
-				Utility::getTableValue( L, "_cid" );
+				Tools::Utility::getTableValue( L, "_cid" );
 				if( lua_isstring( L, -1 ) ) {
 					cid = lua_tostring( L, -1 );
 					ok = true;
@@ -72,11 +72,11 @@ namespace BlueBear {
 			lua_getglobal( L, "bluebear" );
 
 			// bluebear.classes bluebear
-			Utility::getTableValue( L, "classes" );
+			Tools::Utility::getTableValue( L, "classes" );
 
 			// Get the actual class referred to by this classID
 			// Class bluebear
-			Utility::getTableTreeValue( L, classID );
+			Tools::Utility::getTableTreeValue( L, classID );
 
 			// If "nil bluebear": Cannot continue: the class was not found
 			if( lua_istable( L, -1 ) ) {
@@ -84,7 +84,7 @@ namespace BlueBear {
 				// Let's start by creating a new instance
 
 				// <new> Class bluebear
-				Utility::getTableValue( L, "new" );
+				Tools::Utility::getTableValue( L, "new" );
 
 				// Class <new> Class bluebear
 				lua_pushvalue( L, -2 );
@@ -123,7 +123,7 @@ namespace BlueBear {
 
 			// Use the load method to deserialise
 			// <load> instance
-			Utility::getTableValue( L, "load" );
+			Tools::Utility::getTableValue( L, "load" );
 
 			// instance <load> instance
 			lua_pushvalue( L, -2 );
@@ -133,7 +133,7 @@ namespace BlueBear {
 			lua_getglobal( L, "JSON" );
 
 			// <decode> JSON instance <load> instance
-			Utility::getTableValue( L, "decode" );
+			Tools::Utility::getTableValue( L, "decode" );
 
 			// JSON <decode> JSON instance <load> instance
 			lua_pushvalue( L, -2 );
@@ -158,7 +158,7 @@ namespace BlueBear {
 			if( lua_pcall( L, 2, 0, 0 ) == 0 ) {
 				// Grab the _cid of the LotEntity and set the public "cid" property to this value
 				// cid instance
-				Utility::getTableValue( L, "_cid" );
+				Tools::Utility::getTableValue( L, "_cid" );
 				if( lua_isstring( L, -1 ) ) {
 					cid = lua_tostring( L, -1 );
 					ok = true;
@@ -189,7 +189,7 @@ namespace BlueBear {
 			lua_rawgeti( L, LUA_REGISTRYINDEX, luaVMInstance );
 
 			// register_callback() instance table/nil
-			Utility::getTableValue( L, "register_callback" );
+			Tools::Utility::getTableValue( L, "register_callback" );
 
 			// instance register_callback() instance table/nil
 			lua_pushvalue( L, -2 );
@@ -228,15 +228,15 @@ namespace BlueBear {
 			lua_rawgeti( L, LUA_REGISTRYINDEX, luaVMInstance );
 
 			// _sys instance
-			Utility::getTableValue( L, "_sys" );
+			Tools::Utility::getTableValue( L, "_sys" );
 			// _sys._sched _sys instance
-			Utility::getTableValue( L, "_sched" );
+			Tools::Utility::getTableValue( L, "_sched" );
 
 			// Create the key we will need from currentTick
 			std::string tickKey = std::to_string( currentTickReference ) + ".0";
 
 			// Check if tickKey has an associated value in _sched
-			Utility::getTableValue( L, tickKey.c_str() );
+			Tools::Utility::getTableValue( L, tickKey.c_str() );
 
 			if( lua_istable( L, -1 ) ) {
 				// tick_array_table _sys._sched _sys instance
@@ -251,7 +251,7 @@ namespace BlueBear {
 
 					// STEP 1: Get the named function and push a closure with "self"
 					// "method" SFT 1 tick_array_table _sys._sched _sys instance
-					Utility::getTableValue( L, "method" );
+					Tools::Utility::getTableValue( L, "method" );
 
 					std::string functionName = lua_tostring( L, -1 );
 					// SFT 1 tick_array_table _sys._sched _sys instance
@@ -261,7 +261,7 @@ namespace BlueBear {
 					lua_pushvalue( L, -6 );
 
 					// <function> object SFT 1 tick_array_table _sys._sched _sys instance
-					Utility::getTableValue( L, functionName.c_str() );
+					Tools::Utility::getTableValue( L, functionName.c_str() );
 
 					// object <function> object SFT 1 tick_array_table _sys._sched _sys instance
 					lua_pushvalue( L, -2 );
@@ -270,7 +270,7 @@ namespace BlueBear {
 					// SFT object <function> object SFT 1 tick_array_table _sys._sched _sys instance
 					lua_pushvalue( L, -4 );
 					// [argument]/nil SFT object <function> object SFT 1 tick_array_table _sys._sched _sys instance
-					Utility::getTableValue( L, "arguments" );
+					Tools::Utility::getTableValue( L, "arguments" );
 					// [argument]/nil object <function> object SFT 1 tick_array_table _sys._sched _sys instance
 					lua_remove( L, -2 );
 

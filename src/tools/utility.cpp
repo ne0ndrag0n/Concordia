@@ -1,4 +1,4 @@
-#include "utility.hpp"
+#include "tools/utility.hpp"
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -21,7 +21,7 @@
 #endif
 
 namespace BlueBear {
-
+	namespace Tools {
 		/**
 		 * Dump the Lua stack out to terminal
 		 */
@@ -302,4 +302,5 @@ namespace BlueBear {
 
 			// <desired table>
 		}
+	}
 }

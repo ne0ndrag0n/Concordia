@@ -2,7 +2,7 @@
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
-#include "utility.hpp"
+#include "tools/utility.hpp"
 #include "scripting/lot.hpp"
 #include "scripting/lotentity.hpp"
 #include "log.hpp"
@@ -124,7 +124,7 @@ namespace BlueBear {
        lua_getglobal( L, "JSON" );
 
        // encode() JSON table
-       Utility::getTableValue( L, "encode" );
+       Tools::Utility::getTableValue( L, "encode" );
 
        // JSON encode() JSON table
        lua_pushvalue( L, -2 );

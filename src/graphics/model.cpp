@@ -3,7 +3,6 @@
 #include "graphics/mesh.hpp"
 #include "graphics/drawable.hpp"
 #include "graphics/texture.hpp"
-#include "utility.hpp"
 #include "log.hpp"
 #include <string>
 #include <sstream>
