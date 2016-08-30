@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <string>
 #include <cstring>
+#include <jsoncpp/json/json.h>
 #include <string>
 #include <iterator>
 #include <fstream>
@@ -301,6 +302,15 @@ namespace BlueBear {
 			}
 
 			// <desired table>
+		}
+
+		/**
+		 * Determines if Json::Value is an RLE object. An RLE object is an object, contains a numeric "run" field, and a defined "value" field.
+		 */
+		bool Utility::isRLEObject( Json::Value& value ) {
+			return value.isObject() &&
+				value.get( "run", Json::Value::null ).isInt() &&
+				!( value.get( "value", Json::Value::null ).isNull() );
 		}
 	}
 }

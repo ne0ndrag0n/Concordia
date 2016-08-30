@@ -5,6 +5,7 @@
 #include <lualib.h>
 #include <lauxlib.h>
 #include <cstdint>
+#include <jsoncpp/json/json.h>
 #include <cstddef>
 #include <fstream>
 #include <vector>
@@ -48,6 +49,8 @@ namespace BlueBear {
 				static std::vector<std::string> split(const std::string &text, char sep);
 
 				static void getTableTreeValue( lua_State* L, const std::string& treeValue );
+
+				static bool isRLEObject( Json::Value& value );
 		};
 	}
 }
