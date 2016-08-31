@@ -119,7 +119,7 @@ namespace BlueBear {
       // TODO: Fix this unholy mess of counters and garbage
       // Get xPosition and yPosition to determine world space positions of floor tiles
       int xPosition = -( lot.floorMap->dimensionX / 2 );
-      int yPosition = -( lot.floorMap->dimensionY / 2 );
+      int yPosition = lot.floorMap->dimensionY / 2;
       int xCounter = 0;
       int yCounter = 0;
       // Determines the floor level
@@ -155,7 +155,7 @@ namespace BlueBear {
         xCounter++;
         if( xCounter >= lot.floorMap->dimensionX ) {
           xCounter = 0;
-          yCounter++;
+          yCounter--;
         }
 
       }
