@@ -48,8 +48,12 @@ namespace BlueBear {
 			floorMap = std::make_unique< Containers::Collection3D< std::shared_ptr< Tile > > >( stories, floorX, floorY );
 
 			for( const Json::Value& level : levels ) {
-				unsigned int entry = level.asUInt();
-				floorMap->pushDirect( lookup.at( entry ) );
+				int entry = level.asInt();
+				if( entry >= 0 ) {
+					floorMap->pushDirect( lookup.at( entry ) );
+				} else {
+					floorMap->pushDirect( std::shared_ptr< Tile >() );
+				}
 			}
 		}
 

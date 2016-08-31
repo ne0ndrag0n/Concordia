@@ -143,13 +143,6 @@ namespace BlueBear {
           floorDrawable.material = materialCache.get( *tilePtr );
 
           instance->setPosition( glm::vec3( xPosition + xCounter, yPosition + yCounter, floorLevel ) );
-          xCounter++;
-
-          // wrote this shit when i was tired
-          if( xCounter >= lot.floorMap->dimensionX ) {
-            xCounter = 0;
-            yCounter++;
-          }
 
           // The pointer to this floor tile goes into the floorInstanceCollection
           floorInstanceCollection->pushDirect( instance );
@@ -157,6 +150,14 @@ namespace BlueBear {
           // There is no floor tile located here. Consequently, insert an empty Instance pointer here; it will be skipped on draw.
           floorInstanceCollection->pushDirect( std::shared_ptr< Instance >() );
         }
+
+        // No matter what, handle incrementation of items
+        xCounter++;
+        if( xCounter >= lot.floorMap->dimensionX ) {
+          xCounter = 0;
+          yCounter++;
+        }
+
       }
 
       Log::getInstance().info( "Display::loadInfrastructure", "Finished creating infrastructure instances." );
@@ -213,7 +214,9 @@ namespace BlueBear {
       auto length = instance.floorInstanceCollection->getLength();
       for( auto i = 0; i != length; i++ ) {
         std::shared_ptr< Instance > floorInstance = instance.floorInstanceCollection->getItemDirect( i );
-        floorInstance->drawEntity();
+        if( floorInstance ) {
+          floorInstance->drawEntity();
+        }
       }
 
       instance.mainWindow.display();
