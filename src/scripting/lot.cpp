@@ -47,12 +47,22 @@ namespace BlueBear {
 			Log::getInstance().debug( "Lot::buildFloorMap", "Stories: " + std::to_string( stories ) + " " + std::to_string( floorX ) + "x" + std::to_string( floorY ) );
 			floorMap = std::make_unique< Containers::Collection3D< std::shared_ptr< Tile > > >( stories, floorX, floorY );
 
-			for( const Json::Value& level : levels ) {
-				int entry = level.asInt();
-				if( entry >= 0 ) {
-					floorMap->pushDirect( lookup.at( entry ) );
+			for( Json::Value& level : levels ) {
+				if( Tools::Utility::isRLEObject( level ) ) {
+					// De-RLE the object
+					unsigned int run = level[ "run" ].asUInt();
+					auto entry = lookup.at( level[ "value" ].asInt() );
+
+					for( unsigned int i = 0; i != run; i++ ) {
+						floorMap->pushDirect( entry );
+					}
 				} else {
-					floorMap->pushDirect( std::shared_ptr< Tile >() );
+					int entry = level.asInt();
+					if( entry >= 0 ) {
+						floorMap->pushDirect( lookup.at( entry ) );
+					} else {
+						floorMap->pushDirect( std::shared_ptr< Tile >() );
+					}
 				}
 			}
 		}
