@@ -27,6 +27,8 @@ namespace BlueBear {
     configRoot[ "current_locale" ] = "en_US";
     configRoot[ "threadpool_count" ] = 2;
     configRoot[ "threadpool_detect" ] = true;
+    configRoot[ "font_osd" ] = "system/ui/dosvga.ttf";
+    configRoot[ "font_ui" ] = "system/ui/terminus.ttf";
 
     // Load settings.json from file
     std::ifstream settingsFile( SETTINGS_PATH );

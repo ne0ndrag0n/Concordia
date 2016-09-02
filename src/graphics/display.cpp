@@ -35,6 +35,17 @@ namespace BlueBear {
 
       // There must always be a defined State (avoid branch penalty/null check in tight loop)
       currentState = std::make_unique< IdleState >( *this );
+
+      // Load defined fonts - Crash if we fail (game can't run without these fonts)
+      if( !fonts.osdFont.loadFromFile( ConfigManager::getInstance().getValue( "font_osd" ) ) ) {
+        Log::getInstance().error( "Display::Display", "Failed to load the OSD font!" );
+        exit( 1 );
+      }
+
+      if( !fonts.uiFont.loadFromFile( ConfigManager::getInstance().getValue( "font_ui" ) ) ) {
+        Log::getInstance().error( "Display::Display", "Failed to load the UI font!" );
+        exit( 1 );
+      }
     }
 
     Display::~Display() = default;

@@ -119,6 +119,11 @@ namespace BlueBear {
 
         std::unique_ptr< State > currentState;
 
+        struct {
+          sf::Font osdFont;
+          sf::Font uiFont;
+        } fonts;
+
         // This should last the life of the Display instance.
         MaterialCache materialCache;
 

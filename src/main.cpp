@@ -9,12 +9,14 @@
 #include <iostream>
 #include <thread>
 #include <SFML/Window.hpp>
+#include <SFML/System.hpp>
 #include <memory>
 
 using namespace BlueBear;
 
 int main() {
 	Log::getInstance().info( "Main", LocaleManager::getInstance().getString( "BLUEBEAR_WELCOME_MESSAGE" ) );
+	sf::err().rdbuf( NULL );
 
 	// main() thread is the UI thread, or should be
 	Threading::CommandBus commandBus;
