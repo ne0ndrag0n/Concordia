@@ -62,6 +62,16 @@ namespace BlueBear {
       };
 
       class MainGameState : public State {
+          struct {
+            sf::Text mode;
+            sf::Text coords;
+            sf::Text direction;
+          } texts;
+          struct {
+            std::string ISOMETRIC;
+            std::string FIRST_PERSON;
+          } strings;
+          void processOsd();
         public:
           void execute();
           MainGameState( Display& instance );

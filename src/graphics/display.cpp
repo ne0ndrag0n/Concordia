@@ -207,6 +207,21 @@ namespace BlueBear {
     Display::MainGameState::MainGameState( Display& instance ) : Display::State::State( instance ) {
       // Setup camera
       instance.camera = std::make_unique< Camera >( instance.defaultShader->Program, instance.x, instance.y );
+
+      texts.mode.setFont( instance.fonts.osdFont );
+      texts.mode.setCharacterSize( 16 );
+      texts.mode.setColor( sf::Color::White );
+      texts.mode.setPosition( 0, 0 );
+
+      texts.coords.setFont( instance.fonts.osdFont );
+      texts.coords.setCharacterSize( 16 );
+      texts.coords.setColor( sf::Color::Red );
+      texts.coords.setPosition( 0, 16 );
+
+      texts.direction.setFont( instance.fonts.osdFont );
+      texts.direction.setCharacterSize( 16 );
+      texts.direction.setColor( sf::Color::Green );
+      texts.direction.setPosition( 0, 32 );
     }
     Display::MainGameState::~MainGameState() {
       // Remove camera
@@ -230,7 +245,23 @@ namespace BlueBear {
         }
       }
 
+      instance.mainWindow.pushGLStates();
+        processOsd();
+      instance.mainWindow.popGLStates();
+
       instance.mainWindow.display();
+    }
+    void Display::MainGameState::processOsd() {
+      static std::string ISOMETRIC( LocaleManager::getInstance().getString( "ISOMETRIC" ) );
+      static std::string FIRST_PERSON( LocaleManager::getInstance().getString( "FIRST_PERSON" ) );
+
+      texts.mode.setString( instance.camera->ortho ? ISOMETRIC : FIRST_PERSON );
+      texts.coords.setString( instance.camera->positionToString().c_str() );
+      texts.direction.setString( instance.camera->directionToString().c_str() );
+
+      instance.mainWindow.draw( texts.mode );
+      instance.mainWindow.draw( texts.coords );
+      instance.mainWindow.draw( texts.direction );
     }
 
     // ---------- COMMANDS ----------

@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include "localemanager.hpp"
 
 namespace BlueBear {
   namespace Graphics {
@@ -136,15 +137,17 @@ namespace BlueBear {
     }
 
     std::string Camera::positionToString() {
-      std::stringstream s;
-      s << "Camera: " << camera.x << ", " << camera.y << ", " << camera.z;
-      return s.str();
+      // Yet another GCC bug (surprise, surprise): the identifier "CAMERA" is not usable here because it's confusing it for either
+      // "Camera" or "camera", two things that are not any of the other items. GJ GCC!
+      static std::string CAMERA_STRING( LocaleManager::getInstance().getString( "CAMERA" ) );
+
+      return CAMERA_STRING + ": " + std::to_string( camera.x ) + ", " + std::to_string( camera.y ) + ", " + std::to_string( camera.z );
     }
 
     std::string Camera::directionToString() {
-      std::stringstream s;
-      s << "Direction: " << direction.x << ", " << direction.y << ", " << direction.z << std::endl;
-      return s.str();
+      static std::string DIRECTION( LocaleManager::getInstance().getString( "DIRECTION" ) );
+
+      return DIRECTION + ": " + std::to_string( direction.x ) + ", " + std::to_string( direction.y ) + ", " + std::to_string( direction.z );;
     }
 
   }

@@ -1,4 +1,6 @@
 {
   "ticks_per_second": 30,
-  "min_log_level": 0
+  "min_log_level": 0,
+  "viewport_x": 1200,
+  "viewport_y": 700
 }
