@@ -544,10 +544,7 @@ namespace BlueBear {
 			// and unlocking the main loop to perform other operations.
 			displayCommandList.push_back( std::make_unique< Graphics::Display::SendInfrastructureCommand >( *currentLot ) );
 
-			// This outer loop is a preliminary feature, the engine shouldn't stop until it's instructed to
-			// We'll need to account for integer overflow in both here and Lua
-			// cancel will be the only flag used here. when cancel is set to true, break the loop and prepare Engine for shutdown.
-			while( currentTick <= WORLD_TICKS_MAX ) {
+			while( !cancel ) {
 				// Let's set up a start and end duration
 				auto startTime = std::chrono::steady_clock::now();
 
@@ -585,6 +582,11 @@ namespace BlueBear {
 				// Try to empty out the list and send it to the commandbus
 				if( displayCommandList.size() > 0 ) {
 					commandBus.attemptProduce( displayCommandList );
+				}
+
+				// TODO: Get rid of this when the time is right
+				if( currentTick >= WORLD_TICKS_MAX ) {
+					cancel = true;
 				}
 
 				// Wait the difference between one second, and however long it took for this shit to finish
