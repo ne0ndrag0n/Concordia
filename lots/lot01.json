@@ -17,7 +17,9 @@
 			"dict": [ "grey" ],
 			"levels": [
 				[
-					{ "dim": "x", "pos": 28, "front": 0, "back": 0 }
+					{ "run": 24, "value": -1 },
+					{ "x": { "f": 0, "b": 0 } },
+					{ "run": 24, "value": -1 }
 				]
 			]
 		}
