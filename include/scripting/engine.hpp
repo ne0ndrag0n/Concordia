@@ -40,6 +40,7 @@ namespace BlueBear {
 				std::map< std::string, BlueBear::ModpackStatus > loadedModpacks;
 				Threading::CommandBus& commandBus;
 				bool active;
+				bool cancel;
 				unsigned int sleepInterval;
 
 				void callActionOnObject( const char* playerId, const char* objectId, const char* method );
@@ -78,6 +79,11 @@ namespace BlueBear {
 					bool status;
 					public:
 						SetLockState( bool status );
+						void execute( Engine& instance );
+				};
+
+				class ShutdownEngine : public Command {
+					public:
 						void execute( Engine& instance );
 				};
 

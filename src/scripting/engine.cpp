@@ -31,7 +31,11 @@ namespace BlueBear {
 	namespace Scripting {
 
 		Engine::Engine( Threading::CommandBus& commandBus ) :
-		 L( luaL_newstate() ), currentModpackDirectory( nullptr ), ticksPerSecond( ConfigManager::getInstance().getIntValue( "ticks_per_second" ) ), commandBus( commandBus ) {
+		 L( luaL_newstate() ),
+		 currentModpackDirectory( nullptr ),
+		 ticksPerSecond( ConfigManager::getInstance().getIntValue( "ticks_per_second" ) ),
+		 commandBus( commandBus ),
+		 cancel( false ) {
 			luaL_openlibs( L );
 			setActiveState( false );
 		}
@@ -542,6 +546,7 @@ namespace BlueBear {
 
 			// This outer loop is a preliminary feature, the engine shouldn't stop until it's instructed to
 			// We'll need to account for integer overflow in both here and Lua
+			// cancel will be the only flag used here. when cancel is set to true, break the loop and prepare Engine for shutdown.
 			while( currentTick <= WORLD_TICKS_MAX ) {
 				// Let's set up a start and end duration
 				auto startTime = std::chrono::steady_clock::now();
@@ -627,6 +632,10 @@ namespace BlueBear {
 		Engine::SetLockState::SetLockState( bool status ) : status( status ) {}
 		void Engine::SetLockState::execute( Engine& instance ) {
 			instance.setActiveState( status );
+		}
+
+		void Engine::ShutdownEngine::execute( Engine& instance ) {
+			instance.cancel = true;
 		}
 	}
 }
