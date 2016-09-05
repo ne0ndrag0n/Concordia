@@ -122,7 +122,7 @@ namespace BlueBear {
 
     void Camera::rotateRight() {
       if( ortho ) {
-        currentRotation = ( currentRotation - 1 ) % 4;
+        currentRotation = ( currentRotation + 1 ) % 4;
 
         doRotate();
       }
@@ -130,10 +130,14 @@ namespace BlueBear {
 
     void Camera::rotateLeft() {
       if( ortho ) {
-        currentRotation = ( currentRotation + 1 ) % 4;
+        currentRotation = ( currentRotation - 1 ) % 4;
 
         doRotate();
       }
+    }
+
+    GLuint Camera::getCurrentRotation() {
+      return currentRotation;
     }
 
     std::string Camera::positionToString() {

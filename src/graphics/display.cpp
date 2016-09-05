@@ -237,6 +237,11 @@ namespace BlueBear {
       texts.direction.setCharacterSize( 16 );
       texts.direction.setColor( sf::Color::Green );
       texts.direction.setPosition( 0, 32 );
+
+      texts.rotation.setFont( instance.fonts.osdFont );
+      texts.rotation.setCharacterSize( 16 );
+      texts.rotation.setColor( sf::Color::Blue );
+      texts.rotation.setPosition( 0, 48 );
     }
     Display::MainGameState::~MainGameState() {
       // Remove camera
@@ -312,14 +317,17 @@ namespace BlueBear {
     void Display::MainGameState::processOsd() {
       static std::string ISOMETRIC( LocaleManager::getInstance().getString( "ISOMETRIC" ) );
       static std::string FIRST_PERSON( LocaleManager::getInstance().getString( "FIRST_PERSON" ) );
+      static std::string ROTATION( LocaleManager::getInstance().getString( "ROTATION" ) );
 
       texts.mode.setString( instance.camera->ortho ? ISOMETRIC : FIRST_PERSON );
       texts.coords.setString( instance.camera->positionToString().c_str() );
       texts.direction.setString( instance.camera->directionToString().c_str() );
+      texts.rotation.setString( ROTATION + ": " + std::to_string( instance.camera->getCurrentRotation() ) );
 
       instance.mainWindow.draw( texts.mode );
       instance.mainWindow.draw( texts.coords );
       instance.mainWindow.draw( texts.direction );
+      instance.mainWindow.draw( texts.rotation );
     }
 
     // ---------- COMMANDS ----------

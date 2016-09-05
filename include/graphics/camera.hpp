@@ -25,9 +25,9 @@ namespace BlueBear {
         GLfloat pitch = 0.0f;
         const glm::vec2 rotations[4] = {
           glm::vec2( -1.0f, -1.0f ),
-          glm::vec2( -1.0f, 1.0f ),
+          glm::vec2( 1.0f, -1.0f ),
           glm::vec2( 1.0f, 1.0f ),
-          glm::vec2( 1.0f, -1.0f )
+          glm::vec2( -1.0f, 1.0f )
         };
         GLuint currentRotation = 0;
 
@@ -55,6 +55,7 @@ namespace BlueBear {
         void updateFirstPersonView( int deltaX, int deltaY );
         void rotateRight();
         void rotateLeft();
+        GLuint getCurrentRotation();
         std::string positionToString();
         std::string directionToString();
     };

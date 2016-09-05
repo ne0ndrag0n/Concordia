@@ -70,6 +70,7 @@ namespace BlueBear {
             sf::Text mode;
             sf::Text coords;
             sf::Text direction;
+            sf::Text rotation;
           } texts;
           struct {
             std::string ISOMETRIC;

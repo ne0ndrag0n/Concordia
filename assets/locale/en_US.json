@@ -4,5 +4,6 @@
   "ISOMETRIC": "Isometric",
   "FIRST_PERSON": "First-person",
   "CAMERA": "Camera",
-  "DIRECTION": "Direction"
+  "DIRECTION": "Direction",
+  "ROTATION": "Rotation"
 }
