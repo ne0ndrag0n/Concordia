@@ -39,6 +39,8 @@ namespace BlueBear {
     configRoot[ "key_pause" ] = sf::Keyboard::Num1;
     configRoot[ "key_play" ] = sf::Keyboard::Num2;
     configRoot[ "key_play_fast" ] = sf::Keyboard::Num3;
+    configRoot[ "key_rotate_right" ] = sf::Keyboard::E;
+    configRoot[ "key_rotate_left" ] = sf::Keyboard::Q;
 
     // Load settings.json from file
     std::ifstream settingsFile( SETTINGS_PATH );

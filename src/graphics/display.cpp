@@ -269,6 +269,8 @@ namespace BlueBear {
     void Display::MainGameState::handleEvent( sf::Event& event ) {
       // Lay out some statics
       static int KEY_PERSPECTIVE = ConfigManager::getInstance().getIntValue( "key_switch_perspective" );
+      static int KEY_ROTATE_RIGHT = ConfigManager::getInstance().getIntValue( "key_rotate_right" );
+      static int KEY_ROTATE_LEFT = ConfigManager::getInstance().getIntValue( "key_rotate_left" );
 
       // Main game has a few events mostly relating to camera
       switch( event.type ) {
@@ -292,6 +294,14 @@ namespace BlueBear {
                 // just forget about this for now
                 //instance.mainWindow.setFramerateLimit( 30 );
               }
+            }
+
+            if( keyCode == KEY_ROTATE_RIGHT ) {
+              camera.rotateRight();
+            }
+
+            if( keyCode == KEY_ROTATE_LEFT ) {
+              camera.rotateLeft();
             }
             break;
           }
