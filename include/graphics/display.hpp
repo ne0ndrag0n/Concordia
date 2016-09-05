@@ -6,6 +6,7 @@
  */
 #include "containers/collection3d.hpp"
 #include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
 #include <vector>
 #include <memory>
 #include <list>
@@ -47,18 +48,21 @@ namespace BlueBear {
           Display& instance;
           State( Display& instance );
           virtual void execute() = 0;
+          virtual void handleEvent( sf::Event& event ) = 0;
       };
 
       class IdleState : public State {
         public:
           IdleState( Display& instance );
           void execute();
+          void handleEvent( sf::Event& event );
       };
 
       class TitleState : public State {
         public:
           TitleState( Display& instance );
           void execute();
+          void handleEvent( sf::Event& event );
       };
 
       class MainGameState : public State {
@@ -74,6 +78,7 @@ namespace BlueBear {
           void processOsd();
         public:
           void execute();
+          void handleEvent( sf::Event& event );
           MainGameState( Display& instance );
           ~MainGameState();
       };

@@ -61,6 +61,8 @@ namespace BlueBear {
         mainWindow.setFramerateLimit( ConfigManager::getInstance().getIntValue( "fps_overview" ) );
       }
 
+      mainWindow.setKeyRepeatEnabled( false );
+
       // Initialize OpenGL using GLEW
       glewExperimental = true;
       auto glewStatus = glewInit();
@@ -100,8 +102,16 @@ namespace BlueBear {
         // Handle events
         sf::Event event;
         while( mainWindow.pollEvent( event ) ) {
-          if( event.type == sf::Event::Closed ) {
-            mainWindow.close();
+          // This might be all we need for now
+          switch( event.type ) {
+            case sf::Event::Closed:
+              mainWindow.close();
+              break;
+            default:
+              // Any event not handled by Display itself
+              // is passed along to currentState
+              currentState->handleEvent( event );
+              break;
           }
         }
 
@@ -186,6 +196,7 @@ namespace BlueBear {
 
     // Does nothing. This is better than a null pointer check in a tight loop.
     Display::IdleState::IdleState( Display& instance ) : Display::State::State( instance ) {}
+    void Display::IdleState::handleEvent( sf::Event& event ) {}
     void Display::IdleState::execute() {
       glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
       glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -197,8 +208,12 @@ namespace BlueBear {
      * Display renderer state for the titlescreen
      */
     Display::TitleState::TitleState( Display& instance ) : Display::State::State( instance ) {}
+    void Display::TitleState::handleEvent( sf::Event& event ) {}
     void Display::TitleState::execute() {
+      glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+      glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
+      instance.mainWindow.display();
     }
 
     /**
@@ -250,6 +265,39 @@ namespace BlueBear {
       instance.mainWindow.popGLStates();
 
       instance.mainWindow.display();
+    }
+    void Display::MainGameState::handleEvent( sf::Event& event ) {
+      // Lay out some statics
+      static int KEY_PERSPECTIVE = ConfigManager::getInstance().getIntValue( "key_switch_perspective" );
+
+      // Main game has a few events mostly relating to camera
+      switch( event.type ) {
+        case sf::Event::KeyPressed:
+          // absolutely disgusting
+          {
+            auto keyCode = event.key.code;
+            auto& camera = *( instance.camera );
+
+            if( keyCode == KEY_PERSPECTIVE ) {
+              if( camera.ortho ) {
+                camera.setOrthographic( false );
+                //instance.mainWindow.setMouseCursorVisible( false );
+                // there is no center yet
+                //sf::Mouse::setPosition( center, instance.mainWindow );
+                // just forget about this for now
+                //instance.mainWindow.setFramerateLimit( 60 );
+              } else {
+                camera.setOrthographic( true );
+                //instance.mainWindow.setMouseCursorVisible( true );
+                // just forget about this for now
+                //instance.mainWindow.setFramerateLimit( 30 );
+              }
+            }
+            break;
+          }
+        default:
+          break;
+      }
     }
     void Display::MainGameState::processOsd() {
       static std::string ISOMETRIC( LocaleManager::getInstance().getString( "ISOMETRIC" ) );

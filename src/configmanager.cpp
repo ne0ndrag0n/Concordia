@@ -4,6 +4,7 @@
 #include <lualib.h>
 #include <lauxlib.h>
 #include <jsoncpp/json/json.h>
+#include <SFML/Window/Keyboard.hpp>
 #include <iostream>
 #include <fstream>
 
@@ -29,6 +30,15 @@ namespace BlueBear {
     configRoot[ "threadpool_detect" ] = true;
     configRoot[ "font_osd" ] = "system/ui/dosvga.ttf";
     configRoot[ "font_ui" ] = "system/ui/terminus.ttf";
+    configRoot[ "key_switch_perspective" ] = sf::Keyboard::P;
+    configRoot[ "key_move_up" ] = sf::Keyboard::Up;
+    configRoot[ "key_move_down" ] = sf::Keyboard::Down;
+    configRoot[ "key_move_left" ] = sf::Keyboard::Left;
+    configRoot[ "key_move_right" ] = sf::Keyboard::Right;
+    configRoot[ "key_terminal" ] = sf::Keyboard::Tilde;
+    configRoot[ "key_pause" ] = sf::Keyboard::Num1;
+    configRoot[ "key_play" ] = sf::Keyboard::Num2;
+    configRoot[ "key_play_fast" ] = sf::Keyboard::Num3;
 
     // Load settings.json from file
     std::ifstream settingsFile( SETTINGS_PATH );

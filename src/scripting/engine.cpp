@@ -594,6 +594,11 @@ namespace BlueBear {
 				std::this_thread::sleep_until( startTime + std::chrono::milliseconds( sleepInterval ) );
 			}
 
+			// Transition back to Idle or TitleScreen state when the loop is done
+			// Enqueue state change command, then force commit
+			displayCommandList.push_back( std::make_unique< Graphics::Display::ChangeStateCommand >( Graphics::Display::ChangeStateCommand::State::STATE_TITLESCREEN ) );
+			commandBus.produce( displayCommandList );
+
 			Log::getInstance().debug( "Engine::objectLoop", "Finished!" );
 		}
 
