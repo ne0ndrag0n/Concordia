@@ -1,5 +1,6 @@
 #include "graphics/texturecache.hpp"
 #include "graphics/texture.hpp"
+#include "graphics/atlasbuilder.hpp"
 #include <string>
 #include <map>
 #include <memory>
@@ -34,6 +35,54 @@ namespace BlueBear {
         }
       }
     }
+
+    /**
+     * Shared logic to work around C++'s inability to just define a damn non-pointer reference and assign it separately
+     */
+    std::shared_ptr< Texture > TextureCache::generateForAtlasBuilderEntry( AtlasBuilderEntry& entry, AtlasBuilderMappings& mappings ) {
+      // This atlas builder already exists
+      AtlasBuilder& builder = entry.builder;
+      SharedPointerTextureCache& texCache = entry.generatedTextures;
+
+      // Generate the key for the desired set of textures
+      std::string key;
+      for( auto& iterator : mappings ) {
+        key = key + iterator.second + " ";
+      }
+
+      auto textureIterator = texCache.find( key );
+      if( textureIterator != texCache.end() ) {
+        // The texture was found
+        return textureIterator->second;
+      } else {
+        // The texture needs to be generated using "builder"
+        for( auto& kvPair : mappings ) {
+          builder.setAtlasMapping( kvPair.first, kvPair.second );
+        }
+
+        return texCache[ key ] = builder.getTextureAtlas();
+      }
+    }
+
+    /**
+     * Get a texture according to an atlas and cache both the AtlasBuilder used to make it
+     * and the resulting atlas (if you provided the same order in the map).
+     */
+    std::shared_ptr< Texture > TextureCache::getUsingAtlas( const std::string& atlasBasePath, AtlasBuilderMappings& mappings ) {
+      // Test for atlas at the current path
+      auto atlasBuilderEntryIterator = atlasTextureCache.find( atlasBasePath );
+
+      if( atlasBuilderEntryIterator != atlasTextureCache.end() ) {
+        return generateForAtlasBuilderEntry( atlasBuilderEntryIterator->second, mappings );
+      } else {
+        // This atlas builder needs to be created
+        AtlasBuilderEntry& wrapper = atlasTextureCache[ atlasBasePath ] = AtlasBuilderEntry();
+        wrapper.builder.configure( atlasBasePath );
+
+        return generateForAtlasBuilderEntry( wrapper, mappings );
+      }
+    }
+
 
   }
 }

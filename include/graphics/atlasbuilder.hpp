@@ -33,7 +33,7 @@ namespace BlueBear {
       public:
         struct CannotLoadFileException : public std::exception { const char* what () const throw () { return "Could not load a required file!"; } };
 
-        AtlasBuilder();
+        AtlasBuilder() = default;
 
         void setAtlasMapping( const std::string& key, const std::string& path );
         void configure( const std::string& jsonPath );
