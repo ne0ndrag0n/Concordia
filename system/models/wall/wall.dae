@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset>
+    <contributor>
+      <author>Blender User</author>
+      <authoring_tool>Blender 2.77.0 commit date:2016-04-05, commit time:18:12, hash:abf6f08</authoring_tool>
+    </contributor>
+    <created>2016-07-09T19:59:30</created>
+    <modified>2016-07-09T19:59:30</modified>
+    <unit name="meter" meter="1"/>
+    <up_axis>Z_UP</up_axis>
+  </asset>
+  <library_images>
+    <image id="wall_png" name="wall_png">
+      <init_from>wall.png</init_from>
+    </image>
+  </library_images>
+  <library_effects>
+    <effect id="default-effect">
+      <profile_COMMON>
+        <newparam sid="wall_png-surface">
+          <surface type="2D">
+            <init_from>wall_png</init_from>
+          </surface>
+        </newparam>
+        <newparam sid="wall_png-sampler">
+          <sampler2D>
+            <source>wall_png-surface</source>
+          </sampler2D>
+        </newparam>
+        <technique sid="common">
+          <phong>
+            <emission>
+              <color sid="emission">0 0 0 1</color>
+            </emission>
+            <ambient>
+              <color sid="ambient">0 0 0 1</color>
+            </ambient>
+            <diffuse>
+              <texture texture="wall_png-sampler" texcoord="UVMap"/>
+            </diffuse>
+            <specular>
+              <color sid="specular">0.5 0.5 0.5 1</color>
+            </specular>
+            <shininess>
+              <float sid="shininess">50</float>
+            </shininess>
+            <index_of_refraction>
+              <float sid="index_of_refraction">1</float>
+            </index_of_refraction>
+          </phong>
+        </technique>
+      </profile_COMMON>
+    </effect>
+  </library_effects>
+  <library_materials>
+    <material id="default-material" name="default">
+      <instance_effect url="#default-effect"/>
+    </material>
+  </library_materials>
+  <library_geometries>
+    <geometry id="WallMesh-mesh" name="WallMesh">
+      <mesh>
+        <source id="WallMesh-mesh-positions">
+          <float_array id="WallMesh-mesh-positions-array" count="24">-0.5 -0.04999995 -2 -0.5 -0.04999995 2 -0.5 0.04999995 -2 -0.5 0.04999995 2 0.5 -0.04999995 -2 0.5 -0.04999995 2 0.5 0.04999995 -2 0.5 0.04999995 2</float_array>
+          <technique_common>
+            <accessor source="#WallMesh-mesh-positions-array" count="8" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="WallMesh-mesh-normals">
+          <float_array id="WallMesh-mesh-normals-array" count="18">-1 0 0 0 1 0 1 0 0 0 -1 0 0 0 -1 0 0 1</float_array>
+          <technique_common>
+            <accessor source="#WallMesh-mesh-normals-array" count="6" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="WallMesh-mesh-map-0">
+          <float_array id="WallMesh-mesh-map-0-array" count="72">0.8955078 0.001953125 0.8525391 0.9980469 0.8525391 0.001953125 0.4277344 0.9980469 0.8457031 0.001953125 0.8457031 0.9980469 0.9023438 0.9980469 0.9453125 0.001953125 0.9453125 0.9980469 0.002937078 0.99805 0.4208911 0.001950025 0.4209058 0.9980438 0.953125 0.2519531 0.9960938 0.001953125 0.9960938 0.2519531 0.9960938 0.2548828 0.953125 0.5048828 0.953125 0.2548828 0.8955078 0.001953125 0.8955078 0.9980469 0.8525391 0.9980469 0.4277344 0.9980469 0.4277344 0.001953125 0.8457031 0.001953125 0.9023438 0.9980469 0.9023438 0.001953125 0.9453125 0.001953125 0.002937078 0.99805 0.002922296 0.001956224 0.4208911 0.001950025 0.953125 0.2519531 0.953125 0.001953125 0.9960938 0.001953125 0.9960938 0.2548828 0.9960938 0.5048828 0.953125 0.5048828</float_array>
+          <technique_common>
+            <accessor source="#WallMesh-mesh-map-0-array" count="36" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="WallMesh-mesh-vertices">
+          <input semantic="POSITION" source="#WallMesh-mesh-positions"/>
+        </vertices>
+        <polylist material="default-material" count="12">
+          <input semantic="VERTEX" source="#WallMesh-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#WallMesh-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#WallMesh-mesh-map-0" offset="2" set="0"/>
+          <vcount>3 3 3 3 3 3 3 3 3 3 3 3 </vcount>
+          <p>3 0 0 0 0 1 1 0 2 7 1 3 2 1 4 3 1 5 5 2 6 6 2 7 7 2 8 1 3 9 4 3 10 5 3 11 2 4 12 4 4 13 0 4 14 7 5 15 1 5 16 5 5 17 3 0 18 2 0 19 0 0 20 7 1 21 6 1 22 2 1 23 5 2 24 4 2 25 6 2 26 1 3 27 0 3 28 4 3 29 2 4 30 6 4 31 4 4 32 7 5 33 3 5 34 1 5 35</p>
+        </polylist>
+      </mesh>
+    </geometry>
+  </library_geometries>
+  <library_controllers/>
+  <library_visual_scenes>
+    <visual_scene id="Scene" name="Scene">
+      <node id="Wall" name="Wall" type="NODE">
+        <matrix sid="transform">1 0 0 0 0 1 0 0.45 0 0 1 2 0 0 0 1</matrix>
+        <instance_geometry url="#WallMesh-mesh" name="Wall">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="default-material" target="#default-material">
+                <bind_vertex_input semantic="UVMap" input_semantic="TEXCOORD" input_set="0"/>
+              </instance_material>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+      </node>
+    </visual_scene>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene url="#Scene"/>
+  </scene>
+</COLLADA>
