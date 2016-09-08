@@ -17,6 +17,7 @@ namespace BlueBear {
 	namespace Scripting {
 		class LotEntity;
 		class Tile;
+		struct WallCell;
 
 		class Lot {
 
@@ -25,10 +26,12 @@ namespace BlueBear {
 				const Tick& currentTickReference;
 				InfrastructureFactory& infrastructureFactory;
 				void buildFloorMap( Json::Value& floor );
+				void buildWallMap( Json::Value& walls );
 
 			public:
 				std::map< std::string, std::unique_ptr< LotEntity > > objects;
 				std::unique_ptr< Containers::Collection3D< std::shared_ptr< Tile > > > floorMap;
+				std::unique_ptr< Containers::Collection3D< std::shared_ptr< WallCell > > > wallMap;
 				int floorX;
 				int floorY;
 				int stories;

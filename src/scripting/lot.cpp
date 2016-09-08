@@ -10,6 +10,7 @@
 #include <jsoncpp/json/json.h>
 #include "scripting/eventmanager.hpp"
 #include "scripting/tile.hpp"
+#include "scripting/wallcell.hpp"
 #include <memory>
 #include <vector>
 #include <cstring>
@@ -30,6 +31,22 @@ namespace BlueBear {
 			undergroundStories( rootObject[ "subtr" ].asInt() ),
 			terrainType( TerrainType( rootObject[ "terrain" ].asInt() ) ) {
 			buildFloorMap( rootObject[ "infr" ][ "floor" ] );
+			buildWallMap( rootObject[ "infr" ][ "wall" ] );
+		}
+
+		/**
+		 * Using the object lot.infr.wall, build the Collection3D containing all WallCells on the lot. Renderer (Display)
+		 * will handle where they end up and what joints are used to draw the walls.
+		 */
+		void Lot::buildWallMap( Json::Value& wall ) {
+			Json::Value dict = wall[ "dict" ];
+			Json::Value levels = wall[ "levels" ];
+
+			// Create the vector reference of shared_ptrs by iterating through dict
+			std::vector< std::shared_ptr< WallCell > > lookup;
+			for( const Json::Value& dictEntry : dict ) {
+
+			}
 		}
 
 		void Lot::buildFloorMap( Json::Value& floor ) {

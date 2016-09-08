@@ -17,13 +17,17 @@ namespace BlueBear {
     class InfrastructureFactory {
       static constexpr const char* TILE_SYSTEM_PATH = "system/flooring/";
       static constexpr const char* TILE_ASSETS_PATH = "assets/flooring/";
+      static constexpr const char* WALL_ASSETS_PATH = "assets/wallpaper/";
       static constexpr const char* TILE_SYSTEM_ROOT = "base.json";
+      static constexpr const char* WALL_SYSTEM_ROOT = "base.json";
       Json::Value tileConstants;
       std::mutex tileRegistryMutex;
       std::map< std::string, std::shared_ptr< Tile > > tileRegistry;
+      std::map< std::string, std::shared_ptr< Wallpaper > > wallpaperRegistry;
 
       private:
         void registerFloorTile( const std::string& path );
+        void registerWallpaper( const std::string& path );
         std::string getVariableOrValue( const std::string& key, const std::string& value );
 
       public:
@@ -33,7 +37,7 @@ namespace BlueBear {
         Wallpaper getWallpaper( const std::string& key );
 
         void registerFloorTiles();
-        void registerWallpaper();
+        void registerWallpapers();
 
     };
 

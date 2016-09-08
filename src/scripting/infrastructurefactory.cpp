@@ -85,6 +85,7 @@ namespace BlueBear {
 
       // Now that all constants are loaded, start traversing the directory and get the user-defined packages
       std::vector< std::string > directories = Tools::Utility::getSubdirectoryList( TILE_ASSETS_PATH );
+      // this is an experiment in parallelism that should probably be removed because of the lock
       async::parallel_for( Threading::AsyncManager::getInstance().getScheduler(), directories, [ & ]( std::string& directory ) {
         registerFloorTile( std::string( TILE_ASSETS_PATH ) + directory );
       } );
@@ -97,5 +98,23 @@ namespace BlueBear {
       return tileRegistry.at( key );
     }
 
+    /**
+     * Register all the wallpaper. This is markedly simpler since there's no need for a base wallpaper class.
+     * The only important thing this function needs to make sure of, is that there's always a "grey" wallpaper class.
+     * Wallpaper types in assets/wallpaper that define themselves with id "grey" will be silently ignored, and Log
+     * will throw a warning that this id is reserved for the unpainted wallpanel class.
+     */
+    void InfrastructureFactory::registerWallpapers() {
+      std::vector< std::string > directories = Tools::Utility::getSubdirectoryList( WALL_ASSETS_PATH );
+      // likewise with registerFloorTiles, likely we'll want to remove this because of the lock and how it negates the parallel benefit
+      async::parallel_for( Threading::AsyncManager::getInstance().getScheduler(), directories, [ & ]( std::string& directory ) {
+        registerWallpaper( std::string( WALL_ASSETS_PATH ) + directory );
+      } );
+    }
+
+    void InfrastructureFactory::registerWallpaper( const std::string& path ) {
+      std::string fullPath = path + "/" + WALL_SYSTEM_ROOT;
+      
+    }
   }
 }
