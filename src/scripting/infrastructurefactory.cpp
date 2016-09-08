@@ -1,5 +1,6 @@
 #include "scripting/infrastructurefactory.hpp"
 #include "scripting/tile.hpp"
+#include "scripting/wallpaper.hpp"
 #include "log.hpp"
 #include "tools/utility.hpp"
 #include "threading/async.hpp"
@@ -14,6 +15,8 @@
 
 namespace BlueBear {
   namespace Scripting {
+
+    const std::string InfrastructureFactory::GREY_SYSTEM_WALLPAPER = "system/models/wall/greywallpaper.png";
 
     /**
      * Given the key and value, check against tileConstants for a value. If the value is present within, return THAT value,
@@ -105,6 +108,10 @@ namespace BlueBear {
      * will throw a warning that this id is reserved for the unpainted wallpanel class.
      */
     void InfrastructureFactory::registerWallpapers() {
+      // First and foremost - register _grey, the standard, hardcoded grey wallaper.
+      // No more constexpr - GCC bug breaks them randomly
+      wallpaperRegistry[ "_grey" ] = std::make_shared< Wallpaper >( "_grey", GREY_SYSTEM_WALLPAPER, 0.0 );
+
       std::vector< std::string > directories = Tools::Utility::getSubdirectoryList( WALL_ASSETS_PATH );
       // likewise with registerFloorTiles, likely we'll want to remove this because of the lock and how it negates the parallel benefit
       async::parallel_for( Threading::AsyncManager::getInstance().getScheduler(), directories, [ & ]( std::string& directory ) {
@@ -114,7 +121,40 @@ namespace BlueBear {
 
     void InfrastructureFactory::registerWallpaper( const std::string& path ) {
       std::string fullPath = path + "/" + WALL_SYSTEM_ROOT;
-      
+      std::ifstream definitionFile;
+      definitionFile.exceptions( std::ios::failbit | std::ios::badbit );
+      definitionFile.open( fullPath );
+
+      Json::Reader reader;
+      Json::Value definitionJSON;
+      if( reader.parse( definitionFile, definitionJSON ) ) {
+        for( Json::Value::iterator jsonIterator = definitionJSON.begin(); jsonIterator != definitionJSON.end(); ++jsonIterator ) {
+          std::string key = jsonIterator.key().asString();
+
+          if( key != "_grey" ) {
+            Json::Value wallpaperDefinition = *jsonIterator;
+
+            if( wallpaperDefinition.isMember( "image" ) ) {
+              {
+                std::unique_lock< std::mutex > wallpaperRegistryLock( wallpaperRegistryMutex );
+                wallpaperRegistry[ key ] = std::make_shared< Wallpaper >(
+                  key,
+                  path + "/" + wallpaperDefinition[ "image" ].asString(),
+                  wallpaperDefinition[ "price" ].asDouble()
+                );
+              }
+
+              Log::getInstance().debug( "InfrastructureFactory::registerWallpaper" , "Registered " + key + " at " + fullPath );
+            } else {
+              Log::getInstance().error( "InfrastructureFactory::registerWallpaper", "Unable to create wallpaper at path " + fullPath + ": missing fields." );
+            }
+          } else {
+            Log::getInstance().warn( "InfrastructureFactory::registerWallpaper", "Cannot register wallpaper: \"_grey\" is a reserved id." );
+          }
+        }
+      } else {
+        Log::getInstance().error( "InfrastructureFactory::wallpaper", "Unable to parse JSON file " + fullPath );
+      }
     }
   }
 }

@@ -14,7 +14,7 @@
 			]
 		},
 		"wall": {
-			"dict": [ "grey" ],
+			"dict": [ "_grey" ],
 			"levels": [
 				[
 					{ "run": 24, "value": -1 },

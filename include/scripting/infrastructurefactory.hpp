@@ -15,6 +15,8 @@ namespace BlueBear {
     class Wallpaper;
 
     class InfrastructureFactory {
+      // Phase in new static convention here
+      static const std::string GREY_SYSTEM_WALLPAPER;
       static constexpr const char* TILE_SYSTEM_PATH = "system/flooring/";
       static constexpr const char* TILE_ASSETS_PATH = "assets/flooring/";
       static constexpr const char* WALL_ASSETS_PATH = "assets/wallpaper/";
@@ -22,6 +24,7 @@ namespace BlueBear {
       static constexpr const char* WALL_SYSTEM_ROOT = "base.json";
       Json::Value tileConstants;
       std::mutex tileRegistryMutex;
+      std::mutex wallpaperRegistryMutex;
       std::map< std::string, std::shared_ptr< Tile > > tileRegistry;
       std::map< std::string, std::shared_ptr< Wallpaper > > wallpaperRegistry;
 
