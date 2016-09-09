@@ -11,6 +11,7 @@
 #include "scripting/eventmanager.hpp"
 #include "scripting/tile.hpp"
 #include "scripting/wallcell.hpp"
+#include "scripting/wallpaper.hpp"
 #include <memory>
 #include <vector>
 #include <cstring>
@@ -43,9 +44,20 @@ namespace BlueBear {
 			Json::Value levels = wall[ "levels" ];
 
 			// Create the vector reference of shared_ptrs by iterating through dict
-			std::vector< std::shared_ptr< WallCell > > lookup;
+			std::vector< std::shared_ptr< Wallpaper > > lookup;
 			for( const Json::Value& dictEntry : dict ) {
+				auto wallpaper = infrastructureFactory.getWallpaper( dictEntry.asString() );
+				lookup.push_back( wallpaper );
+			}
 
+			wallMap = std::make_unique< Containers::Collection3D< std::shared_ptr< WallCell > > >( stories, floorX, floorY );
+
+			for( Json::Value& level : levels ) {
+				if( Tools::Utility::isRLEObject( level ) ) {
+					// De-RLE the object
+				} else {
+					// Push a wallcell
+				}
 			}
 		}
 

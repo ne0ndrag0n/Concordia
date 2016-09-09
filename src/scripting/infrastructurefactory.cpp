@@ -101,6 +101,10 @@ namespace BlueBear {
       return tileRegistry.at( key );
     }
 
+    std::shared_ptr< Wallpaper > InfrastructureFactory::getWallpaper( const std::string& key ) {
+      return wallpaperRegistry.at( key );
+    }
+
     /**
      * Register all the wallpaper. This is markedly simpler since there's no need for a base wallpaper class.
      * The only important thing this function needs to make sure of, is that there's always a "grey" wallpaper class.
