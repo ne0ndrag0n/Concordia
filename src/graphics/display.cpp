@@ -138,20 +138,18 @@ namespace BlueBear {
       auto size = lot.floorMap->getLength();
 
       // TODO: Fix this unholy mess of counters and garbage
-      // Get xPosition and yPosition to determine world space positions of floor tiles
-      int xPosition = -( lot.floorMap->dimensionX / 2 );
-      int yPosition = lot.floorMap->dimensionY / 2;
-      int xCounter = 0;
-      int yCounter = 0;
+      int xOrigin = -( lot.floorMap->dimensionX / 2 );
+      int yOrigin = lot.floorMap->dimensionY / 2;
       // Determines the floor level
       int tilesPerLevel = lot.floorMap->dimensionX * lot.floorMap->dimensionY;
-      float floorLevel = -10.0f;
+      // The floor level is -10. Start this at -15 to avoid a branch penalty in the next if.
+      float floorLevel = -15.0f;
 
       for( auto i = 0; i != size; i++ ) {
 
         // Increase level every time we exceed the number of tiles per level
         // Reset the boundaries of the 2D tile map
-        if( i % tilesPerLevel == 0 && i != 0 ) {
+        if( i % tilesPerLevel == 0 ) {
           floorLevel = floorLevel + 5.0f;
         }
 
@@ -163,7 +161,9 @@ namespace BlueBear {
           Drawable& floorDrawable = instance->drawables.at( "Plane" );
           floorDrawable.material = materialCache.get( *tilePtr );
 
-          instance->setPosition( glm::vec3( xPosition + xCounter, yPosition + yCounter, floorLevel ) );
+          int xCounter = i % lot.floorMap->dimensionX;
+          int yCounter = -( i / lot.floorMap->dimensionY );
+          instance->setPosition( glm::vec3( xOrigin + xCounter, yOrigin + yCounter, floorLevel ) );
 
           // The pointer to this floor tile goes into the floorInstanceCollection
           floorInstanceCollection->pushDirect( instance );
@@ -171,14 +171,6 @@ namespace BlueBear {
           // There is no floor tile located here. Consequently, insert an empty Instance pointer here; it will be skipped on draw.
           floorInstanceCollection->pushDirect( std::shared_ptr< Instance >() );
         }
-
-        // No matter what, handle incrementation of items
-        xCounter++;
-        if( xCounter >= lot.floorMap->dimensionX ) {
-          xCounter = 0;
-          yCounter--;
-        }
-
       }
 
       Log::getInstance().info( "Display::loadInfrastructure", "Finished creating infrastructure instances." );
