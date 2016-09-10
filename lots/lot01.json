@@ -10,7 +10,7 @@
 		"floor": {
 			"dict": [ "hardwood1" ],
 			"levels": [
-				{ "run": 36, "value": 0 }
+				[ { "run": 36, "value": 0 } ]
 			]
 		},
 		"wall": {

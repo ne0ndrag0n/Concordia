@@ -27,6 +27,7 @@ namespace BlueBear {
 				InfrastructureFactory& infrastructureFactory;
 				void buildFloorMap( Json::Value& floor );
 				void buildWallMap( Json::Value& walls );
+				std::shared_ptr< WallCell > getWallCell( Json::Value& object, std::vector< std::shared_ptr< Wallpaper > >& lookup );
 
 			public:
 				std::map< std::string, std::unique_ptr< LotEntity > > objects;

@@ -53,12 +53,65 @@ namespace BlueBear {
 			wallMap = std::make_unique< Containers::Collection3D< std::shared_ptr< WallCell > > >( stories, floorX, floorY );
 
 			for( Json::Value& level : levels ) {
-				if( Tools::Utility::isRLEObject( level ) ) {
-					// De-RLE the object
-				} else {
-					// Push a wallcell
+				for( Json::Value& object : level ) {
+					if( Tools::Utility::isRLEObject( object ) ) {
+						// De-RLE the object
+						std::shared_ptr< WallCell > wallCell = getWallCell( object[ "value" ], lookup );
+
+						unsigned int run = object[ "run" ].asUInt();
+						for( unsigned int i = 0; i != run; i++ ) {
+							wallMap->pushDirect( wallCell );
+						}
+					} else {
+						// Push a wallcell or nothing
+						wallMap->pushDirect( getWallCell( object, lookup ) );
+					}
 				}
 			}
+		}
+
+		/**
+		 * Build the wall cell in all four possible dimensions
+		 */
+		std::shared_ptr< WallCell > Lot::getWallCell( Json::Value& object, std::vector< std::shared_ptr< Wallpaper > >& lookup ) {
+			std::shared_ptr< WallCell > wallCell;
+
+			if( object.isObject() && !object.isNumeric() ) {
+				// usable object
+				wallCell = std::make_shared< WallCell >();
+
+				// Check for dimensions x, y, d, and r
+				Json::Value x = object.get( "x", Json::nullValue );
+				Json::Value y = object.get( "y", Json::nullValue );
+				Json::Value d = object.get( "d", Json::nullValue );
+				Json::Value r = object.get( "r", Json::nullValue );
+				if( !x.isNull() ) {
+					wallCell->x = std::make_unique< WallCell::Segment >(
+						lookup.at( x[ "f" ].asUInt() ),
+						lookup.at( x[ "b" ].asUInt() )
+					);
+				}
+				if( !y.isNull() ) {
+					wallCell->y = std::make_unique< WallCell::Segment >(
+						lookup.at( y[ "f" ].asUInt() ),
+						lookup.at( y[ "b" ].asUInt() )
+					);
+				}
+				if( !d.isNull() ) {
+					wallCell->d = std::make_unique< WallCell::Segment >(
+						lookup.at( d[ "f" ].asUInt() ),
+						lookup.at( d[ "b" ].asUInt() )
+					);
+				}
+				if( !r.isNull() ) {
+					wallCell->r = std::make_unique< WallCell::Segment >(
+						lookup.at( r[ "f" ].asUInt() ),
+						lookup.at( r[ "b" ].asUInt() )
+					);
+				}
+			}
+
+			return wallCell;
 		}
 
 		void Lot::buildFloorMap( Json::Value& floor ) {
@@ -77,20 +130,29 @@ namespace BlueBear {
 			floorMap = std::make_unique< Containers::Collection3D< std::shared_ptr< Tile > > >( stories, floorX, floorY );
 
 			for( Json::Value& level : levels ) {
-				if( Tools::Utility::isRLEObject( level ) ) {
-					// De-RLE the object
-					unsigned int run = level[ "run" ].asUInt();
-					auto entry = lookup.at( level[ "value" ].asInt() );
+				for( Json::Value& object : level ) {
+					if( Tools::Utility::isRLEObject( object ) ) {
+						// De-RLE the object
+						unsigned int run = object[ "run" ].asUInt();
+						int index = object[ "value" ].asInt();
+						std::shared_ptr< Tile > entry;
 
-					for( unsigned int i = 0; i != run; i++ ) {
-						floorMap->pushDirect( entry );
-					}
-				} else {
-					int entry = level.asInt();
-					if( entry >= 0 ) {
-						floorMap->pushDirect( lookup.at( entry ) );
+						if( index >= 0 ) {
+							entry = lookup.at( index );
+						} // else leave it null
+
+						for( unsigned int i = 0; i != run; i++ ) {
+							floorMap->pushDirect( entry );
+						}
 					} else {
-						floorMap->pushDirect( std::shared_ptr< Tile >() );
+						int index = object.asInt();
+						std::shared_ptr< Tile > entry;
+
+						if( index >= 0 ) {
+							entry = lookup.at( index );
+						}
+
+						floorMap->pushDirect( entry );
 					}
 				}
 			}
