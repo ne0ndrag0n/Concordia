@@ -126,7 +126,6 @@ namespace BlueBear {
 			}
 
 			// Use the pointer lookup to create the floormap
-			Log::getInstance().debug( "Lot::buildFloorMap", "Stories: " + std::to_string( stories ) + " " + std::to_string( floorX ) + "x" + std::to_string( floorY ) );
 			floorMap = std::make_unique< Containers::Collection3D< std::shared_ptr< Tile > > >( stories, floorX, floorY );
 
 			for( Json::Value& level : levels ) {
@@ -134,28 +133,30 @@ namespace BlueBear {
 					if( Tools::Utility::isRLEObject( object ) ) {
 						// De-RLE the object
 						unsigned int run = object[ "run" ].asUInt();
-						int index = object[ "value" ].asInt();
-						std::shared_ptr< Tile > entry;
-
-						if( index >= 0 ) {
-							entry = lookup.at( index );
-						} // else leave it null
+						std::shared_ptr< Tile > entry = getTile( object[ "value" ].asInt(), lookup );
 
 						for( unsigned int i = 0; i != run; i++ ) {
 							floorMap->pushDirect( entry );
 						}
 					} else {
-						int index = object.asInt();
-						std::shared_ptr< Tile > entry;
-
-						if( index >= 0 ) {
-							entry = lookup.at( index );
-						}
-
-						floorMap->pushDirect( entry );
+						floorMap->pushDirect( getTile( object.asInt(), lookup ) );
 					}
 				}
 			}
+		}
+
+		/**
+		 * Return a tile given a JSON object and a lookup of tiles. This is a simple inline function that just checks to see
+		 * if the entry is blank or not; if it's not blank (index of -1), the lookup is performed.
+		 */
+		std::shared_ptr< Tile > Lot::getTile( int index, std::vector< std::shared_ptr< Tile > >& lookup ) {
+			std::shared_ptr< Tile > entry;
+
+			if( index >= 0 ) {
+				entry = lookup.at( index );
+			}
+
+			return entry;
 		}
 
 		int Lot::lua_getLotObjects( lua_State* L ) {
