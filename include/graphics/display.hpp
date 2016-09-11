@@ -119,6 +119,13 @@ namespace BlueBear {
       private:
         static constexpr const char* FLOOR_MODEL_PATH = "system/models/floor/floor.dae";
         using ViewportDimension = int;
+        // Wrapper class that holds four instances per tile
+        struct WallCellBundler {
+          std::shared_ptr< Instance > x;
+          std::shared_ptr< Instance > y;
+          std::shared_ptr< Instance > d;
+          std::shared_ptr< Instance > r;
+        };
         ViewportDimension x;
         ViewportDimension y;
         std::vector< Instance > instances;
@@ -126,6 +133,7 @@ namespace BlueBear {
         Threading::CommandBus& commandBus;
 
         std::unique_ptr< Containers::Collection3D< std::shared_ptr< Instance > > > floorInstanceCollection;
+        std::unique_ptr< Containers::Collection3D< WallCellBundler > > wallInstanceCollection;
 
         std::unique_ptr< Model > floorModel;
         std::unique_ptr< Model > wallPanelModel;

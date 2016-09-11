@@ -127,6 +127,7 @@ namespace BlueBear {
      */
     void Display::loadInfrastructure( Scripting::Lot& lot ) {
       floorInstanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< Instance > > >( lot.floorMap->levels, lot.floorMap->dimensionX, lot.floorMap->dimensionY );
+      wallInstanceCollection = std::make_unique< Containers::Collection3D< WallCellBundler > >( lot.floorMap->levels, lot.floorMap->dimensionX, lot.floorMap->dimensionY );
 
       // Lazy-load floorPanel and wallPanelModel
       if( !floorModel ) {
@@ -147,6 +148,10 @@ namespace BlueBear {
 
       for( auto i = 0; i != size; i++ ) {
 
+        int xCounter = xOrigin + ( i % lot.floorMap->dimensionX );
+        int yCounter = yOrigin + -( i / lot.floorMap->dimensionY );
+
+        // FLOOR
         // Increase level every time we exceed the number of tiles per level
         // Reset the boundaries of the 2D tile map
         if( i % tilesPerLevel == 0 ) {
@@ -161,9 +166,7 @@ namespace BlueBear {
           Drawable& floorDrawable = instance->drawables.at( "Plane" );
           floorDrawable.material = materialCache.get( *tilePtr );
 
-          int xCounter = i % lot.floorMap->dimensionX;
-          int yCounter = -( i / lot.floorMap->dimensionY );
-          instance->setPosition( glm::vec3( xOrigin + xCounter, yOrigin + yCounter, floorLevel ) );
+          instance->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
 
           // The pointer to this floor tile goes into the floorInstanceCollection
           floorInstanceCollection->pushDirect( instance );
@@ -171,6 +174,10 @@ namespace BlueBear {
           // There is no floor tile located here. Consequently, insert an empty Instance pointer here; it will be skipped on draw.
           floorInstanceCollection->pushDirect( std::shared_ptr< Instance >() );
         }
+
+        // WALLS
+        // Do not nudge any walls here (nudging will be the responsibility of MainGameState)
+
       }
 
       Log::getInstance().info( "Display::loadInfrastructure", "Finished creating infrastructure instances." );
