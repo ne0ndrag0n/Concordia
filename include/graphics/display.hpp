@@ -32,6 +32,8 @@ namespace BlueBear {
     //class Camera;
 
     class Display {
+      static const std::string WALLPANEL_MODEL_XY_PATH;
+      static const std::string WALLPANEL_MODEL_DR_PATH;
 
     public:
       // RAII style
@@ -133,10 +135,13 @@ namespace BlueBear {
         Threading::CommandBus& commandBus;
 
         std::unique_ptr< Containers::Collection3D< std::shared_ptr< Instance > > > floorInstanceCollection;
-        std::unique_ptr< Containers::Collection3D< WallCellBundler > > wallInstanceCollection;
+        std::unique_ptr< Containers::Collection3D< std::unique_ptr< WallCellBundler > > > wallInstanceCollection;
 
         std::unique_ptr< Model > floorModel;
-        std::unique_ptr< Model > wallPanelModel;
+        struct {
+          std::unique_ptr< Model > xy;
+          std::unique_ptr< Model > dr;
+        } wallPanelModels;
 
         std::unique_ptr< Camera > camera;
         std::unique_ptr< Shader > defaultShader;
@@ -151,6 +156,8 @@ namespace BlueBear {
         // This should last the life of the Display instance.
         MaterialCache materialCache;
 
+        // Utility function to get a wall cell bundler reference
+        WallCellBundler& getWallCellBundler( std::unique_ptr< WallCellBundler >& bundlerPtr );
         void main();
     };
 

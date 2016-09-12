@@ -8,6 +8,7 @@
 #include "scripting/lot.hpp"
 #include "scripting/tile.hpp"
 #include "scripting/engine.hpp"
+#include "scripting/wallcell.hpp"
 #include "threading/commandbus.hpp"
 #include "localemanager.hpp"
 #include "configmanager.hpp"
@@ -27,6 +28,9 @@ static BlueBear::Scripting::Engine::CommandList engineCommandList;
 
 namespace BlueBear {
   namespace Graphics {
+
+    const std::string Display::WALLPANEL_MODEL_XY_PATH = "system/models/wall/wall.dae";
+    const std::string Display::WALLPANEL_MODEL_DR_PATH = "system/models/wall/diagwall.dae";
 
     Display::Display( Threading::CommandBus& commandBus ) : commandBus( commandBus ) {
       // Get our settings out of the config manager
@@ -127,12 +131,18 @@ namespace BlueBear {
      */
     void Display::loadInfrastructure( Scripting::Lot& lot ) {
       floorInstanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< Instance > > >( lot.floorMap->levels, lot.floorMap->dimensionX, lot.floorMap->dimensionY );
-      wallInstanceCollection = std::make_unique< Containers::Collection3D< WallCellBundler > >( lot.floorMap->levels, lot.floorMap->dimensionX, lot.floorMap->dimensionY );
+      wallInstanceCollection = std::make_unique< Containers::Collection3D< std::unique_ptr< WallCellBundler > > >( lot.floorMap->levels, lot.floorMap->dimensionX, lot.floorMap->dimensionY );
 
-      // Lazy-load floorPanel and wallPanelModel
+      // Lazy-load floorPanel and each wall panel model
       if( !floorModel ) {
         // wrapped in std::string - compiler bug causes the constexpr not to be evaluated, and fails in linking
         floorModel = std::make_unique< Model >( std::string( FLOOR_MODEL_PATH ) );
+      }
+      if( !wallPanelModels.xy ) {
+        wallPanelModels.xy = std::make_unique< Model >( WALLPANEL_MODEL_XY_PATH );
+      }
+      if( !wallPanelModels.dr ) {
+        wallPanelModels.dr = std::make_unique< Model >( WALLPANEL_MODEL_DR_PATH );
       }
 
       // Transform each Tile instance to an entity
@@ -177,7 +187,28 @@ namespace BlueBear {
 
         // WALLS
         // Do not nudge any walls here (nudging will be the responsibility of MainGameState)
+        // Nudging "X" means moving up in the Y dimension by 0.1
+        // Nudging "Y" means moving left in the X dimension by 0.1
+        auto wallCellPtr = lot.wallMap->getItemDirect( i );
+        std::unique_ptr< WallCellBundler > wallCellBundler;
+        if( wallCellPtr ) {
+          // Several different kinds of wall panel models depending on the type, and several kinds of orientations
+          // If that pointer exists, at least one of these ifs will be fulfilled
+          auto& bundler = getWallCellBundler( wallCellBundler );
 
+          if( wallCellPtr->x ) {
+            bundler.x = std::make_shared< Instance >( *( wallPanelModels.xy ), defaultShader->Program );
+            bundler.x->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
+          }
+
+          if( wallCellPtr->y ) {
+            bundler.y = std::make_shared< Instance >( *( wallPanelModels.xy ), defaultShader->Program );
+            bundler.y->setRotationAngle( glm::radians( -90.0f ) );
+            bundler.y->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
+          }
+
+          
+        }
       }
 
       Log::getInstance().info( "Display::loadInfrastructure", "Finished creating infrastructure instances." );
@@ -187,6 +218,14 @@ namespace BlueBear {
 
       // Drop a SetLockState command for Engine
       engineCommandList.push_back( std::make_unique< Scripting::Engine::SetLockState >( true ) );
+    }
+
+    Display::WallCellBundler& Display::getWallCellBundler( std::unique_ptr< WallCellBundler >& bundlerPtr ) {
+      if( !bundlerPtr ) {
+        bundlerPtr = std::make_unique< WallCellBundler >();
+      }
+
+      return *bundlerPtr;
     }
 
     // ---------- STATES ----------
