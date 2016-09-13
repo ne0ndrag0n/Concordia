@@ -52,6 +52,20 @@ namespace BlueBear {
       }
     }
 
+    /**
+     * Bit of a hackish way to draw an entity with a "nudge" (temporary position)
+     */
+    void Instance::nudgeDrawEntity( const glm::vec3& nudge ) {
+      Transform originalTransform = transform;
+
+      transform.position += nudge;
+
+      markDirty();
+      drawEntity();
+
+      transform = originalTransform;
+    }
+
     void Instance::markDirty() {
       dirty = true;
 

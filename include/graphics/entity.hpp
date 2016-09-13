@@ -40,6 +40,8 @@ namespace BlueBear {
 
         void drawEntity( glm::mat4& parent );
 
+        void nudgeDrawEntity( const glm::vec3& nudge );
+
         void markDirty();
 
         glm::vec3 getPosition();

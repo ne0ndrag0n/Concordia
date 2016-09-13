@@ -17,8 +17,8 @@
 			"dict": [ "_grey" ],
 			"levels": [
 				[
-					{ "run": 24, "value": -1 },
 					{ "x": { "f": 0, "b": 0 } },
+					{ "run": 24, "value": -1 },
 					{ "run": 24, "value": -1 }
 				]
 			]

@@ -55,7 +55,7 @@ namespace BlueBear {
     Display::~Display() = default;
 
     void Display::openDisplay() {
-      mainWindow.create( sf::VideoMode( x, y ), LocaleManager::getInstance().getString( "BLUEBEAR_WINDOW_TITLE" ), sf::Style::Close );
+      mainWindow.create( sf::VideoMode( x, y ), LocaleManager::getInstance().getString( "BLUEBEAR_WINDOW_TITLE" ), sf::Style::Close, sf::ContextSettings( 24, 8, 0, 3, 3 ) );
 
       // Set sync on window by these params:
       // vsync_limiter_overview = true or fps_overview
@@ -131,7 +131,7 @@ namespace BlueBear {
      */
     void Display::loadInfrastructure( Scripting::Lot& lot ) {
       floorInstanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< Instance > > >( lot.floorMap->levels, lot.floorMap->dimensionX, lot.floorMap->dimensionY );
-      wallInstanceCollection = std::make_unique< Containers::Collection3D< std::unique_ptr< WallCellBundler > > >( lot.floorMap->levels, lot.floorMap->dimensionX, lot.floorMap->dimensionY );
+      wallInstanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< WallCellBundler > > >( lot.floorMap->levels, lot.floorMap->dimensionX, lot.floorMap->dimensionY );
 
       // Lazy-load floorPanel and each wall panel model
       if( !floorModel ) {
@@ -190,7 +190,7 @@ namespace BlueBear {
         // Nudging "X" means moving up in the Y dimension by 0.1
         // Nudging "Y" means moving left in the X dimension by 0.1
         auto wallCellPtr = lot.wallMap->getItemDirect( i );
-        std::unique_ptr< WallCellBundler > wallCellBundler;
+        std::shared_ptr< WallCellBundler > wallCellBundler;
         if( wallCellPtr ) {
           // Several different kinds of wall panel models depending on the type, and several kinds of orientations
           // If that pointer exists, at least one of these ifs will be fulfilled
@@ -207,8 +207,19 @@ namespace BlueBear {
             bundler.y->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
           }
 
-          
+          if( wallCellPtr->d ) {
+            bundler.d = std::make_shared< Instance >( *( wallPanelModels.dr ), defaultShader->Program );
+            bundler.d->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
+          }
+
+          if( wallCellPtr->r ) {
+            bundler.r = std::make_shared< Instance >( *( wallPanelModels.dr ), defaultShader->Program );
+            bundler.r->setRotationAngle( glm::radians( -90.0f ) );
+            bundler.r->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
+          }
         }
+
+        wallInstanceCollection->pushDirect( wallCellBundler );
       }
 
       Log::getInstance().info( "Display::loadInfrastructure", "Finished creating infrastructure instances." );
@@ -220,9 +231,9 @@ namespace BlueBear {
       engineCommandList.push_back( std::make_unique< Scripting::Engine::SetLockState >( true ) );
     }
 
-    Display::WallCellBundler& Display::getWallCellBundler( std::unique_ptr< WallCellBundler >& bundlerPtr ) {
+    Display::WallCellBundler& Display::getWallCellBundler( std::shared_ptr< WallCellBundler >& bundlerPtr ) {
       if( !bundlerPtr ) {
-        bundlerPtr = std::make_unique< WallCellBundler >();
+        bundlerPtr = std::make_shared< WallCellBundler >();
       }
 
       return *bundlerPtr;
@@ -294,12 +305,22 @@ namespace BlueBear {
       instance.camera->position();
 
       // Draw entities of each type
-      // Floor
+      // Floor & Walls with nudging
       auto length = instance.floorInstanceCollection->getLength();
       for( auto i = 0; i != length; i++ ) {
         std::shared_ptr< Instance > floorInstance = instance.floorInstanceCollection->getItemDirect( i );
+        std::shared_ptr< WallCellBundler > wallCellBundler = instance.wallInstanceCollection->getItemDirect( i );
+        auto rotation = instance.camera->getCurrentRotation();
+        float xWallNudge = ( rotation == 1 || rotation == 2 ) ? -0.1f : 0.0f;
+        float yWallNudge = ( rotation == 0 || rotation == 1 ) ? 0.1f : 0.0f;
+
         if( floorInstance ) {
           floorInstance->drawEntity();
+        }
+        if( wallCellBundler ) {
+          if( wallCellBundler->x ) {
+            wallCellBundler->x->nudgeDrawEntity( glm::vec3( 0.0f, yWallNudge, 0.0f ) );
+          }
         }
       }
 

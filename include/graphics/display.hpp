@@ -135,7 +135,7 @@ namespace BlueBear {
         Threading::CommandBus& commandBus;
 
         std::unique_ptr< Containers::Collection3D< std::shared_ptr< Instance > > > floorInstanceCollection;
-        std::unique_ptr< Containers::Collection3D< std::unique_ptr< WallCellBundler > > > wallInstanceCollection;
+        std::unique_ptr< Containers::Collection3D< std::shared_ptr< WallCellBundler > > > wallInstanceCollection;
 
         std::unique_ptr< Model > floorModel;
         struct {
@@ -157,7 +157,7 @@ namespace BlueBear {
         MaterialCache materialCache;
 
         // Utility function to get a wall cell bundler reference
-        WallCellBundler& getWallCellBundler( std::unique_ptr< WallCellBundler >& bundlerPtr );
+        WallCellBundler& getWallCellBundler( std::shared_ptr< WallCellBundler >& bundlerPtr );
         void main();
     };
 
