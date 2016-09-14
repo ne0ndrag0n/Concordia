@@ -204,7 +204,7 @@ namespace BlueBear {
           if( wallCellPtr->y ) {
             bundler.y = std::make_shared< Instance >( *( wallPanelModels.xy ), defaultShader->Program );
             bundler.y->setRotationAngle( glm::radians( -90.0f ) );
-            bundler.y->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
+            bundler.y->setPosition( glm::vec3( xCounter - 0.9f, yCounter, floorLevel ) );
           }
 
           if( wallCellPtr->d ) {
@@ -320,6 +320,9 @@ namespace BlueBear {
         if( wallCellBundler ) {
           if( wallCellBundler->x ) {
             wallCellBundler->x->nudgeDrawEntity( glm::vec3( 0.0f, yWallNudge, 0.0f ) );
+          }
+          if( wallCellBundler->y ) {
+            wallCellBundler->y->nudgeDrawEntity( glm::vec3( xWallNudge, 0.0f, 0.0f ) );
           }
         }
       }
