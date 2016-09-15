@@ -5,10 +5,12 @@
 #include "graphics/model.hpp"
 #include "graphics/drawable.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/material.hpp"
 #include "scripting/lot.hpp"
 #include "scripting/tile.hpp"
 #include "scripting/engine.hpp"
 #include "scripting/wallcell.hpp"
+#include "scripting/wallpaper.hpp"
 #include "threading/commandbus.hpp"
 #include "localemanager.hpp"
 #include "configmanager.hpp"
@@ -31,6 +33,7 @@ namespace BlueBear {
 
     const std::string Display::WALLPANEL_MODEL_XY_PATH = "system/models/wall/wall.dae";
     const std::string Display::WALLPANEL_MODEL_DR_PATH = "system/models/wall/diagwall.dae";
+    const std::string Display::WALLATLAS_PATH = "system/models/wall/wallatlas.json";
 
     Display::Display( Threading::CommandBus& commandBus ) : commandBus( commandBus ) {
       // Get our settings out of the config manager
@@ -199,23 +202,47 @@ namespace BlueBear {
           if( wallCellPtr->x ) {
             bundler.x = std::make_shared< Instance >( *( wallPanelModels.xy ), defaultShader->Program );
             bundler.x->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
+            bundler.x->drawables.at( "Wall" ).material = materialCache.getAtlas(
+              MaterialCache::AtlasPackage{
+                WALLATLAS_PATH,
+                { { "FrontWall", wallCellPtr->x->front->imagePath }, { "BackWall", wallCellPtr->x->back->imagePath } }
+              }
+            );
           }
 
           if( wallCellPtr->y ) {
             bundler.y = std::make_shared< Instance >( *( wallPanelModels.xy ), defaultShader->Program );
             bundler.y->setRotationAngle( glm::radians( -90.0f ) );
             bundler.y->setPosition( glm::vec3( xCounter - 0.9f, yCounter, floorLevel ) );
+            bundler.y->drawables.at( "Wall" ).material = materialCache.getAtlas(
+              MaterialCache::AtlasPackage{
+                WALLATLAS_PATH,
+                { { "FrontWall", wallCellPtr->y->front->imagePath }, { "BackWall", wallCellPtr->y->back->imagePath } }
+              }
+            );
           }
 
           if( wallCellPtr->d ) {
             bundler.d = std::make_shared< Instance >( *( wallPanelModels.dr ), defaultShader->Program );
             bundler.d->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
+            bundler.d->drawables.at( "Wall" ).material = materialCache.getAtlas(
+              MaterialCache::AtlasPackage{
+                WALLATLAS_PATH,
+                { { "FrontWall", wallCellPtr->d->front->imagePath }, { "BackWall", wallCellPtr->d->back->imagePath } }
+              }
+            );
           }
 
           if( wallCellPtr->r ) {
             bundler.r = std::make_shared< Instance >( *( wallPanelModels.dr ), defaultShader->Program );
             bundler.r->setRotationAngle( glm::radians( -90.0f ) );
             bundler.r->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
+            bundler.r->drawables.at( "Wall" ).material = materialCache.getAtlas(
+              MaterialCache::AtlasPackage{
+                WALLATLAS_PATH,
+                { { "FrontWall", wallCellPtr->r->front->imagePath }, { "BackWall", wallCellPtr->r->back->imagePath } }
+              }
+            );
           }
         }
 

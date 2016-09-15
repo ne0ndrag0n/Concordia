@@ -48,6 +48,8 @@ namespace BlueBear {
 
 				static std::vector<std::string> split(const std::string &text, char sep);
 
+				static std::string join( const std::vector< std::string >& strings, const std::string& token );
+
 				static void getTableTreeValue( lua_State* L, const std::string& treeValue );
 
 				static bool isRLEObject( Json::Value& value );

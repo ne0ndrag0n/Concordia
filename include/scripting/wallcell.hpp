@@ -3,6 +3,7 @@
 
 namespace BlueBear {
   namespace Scripting {
+    class Wallpaper;
 
     struct WallCell {
 

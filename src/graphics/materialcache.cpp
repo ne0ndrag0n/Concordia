@@ -42,7 +42,7 @@ namespace BlueBear {
     /**
      * Get a material using the path to a texture atlas JSON definition, and the settings provided to the atlas builder.
      */
-    std::shared_ptr< Material > MaterialCache::getAtlas( AtlasPackage& package ) {
+    std::shared_ptr< Material > MaterialCache::getAtlas( const AtlasPackage& package ) {
       // The key for a material based on texture caches is formed like so:
       // path.json:val1 val2 val3
       // As order matters in the TextureCache, it also matters in the MaterialCache

@@ -270,6 +270,23 @@ namespace BlueBear {
 		}
 
 		/**
+		 * C++ doesn't have one of these built into the damn string class.
+		 */
+		std::string Utility::join( const std::vector< std::string >& strings, const std::string& token ) {
+			std::string result;
+
+			unsigned int size = strings.size();
+			for( unsigned int i = 0; i != size; i++ ) {
+				result += strings[ i ];
+				if ( i != size - 1 ) {
+					result += token;
+				}
+			}
+
+			return result;
+		}
+
+		/**
 		 * Traverse and retrieve a value stored in a Lua table as a tree structure.
 		 * Leaves the found value on the top of the stack; leaves nil if the value was not found.
 		 * Always pops the original table.

@@ -1,5 +1,7 @@
 #include "graphics/atlasbuilder.hpp"
 #include "graphics/texture.hpp"
+#include "tools/utility.hpp"
+#include "log.hpp"
 #include <fstream>
 #include <string>
 #include <jsoncpp/json/json.h>
@@ -32,6 +34,15 @@ namespace BlueBear {
         throw AtlasBuilder::CannotLoadFileException();
       }
 
+      // All paths are now relative to the path specified in jsonPath
+      std::string basePath;
+
+      auto tokens = Tools::Utility::split( jsonPath, '/' );
+      if( tokens.size() > 0 ) {
+        tokens.erase( tokens.end() );
+        basePath = Tools::Utility::join( tokens, "/" ) + "/";
+      }
+
       // Create a base image on which to overlay existing images
       Json::Value baseProps = schema[ "base" ];
       Json::Value components = schema[ "mappings" ];
@@ -39,7 +50,7 @@ namespace BlueBear {
       // Dispose of any old image
       base = sf::Image();
       if( baseProps[ "image" ].isString() ) {
-        if( !base.loadFromFile( baseProps[ "image" ].asString() ) ) {
+        if( !base.loadFromFile( basePath + baseProps[ "image" ].asString() ) ) {
           throw AtlasBuilder::CannotLoadFileException();
         }
       } else {

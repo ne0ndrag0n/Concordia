@@ -24,7 +24,7 @@ namespace BlueBear {
           std::map< std::string, std::string > mappings;
         };
         std::shared_ptr< Material > get( Scripting::Tile& tile );
-        std::shared_ptr< Material > getAtlas( AtlasPackage& package );
+        std::shared_ptr< Material > getAtlas( const AtlasPackage& package );
         void prune();
     };
   }

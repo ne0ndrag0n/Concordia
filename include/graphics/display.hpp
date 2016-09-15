@@ -34,6 +34,7 @@ namespace BlueBear {
     class Display {
       static const std::string WALLPANEL_MODEL_XY_PATH;
       static const std::string WALLPANEL_MODEL_DR_PATH;
+      static const std::string WALLATLAS_PATH;
 
     public:
       // RAII style
