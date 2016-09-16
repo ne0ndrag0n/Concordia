@@ -68,8 +68,6 @@ namespace BlueBear {
         mainWindow.setFramerateLimit( ConfigManager::getInstance().getIntValue( "fps_overview" ) );
       }
 
-      mainWindow.setKeyRepeatEnabled( false );
-
       // Initialize OpenGL using GLEW
       glewExperimental = true;
       auto glewStatus = glewInit();
@@ -365,6 +363,10 @@ namespace BlueBear {
       static int KEY_PERSPECTIVE = ConfigManager::getInstance().getIntValue( "key_switch_perspective" );
       static int KEY_ROTATE_RIGHT = ConfigManager::getInstance().getIntValue( "key_rotate_right" );
       static int KEY_ROTATE_LEFT = ConfigManager::getInstance().getIntValue( "key_rotate_left" );
+      static int KEY_UP = ConfigManager::getInstance().getIntValue( "key_move_up" );
+      static int KEY_DOWN = ConfigManager::getInstance().getIntValue( "key_move_down" );
+      static int KEY_LEFT = ConfigManager::getInstance().getIntValue( "key_move_left" );
+      static int KEY_RIGHT = ConfigManager::getInstance().getIntValue( "key_move_right" );
 
       // Main game has a few events mostly relating to camera
       switch( event.type ) {
@@ -397,6 +399,20 @@ namespace BlueBear {
             if( keyCode == KEY_ROTATE_LEFT ) {
               camera.rotateLeft();
             }
+
+            if( keyCode == KEY_UP ) {
+              camera.move( 0.0f, 0.1f, 0.0f );
+            }
+            if( keyCode == KEY_DOWN ) {
+              camera.move( 0.0f, -0.1f, 0.0f );
+            }
+            if( keyCode == KEY_LEFT ) {
+              camera.move( -0.1f, 0.0f, 0.0f );
+            }
+            if( keyCode == KEY_RIGHT ) {
+              camera.move( 0.1f, 0.0f, 0.0f );
+            }
+
             break;
           }
         default:
