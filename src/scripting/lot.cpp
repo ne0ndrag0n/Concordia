@@ -30,7 +30,8 @@ namespace BlueBear {
 			floorY( rootObject[ "floory" ].asInt() ),
 			stories( rootObject[ "stories" ].asInt() ),
 			undergroundStories( rootObject[ "subtr" ].asInt() ),
-			terrainType( TerrainType( rootObject[ "terrain" ].asInt() ) ) {
+			terrainType( TerrainType( rootObject[ "terrain" ].asInt() ) ),
+			currentRotation( rootObject[ "rot" ].asUInt() ) {
 			buildFloorMap( rootObject[ "infr" ][ "floor" ] );
 			buildWallMap( rootObject[ "infr" ][ "wall" ] );
 		}

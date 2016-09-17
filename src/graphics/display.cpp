@@ -128,7 +128,7 @@ namespace BlueBear {
     }
 
     /**
-     * Given a lot, build floorInstanceCollection and translate the Tiles/Wallpanels to instances on the lot
+     * Given a lot, build floorInstanceCollection and translate the Tiles/Wallpanels to instances on the lot. Additionally, send the rotation status.
      */
     void Display::loadInfrastructure( Scripting::Lot& lot ) {
       floorInstanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< Instance > > >( lot.floorMap->levels, lot.floorMap->dimensionX, lot.floorMap->dimensionY );
@@ -250,7 +250,7 @@ namespace BlueBear {
       Log::getInstance().info( "Display::loadInfrastructure", "Finished creating infrastructure instances." );
 
       // When we're done loading the infrastructure, switch the state of the engine
-      currentState = std::make_unique< Display::MainGameState >( *this );
+      currentState = std::make_unique< Display::MainGameState >( *this, lot.currentRotation );
 
       // Drop a SetLockState command for Engine
       engineCommandList.push_back( std::make_unique< Scripting::Engine::SetLockState >( true ) );
@@ -293,9 +293,10 @@ namespace BlueBear {
     /**
      * Display renderer state for the main game loop
      */
-    Display::MainGameState::MainGameState( Display& instance ) : Display::State::State( instance ) {
+    Display::MainGameState::MainGameState( Display& instance, unsigned int cameraRotation ) : Display::State::State( instance ) {
       // Setup camera
       instance.camera = std::make_unique< Camera >( instance.defaultShader->Program, instance.x, instance.y );
+      instance.camera->setRotationDirect( cameraRotation );
 
       texts.mode.setFont( instance.fonts.osdFont );
       texts.mode.setCharacterSize( 16 );

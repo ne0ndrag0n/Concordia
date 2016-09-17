@@ -7,6 +7,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "localemanager.hpp"
+#include "log.hpp"
 
 namespace BlueBear {
   namespace Graphics {
@@ -138,6 +139,20 @@ namespace BlueBear {
 
     GLuint Camera::getCurrentRotation() {
       return currentRotation;
+    }
+
+    void Camera::setRotationDirect( GLuint rotation ) {
+      if( ortho ) {
+
+        if( rotation > 3 ) {
+          Log::getInstance().warn( "Camera::setRotationDirect", "Orthographic rotation not in interval [0,3] (value provided was " + std::to_string( rotation ) + "). Coercing to value in this range..." );
+          rotation = rotation % 4;
+        }
+
+        currentRotation = rotation;
+
+        doRotate();
+      }
     }
 
     std::string Camera::positionToString() {

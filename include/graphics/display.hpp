@@ -83,7 +83,7 @@ namespace BlueBear {
         public:
           void execute();
           void handleEvent( sf::Event& event );
-          MainGameState( Display& instance );
+          MainGameState( Display& instance, unsigned int cameraRotation = 0 );
           ~MainGameState();
       };
       // ----------------------------

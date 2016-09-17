@@ -6,6 +6,7 @@
 	"subtr": 0,
 	"terrain": 1,
 	"ticks": 10,
+	"rot": 0,
 	"infr": {
 		"floor": {
 			"dict": [ "hardwood1" ],
@@ -17,7 +18,8 @@
 			"dict": [ "_grey" ],
 			"levels": [
 				[
-					{ "run": 49, "value": -1 }
+					{ "y": { "f": 0, "b": 0 } },
+					{ "run": 48, "value": -1 }
 				]
 			]
 		}

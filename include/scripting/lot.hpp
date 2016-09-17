@@ -38,6 +38,7 @@ namespace BlueBear {
 				int floorY;
 				int stories;
 				int undergroundStories;
+				unsigned int currentRotation;
 				BlueBear::TerrainType terrainType;
 
 				Lot( lua_State* L, const Tick& currentTickReference, InfrastructureFactory& infrastructureFactory, Json::Value& rootObject );

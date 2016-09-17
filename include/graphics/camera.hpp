@@ -56,6 +56,7 @@ namespace BlueBear {
         void rotateRight();
         void rotateLeft();
         GLuint getCurrentRotation();
+        void setRotationDirect( GLuint rotation );
         std::string positionToString();
         std::string directionToString();
     };
