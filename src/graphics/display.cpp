@@ -199,7 +199,8 @@ namespace BlueBear {
 
           if( wallCellPtr->x ) {
             bundler.x = std::make_shared< Instance >( *( wallPanelModels.xy ), defaultShader->Program );
-            bundler.x->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
+            bundler.x->setPosition( glm::vec3( xCounter, yCounter + 0.9f, floorLevel ) );
+            bundler.x->setRotationAngle( glm::radians( 180.0f ) );
             bundler.x->drawables.at( "Wall" ).material = materialCache.getAtlas(
               MaterialCache::AtlasPackage{
                 WALLATLAS_PATH,
