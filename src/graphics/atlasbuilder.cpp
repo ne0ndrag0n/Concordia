@@ -1,4 +1,6 @@
 #include "graphics/atlasbuilder.hpp"
+#include "graphics/imagebuilder/imagebuilder.hpp"
+#include "graphics/imagebuilder/pathimagebuilder.hpp"
 #include "graphics/texture.hpp"
 #include "tools/utility.hpp"
 #include "log.hpp"
@@ -13,10 +15,13 @@
 namespace BlueBear {
   namespace Graphics {
 
+    /**
+     * Set an atlas mapping using the path method (PathImageBuilder)
+     */
     void AtlasBuilder::setAtlasMapping( const std::string& key, const std::string& path ) {
       AtlasMapping& mapping = mappings.at( key );
 
-      mapping.imagePath = path;
+      mapping.imageBuilder = std::make_unique< PathImageBuilder >( path );
     }
 
     void AtlasBuilder::configure( const std::string& jsonPath ) {
@@ -67,7 +72,7 @@ namespace BlueBear {
           ( unsigned int ) value[ "y" ].asInt(),
           ( unsigned int ) value[ "width" ].asInt(),
           ( unsigned int ) value[ "height" ].asInt(),
-          ""
+          std::unique_ptr< ImageBuilder >()
         };
       }
     }
@@ -77,14 +82,11 @@ namespace BlueBear {
 
       // Apply each overlay
       for( auto& pair : mappings ) {
-        sf::Image overlay;
-        AtlasMapping mapping = pair.second;
+        AtlasMapping& mapping = pair.second;
 
-        if( !overlay.loadFromFile( mapping.imagePath ) ) {
-          throw AtlasBuilder::CannotLoadFileException();
+        if( mapping.imageBuilder ) {
+          atlasBase.copy( mapping.imageBuilder->getImage(), mapping.x, mapping.y );
         }
-
-        atlasBase.copy( overlay, mapping.x, mapping.y );
       }
 
       // Overlay this sf::Image into an OpenGL texture

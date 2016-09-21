@@ -1,6 +1,7 @@
 #ifndef ATLASBUILDER
 #define ATLASBUILDER
 
+#include "graphics/imagebuilder/imagebuilder.hpp"
 #include <istream>
 #include <string>
 #include <SFML/Graphics.hpp>
@@ -24,7 +25,7 @@ namespace BlueBear {
           unsigned int y;
           unsigned int width;
           unsigned int height;
-          std::string imagePath;
+          std::unique_ptr< ImageBuilder > imageBuilder;
         };
 
         sf::Image base;
