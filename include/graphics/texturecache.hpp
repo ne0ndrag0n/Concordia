@@ -12,7 +12,7 @@ namespace BlueBear {
 
     class TextureCache {
       using SharedPointerTextureCache = std::map< std::string, std::shared_ptr< Texture > >;
-      using AtlasBuilderMappings = std::map< std::string, std::string >;
+      using AtlasSettings = std::map< std::string, std::string >;
 
       struct AtlasBuilderEntry {
         AtlasBuilder builder;
@@ -22,14 +22,17 @@ namespace BlueBear {
       SharedPointerTextureCache textureCache;
       std::map< std::string, AtlasBuilderEntry > atlasTextureCache;
 
-      std::shared_ptr< Texture > generateForAtlasBuilderEntry( AtlasBuilderEntry& entry, const AtlasBuilderMappings& mappings );
+      std::shared_ptr< Texture > generateForAtlasBuilderEntry( AtlasBuilderEntry& entry, const AtlasSettings& mappings );
 
       public:
         std::shared_ptr< Texture > get( const std::string& path );
         // Order matters here in the map if you want to get the performance benefit!
         // The map will be transformed to a single string used as the key for the textureCache map
-        std::shared_ptr< Texture > getUsingAtlas( const std::string& atlasBasePath, const AtlasBuilderMappings& mappings );
+        std::shared_ptr< Texture > getUsingAtlas( const std::string& atlasBasePath, const AtlasSettings& mappings );
         void prune();
+
+      private:
+        std::string getKey( const AtlasSettings& mappings );
     };
 
   }

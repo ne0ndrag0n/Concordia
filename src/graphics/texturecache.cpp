@@ -36,19 +36,26 @@ namespace BlueBear {
       }
     }
 
+    std::string TextureCache::getKey( const AtlasSettings& mappings ) {
+      std::string key;
+
+      for( auto& iterator : mappings ) {
+        key = key + iterator.second + " ";
+      }
+
+      return key;
+    }
+
     /**
      * Shared logic to work around C++'s inability to just define a damn non-pointer reference and assign it separately
      */
-    std::shared_ptr< Texture > TextureCache::generateForAtlasBuilderEntry( AtlasBuilderEntry& entry, const AtlasBuilderMappings& mappings ) {
+    std::shared_ptr< Texture > TextureCache::generateForAtlasBuilderEntry( AtlasBuilderEntry& entry, const AtlasSettings& mappings ) {
       // This atlas builder already exists
       AtlasBuilder& builder = entry.builder;
       SharedPointerTextureCache& texCache = entry.generatedTextures;
 
       // Generate the key for the desired set of textures
-      std::string key;
-      for( auto& iterator : mappings ) {
-        key = key + iterator.second + " ";
-      }
+      std::string key = getKey( mappings );
 
       auto textureIterator = texCache.find( key );
       if( textureIterator != texCache.end() ) {
@@ -68,7 +75,7 @@ namespace BlueBear {
      * Get a texture according to an atlas and cache both the AtlasBuilder used to make it
      * and the resulting atlas (if you provided the same order in the map).
      */
-    std::shared_ptr< Texture > TextureCache::getUsingAtlas( const std::string& atlasBasePath, const AtlasBuilderMappings& mappings ) {
+    std::shared_ptr< Texture > TextureCache::getUsingAtlas( const std::string& atlasBasePath, const AtlasSettings& mappings ) {
       // Test for atlas at the current path
       auto atlasBuilderEntryIterator = atlasTextureCache.find( atlasBasePath );
 

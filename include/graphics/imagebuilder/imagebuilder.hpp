@@ -2,6 +2,7 @@
 #define IMAGEBUILDER
 
 #include <SFML/Graphics.hpp>
+#include <string>
 
 namespace BlueBear {
   namespace Graphics {
@@ -10,6 +11,7 @@ namespace BlueBear {
     class ImageBuilder {
       public:
         virtual sf::Image getImage() = 0;
+        virtual std::string getKey() = 0;
     };
 
   }

@@ -24,5 +24,12 @@ namespace BlueBear {
       return image;
     }
 
+    /**
+     * Get a string key that represents an object of this configuration (used for storage in maps)
+     */
+    std::string PathImageBuilder::getKey() {
+      return path;
+    }
+
   }
 }

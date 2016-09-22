@@ -39,18 +39,25 @@ namespace BlueBear {
       }
     }
 
+    std::string MaterialCache::getKey( const AtlasSettings& mappings ) {
+      std::string key;
+
+      for( auto& kvPair : mappings ) {
+        key = key + kvPair.second + " ";
+      }
+
+      return key;
+    }
+
     /**
      * Get a material using the path to a texture atlas JSON definition, and the settings provided to the atlas builder.
      */
-    std::shared_ptr< Material > MaterialCache::getAtlas( const AtlasPackage& package ) {
+    std::shared_ptr< Material > MaterialCache::getAtlas( const std::string& atlasJSONPath, const AtlasSettings& mappings ) {
       // The key for a material based on texture caches is formed like so:
       // path.json:val1 val2 val3
       // As order matters in the TextureCache, it also matters in the MaterialCache
 
-      std::string key = package.atlasJSONPath + ":";
-      for( auto& kvPair : package.mappings ) {
-        key = key + kvPair.second + " ";
-      }
+      std::string key = atlasJSONPath + ":" + getKey( mappings );
 
       auto iterator = materialCache.find( key );
       if( iterator != materialCache.end() ) {
@@ -59,7 +66,7 @@ namespace BlueBear {
       } else {
         // This material needs to be created
         TextureList texList;
-        texList.push_back( textureCache.getUsingAtlas( package.atlasJSONPath, package.mappings ) );
+        texList.push_back( textureCache.getUsingAtlas( atlasJSONPath, mappings ) );
 
         return materialCache[ key ] = std::make_shared< Material >( texList );
       }

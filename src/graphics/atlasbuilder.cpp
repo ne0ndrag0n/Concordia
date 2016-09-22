@@ -24,6 +24,15 @@ namespace BlueBear {
       mapping.imageBuilder = std::make_unique< PathImageBuilder >( path );
     }
 
+    /**
+     * Set an AtlaMapping by providing your own ImageBuilder.
+     */
+    void AtlasBuilder::setAtlasMapping( const std::string& key, std::unique_ptr< ImageBuilder > builder ) {
+      AtlasMapping& mapping = mappings.at( key );
+
+      mapping.imageBuilder = std::move( builder );
+    }
+
     void AtlasBuilder::configure( const std::string& jsonPath ) {
       mappings.clear();
 

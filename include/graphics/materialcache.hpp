@@ -19,13 +19,15 @@ namespace BlueBear {
       std::map< std::string, std::shared_ptr< Material > > materialCache;
 
       public:
-        struct AtlasPackage {
-          std::string atlasJSONPath;
-          std::map< std::string, std::string > mappings;
-        };
+        using AtlasSettings = std::map< std::string, std::string >;
+
         std::shared_ptr< Material > get( Scripting::Tile& tile );
-        std::shared_ptr< Material > getAtlas( const AtlasPackage& package );
+        std::shared_ptr< Material > getAtlas( const std::string& atlasJSONPath, const AtlasSettings& mappings );
+
         void prune();
+
+      private:
+        std::string getKey( const AtlasSettings& mappings );
     };
   }
 }

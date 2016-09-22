@@ -37,6 +37,7 @@ namespace BlueBear {
         AtlasBuilder() = default;
 
         void setAtlasMapping( const std::string& key, const std::string& path );
+        void setAtlasMapping( const std::string& key, std::unique_ptr< ImageBuilder > builder );
         void configure( const std::string& jsonPath );
 
         std::shared_ptr< Texture > getTextureAtlas();

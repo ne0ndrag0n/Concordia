@@ -17,6 +17,7 @@ namespace BlueBear {
         std::string getPath();
 
         sf::Image getImage();
+        std::string getKey();
     };
 
   }
