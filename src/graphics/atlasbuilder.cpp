@@ -16,15 +16,6 @@ namespace BlueBear {
   namespace Graphics {
 
     /**
-     * Set an atlas mapping using the path method (PathImageBuilder)
-     */
-    void AtlasBuilder::setAtlasMapping( const std::string& key, const std::string& path ) {
-      AtlasMapping& mapping = mappings.at( key );
-
-      mapping.imageBuilder = std::make_unique< PathImageBuilder >( path );
-    }
-
-    /**
      * Set an AtlaMapping by providing your own ImageBuilder.
      */
     void AtlasBuilder::setAtlasMapping( const std::string& key, std::unique_ptr< ImageBuilder > builder ) {

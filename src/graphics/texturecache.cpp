@@ -1,6 +1,7 @@
 #include "graphics/texturecache.hpp"
 #include "graphics/texture.hpp"
 #include "graphics/atlasbuilder.hpp"
+#include "graphics/imagebuilder/imagebuilder.hpp"
 #include <string>
 #include <map>
 #include <memory>
@@ -36,11 +37,11 @@ namespace BlueBear {
       }
     }
 
-    std::string TextureCache::getKey( const AtlasSettings& mappings ) {
+    std::string TextureCache::getKey( AtlasSettings& mappings ) {
       std::string key;
 
       for( auto& iterator : mappings ) {
-        key = key + iterator.second + " ";
+        key = key + iterator.second->getKey() + " ";
       }
 
       return key;
@@ -49,7 +50,7 @@ namespace BlueBear {
     /**
      * Shared logic to work around C++'s inability to just define a damn non-pointer reference and assign it separately
      */
-    std::shared_ptr< Texture > TextureCache::generateForAtlasBuilderEntry( AtlasBuilderEntry& entry, const AtlasSettings& mappings ) {
+    std::shared_ptr< Texture > TextureCache::generateForAtlasBuilderEntry( AtlasBuilderEntry& entry, AtlasSettings& mappings ) {
       // This atlas builder already exists
       AtlasBuilder& builder = entry.builder;
       SharedPointerTextureCache& texCache = entry.generatedTextures;
@@ -64,7 +65,7 @@ namespace BlueBear {
       } else {
         // The texture needs to be generated using "builder"
         for( auto& kvPair : mappings ) {
-          builder.setAtlasMapping( kvPair.first, kvPair.second );
+          builder.setAtlasMapping( kvPair.first, std::move( kvPair.second ) );
         }
 
         return texCache[ key ] = builder.getTextureAtlas();
@@ -75,7 +76,7 @@ namespace BlueBear {
      * Get a texture according to an atlas and cache both the AtlasBuilder used to make it
      * and the resulting atlas (if you provided the same order in the map).
      */
-    std::shared_ptr< Texture > TextureCache::getUsingAtlas( const std::string& atlasBasePath, const AtlasSettings& mappings ) {
+    std::shared_ptr< Texture > TextureCache::getUsingAtlas( const std::string& atlasBasePath, AtlasSettings& mappings ) {
       // Test for atlas at the current path
       auto atlasBuilderEntryIterator = atlasTextureCache.find( atlasBasePath );
 

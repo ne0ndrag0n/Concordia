@@ -1,5 +1,7 @@
 #include "graphics/display.hpp"
 #include "containers/collection3d.hpp"
+#include "graphics/imagebuilder/imagebuilder.hpp"
+#include "graphics/imagebuilder/pathimagebuilder.hpp"
 #include "graphics/entity.hpp"
 #include "graphics/shader.hpp"
 #include "graphics/model.hpp"
@@ -25,6 +27,7 @@
 #include <mutex>
 #include <string>
 #include <cstdlib>
+#include <utility>
 
 static BlueBear::Graphics::Display::CommandList displayCommandList;
 static BlueBear::Scripting::Engine::CommandList engineCommandList;
@@ -131,11 +134,15 @@ namespace BlueBear {
     /**
      * Create the required texture atlas settings from the current rotation and wall segment.
      */
-    const std::map< std::string, std::string > Display::getTextureAtlasSettings( Scripting::WallCell::Segment& segment ) {
-      return {
-        { "FrontWall", segment.front->imagePath },
-        { "BackWall", segment.back->imagePath }
-      };
+    void Display::setWallpaperMaterial( Scripting::WallCell::Segment& segment, Instance& instance ) {
+      std::map< std::string, std::unique_ptr< ImageBuilder > > settings;
+
+      settings.emplace( std::make_pair( "FrontWall", std::make_unique< PathImageBuilder >( segment.front->imagePath ) ) );
+      settings.emplace( std::make_pair( "BackWall", std::make_unique< PathImageBuilder >( segment.back->imagePath ) ) );
+
+      std::shared_ptr< Texture > texture = texCache.getUsingAtlas( WALLATLAS_PATH, settings );
+      std::shared_ptr< Material > material = std::make_shared< Material >( texture );
+      instance.drawables.at( "Wall" ).material = material;
     }
 
     /**
@@ -213,27 +220,27 @@ namespace BlueBear {
             bundler.x = std::make_shared< Instance >( *( wallPanelModels.xy ), defaultShader->Program );
             bundler.x->setPosition( glm::vec3( xCounter, yCounter + 0.9f, floorLevel ) );
             bundler.x->setRotationAngle( glm::radians( 180.0f ) );
-            bundler.x->drawables.at( "Wall" ).material = std::make_shared< Material >( TextureList{ texCache.getUsingAtlas( WALLATLAS_PATH, getTextureAtlasSettings( *( wallCellPtr->x ) ) ) } );
+            setWallpaperMaterial( *( wallCellPtr->x ), *( bundler.x ) );
           }
 
           if( wallCellPtr->y ) {
             bundler.y = std::make_shared< Instance >( *( wallPanelModels.xy ), defaultShader->Program );
             bundler.y->setRotationAngle( glm::radians( -90.0f ) );
             bundler.y->setPosition( glm::vec3( xCounter - 0.9f, yCounter, floorLevel ) );
-            bundler.y->drawables.at( "Wall" ).material = std::make_shared< Material >( TextureList{ texCache.getUsingAtlas( WALLATLAS_PATH, getTextureAtlasSettings( *( wallCellPtr->y ) ) ) } );
+            setWallpaperMaterial( *( wallCellPtr->y ), *( bundler.y ) );
           }
 
           if( wallCellPtr->d ) {
             bundler.d = std::make_shared< Instance >( *( wallPanelModels.dr ), defaultShader->Program );
             bundler.d->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
-            bundler.d->drawables.at( "Wall" ).material = std::make_shared< Material >( TextureList{ texCache.getUsingAtlas( WALLATLAS_PATH, getTextureAtlasSettings( *( wallCellPtr->d ) ) ) } );
+            setWallpaperMaterial( *( wallCellPtr->d ), *( bundler.d ) );
           }
 
           if( wallCellPtr->r ) {
             bundler.r = std::make_shared< Instance >( *( wallPanelModels.dr ), defaultShader->Program );
             bundler.r->setRotationAngle( glm::radians( -90.0f ) );
             bundler.r->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
-            bundler.r->drawables.at( "Wall" ).material = std::make_shared< Material >( TextureList{ texCache.getUsingAtlas( WALLATLAS_PATH, getTextureAtlasSettings( *( wallCellPtr->r ) ) ) } );
+            setWallpaperMaterial( *( wallCellPtr->r ), *( bundler.r ) );
           }
         }
 

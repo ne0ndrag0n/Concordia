@@ -15,6 +15,7 @@
 #include <map>
 #include "graphics/texturecache.hpp"
 #include "scripting/wallcell.hpp"
+#include "graphics/imagebuilder/imagebuilder.hpp"
 // Compiler won't accept an incomplete type for Camera. It accepts EVERY other one.
 // You can be the one to fuckin' tell me why.
 #include "graphics/camera.hpp"
@@ -162,7 +163,7 @@ namespace BlueBear {
 
         // Utility function to get a wall cell bundler reference
         WallCellBundler& getWallCellBundler( std::shared_ptr< WallCellBundler >& bundlerPtr );
-        const std::map< std::string, std::string > getTextureAtlasSettings( Scripting::WallCell::Segment& segment );
+        void setWallpaperMaterial( Scripting::WallCell::Segment& segment, Instance& instance );
         void main();
     };
 

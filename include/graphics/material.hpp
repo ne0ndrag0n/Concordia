@@ -18,6 +18,7 @@ namespace BlueBear {
         TextureList specularTextures;
 
         Material();
+        Material( std::shared_ptr< Texture >& diffuseTexture );
         Material( TextureList diffuseTextures );
         Material( TextureList diffuseTextures, TextureList specularTextures );
 
