@@ -13,7 +13,7 @@
 #include <glm/glm.hpp>
 #include <string>
 #include <map>
-#include "graphics/materialcache.hpp"
+#include "graphics/texturecache.hpp"
 #include "scripting/wallcell.hpp"
 // Compiler won't accept an incomplete type for Camera. It accepts EVERY other one.
 // You can be the one to fuckin' tell me why.
@@ -158,7 +158,7 @@ namespace BlueBear {
         } fonts;
 
         // This should last the life of the Display instance.
-        MaterialCache materialCache;
+        TextureCache texCache;
 
         // Utility function to get a wall cell bundler reference
         WallCellBundler& getWallCellBundler( std::shared_ptr< WallCellBundler >& bundlerPtr );
