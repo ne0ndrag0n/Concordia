@@ -141,8 +141,7 @@ namespace BlueBear {
       settings.emplace( std::make_pair( "BackWall", std::make_unique< PathImageBuilder >( segment.back->imagePath ) ) );
 
       std::shared_ptr< Texture > texture = texCache.getUsingAtlas( WALLATLAS_PATH, settings );
-      std::shared_ptr< Material > material = std::make_shared< Material >( texture );
-      instance.drawables.at( "Wall" ).material = material;
+      instance.drawables.at( "Wall" ).material = std::make_shared< Material >( texture );
     }
 
     /**
