@@ -1,6 +1,6 @@
 #include "graphics/atlasbuilder.hpp"
-#include "graphics/imagebuilder/imagebuilder.hpp"
-#include "graphics/imagebuilder/pathimagebuilder.hpp"
+#include "graphics/imagebuilder/imagesource.hpp"
+#include "graphics/imagebuilder/pathimagesource.hpp"
 #include "graphics/texture.hpp"
 #include "tools/utility.hpp"
 #include "log.hpp"
@@ -16,9 +16,9 @@ namespace BlueBear {
   namespace Graphics {
 
     /**
-     * Set an AtlaMapping by providing your own ImageBuilder.
+     * Set an AtlaMapping by providing your own ImageSource.
      */
-    void AtlasBuilder::setAtlasMapping( const std::string& key, std::unique_ptr< ImageBuilder > builder ) {
+    void AtlasBuilder::setAtlasMapping( const std::string& key, std::unique_ptr< ImageSource > builder ) {
       AtlasMapping& mapping = mappings.at( key );
 
       mapping.imageBuilder = std::move( builder );
@@ -72,7 +72,7 @@ namespace BlueBear {
           ( unsigned int ) value[ "y" ].asInt(),
           ( unsigned int ) value[ "width" ].asInt(),
           ( unsigned int ) value[ "height" ].asInt(),
-          std::unique_ptr< ImageBuilder >()
+          std::unique_ptr< ImageSource >()
         };
       }
     }

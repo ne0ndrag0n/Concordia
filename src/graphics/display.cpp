@@ -1,7 +1,7 @@
 #include "graphics/display.hpp"
 #include "containers/collection3d.hpp"
-#include "graphics/imagebuilder/imagebuilder.hpp"
-#include "graphics/imagebuilder/pathimagebuilder.hpp"
+#include "graphics/imagebuilder/imagesource.hpp"
+#include "graphics/imagebuilder/pathimagesource.hpp"
 #include "graphics/entity.hpp"
 #include "graphics/shader.hpp"
 #include "graphics/model.hpp"
@@ -135,10 +135,10 @@ namespace BlueBear {
      * Create the required texture atlas settings from the current rotation and wall segment.
      */
     void Display::setWallpaperMaterial( Scripting::WallCell::Segment& segment, Instance& instance ) {
-      std::map< std::string, std::unique_ptr< ImageBuilder > > settings;
+      std::map< std::string, std::unique_ptr< ImageSource > > settings;
 
-      settings.emplace( std::make_pair( "FrontWall", std::make_unique< PathImageBuilder >( segment.front->imagePath ) ) );
-      settings.emplace( std::make_pair( "BackWall", std::make_unique< PathImageBuilder >( segment.back->imagePath ) ) );
+      settings.emplace( std::make_pair( "FrontWall", std::make_unique< PathImageSource >( segment.front->imagePath ) ) );
+      settings.emplace( std::make_pair( "BackWall", std::make_unique< PathImageSource >( segment.back->imagePath ) ) );
 
       std::shared_ptr< Texture > texture = texCache.getUsingAtlas( WALLATLAS_PATH, settings );
       instance.drawables.at( "Wall" ).material = std::make_shared< Material >( texture );

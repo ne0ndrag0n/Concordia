@@ -8,7 +8,7 @@ namespace BlueBear {
   namespace Graphics {
 
     // Abstract !!
-    class ImageBuilder {
+    class ImageSource {
       public:
         virtual sf::Image getImage() = 0;
         virtual std::string getKey() = 0;

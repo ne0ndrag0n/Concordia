@@ -1,7 +1,7 @@
 #ifndef ATLASBUILDER
 #define ATLASBUILDER
 
-#include "graphics/imagebuilder/imagebuilder.hpp"
+#include "graphics/imagebuilder/imagesource.hpp"
 #include <istream>
 #include <string>
 #include <SFML/Graphics.hpp>
@@ -25,7 +25,7 @@ namespace BlueBear {
           unsigned int y;
           unsigned int width;
           unsigned int height;
-          std::unique_ptr< ImageBuilder > imageBuilder;
+          std::unique_ptr< ImageSource > imageBuilder;
         };
 
         sf::Image base;
@@ -36,7 +36,7 @@ namespace BlueBear {
 
         AtlasBuilder() = default;
 
-        void setAtlasMapping( const std::string& key, std::unique_ptr< ImageBuilder > builder );
+        void setAtlasMapping( const std::string& key, std::unique_ptr< ImageSource > builder );
         void configure( const std::string& jsonPath );
 
         std::shared_ptr< Texture > getTextureAtlas();

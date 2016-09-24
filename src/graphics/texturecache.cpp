@@ -1,7 +1,7 @@
 #include "graphics/texturecache.hpp"
 #include "graphics/texture.hpp"
 #include "graphics/atlasbuilder.hpp"
-#include "graphics/imagebuilder/imagebuilder.hpp"
+#include "graphics/imagebuilder/imagesource.hpp"
 #include <string>
 #include <map>
 #include <memory>

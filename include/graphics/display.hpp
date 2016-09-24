@@ -15,7 +15,7 @@
 #include <map>
 #include "graphics/texturecache.hpp"
 #include "scripting/wallcell.hpp"
-#include "graphics/imagebuilder/imagebuilder.hpp"
+#include "graphics/imagebuilder/imagesource.hpp"
 // Compiler won't accept an incomplete type for Camera. It accepts EVERY other one.
 // You can be the one to fuckin' tell me why.
 #include "graphics/camera.hpp"

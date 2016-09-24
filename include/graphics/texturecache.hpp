@@ -5,7 +5,7 @@
 #include <map>
 #include <memory>
 #include "graphics/atlasbuilder.hpp"
-#include "graphics/imagebuilder/imagebuilder.hpp"
+#include "graphics/imagebuilder/imagesource.hpp"
 
 namespace BlueBear {
   namespace Graphics {
@@ -13,7 +13,7 @@ namespace BlueBear {
 
     class TextureCache {
       using SharedPointerTextureCache = std::map< std::string, std::shared_ptr< Texture > >;
-      using AtlasSettings = std::map< std::string, std::unique_ptr< ImageBuilder > >;
+      using AtlasSettings = std::map< std::string, std::unique_ptr< ImageSource > >;
 
       struct AtlasBuilderEntry {
         AtlasBuilder builder;

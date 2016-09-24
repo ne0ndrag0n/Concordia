@@ -1,18 +1,18 @@
 #ifndef PATHIMAGEBUILDER
 #define PATHIMAGEBUILDER
 
-#include "graphics/imagebuilder/imagebuilder.hpp"
+#include "graphics/imagebuilder/imagesource.hpp"
 #include <SFML/Graphics.hpp>
 #include <string>
 
 namespace BlueBear {
   namespace Graphics {
 
-    class PathImageBuilder : public ImageBuilder {
+    class PathImageSource : public ImageSource {
       std::string path;
 
       public:
-        PathImageBuilder( const std::string& path );
+        PathImageSource( const std::string& path );
         void setPath( const std::string& path );
         std::string getPath();
 
