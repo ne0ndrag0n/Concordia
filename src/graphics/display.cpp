@@ -2,7 +2,7 @@
 #include "containers/collection3d.hpp"
 #include "graphics/imagebuilder/imagesource.hpp"
 #include "graphics/imagebuilder/pathimagesource.hpp"
-#include "graphics/entity.hpp"
+#include "graphics/instance.hpp"
 #include "graphics/shader.hpp"
 #include "graphics/model.hpp"
 #include "graphics/drawable.hpp"

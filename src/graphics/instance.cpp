@@ -1,4 +1,4 @@
-#include "graphics/entity.hpp"
+#include "graphics/instance.hpp"
 #include "graphics/model.hpp"
 #include "graphics/drawable.hpp"
 #include <GL/glew.h>
