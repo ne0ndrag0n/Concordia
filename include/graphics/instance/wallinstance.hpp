@@ -13,6 +13,8 @@ namespace BlueBear {
     class Model;
 
     class WallInstance : public Instance {
+      static const std::string WALLATLAS_PATH;
+
     public:
       using ImageMap = std::unordered_map< std::string, std::shared_ptr< sf::Image > >;
 
@@ -28,6 +30,10 @@ namespace BlueBear {
       WallInstance( const Model& model, GLuint shaderProgram, TextureCache& hostTextureCache );
       void setFrontWallpaper( const std::string& path );
       void setBackWallpaper( const std::string& path );
+
+      void setWallpaper( const std::string& frontPath, const std::string& backPath );
+
+      void selectMaterial( unsigned int rotation );
 
     private:
       TextureCache& hostTextureCache;

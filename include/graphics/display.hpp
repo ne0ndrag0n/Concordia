@@ -31,6 +31,7 @@ namespace BlueBear {
 
   namespace Graphics {
     class Instance;
+    class WallInstance;
     class Model;
     class Shader;
     //class Camera;
@@ -128,10 +129,10 @@ namespace BlueBear {
         using ViewportDimension = int;
         // Wrapper class that holds four instances per tile
         struct WallCellBundler {
-          std::shared_ptr< Instance > x;
-          std::shared_ptr< Instance > y;
-          std::shared_ptr< Instance > d;
-          std::shared_ptr< Instance > r;
+          std::shared_ptr< WallInstance > x;
+          std::shared_ptr< WallInstance > y;
+          std::shared_ptr< WallInstance > d;
+          std::shared_ptr< WallInstance > r;
         };
         ViewportDimension x;
         ViewportDimension y;
@@ -163,7 +164,6 @@ namespace BlueBear {
 
         // Utility function to get a wall cell bundler reference
         WallCellBundler& getWallCellBundler( std::shared_ptr< WallCellBundler >& bundlerPtr );
-        void setWallpaperMaterial( Scripting::WallCell::Segment& segment, Instance& instance );
         void main();
     };
 

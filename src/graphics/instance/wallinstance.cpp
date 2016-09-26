@@ -1,7 +1,11 @@
 #include "graphics/instance/wallinstance.hpp"
 #include "graphics/instance/instance.hpp"
+#include "graphics/imagebuilder/imagesource.hpp"
+#include "graphics/imagebuilder/directimagesource.hpp"
 #include "graphics/texturecache.hpp"
 #include "graphics/model.hpp"
+#include "graphics/texture.hpp"
+#include "graphics/material.hpp"
 #include "exceptions/cannotloadfile.hpp"
 #include <SFML/Graphics.hpp>
 #include <string>
@@ -12,6 +16,7 @@
 namespace BlueBear {
   namespace Graphics {
 
+    const std::string WallInstance::WALLATLAS_PATH = "system/models/wall/wallatlas.json";
     WallInstance::ImageMap WallInstance::imageMap;
 
     WallInstance::WallInstance( const Model& model, GLuint shaderProgram, TextureCache& hostTextureCache ) :
@@ -26,9 +31,39 @@ namespace BlueBear {
       setWallpaper( path, back );
     }
 
+    void WallInstance::setWallpaper( const std::string& frontPath, const std::string& backPath ) {
+      setWallpaper( frontPath, front );
+      setWallpaper( backPath, back );
+    }
+
     void WallInstance::setWallpaper( const std::string& path, WallpaperSide& side ) {
       side.path = path;
+
       side.image = getImage( path );
+
+      // Slice images into their left and right segments
+      const auto originalSize = side.image->getSize();
+
+      side.leftSegment = sf::Image();
+      side.leftSegment.create( 44, 1020 );
+      side.leftSegment.copy( *side.image, 0, 0, { 0, 0, 44, 1020 } );
+
+      side.rightSegment = sf::Image();
+      side.rightSegment.create( 44, 1020 );
+      side.rightSegment.copy( *side.image, 0, 0, { (int)originalSize.x - 45, 0, 44, 1020 } );
+    }
+
+    /**
+     *
+     */
+    void WallInstance::selectMaterial( unsigned int rotation ) {
+      std::map< std::string, std::unique_ptr< ImageSource > > settings;
+
+      settings.emplace( std::make_pair( "FrontWall", std::make_unique< DirectImageSource >( *front.image, front.path ) ) );
+      settings.emplace( std::make_pair( "BackWall", std::make_unique< DirectImageSource >( *back.image, back.path ) ) );
+
+      std::shared_ptr< Texture > texture = hostTextureCache.getUsingAtlas( WALLATLAS_PATH, settings );
+      drawables.at( "Wall" ).material = std::make_shared< Material >( texture );
     }
 
     std::shared_ptr< sf::Image > WallInstance::getImage( const std::string& path ) {

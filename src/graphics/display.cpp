@@ -3,6 +3,7 @@
 #include "graphics/imagebuilder/imagesource.hpp"
 #include "graphics/imagebuilder/pathimagesource.hpp"
 #include "graphics/instance/instance.hpp"
+#include "graphics/instance/wallinstance.hpp"
 #include "graphics/shader.hpp"
 #include "graphics/model.hpp"
 #include "graphics/drawable.hpp"
@@ -132,19 +133,6 @@ namespace BlueBear {
     }
 
     /**
-     * Create the required texture atlas settings from the current rotation and wall segment.
-     */
-    void Display::setWallpaperMaterial( Scripting::WallCell::Segment& segment, Instance& instance ) {
-      std::map< std::string, std::unique_ptr< ImageSource > > settings;
-
-      settings.emplace( std::make_pair( "FrontWall", std::make_unique< PathImageSource >( segment.front->imagePath ) ) );
-      settings.emplace( std::make_pair( "BackWall", std::make_unique< PathImageSource >( segment.back->imagePath ) ) );
-
-      std::shared_ptr< Texture > texture = texCache.getUsingAtlas( WALLATLAS_PATH, settings );
-      instance.drawables.at( "Wall" ).material = std::make_shared< Material >( texture );
-    }
-
-    /**
      * Given a lot, build floorInstanceCollection and translate the Tiles/Wallpanels to instances on the lot. Additionally, send the rotation status.
      */
     void Display::loadInfrastructure( Scripting::Lot& lot ) {
@@ -162,6 +150,8 @@ namespace BlueBear {
       if( !wallPanelModels.dr ) {
         wallPanelModels.dr = std::make_unique< Model >( WALLPANEL_MODEL_DR_PATH );
       }
+
+      WallInstance::imageMap.clear();
 
       // Transform each Tile instance to an entity
       auto size = lot.floorMap->getLength();
@@ -216,30 +206,38 @@ namespace BlueBear {
           auto& bundler = getWallCellBundler( wallCellBundler );
 
           if( wallCellPtr->x ) {
-            bundler.x = std::make_shared< Instance >( *( wallPanelModels.xy ), defaultShader->Program );
+            bundler.x = std::make_shared< WallInstance >( *( wallPanelModels.xy ), defaultShader->Program, texCache );
             bundler.x->setPosition( glm::vec3( xCounter, yCounter + 0.9f, floorLevel ) );
             bundler.x->setRotationAngle( glm::radians( 180.0f ) );
-            setWallpaperMaterial( *( wallCellPtr->x ), *( bundler.x ) );
+
+            bundler.x->setWallpaper( wallCellPtr->x->front->imagePath, wallCellPtr->x->back->imagePath );
+            bundler.x->selectMaterial( 0 );
           }
 
           if( wallCellPtr->y ) {
-            bundler.y = std::make_shared< Instance >( *( wallPanelModels.xy ), defaultShader->Program );
+            bundler.y = std::make_shared< WallInstance >( *( wallPanelModels.xy ), defaultShader->Program, texCache );
             bundler.y->setRotationAngle( glm::radians( -90.0f ) );
             bundler.y->setPosition( glm::vec3( xCounter - 0.9f, yCounter, floorLevel ) );
-            setWallpaperMaterial( *( wallCellPtr->y ), *( bundler.y ) );
+
+            bundler.y->setWallpaper( wallCellPtr->y->front->imagePath, wallCellPtr->y->back->imagePath );
+            bundler.y->selectMaterial( 0 );
           }
 
           if( wallCellPtr->d ) {
-            bundler.d = std::make_shared< Instance >( *( wallPanelModels.dr ), defaultShader->Program );
+            bundler.d = std::make_shared< WallInstance >( *( wallPanelModels.dr ), defaultShader->Program, texCache );
             bundler.d->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
-            setWallpaperMaterial( *( wallCellPtr->d ), *( bundler.d ) );
+
+            bundler.d->setWallpaper( wallCellPtr->d->front->imagePath, wallCellPtr->d->back->imagePath );
+            bundler.d->selectMaterial( 0 );
           }
 
           if( wallCellPtr->r ) {
-            bundler.r = std::make_shared< Instance >( *( wallPanelModels.dr ), defaultShader->Program );
+            bundler.r = std::make_shared< WallInstance >( *( wallPanelModels.dr ), defaultShader->Program, texCache );
             bundler.r->setRotationAngle( glm::radians( -90.0f ) );
             bundler.r->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
-            setWallpaperMaterial( *( wallCellPtr->r ), *( bundler.r ) );
+
+            bundler.r->setWallpaper( wallCellPtr->r->front->imagePath, wallCellPtr->r->back->imagePath );
+            bundler.r->selectMaterial( 0 );
           }
         }
 
