@@ -15,7 +15,7 @@
 			]
 		},
 		"wall": {
-			"dict": [ "_grey" ],
+			"dict": [ "star_test" ],
 			"levels": [
 				[
 					{ "y": { "f": 0, "b": 0 } },

@@ -2,5 +2,9 @@
   "basic_white": {
     "image": "basic_white.png",
     "price": 10
+  },
+  "star_test": {
+    "image": "leftnright.png",
+    "price": 10
   }
 }
