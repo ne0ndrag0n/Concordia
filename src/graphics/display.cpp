@@ -211,7 +211,7 @@ namespace BlueBear {
             bundler.x->setRotationAngle( glm::radians( 180.0f ) );
 
             bundler.x->setWallpaper( wallCellPtr->x->front->imagePath, wallCellPtr->x->back->imagePath );
-            bundler.x->selectMaterial( 0 );
+            bundler.x->selectMaterial( lot.currentRotation );
           }
 
           if( wallCellPtr->y ) {
@@ -220,7 +220,7 @@ namespace BlueBear {
             bundler.y->setPosition( glm::vec3( xCounter - 0.9f, yCounter, floorLevel ) );
 
             bundler.y->setWallpaper( wallCellPtr->y->front->imagePath, wallCellPtr->y->back->imagePath );
-            bundler.y->selectMaterial( 0 );
+            bundler.y->selectMaterial( lot.currentRotation );
           }
 
           if( wallCellPtr->d ) {
@@ -228,7 +228,7 @@ namespace BlueBear {
             bundler.d->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
 
             bundler.d->setWallpaper( wallCellPtr->d->front->imagePath, wallCellPtr->d->back->imagePath );
-            bundler.d->selectMaterial( 0 );
+            bundler.d->selectMaterial( lot.currentRotation );
           }
 
           if( wallCellPtr->r ) {
@@ -237,7 +237,7 @@ namespace BlueBear {
             bundler.r->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
 
             bundler.r->setWallpaper( wallCellPtr->r->front->imagePath, wallCellPtr->r->back->imagePath );
-            bundler.r->selectMaterial( 0 );
+            bundler.r->selectMaterial( lot.currentRotation );
           }
         }
 
@@ -392,10 +392,12 @@ namespace BlueBear {
 
             if( keyCode == KEY_ROTATE_RIGHT ) {
               camera.rotateRight();
+              remapWallTextures();
             }
 
             if( keyCode == KEY_ROTATE_LEFT ) {
               camera.rotateLeft();
+              remapWallTextures();
             }
 
             if( keyCode == KEY_UP ) {
@@ -431,6 +433,9 @@ namespace BlueBear {
       instance.mainWindow.draw( texts.coords );
       instance.mainWindow.draw( texts.direction );
       instance.mainWindow.draw( texts.rotation );
+    }
+    void Display::MainGameState::remapWallTextures() {
+      unsigned int currentRotation = instance.camera->getCurrentRotation();
     }
 
     // ---------- COMMANDS ----------

@@ -85,6 +85,7 @@ namespace BlueBear {
             std::string FIRST_PERSON;
           } strings;
           void processOsd();
+          void remapWallTextures();
         public:
           void execute();
           void handleEvent( sf::Event& event );
