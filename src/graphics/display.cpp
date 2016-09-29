@@ -436,6 +436,27 @@ namespace BlueBear {
     }
     void Display::MainGameState::remapWallTextures() {
       unsigned int currentRotation = instance.camera->getCurrentRotation();
+      unsigned int mapSize = instance.wallInstanceCollection->getLength();
+
+      for( unsigned int i = 0; i != mapSize; i++ ) {
+        auto ptr = instance.wallInstanceCollection->getItemDirect( i );
+        if( ptr ) {
+          auto& wallCellBundler = *ptr;
+
+          if( wallCellBundler.x ) {
+            wallCellBundler.x->selectMaterial( currentRotation );
+          }
+          if( wallCellBundler.y ) {
+            wallCellBundler.y->selectMaterial( currentRotation );
+          }
+          if( wallCellBundler.d ) {
+            wallCellBundler.d->selectMaterial( currentRotation );
+          }
+          if( wallCellBundler.r ) {
+            wallCellBundler.r->selectMaterial( currentRotation );
+          }
+        }
+      }
     }
 
     // ---------- COMMANDS ----------
