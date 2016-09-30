@@ -4,6 +4,10 @@
 #include "graphics/imagebuilder/pathimagesource.hpp"
 #include "graphics/instance/instance.hpp"
 #include "graphics/instance/wallinstance.hpp"
+#include "graphics/instance/xwallinstance.hpp"
+#include "graphics/instance/ywallinstance.hpp"
+#include "graphics/instance/dwallinstance.hpp"
+#include "graphics/instance/rwallinstance.hpp"
 #include "graphics/shader.hpp"
 #include "graphics/model.hpp"
 #include "graphics/drawable.hpp"
@@ -206,7 +210,7 @@ namespace BlueBear {
           auto& bundler = getWallCellBundler( wallCellBundler );
 
           if( wallCellPtr->x ) {
-            bundler.x = std::make_shared< WallInstance >( *( wallPanelModels.xy ), defaultShader->Program, texCache );
+            bundler.x = std::make_shared< XWallInstance >( *( wallPanelModels.xy ), defaultShader->Program, texCache );
             bundler.x->setPosition( glm::vec3( xCounter, yCounter + 0.9f, floorLevel ) );
             bundler.x->setRotationAngle( glm::radians( 180.0f ) );
 
@@ -215,7 +219,7 @@ namespace BlueBear {
           }
 
           if( wallCellPtr->y ) {
-            bundler.y = std::make_shared< WallInstance >( *( wallPanelModels.xy ), defaultShader->Program, texCache );
+            bundler.y = std::make_shared< YWallInstance >( *( wallPanelModels.xy ), defaultShader->Program, texCache );
             bundler.y->setRotationAngle( glm::radians( -90.0f ) );
             bundler.y->setPosition( glm::vec3( xCounter - 0.9f, yCounter, floorLevel ) );
 
@@ -224,7 +228,7 @@ namespace BlueBear {
           }
 
           if( wallCellPtr->d ) {
-            bundler.d = std::make_shared< WallInstance >( *( wallPanelModels.dr ), defaultShader->Program, texCache );
+            bundler.d = std::make_shared< DWallInstance >( *( wallPanelModels.dr ), defaultShader->Program, texCache );
             bundler.d->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
 
             bundler.d->setWallpaper( wallCellPtr->d->front->imagePath, wallCellPtr->d->back->imagePath );
@@ -232,7 +236,7 @@ namespace BlueBear {
           }
 
           if( wallCellPtr->r ) {
-            bundler.r = std::make_shared< WallInstance >( *( wallPanelModels.dr ), defaultShader->Program, texCache );
+            bundler.r = std::make_shared< RWallInstance >( *( wallPanelModels.dr ), defaultShader->Program, texCache );
             bundler.r->setRotationAngle( glm::radians( -90.0f ) );
             bundler.r->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
 
@@ -247,7 +251,10 @@ namespace BlueBear {
       Log::getInstance().info( "Display::loadInfrastructure", "Finished creating infrastructure instances." );
 
       // When we're done loading the infrastructure, switch the state of the engine
-      currentState = std::make_unique< Display::MainGameState >( *this, lot.currentRotation );
+      std::unique_ptr< Display::MainGameState > mainGameStatePtr = std::make_unique< Display::MainGameState >( *this, lot.currentRotation );
+      // TODO: ... call stuff the state is not supposed to know on a general level ...
+      // Avoids crappy downcasting, allows us to move non-display stuff into Display::MainGameState
+      currentState = std::move( mainGameStatePtr );
 
       // Drop a SetLockState command for Engine
       engineCommandList.push_back( std::make_unique< Scripting::Engine::SetLockState >( true ) );

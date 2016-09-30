@@ -64,6 +64,13 @@ namespace BlueBear {
 
       // Apply based on rotation
       // TODO: These only work on the Y-segments. Differentiate.
+      setRotationAttributes( rotation, settings );
+
+      std::shared_ptr< Texture > texture = hostTextureCache.getUsingAtlas( WALLATLAS_PATH, settings );
+      drawables.at( "Wall" ).material = std::make_shared< Material >( texture );
+    }
+
+    void WallInstance::setRotationAttributes( unsigned int rotation, std::map< std::string, std::unique_ptr< ImageSource > >& settings ) {
       switch( rotation ) {
         case 0:
           settings.emplace( std::make_pair( "Side2", std::make_unique< DirectImageSource >( front.leftSegment, "0ry " + front.path ) ) );
@@ -78,9 +85,6 @@ namespace BlueBear {
         default:
           settings.emplace( std::make_pair( "Side1", std::make_unique< DirectImageSource >( front.rightSegment, "3ry " + front.path ) ) );
       }
-
-      std::shared_ptr< Texture > texture = hostTextureCache.getUsingAtlas( WALLATLAS_PATH, settings );
-      drawables.at( "Wall" ).material = std::make_shared< Material >( texture );
     }
 
     std::shared_ptr< sf::Image > WallInstance::getImage( const std::string& path ) {

@@ -35,13 +35,14 @@ namespace BlueBear {
 
       void selectMaterial( unsigned int rotation );
 
-    private:
+    protected:
       TextureCache& hostTextureCache;
       WallpaperSide front;
       WallpaperSide back;
 
       void setWallpaper( const std::string& path, WallpaperSide& side );
       std::shared_ptr< sf::Image > getImage( const std::string& path );
+      virtual void setRotationAttributes( unsigned int rotation, std::map< std::string, std::unique_ptr< ImageSource > >& settings );
     };
 
   }
