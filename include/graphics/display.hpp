@@ -16,8 +16,8 @@
 #include "graphics/texturecache.hpp"
 #include "scripting/wallcell.hpp"
 #include "graphics/imagebuilder/imagesource.hpp"
-// Compiler won't accept an incomplete type for Camera. It accepts EVERY other one.
-// You can be the one to fuckin' tell me why.
+#include "graphics/shader.hpp"
+#include "graphics/model.hpp"
 #include "graphics/camera.hpp"
 
 namespace BlueBear {
@@ -32,9 +32,6 @@ namespace BlueBear {
   namespace Graphics {
     class Instance;
     class WallInstance;
-    class Model;
-    class Shader;
-    //class Camera;
 
     class Display {
     public:
@@ -92,9 +89,9 @@ namespace BlueBear {
             std::shared_ptr< WallInstance > d;
             std::shared_ptr< WallInstance > r;
           };
-          std::unique_ptr< Shader > defaultShader;
-          std::unique_ptr< Camera > camera;
-          std::unique_ptr< Model > floorModel;
+          Shader defaultShader;
+          Camera camera;
+          Model floorModel;
           std::unique_ptr< Containers::Collection3D< std::shared_ptr< Instance > > > floorInstanceCollection;
           std::unique_ptr< Containers::Collection3D< std::shared_ptr< WallCellBundler > > > wallInstanceCollection;
           void processOsd();

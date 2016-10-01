@@ -172,12 +172,11 @@ namespace BlueBear {
     /**
      * Display renderer state for the main game loop
      */
-    Display::MainGameState::MainGameState( Display& instance, Scripting::Lot& lot, TextureCache& texCache ) : Display::State::State( instance ) {
-      // Set up default shader first and foremost
-      defaultShader = std::make_unique< Shader >( "system/shaders/default_vertex.glsl", "system/shaders/default_fragment.glsl" );
-      // Setup camera
-      camera = std::make_unique< Camera >( defaultShader->Program, instance.x, instance.y );
-      camera->setRotationDirect( lot.currentRotation );
+    Display::MainGameState::MainGameState( Display& instance, Scripting::Lot& lot, TextureCache& texCache ) :
+      Display::State::State( instance ),
+      defaultShader( Shader( "system/shaders/default_vertex.glsl", "system/shaders/default_fragment.glsl" ) ),
+      camera( Camera( defaultShader.Program, instance.x, instance.y ) ),
+      floorModel( Model( Display::FLOOR_MODEL_PATH ) ) {
 
       // Load infrastructure models
       // Setup static pointers on each of the wall types
@@ -187,7 +186,9 @@ namespace BlueBear {
       YWallInstance::Piece = xy;
       DWallInstance::Piece = dr;
       RWallInstance::Piece = dr;
-      floorModel = std::make_unique< Model >( Display::FLOOR_MODEL_PATH );
+
+      // Setup camera
+      camera.setRotationDirect( lot.currentRotation );
 
       texts.mode.setFont( instance.fonts.osdFont );
       texts.mode.setCharacterSize( 16 );
@@ -213,9 +214,6 @@ namespace BlueBear {
       loadInfrastructure( lot, texCache );
     }
     Display::MainGameState::~MainGameState() {
-      // Remove camera
-      camera = nullptr;
-
       XWallInstance::Piece.reset();
       YWallInstance::Piece.reset();
 
@@ -254,7 +252,7 @@ namespace BlueBear {
         auto tilePtr = lot.floorMap->getItemDirect( i );
         if( tilePtr ) {
           // Create instance from the model, and change its material using the material cache
-          std::shared_ptr< Instance > instance = std::make_shared< Instance >( *floorModel, defaultShader->Program );
+          std::shared_ptr< Instance > instance = std::make_shared< Instance >( floorModel, defaultShader.Program );
 
           Drawable& floorDrawable = instance->drawables.at( "Plane" );
 
@@ -281,7 +279,7 @@ namespace BlueBear {
           auto& bundler = getWallCellBundler( wallCellBundler );
 
           if( wallCellPtr->x ) {
-            bundler.x = std::make_shared< XWallInstance >( defaultShader->Program, texCache );
+            bundler.x = std::make_shared< XWallInstance >( defaultShader.Program, texCache );
             bundler.x->setPosition( glm::vec3( xCounter, yCounter + 0.9f, floorLevel ) );
             bundler.x->setRotationAngle( glm::radians( 180.0f ) );
 
@@ -290,7 +288,7 @@ namespace BlueBear {
           }
 
           if( wallCellPtr->y ) {
-            bundler.y = std::make_shared< YWallInstance >( defaultShader->Program, texCache );
+            bundler.y = std::make_shared< YWallInstance >( defaultShader.Program, texCache );
             bundler.y->setRotationAngle( glm::radians( -90.0f ) );
             bundler.y->setPosition( glm::vec3( xCounter - 0.9f, yCounter, floorLevel ) );
 
@@ -299,7 +297,7 @@ namespace BlueBear {
           }
 
           if( wallCellPtr->d ) {
-            bundler.d = std::make_shared< DWallInstance >( defaultShader->Program, texCache );
+            bundler.d = std::make_shared< DWallInstance >( defaultShader.Program, texCache );
             bundler.d->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
 
             bundler.d->setWallpaper( wallCellPtr->d->front->imagePath, wallCellPtr->d->back->imagePath );
@@ -307,7 +305,7 @@ namespace BlueBear {
           }
 
           if( wallCellPtr->r ) {
-            bundler.r = std::make_shared< RWallInstance >( defaultShader->Program, texCache );
+            bundler.r = std::make_shared< RWallInstance >( defaultShader.Program, texCache );
             bundler.r->setRotationAngle( glm::radians( -90.0f ) );
             bundler.r->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
 
@@ -333,8 +331,8 @@ namespace BlueBear {
       glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
       // Use default shader and position camera
-      defaultShader->use();
-      camera->position();
+      defaultShader.use();
+      camera.position();
 
       // Draw entities of each type
       // Floor & Walls with nudging
@@ -342,7 +340,7 @@ namespace BlueBear {
       for( auto i = 0; i != length; i++ ) {
         std::shared_ptr< Instance > floorInstance = floorInstanceCollection->getItemDirect( i );
         std::shared_ptr< Display::MainGameState::WallCellBundler > wallCellBundler = wallInstanceCollection->getItemDirect( i );
-        auto rotation = camera->getCurrentRotation();
+        auto rotation = camera.getCurrentRotation();
         float xWallNudge = ( rotation == 1 || rotation == 2 ) ? -0.1f : 0.0f;
         float yWallNudge = ( rotation == 0 || rotation == 1 ) ? 0.1f : 0.0f;
 
@@ -383,15 +381,15 @@ namespace BlueBear {
             auto keyCode = event.key.code;
 
             if( keyCode == KEY_PERSPECTIVE ) {
-              if( camera->ortho ) {
-                camera->setOrthographic( false );
+              if( camera.ortho ) {
+                camera.setOrthographic( false );
                 //instance.mainWindow.setMouseCursorVisible( false );
                 // there is no center yet
                 //sf::Mouse::setPosition( center, instance.mainWindow );
                 // just forget about this for now
                 //instance.mainWindow.setFramerateLimit( 60 );
               } else {
-                camera->setOrthographic( true );
+                camera.setOrthographic( true );
                 //instance.mainWindow.setMouseCursorVisible( true );
                 // just forget about this for now
                 //instance.mainWindow.setFramerateLimit( 30 );
@@ -399,26 +397,26 @@ namespace BlueBear {
             }
 
             if( keyCode == KEY_ROTATE_RIGHT ) {
-              camera->rotateRight();
+              camera.rotateRight();
               remapWallTextures();
             }
 
             if( keyCode == KEY_ROTATE_LEFT ) {
-              camera->rotateLeft();
+              camera.rotateLeft();
               remapWallTextures();
             }
 
             if( keyCode == KEY_UP ) {
-              camera->move( 0.0f, 0.1f, 0.0f );
+              camera.move( 0.0f, 0.1f, 0.0f );
             }
             if( keyCode == KEY_DOWN ) {
-              camera->move( 0.0f, -0.1f, 0.0f );
+              camera.move( 0.0f, -0.1f, 0.0f );
             }
             if( keyCode == KEY_LEFT ) {
-              camera->move( -0.1f, 0.0f, 0.0f );
+              camera.move( -0.1f, 0.0f, 0.0f );
             }
             if( keyCode == KEY_RIGHT ) {
-              camera->move( 0.1f, 0.0f, 0.0f );
+              camera.move( 0.1f, 0.0f, 0.0f );
             }
 
             break;
@@ -432,10 +430,10 @@ namespace BlueBear {
       static std::string FIRST_PERSON( LocaleManager::getInstance().getString( "FIRST_PERSON" ) );
       static std::string ROTATION( LocaleManager::getInstance().getString( "ROTATION" ) );
 
-      texts.mode.setString( camera->ortho ? ISOMETRIC : FIRST_PERSON );
-      texts.coords.setString( camera->positionToString().c_str() );
-      texts.direction.setString( camera->directionToString().c_str() );
-      texts.rotation.setString( ROTATION + ": " + std::to_string( camera->getCurrentRotation() ) );
+      texts.mode.setString( camera.ortho ? ISOMETRIC : FIRST_PERSON );
+      texts.coords.setString( camera.positionToString().c_str() );
+      texts.direction.setString( camera.directionToString().c_str() );
+      texts.rotation.setString( ROTATION + ": " + std::to_string( camera.getCurrentRotation() ) );
 
       instance.mainWindow.draw( texts.mode );
       instance.mainWindow.draw( texts.coords );
@@ -443,7 +441,7 @@ namespace BlueBear {
       instance.mainWindow.draw( texts.rotation );
     }
     void Display::MainGameState::remapWallTextures() {
-      unsigned int currentRotation = camera->getCurrentRotation();
+      unsigned int currentRotation = camera.getCurrentRotation();
       unsigned int mapSize = wallInstanceCollection->getLength();
 
       for( unsigned int i = 0; i != mapSize; i++ ) {
