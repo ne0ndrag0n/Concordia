@@ -41,6 +41,7 @@ namespace BlueBear {
       static const std::string WALLPANEL_MODEL_XY_PATH;
       static const std::string WALLPANEL_MODEL_DR_PATH;
       static const std::string WALLATLAS_PATH;
+      static const std::string FLOOR_MODEL_PATH;
 
       // RAII style
       Display( Threading::CommandBus& commandBus );
@@ -84,12 +85,26 @@ namespace BlueBear {
             std::string ISOMETRIC;
             std::string FIRST_PERSON;
           } strings;
+          // Wrapper class that holds four instances per tile
+          struct WallCellBundler {
+            std::shared_ptr< WallInstance > x;
+            std::shared_ptr< WallInstance > y;
+            std::shared_ptr< WallInstance > d;
+            std::shared_ptr< WallInstance > r;
+          };
+          std::unique_ptr< Shader > defaultShader;
+          std::unique_ptr< Camera > camera;
+          std::unique_ptr< Model > floorModel;
+          std::unique_ptr< Containers::Collection3D< std::shared_ptr< Instance > > > floorInstanceCollection;
+          std::unique_ptr< Containers::Collection3D< std::shared_ptr< WallCellBundler > > > wallInstanceCollection;
           void processOsd();
           void remapWallTextures();
+          void loadInfrastructure( Scripting::Lot& lot, TextureCache& texCache );
+          WallCellBundler& getWallCellBundler( std::shared_ptr< WallCellBundler >& bundlerPtr );
         public:
           void execute();
           void handleEvent( sf::Event& event );
-          MainGameState( Display& instance, unsigned int cameraRotation = 0 );
+          MainGameState( Display& instance, Scripting::Lot& lot, TextureCache& texCache );
           ~MainGameState();
       };
       // ----------------------------
@@ -112,42 +127,14 @@ namespace BlueBear {
           void execute( Display& instance );
       };
 
-      class ChangeStateCommand : public Command {
-        public:
-          enum class State { STATE_IDLE, STATE_TITLESCREEN, STATE_MAINGAME };
-
-          ChangeStateCommand( State selectedState );
-          void execute( Display& instance );
-
-        private:
-          State selectedState;
-      };
-
       using CommandList = std::list< std::unique_ptr< Command > >;
 
       private:
-        static constexpr const char* FLOOR_MODEL_PATH = "system/models/floor/floor.dae";
         using ViewportDimension = int;
-        // Wrapper class that holds four instances per tile
-        struct WallCellBundler {
-          std::shared_ptr< WallInstance > x;
-          std::shared_ptr< WallInstance > y;
-          std::shared_ptr< WallInstance > d;
-          std::shared_ptr< WallInstance > r;
-        };
         ViewportDimension x;
         ViewportDimension y;
-        std::vector< Instance > instances;
         sf::RenderWindow mainWindow;
         Threading::CommandBus& commandBus;
-
-        std::unique_ptr< Containers::Collection3D< std::shared_ptr< Instance > > > floorInstanceCollection;
-        std::unique_ptr< Containers::Collection3D< std::shared_ptr< WallCellBundler > > > wallInstanceCollection;
-
-        std::unique_ptr< Model > floorModel;
-
-        std::unique_ptr< Camera > camera;
-        std::unique_ptr< Shader > defaultShader;
 
         std::unique_ptr< State > currentState;
 
@@ -159,8 +146,6 @@ namespace BlueBear {
         // This should last the life of the Display instance.
         TextureCache texCache;
 
-        // Utility function to get a wall cell bundler reference
-        WallCellBundler& getWallCellBundler( std::shared_ptr< WallCellBundler >& bundlerPtr );
         void main();
     };
 

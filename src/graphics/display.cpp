@@ -43,6 +43,7 @@ namespace BlueBear {
     const std::string Display::WALLPANEL_MODEL_XY_PATH = "system/models/wall/wall.dae";
     const std::string Display::WALLPANEL_MODEL_DR_PATH = "system/models/wall/diagwall.dae";
     const std::string Display::WALLATLAS_PATH = "system/models/wall/wallatlas.json";
+    const std::string Display::FLOOR_MODEL_PATH = "system/models/floor/floor.dae";
 
     Display::Display( Threading::CommandBus& commandBus ) : commandBus( commandBus ) {
       // Get our settings out of the config manager
@@ -85,13 +86,6 @@ namespace BlueBear {
         Log::getInstance().error( "Display::openDisplay", "FATAL: glewInit() did NOT return GLEW_OK! (" + std::string( ( const char* ) glewGetErrorString( glewStatus ) ) + ")" );
         exit( 1 );
       }
-
-      // Open default shaders
-      // FIXME: constexpr in g++ is totally, utterly broken and i do not want to use macro constants
-      // because C-style idioms are banned from this project
-      Log::getInstance().debug( "Display::openDisplay", "Loading the default shader..." );
-      defaultShader = std::make_unique< Shader >( "system/shaders/default_vertex.glsl", "system/shaders/default_fragment.glsl" );
-      Log::getInstance().debug( "Display::openDisplay", "Done" );
 
       // There may be more than just this needed from main.cpp in the area51/sfml_test project
       glViewport( 0, 0, x, y );
@@ -141,17 +135,96 @@ namespace BlueBear {
      */
     void Display::loadInfrastructure( Scripting::Lot& lot ) {
 
-      // Make sure that other shit gets loaded
-      std::unique_ptr< Display::MainGameState > mainGameStatePtr = std::make_unique< Display::MainGameState >( *this, lot.currentRotation );
+      std::unique_ptr< Display::MainGameState > mainGameStatePtr = std::make_unique< Display::MainGameState >( *this, lot, texCache );
 
+      currentState = std::move( mainGameStatePtr );
+
+      // Drop a SetLockState command for Engine
+      engineCommandList.push_back( std::make_unique< Scripting::Engine::SetLockState >( true ) );
+    }
+
+    // ---------- STATES ----------
+
+    Display::State::State( Display& instance ) : instance( instance ) {}
+
+    // Does nothing. This is better than a null pointer check in a tight loop.
+    Display::IdleState::IdleState( Display& instance ) : Display::State::State( instance ) {}
+    void Display::IdleState::handleEvent( sf::Event& event ) {}
+    void Display::IdleState::execute() {
+      glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+      glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+      instance.mainWindow.display();
+    }
+
+    /**
+     * Display renderer state for the titlescreen
+     */
+    Display::TitleState::TitleState( Display& instance ) : Display::State::State( instance ) {}
+    void Display::TitleState::handleEvent( sf::Event& event ) {}
+    void Display::TitleState::execute() {
+      glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+      glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+      instance.mainWindow.display();
+    }
+
+    /**
+     * Display renderer state for the main game loop
+     */
+    Display::MainGameState::MainGameState( Display& instance, Scripting::Lot& lot, TextureCache& texCache ) : Display::State::State( instance ) {
+      // Set up default shader first and foremost
+      defaultShader = std::make_unique< Shader >( "system/shaders/default_vertex.glsl", "system/shaders/default_fragment.glsl" );
+      // Setup camera
+      camera = std::make_unique< Camera >( defaultShader->Program, instance.x, instance.y );
+      camera->setRotationDirect( lot.currentRotation );
+
+      // Load infrastructure models
+      // Setup static pointers on each of the wall types
+      auto xy = std::make_shared< Model >( Display::WALLPANEL_MODEL_XY_PATH );
+      auto dr = std::make_shared< Model >( Display::WALLPANEL_MODEL_DR_PATH );
+      XWallInstance::Piece = xy;
+      YWallInstance::Piece = xy;
+      DWallInstance::Piece = dr;
+      RWallInstance::Piece = dr;
+      floorModel = std::make_unique< Model >( Display::FLOOR_MODEL_PATH );
+
+      texts.mode.setFont( instance.fonts.osdFont );
+      texts.mode.setCharacterSize( 16 );
+      texts.mode.setColor( sf::Color::White );
+      texts.mode.setPosition( 0, 0 );
+
+      texts.coords.setFont( instance.fonts.osdFont );
+      texts.coords.setCharacterSize( 16 );
+      texts.coords.setColor( sf::Color::Red );
+      texts.coords.setPosition( 0, 16 );
+
+      texts.direction.setFont( instance.fonts.osdFont );
+      texts.direction.setCharacterSize( 16 );
+      texts.direction.setColor( sf::Color::Green );
+      texts.direction.setPosition( 0, 32 );
+
+      texts.rotation.setFont( instance.fonts.osdFont );
+      texts.rotation.setCharacterSize( 16 );
+      texts.rotation.setColor( sf::Color::Blue );
+      texts.rotation.setPosition( 0, 48 );
+
+      // Moving much of Display::loadInfrastructure here
+      loadInfrastructure( lot, texCache );
+    }
+    Display::MainGameState::~MainGameState() {
+      // Remove camera
+      camera = nullptr;
+
+      XWallInstance::Piece.reset();
+      YWallInstance::Piece.reset();
+
+      DWallInstance::Piece.reset();
+      RWallInstance::Piece.reset();
+    }
+    void Display::MainGameState::loadInfrastructure( Scripting::Lot& lot, TextureCache& texCache ) {
       floorInstanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< Instance > > >( lot.floorMap->levels, lot.floorMap->dimensionX, lot.floorMap->dimensionY );
-      wallInstanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< WallCellBundler > > >( lot.floorMap->levels, lot.floorMap->dimensionX, lot.floorMap->dimensionY );
-
-      // Lazy-load floorPanel and each wall panel model
-      if( !floorModel ) {
-        // wrapped in std::string - compiler bug causes the constexpr not to be evaluated, and fails in linking
-        floorModel = std::make_unique< Model >( std::string( FLOOR_MODEL_PATH ) );
-      }
+      wallInstanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< Display::MainGameState::WallCellBundler > > >( lot.floorMap->levels, lot.floorMap->dimensionX, lot.floorMap->dimensionY );
 
       WallInstance::imageMap.clear();
 
@@ -201,7 +274,7 @@ namespace BlueBear {
         // Nudging "X" means moving up in the Y dimension by 0.1
         // Nudging "Y" means moving left in the X dimension by 0.1
         auto wallCellPtr = lot.wallMap->getItemDirect( i );
-        std::shared_ptr< WallCellBundler > wallCellBundler;
+        std::shared_ptr< Display::MainGameState::WallCellBundler > wallCellBundler;
         if( wallCellPtr ) {
           // Several different kinds of wall panel models depending on the type, and several kinds of orientations
           // If that pointer exists, at least one of these ifs will be fulfilled
@@ -246,113 +319,30 @@ namespace BlueBear {
         wallInstanceCollection->pushDirect( wallCellBundler );
       }
 
-      Log::getInstance().info( "Display::loadInfrastructure", "Finished creating infrastructure instances." );
-
-      // TODO: ... call stuff the state is not supposed to know on a general level ...
-      // Avoids crappy downcasting, allows us to move non-display stuff into Display::MainGameState
-      currentState = std::move( mainGameStatePtr );
-
-      // Drop a SetLockState command for Engine
-      engineCommandList.push_back( std::make_unique< Scripting::Engine::SetLockState >( true ) );
+      Log::getInstance().info( "Display::MainGameState::loadInfrastructure", "Finished creating infrastructure instances." );
     }
-
-    Display::WallCellBundler& Display::getWallCellBundler( std::shared_ptr< WallCellBundler >& bundlerPtr ) {
+    Display::MainGameState::WallCellBundler& Display::MainGameState::getWallCellBundler( std::shared_ptr< Display::MainGameState::WallCellBundler >& bundlerPtr ) {
       if( !bundlerPtr ) {
-        bundlerPtr = std::make_shared< WallCellBundler >();
+        bundlerPtr = std::make_shared< Display::MainGameState::WallCellBundler >();
       }
 
       return *bundlerPtr;
-    }
-
-    // ---------- STATES ----------
-
-    Display::State::State( Display& instance ) : instance( instance ) {}
-
-    // Does nothing. This is better than a null pointer check in a tight loop.
-    Display::IdleState::IdleState( Display& instance ) : Display::State::State( instance ) {}
-    void Display::IdleState::handleEvent( sf::Event& event ) {}
-    void Display::IdleState::execute() {
-      glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
-      glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-      instance.mainWindow.display();
-    }
-
-    /**
-     * Display renderer state for the titlescreen
-     */
-    Display::TitleState::TitleState( Display& instance ) : Display::State::State( instance ) {}
-    void Display::TitleState::handleEvent( sf::Event& event ) {}
-    void Display::TitleState::execute() {
-      glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
-      glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-      instance.mainWindow.display();
-    }
-
-    /**
-     * Display renderer state for the main game loop
-     */
-    Display::MainGameState::MainGameState( Display& instance, unsigned int cameraRotation ) : Display::State::State( instance ) {
-      // Setup camera
-      instance.camera = std::make_unique< Camera >( instance.defaultShader->Program, instance.x, instance.y );
-      instance.camera->setRotationDirect( cameraRotation );
-
-      // Setup static pointers on each of the wall types
-      auto xy = std::make_shared< Model >( Display::WALLPANEL_MODEL_XY_PATH );
-      auto dr = std::make_shared< Model >( Display::WALLPANEL_MODEL_DR_PATH );
-
-      XWallInstance::Piece = xy;
-      YWallInstance::Piece = xy;
-
-      DWallInstance::Piece = dr;
-      RWallInstance::Piece = dr;
-
-      texts.mode.setFont( instance.fonts.osdFont );
-      texts.mode.setCharacterSize( 16 );
-      texts.mode.setColor( sf::Color::White );
-      texts.mode.setPosition( 0, 0 );
-
-      texts.coords.setFont( instance.fonts.osdFont );
-      texts.coords.setCharacterSize( 16 );
-      texts.coords.setColor( sf::Color::Red );
-      texts.coords.setPosition( 0, 16 );
-
-      texts.direction.setFont( instance.fonts.osdFont );
-      texts.direction.setCharacterSize( 16 );
-      texts.direction.setColor( sf::Color::Green );
-      texts.direction.setPosition( 0, 32 );
-
-      texts.rotation.setFont( instance.fonts.osdFont );
-      texts.rotation.setCharacterSize( 16 );
-      texts.rotation.setColor( sf::Color::Blue );
-      texts.rotation.setPosition( 0, 48 );
-    }
-    Display::MainGameState::~MainGameState() {
-      // Remove camera
-      instance.camera = nullptr;
-
-      XWallInstance::Piece.reset();
-      YWallInstance::Piece.reset();
-
-      DWallInstance::Piece.reset();
-      RWallInstance::Piece.reset();
     }
     void Display::MainGameState::execute() {
       glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
       glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
       // Use default shader and position camera
-      instance.defaultShader->use();
-      instance.camera->position();
+      defaultShader->use();
+      camera->position();
 
       // Draw entities of each type
       // Floor & Walls with nudging
-      auto length = instance.floorInstanceCollection->getLength();
+      auto length = floorInstanceCollection->getLength();
       for( auto i = 0; i != length; i++ ) {
-        std::shared_ptr< Instance > floorInstance = instance.floorInstanceCollection->getItemDirect( i );
-        std::shared_ptr< WallCellBundler > wallCellBundler = instance.wallInstanceCollection->getItemDirect( i );
-        auto rotation = instance.camera->getCurrentRotation();
+        std::shared_ptr< Instance > floorInstance = floorInstanceCollection->getItemDirect( i );
+        std::shared_ptr< Display::MainGameState::WallCellBundler > wallCellBundler = wallInstanceCollection->getItemDirect( i );
+        auto rotation = camera->getCurrentRotation();
         float xWallNudge = ( rotation == 1 || rotation == 2 ) ? -0.1f : 0.0f;
         float yWallNudge = ( rotation == 0 || rotation == 1 ) ? 0.1f : 0.0f;
 
@@ -391,18 +381,17 @@ namespace BlueBear {
           // absolutely disgusting
           {
             auto keyCode = event.key.code;
-            auto& camera = *( instance.camera );
 
             if( keyCode == KEY_PERSPECTIVE ) {
-              if( camera.ortho ) {
-                camera.setOrthographic( false );
+              if( camera->ortho ) {
+                camera->setOrthographic( false );
                 //instance.mainWindow.setMouseCursorVisible( false );
                 // there is no center yet
                 //sf::Mouse::setPosition( center, instance.mainWindow );
                 // just forget about this for now
                 //instance.mainWindow.setFramerateLimit( 60 );
               } else {
-                camera.setOrthographic( true );
+                camera->setOrthographic( true );
                 //instance.mainWindow.setMouseCursorVisible( true );
                 // just forget about this for now
                 //instance.mainWindow.setFramerateLimit( 30 );
@@ -410,26 +399,26 @@ namespace BlueBear {
             }
 
             if( keyCode == KEY_ROTATE_RIGHT ) {
-              camera.rotateRight();
+              camera->rotateRight();
               remapWallTextures();
             }
 
             if( keyCode == KEY_ROTATE_LEFT ) {
-              camera.rotateLeft();
+              camera->rotateLeft();
               remapWallTextures();
             }
 
             if( keyCode == KEY_UP ) {
-              camera.move( 0.0f, 0.1f, 0.0f );
+              camera->move( 0.0f, 0.1f, 0.0f );
             }
             if( keyCode == KEY_DOWN ) {
-              camera.move( 0.0f, -0.1f, 0.0f );
+              camera->move( 0.0f, -0.1f, 0.0f );
             }
             if( keyCode == KEY_LEFT ) {
-              camera.move( -0.1f, 0.0f, 0.0f );
+              camera->move( -0.1f, 0.0f, 0.0f );
             }
             if( keyCode == KEY_RIGHT ) {
-              camera.move( 0.1f, 0.0f, 0.0f );
+              camera->move( 0.1f, 0.0f, 0.0f );
             }
 
             break;
@@ -443,10 +432,10 @@ namespace BlueBear {
       static std::string FIRST_PERSON( LocaleManager::getInstance().getString( "FIRST_PERSON" ) );
       static std::string ROTATION( LocaleManager::getInstance().getString( "ROTATION" ) );
 
-      texts.mode.setString( instance.camera->ortho ? ISOMETRIC : FIRST_PERSON );
-      texts.coords.setString( instance.camera->positionToString().c_str() );
-      texts.direction.setString( instance.camera->directionToString().c_str() );
-      texts.rotation.setString( ROTATION + ": " + std::to_string( instance.camera->getCurrentRotation() ) );
+      texts.mode.setString( camera->ortho ? ISOMETRIC : FIRST_PERSON );
+      texts.coords.setString( camera->positionToString().c_str() );
+      texts.direction.setString( camera->directionToString().c_str() );
+      texts.rotation.setString( ROTATION + ": " + std::to_string( camera->getCurrentRotation() ) );
 
       instance.mainWindow.draw( texts.mode );
       instance.mainWindow.draw( texts.coords );
@@ -454,11 +443,11 @@ namespace BlueBear {
       instance.mainWindow.draw( texts.rotation );
     }
     void Display::MainGameState::remapWallTextures() {
-      unsigned int currentRotation = instance.camera->getCurrentRotation();
-      unsigned int mapSize = instance.wallInstanceCollection->getLength();
+      unsigned int currentRotation = camera->getCurrentRotation();
+      unsigned int mapSize = wallInstanceCollection->getLength();
 
       for( unsigned int i = 0; i != mapSize; i++ ) {
-        auto ptr = instance.wallInstanceCollection->getItemDirect( i );
+        auto ptr = wallInstanceCollection->getItemDirect( i );
         if( ptr ) {
           auto& wallCellBundler = *ptr;
 
@@ -486,21 +475,6 @@ namespace BlueBear {
     Display::SendInfrastructureCommand::SendInfrastructureCommand( Scripting::Lot& lot ) : lot( lot ) {}
     void Display::SendInfrastructureCommand::execute( Graphics::Display& instance ) {
       instance.loadInfrastructure( lot );
-    }
-
-    Display::ChangeStateCommand::ChangeStateCommand( Display::ChangeStateCommand::State selectedState ) : selectedState( selectedState ) {}
-    void Display::ChangeStateCommand::execute( Graphics::Display& instance ) {
-      switch( selectedState ) {
-        case State::STATE_TITLESCREEN:
-          instance.currentState = std::make_unique< Display::TitleState >( instance );
-          break;
-        case State::STATE_MAINGAME:
-          instance.currentState = std::make_unique< Display::MainGameState >( instance );
-          break;
-        case State::STATE_IDLE:
-        default:
-          instance.currentState = std::make_unique< Display::IdleState >( instance );
-      }
     }
   }
 }
