@@ -14,7 +14,9 @@ namespace BlueBear {
 
     class RWallInstance : public WallInstance {
     public:
-      RWallInstance( const Model& model, GLuint shaderProgram, TextureCache& hostTextureCache );
+      static std::shared_ptr< Model > Piece;
+
+      RWallInstance( GLuint shaderProgram, TextureCache& hostTextureCache );
     protected:
       void setRotationAttributes( unsigned int rotation, std::map< std::string, std::unique_ptr< ImageSource > >& settings );
     };

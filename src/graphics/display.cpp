@@ -140,6 +140,10 @@ namespace BlueBear {
      * Given a lot, build floorInstanceCollection and translate the Tiles/Wallpanels to instances on the lot. Additionally, send the rotation status.
      */
     void Display::loadInfrastructure( Scripting::Lot& lot ) {
+
+      // Make sure that other shit gets loaded
+      std::unique_ptr< Display::MainGameState > mainGameStatePtr = std::make_unique< Display::MainGameState >( *this, lot.currentRotation );
+
       floorInstanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< Instance > > >( lot.floorMap->levels, lot.floorMap->dimensionX, lot.floorMap->dimensionY );
       wallInstanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< WallCellBundler > > >( lot.floorMap->levels, lot.floorMap->dimensionX, lot.floorMap->dimensionY );
 
@@ -147,12 +151,6 @@ namespace BlueBear {
       if( !floorModel ) {
         // wrapped in std::string - compiler bug causes the constexpr not to be evaluated, and fails in linking
         floorModel = std::make_unique< Model >( std::string( FLOOR_MODEL_PATH ) );
-      }
-      if( !wallPanelModels.xy ) {
-        wallPanelModels.xy = std::make_unique< Model >( WALLPANEL_MODEL_XY_PATH );
-      }
-      if( !wallPanelModels.dr ) {
-        wallPanelModels.dr = std::make_unique< Model >( WALLPANEL_MODEL_DR_PATH );
       }
 
       WallInstance::imageMap.clear();
@@ -210,7 +208,7 @@ namespace BlueBear {
           auto& bundler = getWallCellBundler( wallCellBundler );
 
           if( wallCellPtr->x ) {
-            bundler.x = std::make_shared< XWallInstance >( *( wallPanelModels.xy ), defaultShader->Program, texCache );
+            bundler.x = std::make_shared< XWallInstance >( defaultShader->Program, texCache );
             bundler.x->setPosition( glm::vec3( xCounter, yCounter + 0.9f, floorLevel ) );
             bundler.x->setRotationAngle( glm::radians( 180.0f ) );
 
@@ -219,7 +217,7 @@ namespace BlueBear {
           }
 
           if( wallCellPtr->y ) {
-            bundler.y = std::make_shared< YWallInstance >( *( wallPanelModels.xy ), defaultShader->Program, texCache );
+            bundler.y = std::make_shared< YWallInstance >( defaultShader->Program, texCache );
             bundler.y->setRotationAngle( glm::radians( -90.0f ) );
             bundler.y->setPosition( glm::vec3( xCounter - 0.9f, yCounter, floorLevel ) );
 
@@ -228,7 +226,7 @@ namespace BlueBear {
           }
 
           if( wallCellPtr->d ) {
-            bundler.d = std::make_shared< DWallInstance >( *( wallPanelModels.dr ), defaultShader->Program, texCache );
+            bundler.d = std::make_shared< DWallInstance >( defaultShader->Program, texCache );
             bundler.d->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
 
             bundler.d->setWallpaper( wallCellPtr->d->front->imagePath, wallCellPtr->d->back->imagePath );
@@ -236,7 +234,7 @@ namespace BlueBear {
           }
 
           if( wallCellPtr->r ) {
-            bundler.r = std::make_shared< RWallInstance >( *( wallPanelModels.dr ), defaultShader->Program, texCache );
+            bundler.r = std::make_shared< RWallInstance >( defaultShader->Program, texCache );
             bundler.r->setRotationAngle( glm::radians( -90.0f ) );
             bundler.r->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
 
@@ -250,8 +248,6 @@ namespace BlueBear {
 
       Log::getInstance().info( "Display::loadInfrastructure", "Finished creating infrastructure instances." );
 
-      // When we're done loading the infrastructure, switch the state of the engine
-      std::unique_ptr< Display::MainGameState > mainGameStatePtr = std::make_unique< Display::MainGameState >( *this, lot.currentRotation );
       // TODO: ... call stuff the state is not supposed to know on a general level ...
       // Avoids crappy downcasting, allows us to move non-display stuff into Display::MainGameState
       currentState = std::move( mainGameStatePtr );
@@ -302,6 +298,16 @@ namespace BlueBear {
       instance.camera = std::make_unique< Camera >( instance.defaultShader->Program, instance.x, instance.y );
       instance.camera->setRotationDirect( cameraRotation );
 
+      // Setup static pointers on each of the wall types
+      auto xy = std::make_shared< Model >( Display::WALLPANEL_MODEL_XY_PATH );
+      auto dr = std::make_shared< Model >( Display::WALLPANEL_MODEL_DR_PATH );
+
+      XWallInstance::Piece = xy;
+      YWallInstance::Piece = xy;
+
+      DWallInstance::Piece = dr;
+      RWallInstance::Piece = dr;
+
       texts.mode.setFont( instance.fonts.osdFont );
       texts.mode.setCharacterSize( 16 );
       texts.mode.setColor( sf::Color::White );
@@ -325,6 +331,12 @@ namespace BlueBear {
     Display::MainGameState::~MainGameState() {
       // Remove camera
       instance.camera = nullptr;
+
+      XWallInstance::Piece.reset();
+      YWallInstance::Piece.reset();
+
+      DWallInstance::Piece.reset();
+      RWallInstance::Piece.reset();
     }
     void Display::MainGameState::execute() {
       glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );

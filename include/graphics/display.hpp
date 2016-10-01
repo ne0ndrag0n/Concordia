@@ -37,11 +37,11 @@ namespace BlueBear {
     //class Camera;
 
     class Display {
+    public:
       static const std::string WALLPANEL_MODEL_XY_PATH;
       static const std::string WALLPANEL_MODEL_DR_PATH;
       static const std::string WALLATLAS_PATH;
 
-    public:
       // RAII style
       Display( Threading::CommandBus& commandBus );
       ~Display();
@@ -145,10 +145,6 @@ namespace BlueBear {
         std::unique_ptr< Containers::Collection3D< std::shared_ptr< WallCellBundler > > > wallInstanceCollection;
 
         std::unique_ptr< Model > floorModel;
-        struct {
-          std::unique_ptr< Model > xy;
-          std::unique_ptr< Model > dr;
-        } wallPanelModels;
 
         std::unique_ptr< Camera > camera;
         std::unique_ptr< Shader > defaultShader;

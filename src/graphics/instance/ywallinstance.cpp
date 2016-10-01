@@ -10,22 +10,25 @@
 namespace BlueBear {
   namespace Graphics {
 
-    YWallInstance::YWallInstance( const Model& model, GLuint shaderProgram, TextureCache& hostTextureCache ) : WallInstance::WallInstance( model, shaderProgram, hostTextureCache ) {}
+    std::shared_ptr< Model > YWallInstance::Piece( nullptr );
+    std::shared_ptr< Model > YWallInstance::EdgePiece( nullptr );
+
+    YWallInstance::YWallInstance( GLuint shaderProgram, TextureCache& hostTextureCache ) : WallInstance::WallInstance( *YWallInstance::Piece, shaderProgram, hostTextureCache ) {}
 
     void YWallInstance::setRotationAttributes( unsigned int rotation, std::map< std::string, std::unique_ptr< ImageSource > >& settings ) {
       switch( rotation ) {
         case 0:
-          settings.emplace( std::make_pair( "Side2", std::make_unique< DirectImageSource >( front.leftSegment, "0ry " + front.path ) ) );
+          settings.emplace( std::make_pair( "Side2", std::make_unique< DirectImageSource >( front.leftSegment, "0ry-s2 " + front.path ) ) );
           break;
         case 1:
-          settings.emplace( std::make_pair( "Side2", std::make_unique< DirectImageSource >( front.rightSegment, "1ry " + front.path ) ) );
+          settings.emplace( std::make_pair( "Side2", std::make_unique< DirectImageSource >( front.rightSegment, "1ry-s2 " + front.path ) ) );
           break;
         case 2:
-          settings.emplace( std::make_pair( "Side1", std::make_unique< DirectImageSource >( front.leftSegment, "2ry " + front.path ) ) );
+          settings.emplace( std::make_pair( "Side1", std::make_unique< DirectImageSource >( front.leftSegment, "2ry-s1 " + front.path ) ) );
           break;
         case 3:
         default:
-          settings.emplace( std::make_pair( "Side1", std::make_unique< DirectImageSource >( front.rightSegment, "3ry " + front.path ) ) );
+          settings.emplace( std::make_pair( "Side1", std::make_unique< DirectImageSource >( front.rightSegment, "3ry-s1 " + front.path ) ) );
       }
     }
 

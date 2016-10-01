@@ -10,7 +10,9 @@
 namespace BlueBear {
   namespace Graphics {
 
-    RWallInstance::RWallInstance( const Model& model, GLuint shaderProgram, TextureCache& hostTextureCache ) : WallInstance::WallInstance( model, shaderProgram, hostTextureCache ) {}
+    std::shared_ptr< Model > RWallInstance::Piece( nullptr );
+
+    RWallInstance::RWallInstance( GLuint shaderProgram, TextureCache& hostTextureCache ) : WallInstance::WallInstance( *RWallInstance::Piece, shaderProgram, hostTextureCache ) {}
 
     void RWallInstance::setRotationAttributes( unsigned int rotation, std::map< std::string, std::unique_ptr< ImageSource > >& settings ) {
 
