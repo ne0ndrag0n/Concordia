@@ -3,15 +3,13 @@
 #include "scripting/wallpaper.hpp"
 #include "log.hpp"
 #include "tools/utility.hpp"
-#include "threading/async.hpp"
-#include <async++.h>
+#include <algorithm>
 #include <jsoncpp/json/json.h>
 #include <string>
 #include <fstream>
 #include <memory>
 #include <exception>
 #include <vector>
-#include <mutex>
 
 namespace BlueBear {
   namespace Scripting {
@@ -50,15 +48,12 @@ namespace BlueBear {
           Json::Value tileDefinition = *jsonIterator;
 
           if( tileDefinition.isMember( "sound" ) && tileDefinition.isMember( "image" ) ) {
-            {
-              std::unique_lock< std::mutex > tileRegistryLock( tileRegistryMutex );
-              tileRegistry[ key ] = std::make_shared< Tile >(
-                key,
-                path + "/" + getVariableOrValue( "sound", tileDefinition[ "sound" ].asString() ),
-                path + "/" + getVariableOrValue( "image", tileDefinition[ "image" ].asString() ),
-                tileDefinition[ "price" ].asDouble()
-              );
-            }
+            tileRegistry[ key ] = std::make_shared< Tile >(
+              key,
+              path + "/" + getVariableOrValue( "sound", tileDefinition[ "sound" ].asString() ),
+              path + "/" + getVariableOrValue( "image", tileDefinition[ "image" ].asString() ),
+              tileDefinition[ "price" ].asDouble()
+            );
 
             Log::getInstance().debug( "InfrastructureFactory::registerFloorTile" , "Registered " + key + " at " + fullPath );
           } else {
@@ -88,8 +83,7 @@ namespace BlueBear {
 
       // Now that all constants are loaded, start traversing the directory and get the user-defined packages
       std::vector< std::string > directories = Tools::Utility::getSubdirectoryList( TILE_ASSETS_PATH );
-      // this is an experiment in parallelism that should probably be removed because of the lock
-      async::parallel_for( Threading::AsyncManager::getInstance().getScheduler(), directories, [ & ]( std::string& directory ) {
+      std::for_each( directories.begin(), directories.end(), [ & ]( std::string& directory ) {
         registerFloorTile( std::string( TILE_ASSETS_PATH ) + directory );
       } );
     }
@@ -117,8 +111,7 @@ namespace BlueBear {
       wallpaperRegistry[ "_grey" ] = std::make_shared< Wallpaper >( "_grey", GREY_SYSTEM_WALLPAPER, 0.0 );
 
       std::vector< std::string > directories = Tools::Utility::getSubdirectoryList( WALL_ASSETS_PATH );
-      // likewise with registerFloorTiles, likely we'll want to remove this because of the lock and how it negates the parallel benefit
-      async::parallel_for( Threading::AsyncManager::getInstance().getScheduler(), directories, [ & ]( std::string& directory ) {
+      std::for_each( directories.begin(), directories.end(), [ & ]( std::string& directory ) {
         registerWallpaper( std::string( WALL_ASSETS_PATH ) + directory );
       } );
     }
@@ -139,14 +132,11 @@ namespace BlueBear {
             Json::Value wallpaperDefinition = *jsonIterator;
 
             if( wallpaperDefinition.isMember( "image" ) ) {
-              {
-                std::unique_lock< std::mutex > wallpaperRegistryLock( wallpaperRegistryMutex );
-                wallpaperRegistry[ key ] = std::make_shared< Wallpaper >(
-                  key,
-                  path + "/" + wallpaperDefinition[ "image" ].asString(),
-                  wallpaperDefinition[ "price" ].asDouble()
-                );
-              }
+              wallpaperRegistry[ key ] = std::make_shared< Wallpaper >(
+                key,
+                path + "/" + wallpaperDefinition[ "image" ].asString(),
+                wallpaperDefinition[ "price" ].asDouble()
+              );
 
               Log::getInstance().debug( "InfrastructureFactory::registerWallpaper" , "Registered " + key + " at " + fullPath );
             } else {
