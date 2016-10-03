@@ -15,10 +15,10 @@
 			]
 		},
 		"wall": {
-			"dict": [ "star_test" ],
+			"dict": [ "star_test", "_grey" ],
 			"levels": [
 				[
-					{ "y": { "f": 0, "b": 0 } },
+					{ "y": { "f": 0, "b": 1 } },
 					{ "run": 48, "value": -1 }
 				]
 			]

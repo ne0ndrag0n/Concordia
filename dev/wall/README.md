@@ -10,9 +10,9 @@ Concordia places wall panels and textures them according to your current rotatio
 ### Rotation 0
 
 #### Texture Adjustments
-|Atlas Entry | Wallpaper Side|
-|------------|---------------|
-|Side2       | Left          |
+|Atlas Entry | Wallpaper Side| Face   |
+|------------|---------------|---------
+|Side2       | Left          | Front
 
 <p align="center">
   <img src="http://i.imgur.com/sx0Ezzx.png">
@@ -21,9 +21,9 @@ Concordia places wall panels and textures them according to your current rotatio
 ### Rotation 1
 
 #### Texture Adjustments
-|Atlas Entry | Wallpaper Side|
-|------------|---------------|
-|Side2       | Right         |
+|Atlas Entry | Wallpaper Side| Face   |
+|------------|---------------|---------
+|Side2       | Right         | Rear
 
 <p align="center">
   <img src="http://i.imgur.com/ZDdeeG1.png">
@@ -33,9 +33,9 @@ Concordia places wall panels and textures them according to your current rotatio
 ### Rotation 2
 
 #### Texture Adjustments
-|Atlas Entry | Wallpaper Side|
-|------------|---------------|
-|Side1       | Left          |
+|Atlas Entry | Wallpaper Side| Face   |
+|------------|---------------|---------
+|Side1       | Left          | Rear
 
 <p align="center">
   <img src="http://i.imgur.com/xqZLgIk.png">
@@ -44,9 +44,9 @@ Concordia places wall panels and textures them according to your current rotatio
 ### Rotation 3
 
 #### Texture Adjustments
-|Atlas Entry | Wallpaper Side|
-|------------|---------------|
-|Side1       | Right         |
+|Atlas Entry | Wallpaper Side| Face   |
+|------------|---------------|---------
+|Side1       | Right         | Front
 
 <p align="center">
   <img src="http://i.imgur.com/Q1q9l5Q.png">
@@ -57,9 +57,9 @@ Concordia places wall panels and textures them according to your current rotatio
 ### Rotation 0
 
 #### Texture Adjustments
-|Atlas Entry | Wallpaper Side|
-|------------|---------------|
-|Side2       | Right         |
+|Atlas Entry | Wallpaper Side| Face   |
+|------------|---------------|---------
+|Side2       | Right         | Rear
 
 <p align="center">
   <img src="http://i.imgur.com/3imZS1E.png">
@@ -68,9 +68,9 @@ Concordia places wall panels and textures them according to your current rotatio
 ### Rotation 1
 
 #### Texture Adjustments
-|Atlas Entry | Wallpaper Side|
-|------------|---------------|
-|Side1       | Left          |
+|Atlas Entry | Wallpaper Side| Face   |
+|------------|---------------|---------
+|Side1       | Left          | Rear
 
 <p align="center">
   <img src="http://i.imgur.com/SglWuyf.png">
@@ -80,9 +80,9 @@ Concordia places wall panels and textures them according to your current rotatio
 ### Rotation 2
 
 #### Texture Adjustments
-|Atlas Entry | Wallpaper Side|
-|------------|---------------|
-|Side1       | Right         |
+|Atlas Entry | Wallpaper Side| Face   |
+|------------|---------------|---------
+|Side1       | Right         | Front
 
 <p align="center">
   <img src="http://i.imgur.com/4ZplrKS.png">
@@ -91,9 +91,9 @@ Concordia places wall panels and textures them according to your current rotatio
 ### Rotation 3
 
 #### Texture Adjustments
-|Atlas Entry | Wallpaper Side|
-|------------|---------------|
-|Side2       | Left          |
+|Atlas Entry | Wallpaper Side| Face   |
+|------------|---------------|---------
+|Side2       | Left          | Front
 
 <p align="center">
   <img src="http://i.imgur.com/mivWbIL.png">
