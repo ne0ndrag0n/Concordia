@@ -44,13 +44,13 @@ namespace BlueBear {
       // Slice images into their left and right segments
       const auto originalSize = side.image->getSize();
 
-      side.leftSegment = sf::Image();
-      side.leftSegment.create( 44, 1020 );
-      side.leftSegment.copy( *side.image, 0, 0, { 0, 0, 44, 1020 } );
+      side.leftSegment = std::make_shared< sf::Image >();
+      side.leftSegment->create( 44, 1020 );
+      side.leftSegment->copy( *side.image, 0, 0, { 0, 0, 44, 1020 } );
 
-      side.rightSegment = sf::Image();
-      side.rightSegment.create( 44, 1020 );
-      side.rightSegment.copy( *side.image, 0, 0, { (int)originalSize.x - 45, 0, 44, 1020 } );
+      side.rightSegment = std::make_shared< sf::Image >();
+      side.rightSegment->create( 44, 1020 );
+      side.rightSegment->copy( *side.image, 0, 0, { (int)originalSize.x - 45, 0, 44, 1020 } );
     }
 
     /**
@@ -68,23 +68,6 @@ namespace BlueBear {
 
       std::shared_ptr< Texture > texture = hostTextureCache.getUsingAtlas( WALLATLAS_PATH, settings );
       drawables.at( "Wall" ).material = std::make_shared< Material >( texture );
-    }
-
-    void WallInstance::setRotationAttributes( unsigned int rotation, std::map< std::string, std::unique_ptr< ImageSource > >& settings ) {
-      switch( rotation ) {
-        case 0:
-          settings.emplace( std::make_pair( "Side2", std::make_unique< DirectImageSource >( front.leftSegment, "0ry " + front.path ) ) );
-          break;
-        case 1:
-          settings.emplace( std::make_pair( "Side2", std::make_unique< DirectImageSource >( front.rightSegment, "1ry " + front.path ) ) );
-          break;
-        case 2:
-          settings.emplace( std::make_pair( "Side1", std::make_unique< DirectImageSource >( front.leftSegment, "2ry " + front.path ) ) );
-          break;
-        case 3:
-        default:
-          settings.emplace( std::make_pair( "Side1", std::make_unique< DirectImageSource >( front.rightSegment, "3ry " + front.path ) ) );
-      }
     }
 
     std::shared_ptr< sf::Image > WallInstance::getImage( const std::string& path ) {

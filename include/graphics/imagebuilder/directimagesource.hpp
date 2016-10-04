@@ -10,6 +10,7 @@ namespace BlueBear {
 
     /**
      * The object referred to by imageReference must STAY VALID!!
+     * TODO: We change this to std::shared_ptr. This reference is too unsafe.
      */
     class DirectImageSource : public ImageSource {
       sf::Image& imageReference;

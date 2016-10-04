@@ -22,8 +22,8 @@ namespace BlueBear {
 
       struct WallpaperSide {
         std::shared_ptr< sf::Image > image;
-        sf::Image leftSegment;
-        sf::Image rightSegment;
+        std::shared_ptr< sf::Image > leftSegment;
+        std::shared_ptr< sf::Image > rightSegment;
         std::string path;
       };
 
@@ -42,7 +42,7 @@ namespace BlueBear {
 
       void setWallpaper( const std::string& path, WallpaperSide& side );
       std::shared_ptr< sf::Image > getImage( const std::string& path );
-      virtual void setRotationAttributes( unsigned int rotation, std::map< std::string, std::unique_ptr< ImageSource > >& settings );
+      virtual void setRotationAttributes( unsigned int rotation, std::map< std::string, std::unique_ptr< ImageSource > >& settings ) = 0;
     };
 
   }

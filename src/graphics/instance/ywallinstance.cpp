@@ -18,17 +18,17 @@ namespace BlueBear {
     void YWallInstance::setRotationAttributes( unsigned int rotation, std::map< std::string, std::unique_ptr< ImageSource > >& settings ) {
       switch( rotation ) {
         case 0:
-          settings.emplace( std::make_pair( "Side2", std::make_unique< DirectImageSource >( front.leftSegment, "0ys2 " + front.path ) ) );
+          settings.emplace( std::make_pair( "Side2", std::make_unique< DirectImageSource >( *front.leftSegment, "0ys2 " + front.path ) ) );
           break;
         case 1:
-          settings.emplace( std::make_pair( "Side2", std::make_unique< DirectImageSource >( back.rightSegment, "1ys2 " + back.path ) ) );
+          settings.emplace( std::make_pair( "Side2", std::make_unique< DirectImageSource >( *back.rightSegment, "1ys2 " + back.path ) ) );
           break;
         case 2:
-          settings.emplace( std::make_pair( "Side1", std::make_unique< DirectImageSource >( back.leftSegment, "2ys1 " + back.path ) ) );
+          settings.emplace( std::make_pair( "Side1", std::make_unique< DirectImageSource >( *back.leftSegment, "2ys1 " + back.path ) ) );
           break;
         case 3:
         default:
-          settings.emplace( std::make_pair( "Side1", std::make_unique< DirectImageSource >( front.rightSegment, "3ys1 " + front.path ) ) );
+          settings.emplace( std::make_pair( "Side1", std::make_unique< DirectImageSource >( *front.rightSegment, "3ys1 " + front.path ) ) );
       }
     }
 
