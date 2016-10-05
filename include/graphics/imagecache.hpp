@@ -15,6 +15,7 @@ namespace BlueBear {
 
     public:
       std::shared_ptr< sf::Image > getImage( std::shared_ptr< ImageSource > source );
+      void prune();
     };
 
   }

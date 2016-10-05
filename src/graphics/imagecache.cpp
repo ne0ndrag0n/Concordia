@@ -9,7 +9,26 @@ namespace BlueBear {
   namespace Graphics {
 
     std::shared_ptr< sf::Image > ImageCache::getImage( std::shared_ptr< ImageSource > source ) {
+      std::string key = source->getKey();
 
+      auto kvPair = imageCache.find( key );
+      if( kvPair != imageCache.end() ) {
+        return kvPair->second;
+      }
+
+      return imageCache[ key ] = std::make_shared< sf::Image >( source->getImage() );
+    }
+
+    void ImageCache::prune() {
+      auto iterator = std::begin( imageCache );
+
+      while( iterator != std::end( imageCache ) ) {
+        if( iterator->second.unique() ) {
+          iterator = imageCache.erase( iterator );
+        } else {
+          iterator++;
+        }
+      }
     }
 
   }
