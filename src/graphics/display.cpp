@@ -135,7 +135,7 @@ namespace BlueBear {
      */
     void Display::loadInfrastructure( Scripting::Lot& lot ) {
 
-      std::unique_ptr< Display::MainGameState > mainGameStatePtr = std::make_unique< Display::MainGameState >( *this, lot, texCache );
+      std::unique_ptr< Display::MainGameState > mainGameStatePtr = std::make_unique< Display::MainGameState >( *this, lot );
 
       currentState = std::move( mainGameStatePtr );
 
@@ -172,7 +172,7 @@ namespace BlueBear {
     /**
      * Display renderer state for the main game loop
      */
-    Display::MainGameState::MainGameState( Display& instance, Scripting::Lot& lot, TextureCache& texCache ) :
+    Display::MainGameState::MainGameState( Display& instance, Scripting::Lot& lot ) :
       Display::State::State( instance ),
       defaultShader( Shader( "system/shaders/default_vertex.glsl", "system/shaders/default_fragment.glsl" ) ),
       camera( Camera( defaultShader.Program, instance.x, instance.y ) ),
@@ -211,7 +211,7 @@ namespace BlueBear {
       texts.rotation.setPosition( 0, 48 );
 
       // Moving much of Display::loadInfrastructure here
-      loadInfrastructure( lot, texCache );
+      loadInfrastructure( lot );
     }
     Display::MainGameState::~MainGameState() {
       XWallInstance::Piece.reset();
@@ -220,7 +220,7 @@ namespace BlueBear {
       DWallInstance::Piece.reset();
       RWallInstance::Piece.reset();
     }
-    void Display::MainGameState::loadInfrastructure( Scripting::Lot& lot, TextureCache& texCache ) {
+    void Display::MainGameState::loadInfrastructure( Scripting::Lot& lot ) {
       floorInstanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< Instance > > >( lot.floorMap->levels, lot.floorMap->dimensionX, lot.floorMap->dimensionY );
       wallInstanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< Display::MainGameState::WallCellBundler > > >( lot.floorMap->levels, lot.floorMap->dimensionX, lot.floorMap->dimensionY );
 
@@ -279,7 +279,7 @@ namespace BlueBear {
           auto& bundler = getWallCellBundler( wallCellBundler );
 
           if( wallCellPtr->x ) {
-            bundler.x = std::make_shared< XWallInstance >( defaultShader.Program, texCache );
+            bundler.x = std::make_shared< XWallInstance >( defaultShader.Program, texCache, imageCache );
             bundler.x->setPosition( glm::vec3( xCounter, yCounter + 0.9f, floorLevel ) );
             bundler.x->setRotationAngle( glm::radians( 180.0f ) );
 
@@ -288,7 +288,7 @@ namespace BlueBear {
           }
 
           if( wallCellPtr->y ) {
-            bundler.y = std::make_shared< YWallInstance >( defaultShader.Program, texCache );
+            bundler.y = std::make_shared< YWallInstance >( defaultShader.Program, texCache, imageCache );
             bundler.y->setRotationAngle( glm::radians( -90.0f ) );
             bundler.y->setPosition( glm::vec3( xCounter - 0.9f, yCounter, floorLevel ) );
 
@@ -297,7 +297,7 @@ namespace BlueBear {
           }
 
           if( wallCellPtr->d ) {
-            bundler.d = std::make_shared< DWallInstance >( defaultShader.Program, texCache );
+            bundler.d = std::make_shared< DWallInstance >( defaultShader.Program, texCache, imageCache );
             bundler.d->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
 
             bundler.d->setWallpaper( wallCellPtr->d->front->imagePath, wallCellPtr->d->back->imagePath );
@@ -305,7 +305,7 @@ namespace BlueBear {
           }
 
           if( wallCellPtr->r ) {
-            bundler.r = std::make_shared< RWallInstance >( defaultShader.Program, texCache );
+            bundler.r = std::make_shared< RWallInstance >( defaultShader.Program, texCache, imageCache );
             bundler.r->setRotationAngle( glm::radians( -90.0f ) );
             bundler.r->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
 

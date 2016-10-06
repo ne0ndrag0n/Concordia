@@ -3,6 +3,8 @@
 #include "graphics/model.hpp"
 #include "graphics/imagebuilder/imagesource.hpp"
 #include "graphics/imagebuilder/directimagesource.hpp"
+#include "graphics/texturecache.hpp"
+#include "graphics/imagecache.hpp"
 #include <memory>
 #include <map>
 #include <string>
@@ -12,7 +14,7 @@ namespace BlueBear {
 
     std::shared_ptr< Model > RWallInstance::Piece( nullptr );
 
-    RWallInstance::RWallInstance( GLuint shaderProgram, TextureCache& hostTextureCache ) : WallInstance::WallInstance( *RWallInstance::Piece, shaderProgram, hostTextureCache ) {}
+    RWallInstance::RWallInstance( GLuint shaderProgram, TextureCache& hostTextureCache, ImageCache& hostImageCache ) : WallInstance::WallInstance( *RWallInstance::Piece, shaderProgram, hostTextureCache, hostImageCache ) {}
 
     void RWallInstance::setRotationAttributes( unsigned int rotation, std::map< std::string, std::unique_ptr< ImageSource > >& settings ) {
 

@@ -14,7 +14,8 @@ namespace BlueBear {
       std::map< std::string, std::shared_ptr< sf::Image > > imageCache;
 
     public:
-      std::shared_ptr< sf::Image > getImage( std::shared_ptr< ImageSource > source );
+      // References are polymorphic so we are migrating to this across the board (get rid of that damn shared_ptr habit ffs).
+      std::shared_ptr< sf::Image > getImage( ImageSource& source );
       void prune();
     };
 

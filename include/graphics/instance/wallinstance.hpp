@@ -3,6 +3,7 @@
 
 #include "graphics/instance/instance.hpp"
 #include "graphics/texturecache.hpp"
+#include "graphics/imagecache.hpp"
 #include <SFML/Graphics.hpp>
 #include <string>
 #include <memory>
@@ -27,7 +28,7 @@ namespace BlueBear {
         std::string path;
       };
 
-      WallInstance( const Model& model, GLuint shaderProgram, TextureCache& hostTextureCache );
+      WallInstance( const Model& model, GLuint shaderProgram, TextureCache& hostTextureCache, ImageCache& hostImageCache );
       void setFrontWallpaper( const std::string& path );
       void setBackWallpaper( const std::string& path );
 
@@ -37,6 +38,7 @@ namespace BlueBear {
 
     protected:
       TextureCache& hostTextureCache;
+      ImageCache& hostImageCache;
       WallpaperSide front;
       WallpaperSide back;
 

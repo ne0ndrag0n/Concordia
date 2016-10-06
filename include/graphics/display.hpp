@@ -14,6 +14,7 @@
 #include <string>
 #include <map>
 #include "graphics/texturecache.hpp"
+#include "graphics/imagecache.hpp"
 #include "scripting/wallcell.hpp"
 #include "graphics/imagebuilder/imagesource.hpp"
 #include "graphics/shader.hpp"
@@ -92,16 +93,18 @@ namespace BlueBear {
           Shader defaultShader;
           Camera camera;
           Model floorModel;
+          TextureCache texCache;
+          ImageCache imageCache;
           std::unique_ptr< Containers::Collection3D< std::shared_ptr< Instance > > > floorInstanceCollection;
           std::unique_ptr< Containers::Collection3D< std::shared_ptr< WallCellBundler > > > wallInstanceCollection;
           void processOsd();
           void remapWallTextures();
-          void loadInfrastructure( Scripting::Lot& lot, TextureCache& texCache );
+          void loadInfrastructure( Scripting::Lot& lot );
           WallCellBundler& getWallCellBundler( std::shared_ptr< WallCellBundler >& bundlerPtr );
         public:
           void execute();
           void handleEvent( sf::Event& event );
-          MainGameState( Display& instance, Scripting::Lot& lot, TextureCache& texCache );
+          MainGameState( Display& instance, Scripting::Lot& lot );
           ~MainGameState();
       };
       // ----------------------------
@@ -139,9 +142,6 @@ namespace BlueBear {
           sf::Font osdFont;
           sf::Font uiFont;
         } fonts;
-
-        // This should last the life of the Display instance.
-        TextureCache texCache;
 
         void main();
     };

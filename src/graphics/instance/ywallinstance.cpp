@@ -3,6 +3,8 @@
 #include "graphics/model.hpp"
 #include "graphics/imagebuilder/imagesource.hpp"
 #include "graphics/imagebuilder/directimagesource.hpp"
+#include "graphics/texturecache.hpp"
+#include "graphics/imagecache.hpp"
 #include <memory>
 #include <map>
 #include <string>
@@ -13,7 +15,7 @@ namespace BlueBear {
     std::shared_ptr< Model > YWallInstance::Piece( nullptr );
     std::shared_ptr< Model > YWallInstance::EdgePiece( nullptr );
 
-    YWallInstance::YWallInstance( GLuint shaderProgram, TextureCache& hostTextureCache ) : WallInstance::WallInstance( *YWallInstance::Piece, shaderProgram, hostTextureCache ) {}
+    YWallInstance::YWallInstance( GLuint shaderProgram, TextureCache& hostTextureCache, ImageCache& hostImageCache ) : WallInstance::WallInstance( *YWallInstance::Piece, shaderProgram, hostTextureCache, hostImageCache ) {}
 
     void YWallInstance::setRotationAttributes( unsigned int rotation, std::map< std::string, std::unique_ptr< ImageSource > >& settings ) {
       switch( rotation ) {

@@ -3,6 +3,7 @@
 #include "graphics/imagebuilder/imagesource.hpp"
 #include "graphics/imagebuilder/directimagesource.hpp"
 #include "graphics/texturecache.hpp"
+#include "graphics/imagecache.hpp"
 #include "graphics/model.hpp"
 #include "graphics/texture.hpp"
 #include "graphics/material.hpp"
@@ -19,8 +20,10 @@ namespace BlueBear {
     const std::string WallInstance::WALLATLAS_PATH = "system/models/wall/wallatlas.json";
     WallInstance::ImageMap WallInstance::imageMap;
 
-    WallInstance::WallInstance( const Model& model, GLuint shaderProgram, TextureCache& hostTextureCache ) :
-      Instance::Instance( model, shaderProgram ), hostTextureCache( hostTextureCache ) {}
+    WallInstance::WallInstance( const Model& model, GLuint shaderProgram, TextureCache& hostTextureCache, ImageCache& hostImageCache ) :
+      Instance::Instance( model, shaderProgram ),
+      hostTextureCache( hostTextureCache ),
+      hostImageCache( hostImageCache ) {}
 
 
     void WallInstance::setFrontWallpaper( const std::string& path ) {
