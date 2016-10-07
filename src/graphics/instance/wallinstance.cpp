@@ -49,22 +49,11 @@ namespace BlueBear {
       // Slice images into their left and right segments
       const auto originalSize = side.image->getSize();
 
-      // Some problems with the original design of CroppedDirectImageSource prevents this from cropping the way we need it here
-      /*
       CroppedDirectImageSource left( *side.image, 0, 0, 44, 1020, path );
-      CroppedDirectImageSource right( *side.image, 0, 0, originalSize.x - 45, 1020, path );
+      CroppedDirectImageSource right( *side.image, originalSize.x - 45, 0, 44, 1020, path );
 
       side.leftSegment = hostImageCache.getImage( left );
       side.rightSegment = hostImageCache.getImage( right );
-      */
-
-      side.leftSegment = std::make_shared< sf::Image >();
-      side.leftSegment->create( 44, 1020 );
-      side.leftSegment->copy( *side.image, 0, 0, { 0, 0, 44, 1020 } );
-
-      side.rightSegment = std::make_shared< sf::Image >();
-      side.rightSegment->create( 44, 1020 );
-      side.rightSegment->copy( *side.image, 0, 0, { (int)originalSize.x - 45, 0, 44, 1020 } );
     }
 
     /**
