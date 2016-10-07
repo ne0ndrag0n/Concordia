@@ -1,11 +1,11 @@
-Project BlueBear
-================
+Concordia
+=========
 
 Version 0.0.3 - Milestone "Picasso"
 
 # Introduction
 
-**Project BlueBear** is a virtual dollhouse for PC and Linux. Construct your dream house, place your dolls within, and watch your family grow to success!
+**Concordia** is a virtual dollhouse for PC and Linux. Construct your dream house, place your dolls within, and watch your family grow to success!
 
 ## Features
 
@@ -13,7 +13,7 @@ Version 0.0.3 - Milestone "Picasso"
 * Scenarios for your household: start off healthy, wealthy and privileged...or disabled, poor, and minority. Your life experience is dictated by the family you create and the traits you select in each individual doll!
 * Select any one of your dolls and accompany them to work: guide your household to success within any one of seven career paths!
 * Tend to their physical well-being by fulfilling five motive groups, and their emotional well-being in one of four personal aspirations. They can't do it alone!
-* Extend the game and its features with the **BlueBear Construction Kit**: create new scenarios, needs & wants, dolls, traits, objects, and so much more!
+* Extend the game and its features with the **Concordia Construction Kit**: create new scenarios, needs & wants, dolls, traits, objects, and so much more!
 
 ## Technical Highlights
 
