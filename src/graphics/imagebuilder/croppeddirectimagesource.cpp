@@ -5,7 +5,7 @@
 
 namespace BlueBear {
   namespace Graphics {
-    CroppedDirectImageSource::CroppedDirectImageSource( sf::Image& image, unsigned int x, unsigned int y, unsigned int w, unsigned int h, const std::string& key ) :
+    CroppedDirectImageSource::CroppedDirectImageSource( sf::Image& image, int x, int y, int w, int h, const std::string& key ) :
       DirectImageSource::DirectImageSource( image, key ), x( x ), y( y ), w( w ), h( h ) {}
 
     sf::Image CroppedDirectImageSource::getImage() {
@@ -13,7 +13,7 @@ namespace BlueBear {
       sf::Image result;
 
       result.create( w, h );
-      result.copy( parentResult, 0, 0, { (int) x, (int) y, (int) w, (int) h } );
+      result.copy( parentResult, 0, 0, { x, y, w, h } );
 
       return result;
     }

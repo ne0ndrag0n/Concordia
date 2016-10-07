@@ -2,6 +2,8 @@
 #include "graphics/instance/instance.hpp"
 #include "graphics/imagebuilder/imagesource.hpp"
 #include "graphics/imagebuilder/directimagesource.hpp"
+#include "graphics/imagebuilder/croppeddirectimagesource.hpp"
+#include "graphics/imagebuilder/pathimagesource.hpp"
 #include "graphics/texturecache.hpp"
 #include "graphics/imagecache.hpp"
 #include "graphics/model.hpp"
@@ -18,7 +20,6 @@ namespace BlueBear {
   namespace Graphics {
 
     const std::string WallInstance::WALLATLAS_PATH = "system/models/wall/wallatlas.json";
-    WallInstance::ImageMap WallInstance::imageMap;
 
     WallInstance::WallInstance( const Model& model, GLuint shaderProgram, TextureCache& hostTextureCache, ImageCache& hostImageCache ) :
       Instance::Instance( model, shaderProgram ),
@@ -42,10 +43,20 @@ namespace BlueBear {
     void WallInstance::setWallpaper( const std::string& path, WallpaperSide& side ) {
       side.path = path;
 
-      side.image = getImage( path );
+      PathImageSource pis( path );
+      side.image = hostImageCache.getImage( pis );
 
       // Slice images into their left and right segments
       const auto originalSize = side.image->getSize();
+
+      // Some problems with the original design of CroppedDirectImageSource prevents this from cropping the way we need it here
+      /*
+      CroppedDirectImageSource left( *side.image, 0, 0, 44, 1020, path );
+      CroppedDirectImageSource right( *side.image, 0, 0, originalSize.x - 45, 1020, path );
+
+      side.leftSegment = hostImageCache.getImage( left );
+      side.rightSegment = hostImageCache.getImage( right );
+      */
 
       side.leftSegment = std::make_shared< sf::Image >();
       side.leftSegment->create( 44, 1020 );
@@ -71,22 +82,6 @@ namespace BlueBear {
 
       std::shared_ptr< Texture > texture = hostTextureCache.getUsingAtlas( WALLATLAS_PATH, settings );
       drawables.at( "Wall" ).material = std::make_shared< Material >( texture );
-    }
-
-    std::shared_ptr< sf::Image > WallInstance::getImage( const std::string& path ) {
-      auto pair = imageMap.find( path );
-
-      if( pair == imageMap.end() ) {
-        // Create and return
-        auto image = std::make_shared< sf::Image >();
-        if( !image->loadFromFile( path ) ) {
-          throw Exceptions::CannotLoadFileException();
-        }
-
-        return imageMap[ path ] = image;
-      } else {
-        return pair->second;
-      }
     }
 
   }

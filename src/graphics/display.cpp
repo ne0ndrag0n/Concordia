@@ -224,8 +224,6 @@ namespace BlueBear {
       floorInstanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< Instance > > >( lot.floorMap->levels, lot.floorMap->dimensionX, lot.floorMap->dimensionY );
       wallInstanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< Display::MainGameState::WallCellBundler > > >( lot.floorMap->levels, lot.floorMap->dimensionX, lot.floorMap->dimensionY );
 
-      WallInstance::imageMap.clear();
-
       // Transform each Tile instance to an entity
       auto size = lot.floorMap->getLength();
 

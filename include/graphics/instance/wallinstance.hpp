@@ -17,10 +17,6 @@ namespace BlueBear {
       static const std::string WALLATLAS_PATH;
 
     public:
-      using ImageMap = std::unordered_map< std::string, std::shared_ptr< sf::Image > >;
-
-      static ImageMap imageMap;
-
       struct WallpaperSide {
         std::shared_ptr< sf::Image > image;
         std::shared_ptr< sf::Image > leftSegment;
@@ -43,7 +39,6 @@ namespace BlueBear {
       WallpaperSide back;
 
       void setWallpaper( const std::string& path, WallpaperSide& side );
-      std::shared_ptr< sf::Image > getImage( const std::string& path );
       virtual void setRotationAttributes( unsigned int rotation, std::map< std::string, std::unique_ptr< ImageSource > >& settings ) = 0;
     };
 
