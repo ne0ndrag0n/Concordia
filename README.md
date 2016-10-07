@@ -1,11 +1,13 @@
 Concordia
 =========
 
-Version 0.0.3 - Milestone "Picasso"
+<img src="http://i.imgur.com/3xK1zDE.png">
+
+## Version 0.0.3 - Milestone "Picasso"
 
 # Introduction
 
-**Concordia** is a virtual dollhouse for PC and Linux. Construct your dream house, place your dolls within, and watch your family grow to success!
+**Concordia** is a social simulation for PC and Linux. Construct your dream house, place your dolls within, and guide your household to success as its members navigate the exciting world of Concordia!
 
 ## Features
 
