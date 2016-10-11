@@ -1,0 +1,33 @@
+{
+  "base": {
+    "width": 56,
+    "height": 70,
+    "image": "wall.png"
+  },
+  "mappings": {
+    "FrontWall": {
+      "x": 3,
+      "y": 3,
+      "width": 16,
+      "height": 64
+    },
+    "BackWall": {
+      "x": 22,
+      "y": 3,
+      "width": 16,
+      "height": 64
+    },
+    "Side1": {
+      "x": 41,
+      "y": 3,
+      "width": 2,
+      "height": 64
+    },
+    "Side2": {
+      "x": 46,
+      "y": 3,
+      "width": 2,
+      "height": 64
+    }
+  }
+}
