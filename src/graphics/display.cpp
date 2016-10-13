@@ -41,8 +41,10 @@ namespace BlueBear {
   namespace Graphics {
 
     const std::string Display::WALLPANEL_MODEL_XY_PATH = "system/models/wall/wall.dae";
+    const std::string Display::WALLPANEL_MODEL_XY_EDGE_PATH = "system/models/wall/wall_large.dae";
     const std::string Display::WALLPANEL_MODEL_DR_PATH = "system/models/wall/diagwall.dae";
     const std::string Display::WALLATLAS_PATH = "system/models/wall/wallatlas.json";
+    const std::string Display::WALLATLAS_EDGE_PATH = "system/models/wall/wallatlaslarge.json";
     const std::string Display::FLOOR_MODEL_PATH = "system/models/floor/floor.dae";
 
     Display::Display( Threading::CommandBus& commandBus ) : commandBus( commandBus ) {
@@ -181,9 +183,12 @@ namespace BlueBear {
       // Load infrastructure models
       // Setup static pointers on each of the wall types
       auto xy = std::make_shared< Model >( Display::WALLPANEL_MODEL_XY_PATH );
+      auto xy_edge = std::make_shared< Model >( Display::WALLPANEL_MODEL_XY_EDGE_PATH );
       auto dr = std::make_shared< Model >( Display::WALLPANEL_MODEL_DR_PATH );
       XWallInstance::Piece = xy;
+      XWallInstance::EdgePiece = xy_edge;
       YWallInstance::Piece = xy;
+      YWallInstance::EdgePiece = xy_edge;
       DWallInstance::Piece = dr;
       RWallInstance::Piece = dr;
 
