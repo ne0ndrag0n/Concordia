@@ -8,6 +8,7 @@
 #include <string>
 #include <memory>
 #include <unordered_map>
+#include <functional>
 
 namespace BlueBear {
   namespace Graphics {
@@ -33,6 +34,8 @@ namespace BlueBear {
       void selectMaterial( unsigned int rotation );
 
     protected:
+      std::function< void( unsigned int, std::map< std::string, std::unique_ptr< ImageSource > >& ) > selectedRotationFunction;
+
       TextureCache& hostTextureCache;
       ImageCache& hostImageCache;
       WallpaperSide front;

@@ -8,6 +8,7 @@
 #include <memory>
 #include <map>
 #include <string>
+#include <functional>
 
 namespace BlueBear {
   namespace Graphics {
@@ -15,7 +16,10 @@ namespace BlueBear {
     std::shared_ptr< Model > XWallInstance::Piece( nullptr );
     std::shared_ptr< Model > XWallInstance::EdgePiece( nullptr );
 
-    XWallInstance::XWallInstance( GLuint shaderProgram, TextureCache& hostTextureCache, ImageCache& hostImageCache ) : WallInstance::WallInstance( *XWallInstance::Piece, shaderProgram, hostTextureCache, hostImageCache ) {}
+    XWallInstance::XWallInstance( GLuint shaderProgram, TextureCache& hostTextureCache, ImageCache& hostImageCache, bool edgePiece ) :
+      WallInstance::WallInstance( edgePiece ? *XWallInstance::EdgePiece : *XWallInstance::Piece, shaderProgram, hostTextureCache, hostImageCache ) {
+        selectedRotationFunction = std::bind( &XWallInstance::setRotationAttributes, this, std::placeholders::_1, std::placeholders::_2 );
+    }
 
     void XWallInstance::setRotationAttributes( unsigned int rotation, std::map< std::string, std::unique_ptr< ImageSource > >& settings ) {
       switch( rotation ) {
