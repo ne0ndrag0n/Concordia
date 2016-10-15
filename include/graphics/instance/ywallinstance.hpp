@@ -21,6 +21,7 @@ namespace BlueBear {
       YWallInstance( GLuint shaderProgram, TextureCache& hostTextureCache, ImageCache& hostImageCache, bool edgePiece = false );
     protected:
       void setRotationAttributes( unsigned int rotation, std::map< std::string, std::unique_ptr< ImageSource > >& settings );
+      void setRotationAttributesEdge( unsigned int rotation, std::map< std::string, std::unique_ptr< ImageSource > >& settings );
     };
 
   }

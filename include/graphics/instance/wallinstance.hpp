@@ -42,7 +42,6 @@ namespace BlueBear {
       WallpaperSide back;
 
       void setWallpaper( const std::string& path, WallpaperSide& side );
-      virtual void setRotationAttributes( unsigned int rotation, std::map< std::string, std::unique_ptr< ImageSource > >& settings ) = 0;
     };
 
   }

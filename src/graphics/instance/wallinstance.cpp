@@ -66,8 +66,7 @@ namespace BlueBear {
       settings.emplace( std::make_pair( "BackWall", std::make_unique< DirectImageSource >( *back.image, back.path ) ) );
 
       // Apply based on rotation
-      // TODO: These only work on the Y-segments. Differentiate.
-      setRotationAttributes( rotation, settings );
+      selectedRotationFunction( rotation, settings );
 
       std::shared_ptr< Texture > texture = hostTextureCache.getUsingAtlas( WALLATLAS_PATH, settings );
       drawables.at( "Wall" ).material = std::make_shared< Material >( texture );
