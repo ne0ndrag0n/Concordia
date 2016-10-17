@@ -43,8 +43,6 @@ namespace BlueBear {
     const std::string Display::WALLPANEL_MODEL_XY_PATH = "system/models/wall/wall.dae";
     const std::string Display::WALLPANEL_MODEL_XY_EDGE_PATH = "system/models/wall/wall_large.dae";
     const std::string Display::WALLPANEL_MODEL_DR_PATH = "system/models/wall/diagwall.dae";
-    const std::string Display::WALLATLAS_PATH = "system/models/wall/wallatlas.json";
-    const std::string Display::WALLATLAS_EDGE_PATH = "system/models/wall/wallatlaslarge.json";
     const std::string Display::FLOOR_MODEL_PATH = "system/models/floor/floor.dae";
 
     Display::Display( Threading::CommandBus& commandBus ) : commandBus( commandBus ) {

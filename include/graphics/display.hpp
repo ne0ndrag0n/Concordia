@@ -39,8 +39,6 @@ namespace BlueBear {
       static const std::string WALLPANEL_MODEL_XY_PATH;
       static const std::string WALLPANEL_MODEL_XY_EDGE_PATH;
       static const std::string WALLPANEL_MODEL_DR_PATH;
-      static const std::string WALLATLAS_PATH;
-      static const std::string WALLATLAS_EDGE_PATH;
       static const std::string FLOOR_MODEL_PATH;
 
       // RAII style
