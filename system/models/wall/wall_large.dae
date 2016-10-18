@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 2.77.0 commit date:2016-04-05, commit time:18:12, hash:abf6f08</authoring_tool>
     </contributor>
-    <created>2016-10-12T18:57:45</created>
-    <modified>2016-10-12T18:57:45</modified>
+    <created>2016-10-17T16:56:56</created>
+    <modified>2016-10-17T16:56:56</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -14,21 +14,18 @@
     <image id="wall_png" name="wall_png">
       <init_from>wall.png</init_from>
     </image>
-    <image id="wall_large_png" name="wall_large_png">
-      <init_from>wall_large.png</init_from>
-    </image>
   </library_images>
   <library_effects>
     <effect id="default-effect">
       <profile_COMMON>
-        <newparam sid="wall_large_png-surface">
+        <newparam sid="wall_png-surface">
           <surface type="2D">
-            <init_from>wall_large_png</init_from>
+            <init_from>wall_png</init_from>
           </surface>
         </newparam>
-        <newparam sid="wall_large_png-sampler">
+        <newparam sid="wall_png-sampler">
           <sampler2D>
-            <source>wall_large_png-surface</source>
+            <source>wall_png-surface</source>
           </sampler2D>
         </newparam>
         <technique sid="common">
@@ -40,7 +37,7 @@
               <color sid="ambient">0 0 0 1</color>
             </ambient>
             <diffuse>
-              <texture texture="wall_large_png-sampler" texcoord="UVMap"/>
+              <texture texture="wall_png-sampler" texcoord="UVMap"/>
             </diffuse>
             <specular>
               <color sid="specular">0.5 0.5 0.5 1</color>

@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 2.77.0 commit date:2016-04-05, commit time:18:12, hash:abf6f08</authoring_tool>
     </contributor>
-    <created>2016-10-09T13:39:54</created>
-    <modified>2016-10-09T13:39:54</modified>
+    <created>2016-10-17T16:55:42</created>
+    <modified>2016-10-17T16:55:42</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -14,21 +14,18 @@
     <image id="wall_png" name="wall_png">
       <init_from>wall.png</init_from>
     </image>
-    <image id="adjusted_uv_map_png" name="adjusted_uv_map_png">
-      <init_from>wall.png</init_from>
-    </image>
   </library_images>
   <library_effects>
     <effect id="default-effect">
       <profile_COMMON>
-        <newparam sid="adjusted_uv_map_png-surface">
+        <newparam sid="wall_png-surface">
           <surface type="2D">
-            <init_from>adjusted_uv_map_png</init_from>
+            <init_from>wall_png</init_from>
           </surface>
         </newparam>
-        <newparam sid="adjusted_uv_map_png-sampler">
+        <newparam sid="wall_png-sampler">
           <sampler2D>
-            <source>adjusted_uv_map_png-surface</source>
+            <source>wall_png-surface</source>
           </sampler2D>
         </newparam>
         <technique sid="common">
@@ -40,7 +37,7 @@
               <color sid="ambient">0 0 0 1</color>
             </ambient>
             <diffuse>
-              <texture texture="adjusted_uv_map_png-sampler" texcoord="UVMap"/>
+              <texture texture="wall_png-sampler" texcoord="UVMap"/>
             </diffuse>
             <specular>
               <color sid="specular">0.5 0.5 0.5 1</color>
@@ -85,7 +82,7 @@
           </technique_common>
         </source>
         <source id="WallMesh-mesh-map-0">
-          <float_array id="WallMesh-mesh-map-0-array" count="72">0.7321429 0.9571428 0.7678571 0.04285711 0.7678571 0.9571428 0.3928571 0.9571428 0.6785714 0.04285711 0.6785714 0.9571428 0.8214286 0.9571428 0.8571429 0.04285711 0.8571429 0.9571428 0.0535714 0.9571428 0.3392857 0.04285711 0.3392857 0.9571428 0.9107143 0.2714286 0.9464286 0.04285711 0.9464286 0.2714286 0.9464286 0.3142857 0.9107143 0.5428572 0.9107143 0.3142857 0.7321429 0.9571428 0.7321429 0.04285711 0.7678571 0.04285711 0.3928571 0.9571428 0.3928571 0.04285711 0.6785714 0.04285711 0.8214286 0.9571428 0.8214286 0.04285711 0.8571429 0.04285711 0.0535714 0.9571428 0.0535714 0.04285711 0.3392857 0.04285711 0.9107143 0.2714286 0.9107143 0.04285711 0.9464286 0.04285711 0.9464286 0.3142857 0.9464286 0.5428572 0.9107143 0.5428572</float_array>
+          <float_array id="WallMesh-mesh-map-0-array" count="72">0.7727273 0.9571428 0.8030303 0.04285711 0.8030303 0.9571428 0.4848485 0.9571428 0.7272728 0.04285711 0.7272728 0.9571428 0.8484849 0.9571428 0.8787879 0.04285711 0.8787879 0.9571428 0.0454545 0.9571428 0.2878788 0.04285711 0.2878788 0.9571428 0.9242424 0.3 0.9545454 0.07142853 0.9545454 0.3 0.9545454 0.3714286 0.9242424 0.6 0.9242424 0.3714286 0.7727273 0.9571428 0.7727273 0.04285711 0.8030303 0.04285711 0.4848485 0.9571428 0.4848485 0.04285711 0.7272728 0.04285711 0.8484849 0.9571428 0.8484849 0.04285711 0.8787879 0.04285711 0.0454545 0.9571428 0.0454545 0.04285711 0.2878788 0.04285711 0.9242424 0.3 0.9242424 0.07142853 0.9545454 0.07142853 0.9545454 0.3714286 0.9545454 0.6 0.9242424 0.6</float_array>
           <technique_common>
             <accessor source="#WallMesh-mesh-map-0-array" count="36" stride="2">
               <param name="S" type="float"/>
