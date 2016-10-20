@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <memory>
+#include <utility>
 
 namespace BlueBear {
   namespace Containers {
@@ -26,8 +27,14 @@ namespace BlueBear {
         T getItem( unsigned int level, unsigned int x, unsigned int y ) {
           return items[ getSingleIndex( level, x, y ) ];
         }
+        T& getItemByRef( unsigned int level, unsigned int x, unsigned int y ) {
+          return getItem( level, x, y );
+        }
         T getItemDirect( unsigned int direct ) {
           return items[ direct ];
+        }
+        T& getItemDirectByRef( unsigned int direct ) {
+          return getItemDirect( direct );
         }
         unsigned int getLength() {
           return items.size();
@@ -35,6 +42,10 @@ namespace BlueBear {
         //void setItem( unsigned int level, unsigned int x, unsigned int y, T item );
         void pushDirect( T item ) {
           items.push_back( item );
+        }
+
+        void moveDirect( T item ) {
+          items.push_back( std::move( item ) );
         }
     };
 
