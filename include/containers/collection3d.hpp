@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include <utility>
+#include <functional>
 
 namespace BlueBear {
   namespace Containers {
@@ -46,6 +47,11 @@ namespace BlueBear {
 
         void moveDirect( T item ) {
           items.push_back( std::move( item ) );
+        }
+
+        // little shit functions for functional programming
+        void operationOn( unsigned int direct, std::function< void( T& ) > func ) {
+          func( items[ direct ] );
         }
     };
 
