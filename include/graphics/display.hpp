@@ -5,6 +5,7 @@
  * Abstracted class representing the display device that is available to BlueBear.
  */
 #include "containers/collection3d.hpp"
+#include "containers/conccollection3d.hpp"
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <vector>

@@ -11,7 +11,7 @@ namespace BlueBear {
 
     template <typename T> class Collection3D {
 
-      private:
+      protected:
         std::vector< T > items;
         unsigned int getSingleIndex( unsigned int level, unsigned int x, unsigned int y ) {
           unsigned int origin = level * ( dimensionX * dimensionY );
@@ -20,38 +20,44 @@ namespace BlueBear {
           return origin + ( ( dimensionX * y ) + x );
         }
 
+        std::vector< T >& getItems() {
+          return items;
+        }
+
       public:
         unsigned int dimensionX;
         unsigned int dimensionY;
         unsigned int levels;
         Collection3D( unsigned int levels, unsigned int x, unsigned int y ) : levels( levels ), dimensionX( x ), dimensionY( y ) {}
+
+        // fuckin' const-correctness, how does it work
         T getItem( unsigned int level, unsigned int x, unsigned int y ) {
-          return items[ getSingleIndex( level, x, y ) ];
+          return getItems()[ getSingleIndex( level, x, y ) ];
         }
         T& getItemByRef( unsigned int level, unsigned int x, unsigned int y ) {
-          return getItem( level, x, y );
+          return getItems()[ getSingleIndex( level, x, y ) ];
         }
         T getItemDirect( unsigned int direct ) {
-          return items[ direct ];
+          return getItems()[ direct ];
         }
         T& getItemDirectByRef( unsigned int direct ) {
-          return getItemDirect( direct );
+          return getItems()[ direct ];
         }
-        unsigned int getLength() {
-          return items.size();
+        virtual unsigned int getLength() {
+          return getItems().size();
         }
         //void setItem( unsigned int level, unsigned int x, unsigned int y, T item );
-        void pushDirect( T item ) {
-          items.push_back( item );
+        virtual void pushDirect( T item ) {
+          getItems().push_back( item );
         }
 
-        void moveDirect( T item ) {
-          items.push_back( std::move( item ) );
+        virtual void moveDirect( T item ) {
+          getItems().push_back( std::move( item ) );
         }
 
         // little shit functions for functional programming
-        void operationOn( unsigned int direct, std::function< void( T& ) > func ) {
-          func( items[ direct ] );
+        virtual void operationOn( unsigned int direct, std::function< void( T& ) > func ) {
+          func( getItems()[ direct ] );
         }
     };
 
