@@ -25,6 +25,8 @@ namespace BlueBear {
         }
 
       public:
+        using Predicate = std::function< void( T& ) >;
+
         unsigned int dimensionX;
         unsigned int dimensionY;
         unsigned int levels;
@@ -56,7 +58,7 @@ namespace BlueBear {
         }
 
         // little shit functions for functional programming
-        virtual void operationOn( unsigned int direct, std::function< void( T& ) > func ) {
+        virtual void operationOn( unsigned int direct, Predicate func ) {
           func( getItems()[ direct ] );
         }
     };

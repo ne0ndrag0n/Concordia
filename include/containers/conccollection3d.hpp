@@ -20,7 +20,14 @@ namespace BlueBear {
     private:
       std::mutex vectorMutex;
 
+      Threading::Lockable< T >& getLockable( unsigned int direct ) {
+        std::unique_lock< std::mutex > lock( vectorMutex );
+        return Collection3D< Threading::Lockable< T > >::getItems()[ direct ];
+      }
+
     public:
+      using Predicate = std::function< void( T& ) >;
+
       // Expose these via superclass call + lock
       unsigned int getLength() {
         std::unique_lock< std::mutex > lock( vectorMutex );
@@ -41,8 +48,12 @@ namespace BlueBear {
 
       // Everything you do with any object stored in a ConcCollection3D is gatekept by these functional methods
       // You must pass a lambda to do anything!
+      void operationOn( unsigned int direct, Predicate func ) {
+        Threading::Lockable< T >& lockable = getLockable( direct );
 
-
+        std::unique_lock< std::mutex > lock( lockable.mutex );
+        func( lockable.object );
+      }
     };
   }
 }
