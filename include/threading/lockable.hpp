@@ -14,18 +14,23 @@ namespace BlueBear {
       std::shared_ptr< std::mutex > mutex;
 
     public:
+      // Default constructor needed for STL containers; using this is discouraged unless you need a default object
+      // Instead, use the static "create" method to create a Lockable
       Lockable() :
         object( std::shared_ptr< T >() ),
         mutex( std::shared_ptr< std::mutex >() ) {}
 
-      template < typename... Args > Lockable( bool nullPointer, Args&&... args ) :
-        mutex( std::make_shared< std::mutex >() ) {
+      /**
+       * Use this method instead to create Lockable objects
+       * This is to work around ambiguity which would result in the above constructor being called for empty argument lists
+       * I'm really counting on RVO here
+       */
+      template< typename... Args > static Lockable create( Args&&... args ) {
+        Lockable< T > lockable;
 
-        if( nullPointer ) {
-          object = std::shared_ptr< T >();
-        } else {
-          object = std::make_shared< T >( args... );
-        }
+        lockable.set( args... );
+
+        return lockable;
       }
 
       template< typename... Args > void set( Args&&... args ) {
