@@ -3,6 +3,7 @@
 #include <lualib.h>
 #include <lauxlib.h>
 #include "containers/collection3d.hpp"
+#include "containers/conccollection3d.hpp"
 #include "scripting/lotentity.hpp"
 #include "scripting/lot.hpp"
 #include "log.hpp"
@@ -128,7 +129,7 @@ namespace BlueBear {
 			}
 
 			// Use the pointer lookup to create the floormap
-			floorMap = std::make_unique< Containers::Collection3D< Threading::Lockable< Tile > > >( stories, floorX, floorY );
+			floorMap = std::make_unique< Containers::ConcCollection3D< Threading::Lockable< Tile > > >( stories, floorX, floorY );
 
 			for( Json::Value& level : levels ) {
 				for( Json::Value& object : level ) {

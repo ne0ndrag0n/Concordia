@@ -2,6 +2,7 @@
 #define LOT
 
 #include "containers/collection3d.hpp"
+#include "containers/conccollection3d.hpp"
 #include "scripting/infrastructurefactory.hpp"
 #include "threading/lockable.hpp"
 #include <lua.h>
@@ -33,7 +34,7 @@ namespace BlueBear {
 
 			public:
 				std::map< std::string, std::unique_ptr< LotEntity > > objects;
-				std::unique_ptr< Containers::Collection3D< Threading::Lockable< Tile > > > floorMap;
+				std::unique_ptr< Containers::ConcCollection3D< Threading::Lockable< Tile > > > floorMap;
 				std::unique_ptr< Containers::Collection3D< std::shared_ptr< WallCell > > > wallMap;
 				int floorX;
 				int floorY;

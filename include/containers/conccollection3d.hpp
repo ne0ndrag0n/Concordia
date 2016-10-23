@@ -22,6 +22,8 @@ namespace BlueBear {
       std::mutex dimensionMutex;
 
     public:
+      ConcCollection3D( unsigned int levels, unsigned int x, unsigned int y ) : Collection3D< T >::Collection3D( levels, x, y ) {}
+
       // Expose these via superclass call + lock
 
       typename Collection3D< T >::Dimensions getDimensions() {
