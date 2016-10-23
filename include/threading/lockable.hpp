@@ -27,6 +27,11 @@ namespace BlueBear {
         std::unique_lock< std::mutex > lock( *mutex );
         return predicate( *object );
       }
+
+      explicit operator bool() const {
+        // ? is there a way to just call this directly ?
+        return object.operator bool();
+      }
     };
 
   }
