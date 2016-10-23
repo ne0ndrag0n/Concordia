@@ -14,8 +14,8 @@ namespace BlueBear {
       const std::shared_ptr< std::mutex > mutex;
 
     public:
-      template < typename... Args > Lockable( Args&&... args ) :
-        object( std::make_shared< T >( args... ) ),
+      template < typename... Args > Lockable( bool nullPointer, Args&&... args ) :
+        object( nullPointer ? std::shared_ptr< T >() : std::make_shared< T >( args... ) ),
         mutex( std::make_shared< std::mutex >() ) {}
 
       // Synctactic sugar for void methods that avoids the generic qualifier
