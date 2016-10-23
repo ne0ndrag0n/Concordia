@@ -10,13 +10,33 @@ namespace BlueBear {
 
     template < typename T > class Lockable {
     private:
-      const std::shared_ptr< T > object;
-      const std::shared_ptr< std::mutex > mutex;
+      std::shared_ptr< T > object;
+      std::shared_ptr< std::mutex > mutex;
 
     public:
+      Lockable() :
+        object( std::shared_ptr< T >() ),
+        mutex( std::shared_ptr< std::mutex >() ) {}
+
       template < typename... Args > Lockable( bool nullPointer, Args&&... args ) :
-        object( nullPointer ? std::shared_ptr< T >() : std::make_shared< T >( args... ) ),
-        mutex( std::make_shared< std::mutex >() ) {}
+        mutex( std::make_shared< std::mutex >() ) {
+
+        if( nullPointer ) {
+          object = std::shared_ptr< T >();
+        } else {
+          object = std::make_shared< T >( args... );
+        }
+      }
+
+      template< typename... Args > void set( Args&&... args ) {
+        object = std::make_shared< T >( args... );
+        mutex = std::make_shared< std::mutex >();
+      }
+
+      void reset() {
+        object = std::shared_ptr< T >();
+        mutex = std::shared_ptr< std::mutex >();
+      }
 
       // Synctactic sugar for void methods that avoids the generic qualifier
       void lock( std::function< void( T& ) > predicate ) {
@@ -29,7 +49,6 @@ namespace BlueBear {
       }
 
       explicit operator bool() const {
-        // ? is there a way to just call this directly ?
         return object.operator bool();
       }
     };
