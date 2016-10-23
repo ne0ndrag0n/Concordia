@@ -15,45 +15,34 @@ namespace BlueBear {
     /**
      * A ConcCollection3D protects both its own collection, and the objects within.
      */
-    template < typename T > class ConcCollection3D : private Collection3D< Threading::Lockable< T > > {
+    template < typename T > class ConcCollection3D : public Collection3D< T > {
 
     private:
       std::mutex vectorMutex;
 
-      Threading::Lockable< T >& getLockable( unsigned int direct ) {
+    public:
+      // Expose these via superclass call + lock
+
+      T& getItemDirectByRef( unsigned int direct ) {
         std::unique_lock< std::mutex > lock( vectorMutex );
-        return Collection3D< Threading::Lockable< T > >::getItems()[ direct ];
+        return Collection3D< T >::getItemDirectByRef( direct );
       }
 
-    public:
-      using Predicate = std::function< void( T& ) >;
-
-      // Expose these via superclass call + lock
       unsigned int getLength() {
         std::unique_lock< std::mutex > lock( vectorMutex );
-        return Collection3D< Threading::Lockable< T > >::getLength();
+        return Collection3D< T >::getLength();
       }
 
       void pushDirect( T item ) {
         std::unique_lock< std::mutex > lock( vectorMutex );
-
-        Collection3D< Threading::Lockable< T > >::pushDirect( Threading::Lockable< T >( item ) );
+        Collection3D< T >::pushDirect( item );
       }
 
       void moveDirect( T item ) {
         std::unique_lock< std::mutex > lock( vectorMutex );
-
-        Collection3D< Threading::Lockable< T > >::getItems().push_back( std::move( Threading::Lockable< T >( item ) ) );
+        Collection3D< T >::getItems().push_back( std::move( item ) );
       }
 
-      // Everything you do with any object stored in a ConcCollection3D is gatekept by these functional methods
-      // You must pass a lambda to do anything!
-      void operationOn( unsigned int direct, Predicate func ) {
-        Threading::Lockable< T >& lockable = getLockable( direct );
-
-        std::unique_lock< std::mutex > lock( lockable.mutex );
-        func( lockable.object );
-      }
     };
   }
 }

@@ -32,19 +32,20 @@ namespace BlueBear {
         unsigned int levels;
         Collection3D( unsigned int levels, unsigned int x, unsigned int y ) : levels( levels ), dimensionX( x ), dimensionY( y ) {}
 
-        // fuckin' const-correctness, how does it work
-        T getItem( unsigned int level, unsigned int x, unsigned int y ) {
-          return getItems()[ getSingleIndex( level, x, y ) ];
-        }
-        T& getItemByRef( unsigned int level, unsigned int x, unsigned int y ) {
-          return getItems()[ getSingleIndex( level, x, y ) ];
+        virtual T& getItemDirectByRef( unsigned int direct ) {
+          return getItems()[ direct ];
         }
         T getItemDirect( unsigned int direct ) {
-          return getItems()[ direct ];
+          return getItemDirectByRef( direct );
         }
-        T& getItemDirectByRef( unsigned int direct ) {
-          return getItems()[ direct ];
+
+        T& getItemByRef( unsigned int level, unsigned int x, unsigned int y ) {
+          return getItemDirectByRef( getSingleIndex( level, x, y ) );
         }
+        T getItem( unsigned int level, unsigned int x, unsigned int y ) {
+          return getItemByRef( level, x, y );
+        }
+
         virtual unsigned int getLength() {
           return getItems().size();
         }
@@ -55,11 +56,6 @@ namespace BlueBear {
 
         virtual void moveDirect( T item ) {
           getItems().push_back( std::move( item ) );
-        }
-
-        // little shit functions for functional programming
-        virtual void operationOn( unsigned int direct, Predicate func ) {
-          func( getItems()[ direct ] );
         }
     };
 
