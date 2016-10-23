@@ -29,13 +29,13 @@ namespace BlueBear {
 				InfrastructureFactory& infrastructureFactory;
 				void buildFloorMap( Json::Value& floor );
 				void buildWallMap( Json::Value& walls );
-				std::shared_ptr< WallCell > getWallCell( Json::Value& object, std::vector< Threading::Lockable< Wallpaper > >& lookup );
+				Threading::Lockable< WallCell > getWallCell( Json::Value& object, std::vector< Threading::Lockable< Wallpaper > >& lookup );
 				inline Threading::Lockable< Tile > getTile( int index, std::vector< Threading::Lockable< Tile > >& lookup );
 
 			public:
 				std::map< std::string, std::unique_ptr< LotEntity > > objects;
 				std::unique_ptr< Containers::ConcCollection3D< Threading::Lockable< Tile > > > floorMap;
-				std::unique_ptr< Containers::Collection3D< std::shared_ptr< WallCell > > > wallMap;
+				std::unique_ptr< Containers::ConcCollection3D< Threading::Lockable< WallCell > > > wallMap;
 				int floorX;
 				int floorY;
 				int stories;

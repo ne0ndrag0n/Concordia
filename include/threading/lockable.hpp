@@ -53,6 +53,14 @@ namespace BlueBear {
         return predicate( *object );
       }
 
+      /**
+       * Run an unsafe operation (call the function on the wrapped object without locking)
+       * You should only need this in very exceptional scenarios, which is why there is no syntactic sugar function for "unsafe"
+       */
+      template < typename R > R unsafe( std::function< R( T& ) > predicate ) {
+        return predicate( *object );
+      }
+
       explicit operator bool() const {
         return object.operator bool();
       }

@@ -34,6 +34,7 @@
 #include <string>
 #include <cstdlib>
 #include <utility>
+#include <functional>
 
 static BlueBear::Graphics::Display::CommandList displayCommandList;
 static BlueBear::Scripting::Engine::CommandList engineCommandList;
@@ -224,6 +225,15 @@ namespace BlueBear {
       DWallInstance::Piece.reset();
       RWallInstance::Piece.reset();
     }
+    bool Display::MainGameState::isWallDimensionPresent( std::string& frontPath, std::string& backPath, std::unique_ptr< Scripting::WallCell::Segment >& ptr ) {
+      if( ptr ) {
+        frontPath.assign( ptr->front.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } ) );
+        backPath.assign( ptr->back.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } ) );
+        return true;
+      } else {
+        return false;
+      }
+    }
     void Display::MainGameState::loadInfrastructure( Scripting::Lot& lot ) {
       auto dimensions = lot.floorMap->getDimensions();
 
@@ -277,57 +287,49 @@ namespace BlueBear {
         // Do not nudge any walls here (nudging will be the responsibility of MainGameState)
         // Nudging "X" means moving up in the Y dimension by 0.1
         // Nudging "Y" means moving left in the X dimension by 0.1
-        auto wallCellPtr = lot.wallMap->getItemDirect( i );
+        Threading::Lockable< Scripting::WallCell > wallCellPtr = lot.wallMap->getItemDirect( i );
         std::shared_ptr< Display::MainGameState::WallCellBundler > wallCellBundler;
         if( wallCellPtr ) {
           // Several different kinds of wall panel models depending on the type, and several kinds of orientations
           // If that pointer exists, at least one of these ifs will be fulfilled
           auto& bundler = getWallCellBundler( wallCellBundler );
 
-          if( wallCellPtr->x ) {
+          std::string frontPath;
+          std::string backPath;
+
+          // oh my fucking god i am so sorry about this
+          if( wallCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.x ); } ) ) {
             bundler.x = std::make_shared< XWallInstance >( defaultShader.Program, texCache, imageCache );
             bundler.x->setPosition( glm::vec3( xCounter, yCounter + 0.9f, floorLevel ) );
             bundler.x->setRotationAngle( glm::radians( 180.0f ) );
 
-            bundler.x->setWallpaper(
-              wallCellPtr->x->front.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } ),
-              wallCellPtr->x->back.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } )
-            );
+            bundler.x->setWallpaper( frontPath, backPath );
             bundler.x->selectMaterial( lot.currentRotation );
           }
 
-          if( wallCellPtr->y ) {
+          if( wallCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.y ); } ) ) {
             bundler.y = std::make_shared< YWallInstance >( defaultShader.Program, texCache, imageCache );
             bundler.y->setRotationAngle( glm::radians( -90.0f ) );
             bundler.y->setPosition( glm::vec3( xCounter - 0.9f, yCounter, floorLevel ) );
 
-            bundler.y->setWallpaper(
-              wallCellPtr->y->front.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } ),
-              wallCellPtr->y->back.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } )
-            );
+            bundler.y->setWallpaper( frontPath, backPath );
             bundler.y->selectMaterial( lot.currentRotation );
           }
 
-          if( wallCellPtr->d ) {
+          if( wallCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.d ); } ) ) {
             bundler.d = std::make_shared< DWallInstance >( defaultShader.Program, texCache, imageCache );
             bundler.d->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
 
-            bundler.d->setWallpaper(
-              wallCellPtr->d->front.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } ),
-              wallCellPtr->d->back.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } )
-            );
+            bundler.d->setWallpaper( frontPath, backPath );
             bundler.d->selectMaterial( lot.currentRotation );
           }
 
-          if( wallCellPtr->r ) {
+          if( wallCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.r ); } ) ) {
             bundler.r = std::make_shared< RWallInstance >( defaultShader.Program, texCache, imageCache );
             bundler.r->setRotationAngle( glm::radians( -90.0f ) );
             bundler.r->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
 
-            bundler.r->setWallpaper(
-              wallCellPtr->r->front.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } ),
-              wallCellPtr->r->back.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } )
-            );
+            bundler.r->setWallpaper( frontPath, backPath );
             bundler.r->selectMaterial( lot.currentRotation );
           }
         }
