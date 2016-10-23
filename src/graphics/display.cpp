@@ -225,24 +225,26 @@ namespace BlueBear {
       RWallInstance::Piece.reset();
     }
     void Display::MainGameState::loadInfrastructure( Scripting::Lot& lot ) {
-      floorInstanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< Instance > > >( lot.floorMap->levels, lot.floorMap->dimensionX, lot.floorMap->dimensionY );
-      wallInstanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< Display::MainGameState::WallCellBundler > > >( lot.floorMap->levels, lot.floorMap->dimensionX, lot.floorMap->dimensionY );
+      auto dimensions = lot.floorMap->getDimensions();
+
+      floorInstanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< Instance > > >( dimensions.levels, dimensions.x, dimensions.y );
+      wallInstanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< Display::MainGameState::WallCellBundler > > >( dimensions.levels, dimensions.x, dimensions.y );
 
       // Transform each Tile instance to an entity
       auto size = lot.floorMap->getLength();
 
       // TODO: Fix this unholy mess of counters and garbage
-      int xOrigin = -( lot.floorMap->dimensionX / 2 );
-      int yOrigin = lot.floorMap->dimensionY / 2;
+      int xOrigin = -( dimensions.x / 2 );
+      int yOrigin = dimensions.y / 2;
       // Determines the floor level
-      int tilesPerLevel = lot.floorMap->dimensionX * lot.floorMap->dimensionY;
+      int tilesPerLevel = dimensions.x * dimensions.y;
       // The floor level is -10. Start this at -15 to avoid a branch penalty in the next if.
       float floorLevel = -15.0f;
 
       for( auto i = 0; i != size; i++ ) {
 
-        int xCounter = xOrigin + ( i % lot.floorMap->dimensionX );
-        int yCounter = yOrigin + -( i / lot.floorMap->dimensionY );
+        int xCounter = xOrigin + ( i % dimensions.x );
+        int yCounter = yOrigin + -( i / dimensions.y );
 
         // FLOOR
         // Increase level every time we exceed the number of tiles per level

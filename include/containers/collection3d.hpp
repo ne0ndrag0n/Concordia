@@ -14,10 +14,10 @@ namespace BlueBear {
       protected:
         std::vector< T > items;
         unsigned int getSingleIndex( unsigned int level, unsigned int x, unsigned int y ) {
-          unsigned int origin = level * ( dimensionX * dimensionY );
+          unsigned int origin = level * ( dimensions.x * dimensions.y );
 
           // check this formula
-          return origin + ( ( dimensionX * y ) + x );
+          return origin + ( ( dimensions.x * y ) + x );
         }
 
         std::vector< T >& getItems() {
@@ -26,11 +26,37 @@ namespace BlueBear {
 
       public:
         using Predicate = std::function< void( T& ) >;
+        struct Dimensions {
+          unsigned int x;
+          unsigned int y;
+          unsigned int levels;
+        };
 
-        unsigned int dimensionX;
-        unsigned int dimensionY;
-        unsigned int levels;
-        Collection3D( unsigned int levels, unsigned int x, unsigned int y ) : levels( levels ), dimensionX( x ), dimensionY( y ) {}
+      protected:
+        Dimensions dimensions;
+
+      public:
+        Collection3D( unsigned int levels, unsigned int x, unsigned int y ) : dimensions( Dimensions{ x, y, levels } ) {}
+
+        unsigned int getX() {
+          return getDimensions().x;
+        }
+
+        unsigned int getY() {
+          return getDimensions().y;
+        }
+
+        unsigned int getLevels() {
+          return getDimensions().levels;
+        }
+
+        /**
+         * RVO might destroy thread safety here?
+         * This is SUPPOSED to be a copy, explicitly
+         */
+        virtual Dimensions getDimensions() {
+          return dimensions;
+        }
 
         virtual T& getItemDirectByRef( unsigned int direct ) {
           return getItems()[ direct ];

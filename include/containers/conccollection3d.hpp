@@ -19,9 +19,15 @@ namespace BlueBear {
 
     private:
       std::mutex vectorMutex;
+      std::mutex dimensionMutex;
 
     public:
       // Expose these via superclass call + lock
+
+      typename Collection3D< T >::Dimensions getDimensions() {
+        std::unique_lock< std::mutex > lock( dimensionMutex );
+        return Collection3D< T >::getDimensions();
+      }
 
       T& getItemDirectByRef( unsigned int direct ) {
         std::unique_lock< std::mutex > lock( vectorMutex );
