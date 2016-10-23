@@ -3,6 +3,7 @@
 
 #include "containers/collection3d.hpp"
 #include "scripting/infrastructurefactory.hpp"
+#include "threading/lockable.hpp"
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -28,11 +29,11 @@ namespace BlueBear {
 				void buildFloorMap( Json::Value& floor );
 				void buildWallMap( Json::Value& walls );
 				std::shared_ptr< WallCell > getWallCell( Json::Value& object, std::vector< std::shared_ptr< Wallpaper > >& lookup );
-				inline std::shared_ptr< Tile > getTile( int index, std::vector< std::shared_ptr< Tile > >& lookup );
+				inline Threading::Lockable< Tile > getTile( int index, std::vector< Threading::Lockable< Tile > >& lookup );
 
 			public:
 				std::map< std::string, std::unique_ptr< LotEntity > > objects;
-				std::unique_ptr< Containers::Collection3D< std::shared_ptr< Tile > > > floorMap;
+				std::unique_ptr< Containers::Collection3D< Threading::Lockable< Tile > > > floorMap;
 				std::unique_ptr< Containers::Collection3D< std::shared_ptr< WallCell > > > wallMap;
 				int floorX;
 				int floorY;

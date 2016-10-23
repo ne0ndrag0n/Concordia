@@ -20,6 +20,7 @@
 #include "scripting/wallcell.hpp"
 #include "scripting/wallpaper.hpp"
 #include "threading/commandbus.hpp"
+#include "threading/lockable.hpp"
 #include "localemanager.hpp"
 #include "configmanager.hpp"
 #include "log.hpp"
@@ -250,14 +251,16 @@ namespace BlueBear {
           floorLevel = floorLevel + 5.0f;
         }
 
-        auto tilePtr = lot.floorMap->getItemDirect( i );
+        Threading::Lockable< Scripting::Tile > tilePtr = lot.floorMap->getItemDirect( i );
         if( tilePtr ) {
           // Create instance from the model, and change its material using the material cache
           std::shared_ptr< Instance > instance = std::make_shared< Instance >( floorModel, defaultShader.Program );
 
           Drawable& floorDrawable = instance->drawables.at( "Plane" );
 
-          floorDrawable.material = std::make_shared< Material >( TextureList{ texCache.get( tilePtr->imagePath ) } );
+          tilePtr.lock( [ & ]( Scripting::Tile& tile ) {
+            floorDrawable.material = std::make_shared< Material >( TextureList{ texCache.get( tile.imagePath ) } );
+          } );
 
           instance->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
 
