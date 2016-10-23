@@ -179,7 +179,9 @@ namespace BlueBear {
       Display::State::State( instance ),
       defaultShader( Shader( "system/shaders/default_vertex.glsl", "system/shaders/default_fragment.glsl" ) ),
       camera( Camera( defaultShader.Program, instance.x, instance.y ) ),
-      floorModel( Model( Display::FLOOR_MODEL_PATH ) ) {
+      floorModel( Model( Display::FLOOR_MODEL_PATH ) ),
+      floorMap( floorMap ),
+      wallMap( wallMap ) {
 
       // Load infrastructure models
       // Setup static pointers on each of the wall types
@@ -217,7 +219,7 @@ namespace BlueBear {
       texts.rotation.setPosition( 0, 48 );
 
       // Moving much of Display::loadInfrastructure here
-      loadInfrastructure( currentRotation, floorMap, wallMap );
+      loadInfrastructure( currentRotation );
     }
     Display::MainGameState::~MainGameState() {
       XWallInstance::Piece.reset();
@@ -235,7 +237,7 @@ namespace BlueBear {
         return false;
       }
     }
-    void Display::MainGameState::loadInfrastructure( unsigned int currentRotation, Containers::ConcCollection3D< Threading::Lockable< Scripting::Tile > >& floorMap, Containers::ConcCollection3D< Threading::Lockable< Scripting::WallCell > >& wallMap ) {
+    void Display::MainGameState::loadInfrastructure( unsigned int currentRotation ) {
       auto dimensions = floorMap.getDimensions();
 
       floorInstanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< Instance > > >( dimensions.levels, dimensions.x, dimensions.y );

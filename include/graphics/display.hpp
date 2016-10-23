@@ -98,12 +98,16 @@ namespace BlueBear {
           Model floorModel;
           TextureCache texCache;
           ImageCache imageCache;
+          // These are from the lot!
+          Containers::ConcCollection3D< Threading::Lockable< Scripting::Tile > >& floorMap;
+          Containers::ConcCollection3D< Threading::Lockable< Scripting::WallCell > >& wallMap;
+          // These are ours!
           std::unique_ptr< Containers::Collection3D< std::shared_ptr< Instance > > > floorInstanceCollection;
           std::unique_ptr< Containers::Collection3D< std::shared_ptr< WallCellBundler > > > wallInstanceCollection;
           void processOsd();
           void remapWallTextures();
           bool isWallDimensionPresent( std::string& frontPath, std::string& backPath, std::unique_ptr< Scripting::WallCell::Segment >& ptr );
-          void loadInfrastructure( unsigned int currentRotation, Containers::ConcCollection3D< Threading::Lockable< Scripting::Tile > >& floorMap, Containers::ConcCollection3D< Threading::Lockable< Scripting::WallCell > >& wallMap );
+          void loadInfrastructure( unsigned int currentRotation );
           WallCellBundler& getWallCellBundler( std::shared_ptr< WallCellBundler >& bundlerPtr );
         public:
           void execute();
