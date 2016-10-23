@@ -16,11 +16,13 @@
 #include <map>
 #include "graphics/texturecache.hpp"
 #include "graphics/imagecache.hpp"
+#include "scripting/tile.hpp"
 #include "scripting/wallcell.hpp"
 #include "graphics/imagebuilder/imagesource.hpp"
 #include "graphics/shader.hpp"
 #include "graphics/model.hpp"
 #include "graphics/camera.hpp"
+#include "threading/lockable.hpp"
 
 namespace BlueBear {
   namespace Scripting {
@@ -48,7 +50,7 @@ namespace BlueBear {
 
       void openDisplay();
       void start();
-      void loadInfrastructure( Scripting::Lot& lot );
+      void loadInfrastructure( unsigned int currentRotation, Containers::ConcCollection3D< Threading::Lockable< Scripting::Tile > >& floorMap, Containers::ConcCollection3D< Threading::Lockable< Scripting::WallCell > >& wallMap );
 
       // ---------- STATES ----------
       class State {
@@ -101,12 +103,12 @@ namespace BlueBear {
           void processOsd();
           void remapWallTextures();
           bool isWallDimensionPresent( std::string& frontPath, std::string& backPath, std::unique_ptr< Scripting::WallCell::Segment >& ptr );
-          void loadInfrastructure( Scripting::Lot& lot );
+          void loadInfrastructure( unsigned int currentRotation, Containers::ConcCollection3D< Threading::Lockable< Scripting::Tile > >& floorMap, Containers::ConcCollection3D< Threading::Lockable< Scripting::WallCell > >& wallMap );
           WallCellBundler& getWallCellBundler( std::shared_ptr< WallCellBundler >& bundlerPtr );
         public:
           void execute();
           void handleEvent( sf::Event& event );
-          MainGameState( Display& instance, Scripting::Lot& lot );
+          MainGameState( Display& instance, unsigned int currentRotation, Containers::ConcCollection3D< Threading::Lockable< Scripting::Tile > >& floorMap, Containers::ConcCollection3D< Threading::Lockable< Scripting::WallCell > >& wallMap );
           ~MainGameState();
       };
       // ----------------------------
@@ -123,7 +125,9 @@ namespace BlueBear {
       };
 
       class SendInfrastructureCommand : public Command {
-        Scripting::Lot& lot;
+        unsigned int rotation;
+        Containers::ConcCollection3D< Threading::Lockable< Scripting::Tile > >& floorMap;
+        Containers::ConcCollection3D< Threading::Lockable< Scripting::WallCell > >& wallMap;
         public:
           SendInfrastructureCommand( Scripting::Lot& lot );
           void execute( Display& instance );

@@ -1,5 +1,6 @@
 #include "graphics/display.hpp"
 #include "containers/collection3d.hpp"
+#include "containers/conccollection3d.hpp"
 #include "graphics/imagebuilder/imagesource.hpp"
 #include "graphics/imagebuilder/pathimagesource.hpp"
 #include "graphics/instance/instance.hpp"
@@ -135,9 +136,9 @@ namespace BlueBear {
     /**
      * Given a lot, build floorInstanceCollection and translate the Tiles/Wallpanels to instances on the lot. Additionally, send the rotation status.
      */
-    void Display::loadInfrastructure( Scripting::Lot& lot ) {
+    void Display::loadInfrastructure( unsigned int currentRotation, Containers::ConcCollection3D< Threading::Lockable< Scripting::Tile > >& floorMap, Containers::ConcCollection3D< Threading::Lockable< Scripting::WallCell > >& wallMap ) {
 
-      std::unique_ptr< Display::MainGameState > mainGameStatePtr = std::make_unique< Display::MainGameState >( *this, lot );
+      std::unique_ptr< Display::MainGameState > mainGameStatePtr = std::make_unique< Display::MainGameState >( *this, currentRotation, floorMap, wallMap );
 
       currentState = std::move( mainGameStatePtr );
 
@@ -174,7 +175,7 @@ namespace BlueBear {
     /**
      * Display renderer state for the main game loop
      */
-    Display::MainGameState::MainGameState( Display& instance, Scripting::Lot& lot ) :
+    Display::MainGameState::MainGameState( Display& instance, unsigned int currentRotation, Containers::ConcCollection3D< Threading::Lockable< Scripting::Tile > >& floorMap, Containers::ConcCollection3D< Threading::Lockable< Scripting::WallCell > >& wallMap ) :
       Display::State::State( instance ),
       defaultShader( Shader( "system/shaders/default_vertex.glsl", "system/shaders/default_fragment.glsl" ) ),
       camera( Camera( defaultShader.Program, instance.x, instance.y ) ),
@@ -193,7 +194,7 @@ namespace BlueBear {
       RWallInstance::Piece = dr;
 
       // Setup camera
-      camera.setRotationDirect( lot.currentRotation );
+      camera.setRotationDirect( currentRotation );
 
       texts.mode.setFont( instance.fonts.osdFont );
       texts.mode.setCharacterSize( 16 );
@@ -216,7 +217,7 @@ namespace BlueBear {
       texts.rotation.setPosition( 0, 48 );
 
       // Moving much of Display::loadInfrastructure here
-      loadInfrastructure( lot );
+      loadInfrastructure( currentRotation, floorMap, wallMap );
     }
     Display::MainGameState::~MainGameState() {
       XWallInstance::Piece.reset();
@@ -234,14 +235,14 @@ namespace BlueBear {
         return false;
       }
     }
-    void Display::MainGameState::loadInfrastructure( Scripting::Lot& lot ) {
-      auto dimensions = lot.floorMap->getDimensions();
+    void Display::MainGameState::loadInfrastructure( unsigned int currentRotation, Containers::ConcCollection3D< Threading::Lockable< Scripting::Tile > >& floorMap, Containers::ConcCollection3D< Threading::Lockable< Scripting::WallCell > >& wallMap ) {
+      auto dimensions = floorMap.getDimensions();
 
       floorInstanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< Instance > > >( dimensions.levels, dimensions.x, dimensions.y );
       wallInstanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< Display::MainGameState::WallCellBundler > > >( dimensions.levels, dimensions.x, dimensions.y );
 
       // Transform each Tile instance to an entity
-      auto size = lot.floorMap->getLength();
+      auto size = floorMap.getLength();
 
       // TODO: Fix this unholy mess of counters and garbage
       int xOrigin = -( dimensions.x / 2 );
@@ -263,7 +264,7 @@ namespace BlueBear {
           floorLevel = floorLevel + 5.0f;
         }
 
-        Threading::Lockable< Scripting::Tile > tilePtr = lot.floorMap->getItemDirect( i );
+        Threading::Lockable< Scripting::Tile > tilePtr = floorMap.getItemDirect( i );
         if( tilePtr ) {
           // Create instance from the model, and change its material using the material cache
           std::shared_ptr< Instance > instance = std::make_shared< Instance >( floorModel, defaultShader.Program );
@@ -287,7 +288,7 @@ namespace BlueBear {
         // Do not nudge any walls here (nudging will be the responsibility of MainGameState)
         // Nudging "X" means moving up in the Y dimension by 0.1
         // Nudging "Y" means moving left in the X dimension by 0.1
-        Threading::Lockable< Scripting::WallCell > wallCellPtr = lot.wallMap->getItemDirect( i );
+        Threading::Lockable< Scripting::WallCell > wallCellPtr = wallMap.getItemDirect( i );
         std::shared_ptr< Display::MainGameState::WallCellBundler > wallCellBundler;
         if( wallCellPtr ) {
           // Several different kinds of wall panel models depending on the type, and several kinds of orientations
@@ -304,7 +305,7 @@ namespace BlueBear {
             bundler.x->setRotationAngle( glm::radians( 180.0f ) );
 
             bundler.x->setWallpaper( frontPath, backPath );
-            bundler.x->selectMaterial( lot.currentRotation );
+            bundler.x->selectMaterial( currentRotation );
           }
 
           if( wallCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.y ); } ) ) {
@@ -313,7 +314,7 @@ namespace BlueBear {
             bundler.y->setPosition( glm::vec3( xCounter - 0.9f, yCounter, floorLevel ) );
 
             bundler.y->setWallpaper( frontPath, backPath );
-            bundler.y->selectMaterial( lot.currentRotation );
+            bundler.y->selectMaterial( currentRotation );
           }
 
           if( wallCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.d ); } ) ) {
@@ -321,7 +322,7 @@ namespace BlueBear {
             bundler.d->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
 
             bundler.d->setWallpaper( frontPath, backPath );
-            bundler.d->selectMaterial( lot.currentRotation );
+            bundler.d->selectMaterial( currentRotation );
           }
 
           if( wallCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.r ); } ) ) {
@@ -330,7 +331,7 @@ namespace BlueBear {
             bundler.r->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
 
             bundler.r->setWallpaper( frontPath, backPath );
-            bundler.r->selectMaterial( lot.currentRotation );
+            bundler.r->selectMaterial( currentRotation );
           }
         }
 
@@ -490,9 +491,12 @@ namespace BlueBear {
       Log::getInstance().info( "NewEntityCommand", "Called registerNewEntity, hang in there..." );
     }
 
-    Display::SendInfrastructureCommand::SendInfrastructureCommand( Scripting::Lot& lot ) : lot( lot ) {}
+    Display::SendInfrastructureCommand::SendInfrastructureCommand( Scripting::Lot& lot ) :
+      rotation( lot.currentRotation ),
+      floorMap( *lot.floorMap ),
+      wallMap( *lot.wallMap ) {}
     void Display::SendInfrastructureCommand::execute( Graphics::Display& instance ) {
-      instance.loadInfrastructure( lot );
+      instance.loadInfrastructure( rotation, floorMap, wallMap );
     }
   }
 }
