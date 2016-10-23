@@ -24,7 +24,7 @@ namespace BlueBear {
       static constexpr const char* WALL_SYSTEM_ROOT = "base.json";
       Json::Value tileConstants;
       std::map< std::string, Threading::Lockable< Tile > > tileRegistry;
-      std::map< std::string, std::shared_ptr< Wallpaper > > wallpaperRegistry;
+      std::map< std::string, Threading::Lockable< Wallpaper > > wallpaperRegistry;
 
       private:
         void registerFloorTile( const std::string& path );
@@ -35,7 +35,7 @@ namespace BlueBear {
         struct CannotLoadFileException : public std::exception { const char* what () const throw () { return "Could not load a required file!"; } };
 
         Threading::Lockable< Tile > getFloorTile( const std::string& key );
-        std::shared_ptr< Wallpaper > getWallpaper( const std::string& key );
+        Threading::Lockable< Wallpaper > getWallpaper( const std::string& key );
 
         void registerFloorTiles();
         void registerWallpapers();

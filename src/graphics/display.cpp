@@ -289,7 +289,10 @@ namespace BlueBear {
             bundler.x->setPosition( glm::vec3( xCounter, yCounter + 0.9f, floorLevel ) );
             bundler.x->setRotationAngle( glm::radians( 180.0f ) );
 
-            bundler.x->setWallpaper( wallCellPtr->x->front->imagePath, wallCellPtr->x->back->imagePath );
+            bundler.x->setWallpaper(
+              wallCellPtr->x->front.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } ),
+              wallCellPtr->x->back.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } )
+            );
             bundler.x->selectMaterial( lot.currentRotation );
           }
 
@@ -298,7 +301,10 @@ namespace BlueBear {
             bundler.y->setRotationAngle( glm::radians( -90.0f ) );
             bundler.y->setPosition( glm::vec3( xCounter - 0.9f, yCounter, floorLevel ) );
 
-            bundler.y->setWallpaper( wallCellPtr->y->front->imagePath, wallCellPtr->y->back->imagePath );
+            bundler.y->setWallpaper(
+              wallCellPtr->y->front.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } ),
+              wallCellPtr->y->back.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } )
+            );
             bundler.y->selectMaterial( lot.currentRotation );
           }
 
@@ -306,7 +312,10 @@ namespace BlueBear {
             bundler.d = std::make_shared< DWallInstance >( defaultShader.Program, texCache, imageCache );
             bundler.d->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
 
-            bundler.d->setWallpaper( wallCellPtr->d->front->imagePath, wallCellPtr->d->back->imagePath );
+            bundler.d->setWallpaper(
+              wallCellPtr->d->front.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } ),
+              wallCellPtr->d->back.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } )
+            );
             bundler.d->selectMaterial( lot.currentRotation );
           }
 
@@ -315,7 +324,10 @@ namespace BlueBear {
             bundler.r->setRotationAngle( glm::radians( -90.0f ) );
             bundler.r->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
 
-            bundler.r->setWallpaper( wallCellPtr->r->front->imagePath, wallCellPtr->r->back->imagePath );
+            bundler.r->setWallpaper(
+              wallCellPtr->r->front.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } ),
+              wallCellPtr->r->back.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } )
+            );
             bundler.r->selectMaterial( lot.currentRotation );
           }
         }
