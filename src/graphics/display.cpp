@@ -244,7 +244,7 @@ namespace BlueBear {
       auto dimensions = floorMap.getDimensions();
 
       floorInstanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< Instance > > >( dimensions.levels, dimensions.x, dimensions.y );
-      wallInstanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< Display::MainGameState::WallCellBundler > > >( dimensions.levels, dimensions.x, dimensions.y );
+      wallInstanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< Display::MainGameState::WallCellBundler > > >( dimensions.levels, dimensions.x + 1, dimensions.y + 1 );
 
       // Transform each Tile instance to an entity
       auto size = floorMap.getLength();
@@ -287,6 +287,27 @@ namespace BlueBear {
         } else {
           // There is no floor tile located here. Consequently, insert an empty Instance pointer here; it will be skipped on draw.
           floorInstanceCollection->pushDirect( std::shared_ptr< Instance >() );
+        }
+      }
+
+      // TODO: absolutely inexcusable quick sloppy bugfix for the additional wall dimension that wasn't properly accounted for
+      // this will be cleaned up very, very shortly as the code is tested and refactored
+      int wallDimX = dimensions.x + 1;
+      int wallDimY = dimensions.y + 1;
+      tilesPerLevel = wallDimX * wallDimY;
+      floorLevel = -15.0f;
+
+      size = wallMap.getLength();
+      for( auto i = 0; i != size; i++ ) {
+
+        int xCounter = xOrigin + ( i % wallDimX );
+        int yCounter = yOrigin + -( i / wallDimY );
+
+        // FLOOR
+        // Increase level every time we exceed the number of tiles per level
+        // Reset the boundaries of the 2D tile map
+        if( i % tilesPerLevel == 0 ) {
+          floorLevel = floorLevel + 5.0f;
         }
 
         // WALLS

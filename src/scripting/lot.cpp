@@ -53,7 +53,7 @@ namespace BlueBear {
 				lookup.push_back( wallpaper );
 			}
 
-			wallMap = std::make_unique< Containers::ConcCollection3D< Threading::Lockable< WallCell > > >( stories, floorX, floorY );
+			wallMap = std::make_unique< Containers::ConcCollection3D< Threading::Lockable< WallCell > > >( stories, floorX + 1, floorY + 1 );
 
 			for( Json::Value& level : levels ) {
 				for( Json::Value& object : level ) {
