@@ -228,6 +228,9 @@ namespace BlueBear {
       DWallInstance::Piece.reset();
       RWallInstance::Piece.reset();
     }
+    /**
+     * Determine if a wall on a segment in this dimension exists.
+     */
     bool Display::MainGameState::isWallDimensionPresent( std::string& frontPath, std::string& backPath, std::unique_ptr< Scripting::WallCell::Segment >& ptr ) {
       if( ptr ) {
         frontPath.assign( ptr->front.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } ) );
