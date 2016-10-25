@@ -72,6 +72,10 @@ namespace BlueBear {
           return getItemByRef( level, x, y );
         }
 
+        virtual void clear() {
+          items.clear();
+        }
+
         virtual unsigned int getLength() {
           return getItems().size();
         }

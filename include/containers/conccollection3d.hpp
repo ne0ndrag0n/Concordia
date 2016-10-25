@@ -36,6 +36,11 @@ namespace BlueBear {
         return Collection3D< T >::getItemDirectByRef( direct );
       }
 
+      void clear() {
+        std::unique_lock< std::mutex > lock( vectorMutex );
+        Collection3D< T >::clear();
+      }
+
       unsigned int getLength() {
         std::unique_lock< std::mutex > lock( vectorMutex );
         return Collection3D< T >::getLength();

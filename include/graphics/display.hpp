@@ -93,6 +93,7 @@ namespace BlueBear {
             std::shared_ptr< WallInstance > d;
             std::shared_ptr< WallInstance > r;
           };
+          unsigned int currentRotation;
           Shader defaultShader;
           Camera camera;
           Model floorModel;
@@ -107,7 +108,9 @@ namespace BlueBear {
           void processOsd();
           void remapWallTextures();
           bool isWallDimensionPresent( std::string& frontPath, std::string& backPath, std::unique_ptr< Scripting::WallCell::Segment >& ptr );
-          void loadInfrastructure( unsigned int currentRotation );
+          void loadInfrastructure();
+          void createFloorInstances();
+          void createWallInstances();
           WallCellBundler& getWallCellBundler( std::shared_ptr< WallCellBundler >& bundlerPtr );
         public:
           void execute();

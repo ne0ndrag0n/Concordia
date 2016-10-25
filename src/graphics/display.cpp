@@ -181,7 +181,8 @@ namespace BlueBear {
       camera( Camera( defaultShader.Program, instance.x, instance.y ) ),
       floorModel( Model( Display::FLOOR_MODEL_PATH ) ),
       floorMap( floorMap ),
-      wallMap( wallMap ) {
+      wallMap( wallMap ),
+      currentRotation( currentRotation ) {
 
       // Load infrastructure models
       // Setup static pointers on each of the wall types
@@ -219,7 +220,7 @@ namespace BlueBear {
       texts.rotation.setPosition( 0, 48 );
 
       // Moving much of Display::loadInfrastructure here
-      loadInfrastructure( currentRotation );
+      loadInfrastructure();
     }
     Display::MainGameState::~MainGameState() {
       XWallInstance::Piece.reset();
@@ -240,16 +241,11 @@ namespace BlueBear {
         return false;
       }
     }
-    void Display::MainGameState::loadInfrastructure( unsigned int currentRotation ) {
+    void Display::MainGameState::createFloorInstances() {
+      floorInstanceCollection->clear();
+
       auto dimensions = floorMap.getDimensions();
 
-      floorInstanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< Instance > > >( dimensions.levels, dimensions.x, dimensions.y );
-      wallInstanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< Display::MainGameState::WallCellBundler > > >( dimensions.levels, dimensions.x + 1, dimensions.y + 1 );
-
-      // Transform each Tile instance to an entity
-      auto size = floorMap.getLength();
-
-      // TODO: Fix this unholy mess of counters and garbage
       int xOrigin = -( dimensions.x / 2 );
       int yOrigin = dimensions.y / 2;
       // Determines the floor level
@@ -257,6 +253,7 @@ namespace BlueBear {
       // The floor level is -10. Start this at -15 to avoid a branch penalty in the next if.
       float floorLevel = -15.0f;
 
+      auto size = floorMap.getLength();
       for( auto i = 0; i != size; i++ ) {
 
         int xCounter = xOrigin + ( i % dimensions.x );
@@ -289,21 +286,22 @@ namespace BlueBear {
           floorInstanceCollection->pushDirect( std::shared_ptr< Instance >() );
         }
       }
+    }
+    void Display::MainGameState::createWallInstances() {
+      wallInstanceCollection->clear();
 
-      // TODO: absolutely inexcusable quick sloppy bugfix for the additional wall dimension that wasn't properly accounted for
-      // this will be cleaned up very, very shortly as the code is tested and refactored
-      xOrigin = -( ( dimensions.x + 1 ) / 2 );
-      yOrigin = ( dimensions.y + 1 ) / 2;
-      int wallDimX = dimensions.x + 1;
-      int wallDimY = dimensions.y + 1;
-      tilesPerLevel = wallDimX * wallDimY;
-      floorLevel = -15.0f;
+      auto dimensions = wallMap.getDimensions();
 
-      size = wallMap.getLength();
+      int xOrigin = -( ( dimensions.x ) / 2 );
+      int yOrigin = ( dimensions.y ) / 2;
+      int tilesPerLevel = dimensions.x * dimensions.y;
+      float floorLevel = -15.0f;
+
+      auto size = wallMap.getLength();
       for( auto i = 0; i != size; i++ ) {
 
-        int xCounter = xOrigin + ( i % wallDimX );
-        int yCounter = yOrigin + -( i / wallDimY );
+        int xCounter = xOrigin + ( i % dimensions.x );
+        int yCounter = yOrigin + -( i / dimensions.y );
 
         // FLOOR
         // Increase level every time we exceed the number of tiles per level
@@ -365,6 +363,16 @@ namespace BlueBear {
 
         wallInstanceCollection->pushDirect( wallCellBundler );
       }
+    }
+    void Display::MainGameState::loadInfrastructure() {
+      auto dimensions = floorMap.getDimensions();
+      floorInstanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< Instance > > >( dimensions.levels, dimensions.x, dimensions.y );
+
+      auto dimensionsWall = wallMap.getDimensions();
+      wallInstanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< Display::MainGameState::WallCellBundler > > >( dimensionsWall.levels, dimensionsWall.x, dimensionsWall.y );
+
+      createFloorInstances();
+      createWallInstances();
 
       Log::getInstance().info( "Display::MainGameState::loadInfrastructure", "Finished creating infrastructure instances." );
     }
