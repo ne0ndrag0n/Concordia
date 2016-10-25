@@ -292,6 +292,8 @@ namespace BlueBear {
 
       // TODO: absolutely inexcusable quick sloppy bugfix for the additional wall dimension that wasn't properly accounted for
       // this will be cleaned up very, very shortly as the code is tested and refactored
+      xOrigin = -( ( dimensions.x + 1 ) / 2 );
+      yOrigin = ( dimensions.y + 1 ) / 2;
       int wallDimX = dimensions.x + 1;
       int wallDimY = dimensions.y + 1;
       tilesPerLevel = wallDimX * wallDimY;
