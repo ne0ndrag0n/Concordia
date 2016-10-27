@@ -326,43 +326,73 @@ namespace BlueBear {
 
           // oh my fucking god i am so sorry about this
           if( wallCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.x ); } ) ) {
-            bundler.x = std::make_shared< XWallInstance >( defaultShader.Program, texCache, imageCache );
-            bundler.x->setPosition( glm::vec3( xCounter, yCounter + 0.9f, floorLevel ) );
-            bundler.x->setRotationAngle( glm::radians( 180.0f ) );
-
-            bundler.x->setWallpaper( frontPath, backPath );
-            bundler.x->selectMaterial( currentRotation );
+            bundler.x = newXWallInstance( xCounter, yCounter, floorLevel, frontPath, backPath );
           }
 
           if( wallCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.y ); } ) ) {
-            bundler.y = std::make_shared< YWallInstance >( defaultShader.Program, texCache, imageCache );
-            bundler.y->setRotationAngle( glm::radians( -90.0f ) );
-            bundler.y->setPosition( glm::vec3( xCounter - 0.9f, yCounter, floorLevel ) );
-
-            bundler.y->setWallpaper( frontPath, backPath );
-            bundler.y->selectMaterial( currentRotation );
+            bundler.y = newYWallInstance( xCounter, yCounter, floorLevel, frontPath, backPath );
           }
 
           if( wallCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.d ); } ) ) {
-            bundler.d = std::make_shared< DWallInstance >( defaultShader.Program, texCache, imageCache );
-            bundler.d->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
-
-            bundler.d->setWallpaper( frontPath, backPath );
-            bundler.d->selectMaterial( currentRotation );
+            bundler.d = newDWallInstance( xCounter, yCounter, floorLevel, frontPath, backPath );
           }
 
           if( wallCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.r ); } ) ) {
-            bundler.r = std::make_shared< RWallInstance >( defaultShader.Program, texCache, imageCache );
-            bundler.r->setRotationAngle( glm::radians( -90.0f ) );
-            bundler.r->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
-
-            bundler.r->setWallpaper( frontPath, backPath );
-            bundler.r->selectMaterial( currentRotation );
+            bundler.r = newRWallInstance( xCounter, yCounter, floorLevel, frontPath, backPath );
           }
         }
 
         wallInstanceCollection->pushDirect( wallCellBundler );
       }
+    }
+    /**
+     * Separated functions to get new wall instances
+     */
+    std::shared_ptr< XWallInstance > Display::MainGameState::newXWallInstance( int x, int y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper, bool edge ) {
+      std::shared_ptr< XWallInstance > value = std::make_shared< XWallInstance >( defaultShader.Program, texCache, imageCache );
+      value->setPosition( glm::vec3( x, y + 0.9f, floorLevel ) );
+      value->setRotationAngle( glm::radians( 180.0f ) );
+
+      value->setWallpaper( frontWallpaper, backWallpaper );
+      value->selectMaterial( currentRotation );
+
+      return value;
+    }
+    std::shared_ptr< YWallInstance > Display::MainGameState::newYWallInstance( int x, int y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper, bool edge ) {
+      std::shared_ptr< YWallInstance > value = std::make_shared< YWallInstance >( defaultShader.Program, texCache, imageCache );
+      value->setRotationAngle( glm::radians( -90.0f ) );
+      value->setPosition( glm::vec3( x - 0.9f, y, floorLevel ) );
+
+      value->setWallpaper( frontWallpaper, backWallpaper );
+      value->selectMaterial( currentRotation );
+
+      return value;
+    }
+    std::shared_ptr< DWallInstance > Display::MainGameState::newDWallInstance( int x, int y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper ) {
+      std::shared_ptr< DWallInstance > value = std::make_shared< DWallInstance >( defaultShader.Program, texCache, imageCache );
+      value->setPosition( glm::vec3( x, y, floorLevel ) );
+
+      value->setWallpaper( frontWallpaper, backWallpaper );
+      value->selectMaterial( currentRotation );
+
+      return value;
+    }
+    std::shared_ptr< RWallInstance > Display::MainGameState::newRWallInstance( int x, int y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper ) {
+      std::shared_ptr< RWallInstance > value = std::make_shared< RWallInstance >( defaultShader.Program, texCache, imageCache );
+      value->setRotationAngle( glm::radians( -90.0f ) );
+      value->setPosition( glm::vec3( x, y, floorLevel ) );
+
+      value->setWallpaper( frontWallpaper, backWallpaper );
+      value->selectMaterial( currentRotation );
+
+      return value;
+    }
+    /**
+     * Update wall edge segments; this basically means discarding existing wall segments built using createWallInstances and replacing them as-needed with edge segments.
+     * See dev/wall/edgeSegments.md
+     */
+    void Display::MainGameState::updateWallEdgeSegments() {
+
     }
     void Display::MainGameState::loadInfrastructure() {
       auto dimensions = floorMap.getDimensions();

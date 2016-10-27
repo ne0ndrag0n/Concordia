@@ -36,6 +36,10 @@ namespace BlueBear {
   namespace Graphics {
     class Instance;
     class WallInstance;
+    class XWallInstance;
+    class YWallInstance;
+    class DWallInstance;
+    class RWallInstance;
 
     class Display {
     public:
@@ -111,7 +115,12 @@ namespace BlueBear {
           void loadInfrastructure();
           void createFloorInstances();
           void createWallInstances();
+          void updateWallEdgeSegments();
           WallCellBundler& getWallCellBundler( std::shared_ptr< WallCellBundler >& bundlerPtr );
+          std::shared_ptr< XWallInstance > newXWallInstance( int x, int y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper, bool edge = false );
+          std::shared_ptr< YWallInstance > newYWallInstance( int x, int y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper, bool edge = false );
+          std::shared_ptr< DWallInstance > newDWallInstance( int x, int y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper );
+          std::shared_ptr< RWallInstance > newRWallInstance( int x, int y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper );
         public:
           void execute();
           void handleEvent( sf::Event& event );
