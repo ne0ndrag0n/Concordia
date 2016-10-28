@@ -246,44 +246,37 @@ namespace BlueBear {
 
       auto dimensions = floorMap.getDimensions();
 
-      int xOrigin = -( dimensions.x / 2 );
-      int yOrigin = dimensions.y / 2;
-      // Determines the floor level
-      int tilesPerLevel = dimensions.x * dimensions.y;
-      // The floor level is -10. Start this at -15 to avoid a branch penalty in the next if.
-      float floorLevel = -15.0f;
+      float xOrigin = -( (int)dimensions.x / 2 ) + 0.5f;
+      float yOrigin = ( dimensions.y / 2 ) - 0.5f;
 
-      auto size = floorMap.getLength();
-      for( auto i = 0; i != size; i++ ) {
+      for ( unsigned int zCounter = 0; zCounter != dimensions.levels; zCounter++ ) {
+        for( unsigned int yCounter = 0; yCounter != dimensions.y; yCounter++ ) {
+          for( unsigned int xCounter = 0; xCounter != dimensions.x; xCounter++ ) {
 
-        int xCounter = xOrigin + ( i % dimensions.x );
-        int yCounter = yOrigin + -( i / dimensions.y );
+            glm::vec3 floorCoords( xOrigin + xCounter, yOrigin + yCounter, -10.0f - zCounter );
 
-        // FLOOR
-        // Increase level every time we exceed the number of tiles per level
-        // Reset the boundaries of the 2D tile map
-        if( i % tilesPerLevel == 0 ) {
-          floorLevel = floorLevel + 5.0f;
-        }
+            Threading::Lockable< Scripting::Tile > tilePtr = floorMap.getItem( zCounter, xCounter, yCounter );
 
-        Threading::Lockable< Scripting::Tile > tilePtr = floorMap.getItemDirect( i );
-        if( tilePtr ) {
-          // Create instance from the model, and change its material using the material cache
-          std::shared_ptr< Instance > instance = std::make_shared< Instance >( floorModel, defaultShader.Program );
+            if( tilePtr ) {
+              // Create instance from the model, and change its material using the material cache
+              std::shared_ptr< Instance > instance = std::make_shared< Instance >( floorModel, defaultShader.Program );
 
-          Drawable& floorDrawable = instance->drawables.at( "Plane" );
+              Drawable& floorDrawable = instance->drawables.at( "Plane" );
 
-          tilePtr.lock( [ & ]( Scripting::Tile& tile ) {
-            floorDrawable.material = std::make_shared< Material >( TextureList{ texCache.get( tile.imagePath ) } );
-          } );
+              tilePtr.lock( [ & ]( Scripting::Tile& tile ) {
+                floorDrawable.material = std::make_shared< Material >( TextureList{ texCache.get( tile.imagePath ) } );
+              } );
 
-          instance->setPosition( glm::vec3( xCounter, yCounter, floorLevel ) );
+              instance->setPosition( floorCoords );
 
-          // The pointer to this floor tile goes into the floorInstanceCollection
-          floorInstanceCollection->pushDirect( instance );
-        } else {
-          // There is no floor tile located here. Consequently, insert an empty Instance pointer here; it will be skipped on draw.
-          floorInstanceCollection->pushDirect( std::shared_ptr< Instance >() );
+              // The pointer to this floor tile goes into the floorInstanceCollection
+              floorInstanceCollection->pushDirect( instance );
+            } else {
+              // There is no floor tile located here. Consequently, insert an empty Instance pointer here; it will be skipped on draw.
+              floorInstanceCollection->pushDirect( std::shared_ptr< Instance >() );
+            }
+
+          }
         }
       }
     }
@@ -292,63 +285,58 @@ namespace BlueBear {
 
       auto dimensions = wallMap.getDimensions();
 
-      int xOrigin = -( ( dimensions.x ) / 2 );
-      int yOrigin = ( dimensions.y ) / 2;
-      int tilesPerLevel = dimensions.x * dimensions.y;
-      float floorLevel = -15.0f;
+      float xOrigin = -( (int)dimensions.x / 2 ) + 0.5f;
+      float yOrigin = ( dimensions.y / 2 ) - 0.5f;
 
-      auto size = wallMap.getLength();
-      for( auto i = 0; i != size; i++ ) {
+      for ( unsigned int zCounter = 0; zCounter != dimensions.levels; zCounter++ ) {
+        for( unsigned int yCounter = 0; yCounter != dimensions.y; yCounter++ ) {
+          for( unsigned int xCounter = 0; xCounter != dimensions.x; xCounter++ ) {
 
-        int xCounter = xOrigin + ( i % dimensions.x );
-        int yCounter = yOrigin + -( i / dimensions.y );
+            // WALLS
+            // Do not nudge any walls here (nudging will be the responsibility of MainGameState)
+            // Nudging "X" means moving up in the Y dimension by 0.1
+            // Nudging "Y" means moving left in the X dimension by 0.1
 
-        // FLOOR
-        // Increase level every time we exceed the number of tiles per level
-        // Reset the boundaries of the 2D tile map
-        if( i % tilesPerLevel == 0 ) {
-          floorLevel = floorLevel + 5.0f;
-        }
+            glm::vec3 wallCenter( xOrigin + xCounter, yOrigin + yCounter, -10.0f - zCounter );
 
-        // WALLS
-        // Do not nudge any walls here (nudging will be the responsibility of MainGameState)
-        // Nudging "X" means moving up in the Y dimension by 0.1
-        // Nudging "Y" means moving left in the X dimension by 0.1
-        Threading::Lockable< Scripting::WallCell > wallCellPtr = wallMap.getItemDirect( i );
-        std::shared_ptr< Display::MainGameState::WallCellBundler > wallCellBundler;
-        if( wallCellPtr ) {
-          // Several different kinds of wall panel models depending on the type, and several kinds of orientations
-          // If that pointer exists, at least one of these ifs will be fulfilled
-          auto& bundler = getWallCellBundler( wallCellBundler );
+            Threading::Lockable< Scripting::WallCell > wallCellPtr = wallMap.getItem( zCounter, xCounter, yCounter );
+            std::shared_ptr< Display::MainGameState::WallCellBundler > wallCellBundler;
+            if( wallCellPtr ) {
+              // Several different kinds of wall panel models depending on the type, and several kinds of orientations
+              // If that pointer exists, at least one of these ifs will be fulfilled
+              auto& bundler = getWallCellBundler( wallCellBundler );
 
-          std::string frontPath;
-          std::string backPath;
+              std::string frontPath;
+              std::string backPath;
 
-          // oh my fucking god i am so sorry about this
-          if( wallCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.x ); } ) ) {
-            bundler.x = newXWallInstance( xCounter, yCounter, floorLevel, frontPath, backPath );
-          }
+              // oh my fucking god i am so sorry about this
+              if( wallCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.x ); } ) ) {
+                bundler.x = newXWallInstance( wallCenter.x, wallCenter.y, wallCenter.z, frontPath, backPath );
+              }
 
-          if( wallCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.y ); } ) ) {
-            bundler.y = newYWallInstance( xCounter, yCounter, floorLevel, frontPath, backPath );
-          }
+              if( wallCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.y ); } ) ) {
+                bundler.y = newYWallInstance( wallCenter.x, wallCenter.y, wallCenter.z, frontPath, backPath );
+              }
 
-          if( wallCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.d ); } ) ) {
-            bundler.d = newDWallInstance( xCounter, yCounter, floorLevel, frontPath, backPath );
-          }
+              if( wallCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.d ); } ) ) {
+                bundler.d = newDWallInstance( wallCenter.x, wallCenter.y, wallCenter.z, frontPath, backPath );
+              }
 
-          if( wallCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.r ); } ) ) {
-            bundler.r = newRWallInstance( xCounter, yCounter, floorLevel, frontPath, backPath );
+              if( wallCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.r ); } ) ) {
+                bundler.r = newRWallInstance( wallCenter.x, wallCenter.y, wallCenter.z, frontPath, backPath );
+              }
+            }
+
+            wallInstanceCollection->pushDirect( wallCellBundler );
+
           }
         }
-
-        wallInstanceCollection->pushDirect( wallCellBundler );
       }
     }
     /**
      * Separated functions to get new wall instances
      */
-    std::shared_ptr< XWallInstance > Display::MainGameState::newXWallInstance( int x, int y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper, bool edge ) {
+    std::shared_ptr< XWallInstance > Display::MainGameState::newXWallInstance( float x, float y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper, bool edge ) {
       std::shared_ptr< XWallInstance > value = std::make_shared< XWallInstance >( defaultShader.Program, texCache, imageCache );
       value->setPosition( glm::vec3( x, y + 0.9f, floorLevel ) );
       value->setRotationAngle( glm::radians( 180.0f ) );
@@ -358,7 +346,7 @@ namespace BlueBear {
 
       return value;
     }
-    std::shared_ptr< YWallInstance > Display::MainGameState::newYWallInstance( int x, int y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper, bool edge ) {
+    std::shared_ptr< YWallInstance > Display::MainGameState::newYWallInstance( float x, float y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper, bool edge ) {
       std::shared_ptr< YWallInstance > value = std::make_shared< YWallInstance >( defaultShader.Program, texCache, imageCache );
       value->setRotationAngle( glm::radians( -90.0f ) );
       value->setPosition( glm::vec3( x - 0.9f, y, floorLevel ) );
@@ -368,7 +356,7 @@ namespace BlueBear {
 
       return value;
     }
-    std::shared_ptr< DWallInstance > Display::MainGameState::newDWallInstance( int x, int y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper ) {
+    std::shared_ptr< DWallInstance > Display::MainGameState::newDWallInstance( float x, float y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper ) {
       std::shared_ptr< DWallInstance > value = std::make_shared< DWallInstance >( defaultShader.Program, texCache, imageCache );
       value->setPosition( glm::vec3( x, y, floorLevel ) );
 
@@ -377,7 +365,7 @@ namespace BlueBear {
 
       return value;
     }
-    std::shared_ptr< RWallInstance > Display::MainGameState::newRWallInstance( int x, int y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper ) {
+    std::shared_ptr< RWallInstance > Display::MainGameState::newRWallInstance( float x, float y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper ) {
       std::shared_ptr< RWallInstance > value = std::make_shared< RWallInstance >( defaultShader.Program, texCache, imageCache );
       value->setRotationAngle( glm::radians( -90.0f ) );
       value->setPosition( glm::vec3( x, y, floorLevel ) );

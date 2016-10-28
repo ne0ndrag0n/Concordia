@@ -18,10 +18,7 @@
 			"dict": [ "star_test", "_grey" ],
 			"levels": [
 				[
-					{ "y": { "f": 0, "b": 0 } },
-					{ "run": 6, "value": -1 },
-					{ "y": { "f": 0, "b": 0 } },
-					{ "run": 40, "value": -1 }
+					{ "run": 49, "value": -1 }
 				]
 			]
 		}
