@@ -3,5 +3,10 @@
     "sound": "hard",
     "image": "hardwood1.png",
     "price": 10
+  },
+  "hardwood2": {
+    "sound": "hard",
+    "image": "hardwood2.png",
+    "price": 10
   }
 }

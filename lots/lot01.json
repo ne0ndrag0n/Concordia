@@ -9,9 +9,12 @@
 	"rot": 0,
 	"infr": {
 		"floor": {
-			"dict": [ "hardwood1" ],
+			"dict": [ "hardwood1", "hardwood2" ],
 			"levels": [
-				[ { "run": 36, "value": 0 } ]
+				[
+					{ "run": 18, "value": 0 },
+					{ "run": 18, "value": 1 }
+				]
 			]
 		},
 		"wall": {
