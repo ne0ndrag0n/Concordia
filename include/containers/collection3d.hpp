@@ -14,10 +14,7 @@ namespace BlueBear {
       protected:
         std::vector< T > items;
         unsigned int getSingleIndex( unsigned int level, unsigned int x, unsigned int y ) {
-          unsigned int origin = level * ( dimensions.x * dimensions.y );
-
-          // check this formula
-          return origin + ( ( dimensions.x * y ) + x );
+          return ( dimensions.y * dimensions.x * level ) + ( dimensions.x * y ) + x;
         }
 
         std::vector< T >& getItems() {
