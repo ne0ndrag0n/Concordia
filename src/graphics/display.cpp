@@ -255,8 +255,6 @@ namespace BlueBear {
 
             glm::vec3 floorCoords( xOrigin + xCounter, yOrigin - yCounter, -10.0f - zCounter );
 
-            //Log::getInstance().debug( "Display::MainGameState::createFloorInstances", "Drawing this tile at location " + std::to_string( floorCoords.x ) + ", " + std::to_string( floorCoords.y ) + ", " + std::to_string( floorCoords.z ) );
-
             Threading::Lockable< Scripting::Tile > tilePtr = floorMap.getItem( zCounter, xCounter, yCounter );
 
             if( tilePtr ) {
@@ -299,7 +297,7 @@ namespace BlueBear {
             // Nudging "X" means moving up in the Y dimension by 0.1
             // Nudging "Y" means moving left in the X dimension by 0.1
 
-            glm::vec3 wallCenter( xOrigin + xCounter, yOrigin + yCounter, -10.0f - zCounter );
+            glm::vec3 wallCenter( xOrigin + xCounter, yOrigin - yCounter, -10.0f - zCounter );
 
             Threading::Lockable< Scripting::WallCell > wallCellPtr = wallMap.getItem( zCounter, xCounter, yCounter );
             std::shared_ptr< Display::MainGameState::WallCellBundler > wallCellBundler;
