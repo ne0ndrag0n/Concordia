@@ -253,7 +253,9 @@ namespace BlueBear {
         for( unsigned int yCounter = 0; yCounter != dimensions.y; yCounter++ ) {
           for( unsigned int xCounter = 0; xCounter != dimensions.x; xCounter++ ) {
 
-            glm::vec3 floorCoords( xOrigin + xCounter, yOrigin + yCounter, -10.0f - zCounter );
+            glm::vec3 floorCoords( xOrigin + xCounter, yOrigin - yCounter, -10.0f - zCounter );
+
+            //Log::getInstance().debug( "Display::MainGameState::createFloorInstances", "Drawing this tile at location " + std::to_string( floorCoords.x ) + ", " + std::to_string( floorCoords.y ) + ", " + std::to_string( floorCoords.z ) );
 
             Threading::Lockable< Scripting::Tile > tilePtr = floorMap.getItem( zCounter, xCounter, yCounter );
 
