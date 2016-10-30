@@ -350,14 +350,9 @@ namespace BlueBear {
       std::shared_ptr< YWallInstance > value = std::make_shared< YWallInstance >( defaultShader.Program, texCache, imageCache, edge );
 
       // untested, sloppy code
-      if( edge ) {
-        if ( currentRotation == 0 || currentRotation == 1 ) {
-          value->setRotationAngle( glm::radians( 90.0f ) );
-          value->setPosition( glm::vec3( x, y, floorLevel ) );
-        } else {
-          value->setRotationAngle( glm::radians( 90.0f ) );
-          value->setPosition( glm::vec3( x, y, floorLevel ) );
-        }
+      if( edge && ( currentRotation == 0 || currentRotation == 1 ) ) {
+        value->setRotationAngle( glm::radians( 90.0f ) );
+        value->setPosition( glm::vec3( x, y, floorLevel ) );
       } else {
         value->setRotationAngle( glm::radians( -90.0f ) );
         value->setPosition( glm::vec3( x - 0.9f, y, floorLevel ) );
