@@ -25,6 +25,10 @@ namespace BlueBear {
      * Set the texture atlas attributes per rotation
      */
     void YWallInstance::setRotationAttributes( unsigned int rotation, std::map< std::string, std::unique_ptr< ImageSource > >& settings ) {
+
+      settings.emplace( std::make_pair( "FrontWall", std::make_unique< DirectImageSource >( *front.image, front.path ) ) );
+      settings.emplace( std::make_pair( "BackWall", std::make_unique< DirectImageSource >( *back.image, back.path ) ) );
+
       switch( rotation ) {
         case 0:
           settings.emplace( std::make_pair( "Side2", std::make_unique< DirectImageSource >( *front.leftSegment, "0ys2 " + front.path ) ) );
@@ -44,6 +48,11 @@ namespace BlueBear {
     void YWallInstance::setRotationAttributesEdge( unsigned int rotation, std::map< std::string, std::unique_ptr< ImageSource > >& settings ) {
       // Similar but not identical code - A different face is seen by the player on certain rotations of the edge piece.
       // TODO: This stuff is based on earlier code and needs to be fixed
+
+      // TODO: These two lines depend on rotation!!
+      settings.emplace( std::make_pair( "FrontWall", std::make_unique< DirectImageSource >( *front.image, front.path ) ) );
+      settings.emplace( std::make_pair( "BackWall", std::make_unique< DirectImageSource >( *back.image, back.path ) ) );
+
       switch( rotation ) {
         case 0:
           settings.emplace( std::make_pair( "Side2", std::make_unique< DirectImageSource >( *front.leftSegment, "0ys2 " + front.path ) ) );
