@@ -347,27 +347,24 @@ namespace BlueBear {
       return value;
     }
     std::shared_ptr< YWallInstance > Display::MainGameState::newYWallInstance( float x, float y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper, bool edge ) {
+      edge = true;
       std::shared_ptr< YWallInstance > value = std::make_shared< YWallInstance >( defaultShader.Program, texCache, imageCache, edge );
 
       // untested, sloppy code
-      /*
       if( edge ) {
         if ( currentRotation == 0 || currentRotation == 1 ) {
           value->setRotationAngle( glm::radians( 90.0f ) );
           value->setPosition( glm::vec3( x, y, floorLevel ) );
-          value->setWallpaper( backWallpaper, frontWallpaper );
         } else {
           value->setRotationAngle( glm::radians( 90.0f ) );
           value->setPosition( glm::vec3( x, y, floorLevel ) );
-          value->setWallpaper( backWallpaper, frontWallpaper );
         }
       } else {
-      */
         value->setRotationAngle( glm::radians( -90.0f ) );
         value->setPosition( glm::vec3( x - 0.9f, y, floorLevel ) );
-        value->setWallpaper( frontWallpaper, backWallpaper );
-      //}
+      }
 
+      value->setWallpaper( frontWallpaper, backWallpaper );
       value->selectMaterial( currentRotation );
 
       return value;

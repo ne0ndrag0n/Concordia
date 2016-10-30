@@ -49,25 +49,30 @@ namespace BlueBear {
       // Similar but not identical code - A different face is seen by the player on certain rotations of the edge piece.
       // TODO: This stuff is based on earlier code and needs to be fixed
 
-      // TODO: These two lines depend on rotation!!
-      settings.emplace( std::make_pair( "FrontWall", std::make_unique< DirectImageSource >( *front.image, front.path ) ) );
-      settings.emplace( std::make_pair( "BackWall", std::make_unique< DirectImageSource >( *back.image, back.path ) ) );
 
       switch( rotation ) {
         case 0:
-          settings.emplace( std::make_pair( "Side2", std::make_unique< DirectImageSource >( *front.leftSegment, "0ys2 " + front.path ) ) );
-          settings.emplace( std::make_pair( "FrontWallExtended", std::make_unique< DirectImageSource >( *front.rightSegment, "0yf " + front.path ) ) );
+          // Back faces the player - set it to the front image
+          settings.emplace( std::make_pair( "BackWall", std::make_unique< DirectImageSource >( *front.image, front.path ) ) );
+          settings.emplace( std::make_pair( "Side1", std::make_unique< DirectImageSource >( *front.leftSegment, "0ys1 " + front.path ) ) );
+          settings.emplace( std::make_pair( "BackWallExtended", std::make_unique< DirectImageSource >( *front.rightSegment, "0yb " + front.path ) ) );
           break;
         case 1:
-          settings.emplace( std::make_pair( "Side2", std::make_unique< DirectImageSource >( *back.rightSegment, "1ys2 " + back.path ) ) );
-          settings.emplace( std::make_pair( "BackWallExtended", std::make_unique< DirectImageSource >( *back.leftSegment, "1yb " + back.path ) ) );
+          // Front faces the player - set it to the back image
+          settings.emplace( std::make_pair( "FrontWall", std::make_unique< DirectImageSource >( *back.image, back.path ) ) );
+          settings.emplace( std::make_pair( "Side1", std::make_unique< DirectImageSource >( *back.rightSegment, "1ys1 " + back.path ) ) );
+          settings.emplace( std::make_pair( "FrontWallExtended", std::make_unique< DirectImageSource >( *back.leftSegment, "1yf " + back.path ) ) );
           break;
         case 2:
+          settings.emplace( std::make_pair( "FrontWall", std::make_unique< DirectImageSource >( *front.image, front.path ) ) );
+          settings.emplace( std::make_pair( "BackWall", std::make_unique< DirectImageSource >( *back.image, back.path ) ) );
           settings.emplace( std::make_pair( "Side1", std::make_unique< DirectImageSource >( *back.leftSegment, "2ys1 " + back.path ) ) );
           settings.emplace( std::make_pair( "BackWallExtended", std::make_unique< DirectImageSource >( *back.rightSegment, "2yb " + back.path ) ) );
           break;
         case 3:
         default:
+          settings.emplace( std::make_pair( "FrontWall", std::make_unique< DirectImageSource >( *front.image, front.path ) ) );
+          settings.emplace( std::make_pair( "BackWall", std::make_unique< DirectImageSource >( *back.image, back.path ) ) );
           settings.emplace( std::make_pair( "Side1", std::make_unique< DirectImageSource >( *front.rightSegment, "3ys1 " + front.path ) ) );
           settings.emplace( std::make_pair( "FrontWallExtended", std::make_unique< DirectImageSource >( *front.leftSegment, "3yf " + front.path ) ) );
       }
