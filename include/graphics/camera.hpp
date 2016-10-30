@@ -53,8 +53,8 @@ namespace BlueBear {
         void walkForward();
         void walkBackward();
         void updateFirstPersonView( int deltaX, int deltaY );
-        void rotateRight();
-        void rotateLeft();
+        unsigned int rotateRight();
+        unsigned int rotateLeft();
         GLuint getCurrentRotation();
         void setRotationDirect( GLuint rotation );
         std::string positionToString();

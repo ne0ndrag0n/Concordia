@@ -42,21 +42,24 @@ namespace BlueBear {
     }
 
     void YWallInstance::setRotationAttributesEdge( unsigned int rotation, std::map< std::string, std::unique_ptr< ImageSource > >& settings ) {
-      YWallInstance::setRotationAttributes( rotation, settings );
-
-      // Apply additional settings to each extended attribute for this extended wall instance
+      // Similar but not identical code - A different face is seen by the player on certain rotations of the edge piece.
+      // TODO: This stuff is based on earlier code and needs to be fixed
       switch( rotation ) {
         case 0:
+          settings.emplace( std::make_pair( "Side2", std::make_unique< DirectImageSource >( *front.leftSegment, "0ys2 " + front.path ) ) );
           settings.emplace( std::make_pair( "FrontWallExtended", std::make_unique< DirectImageSource >( *front.rightSegment, "0yf " + front.path ) ) );
           break;
         case 1:
+          settings.emplace( std::make_pair( "Side2", std::make_unique< DirectImageSource >( *back.rightSegment, "1ys2 " + back.path ) ) );
           settings.emplace( std::make_pair( "BackWallExtended", std::make_unique< DirectImageSource >( *back.leftSegment, "1yb " + back.path ) ) );
           break;
         case 2:
+          settings.emplace( std::make_pair( "Side1", std::make_unique< DirectImageSource >( *back.leftSegment, "2ys1 " + back.path ) ) );
           settings.emplace( std::make_pair( "BackWallExtended", std::make_unique< DirectImageSource >( *back.rightSegment, "2yb " + back.path ) ) );
           break;
         case 3:
         default:
+          settings.emplace( std::make_pair( "Side1", std::make_unique< DirectImageSource >( *front.rightSegment, "3ys1 " + front.path ) ) );
           settings.emplace( std::make_pair( "FrontWallExtended", std::make_unique< DirectImageSource >( *front.leftSegment, "3yf " + front.path ) ) );
       }
     }

@@ -337,7 +337,7 @@ namespace BlueBear {
      * Separated functions to get new wall instances
      */
     std::shared_ptr< XWallInstance > Display::MainGameState::newXWallInstance( float x, float y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper, bool edge ) {
-      std::shared_ptr< XWallInstance > value = std::make_shared< XWallInstance >( defaultShader.Program, texCache, imageCache );
+      std::shared_ptr< XWallInstance > value = std::make_shared< XWallInstance >( defaultShader.Program, texCache, imageCache, edge );
       value->setPosition( glm::vec3( x, y + 0.9f, floorLevel ) );
       value->setRotationAngle( glm::radians( 180.0f ) );
 
@@ -347,11 +347,27 @@ namespace BlueBear {
       return value;
     }
     std::shared_ptr< YWallInstance > Display::MainGameState::newYWallInstance( float x, float y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper, bool edge ) {
-      std::shared_ptr< YWallInstance > value = std::make_shared< YWallInstance >( defaultShader.Program, texCache, imageCache );
-      value->setRotationAngle( glm::radians( -90.0f ) );
-      value->setPosition( glm::vec3( x - 0.9f, y, floorLevel ) );
+      std::shared_ptr< YWallInstance > value = std::make_shared< YWallInstance >( defaultShader.Program, texCache, imageCache, edge );
 
-      value->setWallpaper( frontWallpaper, backWallpaper );
+      // untested, sloppy code
+      /*
+      if( edge ) {
+        if ( currentRotation == 0 || currentRotation == 1 ) {
+          value->setRotationAngle( glm::radians( 90.0f ) );
+          value->setPosition( glm::vec3( x, y, floorLevel ) );
+          value->setWallpaper( backWallpaper, frontWallpaper );
+        } else {
+          value->setRotationAngle( glm::radians( 90.0f ) );
+          value->setPosition( glm::vec3( x, y, floorLevel ) );
+          value->setWallpaper( backWallpaper, frontWallpaper );
+        }
+      } else {
+      */
+        value->setRotationAngle( glm::radians( -90.0f ) );
+        value->setPosition( glm::vec3( x - 0.9f, y, floorLevel ) );
+        value->setWallpaper( frontWallpaper, backWallpaper );
+      //}
+
       value->selectMaterial( currentRotation );
 
       return value;
@@ -380,7 +396,32 @@ namespace BlueBear {
      * See dev/wall/edgeSegments.md
      */
     void Display::MainGameState::updateWallEdgeSegments() {
+      auto dimensions = wallInstanceCollection->getDimensions();
 
+      float xOrigin = -( (int)dimensions.x / 2 ) + 0.5f;
+      float yOrigin = ( dimensions.y / 2 ) - 0.5f;
+
+      unsigned int xEdge = dimensions.x - 1;
+      unsigned int yEdge = dimensions.y - 1;
+
+      for ( unsigned int zCounter = 0; zCounter != dimensions.levels; zCounter++ ) {
+        for( unsigned int yCounter = 0; yCounter != dimensions.y; yCounter++ ) {
+          for( unsigned int xCounter = 0; xCounter != dimensions.x; xCounter++ ) {
+
+            std::shared_ptr< Display::MainGameState::WallCellBundler > wallCellBundler = wallInstanceCollection->getItem( zCounter, xCounter, yCounter );
+
+            if( wallCellBundler->y ) {
+              // Y-AXIS SEGMENTS:
+              // Rotations 0 & 1: Use edge piece if there is no segment at [ xCounter ][ yCounter - 1 ]. For edges of the board, at [ xCounter ][ 0 ], always use an edge piece.
+              // If yCounter is equal to yEdge, don't check at all.
+              // Rotations 2 & 3: Use edge piece if there is no segment at [ xCounter ][ yCounter + 1 ]. For edges of the board, at [ xCounter ][ yEdge ], always use an edge piece.
+              // If yCounter is equal to 0, don't check at all.
+            }
+
+
+          }
+        }
+      }
     }
     void Display::MainGameState::loadInfrastructure() {
       auto dimensions = floorMap.getDimensions();
@@ -415,6 +456,8 @@ namespace BlueBear {
       for( auto i = 0; i != length; i++ ) {
         std::shared_ptr< Instance > floorInstance = floorInstanceCollection->getItemDirect( i );
         std::shared_ptr< Display::MainGameState::WallCellBundler > wallCellBundler = wallInstanceCollection->getItemDirect( i );
+
+        // FIXME: This should not have to recalculate on every frame. Please revise this to precalculate/nudge only after a rotation.
         auto rotation = camera.getCurrentRotation();
         float xWallNudge = ( rotation == 1 || rotation == 2 ) ? -0.1f : 0.0f;
         float yWallNudge = ( rotation == 0 || rotation == 1 ) ? 0.1f : 0.0f;
@@ -472,12 +515,12 @@ namespace BlueBear {
             }
 
             if( keyCode == KEY_ROTATE_RIGHT ) {
-              camera.rotateRight();
+              currentRotation = camera.rotateRight();
               remapWallTextures();
             }
 
             if( keyCode == KEY_ROTATE_LEFT ) {
-              camera.rotateLeft();
+              currentRotation = camera.rotateLeft();
               remapWallTextures();
             }
 

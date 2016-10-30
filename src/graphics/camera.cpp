@@ -121,20 +121,24 @@ namespace BlueBear {
       }
     }
 
-    void Camera::rotateRight() {
+    unsigned int Camera::rotateRight() {
       if( ortho ) {
         currentRotation = ( currentRotation + 1 ) % 4;
 
         doRotate();
       }
+
+      return currentRotation;
     }
 
-    void Camera::rotateLeft() {
+    unsigned int Camera::rotateLeft() {
       if( ortho ) {
         currentRotation = ( currentRotation - 1 ) % 4;
 
         doRotate();
       }
+
+      return currentRotation;
     }
 
     GLuint Camera::getCurrentRotation() {
