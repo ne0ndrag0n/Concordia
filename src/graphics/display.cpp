@@ -347,7 +347,6 @@ namespace BlueBear {
       return value;
     }
     std::shared_ptr< YWallInstance > Display::MainGameState::newYWallInstance( float x, float y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper, bool edge ) {
-      edge = true;
       std::shared_ptr< YWallInstance > value = std::make_shared< YWallInstance >( defaultShader.Program, texCache, imageCache, edge );
 
       // untested, sloppy code

@@ -64,6 +64,7 @@ namespace BlueBear {
           settings.emplace( std::make_pair( "FrontWallExtended", std::make_unique< DirectImageSource >( *back.leftSegment, "1yf " + back.path ) ) );
           break;
         case 2:
+          // FIXME
           settings.emplace( std::make_pair( "FrontWall", std::make_unique< DirectImageSource >( *front.image, front.path ) ) );
           settings.emplace( std::make_pair( "BackWall", std::make_unique< DirectImageSource >( *back.image, back.path ) ) );
           settings.emplace( std::make_pair( "Side1", std::make_unique< DirectImageSource >( *back.leftSegment, "2ys1 " + back.path ) ) );
@@ -71,6 +72,7 @@ namespace BlueBear {
           break;
         case 3:
         default:
+          // FIXME
           settings.emplace( std::make_pair( "FrontWall", std::make_unique< DirectImageSource >( *front.image, front.path ) ) );
           settings.emplace( std::make_pair( "BackWall", std::make_unique< DirectImageSource >( *back.image, back.path ) ) );
           settings.emplace( std::make_pair( "Side1", std::make_unique< DirectImageSource >( *front.rightSegment, "3ys1 " + front.path ) ) );
