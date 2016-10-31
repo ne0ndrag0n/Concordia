@@ -315,7 +315,34 @@ namespace BlueBear {
               }
 
               if( wallCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.y ); } ) ) {
-                bundler.y = newYWallInstance( wallCenter.x, wallCenter.y, wallCenter.z, frontPath, backPath );
+                // Rotations 0 and 1: Check for either yCounter equal to 0 (always place an edge piece) or [ yCounter - 1 ][ xCounter ]
+                // Rotations 2 and 3: Check for either yCounter equal to dimensions.y - 2 (always place an edge piece), or [ yCounter + 1 ][ xCounter ]
+                bool edge = false;
+
+                auto checkNearbySegments = [ & ]( unsigned int adjusted_yCounter ) {
+                  Threading::Lockable< Scripting::WallCell > adjacentCell = wallMap.getItem( zCounter, xCounter, adjusted_yCounter );
+
+                  if( adjacentCell ) {
+                    // We know *something* is here but is it the wall we need?
+                    return adjacentCell.lock< bool >( []( Scripting::WallCell& wallCell ) { return !wallCell.y.operator bool(); } );
+                  } else {
+                    // We know nothing is here: edge piece.
+                    return true;
+                  }
+                };
+
+                switch( currentRotation ) {
+                  case 0:
+                  case 1:
+                    edge = yCounter == 0 ? true : checkNearbySegments( yCounter - 1 );
+                    break;
+                  case 2:
+                  case 3:
+                  default:
+                    edge = yCounter == dimensions.y - 2 ? true : checkNearbySegments( yCounter + 1 );
+                }
+
+                bundler.y = newYWallInstance( wallCenter.x, wallCenter.y, wallCenter.z, frontPath, backPath, edge );
               }
 
               if( wallCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.d ); } ) ) {

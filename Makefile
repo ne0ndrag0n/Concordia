@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -std=c++14 -g -rdynamic
+CFLAGS = -pthread -std=c++14 -g -rdynamic
 INCLUDES = -Iinclude
 LIBS = -lpthread -lasync++ -lassimp -lGLEW -lGL -lsfml-graphics -lsfml-window -lsfml-system -ljsoncpp -llua -ldl
 
