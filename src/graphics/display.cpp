@@ -324,7 +324,7 @@ namespace BlueBear {
 
                   if( adjacentCell ) {
                     // We know *something* is here but is it the wall we need?
-                    return adjacentCell.lock< bool >( []( Scripting::WallCell& wallCell ) { return !wallCell.y.operator bool(); } );
+                    return adjacentCell.lock< bool >( []( Scripting::WallCell& wallCell ) { return !wallCell.y; } );
                   } else {
                     // We know nothing is here: edge piece.
                     return true;
