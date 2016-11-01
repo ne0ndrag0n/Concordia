@@ -26,29 +26,28 @@ namespace BlueBear {
      */
     void YWallInstance::setRotationAttributes( unsigned int rotation, std::map< std::string, std::unique_ptr< ImageSource > >& settings ) {
 
-      settings.emplace( std::make_pair( "FrontWall", std::make_unique< DirectImageSource >( *front.image, front.path ) ) );
-      settings.emplace( std::make_pair( "BackWall", std::make_unique< DirectImageSource >( *back.image, back.path ) ) );
-
       switch( rotation ) {
         case 0:
+          settings.emplace( std::make_pair( "FrontWall", std::make_unique< DirectImageSource >( *front.image, front.path ) ) );
           settings.emplace( std::make_pair( "Side2", std::make_unique< DirectImageSource >( *front.leftSegment, "0ys2 " + front.path ) ) );
           break;
         case 1:
+          settings.emplace( std::make_pair( "BackWall", std::make_unique< DirectImageSource >( *back.image, back.path ) ) );
           settings.emplace( std::make_pair( "Side2", std::make_unique< DirectImageSource >( *back.rightSegment, "1ys2 " + back.path ) ) );
           break;
         case 2:
+          settings.emplace( std::make_pair( "BackWall", std::make_unique< DirectImageSource >( *back.image, back.path ) ) );
           settings.emplace( std::make_pair( "Side1", std::make_unique< DirectImageSource >( *back.leftSegment, "2ys1 " + back.path ) ) );
           break;
         case 3:
         default:
+          settings.emplace( std::make_pair( "FrontWall", std::make_unique< DirectImageSource >( *front.image, front.path ) ) );
           settings.emplace( std::make_pair( "Side1", std::make_unique< DirectImageSource >( *front.rightSegment, "3ys1 " + front.path ) ) );
       }
     }
 
     void YWallInstance::setRotationAttributesEdge( unsigned int rotation, std::map< std::string, std::unique_ptr< ImageSource > >& settings ) {
       // Similar but not identical code - A different face is seen by the player on certain rotations of the edge piece.
-      // TODO: This stuff is based on earlier code and needs to be fixed
-
 
       switch( rotation ) {
         case 0:
@@ -64,17 +63,13 @@ namespace BlueBear {
           settings.emplace( std::make_pair( "FrontWallExtended", std::make_unique< DirectImageSource >( *back.leftSegment, "1yf " + back.path ) ) );
           break;
         case 2:
-          // FIXME
-          settings.emplace( std::make_pair( "FrontWall", std::make_unique< DirectImageSource >( *front.image, front.path ) ) );
           settings.emplace( std::make_pair( "BackWall", std::make_unique< DirectImageSource >( *back.image, back.path ) ) );
           settings.emplace( std::make_pair( "Side1", std::make_unique< DirectImageSource >( *back.leftSegment, "2ys1 " + back.path ) ) );
           settings.emplace( std::make_pair( "BackWallExtended", std::make_unique< DirectImageSource >( *back.rightSegment, "2yb " + back.path ) ) );
           break;
         case 3:
         default:
-          // FIXME
           settings.emplace( std::make_pair( "FrontWall", std::make_unique< DirectImageSource >( *front.image, front.path ) ) );
-          settings.emplace( std::make_pair( "BackWall", std::make_unique< DirectImageSource >( *back.image, back.path ) ) );
           settings.emplace( std::make_pair( "Side1", std::make_unique< DirectImageSource >( *front.rightSegment, "3ys1 " + front.path ) ) );
           settings.emplace( std::make_pair( "FrontWallExtended", std::make_unique< DirectImageSource >( *front.leftSegment, "3yf " + front.path ) ) );
       }
