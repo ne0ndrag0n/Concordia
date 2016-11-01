@@ -365,7 +365,14 @@ namespace BlueBear {
      */
     std::shared_ptr< XWallInstance > Display::MainGameState::newXWallInstance( float x, float y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper, bool edge ) {
       std::shared_ptr< XWallInstance > value = std::make_shared< XWallInstance >( defaultShader.Program, texCache, imageCache, edge );
-      value->setPosition( glm::vec3( x, y + 0.9f, floorLevel ) );
+
+      glm::vec3 position( x, y + 0.9f, floorLevel );
+
+      if ( currentRotation == 0 || currentRotation == 1 ) {
+        position.y = position.y + 0.1f;
+      }
+
+      value->setPosition( position );
       value->setRotationAngle( glm::radians( 180.0f ) );
 
       value->setWallpaper( frontWallpaper, backWallpaper );
@@ -376,15 +383,23 @@ namespace BlueBear {
     std::shared_ptr< YWallInstance > Display::MainGameState::newYWallInstance( float x, float y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper, bool edge ) {
       std::shared_ptr< YWallInstance > value = std::make_shared< YWallInstance >( defaultShader.Program, texCache, imageCache, edge );
 
+      glm::vec3 position;
+
       // untested, sloppy code
       if( edge && ( currentRotation == 0 || currentRotation == 1 ) ) {
         value->setRotationAngle( glm::radians( 90.0f ) );
-        value->setPosition( glm::vec3( x, y, floorLevel ) );
+        position = glm::vec3( x, y, floorLevel );
       } else {
         value->setRotationAngle( glm::radians( -90.0f ) );
-        value->setPosition( glm::vec3( x - 0.9f, y, floorLevel ) );
+        position = glm::vec3( x - 0.9f, y, floorLevel );
       }
 
+      // X-nudge
+      if ( currentRotation == 1 || currentRotation == 2 ) {
+        position.x = position.x - 0.1f;
+      }
+
+      value->setPosition( position );
       value->setWallpaper( frontWallpaper, backWallpaper );
       value->selectMaterial( currentRotation );
 
@@ -441,22 +456,22 @@ namespace BlueBear {
       auto length = floorInstanceCollection->getLength();
       for( auto i = 0; i != length; i++ ) {
         std::shared_ptr< Instance > floorInstance = floorInstanceCollection->getItemDirect( i );
-        std::shared_ptr< Display::MainGameState::WallCellBundler > wallCellBundler = wallInstanceCollection->getItemDirect( i );
-
-        // FIXME: This should not have to recalculate on every frame. Please revise this to precalculate/nudge only after a rotation.
-        auto rotation = camera.getCurrentRotation();
-        float xWallNudge = ( rotation == 1 || rotation == 2 ) ? -0.1f : 0.0f;
-        float yWallNudge = ( rotation == 0 || rotation == 1 ) ? 0.1f : 0.0f;
 
         if( floorInstance ) {
           floorInstance->drawEntity();
         }
+      }
+
+      auto wallLength = wallInstanceCollection->getLength();
+      for( auto i = 0; i != wallLength; i++ ) {
+        std::shared_ptr< Display::MainGameState::WallCellBundler > wallCellBundler = wallInstanceCollection->getItemDirect( i );
+
         if( wallCellBundler ) {
           if( wallCellBundler->x ) {
-            wallCellBundler->x->nudgeDrawEntity( glm::vec3( 0.0f, yWallNudge, 0.0f ) );
+            wallCellBundler->x->drawEntity();
           }
           if( wallCellBundler->y ) {
-            wallCellBundler->y->nudgeDrawEntity( glm::vec3( xWallNudge, 0.0f, 0.0f ) );
+            wallCellBundler->y->drawEntity();
           }
         }
       }
