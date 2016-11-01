@@ -409,38 +409,6 @@ namespace BlueBear {
 
       return value;
     }
-    /**
-     * Update wall edge segments; this basically means discarding existing wall segments built using createWallInstances and replacing them as-needed with edge segments.
-     * See dev/wall/edgeSegments.md
-     */
-    void Display::MainGameState::updateWallEdgeSegments() {
-      auto dimensions = wallInstanceCollection->getDimensions();
-
-      float xOrigin = -( (int)dimensions.x / 2 ) + 0.5f;
-      float yOrigin = ( dimensions.y / 2 ) - 0.5f;
-
-      unsigned int xEdge = dimensions.x - 1;
-      unsigned int yEdge = dimensions.y - 1;
-
-      for ( unsigned int zCounter = 0; zCounter != dimensions.levels; zCounter++ ) {
-        for( unsigned int yCounter = 0; yCounter != dimensions.y; yCounter++ ) {
-          for( unsigned int xCounter = 0; xCounter != dimensions.x; xCounter++ ) {
-
-            std::shared_ptr< Display::MainGameState::WallCellBundler > wallCellBundler = wallInstanceCollection->getItem( zCounter, xCounter, yCounter );
-
-            if( wallCellBundler->y ) {
-              // Y-AXIS SEGMENTS:
-              // Rotations 0 & 1: Use edge piece if there is no segment at [ xCounter ][ yCounter - 1 ]. For edges of the board, at [ xCounter ][ 0 ], always use an edge piece.
-              // If yCounter is equal to yEdge, don't check at all.
-              // Rotations 2 & 3: Use edge piece if there is no segment at [ xCounter ][ yCounter + 1 ]. For edges of the board, at [ xCounter ][ yEdge ], always use an edge piece.
-              // If yCounter is equal to 0, don't check at all.
-            }
-
-
-          }
-        }
-      }
-    }
     void Display::MainGameState::loadInfrastructure() {
       auto dimensions = floorMap.getDimensions();
       floorInstanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< Instance > > >( dimensions.levels, dimensions.x, dimensions.y );
@@ -534,12 +502,12 @@ namespace BlueBear {
 
             if( keyCode == KEY_ROTATE_RIGHT ) {
               currentRotation = camera.rotateRight();
-              remapWallTextures();
+              createWallInstances();
             }
 
             if( keyCode == KEY_ROTATE_LEFT ) {
               currentRotation = camera.rotateLeft();
-              remapWallTextures();
+              createWallInstances();
             }
 
             if( keyCode == KEY_UP ) {
@@ -575,30 +543,6 @@ namespace BlueBear {
       instance.mainWindow.draw( texts.coords );
       instance.mainWindow.draw( texts.direction );
       instance.mainWindow.draw( texts.rotation );
-    }
-    void Display::MainGameState::remapWallTextures() {
-      unsigned int currentRotation = camera.getCurrentRotation();
-      unsigned int mapSize = wallInstanceCollection->getLength();
-
-      for( unsigned int i = 0; i != mapSize; i++ ) {
-        auto ptr = wallInstanceCollection->getItemDirect( i );
-        if( ptr ) {
-          auto& wallCellBundler = *ptr;
-
-          if( wallCellBundler.x ) {
-            wallCellBundler.x->selectMaterial( currentRotation );
-          }
-          if( wallCellBundler.y ) {
-            wallCellBundler.y->selectMaterial( currentRotation );
-          }
-          if( wallCellBundler.d ) {
-            wallCellBundler.d->selectMaterial( currentRotation );
-          }
-          if( wallCellBundler.r ) {
-            wallCellBundler.r->selectMaterial( currentRotation );
-          }
-        }
-      }
     }
 
     // ---------- COMMANDS ----------

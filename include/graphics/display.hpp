@@ -110,12 +110,10 @@ namespace BlueBear {
           std::unique_ptr< Containers::Collection3D< std::shared_ptr< Instance > > > floorInstanceCollection;
           std::unique_ptr< Containers::Collection3D< std::shared_ptr< WallCellBundler > > > wallInstanceCollection;
           void processOsd();
-          void remapWallTextures();
           bool isWallDimensionPresent( std::string& frontPath, std::string& backPath, std::unique_ptr< Scripting::WallCell::Segment >& ptr );
           void loadInfrastructure();
           void createFloorInstances();
           void createWallInstances();
-          void updateWallEdgeSegments();
           WallCellBundler& getWallCellBundler( std::shared_ptr< WallCellBundler >& bundlerPtr );
           std::shared_ptr< XWallInstance > newXWallInstance( float x, float y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper, bool edge = false );
           std::shared_ptr< YWallInstance > newYWallInstance( float x, float y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper, bool edge = false );
