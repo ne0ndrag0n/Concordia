@@ -24,11 +24,13 @@ namespace BlueBear {
     }
 
     void Camera::doRotate() {
+      /*
       glm::vec2 quadrant = rotations[ currentRotation ];
 
       camera.x = cameraHeight * quadrant.x;
       camera.y = cameraHeight * quadrant.y;
       direction = originalDirection = glm::vec3( glm::normalize( lookingAt - camera ) );
+      */
       dirty = true;
     }
 
@@ -36,7 +38,9 @@ namespace BlueBear {
       ortho = flag;
 
       if( ortho ) {
-        direction = originalDirection;
+        camera = glm::vec3( 0.0f, 0.0f, -10.0f );
+      } else {
+        camera = glm::vec3( -cameraHeight, -cameraHeight, lookingAt.z + cameraHeight );
       }
 
       dirty = true;
@@ -68,12 +72,10 @@ namespace BlueBear {
 
     void Camera::position() {
       if( dirty ) {
-        GLfloat scaledWidthHalf = ( widthHalf * zoom ) / 100.0f;
-        GLfloat scaledHeightHalf = ( heightHalf * zoom ) / 100.0f;
-
-        view = glm::lookAt( camera, camera + direction, up );
+        // getOrthoView for now
+        view = getOrthoView();
         projection = ortho ?
-           glm::ortho( -scaledWidthHalf, scaledWidthHalf, -scaledHeightHalf, scaledHeightHalf, -20.0f, 50.0f ) :
+           getOrthoMatrix() :
            glm::perspective( 45.0f, perspectiveAspectRatio, 0.1f, 50.0f );
 
         dirty = false;
@@ -81,6 +83,27 @@ namespace BlueBear {
       // Set uniforms
       glUniformMatrix4fv( glGetUniformLocation( program, "view" ), 1, GL_FALSE, glm::value_ptr( view ) );
       glUniformMatrix4fv( glGetUniformLocation( program, "projection" ), 1, GL_FALSE, glm::value_ptr( projection ) );
+    }
+
+    glm::mat4 Camera::getOrthoView() {
+      glm::mat4 view;
+
+      view = glm::translate( view, camera );
+
+      view = glm::rotate( view, glm::radians( 60.0f ), glm::vec3( 1.0f, 0.0f, 0.0f ) );
+      view = glm::rotate( view, glm::radians( 45.0f ), glm::vec3( 0.0f, 0.0f, 1.0f ) );
+
+      return view;
+    }
+
+    glm::mat4 Camera::getOrthoMatrix() {
+      glm::mat4 ortho;
+      GLfloat scaledWidthHalf = ( widthHalf * zoom ) / 100.0f;
+      GLfloat scaledHeightHalf = ( heightHalf * zoom ) / 100.0f;
+
+      ortho = glm::ortho( -scaledWidthHalf, scaledWidthHalf, -scaledHeightHalf, scaledHeightHalf, -20.0f, 50.0f );
+
+      return ortho;
     }
 
     void Camera::walkForward() {

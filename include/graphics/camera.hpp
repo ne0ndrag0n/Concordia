@@ -18,7 +18,7 @@ namespace BlueBear {
 
         GLfloat cameraHeight = 3.0f;
         glm::vec3 lookingAt = glm::vec3( 0.0f, 0.0f, -9.0f );
-        glm::vec3 camera = glm::vec3( -cameraHeight, -cameraHeight, lookingAt.z + cameraHeight );
+        glm::vec3 camera = glm::vec3( 0, 0, -10.0f );
         glm::vec3 originalDirection = glm::vec3( glm::normalize( lookingAt - camera ) );
         glm::vec3 up = glm::vec3( 0.0f, 0.0f, 1.0f );
         GLfloat yaw = 0.0f;
@@ -50,6 +50,8 @@ namespace BlueBear {
         float zoomOut();
         float setZoom( float zoomSetting );
         void position();
+        glm::mat4 getOrthoView();
+        glm::mat4 getOrthoMatrix();
         void walkForward();
         void walkBackward();
         void updateFirstPersonView( int deltaX, int deltaY );
