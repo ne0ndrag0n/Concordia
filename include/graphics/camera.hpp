@@ -23,12 +23,6 @@ namespace BlueBear {
         glm::vec3 up = glm::vec3( 0.0f, 0.0f, 1.0f );
         GLfloat yaw = 0.0f;
         GLfloat pitch = 0.0f;
-        const glm::vec2 rotations[4] = {
-          glm::vec2( -1.0f, -1.0f ),
-          glm::vec2( 1.0f, -1.0f ),
-          glm::vec2( 1.0f, 1.0f ),
-          glm::vec2( -1.0f, 1.0f )
-        };
         GLuint currentRotation = 0;
 
         float perspectiveAspectRatio;
@@ -37,6 +31,8 @@ namespace BlueBear {
         float zoom = 1.0f;
         const float zoomIncrement = 0.25f;
         bool dirty = true;
+
+        GLfloat orthoRotationAngle = 45.0f;
 
         void doRotate();
 

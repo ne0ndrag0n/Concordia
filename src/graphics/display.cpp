@@ -515,6 +515,7 @@ namespace BlueBear {
                 //instance.mainWindow.setFramerateLimit( 30 );
               }
             }
+            */
 
             if( keyCode == KEY_ROTATE_RIGHT ) {
               currentRotation = camera.rotateRight();
@@ -525,7 +526,6 @@ namespace BlueBear {
               currentRotation = camera.rotateLeft();
               createWallInstances();
             }
-            */
 
             if( keyCode == KEY_UP ) {
               camera.move( 0.0f, -0.1f, 0.0f );

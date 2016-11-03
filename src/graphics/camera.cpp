@@ -24,13 +24,24 @@ namespace BlueBear {
     }
 
     void Camera::doRotate() {
-      /*
-      glm::vec2 quadrant = rotations[ currentRotation ];
+      // FIXME: Consider making this more flexible. A lot of stuff up to this point depends on the legacy 0-1-2-3 rotation
+      // which previously assumed a gluLookAt method of computing the view matrix (see the "rotations" array). This switch statement is garbage.
+      switch( currentRotation ) {
+        case 0:
+          orthoRotationAngle = 45.0f;
+          break;
+        case 1:
+          orthoRotationAngle = -45.0f;
+          break;
+        case 2:
+          orthoRotationAngle = -135.0f;
+          break;
+        case 3:
+        default:
+          orthoRotationAngle = -225.0f;
+          break;
+      }
 
-      camera.x = cameraHeight * quadrant.x;
-      camera.y = cameraHeight * quadrant.y;
-      direction = originalDirection = glm::vec3( glm::normalize( lookingAt - camera ) );
-      */
       dirty = true;
     }
 
@@ -91,7 +102,7 @@ namespace BlueBear {
       view = glm::translate( view, camera );
 
       view = glm::rotate( view, glm::radians( -60.0f ), glm::vec3( 1.0f, 0.0f, 0.0f ) );
-      view = glm::rotate( view, glm::radians( 45.0f ), glm::vec3( 0.0f, 0.0f, 1.0f ) );
+      view = glm::rotate( view, glm::radians( orthoRotationAngle ), glm::vec3( 0.0f, 0.0f, 1.0f ) );
 
       return view;
     }
