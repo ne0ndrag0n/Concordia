@@ -90,7 +90,7 @@ namespace BlueBear {
 
       view = glm::translate( view, camera );
 
-      view = glm::rotate( view, glm::radians( 60.0f ), glm::vec3( 1.0f, 0.0f, 0.0f ) );
+      view = glm::rotate( view, glm::radians( -60.0f ), glm::vec3( 1.0f, 0.0f, 0.0f ) );
       view = glm::rotate( view, glm::radians( 45.0f ), glm::vec3( 0.0f, 0.0f, 1.0f ) );
 
       return view;
