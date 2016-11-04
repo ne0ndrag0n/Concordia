@@ -13,12 +13,12 @@
 			"levels": [
 				[
 					{ "run": 18, "value": 0 },
-					{ "run": 18, "value": 1 }
+					{ "run": 18, "value": 0 }
 				]
 			]
 		},
 		"wall": {
-			"dict": [ "star_test", "_grey" ],
+			"dict": [ "_grey", "fancy" ],
 			"levels": [
 				[
 					{ "y": { "f": 0, "b": 1 } },

@@ -6,5 +6,9 @@
   "star_test": {
     "image": "leftnright.png",
     "price": 10
+  },
+  "fancy": {
+	"image": "fancy.png",
+	"price": 10
   }
 }
