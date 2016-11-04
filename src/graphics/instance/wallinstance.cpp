@@ -49,8 +49,8 @@ namespace BlueBear {
       // Slice images into their left and right segments
       const auto originalSize = side.image->getSize();
 
-      CroppedDirectImageSource left( *side.image, 0, 0, 2, 64, path );
-      CroppedDirectImageSource right( *side.image, originalSize.x - 3, 0, 2, 64, path );
+      CroppedDirectImageSource left( *side.image, 0, 0, 6, 192, path );
+      CroppedDirectImageSource right( *side.image, originalSize.x - 7, 0, 6, 192, path );
 
       side.leftSegment = hostImageCache.getImage( left );
       side.rightSegment = hostImageCache.getImage( right );
