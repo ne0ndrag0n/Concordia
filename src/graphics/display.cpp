@@ -315,34 +315,7 @@ namespace BlueBear {
               }
 
               if( wallCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.y ); } ) ) {
-                // Rotations 0 and 1: Check for either yCounter equal to 0 (always place an edge piece) or [ yCounter - 1 ][ xCounter ]
-                // Rotations 2 and 3: Check for either yCounter equal to dimensions.y - 2 (always place an edge piece), or [ yCounter + 1 ][ xCounter ]
-                bool edge = false;
-
-                auto checkNearbySegments = [ & ]( unsigned int adjusted_yCounter ) {
-                  Threading::Lockable< Scripting::WallCell > adjacentCell = wallMap.getItem( zCounter, xCounter, adjusted_yCounter );
-
-                  if( adjacentCell ) {
-                    // We know *something* is here but is it the wall we need?
-                    return adjacentCell.lock< bool >( []( Scripting::WallCell& wallCell ) { return !wallCell.y; } );
-                  } else {
-                    // We know nothing is here: edge piece.
-                    return true;
-                  }
-                };
-
-                switch( currentRotation ) {
-                  case 0:
-                  case 1:
-                    edge = yCounter == 0 ? true : checkNearbySegments( yCounter - 1 );
-                    break;
-                  case 2:
-                  case 3:
-                  default:
-                    edge = yCounter == dimensions.y - 2 ? true : checkNearbySegments( yCounter + 1 );
-                }
-
-                bundler.y = newYWallInstance( wallCenter.x, wallCenter.y, wallCenter.z, frontPath, backPath, edge );
+                bundler.y = newYWallInstance( wallCenter.x, wallCenter.y, wallCenter.z, frontPath, backPath );
               }
 
               if( wallCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.d ); } ) ) {
@@ -363,8 +336,8 @@ namespace BlueBear {
     /**
      * Separated functions to get new wall instances
      */
-    std::shared_ptr< XWallInstance > Display::MainGameState::newXWallInstance( float x, float y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper, bool edge ) {
-      std::shared_ptr< XWallInstance > value = std::make_shared< XWallInstance >( defaultShader.Program, texCache, imageCache, edge );
+    std::shared_ptr< XWallInstance > Display::MainGameState::newXWallInstance( float x, float y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper ) {
+      std::shared_ptr< XWallInstance > value = std::make_shared< XWallInstance >( defaultShader.Program, texCache, imageCache );
 
       glm::vec3 position( x, y + 0.9f, floorLevel );
 
@@ -380,19 +353,13 @@ namespace BlueBear {
 
       return value;
     }
-    std::shared_ptr< YWallInstance > Display::MainGameState::newYWallInstance( float x, float y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper, bool edge ) {
-      std::shared_ptr< YWallInstance > value = std::make_shared< YWallInstance >( defaultShader.Program, texCache, imageCache, edge );
+    std::shared_ptr< YWallInstance > Display::MainGameState::newYWallInstance( float x, float y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper ) {
+      std::shared_ptr< YWallInstance > value = std::make_shared< YWallInstance >( defaultShader.Program, texCache, imageCache );
 
       glm::vec3 position;
 
-      // untested, sloppy code
-      if( edge && ( currentRotation == 0 || currentRotation == 1 ) ) {
-        value->setRotationAngle( glm::radians( 90.0f ) );
-        position = glm::vec3( x, y, floorLevel );
-      } else {
-        value->setRotationAngle( glm::radians( -90.0f ) );
-        position = glm::vec3( x - 0.9f, y, floorLevel );
-      }
+      value->setRotationAngle( glm::radians( -90.0f ) );
+      position = glm::vec3( x - 0.9f, y, floorLevel );
 
       // X-nudge
       if ( currentRotation == 1 || currentRotation == 2 ) {

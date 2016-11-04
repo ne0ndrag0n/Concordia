@@ -115,8 +115,8 @@ namespace BlueBear {
           void createFloorInstances();
           void createWallInstances();
           WallCellBundler& getWallCellBundler( std::shared_ptr< WallCellBundler >& bundlerPtr );
-          std::shared_ptr< XWallInstance > newXWallInstance( float x, float y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper, bool edge = false );
-          std::shared_ptr< YWallInstance > newYWallInstance( float x, float y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper, bool edge = false );
+          std::shared_ptr< XWallInstance > newXWallInstance( float x, float y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper );
+          std::shared_ptr< YWallInstance > newYWallInstance( float x, float y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper );
           std::shared_ptr< DWallInstance > newDWallInstance( float x, float y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper );
           std::shared_ptr< RWallInstance > newRWallInstance( float x, float y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper );
         public:
