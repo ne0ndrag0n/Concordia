@@ -63,7 +63,7 @@ namespace BlueBear {
       std::map< std::string, std::unique_ptr< ImageSource > > settings;
 
       // Apply based on rotation
-      selectedRotationFunction( rotation, settings );
+      setRotationAttributes( rotation, settings );
 
       std::shared_ptr< Texture > texture = hostTextureCache.getUsingAtlas( WALLATLAS_PATH, settings );
       drawables.at( "Wall" ).material = std::make_shared< Material >( texture );

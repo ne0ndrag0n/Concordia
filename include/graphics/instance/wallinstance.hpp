@@ -7,7 +7,7 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 #include <memory>
-#include <unordered_map>
+#include <map>
 #include <functional>
 
 namespace BlueBear {
@@ -34,14 +34,13 @@ namespace BlueBear {
       void selectMaterial( unsigned int rotation );
 
     protected:
-      std::function< void( unsigned int, std::map< std::string, std::unique_ptr< ImageSource > >& ) > selectedRotationFunction;
-
       TextureCache& hostTextureCache;
       ImageCache& hostImageCache;
       WallpaperSide front;
       WallpaperSide back;
 
       void setWallpaper( const std::string& path, WallpaperSide& side );
+      virtual void setRotationAttributes( unsigned int rotation, std::map< std::string, std::unique_ptr< ImageSource > >& settings ) = 0;
     };
 
   }
