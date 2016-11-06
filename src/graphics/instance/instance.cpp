@@ -27,6 +27,9 @@ namespace BlueBear {
       }
     }
 
+    /**
+     * FIXME: This only goes one level of recursion deep, you derp
+     */
     std::shared_ptr< Instance > Instance::findChildByName( std::string name ) {
       return children[ name ];
     }

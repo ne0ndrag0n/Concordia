@@ -65,7 +65,12 @@ namespace BlueBear {
       // Apply based on rotation
       setRotationAttributes( rotation, settings );
 
-      drawables.at( "Wall" ).material = std::make_shared< Material >( hostTextureCache.getUsingAtlas( WALLATLAS_PATH, settings ) );
+      std::shared_ptr< Material > material = std::make_shared< Material >( hostTextureCache.getUsingAtlas( WALLATLAS_PATH, settings ) );
+
+      drawables.at( "Wall" ).material = material;
+      // FIXME: this is absolutely disgusting and the hierarchy doesn't even match what we exported in Blender
+      findChildByName( "LeftCorner" )->drawables.at( "LeftCorner" ).material = material;
+      findChildByName( "RightCorner" )->drawables.at( "RightCorner" ).material = material;
     }
 
   }

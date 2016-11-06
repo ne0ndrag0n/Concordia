@@ -43,8 +43,8 @@ static BlueBear::Scripting::Engine::CommandList engineCommandList;
 namespace BlueBear {
   namespace Graphics {
 
-    const std::string Display::WALLPANEL_MODEL_XY_PATH = "system/models/wall/wall.dae";
-    const std::string Display::WALLPANEL_MODEL_XY_EDGE_PATH = "system/models/wall/wall_large.dae";
+    const std::string Display::WALLPANEL_MODEL_XY_PATH = "system/models/wall/wall_new.dae";
+    const std::string Display::WALLPANEL_MODEL_XY_EDGE_PATH = "system/models/wall/wall_new.dae";
     const std::string Display::WALLPANEL_MODEL_DR_PATH = "system/models/wall/diagwall.dae";
     const std::string Display::FLOOR_MODEL_PATH = "system/models/floor/floor.dae";
 
