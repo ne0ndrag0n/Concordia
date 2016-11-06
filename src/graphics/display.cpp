@@ -190,9 +190,7 @@ namespace BlueBear {
       auto xy_edge = std::make_shared< Model >( Display::WALLPANEL_MODEL_XY_EDGE_PATH );
       auto dr = std::make_shared< Model >( Display::WALLPANEL_MODEL_DR_PATH );
       XWallInstance::Piece = xy;
-      XWallInstance::EdgePiece = xy_edge;
       YWallInstance::Piece = xy;
-      YWallInstance::EdgePiece = xy_edge;
       DWallInstance::Piece = dr;
       RWallInstance::Piece = dr;
 

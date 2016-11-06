@@ -14,7 +14,6 @@ namespace BlueBear {
   namespace Graphics {
 
     std::shared_ptr< Model > XWallInstance::Piece( nullptr );
-    std::shared_ptr< Model > XWallInstance::EdgePiece( nullptr );
 
     XWallInstance::XWallInstance( GLuint shaderProgram, TextureCache& hostTextureCache, ImageCache& hostImageCache ) :
       WallInstance::WallInstance( *XWallInstance::Piece, shaderProgram, hostTextureCache, hostImageCache ) {}
