@@ -23,8 +23,8 @@ namespace BlueBear {
     }
 
     // Used internally to generate child nodes
-    Model::Model( aiNode* node, const aiScene* scene, std::string& directory, aiMatrix4x4 parentTransform ) : directory( directory ) {
-      processNode( node, scene, parentTransform );
+    Model::Model( aiNode* node, const aiScene* scene, std::string& directory, aiMatrix4x4 parentTransform, unsigned int level ) : directory( directory ) {
+      processNode( node, scene, parentTransform, level );
     }
 
     glm::mat4 Model::aiToGLMmat4( aiMatrix4x4& matrix ) {
@@ -71,26 +71,29 @@ namespace BlueBear {
       }
     }
 
-    void Model::processNode( aiNode* node, const aiScene* scene, aiMatrix4x4 parentTransform ) {
-      Log::getInstance().debug( "Model::processNode", "Processing " + std::string( node->mName.C_Str() ) );
+    void Model::processNode( aiNode* node, const aiScene* scene, aiMatrix4x4 parentTransform, unsigned int level ) {
+      std::string indentation;
+      for( int i = 0; i != level; i++ ) {
+        indentation = indentation + "\t";
+      }
+
+      Log::getInstance().debug( "Model::processNode", indentation + "Processing " + std::string( node->mName.C_Str() ) + " { " );
 
       aiMatrix4x4 resultantTransform = parentTransform * node->mTransformation;
 
       for( int i = 0; i < node->mNumMeshes; i++ ) {
         aiMesh* mesh = scene->mMeshes[ node->mMeshes[ i ] ];
 
-        std::stringstream stream;
-        stream << '\t' << "Loading mesh " << mesh->mName.C_Str();
-        Log::getInstance().debug( "Model::processNode", stream.str() );
+        Log::getInstance().debug( "Model::processNode", indentation + "\tLoading mesh: " + mesh->mName.C_Str() );
 
         this->processMesh( mesh, scene, node->mName.C_Str(), aiToGLMmat4( resultantTransform ) );
       }
 
       for( int i = 0; i < node->mNumChildren; i++ ) {
-        children.emplace( node->mChildren[ i ]->mName.C_Str(), std::make_unique< Model >( node->mChildren[ i ], scene, directory, resultantTransform ) );
+        children.emplace( node->mChildren[ i ]->mName.C_Str(), std::make_unique< Model >( node->mChildren[ i ], scene, directory, resultantTransform, level + 1 ) );
       }
 
-      Log::getInstance().debug( "Model::processNode", "Done with " + std::string( node->mName.C_Str() ) );
+      Log::getInstance().debug( "Model::processNode", indentation + "}" );
      }
 
     void Model::processMesh( aiMesh* mesh, const aiScene* scene, std::string nodeTitle, glm::mat4 transformation ) {

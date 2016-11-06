@@ -23,7 +23,7 @@ namespace BlueBear {
         std::map< std::string, std::unique_ptr< Model > > children;
 
         Model( std::string path );
-        Model( aiNode* node, const aiScene* scene, std::string& directory, aiMatrix4x4 parentTransform );
+        Model( aiNode* node, const aiScene* scene, std::string& directory, aiMatrix4x4 parentTransform, unsigned int level );
 
       private:
         std::string directory;
@@ -34,7 +34,7 @@ namespace BlueBear {
 
         void loadModel( std::string path );
 
-        void processNode( aiNode* node, const aiScene* scene, aiMatrix4x4 parentTransform );
+        void processNode( aiNode* node, const aiScene* scene, aiMatrix4x4 parentTransform, unsigned int level = 0 );
 
         void processMesh( aiMesh* mesh, const aiScene* scene, std::string nodeTitle, glm::mat4 transformation );
 
