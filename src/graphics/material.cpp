@@ -10,7 +10,7 @@ namespace BlueBear {
     Material::Material() {}
     Material::Material( TextureList diffuseTextures ) : diffuseTextures( diffuseTextures ) {}
     Material::Material( TextureList diffuseTextures, TextureList specularTextures ) : diffuseTextures( diffuseTextures ), specularTextures( specularTextures ) {}
-    Material::Material( std::shared_ptr< Texture >& diffuseTexture ) {
+    Material::Material( const std::shared_ptr< Texture >& diffuseTexture ) {
       diffuseTextures.push_back( diffuseTexture );
     }
 
