@@ -29,7 +29,7 @@ namespace BlueBear {
         void prepareInstanceRecursive( const Model& model );
 
       public:
-        std::map< std::string, Drawable > drawables;
+        std::shared_ptr< Drawable > drawable;
         std::map< std::string, std::shared_ptr< Instance > > children;
 
         Instance( const Model& model, GLuint shaderProgram );

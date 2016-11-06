@@ -257,7 +257,7 @@ namespace BlueBear {
               // Create instance from the model, and change its material using the material cache
               std::shared_ptr< Instance > instance = std::make_shared< Instance >( floorModel, defaultShader.Program );
 
-              Drawable& floorDrawable = instance->drawables.at( "Plane" );
+              Drawable& floorDrawable = *( instance->drawable );
 
               tilePtr.lock( [ & ]( Scripting::Tile& tile ) {
                 floorDrawable.material = std::make_shared< Material >( TextureList{ texCache.get( tile.imagePath ) } );

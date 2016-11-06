@@ -81,10 +81,11 @@ namespace BlueBear {
 
       aiMatrix4x4 resultantTransform = parentTransform * node->mTransformation;
 
-      for( int i = 0; i < node->mNumMeshes; i++ ) {
-        aiMesh* mesh = scene->mMeshes[ node->mMeshes[ i ] ];
+      if( node->mNumMeshes ) {
+        // Generally we're only going to worry about the first mesh here. Where is there ever more meshes? Blender doesn't seem to permit >1 mesh. I'll probably regret undoing this.
+        aiMesh* mesh = scene->mMeshes[ node->mMeshes[ 0 ] ];
 
-        Log::getInstance().debug( "Model::processNode", indentation + "\tLoading mesh: " + mesh->mName.C_Str() );
+        Log::getInstance().debug( "Model::processNode", indentation + "\tLoading mesh " + mesh->mName.C_Str() );
 
         this->processMesh( mesh, scene, node->mName.C_Str(), aiToGLMmat4( resultantTransform ) );
       }
@@ -127,7 +128,7 @@ namespace BlueBear {
         defaultMaterial = std::make_shared< Material >( loadMaterialTextures( material, aiTextureType_DIFFUSE ) );
       }
 
-      drawables.emplace( nodeTitle, Drawable( std::make_shared< Mesh >( vertices, indices ), defaultMaterial ) );
+      drawable = std::make_shared< Drawable >( std::make_shared< Mesh >( vertices, indices ), defaultMaterial );
     }
 
     TextureList Model::loadMaterialTextures( aiMaterial* material, aiTextureType type ) {

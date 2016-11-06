@@ -16,8 +16,8 @@ namespace BlueBear {
     }
 
     void Instance::prepareInstanceRecursive( const Model& model ) {
-      // Copy the list of drawables
-      drawables = model.drawables;
+      // Copy the drawable
+      drawable = model.drawable;
 
       for( auto& pair : model.children ) {
         auto& child = *( pair.second );
@@ -43,10 +43,8 @@ namespace BlueBear {
     void Instance::drawEntity( glm::mat4& parent ) {
       glm::mat4 nextParent = transform.sendToShader( shaderProgram, parent, dirty );
 
-      for( auto& pair : drawables ) {
-        auto& drawable = pair.second;
-
-        drawable.render( shaderProgram );
+      if( drawable ) {
+        drawable->render( shaderProgram );
       }
 
       for( auto& pair : children ) {

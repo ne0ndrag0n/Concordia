@@ -19,7 +19,7 @@ namespace BlueBear {
     class Model {
 
       public:
-        std::map< std::string, Drawable > drawables;
+        std::shared_ptr< Drawable > drawable;
         std::map< std::string, std::unique_ptr< Model > > children;
 
         Model( std::string path );

@@ -67,10 +67,9 @@ namespace BlueBear {
 
       std::shared_ptr< Material > material = std::make_shared< Material >( hostTextureCache.getUsingAtlas( WALLATLAS_PATH, settings ) );
 
-      drawables.at( "Wall" ).material = material;
-      // FIXME: this is absolutely disgusting and the hierarchy doesn't even match what we exported in Blender
-      findChildByName( "LeftCorner" )->drawables.at( "LeftCorner" ).material = material;
-      findChildByName( "RightCorner" )->drawables.at( "RightCorner" ).material = material;
+      drawable->material = material;
+      findChildByName( "LeftCorner" )->drawable->material = material;
+      findChildByName( "RightCorner" )->drawable->material = material;
     }
 
   }
