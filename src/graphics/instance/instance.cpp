@@ -17,7 +17,9 @@ namespace BlueBear {
 
     void Instance::prepareInstanceRecursive( const Model& model ) {
       // Copy the drawable
-      drawable = model.drawable;
+      if( model.drawable ) {
+        drawable = std::make_unique< Drawable >( *model.drawable );
+      }
 
       for( auto& pair : model.children ) {
         auto& child = *( pair.second );

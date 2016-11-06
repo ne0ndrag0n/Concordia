@@ -2,6 +2,7 @@
 #define MODEL3D
 
 #include "graphics/material.hpp"
+#include "graphics/drawable.hpp"
 #include <string>
 #include <map>
 #include <memory>
@@ -19,7 +20,7 @@ namespace BlueBear {
     class Model {
 
       public:
-        std::shared_ptr< Drawable > drawable;
+        std::unique_ptr< Drawable > drawable;
         std::map< std::string, std::unique_ptr< Model > > children;
 
         Model( std::string path );

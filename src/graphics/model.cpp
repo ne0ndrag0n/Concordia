@@ -128,7 +128,7 @@ namespace BlueBear {
         defaultMaterial = std::make_shared< Material >( loadMaterialTextures( material, aiTextureType_DIFFUSE ) );
       }
 
-      drawable = std::make_shared< Drawable >( std::make_shared< Mesh >( vertices, indices ), defaultMaterial );
+      drawable = std::make_unique< Drawable >( std::make_shared< Mesh >( vertices, indices ), defaultMaterial );
     }
 
     TextureList Model::loadMaterialTextures( aiMaterial* material, aiTextureType type ) {
