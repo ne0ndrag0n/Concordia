@@ -40,6 +40,7 @@ namespace BlueBear {
     class YWallInstance;
     class DWallInstance;
     class RWallInstance;
+    class WallCellBundler;
 
     class Display {
     public:
@@ -89,13 +90,6 @@ namespace BlueBear {
             std::string ISOMETRIC;
             std::string FIRST_PERSON;
           } strings;
-          // Wrapper class that holds four instances per tile
-          struct WallCellBundler {
-            std::shared_ptr< WallInstance > x;
-            std::shared_ptr< WallInstance > y;
-            std::shared_ptr< WallInstance > d;
-            std::shared_ptr< WallInstance > r;
-          };
           unsigned int currentRotation;
           Shader defaultShader;
           Camera camera;

@@ -15,6 +15,7 @@
 #include "graphics/camera.hpp"
 #include "graphics/material.hpp"
 #include "graphics/texture.hpp"
+#include "graphics/wallcellbundler.hpp"
 #include "scripting/lot.hpp"
 #include "scripting/tile.hpp"
 #include "scripting/engine.hpp"
@@ -296,7 +297,7 @@ namespace BlueBear {
             glm::vec3 wallCenter( xOrigin + xCounter, yOrigin - yCounter, zCounter * 2.0f );
 
             Threading::Lockable< Scripting::WallCell > wallCellPtr = wallMap.getItem( zCounter, xCounter, yCounter );
-            std::shared_ptr< Display::MainGameState::WallCellBundler > wallCellBundler;
+            std::shared_ptr< WallCellBundler > wallCellBundler;
             if( wallCellPtr ) {
               // Several different kinds of wall panel models depending on the type, and several kinds of orientations
               // If that pointer exists, at least one of these ifs will be fulfilled
@@ -392,16 +393,16 @@ namespace BlueBear {
       floorInstanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< Instance > > >( dimensions.levels, dimensions.x, dimensions.y );
 
       auto dimensionsWall = wallMap.getDimensions();
-      wallInstanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< Display::MainGameState::WallCellBundler > > >( dimensionsWall.levels, dimensionsWall.x, dimensionsWall.y );
+      wallInstanceCollection = std::make_unique< Containers::Collection3D< std::shared_ptr< WallCellBundler > > >( dimensionsWall.levels, dimensionsWall.x, dimensionsWall.y );
 
       createFloorInstances();
       createWallInstances();
 
       Log::getInstance().info( "Display::MainGameState::loadInfrastructure", "Finished creating infrastructure instances." );
     }
-    Display::MainGameState::WallCellBundler& Display::MainGameState::getWallCellBundler( std::shared_ptr< Display::MainGameState::WallCellBundler >& bundlerPtr ) {
+    WallCellBundler& Display::MainGameState::getWallCellBundler( std::shared_ptr< WallCellBundler >& bundlerPtr ) {
       if( !bundlerPtr ) {
-        bundlerPtr = std::make_shared< Display::MainGameState::WallCellBundler >();
+        bundlerPtr = std::make_shared< WallCellBundler >();
       }
 
       return *bundlerPtr;
@@ -427,7 +428,7 @@ namespace BlueBear {
 
       auto wallLength = wallInstanceCollection->getLength();
       for( auto i = 0; i != wallLength; i++ ) {
-        std::shared_ptr< Display::MainGameState::WallCellBundler > wallCellBundler = wallInstanceCollection->getItemDirect( i );
+        std::shared_ptr< WallCellBundler > wallCellBundler = wallInstanceCollection->getItemDirect( i );
 
         if( wallCellBundler ) {
           if( wallCellBundler->x ) {
