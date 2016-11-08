@@ -402,7 +402,7 @@ namespace BlueBear {
     }
     WallCellBundler& Display::MainGameState::getWallCellBundler( std::shared_ptr< WallCellBundler >& bundlerPtr ) {
       if( !bundlerPtr ) {
-        bundlerPtr = std::make_shared< WallCellBundler >();
+        bundlerPtr = std::make_shared< WallCellBundler >( currentRotation );
       }
 
       return *bundlerPtr;
@@ -431,12 +431,7 @@ namespace BlueBear {
         std::shared_ptr< WallCellBundler > wallCellBundler = wallInstanceCollection->getItemDirect( i );
 
         if( wallCellBundler ) {
-          if( wallCellBundler->x ) {
-            wallCellBundler->x->drawEntity();
-          }
-          if( wallCellBundler->y ) {
-            wallCellBundler->y->drawEntity();
-          }
+          wallCellBundler->render();
         }
       }
 
