@@ -193,6 +193,8 @@ namespace BlueBear {
       DWallInstance::Piece = dr;
       RWallInstance::Piece = dr;
 
+      WallCellBundler::Piece = xy;
+
       // Setup camera
       camera.setRotationDirect( currentRotation );
 
@@ -220,6 +222,8 @@ namespace BlueBear {
       loadInfrastructure();
     }
     Display::MainGameState::~MainGameState() {
+      WallCellBundler::Piece.reset();
+
       XWallInstance::Piece.reset();
       YWallInstance::Piece.reset();
 
