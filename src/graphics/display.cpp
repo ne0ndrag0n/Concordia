@@ -406,7 +406,7 @@ namespace BlueBear {
     }
     WallCellBundler& Display::MainGameState::getWallCellBundler( std::shared_ptr< WallCellBundler >& bundlerPtr ) {
       if( !bundlerPtr ) {
-        bundlerPtr = std::make_shared< WallCellBundler >( currentRotation );
+        bundlerPtr = std::make_shared< WallCellBundler >( currentRotation, texCache, imageCache, defaultShader.Program );
       }
 
       return *bundlerPtr;
