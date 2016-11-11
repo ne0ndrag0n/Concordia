@@ -46,7 +46,8 @@ namespace BlueBear {
       const auto originalSize = side.image->getSize();
 
       CroppedDirectImageSource left( *side.image, 0, 0, 6, 192, path );
-      CroppedDirectImageSource right( *side.image, originalSize.x - 7, 0, 6, 192, path );
+      // This was -7. I'm not sure why. It makes far more sense to be imageSize.x - 6.
+      CroppedDirectImageSource right( *side.image, originalSize.x - 6, 0, 6, 192, path );
 
       side.leftSegment = hostImageCache.getImage( left );
       side.rightSegment = hostImageCache.getImage( right );

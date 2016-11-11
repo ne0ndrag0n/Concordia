@@ -11,22 +11,10 @@
       "width": 48,
       "height": 192
     },
-    "FrontWallExtended": {
-      "x": 66,
-      "y": 9,
-      "width": 6,
-      "height": 192
-    },
     "BackWall": {
       "x": 96,
       "y": 9,
       "width": 48,
-      "height": 192
-    },
-    "BackWallExtended": {
-      "x": 81,
-      "y": 9,
-      "width": 6,
       "height": 192
     },
     "Side1": {

@@ -59,16 +59,12 @@ namespace BlueBear {
       // Generate the key for the desired set of textures
       std::string key = getKey( mappings );
 
-      Log::getInstance().debug( "TextureCache::generateForAtlasBuilderEntry", "For key " + key + "..." );
-
       auto textureIterator = texCache.find( key );
       if( textureIterator != texCache.end() ) {
-        Log::getInstance().debug( "TextureCache::generateForAtlasBuilderEntry", "Key found and not regenerating." );
-
         // The texture was found
         return textureIterator->second;
       } else {
-        Log::getInstance().debug( "TextureCache::generateForAtlasBuilderEntry", "Key not found; generating texture atlas." );
+        Log::getInstance().warn( "TextureCache::generateForAtlasBuilderEntry", "Key (" + key + ") not found; generating texture atlas." );
 
         // The texture needs to be generated using "builder"
         for( auto& kvPair : mappings ) {
