@@ -60,6 +60,38 @@ namespace BlueBear {
       SegmentBundle front = getSegmentBundle( frontWallpaper );
       SegmentBundle back = getSegmentBundle( backWallpaper );
 
+      settings.emplace( std::make_pair( "FrontWall", std::make_unique< DirectImageSource >( *front.image, frontWallpaper ) ) );
+      settings.emplace( std::make_pair( "BackWall", std::make_unique< DirectImageSource >( *back.image, backWallpaper ) ) );
+
+      switch( currentRotation ) {
+        case 0:
+          settings.emplace( std::make_pair( "Side2", std::make_unique< DirectImageSource >( *back.rightSegment, "0xs2 " + backWallpaper ) ) );
+          break;
+        case 1:
+          settings.emplace( std::make_pair( "Side1", std::make_unique< DirectImageSource >( *back.leftSegment, "1xs1 " + backWallpaper ) ) );
+          break;
+        case 2:
+          settings.emplace( std::make_pair( "Side1", std::make_unique< DirectImageSource >( *front.rightSegment, "2xs1 " + frontWallpaper ) ) );
+          break;
+        case 3:
+        default:
+          settings.emplace( std::make_pair( "Side2", std::make_unique< DirectImageSource >( *front.leftSegment, "3xs2 " + frontWallpaper ) ) );
+      }
+
+      std::shared_ptr< Material > material = std::make_shared< Material >( hostTextureCache.getUsingAtlas( WALLATLAS_PATH, settings ) );
+
+      x->drawable->material = material;
+      x->findChildByName( "LeftCorner" )->drawable->material = material;
+      x->findChildByName( "RightCorner" )->drawable->material = material;
+    }
+
+    void WallCellBundler::newYWallInstance( float xPos, float yPos, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper ) {
+      y = std::make_shared< Instance >( *WallCellBundler::Piece, shader );
+
+      std::map< std::string, std::unique_ptr< ImageSource > > settings;
+      SegmentBundle front = getSegmentBundle( frontWallpaper );
+      SegmentBundle back = getSegmentBundle( backWallpaper );
+
       switch( currentRotation ) {
         case 0:
           settings.emplace( std::make_pair( "FrontWall", std::make_unique< DirectImageSource >( *front.image, frontWallpaper ) ) );
@@ -81,9 +113,9 @@ namespace BlueBear {
 
       std::shared_ptr< Material > material = std::make_shared< Material >( hostTextureCache.getUsingAtlas( WALLATLAS_PATH, settings ) );
 
-      x->drawable->material = material;
-      x->findChildByName( "LeftCorner" )->drawable->material = material;
-      x->findChildByName( "RightCorner" )->drawable->material = material;
+      y->drawable->material = material;
+      y->findChildByName( "LeftCorner" )->drawable->material = material;
+      y->findChildByName( "RightCorner" )->drawable->material = material;
     }
 
   }
