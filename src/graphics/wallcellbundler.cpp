@@ -12,6 +12,7 @@
 #include <map>
 #include <utility>
 #include <SFML/Graphics.hpp>
+#include <glm/glm.hpp>
 
 namespace BlueBear {
   namespace Graphics {
@@ -78,6 +79,14 @@ namespace BlueBear {
           settings.emplace( std::make_pair( "Side2", std::make_unique< DirectImageSource >( *front.leftSegment, "3xs2 " + frontWallpaper ) ) );
       }
 
+      glm::vec3 position( xPos, yPos + 0.9f, floorLevel );
+      if ( currentRotation == 0 || currentRotation == 1 ) {
+        position.y = position.y + 0.1f;
+      }
+
+      x->setPosition( position );
+      x->setRotationAngle( glm::radians( 180.0f ) );
+
       std::shared_ptr< Material > material = std::make_shared< Material >( hostTextureCache.getUsingAtlas( WALLATLAS_PATH, settings ) );
 
       x->drawable->material = material;
@@ -110,6 +119,14 @@ namespace BlueBear {
           settings.emplace( std::make_pair( "FrontWall", std::make_unique< DirectImageSource >( *front.image, frontWallpaper ) ) );
           settings.emplace( std::make_pair( "Side1", std::make_unique< DirectImageSource >( *front.rightSegment, "3ys1 " + frontWallpaper ) ) );
       }
+
+      glm::vec3 position( xPos - 0.9f, yPos, floorLevel );
+      if ( currentRotation == 1 || currentRotation == 2 ) {
+        position.x = position.x - 0.1f;
+      }
+
+      y->setPosition( position );
+      y->setRotationAngle( glm::radians( -90.0f ) );
 
       std::shared_ptr< Material > material = std::make_shared< Material >( hostTextureCache.getUsingAtlas( WALLATLAS_PATH, settings ) );
 

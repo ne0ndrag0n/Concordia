@@ -312,20 +312,14 @@ namespace BlueBear {
 
               // oh my fucking god i am so sorry about this
               if( wallCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.x ); } ) ) {
-                bundler.x = newXWallInstance( wallCenter.x, wallCenter.y, wallCenter.z, frontPath, backPath );
+                bundler.newXWallInstance( wallCenter.x, wallCenter.y, wallCenter.z, frontPath, backPath );
               }
 
               if( wallCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.y ); } ) ) {
-                bundler.y = newYWallInstance( wallCenter.x, wallCenter.y, wallCenter.z, frontPath, backPath );
+                bundler.newYWallInstance( wallCenter.x, wallCenter.y, wallCenter.z, frontPath, backPath );
               }
 
-              if( wallCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.d ); } ) ) {
-                bundler.d = newDWallInstance( wallCenter.x, wallCenter.y, wallCenter.z, frontPath, backPath );
-              }
-
-              if( wallCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.r ); } ) ) {
-                bundler.r = newRWallInstance( wallCenter.x, wallCenter.y, wallCenter.z, frontPath, backPath );
-              }
+              // TODO: D and R segments
             }
 
             wallInstanceCollection->pushDirect( wallCellBundler );
@@ -333,64 +327,6 @@ namespace BlueBear {
           }
         }
       }
-    }
-    /**
-     * Separated functions to get new wall instances
-     */
-    std::shared_ptr< XWallInstance > Display::MainGameState::newXWallInstance( float x, float y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper ) {
-      std::shared_ptr< XWallInstance > value = std::make_shared< XWallInstance >( defaultShader.Program, texCache, imageCache );
-
-      glm::vec3 position( x, y + 0.9f, floorLevel );
-
-      if ( currentRotation == 0 || currentRotation == 1 ) {
-        position.y = position.y + 0.1f;
-      }
-
-      value->setPosition( position );
-      value->setRotationAngle( glm::radians( 180.0f ) );
-
-      value->setWallpaper( frontWallpaper, backWallpaper );
-      value->selectMaterial( currentRotation );
-
-      return value;
-    }
-    std::shared_ptr< YWallInstance > Display::MainGameState::newYWallInstance( float x, float y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper ) {
-      std::shared_ptr< YWallInstance > value = std::make_shared< YWallInstance >( defaultShader.Program, texCache, imageCache );
-
-      glm::vec3 position;
-
-      value->setRotationAngle( glm::radians( -90.0f ) );
-      position = glm::vec3( x - 0.9f, y, floorLevel );
-
-      // X-nudge
-      if ( currentRotation == 1 || currentRotation == 2 ) {
-        position.x = position.x - 0.1f;
-      }
-
-      value->setPosition( position );
-      value->setWallpaper( frontWallpaper, backWallpaper );
-      value->selectMaterial( currentRotation );
-
-      return value;
-    }
-    std::shared_ptr< DWallInstance > Display::MainGameState::newDWallInstance( float x, float y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper ) {
-      std::shared_ptr< DWallInstance > value = std::make_shared< DWallInstance >( defaultShader.Program, texCache, imageCache );
-      value->setPosition( glm::vec3( x, y, floorLevel ) );
-
-      value->setWallpaper( frontWallpaper, backWallpaper );
-      value->selectMaterial( currentRotation );
-
-      return value;
-    }
-    std::shared_ptr< RWallInstance > Display::MainGameState::newRWallInstance( float x, float y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper ) {
-      std::shared_ptr< RWallInstance > value = std::make_shared< RWallInstance >( defaultShader.Program, texCache, imageCache );
-      value->setRotationAngle( glm::radians( -90.0f ) );
-      value->setPosition( glm::vec3( x, y, floorLevel ) );
-
-      value->setWallpaper( frontWallpaper, backWallpaper );
-      value->selectMaterial( currentRotation );
-
-      return value;
     }
     void Display::MainGameState::loadInfrastructure() {
       auto dimensions = floorMap.getDimensions();
