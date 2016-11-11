@@ -12,6 +12,8 @@ namespace BlueBear {
     class Model;
 
     class WallCellBundler {
+      static const std::string WALLATLAS_PATH;
+
       unsigned int shader;
       unsigned int currentRotation;
       TextureCache& hostTextureCache;
@@ -36,10 +38,10 @@ namespace BlueBear {
       std::shared_ptr< Instance > r;
 
       void render();
-      void newXWallInstance( float x, float y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper );
-      void newYWallInstance( float x, float y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper );
-      void newDWallInstance( float x, float y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper );
-      void newRWallInstance( float x, float y, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper );
+      void newXWallInstance( float xPos, float yPos, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper );
+      void newYWallInstance( float xPos, float yPos, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper );
+      void newDWallInstance( float xPos, float yPos, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper );
+      void newRWallInstance( float xPos, float yPos, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper );
     };
 
   }
