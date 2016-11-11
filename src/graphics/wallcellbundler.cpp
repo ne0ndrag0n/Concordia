@@ -1,8 +1,8 @@
 #include "graphics/wallcellbundler.hpp"
-#include "graphics/instance/wallinstance.hpp"
 #include "graphics/model.hpp"
 #include "graphics/imagecache.hpp"
 #include "graphics/texturecache.hpp"
+#include "graphics/instance/instance.hpp"
 #include "graphics/imagebuilder/imagesource.hpp"
 #include "graphics/imagebuilder/pathimagesource.hpp"
 #include "graphics/imagebuilder/croppeddirectimagesource.hpp"
@@ -61,21 +61,22 @@ namespace BlueBear {
       SegmentBundle front = getSegmentBundle( frontWallpaper );
       SegmentBundle back = getSegmentBundle( backWallpaper );
 
-      settings.emplace( std::make_pair( "FrontWall", std::make_unique< DirectImageSource >( *front.image, frontWallpaper ) ) );
-      settings.emplace( std::make_pair( "BackWall", std::make_unique< DirectImageSource >( *back.image, backWallpaper ) ) );
-
       switch( currentRotation ) {
         case 0:
+          settings.emplace( std::make_pair( "BackWall", std::make_unique< DirectImageSource >( *back.image, backWallpaper ) ) );
           settings.emplace( std::make_pair( "Side2", std::make_unique< DirectImageSource >( *back.rightSegment, "0xs2 " + backWallpaper ) ) );
           break;
         case 1:
+          settings.emplace( std::make_pair( "BackWall", std::make_unique< DirectImageSource >( *back.image, backWallpaper ) ) );
           settings.emplace( std::make_pair( "Side1", std::make_unique< DirectImageSource >( *back.leftSegment, "1xs1 " + backWallpaper ) ) );
           break;
         case 2:
+          settings.emplace( std::make_pair( "FrontWall", std::make_unique< DirectImageSource >( *front.image, frontWallpaper ) ) );
           settings.emplace( std::make_pair( "Side1", std::make_unique< DirectImageSource >( *front.rightSegment, "2xs1 " + frontWallpaper ) ) );
           break;
         case 3:
         default:
+          settings.emplace( std::make_pair( "FrontWall", std::make_unique< DirectImageSource >( *front.image, frontWallpaper ) ) );
           settings.emplace( std::make_pair( "Side2", std::make_unique< DirectImageSource >( *front.leftSegment, "3xs2 " + frontWallpaper ) ) );
       }
 

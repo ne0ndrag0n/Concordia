@@ -4,11 +4,6 @@
 #include "graphics/imagebuilder/imagesource.hpp"
 #include "graphics/imagebuilder/pathimagesource.hpp"
 #include "graphics/instance/instance.hpp"
-#include "graphics/instance/wallinstance.hpp"
-#include "graphics/instance/xwallinstance.hpp"
-#include "graphics/instance/ywallinstance.hpp"
-#include "graphics/instance/dwallinstance.hpp"
-#include "graphics/instance/rwallinstance.hpp"
 #include "graphics/shader.hpp"
 #include "graphics/model.hpp"
 #include "graphics/drawable.hpp"
@@ -188,10 +183,6 @@ namespace BlueBear {
       // Setup static pointers on each of the wall types
       auto xy = std::make_shared< Model >( Display::WALLPANEL_MODEL_XY_PATH );
       auto dr = std::make_shared< Model >( Display::WALLPANEL_MODEL_DR_PATH );
-      XWallInstance::Piece = xy;
-      YWallInstance::Piece = xy;
-      DWallInstance::Piece = dr;
-      RWallInstance::Piece = dr;
 
       WallCellBundler::Piece = xy;
 
@@ -223,12 +214,6 @@ namespace BlueBear {
     }
     Display::MainGameState::~MainGameState() {
       WallCellBundler::Piece.reset();
-
-      XWallInstance::Piece.reset();
-      YWallInstance::Piece.reset();
-
-      DWallInstance::Piece.reset();
-      RWallInstance::Piece.reset();
     }
     /**
      * Determine if a wall on a segment in this dimension exists.
