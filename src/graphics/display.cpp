@@ -180,11 +180,8 @@ namespace BlueBear {
       currentRotation( currentRotation ) {
 
       // Load infrastructure models
-      // Setup static pointers on each of the wall types
-      auto xy = std::make_shared< Model >( Display::WALLPANEL_MODEL_XY_PATH );
-      auto dr = std::make_shared< Model >( Display::WALLPANEL_MODEL_DR_PATH );
-
-      WallCellBundler::Piece = xy;
+      // Setup static pointer
+      WallCellBundler::Piece = std::make_unique< Model >( Display::WALLPANEL_MODEL_XY_PATH );
 
       // Setup camera
       camera.setRotationDirect( currentRotation );

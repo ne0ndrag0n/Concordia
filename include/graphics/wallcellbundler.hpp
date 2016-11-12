@@ -29,14 +29,14 @@ namespace BlueBear {
       SegmentBundle getSegmentBundle( const std::string& path );
 
     public:
-      static std::shared_ptr< Model > Piece;
+      static std::unique_ptr< Model > Piece;
 
       WallCellBundler( unsigned int currentRotation, TextureCache& hostTextureCache, ImageCache& hostImageCache, unsigned int shader );
 
-      std::shared_ptr< Instance > x;
-      std::shared_ptr< Instance > y;
-      std::shared_ptr< Instance > d;
-      std::shared_ptr< Instance > r;
+      std::unique_ptr< Instance > x;
+      std::unique_ptr< Instance > y;
+      std::unique_ptr< Instance > d;
+      std::unique_ptr< Instance > r;
 
       void render();
       void newXWallInstance( float xPos, float yPos, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper, std::shared_ptr< WallCellBundler > topNeighbour );

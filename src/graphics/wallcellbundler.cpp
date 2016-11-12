@@ -17,7 +17,7 @@
 namespace BlueBear {
   namespace Graphics {
 
-    std::shared_ptr< Model > WallCellBundler::Piece( nullptr );
+    std::unique_ptr< Model > WallCellBundler::Piece( nullptr );
     const std::string WallCellBundler::WALLATLAS_PATH = "system/models/wall/wallatlas.json";
 
     WallCellBundler::WallCellBundler( unsigned int currentRotation, TextureCache& hostTextureCache, ImageCache& hostImageCache, unsigned int shader ) :
@@ -58,7 +58,7 @@ namespace BlueBear {
     }
 
     void WallCellBundler::newXWallInstance( float xPos, float yPos, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper, std::shared_ptr< WallCellBundler > topNeighbour ) {
-      x = std::make_shared< Instance >( *WallCellBundler::Piece, shader );
+      x = std::make_unique< Instance >( *WallCellBundler::Piece, shader );
 
       std::map< std::string, std::unique_ptr< ImageSource > > settings;
       SegmentBundle front = getSegmentBundle( frontWallpaper );
@@ -111,7 +111,7 @@ namespace BlueBear {
     }
 
     void WallCellBundler::newYWallInstance( float xPos, float yPos, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper, std::shared_ptr< WallCellBundler > leftNeighbour ) {
-      y = std::make_shared< Instance >( *WallCellBundler::Piece, shader );
+      y = std::make_unique< Instance >( *WallCellBundler::Piece, shader );
 
       std::map< std::string, std::unique_ptr< ImageSource > > settings;
       SegmentBundle front = getSegmentBundle( frontWallpaper );
