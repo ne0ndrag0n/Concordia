@@ -381,6 +381,8 @@ namespace BlueBear {
       static int KEY_DOWN = ConfigManager::getInstance().getIntValue( "key_move_down" );
       static int KEY_LEFT = ConfigManager::getInstance().getIntValue( "key_move_left" );
       static int KEY_RIGHT = ConfigManager::getInstance().getIntValue( "key_move_right" );
+      static int KEY_ZOOM_IN = ConfigManager::getInstance().getIntValue( "key_zoom_in" );
+      static int KEY_ZOOM_OUT = ConfigManager::getInstance().getIntValue( "key_zoom_out" );
 
       // Main game has a few events mostly relating to camera
       switch( event.type ) {
@@ -428,6 +430,12 @@ namespace BlueBear {
             }
             if( keyCode == KEY_RIGHT ) {
               camera.move( -0.1f, 0.0f, 0.0f );
+            }
+            if( keyCode == KEY_ZOOM_IN ) {
+              camera.zoomIn();
+            }
+            if( keyCode == KEY_ZOOM_OUT ) {
+              camera.zoomOut();
             }
 
             break;
