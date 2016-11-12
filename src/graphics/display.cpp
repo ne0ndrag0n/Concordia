@@ -297,11 +297,20 @@ namespace BlueBear {
 
               // oh my fucking god i am so sorry about this
               if( wallCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.x ); } ) ) {
-                bundler.newXWallInstance( wallCenter.x, wallCenter.y, wallCenter.z, frontPath, backPath );
+                bundler.newXWallInstance(
+                  wallCenter.x, wallCenter.y, wallCenter.z,
+                  frontPath, backPath,
+                  // if not on the first row, return the item above in the Y direction
+                  yCounter == 0 ? std::shared_ptr< WallCellBundler >( nullptr ) : wallInstanceCollection->getItem( zCounter, xCounter, yCounter - 1 )
+                );
               }
 
               if( wallCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.y ); } ) ) {
-                bundler.newYWallInstance( wallCenter.x, wallCenter.y, wallCenter.z, frontPath, backPath );
+                bundler.newYWallInstance(
+                  wallCenter.x, wallCenter.y, wallCenter.z,
+                  frontPath, backPath,
+                  xCounter == 0 ? std::shared_ptr< WallCellBundler >( nullptr ) : wallInstanceCollection->getItem( zCounter, xCounter - 1, yCounter )
+                );
               }
 
               // TODO: D and R segments

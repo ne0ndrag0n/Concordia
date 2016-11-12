@@ -57,7 +57,7 @@ namespace BlueBear {
       return side;
     }
 
-    void WallCellBundler::newXWallInstance( float xPos, float yPos, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper ) {
+    void WallCellBundler::newXWallInstance( float xPos, float yPos, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper, std::shared_ptr< WallCellBundler > topNeighbour ) {
       x = std::make_shared< Instance >( *WallCellBundler::Piece, shader );
 
       std::map< std::string, std::unique_ptr< ImageSource > > settings;
@@ -110,7 +110,7 @@ namespace BlueBear {
       x->findChildByName( "RightCorner" )->drawable->material = material;
     }
 
-    void WallCellBundler::newYWallInstance( float xPos, float yPos, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper ) {
+    void WallCellBundler::newYWallInstance( float xPos, float yPos, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper, std::shared_ptr< WallCellBundler > leftNeighbour ) {
       y = std::make_shared< Instance >( *WallCellBundler::Piece, shader );
 
       std::map< std::string, std::unique_ptr< ImageSource > > settings;

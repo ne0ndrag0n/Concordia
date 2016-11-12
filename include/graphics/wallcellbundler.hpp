@@ -39,8 +39,8 @@ namespace BlueBear {
       std::shared_ptr< Instance > r;
 
       void render();
-      void newXWallInstance( float xPos, float yPos, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper );
-      void newYWallInstance( float xPos, float yPos, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper );
+      void newXWallInstance( float xPos, float yPos, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper, std::shared_ptr< WallCellBundler > topNeighbour );
+      void newYWallInstance( float xPos, float yPos, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper, std::shared_ptr< WallCellBundler > leftNeighbour );
       void newDWallInstance( float xPos, float yPos, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper );
       void newRWallInstance( float xPos, float yPos, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper );
     };
