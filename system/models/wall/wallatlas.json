@@ -5,16 +5,40 @@
     "image": "wall.png"
   },
   "mappings": {
-    "FrontWall": {
+    "FrontWallLeft": {
       "x": 9,
       "y": 9,
-      "width": 48,
+      "width": 6,
       "height": 192
     },
-    "BackWall": {
+    "FrontWallCenter": {
+      "x": 15,
+      "y": 9,
+      "width": 36,
+      "height": 192
+    },
+    "FrontWallRight": {
+      "x": 51,
+      "y": 9,
+      "width": 6,
+      "height": 192
+    },
+    "BackWallLeft": {
       "x": 96,
       "y": 9,
-      "width": 48,
+      "width": 6,
+      "height": 192
+    },
+    "BackWallCenter": {
+      "x": 102,
+      "y": 9,
+      "width": 36,
+      "height": 192
+    },
+    "BackWallRight": {
+      "x": 138,
+      "y": 9,
+      "width": 6,
       "height": 192
     },
     "Side1": {

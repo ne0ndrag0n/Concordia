@@ -22,6 +22,7 @@ namespace BlueBear {
       struct SegmentBundle {
         std::shared_ptr< sf::Image > image;
         std::shared_ptr< sf::Image > leftSegment;
+        std::shared_ptr< sf::Image > centerSegment;
         std::shared_ptr< sf::Image > rightSegment;
       };
 

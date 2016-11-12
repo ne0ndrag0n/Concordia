@@ -46,10 +46,12 @@ namespace BlueBear {
       const auto originalSize = side.image->getSize();
 
       CroppedDirectImageSource left( *side.image, 0, 0, 6, 192, path );
+      CroppedDirectImageSource center( *side.image, 6, 0, 36, 192, path );
       // This was -7. I'm not sure why. It makes far more sense to be imageSize.x - 6.
       CroppedDirectImageSource right( *side.image, originalSize.x - 6, 0, 6, 192, path );
 
       side.leftSegment = hostImageCache.getImage( left );
+      side.centerSegment = hostImageCache.getImage( center );
       side.rightSegment = hostImageCache.getImage( right );
 
       return side;
@@ -64,20 +66,32 @@ namespace BlueBear {
 
       switch( currentRotation ) {
         case 0:
-          settings.emplace( std::make_pair( "BackWall", std::make_unique< DirectImageSource >( *back.image, backWallpaper ) ) );
+          //settings.emplace( std::make_pair( "BackWall", std::make_unique< DirectImageSource >( *back.image, backWallpaper ) ) );
+          settings.emplace( std::make_pair( "BackWallLeft", std::make_unique< DirectImageSource >( *back.leftSegment, "0xl " + backWallpaper ) ) );
+          settings.emplace( std::make_pair( "BackWallCenter", std::make_unique< DirectImageSource >( *back.centerSegment, "0xc " + backWallpaper ) ) );
+          settings.emplace( std::make_pair( "BackWallRight", std::make_unique< DirectImageSource >( *back.rightSegment, "0xr " + backWallpaper ) ) );
           settings.emplace( std::make_pair( "Side2", std::make_unique< DirectImageSource >( *back.rightSegment, "0xs2 " + backWallpaper ) ) );
           break;
         case 1:
-          settings.emplace( std::make_pair( "BackWall", std::make_unique< DirectImageSource >( *back.image, backWallpaper ) ) );
+          //settings.emplace( std::make_pair( "BackWall", std::make_unique< DirectImageSource >( *back.image, backWallpaper ) ) );
+          settings.emplace( std::make_pair( "BackWallLeft", std::make_unique< DirectImageSource >( *back.leftSegment, "1xl " + backWallpaper ) ) );
+          settings.emplace( std::make_pair( "BackWallCenter", std::make_unique< DirectImageSource >( *back.centerSegment, "1xc " + backWallpaper ) ) );
+          settings.emplace( std::make_pair( "BackWallRight", std::make_unique< DirectImageSource >( *back.rightSegment, "1xr " + backWallpaper ) ) );
           settings.emplace( std::make_pair( "Side1", std::make_unique< DirectImageSource >( *back.leftSegment, "1xs1 " + backWallpaper ) ) );
           break;
         case 2:
-          settings.emplace( std::make_pair( "FrontWall", std::make_unique< DirectImageSource >( *front.image, frontWallpaper ) ) );
+          //settings.emplace( std::make_pair( "FrontWall", std::make_unique< DirectImageSource >( *front.image, frontWallpaper ) ) );
+          settings.emplace( std::make_pair( "FrontWallLeft", std::make_unique< DirectImageSource >( *front.leftSegment, "2xl " + frontWallpaper ) ) );
+          settings.emplace( std::make_pair( "FrontWallCenter", std::make_unique< DirectImageSource >( *front.centerSegment, "2xc " + frontWallpaper ) ) );
+          settings.emplace( std::make_pair( "FrontWallRight", std::make_unique< DirectImageSource >( *front.rightSegment, "2xr " + frontWallpaper ) ) );
           settings.emplace( std::make_pair( "Side1", std::make_unique< DirectImageSource >( *front.rightSegment, "2xs1 " + frontWallpaper ) ) );
           break;
         case 3:
         default:
-          settings.emplace( std::make_pair( "FrontWall", std::make_unique< DirectImageSource >( *front.image, frontWallpaper ) ) );
+          //settings.emplace( std::make_pair( "FrontWall", std::make_unique< DirectImageSource >( *front.image, frontWallpaper ) ) );
+          settings.emplace( std::make_pair( "FrontWallLeft", std::make_unique< DirectImageSource >( *front.leftSegment, "3xl " + frontWallpaper ) ) );
+          settings.emplace( std::make_pair( "FrontWallCenter", std::make_unique< DirectImageSource >( *front.centerSegment, "3xc " + frontWallpaper ) ) );
+          settings.emplace( std::make_pair( "FrontWallRight", std::make_unique< DirectImageSource >( *front.rightSegment, "3xr " + frontWallpaper ) ) );
           settings.emplace( std::make_pair( "Side2", std::make_unique< DirectImageSource >( *front.leftSegment, "3xs2 " + frontWallpaper ) ) );
       }
 
@@ -105,20 +119,32 @@ namespace BlueBear {
 
       switch( currentRotation ) {
         case 0:
-          settings.emplace( std::make_pair( "FrontWall", std::make_unique< DirectImageSource >( *front.image, frontWallpaper ) ) );
+          //settings.emplace( std::make_pair( "FrontWall", std::make_unique< DirectImageSource >( *front.image, frontWallpaper ) ) );
+          settings.emplace( std::make_pair( "FrontWallLeft", std::make_unique< DirectImageSource >( *front.leftSegment, "0yl " + frontWallpaper ) ) );
+          settings.emplace( std::make_pair( "FrontWallCenter", std::make_unique< DirectImageSource >( *front.centerSegment, "0yc " + frontWallpaper ) ) );
+          settings.emplace( std::make_pair( "FrontWallRight", std::make_unique< DirectImageSource >( *front.rightSegment, "0yr " + frontWallpaper ) ) );
           settings.emplace( std::make_pair( "Side2", std::make_unique< DirectImageSource >( *front.leftSegment, "0ys2 " + frontWallpaper ) ) );
           break;
         case 1:
-          settings.emplace( std::make_pair( "BackWall", std::make_unique< DirectImageSource >( *back.image, backWallpaper ) ) );
+          //settings.emplace( std::make_pair( "BackWall", std::make_unique< DirectImageSource >( *back.image, backWallpaper ) ) );
+          settings.emplace( std::make_pair( "BackWallLeft", std::make_unique< DirectImageSource >( *back.leftSegment, "1yl " + backWallpaper ) ) );
+          settings.emplace( std::make_pair( "BackWallCenter", std::make_unique< DirectImageSource >( *back.centerSegment, "1yc " + backWallpaper ) ) );
+          settings.emplace( std::make_pair( "BackWallRight", std::make_unique< DirectImageSource >( *back.rightSegment, "1yr " + backWallpaper ) ) );
           settings.emplace( std::make_pair( "Side2", std::make_unique< DirectImageSource >( *back.rightSegment, "1ys2 " + backWallpaper ) ) );
           break;
         case 2:
-          settings.emplace( std::make_pair( "BackWall", std::make_unique< DirectImageSource >( *back.image, backWallpaper ) ) );
+          //settings.emplace( std::make_pair( "BackWall", std::make_unique< DirectImageSource >( *back.image, backWallpaper ) ) );
+          settings.emplace( std::make_pair( "BackWallLeft", std::make_unique< DirectImageSource >( *back.leftSegment, "2yl " + backWallpaper ) ) );
+          settings.emplace( std::make_pair( "BackWallCenter", std::make_unique< DirectImageSource >( *back.centerSegment, "2yc " + backWallpaper ) ) );
+          settings.emplace( std::make_pair( "BackWallRight", std::make_unique< DirectImageSource >( *back.rightSegment, "2yr " + backWallpaper ) ) );
           settings.emplace( std::make_pair( "Side1", std::make_unique< DirectImageSource >( *back.leftSegment, "2ys1 " + backWallpaper ) ) );
           break;
         case 3:
         default:
-          settings.emplace( std::make_pair( "FrontWall", std::make_unique< DirectImageSource >( *front.image, frontWallpaper ) ) );
+          //settings.emplace( std::make_pair( "FrontWall", std::make_unique< DirectImageSource >( *front.image, frontWallpaper ) ) );
+          settings.emplace( std::make_pair( "FrontWallLeft", std::make_unique< DirectImageSource >( *front.leftSegment, "3yl " + frontWallpaper ) ) );
+          settings.emplace( std::make_pair( "FrontWallCenter", std::make_unique< DirectImageSource >( *front.centerSegment, "3yc " + frontWallpaper ) ) );
+          settings.emplace( std::make_pair( "FrontWallRight", std::make_unique< DirectImageSource >( *front.rightSegment, "3yr " + frontWallpaper ) ) );
           settings.emplace( std::make_pair( "Side1", std::make_unique< DirectImageSource >( *front.rightSegment, "3ys1 " + frontWallpaper ) ) );
       }
 
