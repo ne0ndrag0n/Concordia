@@ -36,7 +36,7 @@ namespace BlueBear {
       }
     }
 
-    WallCellBundler::SegmentBundle WallCellBundler::getSegmentBundle( const std::string& path ) {
+    WallCellBundler::SegmentBundle WallCellBundler::getSegmentBundle( const std::string& path, bool useLeft, bool useCenter, bool useRight ) {
       WallCellBundler::SegmentBundle side;
 
       PathImageSource pis( path );
@@ -45,14 +45,21 @@ namespace BlueBear {
       // Slice images into their left and right segments
       const auto originalSize = side.image->getSize();
 
-      CroppedDirectImageSource left( *side.image, 0, 0, 6, 192, path );
-      CroppedDirectImageSource center( *side.image, 6, 0, 36, 192, path );
-      // This was -7. I'm not sure why. It makes far more sense to be imageSize.x - 6.
-      CroppedDirectImageSource right( *side.image, originalSize.x - 6, 0, 6, 192, path );
+      if( useLeft ) {
+        CroppedDirectImageSource left( *side.image, 0, 0, 6, 192, path );
+        side.leftSegment = hostImageCache.getImage( left );
+      }
 
-      side.leftSegment = hostImageCache.getImage( left );
-      side.centerSegment = hostImageCache.getImage( center );
-      side.rightSegment = hostImageCache.getImage( right );
+      if( useCenter ) {
+        CroppedDirectImageSource center( *side.image, 6, 0, 36, 192, path );
+        side.centerSegment = hostImageCache.getImage( center );
+      }
+
+      if( useRight ) {
+        // This was -7. I'm not sure why. It makes far more sense to be imageSize.x - 6.
+        CroppedDirectImageSource right( *side.image, originalSize.x - 6, 0, 6, 192, path );
+        side.rightSegment = hostImageCache.getImage( right );
+      }
 
       return side;
     }

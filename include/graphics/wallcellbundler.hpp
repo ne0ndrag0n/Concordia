@@ -26,7 +26,7 @@ namespace BlueBear {
         std::shared_ptr< sf::Image > rightSegment;
       };
 
-      SegmentBundle getSegmentBundle( const std::string& path );
+      SegmentBundle getSegmentBundle( const std::string& path, bool useLeft = true, bool useCenter = true, bool useRight = true );
 
     public:
       static std::unique_ptr< Model > Piece;
