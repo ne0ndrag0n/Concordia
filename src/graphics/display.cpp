@@ -212,18 +212,6 @@ namespace BlueBear {
     Display::MainGameState::~MainGameState() {
       WallCellBundler::Piece.reset();
     }
-    /**
-     * Determine if a wall on a segment in this dimension exists.
-     */
-    bool Display::MainGameState::isWallDimensionPresent( std::string& frontPath, std::string& backPath, std::unique_ptr< Scripting::WallCell::Segment >& ptr ) {
-      if( ptr ) {
-        frontPath.assign( ptr->front.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } ) );
-        backPath.assign( ptr->back.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } ) );
-        return true;
-      } else {
-        return false;
-      }
-    }
     void Display::MainGameState::createFloorInstances() {
       floorInstanceCollection->clear();
 
@@ -287,30 +275,13 @@ namespace BlueBear {
             if( wallCellPtr ) {
               // Several different kinds of wall panel models depending on the type, and several kinds of orientations
               // If that pointer exists, at least one of these ifs will be fulfilled
-              auto& bundler = *( wallCellBundler = std::make_shared< WallCellBundler >( currentRotation, texCache, imageCache, defaultShader.Program ) );
-
-              std::string frontPath;
-              std::string backPath;
-
-              // oh my fucking god i am so sorry about this
-              if( wallCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.x ); } ) ) {
-                bundler.newXWallInstance(
-                  wallCenter.x, wallCenter.y, wallCenter.z,
-                  frontPath, backPath,
-                  // if not on the first row, return the item above in the Y direction
-                  yCounter == 0 ? std::shared_ptr< WallCellBundler >( nullptr ) : wallInstanceCollection->getItem( zCounter, xCounter, yCounter - 1 )
-                );
-              }
-
-              if( wallCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.y ); } ) ) {
-                bundler.newYWallInstance(
-                  wallCenter.x, wallCenter.y, wallCenter.z,
-                  frontPath, backPath,
-                  xCounter == 0 ? std::shared_ptr< WallCellBundler >( nullptr ) : wallInstanceCollection->getItem( zCounter, xCounter - 1, yCounter )
-                );
-              }
-
-              // TODO: D and R segments
+               wallCellBundler = std::make_shared< WallCellBundler >(
+                 wallCellPtr,
+                 yCounter == 0 ? std::weak_ptr< WallCellBundler >() : wallInstanceCollection->getItem( zCounter, xCounter, yCounter - 1 ),
+                 xCounter == 0 ? std::weak_ptr< WallCellBundler >() : wallInstanceCollection->getItem( zCounter, xCounter - 1, yCounter ),
+                 glm::vec3( xOrigin + xCounter, yOrigin - yCounter, zCounter * 2.0f ),
+                 currentRotation, texCache, imageCache, defaultShader.Program
+               );
             }
 
             wallInstanceCollection->pushDirect( wallCellBundler );

@@ -7,6 +7,9 @@
 #include "graphics/imagebuilder/pathimagesource.hpp"
 #include "graphics/imagebuilder/croppeddirectimagesource.hpp"
 #include "graphics/material.hpp"
+#include "threading/lockable.hpp"
+#include "scripting/wallcell.hpp"
+#include "scripting/wallpaper.hpp"
 #include <memory>
 #include <string>
 #include <map>
@@ -20,11 +23,29 @@ namespace BlueBear {
     std::unique_ptr< Model > WallCellBundler::Piece( nullptr );
     const std::string WallCellBundler::WALLATLAS_PATH = "system/models/wall/wallatlas.json";
 
-    WallCellBundler::WallCellBundler( unsigned int currentRotation, TextureCache& hostTextureCache, ImageCache& hostImageCache, unsigned int shader ) :
+    WallCellBundler::WallCellBundler( Threading::Lockable< Scripting::WallCell > hostCell, std::weak_ptr< WallCellBundler > topNeighbour, std::weak_ptr< WallCellBundler > leftNeighbour, glm::vec3 center, unsigned int currentRotation, TextureCache& hostTextureCache, ImageCache& hostImageCache, unsigned int shader ) :
      currentRotation( currentRotation ),
      hostTextureCache( hostTextureCache ),
      hostImageCache( hostImageCache ),
-     shader( shader ) {}
+     shader( shader ),
+     hostCellPtr( hostCell ),
+     topNeighbour( topNeighbour ),
+     leftNeighbour( leftNeighbour ),
+     center( center ) {
+
+       std::string frontPath;
+       std::string backPath;
+
+       if( hostCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.x ); } ) ) {
+         newXWallInstance( frontPath, backPath );
+       }
+
+       if( hostCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.y ); } ) ) {
+         newYWallInstance( frontPath, backPath );
+       }
+
+       // TODO: D and R segments
+     }
 
     void WallCellBundler::render() {
       if( x ) {
@@ -33,6 +54,16 @@ namespace BlueBear {
 
       if( y ) {
         y->drawEntity();
+      }
+    }
+
+    bool WallCellBundler::isWallDimensionPresent( std::string& frontPath, std::string& backPath, std::unique_ptr< Scripting::WallCell::Segment >& ptr ) {
+      if( ptr ) {
+        frontPath.assign( ptr->front.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } ) );
+        backPath.assign( ptr->back.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } ) );
+        return true;
+      } else {
+        return false;
       }
     }
 
@@ -64,7 +95,7 @@ namespace BlueBear {
       return side;
     }
 
-    void WallCellBundler::newXWallInstance( float xPos, float yPos, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper, std::shared_ptr< WallCellBundler > topNeighbour ) {
+    void WallCellBundler::newXWallInstance( std::string& frontWallpaper, std::string& backWallpaper ) {
       x = std::make_unique< Instance >( *WallCellBundler::Piece, shader );
 
       std::map< std::string, std::unique_ptr< ImageSource > > settings;
@@ -102,7 +133,7 @@ namespace BlueBear {
           settings.emplace( std::make_pair( "Side2", std::make_unique< DirectImageSource >( *front.leftSegment, "3xs2 " + frontWallpaper ) ) );
       }
 
-      glm::vec3 position( xPos, yPos + 0.9f, floorLevel );
+      glm::vec3 position( center.x, center.y + 0.9f, center.z );
       if ( currentRotation == 0 || currentRotation == 1 ) {
         position.y = position.y + 0.1f;
       }
@@ -117,7 +148,7 @@ namespace BlueBear {
       x->findChildByName( "RightCorner" )->drawable->material = material;
     }
 
-    void WallCellBundler::newYWallInstance( float xPos, float yPos, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper, std::shared_ptr< WallCellBundler > leftNeighbour ) {
+    void WallCellBundler::newYWallInstance( std::string& frontWallpaper, std::string& backWallpaper ) {
       y = std::make_unique< Instance >( *WallCellBundler::Piece, shader );
 
       std::map< std::string, std::unique_ptr< ImageSource > > settings;
@@ -155,7 +186,7 @@ namespace BlueBear {
           settings.emplace( std::make_pair( "Side1", std::make_unique< DirectImageSource >( *front.rightSegment, "3ys1 " + frontWallpaper ) ) );
       }
 
-      glm::vec3 position( xPos - 0.9f, yPos, floorLevel );
+      glm::vec3 position( center.x - 0.9f, center.y, center.z );
       if ( currentRotation == 1 || currentRotation == 2 ) {
         position.x = position.x - 0.1f;
       }

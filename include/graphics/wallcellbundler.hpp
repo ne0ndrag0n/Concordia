@@ -3,8 +3,11 @@
 
 #include "graphics/imagecache.hpp"
 #include "graphics/texturecache.hpp"
+#include "threading/lockable.hpp"
+#include "scripting/wallcell.hpp"
 #include <memory>
 #include <SFML/Graphics.hpp>
+#include <glm/glm.hpp>
 
 namespace BlueBear {
   namespace Graphics {
@@ -19,6 +22,12 @@ namespace BlueBear {
       TextureCache& hostTextureCache;
       ImageCache& hostImageCache;
 
+      Threading::Lockable< Scripting::WallCell > hostCellPtr;
+      std::weak_ptr< WallCellBundler > topNeighbour;
+      std::weak_ptr< WallCellBundler > leftNeighbour;
+
+      glm::vec3 center;
+
       struct SegmentBundle {
         std::shared_ptr< sf::Image > image;
         std::shared_ptr< sf::Image > leftSegment;
@@ -27,11 +36,16 @@ namespace BlueBear {
       };
 
       SegmentBundle getSegmentBundle( const std::string& path, bool useLeft = true, bool useCenter = true, bool useRight = true );
+      bool isWallDimensionPresent( std::string& frontPath, std::string& backPath, std::unique_ptr< Scripting::WallCell::Segment >& ptr );
 
     public:
       static std::unique_ptr< Model > Piece;
 
-      WallCellBundler( unsigned int currentRotation, TextureCache& hostTextureCache, ImageCache& hostImageCache, unsigned int shader );
+      WallCellBundler(
+        Threading::Lockable< Scripting::WallCell > hostCell, std::weak_ptr< WallCellBundler > topNeighbour, std::weak_ptr< WallCellBundler > leftNeighbour,
+        glm::vec3 center,
+        unsigned int currentRotation, TextureCache& hostTextureCache, ImageCache& hostImageCache, unsigned int shader
+      );
 
       std::unique_ptr< Instance > x;
       std::unique_ptr< Instance > y;
@@ -39,10 +53,10 @@ namespace BlueBear {
       std::unique_ptr< Instance > r;
 
       void render();
-      void newXWallInstance( float xPos, float yPos, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper, std::shared_ptr< WallCellBundler > topNeighbour );
-      void newYWallInstance( float xPos, float yPos, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper, std::shared_ptr< WallCellBundler > leftNeighbour );
-      void newDWallInstance( float xPos, float yPos, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper );
-      void newRWallInstance( float xPos, float yPos, float floorLevel, std::string& frontWallpaper, std::string& backWallpaper );
+      void newXWallInstance( std::string& frontWallpaper, std::string& backWallpaper );
+      void newYWallInstance( std::string& frontWallpaper, std::string& backWallpaper );
+      void newDWallInstance( std::string& frontWallpaper, std::string& backWallpaper );
+      void newRWallInstance( std::string& frontWallpaper, std::string& backWallpaper );
     };
 
   }

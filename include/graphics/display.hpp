@@ -103,7 +103,6 @@ namespace BlueBear {
           std::unique_ptr< Containers::Collection3D< std::shared_ptr< Instance > > > floorInstanceCollection;
           std::unique_ptr< Containers::Collection3D< std::shared_ptr< WallCellBundler > > > wallInstanceCollection;
           void processOsd();
-          bool isWallDimensionPresent( std::string& frontPath, std::string& backPath, std::unique_ptr< Scripting::WallCell::Segment >& ptr );
           void loadInfrastructure();
           void createFloorInstances();
           void createWallInstances();
