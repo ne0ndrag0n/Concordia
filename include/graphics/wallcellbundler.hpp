@@ -22,7 +22,6 @@ namespace BlueBear {
       TextureCache& hostTextureCache;
       ImageCache& hostImageCache;
 
-      Threading::Lockable< Scripting::WallCell > hostCellPtr;
       std::weak_ptr< WallCellBundler > topNeighbour;
       std::weak_ptr< WallCellBundler > leftNeighbour;
 
@@ -35,11 +34,16 @@ namespace BlueBear {
         std::shared_ptr< sf::Image > rightSegment;
       };
 
-      SegmentBundle getSegmentBundle( const std::string& path, bool useLeft = true, bool useCenter = true, bool useRight = true );
       bool isWallDimensionPresent( std::string& frontPath, std::string& backPath, std::unique_ptr< Scripting::WallCell::Segment >& ptr );
+      void newXWallInstance( std::string& frontWallpaper, std::string& backWallpaper );
+      void newYWallInstance( std::string& frontWallpaper, std::string& backWallpaper );
+      void newDWallInstance( std::string& frontWallpaper, std::string& backWallpaper );
+      void newRWallInstance( std::string& frontWallpaper, std::string& backWallpaper );
 
     public:
       static std::unique_ptr< Model > Piece;
+
+      Threading::Lockable< Scripting::WallCell > hostCellPtr;
 
       WallCellBundler(
         Threading::Lockable< Scripting::WallCell > hostCell, std::weak_ptr< WallCellBundler > topNeighbour, std::weak_ptr< WallCellBundler > leftNeighbour,
@@ -52,11 +56,8 @@ namespace BlueBear {
       std::unique_ptr< Instance > d;
       std::unique_ptr< Instance > r;
 
+      SegmentBundle getSegmentBundle( const std::string& path, bool useLeft = true, bool useCenter = true, bool useRight = true );
       void render();
-      void newXWallInstance( std::string& frontWallpaper, std::string& backWallpaper );
-      void newYWallInstance( std::string& frontWallpaper, std::string& backWallpaper );
-      void newDWallInstance( std::string& frontWallpaper, std::string& backWallpaper );
-      void newRWallInstance( std::string& frontWallpaper, std::string& backWallpaper );
     };
 
   }
