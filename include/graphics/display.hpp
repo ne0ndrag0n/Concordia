@@ -107,7 +107,6 @@ namespace BlueBear {
           void loadInfrastructure();
           void createFloorInstances();
           void createWallInstances();
-          WallCellBundler& getWallCellBundler( std::shared_ptr< WallCellBundler >& bundlerPtr );
         public:
           void execute();
           void handleEvent( sf::Event& event );

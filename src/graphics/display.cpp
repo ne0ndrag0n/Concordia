@@ -287,7 +287,7 @@ namespace BlueBear {
             if( wallCellPtr ) {
               // Several different kinds of wall panel models depending on the type, and several kinds of orientations
               // If that pointer exists, at least one of these ifs will be fulfilled
-              auto& bundler = getWallCellBundler( wallCellBundler );
+              auto& bundler = *( wallCellBundler = std::make_shared< WallCellBundler >( currentRotation, texCache, imageCache, defaultShader.Program ) );
 
               std::string frontPath;
               std::string backPath;
@@ -330,13 +330,6 @@ namespace BlueBear {
       createWallInstances();
 
       Log::getInstance().info( "Display::MainGameState::loadInfrastructure", "Finished creating infrastructure instances." );
-    }
-    WallCellBundler& Display::MainGameState::getWallCellBundler( std::shared_ptr< WallCellBundler >& bundlerPtr ) {
-      if( !bundlerPtr ) {
-        bundlerPtr = std::make_shared< WallCellBundler >( currentRotation, texCache, imageCache, defaultShader.Program );
-      }
-
-      return *bundlerPtr;
     }
     void Display::MainGameState::execute() {
       glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
