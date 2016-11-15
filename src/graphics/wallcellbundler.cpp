@@ -10,6 +10,7 @@
 #include "threading/lockable.hpp"
 #include "scripting/wallcell.hpp"
 #include "scripting/wallpaper.hpp"
+#include "log.hpp"
 #include <memory>
 #include <string>
 #include <map>
@@ -134,8 +135,35 @@ namespace BlueBear {
       }
 
       glm::vec3 position( center.x, center.y + 0.9f, center.z );
+
+      // Stay in scope for the material call below
+      // THIS IS ALREADY STARTING TO SUCK
+      std::shared_ptr< sf::Image > potentialSide;
+
       if ( currentRotation == 0 || currentRotation == 1 ) {
         position.y = position.y + 0.1f;
+
+        // For the Rotation 0 nudge, there's a couple of things that need to be taken care of on the neighbouring instance
+        // TODO: rework
+        /*
+        if( currentRotation == 0 ) {
+          std::shared_ptr< WallCellBundler > top = topNeighbour.lock();
+
+          if( top && top->y ) {
+            // This segment needs to be removed as X will provide it
+            top->y->children.erase( "RightCorner" );
+
+            // We'll need to retexture Side2 to be the front face of this wallpaper
+            std::string upperFront = top->hostCellPtr.lock< std::string >( [ & ]( Scripting::WallCell& wallCell ) {
+              return wallCell.y->front.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } );
+            } );
+
+            settings.erase( "Side2" );
+            potentialSide = getSegmentBundle( upperFront, false, false, true ).rightSegment;
+            settings.emplace( std::make_pair( "Side2", std::make_unique< DirectImageSource >( *potentialSide, "0xs2 " + upperFront ) ) );
+          }
+        }
+        */
       }
 
       x->setPosition( position );
