@@ -1,5 +1,5 @@
-#ifndef DIRECTIMAGESOURCE
-#define DIRECTIMAGESOURCE
+#ifndef POINTERIMAGESOURCE
+#define POINTERIMAGESOURCE
 
 #include "graphics/imagebuilder/imagesource.hpp"
 #include <SFML/Graphics.hpp>
