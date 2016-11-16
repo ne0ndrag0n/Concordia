@@ -26,6 +26,7 @@ namespace BlueBear {
       std::weak_ptr< WallCellBundler > leftNeighbour;
 
       glm::vec3 center;
+      glm::vec3 position;
 
       struct SegmentBundle {
         std::shared_ptr< sf::Image > image;
@@ -42,12 +43,14 @@ namespace BlueBear {
 
     public:
       static std::unique_ptr< Model > Piece;
+      static float xOrigin;
+      static float yOrigin;
 
       Threading::Lockable< Scripting::WallCell > hostCellPtr;
 
       WallCellBundler(
         Threading::Lockable< Scripting::WallCell > hostCell, std::weak_ptr< WallCellBundler > topNeighbour, std::weak_ptr< WallCellBundler > leftNeighbour,
-        glm::vec3 center,
+        glm::vec3 position,
         unsigned int currentRotation, TextureCache& hostTextureCache, ImageCache& hostImageCache, unsigned int shader
       );
 

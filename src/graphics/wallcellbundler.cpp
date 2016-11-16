@@ -25,7 +25,10 @@ namespace BlueBear {
     std::unique_ptr< Model > WallCellBundler::Piece( nullptr );
     const std::string WallCellBundler::WALLATLAS_PATH = "system/models/wall/wallatlas.json";
 
-    WallCellBundler::WallCellBundler( Threading::Lockable< Scripting::WallCell > hostCell, std::weak_ptr< WallCellBundler > topNeighbour, std::weak_ptr< WallCellBundler > leftNeighbour, glm::vec3 center, unsigned int currentRotation, TextureCache& hostTextureCache, ImageCache& hostImageCache, unsigned int shader ) :
+    float WallCellBundler::xOrigin = 0.0f;
+    float WallCellBundler::yOrigin = 0.0f;
+
+    WallCellBundler::WallCellBundler( Threading::Lockable< Scripting::WallCell > hostCell, std::weak_ptr< WallCellBundler > topNeighbour, std::weak_ptr< WallCellBundler > leftNeighbour, glm::vec3 position, unsigned int currentRotation, TextureCache& hostTextureCache, ImageCache& hostImageCache, unsigned int shader ) :
      currentRotation( currentRotation ),
      hostTextureCache( hostTextureCache ),
      hostImageCache( hostImageCache ),
@@ -33,7 +36,9 @@ namespace BlueBear {
      hostCellPtr( hostCell ),
      topNeighbour( topNeighbour ),
      leftNeighbour( leftNeighbour ),
-     center( center ) {
+     position( position ) {
+
+       center = glm::vec3( xOrigin + position.x, yOrigin - position.y, position.z * 2.0f );
 
        std::string frontPath;
        std::string backPath;

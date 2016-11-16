@@ -256,19 +256,12 @@ namespace BlueBear {
 
       auto dimensions = wallMap.getDimensions();
 
-      float xOrigin = -( (int)dimensions.x / 2 ) + 0.5f;
-      float yOrigin = ( dimensions.y / 2 ) - 0.5f;
+      WallCellBundler::xOrigin = -( (int)dimensions.x / 2 ) + 0.5f;
+      WallCellBundler::yOrigin = ( dimensions.y / 2 ) - 0.5f;
 
       for ( unsigned int zCounter = 0; zCounter != dimensions.levels; zCounter++ ) {
         for( unsigned int yCounter = 0; yCounter != dimensions.y; yCounter++ ) {
           for( unsigned int xCounter = 0; xCounter != dimensions.x; xCounter++ ) {
-
-            // WALLS
-            // Do not nudge any walls here (nudging will be the responsibility of MainGameState)
-            // Nudging "X" means moving up in the Y dimension by 0.1
-            // Nudging "Y" means moving left in the X dimension by 0.1
-
-            glm::vec3 wallCenter( xOrigin + xCounter, yOrigin - yCounter, zCounter * 2.0f );
 
             Threading::Lockable< Scripting::WallCell > wallCellPtr = wallMap.getItem( zCounter, xCounter, yCounter );
             std::shared_ptr< WallCellBundler > wallCellBundler;
@@ -279,7 +272,7 @@ namespace BlueBear {
                  wallCellPtr,
                  yCounter == 0 ? std::weak_ptr< WallCellBundler >() : wallInstanceCollection->getItem( zCounter, xCounter, yCounter - 1 ),
                  xCounter == 0 ? std::weak_ptr< WallCellBundler >() : wallInstanceCollection->getItem( zCounter, xCounter - 1, yCounter ),
-                 glm::vec3( xOrigin + xCounter, yOrigin - yCounter, zCounter * 2.0f ),
+                 glm::vec3( xCounter, yCounter, zCounter ),
                  currentRotation, texCache, imageCache, defaultShader.Program
                );
             }
