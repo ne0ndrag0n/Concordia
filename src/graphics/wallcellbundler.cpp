@@ -100,22 +100,54 @@ namespace BlueBear {
     void WallCellBundler::newXWallInstance( std::string& frontWallpaper, std::string& backWallpaper ) {
       x = std::make_unique< Instance >( *WallCellBundler::Piece, shader );
 
+      glm::vec3 position( center.x, center.y + 0.9f, center.z );
+
       std::map< std::string, std::unique_ptr< ImageSource > > settings;
       SegmentBundle front = getSegmentBundle( frontWallpaper );
       SegmentBundle back = getSegmentBundle( backWallpaper );
 
       switch( currentRotation ) {
         case 0:
-          settings.emplace( std::make_pair( "BackWallLeft", std::make_unique< PointerImageSource >( back.leftSegment, "0xl " + backWallpaper ) ) );
-          settings.emplace( std::make_pair( "BackWallCenter", std::make_unique< PointerImageSource >( back.centerSegment, "0xc " + backWallpaper ) ) );
-          settings.emplace( std::make_pair( "BackWallRight", std::make_unique< PointerImageSource >( back.rightSegment, "0xr " + backWallpaper ) ) );
-          settings.emplace( std::make_pair( "Side2", std::make_unique< PointerImageSource >( back.rightSegment, "0xs2 " + backWallpaper ) ) );
+          {
+            // This rotation requires a nudge
+            position.y = position.y + 0.1f;
+
+            settings.emplace( std::make_pair( "BackWallLeft", std::make_unique< PointerImageSource >( back.leftSegment, "0xl " + backWallpaper ) ) );
+            settings.emplace( std::make_pair( "BackWallCenter", std::make_unique< PointerImageSource >( back.centerSegment, "0xc " + backWallpaper ) ) );
+            settings.emplace( std::make_pair( "BackWallRight", std::make_unique< PointerImageSource >( back.rightSegment, "0xr " + backWallpaper ) ) );
+
+            // Now let's determine what Side2 should be on this nudged piece
+            std::shared_ptr< WallCellBundler > top = topNeighbour.lock();
+            if( top && top->y ) {
+              // This nudge will result in a collision with the Y-segment piece in the cell above
+              // Handle this by deleting the Y-segment piece's RightCorner segment, then setting Side2 of this new model to its front image.
+
+              // Delete the Y-segment piece's RightCorner segment so nothing can collide
+              top->y->children.erase( "RightCorner" );
+
+              // Get "upperFront", which is the front image path for the Y-segment wall
+              std::string upperFront = top->hostCellPtr.lock< std::string >( [ & ]( Scripting::WallCell& wallCell ) {
+                return wallCell.y->front.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } );
+              } );
+
+              // Using upperFront, emplace Side2 as the rightSegment image pointer for that path
+              settings.emplace( std::make_pair( "Side2", std::make_unique< PointerImageSource >( getSegmentBundle( upperFront, false, false, true ).rightSegment, "0xs2 " + upperFront ) ) );
+            } else {
+              // This nudge will not result in any collision with the cell above (or there is no actual cell above). Let's go with the usual plan for Side2.
+              settings.emplace( std::make_pair( "Side2", std::make_unique< PointerImageSource >( back.rightSegment, "0xs2 " + backWallpaper ) ) );
+            }
+          }
           break;
         case 1:
-          settings.emplace( std::make_pair( "BackWallLeft", std::make_unique< PointerImageSource >( back.leftSegment, "1xl " + backWallpaper ) ) );
-          settings.emplace( std::make_pair( "BackWallCenter", std::make_unique< PointerImageSource >( back.centerSegment, "1xc " + backWallpaper ) ) );
-          settings.emplace( std::make_pair( "BackWallRight", std::make_unique< PointerImageSource >( back.rightSegment, "1xr " + backWallpaper ) ) );
-          settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( back.leftSegment, "1xs1 " + backWallpaper ) ) );
+          {
+            // This rotation requires a nudge
+            position.y = position.y + 0.1f;
+
+            settings.emplace( std::make_pair( "BackWallLeft", std::make_unique< PointerImageSource >( back.leftSegment, "1xl " + backWallpaper ) ) );
+            settings.emplace( std::make_pair( "BackWallCenter", std::make_unique< PointerImageSource >( back.centerSegment, "1xc " + backWallpaper ) ) );
+            settings.emplace( std::make_pair( "BackWallRight", std::make_unique< PointerImageSource >( back.rightSegment, "1xr " + backWallpaper ) ) );
+            settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( back.leftSegment, "1xs1 " + backWallpaper ) ) );
+          }
           break;
         case 2:
           settings.emplace( std::make_pair( "FrontWallLeft", std::make_unique< PointerImageSource >( front.leftSegment, "2xl " + frontWallpaper ) ) );
@@ -129,38 +161,6 @@ namespace BlueBear {
           settings.emplace( std::make_pair( "FrontWallCenter", std::make_unique< PointerImageSource >( front.centerSegment, "3xc " + frontWallpaper ) ) );
           settings.emplace( std::make_pair( "FrontWallRight", std::make_unique< PointerImageSource >( front.rightSegment, "3xr " + frontWallpaper ) ) );
           settings.emplace( std::make_pair( "Side2", std::make_unique< PointerImageSource >( front.leftSegment, "3xs2 " + frontWallpaper ) ) );
-      }
-
-      glm::vec3 position( center.x, center.y + 0.9f, center.z );
-
-      // Stay in scope for the material call below
-      // THIS IS ALREADY STARTING TO SUCK
-      std::shared_ptr< sf::Image > potentialSide;
-
-      if ( currentRotation == 0 || currentRotation == 1 ) {
-        position.y = position.y + 0.1f;
-
-        // For the Rotation 0 nudge, there's a couple of things that need to be taken care of on the neighbouring instance
-        // TODO: rework
-        /*
-        if( currentRotation == 0 ) {
-          std::shared_ptr< WallCellBundler > top = topNeighbour.lock();
-
-          if( top && top->y ) {
-            // This segment needs to be removed as X will provide it
-            top->y->children.erase( "RightCorner" );
-
-            // We'll need to retexture Side2 to be the front face of this wallpaper
-            std::string upperFront = top->hostCellPtr.lock< std::string >( [ & ]( Scripting::WallCell& wallCell ) {
-              return wallCell.y->front.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } );
-            } );
-
-            settings.erase( "Side2" );
-            potentialSide = getSegmentBundle( upperFront, false, false, true ).rightSegment;
-            settings.emplace( std::make_pair( "Side2", std::make_unique< DirectImageSource >( *potentialSide, "0xs2 " + upperFront ) ) );
-          }
-        }
-        */
       }
 
       x->setPosition( position );
