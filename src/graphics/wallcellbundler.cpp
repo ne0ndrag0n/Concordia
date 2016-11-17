@@ -131,10 +131,11 @@ namespace BlueBear {
             settings.emplace( std::make_pair( "BackWallRight", std::make_unique< PointerImageSource >( back.rightSegment, "0xr " + backWallpaper ) ) );
 
             // Now let's determine what Side2 should be on this nudged piece
+
             // CASE: Newly placed X-Segment collides with Y-Segment in cell above.
             std::shared_ptr< WallCellBundler > top = safeGetBundler( hostCollection, counter.x, counter.y - 1, counter.z );
-
-            if( top && top->y ) {
+            bool topContainsY = top && top->y;
+            if( topContainsY ) {
               // This nudge will result in a collision with the Y-segment piece in the cell above
               // Handle this by deleting the Y-segment piece's RightCorner segment, then setting Side2 of this new model to its front image.
 
@@ -158,6 +159,21 @@ namespace BlueBear {
             } else {
               // This nudge will not result in any collision with the cell above (or there is no actual cell above). Let's go with the usual plan for Side2.
               settings.emplace( std::make_pair( "Side2", std::make_unique< PointerImageSource >( back.rightSegment, "0xs2 " + backWallpaper ) ) );
+            }
+
+            // CASE: The placed X-segment causes an inconsistent corner due to the presence of a Y-segment at x + 1, y - 1 (upper right corner relative to this cell)
+            // What needs to be done here: Remove the RightCorner in the upper right corner and create an ExtendedSegment in this X piece
+            std::shared_ptr< WallCellBundler > upperRight = safeGetBundler( hostCollection, counter.x + 1, counter.y - 1, counter.z );
+            bool upperRightContainsY = upperRight && upperRight->y;
+            if( upperRightContainsY ) {
+              // Copy X-segment's RightCorner and move it
+              upperRight->y->children.erase( "RightCorner" );
+
+              std::shared_ptr< Instance > xExtended = std::make_shared< Instance >( *( x->children.at( "RightCorner" ) ) );
+              glm::vec3 position = xExtended->getPosition();
+              position.x = position.x - 1.0f;
+              xExtended->setPosition( position );
+              x->children[ "ExtendedSegment" ] = xExtended;
             }
           }
           break;
@@ -219,6 +235,7 @@ namespace BlueBear {
             bool topContainsY = top && top->y;
 
             if( !topContainsY && x ) {
+              // FIXME: case of above (X) where we handle that corner?
               x->children.erase( "RightCorner" );
               // Copy Y-segment's RightCorner into a new pointer
               // Drawable is not copied!!
