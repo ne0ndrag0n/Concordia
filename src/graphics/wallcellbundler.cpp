@@ -144,7 +144,8 @@ namespace BlueBear {
                 top->y->children.erase( "RightCorner" );
               } else {
                 // The only way this would happen is if RightCorner was already deleted in favor of X to the left's ExtendedSegment. That'll have to go now.
-                // TODO
+                std::shared_ptr< WallCellBundler > left = safeGetBundler( hostCollection, counter.x - 1, counter.y, counter.z );
+                left->x->children.erase( "ExtendedSegment" );
               }
 
               // Get "upperFront", which is the front image path for the Y-segment wall
