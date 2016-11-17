@@ -270,8 +270,7 @@ namespace BlueBear {
               // If that pointer exists, at least one of these ifs will be fulfilled
                wallCellBundler = std::make_shared< WallCellBundler >(
                  wallCellPtr,
-                 yCounter == 0 ? std::weak_ptr< WallCellBundler >() : wallInstanceCollection->getItem( zCounter, xCounter, yCounter - 1 ),
-                 xCounter == 0 ? std::weak_ptr< WallCellBundler >() : wallInstanceCollection->getItem( zCounter, xCounter - 1, yCounter ),
+                 *wallInstanceCollection,
                  glm::vec3( xCounter, yCounter, zCounter ),
                  currentRotation, texCache, imageCache, defaultShader.Program
                );

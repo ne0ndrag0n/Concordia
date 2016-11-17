@@ -8,6 +8,7 @@
 #include "graphics/imagebuilder/croppeddirectimagesource.hpp"
 #include "graphics/imagebuilder/pointerimagesource.hpp"
 #include "graphics/material.hpp"
+#include "containers/collection3d.hpp"
 #include "threading/lockable.hpp"
 #include "scripting/wallcell.hpp"
 #include "scripting/wallpaper.hpp"
@@ -28,27 +29,25 @@ namespace BlueBear {
     float WallCellBundler::xOrigin = 0.0f;
     float WallCellBundler::yOrigin = 0.0f;
 
-    WallCellBundler::WallCellBundler( Threading::Lockable< Scripting::WallCell > hostCell, std::weak_ptr< WallCellBundler > topNeighbour, std::weak_ptr< WallCellBundler > leftNeighbour, glm::vec3 position, unsigned int currentRotation, TextureCache& hostTextureCache, ImageCache& hostImageCache, unsigned int shader ) :
+    WallCellBundler::WallCellBundler( Threading::Lockable< Scripting::WallCell > hostCell, Containers::Collection3D< std::shared_ptr< WallCellBundler > >& hostCollection, glm::vec3 counter, unsigned int currentRotation, TextureCache& hostTextureCache, ImageCache& hostImageCache, unsigned int shader ) :
      currentRotation( currentRotation ),
      hostTextureCache( hostTextureCache ),
      hostImageCache( hostImageCache ),
      shader( shader ),
      hostCellPtr( hostCell ),
-     topNeighbour( topNeighbour ),
-     leftNeighbour( leftNeighbour ),
-     position( position ) {
+     counter( counter ) {
 
-       center = glm::vec3( xOrigin + position.x, yOrigin - position.y, position.z * 2.0f );
+       center = glm::vec3( xOrigin + counter.x, yOrigin - counter.y, counter.z * 2.0f );
 
        std::string frontPath;
        std::string backPath;
 
        if( hostCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.x ); } ) ) {
-         newXWallInstance( frontPath, backPath );
+         newXWallInstance( hostCollection, frontPath, backPath );
        }
 
        if( hostCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.y ); } ) ) {
-         newYWallInstance( frontPath, backPath );
+         newYWallInstance( hostCollection, frontPath, backPath );
        }
 
        // TODO: D and R segments
@@ -102,7 +101,17 @@ namespace BlueBear {
       return side;
     }
 
-    void WallCellBundler::newXWallInstance( std::string& frontWallpaper, std::string& backWallpaper ) {
+    std::shared_ptr< WallCellBundler > WallCellBundler::safeGetBundler( Containers::Collection3D< std::shared_ptr< WallCellBundler > >& hostCollection, int x, int y, int z ) {
+      std::shared_ptr< WallCellBundler > result( nullptr );
+
+      if( x >= 0 && y >= 0 && z >= 0 ) {
+        result = hostCollection.getItem( z, x, y );
+      }
+
+      return result;
+    }
+
+    void WallCellBundler::newXWallInstance( Containers::Collection3D< std::shared_ptr< WallCellBundler > >& hostCollection, std::string& frontWallpaper, std::string& backWallpaper ) {
       x = std::make_unique< Instance >( *WallCellBundler::Piece, shader );
 
       glm::vec3 position( center.x, center.y + 0.9f, center.z );
@@ -122,7 +131,8 @@ namespace BlueBear {
             settings.emplace( std::make_pair( "BackWallRight", std::make_unique< PointerImageSource >( back.rightSegment, "0xr " + backWallpaper ) ) );
 
             // Now let's determine what Side2 should be on this nudged piece
-            std::shared_ptr< WallCellBundler > top = topNeighbour.lock();
+            std::shared_ptr< WallCellBundler > top = safeGetBundler( hostCollection, counter.x, counter.y - 1, counter.z );
+
             if( top && top->y ) {
               // This nudge will result in a collision with the Y-segment piece in the cell above
               // Handle this by deleting the Y-segment piece's RightCorner segment, then setting Side2 of this new model to its front image.
@@ -178,7 +188,7 @@ namespace BlueBear {
       x->findChildByName( "RightCorner" )->drawable->material = material;
     }
 
-    void WallCellBundler::newYWallInstance( std::string& frontWallpaper, std::string& backWallpaper ) {
+    void WallCellBundler::newYWallInstance( Containers::Collection3D< std::shared_ptr< WallCellBundler > >& hostCollection, std::string& frontWallpaper, std::string& backWallpaper ) {
       y = std::make_unique< Instance >( *WallCellBundler::Piece, shader );
 
       glm::vec3 position( center.x - 0.9f, center.y, center.z );
