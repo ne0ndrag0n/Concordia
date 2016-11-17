@@ -131,6 +131,7 @@ namespace BlueBear {
             settings.emplace( std::make_pair( "BackWallRight", std::make_unique< PointerImageSource >( back.rightSegment, "0xr " + backWallpaper ) ) );
 
             // Now let's determine what Side2 should be on this nudged piece
+            // CASE: Newly placed X-Segment collides with Y-Segment in cell above.
             std::shared_ptr< WallCellBundler > top = safeGetBundler( hostCollection, counter.x, counter.y - 1, counter.z );
 
             if( top && top->y ) {
@@ -138,7 +139,13 @@ namespace BlueBear {
               // Handle this by deleting the Y-segment piece's RightCorner segment, then setting Side2 of this new model to its front image.
 
               // Delete the Y-segment piece's RightCorner segment so nothing can collide
-              top->y->children.erase( "RightCorner" );
+              // We can either collide with the top RightCorner, or if the piece to the left was directly before a lower right corner, the left X-segment's ExtendedSegment
+              if( top->y->children.find( "RightCorner" ) != top->y->children.end() ) {
+                top->y->children.erase( "RightCorner" );
+              } else {
+                // The only way this would happen is if RightCorner was already deleted in favor of X to the left's ExtendedSegment. That'll have to go now.
+                // TODO
+              }
 
               // Get "upperFront", which is the front image path for the Y-segment wall
               std::string upperFront = top->hostCellPtr.lock< std::string >( [ & ]( Scripting::WallCell& wallCell ) {
@@ -205,8 +212,12 @@ namespace BlueBear {
             settings.emplace( std::make_pair( "FrontWallRight", std::make_unique< PointerImageSource >( front.rightSegment, "0yr " + frontWallpaper ) ) );
             settings.emplace( std::make_pair( "Side2", std::make_unique< PointerImageSource >( front.leftSegment, "0ys2 " + frontWallpaper ) ) );
 
-            // Determine if we need to cover the upper-left corner in this case
-            if( x ) {
+            // CASE: There is an X-segment in the same cell, and this Y-segment will need a replacement piece to make sure the entire side of the wall is displayed.
+            // There is no Y-piece in the cell above, which would negate the need for this.
+            std::shared_ptr< WallCellBundler > top = safeGetBundler( hostCollection, counter.x, counter.y - 1, counter.z );
+            bool topContainsY = top && top->y;
+
+            if( !topContainsY && x ) {
               x->children.erase( "RightCorner" );
               // Copy Y-segment's RightCorner into a new pointer
               // Drawable is not copied!!
