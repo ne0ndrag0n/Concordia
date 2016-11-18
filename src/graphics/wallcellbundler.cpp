@@ -232,11 +232,18 @@ namespace BlueBear {
             // CASE: There is an X-segment in the same cell, and this Y-segment will need a replacement piece to make sure the entire side of the wall is displayed.
             // There is no Y-piece in the cell above, which would negate the need for this.
             std::shared_ptr< WallCellBundler > top = safeGetBundler( hostCollection, counter.x, counter.y - 1, counter.z );
-            bool topContainsY = top && top->y;
+            std::shared_ptr< WallCellBundler > left = safeGetBundler( hostCollection, counter.x - 1, counter.y, counter.z );
 
-            if( !topContainsY && x ) {
-              // FIXME: case of above (X) where we handle that corner?
-              x->children.erase( "RightCorner" );
+            bool topContainsY = top && top->y;
+            bool currentContainsX = x.operator bool();
+            bool leftContainsX = left && left->x;
+
+            if( !topContainsY && ( currentContainsX != leftContainsX ) ) {
+
+              if( currentContainsX ) {
+                x->children.erase( "RightCorner" );
+              }
+
               // Copy Y-segment's RightCorner into a new pointer
               // Drawable is not copied!!
               std::shared_ptr< Instance > yExtended = std::make_shared< Instance >( *( y->children.at( "RightCorner" ) ) );
