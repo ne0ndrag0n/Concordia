@@ -256,7 +256,6 @@ namespace BlueBear {
             settings.emplace( std::make_pair( "FrontWallLeft", std::make_unique< PointerImageSource >( front.leftSegment, "3xl " + frontWallpaper ) ) );
             settings.emplace( std::make_pair( "FrontWallCenter", std::make_unique< PointerImageSource >( front.centerSegment, "3xc " + frontWallpaper ) ) );
             settings.emplace( std::make_pair( "FrontWallRight", std::make_unique< PointerImageSource >( front.rightSegment, "3xr " + frontWallpaper ) ) );
-            settings.emplace( std::make_pair( "Side2", std::make_unique< PointerImageSource >( front.leftSegment, "3xs2 " + frontWallpaper ) ) );
 
             // CASE: X-segment we're about to place may collide with an ExtendedSegment from the left
             std::shared_ptr< WallCellBundler > left = safeGetBundler( hostCollection, counter.x - 1, counter.y, counter.z );
@@ -276,6 +275,21 @@ namespace BlueBear {
               position.x = position.x - 0.1f;
               xExtended->setPosition( position );
               x->children[ "ExtendedSegment" ] = xExtended;
+            }
+
+            std::shared_ptr< WallCellBundler > top = safeGetBundler( hostCollection, counter.x, counter.y - 1, counter.z );
+            bool topContainsY = top && top->y;
+            if( topContainsY && !leftContainsX ) {
+              // CASE: Placing an X in this cell, there is a Y on top, and no X in the left cell. An incomplete corner occurs.
+
+              // Need to get front wallpaper for Y panel on top and apply it to Side2
+              std::string frontWallpaper = top->hostCellPtr.lock< std::string >( [ & ]( Scripting::WallCell& wallCell ) {
+                return wallCell.y->front.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } );
+              } );
+
+              settings.emplace( std::make_pair( "Side2", std::make_unique< PointerImageSource >( getSegmentBundle( frontWallpaper, true, false, true ).leftSegment, "3xs2 " + frontWallpaper ) ) );
+            } else {
+              settings.emplace( std::make_pair( "Side2", std::make_unique< PointerImageSource >( front.leftSegment, "3xs2 " + frontWallpaper ) ) );
             }
           }
       }
