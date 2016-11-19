@@ -218,10 +218,37 @@ namespace BlueBear {
           }
           break;
         case 2:
-          settings.emplace( std::make_pair( "FrontWallLeft", std::make_unique< PointerImageSource >( front.leftSegment, "2xl " + frontWallpaper ) ) );
-          settings.emplace( std::make_pair( "FrontWallCenter", std::make_unique< PointerImageSource >( front.centerSegment, "2xc " + frontWallpaper ) ) );
-          settings.emplace( std::make_pair( "FrontWallRight", std::make_unique< PointerImageSource >( front.rightSegment, "2xr " + frontWallpaper ) ) );
-          settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( front.rightSegment, "2xs1 " + frontWallpaper ) ) );
+          {
+            settings.emplace( std::make_pair( "FrontWallLeft", std::make_unique< PointerImageSource >( front.leftSegment, "2xl " + frontWallpaper ) ) );
+            settings.emplace( std::make_pair( "FrontWallCenter", std::make_unique< PointerImageSource >( front.centerSegment, "2xc " + frontWallpaper ) ) );
+            settings.emplace( std::make_pair( "FrontWallRight", std::make_unique< PointerImageSource >( front.rightSegment, "2xr " + frontWallpaper ) ) );
+
+            // CASE: Open corner to the left of this tile due to a Y-segment directly above
+            std::shared_ptr< WallCellBundler > top = safeGetBundler( hostCollection, counter.x, counter.y - 1, counter.z );
+            bool topContainsY = top && top->y;
+            if( topContainsY ) {
+              std::shared_ptr< Instance > xExtended1 = std::make_shared< Instance >( *( x->children.at( "RightCorner" ) ) );
+              glm::vec3 position = xExtended1->getPosition();
+              // test
+              position.x = position.x + 0.1f;
+              xExtended1->setPosition( position );
+              x->children[ "ExtendedSegment1" ] = xExtended1;
+            }
+
+            // CASE: Placement of X-segment causes incomplete corner with upper-right Y segment
+            std::shared_ptr< WallCellBundler > upperRight = safeGetBundler( hostCollection, counter.x + 1, counter.y - 1, counter.z );
+            bool upperRightContainsY = upperRight && upperRight->y;
+            if( upperRightContainsY ) {
+              // All we have to do is retexture Side1!
+              std::string back = upperRight->hostCellPtr.lock< std::string >( [ & ]( Scripting::WallCell& wallCell ) {
+                return wallCell.y->back.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } );
+              } );
+
+              settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( getSegmentBundle( back, false, false, true ).rightSegment, "2xs1 " + back ) ) );
+            } else {
+              settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( front.rightSegment, "2xs1 " + frontWallpaper ) ) );
+            }
+          }
           break;
         case 3:
         default:
