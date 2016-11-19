@@ -309,6 +309,15 @@ namespace BlueBear {
               yExtended->setPosition( position );
               y->children[ "ExtendedSegment" ] = yExtended;
             }
+
+            // CASE: Gap corner when this cell has an X, top cell has no Y, and left cell has no X
+            if( currentContainsX && !topContainsY && !leftContainsX ) {
+              std::shared_ptr< Instance > yExtended = std::make_shared< Instance >( *( y->children.at( "RightCorner" ) ) );
+              glm::vec3 position = yExtended->getPosition();
+              position.x = position.x - 1.0f;
+              yExtended->setPosition( position );
+              y->children[ "ExtendedSegment" ] = yExtended;
+            }
           }
           break;
         case 2:
