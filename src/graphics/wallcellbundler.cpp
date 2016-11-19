@@ -354,7 +354,21 @@ namespace BlueBear {
             settings.emplace( std::make_pair( "BackWallLeft", std::make_unique< PointerImageSource >( back.leftSegment, "2yl " + backWallpaper ) ) );
             settings.emplace( std::make_pair( "BackWallCenter", std::make_unique< PointerImageSource >( back.centerSegment, "2yc " + backWallpaper ) ) );
             settings.emplace( std::make_pair( "BackWallRight", std::make_unique< PointerImageSource >( back.rightSegment, "2yr " + backWallpaper ) ) );
-            settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( back.leftSegment, "2ys1 " + backWallpaper ) ) );
+
+            // CASE: Y-segment collides with X-segment to the left
+            std::shared_ptr< WallCellBundler > left = safeGetBundler( hostCollection, counter.x - 1, counter.y, counter.z );
+            bool leftContainsX = left && left->x;
+            if( leftContainsX ) {
+              left->x->children.erase( "LeftCorner" );
+
+              std::string leftFront = left->hostCellPtr.lock< std::string >( [ & ]( Scripting::WallCell& wallCell ) {
+                return wallCell.x->front.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } );
+              } );
+
+              settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( getSegmentBundle( leftFront, true, false, false ).leftSegment, "2ys1 " + leftFront ) ) );
+            } else {
+              settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( back.leftSegment, "2ys1 " + backWallpaper ) ) );
+            }
           }
           break;
         case 3:
