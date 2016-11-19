@@ -291,6 +291,24 @@ namespace BlueBear {
             settings.emplace( std::make_pair( "BackWallCenter", std::make_unique< PointerImageSource >( back.centerSegment, "1yc " + backWallpaper ) ) );
             settings.emplace( std::make_pair( "BackWallRight", std::make_unique< PointerImageSource >( back.rightSegment, "1yr " + backWallpaper ) ) );
             settings.emplace( std::make_pair( "Side2", std::make_unique< PointerImageSource >( back.rightSegment, "1ys2 " + backWallpaper ) ) );
+
+            // CASE: There is an incomplete corner for wall boxes formed at their upper right corners
+            std::shared_ptr< WallCellBundler > top = safeGetBundler( hostCollection, counter.x, counter.y - 1, counter.z );
+            std::shared_ptr< WallCellBundler > left = safeGetBundler( hostCollection, counter.x - 1, counter.y, counter.z );
+
+            bool currentContainsX = x.operator bool();
+            bool leftContainsX = left && left->x;
+            bool topContainsY = top && top->y;
+
+            if( !currentContainsX && leftContainsX && !topContainsY ) {
+              left->x->children.erase( "LeftCorner" );
+
+              std::shared_ptr< Instance > yExtended = std::make_shared< Instance >( *( y->children.at( "RightCorner" ) ) );
+              glm::vec3 position = yExtended->getPosition();
+              position.x = position.x - 1.0f;
+              yExtended->setPosition( position );
+              y->children[ "ExtendedSegment" ] = yExtended;
+            }
           }
           break;
         case 2:
