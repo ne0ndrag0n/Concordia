@@ -227,12 +227,12 @@ namespace BlueBear {
             std::shared_ptr< WallCellBundler > top = safeGetBundler( hostCollection, counter.x, counter.y - 1, counter.z );
             bool topContainsY = top && top->y;
             if( topContainsY ) {
-              std::shared_ptr< Instance > xExtended1 = std::make_shared< Instance >( *( x->children.at( "RightCorner" ) ) );
-              glm::vec3 position = xExtended1->getPosition();
+              std::shared_ptr< Instance > xExtended = std::make_shared< Instance >( *( x->children.at( "RightCorner" ) ) );
+              glm::vec3 position = xExtended->getPosition();
               // test
               position.x = position.x + 0.1f;
-              xExtended1->setPosition( position );
-              x->children[ "ExtendedSegment1" ] = xExtended1;
+              xExtended->setPosition( position );
+              x->children[ "ExtendedSegment" ] = xExtended;
             }
 
             // CASE: Placement of X-segment causes incomplete corner with upper-right Y segment
@@ -355,6 +355,14 @@ namespace BlueBear {
             settings.emplace( std::make_pair( "BackWallCenter", std::make_unique< PointerImageSource >( back.centerSegment, "2yc " + backWallpaper ) ) );
             settings.emplace( std::make_pair( "BackWallRight", std::make_unique< PointerImageSource >( back.rightSegment, "2yr " + backWallpaper ) ) );
 
+            // FIXME this fucking mess
+
+            // CASE: Placing this Y will collide with a piece designed to fill a corner gap
+            bool currentContainsX = x.operator bool();
+            if( currentContainsX && x->children.find( "ExtendedSegment" ) != x->children.end() ) {
+              x->children.erase( "ExtendedSegment" );
+            }
+
             // CASE: Y-segment collides with X-segment to the left
             std::shared_ptr< WallCellBundler > left = safeGetBundler( hostCollection, counter.x - 1, counter.y, counter.z );
             bool leftContainsX = left && left->x;
@@ -368,7 +376,6 @@ namespace BlueBear {
               settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( getSegmentBundle( leftFront, true, false, false ).leftSegment, "2ys1 " + leftFront ) ) );
             } else {
               // CASE: If no X segment is to the left, but there is an X segment in the current cell, this forms an incomplete corner.
-              bool currentContainsX = x.operator bool();
               if( currentContainsX ) {
                 std::string xFront = hostCellPtr.lock< std::string >( [ & ]( Scripting::WallCell& wallCell ) {
                   return wallCell.x->front.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } );
