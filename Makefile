@@ -26,3 +26,6 @@ $(MAIN): $(OBJS)
 
 clean:
 		$(RM) *.o *~ $(MAIN)
+
+run:    ${MAIN}
+	./bbexec
