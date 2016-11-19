@@ -367,7 +367,17 @@ namespace BlueBear {
 
               settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( getSegmentBundle( leftFront, true, false, false ).leftSegment, "2ys1 " + leftFront ) ) );
             } else {
-              settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( back.leftSegment, "2ys1 " + backWallpaper ) ) );
+              // CASE: If no X segment is to the left, but there is an X segment in the current cell, this forms an incomplete corner.
+              bool currentContainsX = x.operator bool();
+              if( currentContainsX ) {
+                std::string xFront = hostCellPtr.lock< std::string >( [ & ]( Scripting::WallCell& wallCell ) {
+                  return wallCell.x->front.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } );
+                } );
+
+                settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( getSegmentBundle( xFront, true, false, false ).leftSegment, "2ys1 " + xFront ) ) );
+              } else {
+                settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( back.leftSegment, "2ys1 " + backWallpaper ) ) );
+              }
             }
           }
           break;
