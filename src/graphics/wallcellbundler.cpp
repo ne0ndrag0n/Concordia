@@ -185,7 +185,36 @@ namespace BlueBear {
             settings.emplace( std::make_pair( "BackWallLeft", std::make_unique< PointerImageSource >( back.leftSegment, "1xl " + backWallpaper ) ) );
             settings.emplace( std::make_pair( "BackWallCenter", std::make_unique< PointerImageSource >( back.centerSegment, "1xc " + backWallpaper ) ) );
             settings.emplace( std::make_pair( "BackWallRight", std::make_unique< PointerImageSource >( back.rightSegment, "1xr " + backWallpaper ) ) );
-            settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( back.leftSegment, "1xs1 " + backWallpaper ) ) );
+
+            // CASE: X-segment collides with upper-right cell, which may have nudged a Y segment into it
+            std::shared_ptr< WallCellBundler > upperRight = safeGetBundler( hostCollection, counter.x + 1, counter.y - 1, counter.z );
+            bool upperRightContainsY = upperRight && upperRight->y;
+            if( upperRightContainsY ) {
+              upperRight->y->children.erase( "RightCorner" );
+
+              std::string upperRightBack = upperRight->hostCellPtr.lock< std::string >( [ & ]( Scripting::WallCell& wallCell ) {
+                return wallCell.y->back.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } );
+              } );
+
+              settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( getSegmentBundle( upperRightBack, true, false, false ).leftSegment, "1xs1 " + upperRightBack ) ) );
+            } else {
+              settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( back.leftSegment, "1xs1 " + backWallpaper ) ) );
+            }
+
+            // CASE: X-segment creates incomplete lower-left corner in a box-shaped wall
+            std::shared_ptr< WallCellBundler > top = safeGetBundler( hostCollection, counter.x, counter.y - 1, counter.z );
+            std::shared_ptr< WallCellBundler > left = safeGetBundler( hostCollection, counter.x - 1, counter.y, counter.z );
+            bool topContainsY = top && top->y;
+            bool leftContainsX = left && left->x;
+            if( topContainsY && !leftContainsX ) {
+              top->y->children.erase( "RightCorner" );
+
+              std::shared_ptr< Instance > xExtended = std::make_shared< Instance >( *( x->children.at( "LeftCorner" ) ) );
+              glm::vec3 position = xExtended->getPosition();
+              position.x = position.x + 1.0f;
+              xExtended->setPosition( position );
+              x->children[ "ExtendedSegment" ] = xExtended;
+            }
           }
           break;
         case 2:
