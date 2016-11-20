@@ -430,15 +430,35 @@ namespace BlueBear {
             settings.emplace( std::make_pair( "FrontWallLeft", std::make_unique< PointerImageSource >( front.leftSegment, "3yl " + frontWallpaper ) ) );
             settings.emplace( std::make_pair( "FrontWallCenter", std::make_unique< PointerImageSource >( front.centerSegment, "3yc " + frontWallpaper ) ) );
             settings.emplace( std::make_pair( "FrontWallRight", std::make_unique< PointerImageSource >( front.rightSegment, "3yr " + frontWallpaper ) ) );
-            settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( front.rightSegment, "3ys1 " + frontWallpaper ) ) );
 
-            // CASE: Y-segment we're about to place may collide with an ExtendedSegment from the left
             std::shared_ptr< WallCellBundler > left = safeGetBundler( hostCollection, counter.x - 1, counter.y, counter.z );
             bool leftContainsX = left && left->x;
-            if( leftContainsX ) {
-              if( left->x->children.find( "ExtendedSegment" ) != left->x->children.end() ) {
-                left->x->children.erase( "ExtendedSegment" );
-              }
+            bool currentContainsX = x.operator bool();
+
+            // CASE: Y-segment we're about to place may collide with an ExtendedSegment from the left
+            if( leftContainsX && left->x->children.find( "ExtendedSegment" ) != left->x->children.end() ) {
+              left->x->children.erase( "ExtendedSegment" );
+            }
+
+            if( leftContainsX && !currentContainsX ) {
+              // CASE: This cell only has a Y piece and there's an X piece to the left. Get its front texture and apply it to Side1
+              std::string xFront = left->hostCellPtr.lock< std::string >( [ & ]( Scripting::WallCell& wallCell ) {
+                return wallCell.x->front.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } );
+              } );
+
+              settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( getSegmentBundle( xFront, false, false, true ).rightSegment, "3ys1 " + xFront ) ) );
+            } else if ( currentContainsX ) {
+              // CASE: There's an X piece in this cell but none to the left. A collision occurs in the same cell!
+              x->children.erase( "RightCorner" );
+
+              std::string xFront = hostCellPtr.lock< std::string >( [ & ]( Scripting::WallCell& wallCell ) {
+                return wallCell.x->front.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } );
+              } );
+
+              settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( getSegmentBundle( xFront, true, false, false ).leftSegment, "3ys1 " + xFront ) ) );
+            } else {
+              settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( front.rightSegment, "3ys1 " + frontWallpaper ) ) );
+
             }
           }
       }
