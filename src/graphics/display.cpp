@@ -182,6 +182,7 @@ namespace BlueBear {
       // Load infrastructure models
       // Setup static pointer
       WallCellBundler::Piece = std::make_unique< Model >( Display::WALLPANEL_MODEL_XY_PATH );
+      WallCellBundler::DPiece = std::make_unique< Model >( Display::WALLPANEL_MODEL_DR_PATH );
 
       // Setup camera
       camera.setRotationDirect( currentRotation );
@@ -211,6 +212,7 @@ namespace BlueBear {
     }
     Display::MainGameState::~MainGameState() {
       WallCellBundler::Piece.reset();
+      WallCellBundler::DPiece.reset();
     }
     void Display::MainGameState::createFloorInstances() {
       floorInstanceCollection->clear();

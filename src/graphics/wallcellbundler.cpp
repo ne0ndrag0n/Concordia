@@ -24,6 +24,7 @@ namespace BlueBear {
   namespace Graphics {
 
     std::unique_ptr< Model > WallCellBundler::Piece( nullptr );
+    std::unique_ptr< Model > WallCellBundler::DPiece( nullptr );
     const std::string WallCellBundler::WALLATLAS_PATH = "system/models/wall/wallatlas.json";
 
     float WallCellBundler::xOrigin = 0.0f;

@@ -46,6 +46,7 @@ namespace BlueBear {
 
     public:
       static std::unique_ptr< Model > Piece;
+      static std::unique_ptr< Model > DPiece;
       static float xOrigin;
       static float yOrigin;
 
