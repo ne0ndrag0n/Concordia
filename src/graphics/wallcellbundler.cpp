@@ -51,6 +51,10 @@ namespace BlueBear {
          newYWallInstance( hostCollection, frontPath, backPath );
        }
 
+       if( hostCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.d ); } ) ) {
+         newDWallInstance( hostCollection, frontPath, backPath );
+       }
+
        // TODO: D and R segments
      }
 
@@ -61,6 +65,14 @@ namespace BlueBear {
 
       if( y ) {
         y->drawEntity();
+      }
+
+      if( d ) {
+        d->drawEntity();
+      }
+
+      if( r ) {
+        r->drawEntity();
       }
     }
 
@@ -474,5 +486,40 @@ namespace BlueBear {
       y->findChildByName( "RightCorner" )->drawable->material = material;
     }
 
+    void WallCellBundler::newDWallInstance( Containers::Collection3D< std::shared_ptr< WallCellBundler > >& hostCollection, std::string& frontWallpaper, std::string& backWallpaper ) {
+      d = std::make_unique< Instance >( *WallCellBundler::DPiece, shader );
+
+      glm::vec3 position( center.x, center.y, center.z );
+
+      std::map< std::string, std::unique_ptr< ImageSource > > settings;
+      SegmentBundle front = getSegmentBundle( frontWallpaper );
+      SegmentBundle back = getSegmentBundle( backWallpaper );
+
+      // TODO: Nudge appropriately to ensure all corners are covered
+      // Will the model need to be "supersized"?
+      switch( currentRotation ) {
+        case 0:
+          {
+            position.x += 0.03f;
+            position.y += 0.03f;
+          }
+          break;
+        case 1:
+          {
+
+          }
+          break;
+        case 2:
+        case 3:
+        default:
+          break;
+      }
+
+      // TODO: Settings for D-segment pieces
+
+      d->setPosition( position );
+
+      // TODO: Set material using texture cache
+    }
   }
 }
