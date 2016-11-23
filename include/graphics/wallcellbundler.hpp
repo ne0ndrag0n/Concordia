@@ -17,14 +17,12 @@ namespace BlueBear {
 
     class WallCellBundler {
       static const std::string WALLATLAS_PATH;
+      static const std::string WALLATLAS_COARSE_PATH;
 
       unsigned int shader;
       unsigned int currentRotation;
       TextureCache& hostTextureCache;
       ImageCache& hostImageCache;
-
-      std::weak_ptr< WallCellBundler > topNeighbour;
-      std::weak_ptr< WallCellBundler > leftNeighbour;
 
       glm::vec3 center;
       glm::vec3 counter;

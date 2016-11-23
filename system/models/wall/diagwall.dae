@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 2.77.0 commit date:2016-04-05, commit time:18:12, hash:abf6f08</authoring_tool>
     </contributor>
-    <created>2016-11-21T17:34:01</created>
-    <modified>2016-11-21T17:34:01</modified>
+    <created>2016-11-22T20:11:04</created>
+    <modified>2016-11-22T20:11:04</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -107,7 +107,7 @@
   <library_visual_scenes>
     <visual_scene id="Scene" name="Scene">
       <node id="Wall" name="Wall" type="NODE">
-        <matrix sid="transform">0.7071068 0.7071068 0 0 -0.7071068 0.7071068 0 0 0 0 1 2.01 0 0 0 1</matrix>
+        <matrix sid="transform">1 0 0 0 0 1 0 0 0 0 1 2.01 0 0 0 1</matrix>
         <instance_geometry url="#WallMesh-mesh" name="Wall">
           <bind_material>
             <technique_common>

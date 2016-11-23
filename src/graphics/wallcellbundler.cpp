@@ -26,6 +26,7 @@ namespace BlueBear {
     std::unique_ptr< Model > WallCellBundler::Piece( nullptr );
     std::unique_ptr< Model > WallCellBundler::DPiece( nullptr );
     const std::string WallCellBundler::WALLATLAS_PATH = "system/models/wall/wallatlas.json";
+    const std::string WallCellBundler::WALLATLAS_COARSE_PATH = "system/models/wall/wallatlas_c.json";
 
     float WallCellBundler::xOrigin = 0.0f;
     float WallCellBundler::yOrigin = 0.0f;
@@ -117,6 +118,7 @@ namespace BlueBear {
     std::shared_ptr< WallCellBundler > WallCellBundler::safeGetBundler( Containers::Collection3D< std::shared_ptr< WallCellBundler > >& hostCollection, int x, int y, int z ) {
       std::shared_ptr< WallCellBundler > result( nullptr );
 
+      // FIXME: safeGetBundler is not very "safe" if you're not doing upper-bounds checking!!
       if( x >= 0 && y >= 0 && z >= 0 ) {
         result = hostCollection.getItem( z, x, y );
       }
@@ -502,6 +504,25 @@ namespace BlueBear {
           {
             position.x += 0.03f;
             position.y += 0.03f;
+
+            settings.emplace( std::make_pair( "Front", std::make_unique< PointerImageSource >( front.image, "0c " + frontWallpaper ) ) );
+
+            // CASE: Left segment contains X-piece, there is no Y-piece at top to provide an overlap
+            std::shared_ptr< WallCellBundler > left = safeGetBundler( hostCollection, counter.x - 1, counter.y, counter.z );
+            std::shared_ptr< WallCellBundler > top = safeGetBundler( hostCollection, counter.x, counter.y - 1, counter.z );
+            bool leftContainsX = left && left->x;
+            bool topContainsY = top && top->y;
+
+            if( leftContainsX && !topContainsY && left->x->children.find( "ExtendedSegment" ) == left->x->children.end() ) {
+              // Create a new extended X segment from RightCorner for this corner piece to "crash" into
+              std::shared_ptr< Instance > xExtended = std::make_shared< Instance >( *( left->x->children.at( "RightCorner" ) ) );
+              glm::vec3 position = xExtended->getPosition();
+              position.x = position.x - 1.0f;
+              xExtended->setPosition( position );
+              left->x->children[ "ExtendedSegment" ] = xExtended;
+            }
+
+            d->drawable->material = std::make_shared< Material >( hostTextureCache.getUsingAtlas( WALLATLAS_COARSE_PATH, settings ) );
           }
           break;
         case 1:
@@ -515,11 +536,8 @@ namespace BlueBear {
           break;
       }
 
-      // TODO: Settings for D-segment pieces
-
       d->setPosition( position );
-
-      // TODO: Set material using texture cache
+      d->setRotationAngle( glm::radians( -45.0f ) );
     }
   }
 }
