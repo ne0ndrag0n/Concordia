@@ -359,6 +359,19 @@ namespace BlueBear {
               yExtended->setPosition( position );
               y->children[ "ExtendedSegment" ] = yExtended;
             }
+
+            // CASE: Upper left contains D-segment, this segment doesn't have an X-segment, and we don't already have an ExtendedSegment here from the case above
+            std::shared_ptr< WallCellBundler > upperLeft = safeGetBundler( hostCollection, counter.x - 1, counter.y - 1, counter.z );
+            bool upperLeftContainsD = upperLeft && upperLeft->d;
+            bool currentContainsExtendedSegment = y->children.find( "ExtendedSegment" ) != y->children.end();
+            if( upperLeftContainsD && !currentContainsX && !currentContainsExtendedSegment ) {
+              // Make an extended segment for this D-segment
+              std::shared_ptr< Instance > yExtended = std::make_shared< Instance >( *( y->children.at( "RightCorner" ) ) );
+              glm::vec3 position = yExtended->getPosition();
+              position.x = position.x - 1.0f;
+              yExtended->setPosition( position );
+              y->children[ "ExtendedSegment" ] = yExtended;
+            }
           }
           break;
         case 1:
