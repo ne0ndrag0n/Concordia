@@ -574,11 +574,13 @@ namespace BlueBear {
           break;
         case 1:
           {
-            position.x -= 0.035f;
-            position.y += 0.035f;
+            position.x -= 0.06f;
+            position.y += 0.06f;
             position.z -= 0.01f;
 
             settings.emplace( std::make_pair( "Side2", std::make_unique< PointerImageSource >( front.leftSegment, "1c " + frontWallpaper ) ) );
+            // ooh, first time we're using setScale - plump the segment up in the Y-direction slightly
+            d->setScale( glm::vec3( 1.0f, 1.4f, 1.0f ) );
 
             d->drawable->material = std::make_shared< Material >( hostTextureCache.getUsingAtlas( WALLATLAS_COARSE_PATH, settings ) );
           }
