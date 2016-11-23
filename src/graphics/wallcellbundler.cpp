@@ -20,6 +20,12 @@
 #include <SFML/Graphics.hpp>
 #include <glm/glm.hpp>
 
+/**
+ * Abandon all hope ye who enter here
+ *
+ * FIXME: All this goddamn duplicated code produced in a rush
+ */
+
 namespace BlueBear {
   namespace Graphics {
 
@@ -230,6 +236,17 @@ namespace BlueBear {
               xExtended->setPosition( position );
               x->children[ "ExtendedSegment" ] = xExtended;
             }
+
+            // CASE: D-segment in upper left creates exposed corner
+            std::shared_ptr< WallCellBundler > upperLeft = safeGetBundler( hostCollection, counter.x - 1, counter.y - 1, counter.z );
+            bool upperLeftContainsD = upperLeft && upperLeft->d;
+            if( upperLeftContainsD /* and there won't be any Y above as this is disallowed. don't worry about the above if block being fulfilled */ ) {
+              std::shared_ptr< Instance > xExtended = std::make_shared< Instance >( *( x->children.at( "LeftCorner" ) ) );
+              glm::vec3 position = xExtended->getPosition();
+              position.x = position.x + 1.0f;
+              xExtended->setPosition( position );
+              x->children[ "ExtendedSegment" ] = xExtended;
+            }
           }
           break;
         case 2:
@@ -386,10 +403,12 @@ namespace BlueBear {
             // CASE: There is an incomplete corner for wall boxes formed at their upper right corners
             std::shared_ptr< WallCellBundler > top = safeGetBundler( hostCollection, counter.x, counter.y - 1, counter.z );
             std::shared_ptr< WallCellBundler > left = safeGetBundler( hostCollection, counter.x - 1, counter.y, counter.z );
+            std::shared_ptr< WallCellBundler > upperLeft = safeGetBundler( hostCollection, counter.x - 1, counter.y - 1, counter.z );
 
             bool currentContainsX = x.operator bool();
             bool leftContainsX = left && left->x;
             bool topContainsY = top && top->y;
+            bool upperLeftContainsD = upperLeft && upperLeft->d;
 
             if( !currentContainsX && leftContainsX && !topContainsY ) {
               left->x->children.erase( "LeftCorner" );
@@ -403,6 +422,21 @@ namespace BlueBear {
 
             // CASE: Gap corner when this cell has an X, top cell has no Y, and left cell has no X
             if( currentContainsX && !topContainsY && !leftContainsX ) {
+
+              // Remove X's ExtendedSegment if there is an upper left D-segment (it'll be there)
+              if( upperLeftContainsD ) {
+                x->children.erase( "ExtendedSegment" );
+              }
+
+              std::shared_ptr< Instance > yExtended = std::make_shared< Instance >( *( y->children.at( "RightCorner" ) ) );
+              glm::vec3 position = yExtended->getPosition();
+              position.x = position.x - 1.0f;
+              yExtended->setPosition( position );
+              y->children[ "ExtendedSegment" ] = yExtended;
+            }
+
+            // CASE: Y-segment needs to be extended for D-segment if there is also no X-segment present
+            if( upperLeftContainsD && !currentContainsX ) {
               std::shared_ptr< Instance > yExtended = std::make_shared< Instance >( *( y->children.at( "RightCorner" ) ) );
               glm::vec3 position = yExtended->getPosition();
               position.x = position.x - 1.0f;
@@ -540,7 +574,13 @@ namespace BlueBear {
           break;
         case 1:
           {
+            position.x -= 0.035f;
+            position.y += 0.035f;
+            position.z -= 0.01f;
 
+            settings.emplace( std::make_pair( "Side2", std::make_unique< PointerImageSource >( front.leftSegment, "1c " + frontWallpaper ) ) );
+
+            d->drawable->material = std::make_shared< Material >( hostTextureCache.getUsingAtlas( WALLATLAS_COARSE_PATH, settings ) );
           }
           break;
         case 2:
