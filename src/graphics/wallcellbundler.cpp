@@ -623,6 +623,41 @@ namespace BlueBear {
           break;
         case 3:
         default:
+          {
+            position.x += 0.06f;
+            position.y -= 0.06f;
+            position.z -= 0.01f;
+
+            settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( back.leftSegment, "3c " + backWallpaper ) ) );
+
+            // Plump Segment
+            d->setScale( glm::vec3( 1.0f, 1.4f, 1.0f ) );
+
+            std::shared_ptr< WallCellBundler > left = safeGetBundler( hostCollection, counter.x - 1, counter.y, counter.z );
+            std::shared_ptr< WallCellBundler > top = safeGetBundler( hostCollection, counter.x, counter.y - 1, counter.z );
+            bool leftContainsX = left && left->x;
+            bool topContainsY = top && top->y;
+
+            // CASE: If there's a Y above but no X to the left, get an extended piece onto Y.
+            if( topContainsY && !leftContainsX ) {
+              std::shared_ptr< Instance > yExtended = std::make_shared< Instance >( *( top->y->children.at( "LeftCorner" ) ) );
+              glm::vec3 position = yExtended->getPosition();
+              position.x = position.x + 1.0f;
+              yExtended->setPosition( position );
+              top->y->children[ "ExtendedSegment" ] = yExtended;
+            }
+
+            // CASE: If there's an X to the left but no Y above, get an extended piece onto X.
+            if( !topContainsY && leftContainsX ) {
+              std::shared_ptr< Instance > xExtended = std::make_shared< Instance >( *( left->x->children.at( "RightCorner" ) ) );
+              glm::vec3 position = xExtended->getPosition();
+              position.x = position.x - 1.0f;
+              xExtended->setPosition( position );
+              left->x->children[ "ExtendedSegment" ] = xExtended;
+            }
+
+            d->drawable->material = std::make_shared< Material >( hostTextureCache.getUsingAtlas( WALLATLAS_COARSE_PATH, settings ) );
+          }
           break;
       }
 
