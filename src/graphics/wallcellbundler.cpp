@@ -280,6 +280,17 @@ namespace BlueBear {
             } else {
               settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( front.rightSegment, "2xs1 " + frontWallpaper ) ) );
             }
+
+            // CASE: D-segment in upper left causes potential gap
+            std::shared_ptr< WallCellBundler > upperLeft = safeGetBundler( hostCollection, counter.x - 1, counter.y - 1, counter.z );
+            bool upperLeftContainsD = upperLeft && upperLeft->d;
+            if( upperLeftContainsD ) {
+              std::shared_ptr< Instance > xExtended = std::make_shared< Instance >( *( x->children.at( "RightCorner" ) ) );
+              glm::vec3 position = xExtended->getPosition();
+              position.x = position.x + 0.1f;
+              xExtended->setPosition( position );
+              x->children[ "ExtendedSegment" ] = xExtended;
+            }
           }
           break;
         case 3:
@@ -586,6 +597,30 @@ namespace BlueBear {
           }
           break;
         case 2:
+          {
+            position.x -= 0.03f;
+            position.y -= 0.03f;
+
+            settings.emplace( std::make_pair( "Back", std::make_unique< PointerImageSource >( back.image, "2c " + frontWallpaper ) ) );
+
+            // CASE: No X segment to the left, Y segment to the top, leaves a gap in the corner
+            std::shared_ptr< WallCellBundler > left = safeGetBundler( hostCollection, counter.x - 1, counter.y, counter.z );
+            std::shared_ptr< WallCellBundler > top = safeGetBundler( hostCollection, counter.x, counter.y - 1, counter.z );
+            bool leftContainsX = left && left->x;
+            bool topContainsY = top && top->y;
+
+            if( !leftContainsX && topContainsY ) {
+              // Need to make the extended segment
+              std::shared_ptr< Instance > yExtended = std::make_shared< Instance >( *( top->y->children.at( "LeftCorner" ) ) );
+              glm::vec3 position = yExtended->getPosition();
+              position.x = position.x + 1.0f;
+              yExtended->setPosition( position );
+              top->y->children[ "ExtendedSegment" ] = yExtended;
+            }
+
+            d->drawable->material = std::make_shared< Material >( hostTextureCache.getUsingAtlas( WALLATLAS_COARSE_PATH, settings ) );
+          }
+          break;
         case 3:
         default:
           break;
