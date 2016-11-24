@@ -581,8 +581,6 @@ namespace BlueBear {
               xExtended->setPosition( position );
               left->x->children[ "ExtendedSegment" ] = xExtended;
             }
-
-            d->drawable->material = std::make_shared< Material >( hostTextureCache.getUsingAtlas( WALLATLAS_COARSE_PATH, settings ) );
           }
           break;
         case 1:
@@ -594,8 +592,6 @@ namespace BlueBear {
             settings.emplace( std::make_pair( "Side2", std::make_unique< PointerImageSource >( front.leftSegment, "1dc " + frontWallpaper ) ) );
             // ooh, first time we're using setScale - plump the segment up in the Y-direction slightly
             d->setScale( glm::vec3( 1.0f, 1.4f, 1.0f ) );
-
-            d->drawable->material = std::make_shared< Material >( hostTextureCache.getUsingAtlas( WALLATLAS_COARSE_PATH, settings ) );
           }
           break;
         case 2:
@@ -619,8 +615,6 @@ namespace BlueBear {
               yExtended->setPosition( position );
               top->y->children[ "ExtendedSegment" ] = yExtended;
             }
-
-            d->drawable->material = std::make_shared< Material >( hostTextureCache.getUsingAtlas( WALLATLAS_COARSE_PATH, settings ) );
           }
           break;
         case 3:
@@ -657,14 +651,13 @@ namespace BlueBear {
               xExtended->setPosition( position );
               left->x->children[ "ExtendedSegment" ] = xExtended;
             }
-
-            d->drawable->material = std::make_shared< Material >( hostTextureCache.getUsingAtlas( WALLATLAS_COARSE_PATH, settings ) );
           }
           break;
       }
 
       d->setPosition( position );
       d->setRotationAngle( glm::radians( -45.0f ) );
+      d->drawable->material = std::make_shared< Material >( hostTextureCache.getUsingAtlas( WALLATLAS_COARSE_PATH, settings ) );
     }
 
     void WallCellBundler::newRWallInstance( Containers::Collection3D< std::shared_ptr< WallCellBundler > >& hostCollection, std::string& frontWallpaper, std::string& backWallpaper ) {
