@@ -62,7 +62,9 @@ namespace BlueBear {
          newDWallInstance( hostCollection, frontPath, backPath );
        }
 
-       // TODO: D and R segments
+       if( hostCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.r ); } ) ) {
+         newRWallInstance( hostCollection, frontPath, backPath );
+       }
      }
 
     void WallCellBundler::render() {
@@ -563,7 +565,7 @@ namespace BlueBear {
             position.x += 0.03f;
             position.y += 0.03f;
 
-            settings.emplace( std::make_pair( "Front", std::make_unique< PointerImageSource >( front.image, "0c " + frontWallpaper ) ) );
+            settings.emplace( std::make_pair( "Front", std::make_unique< PointerImageSource >( front.image, "0dc " + frontWallpaper ) ) );
 
             // CASE: Left segment contains X-piece, there is no Y-piece at top to provide an overlap
             std::shared_ptr< WallCellBundler > left = safeGetBundler( hostCollection, counter.x - 1, counter.y, counter.z );
@@ -589,7 +591,7 @@ namespace BlueBear {
             position.y += 0.06f;
             position.z -= 0.01f;
 
-            settings.emplace( std::make_pair( "Side2", std::make_unique< PointerImageSource >( front.leftSegment, "1c " + frontWallpaper ) ) );
+            settings.emplace( std::make_pair( "Side2", std::make_unique< PointerImageSource >( front.leftSegment, "1dc " + frontWallpaper ) ) );
             // ooh, first time we're using setScale - plump the segment up in the Y-direction slightly
             d->setScale( glm::vec3( 1.0f, 1.4f, 1.0f ) );
 
@@ -601,7 +603,7 @@ namespace BlueBear {
             position.x -= 0.03f;
             position.y -= 0.03f;
 
-            settings.emplace( std::make_pair( "Back", std::make_unique< PointerImageSource >( back.image, "2c " + frontWallpaper ) ) );
+            settings.emplace( std::make_pair( "Back", std::make_unique< PointerImageSource >( back.image, "2dc " + backWallpaper ) ) );
 
             // CASE: No X segment to the left, Y segment to the top, leaves a gap in the corner
             std::shared_ptr< WallCellBundler > left = safeGetBundler( hostCollection, counter.x - 1, counter.y, counter.z );
@@ -628,7 +630,7 @@ namespace BlueBear {
             position.y -= 0.06f;
             position.z -= 0.01f;
 
-            settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( back.leftSegment, "3c " + backWallpaper ) ) );
+            settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( back.leftSegment, "3dc " + backWallpaper ) ) );
 
             // Plump Segment
             d->setScale( glm::vec3( 1.0f, 1.4f, 1.0f ) );
@@ -663,6 +665,45 @@ namespace BlueBear {
 
       d->setPosition( position );
       d->setRotationAngle( glm::radians( -45.0f ) );
+    }
+
+    void WallCellBundler::newRWallInstance( Containers::Collection3D< std::shared_ptr< WallCellBundler > >& hostCollection, std::string& frontWallpaper, std::string& backWallpaper ) {
+      r = std::make_unique< Instance >( *WallCellBundler::DPiece, shader );
+
+      glm::vec3 position( center.x, center.y, center.z );
+
+      std::map< std::string, std::unique_ptr< ImageSource > > settings;
+      SegmentBundle front = getSegmentBundle( frontWallpaper );
+      SegmentBundle back = getSegmentBundle( backWallpaper );
+
+
+      switch( currentRotation ) {
+          case 0:
+            {
+              settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( back.leftSegment, "0rc " + backWallpaper ) ) );
+            }
+            break;
+          case 1:
+            {
+              settings.emplace( std::make_pair( "Front", std::make_unique< PointerImageSource >( front.image, "1rc " + frontWallpaper ) ) );
+            }
+            break;
+          case 2:
+            {
+              settings.emplace( std::make_pair( "Side2", std::make_unique< PointerImageSource >( front.leftSegment, "2rc " + frontWallpaper ) ) );
+            }
+            break;
+          case 3:
+          default:
+            {
+              settings.emplace( std::make_pair( "Back", std::make_unique< PointerImageSource >( back.image, "3rc " + frontWallpaper ) ) );
+            }
+            break;
+      }
+
+      r->setPosition( position );
+      r->setRotationAngle( glm::radians( 45.0f ) );
+      r->drawable->material = std::make_shared< Material >( hostTextureCache.getUsingAtlas( WALLATLAS_COARSE_PATH, settings ) );
     }
   }
 }
