@@ -153,9 +153,13 @@ namespace BlueBear {
 
     std::shared_ptr< WallCellBundler > WallCellBundler::safeGetBundler( Containers::Collection3D< std::shared_ptr< WallCellBundler > >& hostCollection, int x, int y, int z ) {
       std::shared_ptr< WallCellBundler > result( nullptr );
+      unsigned int xMax = hostCollection.getX();
+      unsigned int yMax = hostCollection.getY();
+      unsigned int zMax = hostCollection.getLevels();
 
-      // FIXME: safeGetBundler is not very "safe" if you're not doing upper-bounds checking!!
-      if( x >= 0 && y >= 0 && z >= 0 ) {
+      if( x >= 0 && y >= 0 && z >= 0 &&
+          x < xMax && y < yMax && z < zMax
+        ) {
         result = hostCollection.getItem( z, x, y );
       }
 
