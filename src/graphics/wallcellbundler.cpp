@@ -166,6 +166,12 @@ namespace BlueBear {
       return result;
     }
 
+    void WallCellBundler::createExtendedSegment( std::unique_ptr< Instance >& segment, const std::string& corner, glm::vec3 shift, const std::string& resultID ) {
+      std::shared_ptr< Instance > extended = std::make_shared< Instance >( *( segment->children.at( corner ) ) );
+      extended->setPosition( extended->getPosition() + shift );
+      segment->children[ resultID ] = extended;
+    }
+
     void WallCellBundler::newXWallInstance( Containers::Collection3D< std::shared_ptr< WallCellBundler > >& hostCollection, std::string& frontWallpaper, std::string& backWallpaper ) {
       x = std::make_unique< Instance >( *WallCellBundler::Piece, shader );
 
@@ -224,21 +230,13 @@ namespace BlueBear {
               // Copy X-segment's RightCorner and move it
               upperRight->y->children.erase( "RightCorner" );
 
-              std::shared_ptr< Instance > xExtended = std::make_shared< Instance >( *( x->children.at( "RightCorner" ) ) );
-              glm::vec3 position = xExtended->getPosition();
-              position.x = position.x - 1.0f;
-              xExtended->setPosition( position );
-              x->children[ "ExtendedSegment" ] = xExtended;
+              createExtendedSegment( x, "RightCorner", glm::vec3( -1.0f, 0.0f, 0.0f ) );
             }
 
             // CASE: Upper-right segment contains an R-segment, which may create an open corner
             bool upperRightContainsR = upperRight && upperRight->r;
             if( upperRightContainsR ) {
-              std::shared_ptr< Instance > xExtended = std::make_shared< Instance >( *( x->children.at( "RightCorner" ) ) );
-              glm::vec3 position = xExtended->getPosition();
-              position.x = position.x - 1.0f;
-              xExtended->setPosition( position );
-              x->children[ "ExtendedSegment" ] = xExtended;
+              createExtendedSegment( x, "RightCorner", glm::vec3( -1.0f, 0.0f, 0.0f ) );
             }
           }
           break;
@@ -274,32 +272,20 @@ namespace BlueBear {
             if( topContainsY && !leftContainsX ) {
               top->y->children.erase( "RightCorner" );
 
-              std::shared_ptr< Instance > xExtended = std::make_shared< Instance >( *( x->children.at( "LeftCorner" ) ) );
-              glm::vec3 position = xExtended->getPosition();
-              position.x = position.x + 1.0f;
-              xExtended->setPosition( position );
-              x->children[ "ExtendedSegment" ] = xExtended;
+              createExtendedSegment( x, "LeftCorner", glm::vec3( 1.0f, 0.0f, 0.0f ) );
             }
 
             // CASE: D-segment in upper left creates exposed corner
             std::shared_ptr< WallCellBundler > upperLeft = safeGetBundler( hostCollection, counter.x - 1, counter.y - 1, counter.z );
             bool upperLeftContainsD = upperLeft && upperLeft->d;
             if( upperLeftContainsD /* and there won't be any Y above as this is disallowed. don't worry about the above if block being fulfilled */ ) {
-              std::shared_ptr< Instance > xExtended = std::make_shared< Instance >( *( x->children.at( "LeftCorner" ) ) );
-              glm::vec3 position = xExtended->getPosition();
-              position.x = position.x + 1.0f;
-              xExtended->setPosition( position );
-              x->children[ "ExtendedSegment" ] = xExtended;
+              createExtendedSegment( x, "LeftCorner", glm::vec3( 1.0f, 0.0f, 0.0f ) );
             }
 
             // CASE: R-segment to the left and there's not already an ExtendedSegment placed before
             bool leftContainsR = left && left->r;
             if( leftContainsR && ( x->children.find( "ExtendedSegment" ) == x->children.end() ) ) {
-              std::shared_ptr< Instance > xExtended = std::make_shared< Instance >( *( x->children.at( "LeftCorner" ) ) );
-              glm::vec3 position = xExtended->getPosition();
-              position.x = position.x + 1.0f;
-              xExtended->setPosition( position );
-              x->children[ "ExtendedSegment" ] = xExtended;
+              createExtendedSegment( x, "LeftCorner", glm::vec3( 1.0f, 0.0f, 0.0f ) );
             }
           }
           break;
@@ -313,12 +299,7 @@ namespace BlueBear {
             std::shared_ptr< WallCellBundler > top = safeGetBundler( hostCollection, counter.x, counter.y - 1, counter.z );
             bool topContainsY = top && top->y;
             if( topContainsY ) {
-              std::shared_ptr< Instance > xExtended = std::make_shared< Instance >( *( x->children.at( "RightCorner" ) ) );
-              glm::vec3 position = xExtended->getPosition();
-              // test
-              position.x = position.x + 0.1f;
-              xExtended->setPosition( position );
-              x->children[ "ExtendedSegment" ] = xExtended;
+              createExtendedSegment( x, "RightCorner", glm::vec3( 0.1f, 0.0f, 0.0f ) );
             }
 
             // CASE: Placement of X-segment causes incomplete corner with upper-right Y segment
@@ -339,22 +320,14 @@ namespace BlueBear {
             std::shared_ptr< WallCellBundler > upperLeft = safeGetBundler( hostCollection, counter.x - 1, counter.y - 1, counter.z );
             bool upperLeftContainsD = upperLeft && upperLeft->d;
             if( upperLeftContainsD && ( x->children.find( "ExtendedSegment" ) == x->children.end() ) ) {
-              std::shared_ptr< Instance > xExtended = std::make_shared< Instance >( *( x->children.at( "RightCorner" ) ) );
-              glm::vec3 position = xExtended->getPosition();
-              position.x = position.x + 0.1f;
-              xExtended->setPosition( position );
-              x->children[ "ExtendedSegment" ] = xExtended;
+              createExtendedSegment( x, "RightCorner", glm::vec3( 0.1f, 0.0f, 0.0f ) );
             }
 
             // CASE: R-segment to the left, ExtendedSegment not already placed
             std::shared_ptr< WallCellBundler > left = safeGetBundler( hostCollection, counter.x - 1, counter.y, counter.z );
             bool leftContainsR = left && left->r;
             if( leftContainsR && ( x->children.find( "ExtendedSegment" ) == x->children.end() ) ) {
-              std::shared_ptr< Instance > xExtended = std::make_shared< Instance >( *( x->children.at( "LeftCorner" ) ) );
-              glm::vec3 position = xExtended->getPosition();
-              position.x = position.x + 1.0f;
-              xExtended->setPosition( position );
-              x->children[ "ExtendedSegment" ] = xExtended;
+              createExtendedSegment( x, "LeftCorner", glm::vec3( 1.0f, 0.0f, 0.0f ) );
             }
           }
           break;
@@ -379,11 +352,7 @@ namespace BlueBear {
             bool upperRightContainsY = upperRight && upperRight->y;
             bool upperRightContainsR = upperRight && upperRight->r;
             if( upperRightContainsY || upperRightContainsR ) {
-              std::shared_ptr< Instance > xExtended = std::make_shared< Instance >( *( x->children.at( "LeftCorner" ) ) );
-              glm::vec3 position = xExtended->getPosition();
-              position.x = position.x - 0.1f;
-              xExtended->setPosition( position );
-              x->children[ "ExtendedSegment" ] = xExtended;
+              createExtendedSegment( x, "LeftCorner", glm::vec3( -0.1f, 0.0f, 0.0f ) );
             }
 
             std::shared_ptr< WallCellBundler > top = safeGetBundler( hostCollection, counter.x, counter.y - 1, counter.z );
@@ -446,13 +415,7 @@ namespace BlueBear {
                 x->children.erase( "RightCorner" );
               }
 
-              // Copy Y-segment's RightCorner into a new pointer
-              // Drawable is not copied!!
-              std::shared_ptr< Instance > yExtended = std::make_shared< Instance >( *( y->children.at( "RightCorner" ) ) );
-              glm::vec3 position = yExtended->getPosition();
-              position.x = position.x - 1.0f;
-              yExtended->setPosition( position );
-              y->children[ "ExtendedSegment" ] = yExtended;
+              createExtendedSegment( y, "RightCorner", glm::vec3( -1.0f, 0.0f, 0.0f ) );
             }
 
             // CASE: Upper left contains D-segment, this segment doesn't have an X-segment, and we don't already have an ExtendedSegment here from the case above
@@ -461,20 +424,12 @@ namespace BlueBear {
             bool currentContainsExtendedSegment = y->children.find( "ExtendedSegment" ) != y->children.end();
             if( upperLeftContainsD && !currentContainsX && !currentContainsExtendedSegment ) {
               // Make an extended segment for this D-segment
-              std::shared_ptr< Instance > yExtended = std::make_shared< Instance >( *( y->children.at( "RightCorner" ) ) );
-              glm::vec3 position = yExtended->getPosition();
-              position.x = position.x - 1.0f;
-              yExtended->setPosition( position );
-              y->children[ "ExtendedSegment" ] = yExtended;
+              createExtendedSegment( y, "RightCorner", glm::vec3( -1.0f, 0.0f, 0.0f ) );
             }
 
             // CASE: Top contains R-segment. If there's no X-segment to the left, we'll need to fill in the corner. (If there is an X-segment to the left, it already got filled in.)
             if( topContainsR && !leftContainsX ) {
-              std::shared_ptr< Instance > yExtended = std::make_shared< Instance >( *( y->children.at( "RightCorner" ) ) );
-              glm::vec3 position = yExtended->getPosition();
-              position.x = position.x - 1.0f;
-              yExtended->setPosition( position );
-              y->children[ "ExtendedSegment" ] = yExtended;
+              createExtendedSegment( y, "RightCorner", glm::vec3( -1.0f, 0.0f, 0.0f ) );
             }
           }
           break;
@@ -501,11 +456,7 @@ namespace BlueBear {
             if( !currentContainsX && leftContainsX && !topContainsY ) {
               left->x->children.erase( "LeftCorner" );
 
-              std::shared_ptr< Instance > yExtended = std::make_shared< Instance >( *( y->children.at( "RightCorner" ) ) );
-              glm::vec3 position = yExtended->getPosition();
-              position.x = position.x - 1.0f;
-              yExtended->setPosition( position );
-              y->children[ "ExtendedSegment" ] = yExtended;
+              createExtendedSegment( y, "RightCorner", glm::vec3( -1.0f, 0.0f, 0.0f ) );
             }
 
             // CASE: Gap corner when this cell has an X, top cell has no Y, and left cell has no X
@@ -516,29 +467,17 @@ namespace BlueBear {
                 x->children.erase( "ExtendedSegment" );
               }
 
-              std::shared_ptr< Instance > yExtended = std::make_shared< Instance >( *( y->children.at( "RightCorner" ) ) );
-              glm::vec3 position = yExtended->getPosition();
-              position.x = position.x - 1.0f;
-              yExtended->setPosition( position );
-              y->children[ "ExtendedSegment" ] = yExtended;
+              createExtendedSegment( y, "RightCorner", glm::vec3( -1.0f, 0.0f, 0.0f ) );
             }
 
             // CASE: Y-segment needs to be extended for D-segment if there is also no X-segment present
             if( upperLeftContainsD && !currentContainsX ) {
-              std::shared_ptr< Instance > yExtended = std::make_shared< Instance >( *( y->children.at( "RightCorner" ) ) );
-              glm::vec3 position = yExtended->getPosition();
-              position.x = position.x - 1.0f;
-              yExtended->setPosition( position );
-              y->children[ "ExtendedSegment" ] = yExtended;
+              createExtendedSegment( y, "RightCorner", glm::vec3( -1.0f, 0.0f, 0.0f ) );
             }
 
             // CASE: R-segment directly above, no X to the left.
             if( topContainsR && !leftContainsX ) {
-              std::shared_ptr< Instance > yExtended = std::make_shared< Instance >( *( y->children.at( "RightCorner" ) ) );
-              glm::vec3 position = yExtended->getPosition();
-              position.x = position.x - 1.0f;
-              yExtended->setPosition( position );
-              y->children[ "ExtendedSegment" ] = yExtended;
+              createExtendedSegment( y, "RightCorner", glm::vec3( -1.0f, 0.0f, 0.0f ) );
             }
           }
           break;
@@ -659,11 +598,7 @@ namespace BlueBear {
 
             if( leftContainsX && !topContainsY && left->x->children.find( "ExtendedSegment" ) == left->x->children.end() ) {
               // Create a new extended X segment from RightCorner for this corner piece to "crash" into
-              std::shared_ptr< Instance > xExtended = std::make_shared< Instance >( *( left->x->children.at( "RightCorner" ) ) );
-              glm::vec3 position = xExtended->getPosition();
-              position.x = position.x - 1.0f;
-              xExtended->setPosition( position );
-              left->x->children[ "ExtendedSegment" ] = xExtended;
+              createExtendedSegment( left->x, "RightCorner", glm::vec3( -1.0f, 0.0f, 0.0f ) );
             }
           }
           break;
@@ -693,11 +628,7 @@ namespace BlueBear {
 
             if( !leftContainsX && topContainsY ) {
               // Need to make the extended segment
-              std::shared_ptr< Instance > yExtended = std::make_shared< Instance >( *( top->y->children.at( "LeftCorner" ) ) );
-              glm::vec3 position = yExtended->getPosition();
-              position.x = position.x + 1.0f;
-              yExtended->setPosition( position );
-              top->y->children[ "ExtendedSegment" ] = yExtended;
+              createExtendedSegment( top->y, "LeftCorner", glm::vec3( 1.0f, 0.0f, 0.0f ) );
             }
           }
           break;
@@ -720,20 +651,12 @@ namespace BlueBear {
 
             // CASE: If there's a Y above but no X to the left, get an extended piece onto Y.
             if( topContainsY && !leftContainsX ) {
-              std::shared_ptr< Instance > yExtended = std::make_shared< Instance >( *( top->y->children.at( "LeftCorner" ) ) );
-              glm::vec3 position = yExtended->getPosition();
-              position.x = position.x + 1.0f;
-              yExtended->setPosition( position );
-              top->y->children[ "ExtendedSegment" ] = yExtended;
+              createExtendedSegment( top->y, "LeftCorner", glm::vec3( 1.0f, 0.0f, 0.0f ) );
             }
 
             // CASE: If there's an X to the left but no Y above, get an extended piece onto X.
             if( !topContainsY && leftContainsX ) {
-              std::shared_ptr< Instance > xExtended = std::make_shared< Instance >( *( left->x->children.at( "RightCorner" ) ) );
-              glm::vec3 position = xExtended->getPosition();
-              position.x = position.x - 1.0f;
-              xExtended->setPosition( position );
-              left->x->children[ "ExtendedSegment" ] = xExtended;
+              createExtendedSegment( left->x, "RightCorner", glm::vec3( -1.0f, 0.0f, 0.0f ) );
             }
           }
           break;
@@ -786,11 +709,7 @@ namespace BlueBear {
               std::shared_ptr< WallCellBundler > upperRight = safeGetBundler( hostCollection, counter.x + 1, counter.y - 1, counter.z );
               bool upperRightContainsY = upperRight && upperRight->y;
               if( upperRightContainsY ) {
-                std::shared_ptr< Instance > yExtended = std::make_shared< Instance >( *( upperRight->y->children.at( "LeftCorner" ) ) );
-                glm::vec3 position = yExtended->getPosition();
-                position.x = position.x + 1.0f;
-                yExtended->setPosition( position );
-                upperRight->y->children[ "ExtendedSegment" ] = yExtended;
+                createExtendedSegment( upperRight->y, "LeftCorner", glm::vec3( 1.0f, 0.0f, 0.0f ) );
               }
             }
             break;
@@ -806,11 +725,7 @@ namespace BlueBear {
               std::shared_ptr< WallCellBundler > upperRight = safeGetBundler( hostCollection, counter.x + 1, counter.y - 1, counter.z );
               bool upperRightContainsY = upperRight && upperRight->y;
               if( upperRightContainsY ) {
-                std::shared_ptr< Instance > yExtended = std::make_shared< Instance >( *( upperRight->y->children.at( "LeftCorner" ) ) );
-                glm::vec3 position = yExtended->getPosition();
-                position.x = position.x + 1.0f;
-                yExtended->setPosition( position );
-                upperRight->y->children[ "ExtendedSegment" ] = yExtended;
+                createExtendedSegment( upperRight->y, "LeftCorner", glm::vec3( 1.0f, 0.0f, 0.0f ) );
               }
             }
             break;

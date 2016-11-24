@@ -41,6 +41,7 @@ namespace BlueBear {
       void newRWallInstance( Containers::Collection3D< std::shared_ptr< WallCellBundler > >& hostCollection, std::string& frontWallpaper, std::string& backWallpaper );
 
       std::shared_ptr< WallCellBundler > safeGetBundler( Containers::Collection3D< std::shared_ptr< WallCellBundler > >& hostCollection, int x, int y, int z );
+      void createExtendedSegment( std::unique_ptr< Instance >& segment, const std::string& corner, glm::vec3 shift, const std::string& resultID = "ExtendedSegment" );
 
     public:
       static std::unique_ptr< Model > Piece;
