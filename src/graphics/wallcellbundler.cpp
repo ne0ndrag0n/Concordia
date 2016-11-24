@@ -259,6 +259,16 @@ namespace BlueBear {
               xExtended->setPosition( position );
               x->children[ "ExtendedSegment" ] = xExtended;
             }
+
+            // CASE: R-segment to the left and there's not already an ExtendedSegment placed before
+            bool leftContainsR = left && left->r;
+            if( leftContainsR && ( x->children.find( "ExtendedSegment" ) == x->children.end() ) ) {
+              std::shared_ptr< Instance > xExtended = std::make_shared< Instance >( *( x->children.at( "LeftCorner" ) ) );
+              glm::vec3 position = xExtended->getPosition();
+              position.x = position.x + 1.0f;
+              xExtended->setPosition( position );
+              x->children[ "ExtendedSegment" ] = xExtended;
+            }
           }
           break;
         case 2:
@@ -442,6 +452,7 @@ namespace BlueBear {
             bool leftContainsX = left && left->x;
             bool topContainsY = top && top->y;
             bool upperLeftContainsD = upperLeft && upperLeft->d;
+            bool topContainsR = top && top->r;
 
             if( !currentContainsX && leftContainsX && !topContainsY ) {
               left->x->children.erase( "LeftCorner" );
@@ -470,6 +481,15 @@ namespace BlueBear {
 
             // CASE: Y-segment needs to be extended for D-segment if there is also no X-segment present
             if( upperLeftContainsD && !currentContainsX ) {
+              std::shared_ptr< Instance > yExtended = std::make_shared< Instance >( *( y->children.at( "RightCorner" ) ) );
+              glm::vec3 position = yExtended->getPosition();
+              position.x = position.x - 1.0f;
+              yExtended->setPosition( position );
+              y->children[ "ExtendedSegment" ] = yExtended;
+            }
+
+            // CASE: R-segment directly above, no X to the left.
+            if( topContainsR && !leftContainsX ) {
               std::shared_ptr< Instance > yExtended = std::make_shared< Instance >( *( y->children.at( "RightCorner" ) ) );
               glm::vec3 position = yExtended->getPosition();
               position.x = position.x - 1.0f;
@@ -703,6 +723,9 @@ namespace BlueBear {
             break;
           case 1:
             {
+              position.x -= 0.03f;
+              position.y += 0.03f;
+
               settings.emplace( std::make_pair( "Front", std::make_unique< PointerImageSource >( front.image, "1rc " + frontWallpaper ) ) );
             }
             break;
