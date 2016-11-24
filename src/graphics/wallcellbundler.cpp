@@ -303,13 +303,24 @@ namespace BlueBear {
               settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( front.rightSegment, "2xs1 " + frontWallpaper ) ) );
             }
 
-            // CASE: D-segment in upper left causes potential gap
+            // CASE: D-segment in upper left causes potential gap. ExtendedSegment not already placed.
             std::shared_ptr< WallCellBundler > upperLeft = safeGetBundler( hostCollection, counter.x - 1, counter.y - 1, counter.z );
             bool upperLeftContainsD = upperLeft && upperLeft->d;
-            if( upperLeftContainsD ) {
+            if( upperLeftContainsD && ( x->children.find( "ExtendedSegment" ) == x->children.end() ) ) {
               std::shared_ptr< Instance > xExtended = std::make_shared< Instance >( *( x->children.at( "RightCorner" ) ) );
               glm::vec3 position = xExtended->getPosition();
               position.x = position.x + 0.1f;
+              xExtended->setPosition( position );
+              x->children[ "ExtendedSegment" ] = xExtended;
+            }
+
+            // CASE: R-segment to the left, ExtendedSegment not already placed
+            std::shared_ptr< WallCellBundler > left = safeGetBundler( hostCollection, counter.x - 1, counter.y, counter.z );
+            bool leftContainsR = left && left->r;
+            if( leftContainsR && ( x->children.find( "ExtendedSegment" ) == x->children.end() ) ) {
+              std::shared_ptr< Instance > xExtended = std::make_shared< Instance >( *( x->children.at( "LeftCorner" ) ) );
+              glm::vec3 position = xExtended->getPosition();
+              position.x = position.x + 1.0f;
               xExtended->setPosition( position );
               x->children[ "ExtendedSegment" ] = xExtended;
             }
@@ -731,7 +742,23 @@ namespace BlueBear {
             break;
           case 2:
             {
+              position.x -= 0.06f;
+              position.y -= 0.06f;
+              position.z -= 0.01f;
+
+              r->setScale( glm::vec3( 1.0f, 1.4f, 1.0f ) );
               settings.emplace( std::make_pair( "Side2", std::make_unique< PointerImageSource >( front.leftSegment, "2rc " + frontWallpaper ) ) );
+
+              // CASE: Y-segment in upper right
+              std::shared_ptr< WallCellBundler > upperRight = safeGetBundler( hostCollection, counter.x + 1, counter.y - 1, counter.z );
+              bool upperRightContainsY = upperRight && upperRight->y;
+              if( upperRightContainsY ) {
+                std::shared_ptr< Instance > yExtended = std::make_shared< Instance >( *( upperRight->y->children.at( "LeftCorner" ) ) );
+                glm::vec3 position = yExtended->getPosition();
+                position.x = position.x + 1.0f;
+                yExtended->setPosition( position );
+                upperRight->y->children[ "ExtendedSegment" ] = yExtended;
+              }
             }
             break;
           case 3:
