@@ -51,19 +51,47 @@ namespace BlueBear {
        std::string backPath;
 
        if( hostCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.x ); } ) ) {
-         newXWallInstance( hostCollection, frontPath, backPath );
+         try {
+           newXWallInstance( hostCollection, frontPath, backPath );
+         } catch( std::exception& e ) {
+           Log::getInstance().error( "WallCellBundler::WallCellBundler",
+            "Bundler at " + std::to_string( counter.x ) + ", " + std::to_string( counter.y ) + ", " + std::to_string( counter.z ) + " failed to build (x): " + std::string( e.what() )
+           );
+           exit( 1 );
+         }
        }
 
        if( hostCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.y ); } ) ) {
-         newYWallInstance( hostCollection, frontPath, backPath );
+         try {
+           newYWallInstance( hostCollection, frontPath, backPath );
+         } catch( std::exception& e ) {
+           Log::getInstance().error( "WallCellBundler::WallCellBundler",
+            "Bundler at " + std::to_string( counter.x ) + ", " + std::to_string( counter.y ) + ", " + std::to_string( counter.z ) + " failed to build (y): " + std::string( e.what() )
+           );
+           exit( 1 );
+         }
        }
 
        if( hostCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.d ); } ) ) {
-         newDWallInstance( hostCollection, frontPath, backPath );
+         try {
+           newDWallInstance( hostCollection, frontPath, backPath );
+         } catch( std::exception& e ) {
+           Log::getInstance().error( "WallCellBundler::WallCellBundler",
+            "Bundler at " + std::to_string( counter.x ) + ", " + std::to_string( counter.y ) + ", " + std::to_string( counter.z ) + " failed to build (d): " + std::string( e.what() )
+           );
+           exit( 1 );
+         }
        }
 
        if( hostCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.r ); } ) ) {
-         newRWallInstance( hostCollection, frontPath, backPath );
+         try{
+           newRWallInstance( hostCollection, frontPath, backPath );
+         } catch( std::exception& e ) {
+           Log::getInstance().error( "WallCellBundler::WallCellBundler",
+            "Bundler at " + std::to_string( counter.x ) + ", " + std::to_string( counter.y ) + ", " + std::to_string( counter.z ) + " failed to build (r): " + std::string( e.what() )
+           );
+           exit( 1 );
+         }
        }
      }
 
@@ -345,7 +373,8 @@ namespace BlueBear {
             // CASE: X-segment we're about to place causes an open gap because there is a Y-segment in the upper right cell
             std::shared_ptr< WallCellBundler > upperRight = safeGetBundler( hostCollection, counter.x + 1, counter.y - 1, counter.z );
             bool upperRightContainsY = upperRight && upperRight->y;
-            if( upperRightContainsY ) {
+            bool upperRightContainsR = upperRight && upperRight->r;
+            if( upperRightContainsY || upperRightContainsR ) {
               std::shared_ptr< Instance > xExtended = std::make_shared< Instance >( *( x->children.at( "LeftCorner" ) ) );
               glm::vec3 position = xExtended->getPosition();
               position.x = position.x - 0.1f;
@@ -764,7 +793,21 @@ namespace BlueBear {
           case 3:
           default:
             {
+              position.x += 0.03f;
+              position.y -= 0.03f;
+
               settings.emplace( std::make_pair( "Back", std::make_unique< PointerImageSource >( back.image, "3rc " + backWallpaper ) ) );
+
+              // CASE: Upper-right has Y-segment
+              std::shared_ptr< WallCellBundler > upperRight = safeGetBundler( hostCollection, counter.x + 1, counter.y - 1, counter.z );
+              bool upperRightContainsY = upperRight && upperRight->y;
+              if( upperRightContainsY ) {
+                std::shared_ptr< Instance > yExtended = std::make_shared< Instance >( *( upperRight->y->children.at( "LeftCorner" ) ) );
+                glm::vec3 position = yExtended->getPosition();
+                position.x = position.x + 1.0f;
+                yExtended->setPosition( position );
+                upperRight->y->children[ "ExtendedSegment" ] = yExtended;
+              }
             }
             break;
       }
