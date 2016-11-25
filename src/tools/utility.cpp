@@ -11,7 +11,6 @@
 #include <string>
 #include <iterator>
 #include <fstream>
-#include <iostream>
 #include <vector>
 
 // Not X-Platform

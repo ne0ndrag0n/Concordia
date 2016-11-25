@@ -6,7 +6,6 @@
 #include "graphics/display.hpp"
 #include "threading/commandbus.hpp"
 #include "localemanager.hpp"
-#include <iostream>
 #include <thread>
 #include <SFML/Window.hpp>
 #include <SFML/System.hpp>
@@ -25,7 +24,7 @@ int main() {
 
 	Scripting::Engine engine( commandBus );
 	if ( !engine.setupRootEnvironment() ) {
-		std::cerr << "Failed to load BlueBear!" << std::endl;
+		Log::getInstance().error( "main", "Failed to load BlueBear!" );
 		return 1;
 	}
 	// Load a lot object

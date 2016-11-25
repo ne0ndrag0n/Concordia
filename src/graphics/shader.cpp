@@ -3,7 +3,6 @@
 #include <string>
 #include <fstream>
 #include <sstream>
-#include <iostream>
 #include <GL/glew.h>
 
 /**

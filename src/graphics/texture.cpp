@@ -3,7 +3,6 @@
 #include <assimp/types.h>
 #include <GL/glew.h>
 #include <SFML/Graphics.hpp>
-#include <iostream>
 #include <string>
 #include <sstream>
 

@@ -5,7 +5,6 @@
 #include <lauxlib.h>
 #include <jsoncpp/json/json.h>
 #include <SFML/Window/Keyboard.hpp>
-#include <iostream>
 #include <fstream>
 
 namespace BlueBear {

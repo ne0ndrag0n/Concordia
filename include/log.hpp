@@ -1,7 +1,6 @@
 #ifndef LOGMANAGER
 #define LOGMANAGER
 
-#include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>

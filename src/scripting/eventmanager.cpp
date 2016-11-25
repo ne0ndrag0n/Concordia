@@ -11,7 +11,6 @@
 #include <vector>
 #include <map>
 #include <string>
-#include <iostream>
 
 namespace BlueBear {
   namespace Scripting {

@@ -6,6 +6,7 @@
 #include <ctime>
 #include <fstream>
 #include <sstream>
+#include <iostream>
 #include <mutex>
 
 namespace BlueBear {

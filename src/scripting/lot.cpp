@@ -18,7 +18,6 @@
 #include <vector>
 #include <cstring>
 #include <string>
-#include <iostream>
 #include <utility>
 
 namespace BlueBear {
