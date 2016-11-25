@@ -19,7 +19,6 @@ Concordia
 
 ## Technical Highlights
 
-* This game's for the hacker in all of us. With clean, elegantly crafted, annotated source: readability is job #1. Consider any arcane code to be a bug.
 * Lua 5.3 scripting system: everything the game uses outside of its base structure as a dollhouse game is designed as an extensible script (e.g. all objects and types of objects are defined as Lua classes)
 * Isometric 2.5D presentation with a retro-inspired pixel art look-and-feel
 * SFML-powered multimedia framework featuring the SFGUI widget toolkit
