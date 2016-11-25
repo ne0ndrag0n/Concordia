@@ -204,14 +204,11 @@ namespace BlueBear {
       // Setup GUI
       gui.statusLabel = sfg::Label::Create( "Test Label" );
 
-      gui.box = sfg::Box::Create( sfg::Box::Orientation::VERTICAL, 5.0f );
-      gui.box->Pack( gui.statusLabel );
-
       gui.window = sfg::Window::Create();
       gui.window->SetTitle( "Time & Space" );
       gui.window->SetRequisition( sf::Vector2f( 300.0f, 100.0f ) );
       gui.window->SetPosition( sf::Vector2f( 10.0f, instance.y - 110.0f ) );
-      gui.window->Add( gui.box );
+      gui.window->Add( gui.statusLabel );
 
       gui.desktop.Add( gui.window );
       gui.desktop.LoadThemeFromFile( ConfigManager::getInstance().getValue( "ui_theme" ) );

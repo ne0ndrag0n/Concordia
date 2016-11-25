@@ -95,7 +95,6 @@ namespace BlueBear {
           struct {
             sfg::Desktop desktop;
             std::shared_ptr< sfg::Window > window;
-            std::shared_ptr< sfg::Box > box;
             std::shared_ptr< sfg::Label > statusLabel;
             sf::Clock clock;
           } gui;

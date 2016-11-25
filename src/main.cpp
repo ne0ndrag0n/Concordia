@@ -11,6 +11,7 @@
 #include <SFML/System.hpp>
 #include <memory>
 #include <xercesc/util/PlatformUtils.hpp>
+#include <xercesc/util/XMLString.hpp>
 
 using namespace BlueBear;
 
@@ -22,7 +23,7 @@ int main() {
 	try {
 		xercesc::XMLPlatformUtils::Initialize();
 	} catch( const xercesc::XMLException& e ) {
-		Log::getInstance().error( "main", "Failed to initialize Apache Xerces: " + std::string( (const char *) e.getMessage() ) );
+		Log::getInstance().error( "main", "Failed to initialize Apache Xerces: " + std::string( xercesc::XMLString::transcode( e.getMessage() ) ) );
 		return 2;
 	}
 

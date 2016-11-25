@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Window id="time_and_space" width="300" height="100" title="Time and Space">
+  <Label id="test">Test Label</Label>
+</Window>
