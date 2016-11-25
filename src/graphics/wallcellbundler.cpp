@@ -553,7 +553,7 @@ namespace BlueBear {
                 return wallCell.x->front.lock< std::string >( [ & ]( Scripting::Wallpaper& wallpaper ) { return wallpaper.imagePath; } );
               } );
 
-              settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( getSegmentBundle( xFront, true, false, false ).leftSegment, "3ys1 " + xFront ) ) );
+              settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( getSegmentBundle( xFront, false, false, true ).rightSegment, "3ys1 " + xFront ) ) );
             } else {
               settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( front.rightSegment, "3ys1 " + frontWallpaper ) ) );
 
