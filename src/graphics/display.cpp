@@ -187,25 +187,7 @@ namespace BlueBear {
       // Setup camera
       camera.setRotationDirect( currentRotation );
 
-      texts.mode.setFont( instance.fonts.osdFont );
-      texts.mode.setCharacterSize( 16 );
-      texts.mode.setColor( sf::Color::White );
-      texts.mode.setPosition( 0, 0 );
-
-      texts.coords.setFont( instance.fonts.osdFont );
-      texts.coords.setCharacterSize( 16 );
-      texts.coords.setColor( sf::Color::Red );
-      texts.coords.setPosition( 0, 16 );
-
-      texts.direction.setFont( instance.fonts.osdFont );
-      texts.direction.setCharacterSize( 16 );
-      texts.direction.setColor( sf::Color::Green );
-      texts.direction.setPosition( 0, 32 );
-
-      texts.rotation.setFont( instance.fonts.osdFont );
-      texts.rotation.setCharacterSize( 16 );
-      texts.rotation.setColor( sf::Color::Blue );
-      texts.rotation.setPosition( 0, 48 );
+      setupDefaultWindows();
 
       // Moving much of Display::loadInfrastructure here
       loadInfrastructure();
@@ -213,6 +195,21 @@ namespace BlueBear {
     Display::MainGameState::~MainGameState() {
       WallCellBundler::Piece.reset();
       WallCellBundler::DPiece.reset();
+    }
+    void Display::MainGameState::setupDefaultWindows() {
+      // Setup GUI
+      gui.statusLabel = sfg::Label::Create( "Test Label" );
+
+      gui.box = sfg::Box::Create( sfg::Box::Orientation::VERTICAL, 5.0f );
+      gui.box->Pack( gui.statusLabel );
+
+      gui.window = sfg::Window::Create();
+      gui.window->SetTitle( "Time & Space" );
+      gui.window->SetRequisition( sf::Vector2f( 300.0f, 100.0f ) );
+      gui.window->SetPosition( sf::Vector2f( 10.0f, instance.y - 110.0f ) );
+      gui.window->Add( gui.box );
+
+      gui.desktop.Add( gui.window );
     }
     void Display::MainGameState::createFloorInstances() {
       floorInstanceCollection->clear();
@@ -342,6 +339,8 @@ namespace BlueBear {
       static int KEY_ZOOM_IN = ConfigManager::getInstance().getIntValue( "key_zoom_in" );
       static int KEY_ZOOM_OUT = ConfigManager::getInstance().getIntValue( "key_zoom_out" );
 
+      gui.desktop.HandleEvent( event );
+
       // Main game has a few events mostly relating to camera
       switch( event.type ) {
         case sf::Event::KeyPressed:
@@ -403,17 +402,8 @@ namespace BlueBear {
       }
     }
     void Display::MainGameState::processOsd() {
-      static std::string ISOMETRIC( LocaleManager::getInstance().getString( "ISOMETRIC" ) );
-      static std::string FIRST_PERSON( LocaleManager::getInstance().getString( "FIRST_PERSON" ) );
-      static std::string ROTATION( LocaleManager::getInstance().getString( "ROTATION" ) );
-
-      texts.mode.setString( camera.ortho ? ISOMETRIC : FIRST_PERSON );
-      texts.coords.setString( camera.positionToString().c_str() );
-      texts.rotation.setString( ROTATION + ": " + std::to_string( camera.getCurrentRotation() ) );
-
-      instance.mainWindow.draw( texts.mode );
-      instance.mainWindow.draw( texts.coords );
-      instance.mainWindow.draw( texts.rotation );
+      gui.desktop.Update( gui.clock.restart().asSeconds() );
+      instance.sfgui.Display( instance.mainWindow );
     }
 
     // ---------- COMMANDS ----------

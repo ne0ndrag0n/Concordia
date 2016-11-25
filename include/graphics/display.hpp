@@ -83,12 +83,6 @@ namespace BlueBear {
 
       class MainGameState : public State {
           struct {
-            sf::Text mode;
-            sf::Text coords;
-            sf::Text direction;
-            sf::Text rotation;
-          } texts;
-          struct {
             std::string ISOMETRIC;
             std::string FIRST_PERSON;
           } strings;
@@ -98,6 +92,13 @@ namespace BlueBear {
           Model floorModel;
           TextureCache texCache;
           ImageCache imageCache;
+          struct {
+            sfg::Desktop desktop;
+            std::shared_ptr< sfg::Window > window;
+            std::shared_ptr< sfg::Box > box;
+            std::shared_ptr< sfg::Label > statusLabel;
+            sf::Clock clock;
+          } gui;
           // These are from the lot!
           Containers::ConcCollection3D< Threading::Lockable< Scripting::Tile > >& floorMap;
           Containers::ConcCollection3D< Threading::Lockable< Scripting::WallCell > >& wallMap;
@@ -108,6 +109,7 @@ namespace BlueBear {
           void loadInfrastructure();
           void createFloorInstances();
           void createWallInstances();
+          void setupDefaultWindows();
         public:
           void execute();
           void handleEvent( sf::Event& event );
