@@ -44,6 +44,7 @@ namespace BlueBear {
     configRoot[ "key_zoom_out" ] = sf::Keyboard::Subtract;
     configRoot[ "disable_image_cache" ] = false;
     configRoot[ "disable_texture_cache" ] = false;
+    configRoot[ "ui_theme" ] = "system/ui/default.theme";
 
     // Load settings.json from file
     std::ifstream settingsFile( SETTINGS_PATH );

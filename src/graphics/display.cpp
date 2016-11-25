@@ -52,15 +52,19 @@ namespace BlueBear {
       currentState = std::make_unique< IdleState >( *this );
 
       // Load defined fonts - Crash if we fail (game can't run without these fonts)
-      if( !fonts.osdFont.loadFromFile( ConfigManager::getInstance().getValue( "font_osd" ) ) ) {
+      fonts.osdFont = std::make_shared< sf::Font >();
+      if( !fonts.osdFont->loadFromFile( ConfigManager::getInstance().getValue( "font_osd" ) ) ) {
         Log::getInstance().error( "Display::Display", "Failed to load the OSD font!" );
         exit( 1 );
       }
 
-      if( !fonts.uiFont.loadFromFile( ConfigManager::getInstance().getValue( "font_ui" ) ) ) {
+      fonts.uiFont = std::make_shared< sf::Font >();
+      if( !fonts.uiFont->loadFromFile( ConfigManager::getInstance().getValue( "font_ui" ) ) ) {
         Log::getInstance().error( "Display::Display", "Failed to load the UI font!" );
         exit( 1 );
       }
+
+      sfg::Context::Get().GetEngine().GetResourceManager().SetDefaultFont( fonts.osdFont );
     }
 
     Display::~Display() = default;
@@ -210,6 +214,7 @@ namespace BlueBear {
       gui.window->Add( gui.box );
 
       gui.desktop.Add( gui.window );
+      gui.desktop.LoadThemeFromFile( ConfigManager::getInstance().getValue( "ui_theme" ) );
     }
     void Display::MainGameState::createFloorInstances() {
       floorInstanceCollection->clear();

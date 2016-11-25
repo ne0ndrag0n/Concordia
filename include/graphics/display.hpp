@@ -151,8 +151,8 @@ namespace BlueBear {
         std::unique_ptr< State > currentState;
 
         struct {
-          sf::Font osdFont;
-          sf::Font uiFont;
+          std::shared_ptr< sf::Font > osdFont;
+          std::shared_ptr< sf::Font > uiFont;
         } fonts;
 
         void main();
