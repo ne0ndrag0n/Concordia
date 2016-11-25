@@ -26,10 +26,10 @@ Concordia
 
 ## Dependencies
 * SFML 2.3.x
-* SFGUI
+* SFGUI (manual install required)
 * Lua 5.3.x
 * JsonCpp 1.7.x
 * GLM
 * GLEW
 * Assimp
-* Amanieu/asyncplusplus (make sure libasync++.so is in /usr/lib)
+* Amanieu/asyncplusplus (manual install required, make sure libasync++.so is in /usr/lib)
