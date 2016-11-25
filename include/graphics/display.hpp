@@ -8,6 +8,8 @@
 #include "containers/conccollection3d.hpp"
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
+#include <SFGUI/SFGUI.hpp>
+#include <SFGUI/Widgets.hpp>
 #include <vector>
 #include <memory>
 #include <list>
@@ -142,6 +144,7 @@ namespace BlueBear {
         ViewportDimension y;
         sf::RenderWindow mainWindow;
         Threading::CommandBus& commandBus;
+        sfg::SFGUI sfgui;
 
         std::unique_ptr< State > currentState;
 
