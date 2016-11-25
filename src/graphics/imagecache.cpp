@@ -1,5 +1,6 @@
 #include "graphics/imagecache.hpp"
 #include "graphics/imagebuilder/imagesource.hpp"
+#include "configmanager.hpp"
 #include <SFML/Graphics.hpp>
 #include <string>
 #include <map>
@@ -9,6 +10,11 @@ namespace BlueBear {
   namespace Graphics {
 
     std::shared_ptr< sf::Image > ImageCache::getImage( ImageSource& source ) {
+
+      if( ConfigManager::getInstance().getBoolValue( "disable_image_cache" ) == true ) {
+        return std::make_shared< sf::Image >( source.getImage() );
+      }
+
       std::string key = source.getKey();
 
       auto kvPair = imageCache.find( key );

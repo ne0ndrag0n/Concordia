@@ -43,6 +43,8 @@ namespace BlueBear {
     configRoot[ "key_rotate_left" ] = sf::Keyboard::Q;
     configRoot[ "key_zoom_in" ] = sf::Keyboard::Add;
     configRoot[ "key_zoom_out" ] = sf::Keyboard::Subtract;
+    configRoot[ "disable_image_cache" ] = false;
+    configRoot[ "disable_texture_cache" ] = false;
 
     // Load settings.json from file
     std::ifstream settingsFile( SETTINGS_PATH );

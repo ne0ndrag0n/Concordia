@@ -2,6 +2,7 @@
 #include "graphics/texture.hpp"
 #include "graphics/atlasbuilder.hpp"
 #include "graphics/imagebuilder/imagesource.hpp"
+#include "configmanager.hpp"
 #include "log.hpp"
 #include <string>
 #include <map>
@@ -87,10 +88,21 @@ namespace BlueBear {
         return generateForAtlasBuilderEntry( atlasBuilderEntryIterator->second, mappings );
       } else {
         // This atlas builder needs to be created
-        AtlasBuilderEntry& wrapper = atlasTextureCache[ atlasBasePath ] = AtlasBuilderEntry();
-        wrapper.builder.configure( atlasBasePath );
+        if( ConfigManager::getInstance().getBoolValue( "disable_texture_cache" ) == true ) {
+          AtlasBuilder builder;
+          builder.configure( atlasBasePath );
 
-        return generateForAtlasBuilderEntry( wrapper, mappings );
+          for( auto& kvPair : mappings ) {
+            builder.setAtlasMapping( kvPair.first, std::move( kvPair.second ) );
+          }
+
+          return builder.getTextureAtlas();
+        } else {
+          AtlasBuilderEntry& wrapper = atlasTextureCache[ atlasBasePath ] = AtlasBuilderEntry();
+          wrapper.builder.configure( atlasBasePath );
+
+          return generateForAtlasBuilderEntry( wrapper, mappings );
+        }
       }
     }
 
