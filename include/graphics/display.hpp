@@ -109,6 +109,7 @@ namespace BlueBear {
           void createFloorInstances();
           void createWallInstances();
           void setupDefaultWindows();
+          sfg::Desktop getDesktopFromXML();
         public:
           void execute();
           void handleEvent( sf::Event& event );
