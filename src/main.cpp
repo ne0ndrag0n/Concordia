@@ -10,22 +10,12 @@
 #include <SFML/Window.hpp>
 #include <SFML/System.hpp>
 #include <memory>
-#include <xercesc/util/PlatformUtils.hpp>
-#include <xercesc/util/XMLString.hpp>
 
 using namespace BlueBear;
 
 int main() {
 	Log::getInstance().info( "Main", LocaleManager::getInstance().getString( "BLUEBEAR_WELCOME_MESSAGE" ) );
 	sf::err().rdbuf( NULL );
-
-	// Initialize xerces XML platform utils
-	try {
-		xercesc::XMLPlatformUtils::Initialize();
-	} catch( const xercesc::XMLException& e ) {
-		Log::getInstance().error( "main", "Failed to initialize Apache Xerces: " + std::string( xercesc::XMLString::transcode( e.getMessage() ) ) );
-		return 2;
-	}
 
 	// main() thread is the UI thread, or should be
 	Threading::CommandBus commandBus;
@@ -47,6 +37,5 @@ int main() {
 
 	engineThread.join();
 
-	xercesc::XMLPlatformUtils::Terminate();
 	return 0;
 }
