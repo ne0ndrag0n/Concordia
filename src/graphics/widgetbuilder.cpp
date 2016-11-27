@@ -63,13 +63,24 @@ namespace BlueBear {
 
       setIdAndClass( window, element );
 
+      const char* title = element->Attribute( "title" );
+      if( title ) {
+        window->SetTitle( title );
+      }
+
       return window;
     }
 
     std::shared_ptr< sfg::Label > WidgetBuilder::newLabelWidget( tinyxml2::XMLElement* element ) {
       std::shared_ptr< sfg::Label > label;
 
-      // STUB !!
+      const char* labelValue = element->GetText();
+
+      if( labelValue ) {
+        label = sfg::Label::Create( labelValue );
+      } else {
+        label = sfg::Label::Create( "" );
+      }
 
       return label;
     }
