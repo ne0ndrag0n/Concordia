@@ -91,6 +91,31 @@ namespace BlueBear {
         window->SetTitle( title );
       }
 
+      // number |= 1 << x; to set a bit
+      // number &= ~(1 << x); to clear a bit
+      // (ID >> position) & 1 to get specific bit
+
+      // Unpack these properties
+      bool titlebar = window->HasStyle( sfg::Window::Style::TITLEBAR );
+      bool background = window->HasStyle( sfg::Window::Style::BACKGROUND );
+      bool resize = window->HasStyle( sfg::Window::Style::RESIZE );
+      bool shadow = window->HasStyle( sfg::Window::Style::SHADOW );
+      bool close = window->HasStyle( sfg::Window::Style::CLOSE );
+
+      element->QueryBoolAttribute( "titlebar", &titlebar );
+      element->QueryBoolAttribute( "background", &background );
+      element->QueryBoolAttribute( "resize", &resize );
+      element->QueryBoolAttribute( "shadow", &shadow );
+      element->QueryBoolAttribute( "close", &close );
+
+      window->SetStyle(
+        ( titlebar ? 1 : 0 ) |
+        ( ( background ? 1 : 0 ) << 1 ) |
+        ( ( resize ? 1 : 0 ) << 2 ) |
+        ( ( shadow ? 1 : 0 ) << 3 ) |
+        ( ( close ? 1 : 0 ) << 4 )
+      );
+
       return window;
     }
 
