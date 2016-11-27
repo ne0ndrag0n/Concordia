@@ -126,6 +126,7 @@ namespace BlueBear {
 
       if( labelValue ) {
         label = sfg::Label::Create( labelValue );
+        setIdAndClass( label, element );
       } else {
         label = sfg::Label::Create( "" );
       }
