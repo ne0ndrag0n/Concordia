@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Window id="time_and_space" title="Time and Space">
+<Window id="time_and_space" title="Time &amp; Space">
   <Label id="test">Test Label</Label>
 </Window>

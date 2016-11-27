@@ -7,12 +7,35 @@
 #include <SFGUI/Container.hpp>
 #include <SFGUI/Label.hpp>
 #include <tinyxml2.h>
+#include <vector>
 
 namespace BlueBear {
   namespace Graphics {
 
+    WidgetBuilder::WidgetBuilder( const std::string& path ) {
+      document.LoadFile( path.c_str() );
+
+      // Object is unusable if the file failed to load
+      if( document.ErrorID() ) {
+        throw FailedToLoadXMLException();
+      }
+    }
+
     constexpr unsigned int WidgetBuilder::hash(const char* str, int h) {
       return !str[h] ? 5381 : (hash(str, h+1) * 33) ^ str[h];
+    }
+
+    /**
+     * This is where it all happens. Call this method to turn your XML file into a collection of widgets.
+     */
+    std::vector< std::shared_ptr< sfg::Widget > > WidgetBuilder::getWidgets() {
+      std::vector< std::shared_ptr< sfg::Widget > > widgets;
+
+      for ( tinyxml2::XMLElement* node = document.RootElement(); node != NULL; node = node->NextSiblingElement() ) {
+        widgets.push_back( nodeToWidget( node ) );
+      }
+
+      return widgets;
     }
 
     std::shared_ptr< sfg::Widget > WidgetBuilder::nodeToWidget( tinyxml2::XMLElement* element ) {

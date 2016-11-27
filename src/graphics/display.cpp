@@ -11,6 +11,7 @@
 #include "graphics/material.hpp"
 #include "graphics/texture.hpp"
 #include "graphics/wallcellbundler.hpp"
+#include "graphics/widgetbuilder.hpp"
 #include "scripting/lot.hpp"
 #include "scripting/tile.hpp"
 #include "scripting/engine.hpp"
@@ -201,16 +202,13 @@ namespace BlueBear {
       WallCellBundler::DPiece.reset();
     }
     void Display::MainGameState::setupDefaultWindows() {
-      // Setup GUI
-      gui.statusLabel = sfg::Label::Create( "Test Label" );
+      WidgetBuilder builder( "system/ui/main/timespace/timespace.xml" );
+      std::vector< std::shared_ptr< sfg::Widget > > widgets = builder.getWidgets();
 
-      gui.window = sfg::Window::Create();
-      gui.window->SetTitle( "Time & Space" );
-      gui.window->SetRequisition( sf::Vector2f( 300.0f, 100.0f ) );
-      gui.window->SetPosition( sf::Vector2f( 10.0f, instance.y - 110.0f ) );
-      gui.window->Add( gui.statusLabel );
+      for( std::shared_ptr< sfg::Widget > widget : widgets ) {
+        gui.desktop.Add( widget );
+      }
 
-      gui.desktop.Add( gui.window );
       gui.desktop.LoadThemeFromFile( ConfigManager::getInstance().getValue( "ui_theme" ) );
     }
     void Display::MainGameState::createFloorInstances() {
