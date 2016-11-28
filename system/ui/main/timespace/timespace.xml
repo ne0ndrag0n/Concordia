@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Window id="time_and_space" title="Time &amp; Space">
-  <Label id="test">Test Label</Label>
+<Window id="debug" min-width="200" min-height="100" left="-210" top="10">
+  <Box orientation="vertical" spacing="5.0">
+    <Label id="camera">Camera:</Label>
+    <Label id="rotation">Rotation:</Label>
+  </Box>
 </Window>

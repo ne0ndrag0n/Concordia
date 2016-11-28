@@ -1,4 +1,5 @@
 #include "graphics/widgetbuilder.hpp"
+#include "configmanager.hpp"
 #include "log.hpp"
 #include <string>
 #include <memory>
@@ -6,8 +7,10 @@
 #include <SFGUI/Window.hpp>
 #include <SFGUI/Container.hpp>
 #include <SFGUI/Label.hpp>
+#include <SFGUI/Box.hpp>
 #include <tinyxml2.h>
 #include <vector>
+#include <functional>
 
 namespace BlueBear {
   namespace Graphics {
@@ -54,6 +57,11 @@ namespace BlueBear {
           widget = newLabelWidget( element );
           break;
 
+        case hash( "Box" ):
+          widget = newBoxWidget( element );
+          packChildren( std::static_pointer_cast< sfg::Box >( widget ), element );
+          break;
+
         default:
           Log::getInstance().error( "WidgetBuilder::nodeToWidget", "Invalid CME tag specified: " + std::string( tagType ) );
           throw InvalidCMEWidgetException();
@@ -65,6 +73,35 @@ namespace BlueBear {
     void WidgetBuilder::addChildren( std::shared_ptr< sfg::Container > widget, tinyxml2::XMLElement* element ) {
       for ( tinyxml2::XMLElement* child = element->FirstChildElement(); child != NULL; child = child->NextSiblingElement() ) {
         widget->Add( nodeToWidget( child ) );
+      }
+    }
+
+    void WidgetBuilder::packChildren( std::shared_ptr< sfg::Box > widget, tinyxml2::XMLElement* element, PackMethod packMethod ) {
+      static std::function< void( tinyxml2::XMLElement*, bool, bool ) > packLeft = [ & ]( tinyxml2::XMLElement* child, bool expand, bool fill ) {
+        widget->PackStart( nodeToWidget( child ), expand, fill );
+      };
+
+      static std::function< void( tinyxml2::XMLElement*, bool, bool ) > packRight = [ & ]( tinyxml2::XMLElement* child, bool expand, bool fill ) {
+        widget->Pack( nodeToWidget( child ), expand, fill );
+      };
+
+      std::function< void( tinyxml2::XMLElement*, bool, bool ) > pack;
+      switch( packMethod ) {
+        case PackMethod::FROM_LEFT:
+          pack = packLeft;
+          break;
+        case PackMethod::FROM_RIGHT:
+        default:
+          pack = packRight;
+      }
+
+      for ( tinyxml2::XMLElement* child = element->FirstChildElement(); child != NULL; child = child->NextSiblingElement() ) {
+        bool expand = true;
+        bool fill = true;
+
+        child->QueryBoolAttribute( "expand", &expand );
+        child->QueryBoolAttribute( "fill", &fill );
+        pack( child, expand, fill );
       }
     }
 
@@ -81,10 +118,47 @@ namespace BlueBear {
       }
     }
 
+    void WidgetBuilder::correctXBoundary( float* input ) {
+      static int VIEWPORT_X = ConfigManager::getInstance().getIntValue( "viewport_x" );
+
+      if( *input < 0.0f ) {
+        *input = VIEWPORT_X + *input;
+      }
+    }
+
+    void WidgetBuilder::correctYBoundary( float* input ) {
+      static int VIEWPORT_Y = ConfigManager::getInstance().getIntValue( "viewport_y" );
+
+      if( *input < 0.0f ) {
+        *input = VIEWPORT_Y + *input;
+      }
+    }
+
+    void WidgetBuilder::setAllocationAndRequisition( std::shared_ptr< sfg::Widget > widget, tinyxml2::XMLElement* element ) {
+      sf::FloatRect allocation = widget->GetAllocation();
+
+      element->QueryFloatAttribute( "top", &allocation.top );
+      correctYBoundary( &allocation.top );
+      element->QueryFloatAttribute( "left", &allocation.left );
+      correctXBoundary( &allocation.left );
+      element->QueryFloatAttribute( "width", &allocation.width );
+      element->QueryFloatAttribute( "height", &allocation.height );
+
+      widget->SetAllocation( allocation );
+
+      sf::Vector2f requisition = widget->GetRequisition();
+
+      element->QueryFloatAttribute( "min-width", &requisition.x );
+      element->QueryFloatAttribute( "min-height", &requisition.y );
+
+      widget->SetRequisition( requisition );
+    }
+
     std::shared_ptr< sfg::Window > WidgetBuilder::newWindowWidget( tinyxml2::XMLElement* element ) {
       std::shared_ptr< sfg::Window > window = sfg::Window::Create();
 
       setIdAndClass( window, element );
+      setAllocationAndRequisition( window, element );
 
       const char* title = element->Attribute( "title" );
       if( title ) {
@@ -127,11 +201,41 @@ namespace BlueBear {
       if( labelValue ) {
         label = sfg::Label::Create( labelValue );
         setIdAndClass( label, element );
+        setAllocationAndRequisition( label, element );
       } else {
         label = sfg::Label::Create( "" );
       }
 
       return label;
+    }
+
+    std::shared_ptr< sfg::Box > WidgetBuilder::newBoxWidget( tinyxml2::XMLElement* element ) {
+      std::shared_ptr< sfg::Box > box;
+
+      const char* orientation = element->Attribute( "orientation" );
+      if( !orientation ) {
+        orientation = "horizontal";
+      }
+
+      sfg::Box::Orientation orientationFlag;
+
+      switch( hash( orientation ) ) {
+        case hash( "vertical" ):
+          orientationFlag = sfg::Box::Orientation::VERTICAL;
+          break;
+        default:
+          Log::getInstance().warn( "WidgetBuilder::newBoxWidget", "Invalid value for \"orientation\" attribute: " + std::string( orientation ) + ", defaulting to \"horizontal\"" );
+        case hash( "horizontal" ):
+          orientationFlag = sfg::Box::Orientation::HORIZONTAL;
+          break;
+      }
+
+      float spacing = 0.0f;
+      element->QueryFloatAttribute( "spacing", &spacing );
+
+      box = sfg::Box::Create( orientationFlag, spacing );
+
+      return box;
     }
 
   }
