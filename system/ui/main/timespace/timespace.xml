@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Window id="debug" min-width="200" min-height="100" left="-210" top="10">
   <Box orientation="vertical" spacing="5.0">
-    <Label id="camera">Camera:</Label>
-    <Label id="rotation">Rotation:</Label>
+    <Label id="camera" alignment_x="0">Camera:</Label>
+    <Label id="rotation" alignment_x="0">Rotation:</Label>
   </Box>
 </Window>

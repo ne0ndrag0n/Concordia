@@ -8,6 +8,8 @@
 #include <SFGUI/Container.hpp>
 #include <SFGUI/Label.hpp>
 #include <SFGUI/Box.hpp>
+#include <SFGUI/Alignment.hpp>
+#include <SFGUI/Misc.hpp>
 #include <tinyxml2.h>
 #include <vector>
 #include <functional>
@@ -134,6 +136,15 @@ namespace BlueBear {
       }
     }
 
+    void WidgetBuilder::setAlignment( std::shared_ptr< sfg::Misc > widget, tinyxml2::XMLElement* element ) {
+      sf::Vector2f alignment = widget->GetAlignment();
+
+      element->QueryFloatAttribute( "alignment_x", &alignment.x );
+      element->QueryFloatAttribute( "alignment_y", &alignment.y );
+
+      widget->SetAlignment( alignment );
+    }
+
     void WidgetBuilder::setAllocationAndRequisition( std::shared_ptr< sfg::Widget > widget, tinyxml2::XMLElement* element ) {
       sf::FloatRect allocation = widget->GetAllocation();
 
@@ -202,6 +213,7 @@ namespace BlueBear {
         label = sfg::Label::Create( labelValue );
         setIdAndClass( label, element );
         setAllocationAndRequisition( label, element );
+        setAlignment( label, element );
       } else {
         label = sfg::Label::Create( "" );
       }
@@ -234,8 +246,17 @@ namespace BlueBear {
       element->QueryFloatAttribute( "spacing", &spacing );
 
       box = sfg::Box::Create( orientationFlag, spacing );
+      setIdAndClass( box, element );
 
       return box;
+    }
+
+    std::shared_ptr< sfg::Alignment > WidgetBuilder::newAlignmentWidget( tinyxml2::XMLElement* element ) {
+      std::shared_ptr< sfg::Alignment > alignment = sfg::Alignment::Create();
+
+      setAlignment( alignment, element );
+
+      return alignment;
     }
 
   }
