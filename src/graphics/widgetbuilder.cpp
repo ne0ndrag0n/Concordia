@@ -64,6 +64,11 @@ namespace BlueBear {
           packChildren( std::static_pointer_cast< sfg::Box >( widget ), element );
           break;
 
+        case hash( "Alignment" ):
+          widget = newAlignmentWidget( element );
+          addChildren( std::static_pointer_cast< sfg::Container >( widget ), element );
+          break;
+
         default:
           Log::getInstance().error( "WidgetBuilder::nodeToWidget", "Invalid CME tag specified: " + std::string( tagType ) );
           throw InvalidCMEWidgetException();
@@ -254,6 +259,8 @@ namespace BlueBear {
     std::shared_ptr< sfg::Alignment > WidgetBuilder::newAlignmentWidget( tinyxml2::XMLElement* element ) {
       std::shared_ptr< sfg::Alignment > alignment = sfg::Alignment::Create();
 
+      setIdAndClass( alignment, element );
+      setAllocationAndRequisition( alignment, element );
       setAlignment( alignment, element );
 
       return alignment;
