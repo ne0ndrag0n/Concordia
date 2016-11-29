@@ -22,6 +22,9 @@ namespace BlueBear {
 
       // Object is unusable if the file failed to load
       if( document.ErrorID() ) {
+        Log::getInstance().error( "WidgetBuilder::WidgetBuilder",
+          "WidgetBuilder construction failed; could not parse XML file " + path
+        );
         throw FailedToLoadXMLException();
       }
     }

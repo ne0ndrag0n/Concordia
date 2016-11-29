@@ -177,7 +177,14 @@ namespace BlueBear {
       // Setup camera
       camera.setRotationDirect( currentRotation );
 
-      setupDefaultWindows();
+      try {
+        setupDefaultWindows();
+      } catch( ... ) {
+        Log::getInstance().error(
+          "Display::MainGameState::MainGameState",
+          "Failed to create debug panel!"
+        );
+      }
 
       // Moving much of Display::loadInfrastructure here
       loadInfrastructure();
@@ -187,7 +194,7 @@ namespace BlueBear {
       WallCellBundler::DPiece.reset();
     }
     void Display::MainGameState::setupDefaultWindows() {
-      WidgetBuilder builder( "system/ui/main/timespace/timespace.xml" );
+      WidgetBuilder builder( "system/ui/main/debug/debug.xml" );
       std::vector< std::shared_ptr< sfg::Widget > > widgets = builder.getWidgets();
 
       for( std::shared_ptr< sfg::Widget > widget : widgets ) {
