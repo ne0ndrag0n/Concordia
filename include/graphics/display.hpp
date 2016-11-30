@@ -94,8 +94,6 @@ namespace BlueBear {
           ImageCache imageCache;
           struct {
             sfg::Desktop desktop;
-            std::shared_ptr< sfg::Window > window;
-            std::shared_ptr< sfg::Label > statusLabel;
             sf::Clock clock;
           } gui;
           // These are from the lot!
