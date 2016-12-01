@@ -201,7 +201,9 @@ namespace BlueBear {
         gui.desktop.Add( widget );
       }
 
-      gui.desktop.LoadThemeFromFile( ConfigManager::getInstance().getValue( "ui_theme" ) );
+      if( !gui.desktop.LoadThemeFromFile( ConfigManager::getInstance().getValue( "ui_theme" ) ) ) {
+        Log::getInstance().warn( "Display::MainGameState::MainGameState", "ui_theme unable to load." );
+      }
     }
     void Display::MainGameState::createFloorInstances() {
       floorInstanceCollection->clear();
