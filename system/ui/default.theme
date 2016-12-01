@@ -6,3 +6,7 @@
 Window {
   CTitlePaddingNudgeY: -3.0;
 }
+
+Button {
+  CLabelPaddingNudgeY: -3.0;
+}
