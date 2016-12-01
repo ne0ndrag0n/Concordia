@@ -26,7 +26,7 @@ Concordia
 
 ## Dependencies
 * SFML 2.3.x
-* SFGUI 0.3.1 (manual install required)
+* SFGUI 0.3.1 (use custom repo in ne0ndrag0n/SFGUI with some Concordia-specific changes)
 * TinyXML2
 * Lua 5.3.x
 * JsonCpp 1.7.x
