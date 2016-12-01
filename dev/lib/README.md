@@ -7,8 +7,7 @@ Concordia makes use of various **third-party libraries**. This document describe
 ## Version: (tree 1f54526) (ne0ndrag0n/SFGUI)
 
 ## Modifications
-* **TODO** Added the `CPaddingNudgeX` and `CPaddingNudgeY` properties to the BREW engine. This allows us to make "nudging" possible in labels where it wouldn't otherwise be possible.
- * I would like to get these PR'd into the main SFGUI project, but the current implementation is a hack. This is because the only padding property currently in SFGUI is mixed into a math problem affecting all dimensions (see `sfg::eng::BREW::CreateWindowDrawable`). When time is available (and it never will be), overhaul the way ne0ndrag0n/SFGUI handles the padding property so that we can submit a proper PR to the TankOS/SFGUI mainline.
+* **TODO** Add the `CFontCompensation` property, which will allow us to nudge incorrectly calculated Y-axis font spacing in all widgets. This is so **Perfect DOS VGA** or **Terminus** looks good as presented.
  * *Warning:* `Cxyz` properties are internal properties used by Concordia. They are intended for the global theme used by ConcordiaME and thus were barely tested at all. If you're a mod developer, you use them at your own peril. If you're thinking of using them, you probably don't need 'em. Mods using internal properties or private APIs are not eligible for inclusion on ne0ndrag0n ModWorld.
  * Consider forking `sfg::eng::BREW` to something like `sfg::eng::CBrewEngine`. There's just intermittent poking around here to get what we need, which shouldn't require we modify the library.
 * **TODO** Add the ability to dependency inject logging in SFGUI so that log messages emitted by SFGUI print properly (in our case, LogWyvern format)
