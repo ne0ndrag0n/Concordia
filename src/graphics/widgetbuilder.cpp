@@ -10,6 +10,7 @@
 #include <SFGUI/Box.hpp>
 #include <SFGUI/Alignment.hpp>
 #include <SFGUI/Misc.hpp>
+#include <SFGUI/Button.hpp>
 #include <tinyxml2.h>
 #include <vector>
 #include <functional>
@@ -70,6 +71,12 @@ namespace BlueBear {
         case hash( "Alignment" ):
           widget = newAlignmentWidget( element );
           addChildren( std::static_pointer_cast< sfg::Container >( widget ), element );
+          break;
+
+        case hash( "Button" ):
+          widget = newButtonWidget( element );
+          // SFGUI has the ability to add children to a button but I don't think it makes much sense.
+          /* addChildren( std::static_pointer_cast< sfg::Container >( widget ), element ); */
           break;
 
         default:
@@ -267,6 +274,18 @@ namespace BlueBear {
       setAlignment( alignment, element );
 
       return alignment;
+    }
+
+    /**
+     * TODO: Support for sfg::Image, and the ability to add one to a Button
+     */
+    std::shared_ptr< sfg::Button > WidgetBuilder::newButtonWidget( tinyxml2::XMLElement* element ) {
+      std::shared_ptr< sfg::Button > button = sfg::Button::Create( element->GetText() );
+
+      setIdAndClass( button, element );
+      setAllocationAndRequisition( button, element );
+
+      return button;
     }
 
   }

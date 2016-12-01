@@ -3,5 +3,6 @@
   <Box orientation="vertical">
     <Label id="camera" alignment_x="0">Camera: 0.0, 0.0, 0.0</Label>
     <Label id="rotation" alignment_x="0">Rotation: 0</Label>
+    <Button>Test</Button>
   </Box>
 </Window>
