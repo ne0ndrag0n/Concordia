@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Window id="debug" min-width="200" left="10" top="10" title="Debug">
+<Window id="debug" title="Debug">
   <!-- See ComboBox SFGUI example and why this isn't working -->
   <Box orientation="vertical" spacing="5">
     <Box orientation="horizontal" spacing="5" expand="false">

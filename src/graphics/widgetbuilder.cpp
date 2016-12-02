@@ -94,31 +94,21 @@ namespace BlueBear {
     }
 
     void WidgetBuilder::packChildren( std::shared_ptr< sfg::Box > widget, tinyxml2::XMLElement* element, PackMethod packMethod ) {
-      static std::function< void( tinyxml2::XMLElement*, bool, bool ) > packLeft = [ & ]( tinyxml2::XMLElement* child, bool expand, bool fill ) {
-        widget->PackStart( nodeToWidget( child ), expand, fill );
-      };
-
-      static std::function< void( tinyxml2::XMLElement*, bool, bool ) > packRight = [ & ]( tinyxml2::XMLElement* child, bool expand, bool fill ) {
-        widget->Pack( nodeToWidget( child ), expand, fill );
-      };
-
-      std::function< void( tinyxml2::XMLElement*, bool, bool ) > pack;
-      switch( packMethod ) {
-        case PackMethod::FROM_LEFT:
-          pack = packLeft;
-          break;
-        case PackMethod::FROM_RIGHT:
-        default:
-          pack = packRight;
-      }
-
       for ( tinyxml2::XMLElement* child = element->FirstChildElement(); child != NULL; child = child->NextSiblingElement() ) {
         bool expand = true;
         bool fill = true;
 
         child->QueryBoolAttribute( "expand", &expand );
         child->QueryBoolAttribute( "fill", &fill );
-        pack( child, expand, fill );
+
+        switch( packMethod ) {
+          case PackMethod::FROM_LEFT:
+            widget->PackStart( nodeToWidget( child ), expand, fill );
+            break;
+          case PackMethod::FROM_RIGHT:
+          default:
+            widget->Pack( nodeToWidget( child ), expand, fill );
+        }
       }
     }
 
