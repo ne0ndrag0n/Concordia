@@ -7,8 +7,6 @@
       <Button expand="false">1</Button>
       <Button expand="false">2</Button>
     </Box>
-    <Label>
-      Label
-    </Label>
+    <Label>Label</Label>
   </Box>
 </Window>
