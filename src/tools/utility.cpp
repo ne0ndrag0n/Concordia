@@ -328,5 +328,19 @@ namespace BlueBear {
 				value.get( "run", Json::Value::null ).isInt() &&
 				!( value.get( "value", Json::Value::null ).isNull() );
 		}
+
+		std::string Utility::stringLtrim( std::string& s ) {
+			return s.substr( s.find_first_not_of( " \t\f\v\n\r" ) );
+		}
+
+		std::string Utility::stringRtrim( std::string& s ) {
+			return s.erase( s.find_last_not_of( " \t\f\v\n\r" ) + 1 );
+		}
+
+		std::string Utility::stringTrim( std::string& s ) {
+			std::string rTrimmed = Utility::stringRtrim( s );
+
+			return Utility::stringLtrim( rTrimmed );
+		}
 	}
 }

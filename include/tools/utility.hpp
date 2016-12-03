@@ -53,6 +53,12 @@ namespace BlueBear {
 				static void getTableTreeValue( lua_State* L, const std::string& treeValue );
 
 				static bool isRLEObject( Json::Value& value );
+
+				static std::string stringLtrim( std::string& s );
+
+				static std::string stringRtrim( std::string& s );
+
+				static std::string stringTrim( std::string& s );
 		};
 	}
 }
