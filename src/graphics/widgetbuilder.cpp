@@ -1,6 +1,7 @@
 #include "graphics/widgetbuilder.hpp"
 #include "configmanager.hpp"
 #include "log.hpp"
+#include "tools/utility.hpp"
 #include <string>
 #include <memory>
 #include <SFGUI/Widget.hpp>

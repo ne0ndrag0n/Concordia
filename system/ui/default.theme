@@ -1,12 +1,5 @@
 * {
   FontSize: 16;
   FontName: system/ui/dosvga.ttf;
-}
-
-Window {
-  CTitlePaddingNudgeY: -3.0;
-}
-
-Button {
-  CLabelPaddingNudgeY: -3.0;
+  CFontCompensation: -3.0;
 }

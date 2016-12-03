@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Window id="debug" title="Debug">
-  <!-- See ComboBox SFGUI example and why this isn't working -->
-  <Box orientation="vertical" spacing="5">
-    <Box orientation="horizontal" spacing="5" expand="false">
-      <Label>Test</Label>
-      <Button expand="false">1</Button>
-      <Button expand="false">2</Button>
+<Window id="debug" min-width="250" min-height="100" left="-260" top="10" title="Debug" resize="false">
+  <Box orientation="vertical">
+    <Box orientation="horizonal">
+      <Label alignment_x="0">Camera:</Label>
+      <Label id="camera_val" alignment_x="0" expand="false">(0.0, 0.0, 0.0)</Label>
     </Box>
-    <Label>Label</Label>
+    <Box orientation="horizonal">
+      <Label alignment_x="0">Rotation:</Label>
+      <Label id="rot_val" alignment_x="1.0" expand="false">0</Label>
+    </Box>
+    <Box id="control" orientation="horizontal" spacing="5.0">
+      <Button id="rot_l">&lt;</Button>
+      <Button id="rot_r">&gt;</Button>
+      <Button id="zoom_in">+</Button>
+      <Button id="zoom_out">-</Button>
+    </Box>
   </Box>
 </Window>
