@@ -4,10 +4,15 @@
 	Anything that can be placed on a lot and ran as an entity is an "object"
 --]]
 
+bluebear.engine.require_modpack( "util" )
 bluebear.engine.require_modpack( "middleclass" )
 bluebear.engine.require_modpack( "class" )
 
 local Object = class( 'system.serializable.base' )
+
+function Object:initialize()
+	self._cid = bluebear.util.get_cid()
+end
 
 function Object:load( saved )
 	local data = saved or {}

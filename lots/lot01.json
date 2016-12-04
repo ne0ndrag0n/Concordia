@@ -64,6 +64,13 @@
 			]
 		}
 	},
+	"cmap": {
+		"40.0": {
+			"classID": "game.flowers.base",
+			"method": "main",
+			"context": "bb1"
+		}
+	},
 	"entities": [
 		{
 			"classID": "game.flowers.base",
