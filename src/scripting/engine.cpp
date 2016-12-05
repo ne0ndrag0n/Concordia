@@ -379,8 +379,8 @@ namespace BlueBear {
 					// Clear the std::map containing all objects
 					currentLot->objects.clear();
 
-					// Iterate through the "entities" array
-					for( Json::Value& entity : lotJSON[ "entities" ] ) {
+					// Iterate through the "objects" array
+					for( Json::Value& entity : lotJSON[ "objects" ] ) {
 						currentLot->createLotEntityFromJSON( entity );
 					}
 
