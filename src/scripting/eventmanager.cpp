@@ -4,7 +4,7 @@
 #include <lauxlib.h>
 #include "tools/utility.hpp"
 #include "scripting/lot.hpp"
-#include "scripting/lotentity.hpp"
+#include "scripting/serializableinstance.hpp"
 #include "log.hpp"
 #include <jsoncpp/json/json.h>
 #include <cstddef>
@@ -48,7 +48,7 @@ namespace BlueBear {
    * This function assumes you have pushed either nil or a table onto the Lua stack. This represents the "arguments"
    * passed along to each event.
    *
-   * If there is no callback to be called, the value will simply be popped whenever LotEntity::registerCallback
+   * If there is no callback to be called, the value will simply be popped whenever SerializableInstance::registerCallback
    * is called. Therefore, these two values must be copied on the stack every time a registerCallback call is made.
    */
   void EventManager::broadcastEvent( const std::string& eventKey ) {
@@ -63,7 +63,7 @@ namespace BlueBear {
         // On a global event manager, this should always succeed, but it may not succeed on an individual event manager.
         // If it doesn't succeed, the object no longer exists, and we should simply let this drop off.
         if( currentLot->objects.count( cid ) ) {
-          LotEntity& entity = *( currentLot->objects[ cid ] );
+          SerializableInstance& entity = *( currentLot->objects[ cid ] );
 
           // Copy the item at the top of stack. It should be either table or nil, but there should have been
           // something you put here before calling broadcastEvent. If you don't push something, the behaviour

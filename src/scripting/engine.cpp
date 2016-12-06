@@ -3,7 +3,7 @@
 #include <lualib.h>
 #include <lauxlib.h>
 #include "tools/utility.hpp"
-#include "scripting/lotentity.hpp"
+#include "scripting/serializableinstance.hpp"
 #include "scripting/lot.hpp"
 #include "scripting/engine.hpp"
 #include "threading/commandbus.hpp"
@@ -161,7 +161,7 @@ namespace BlueBear {
 			// create_new_instance creates a new instance of an entity and registers it with the lot engine
 			lua_pushstring( L, "create_new_instance" );
 			lua_pushlightuserdata( L, lot );
-			lua_pushcclosure( L, &Lot::lua_createLotEntity, 1 );
+			lua_pushcclosure( L, &Lot::lua_createSerializableInstance, 1 );
 			lua_settable( L, -3 );
 
 			// listen_for instructs the Lot to listen for a specific broadcast for a specific object
@@ -381,7 +381,7 @@ namespace BlueBear {
 
 					// Iterate through the "objects" array
 					for( Json::Value& entity : lotJSON[ "objects" ] ) {
-						currentLot->createLotEntityFromJSON( entity );
+						currentLot->createSerializableInstanceFromJSON( entity );
 					}
 
 					// After the lot has all its LotEntities loaded, let's fix those serialized function references
@@ -403,7 +403,7 @@ namespace BlueBear {
 		}
 
 		/**
-		 * For all serialized curried functions in _sys._sched, ask each object to deserialize the reference to another LotEntity
+		 * For all serialized curried functions in _sys._sched, ask each object to deserialize the reference to another SerializableInstance
 		 */
 		bool Engine::deserializeFunctionRefs() {
 
@@ -414,8 +414,8 @@ namespace BlueBear {
 			Tools::Utility::clearLuaStack( L );
 
 			for( auto& keyValuePair : currentLot->objects ) {
-				// Dereference the pointer to the LotEntity
-				LotEntity& currentEntity = *( keyValuePair.second );
+				// Dereference the pointer to the SerializableInstance
+				SerializableInstance& currentEntity = *( keyValuePair.second );
 
 				// Push this object's table onto the API stack
 				lua_rawgeti( L, LUA_REGISTRYINDEX, currentEntity.luaVMInstance );
@@ -567,7 +567,7 @@ namespace BlueBear {
 						Tools::Utility::setTableIntValue( L, "current_tick", currentTick );
 
 						for( auto& keyValuePair : currentLot->objects ) {
-							LotEntity& currentEntity = *( keyValuePair.second );
+							SerializableInstance& currentEntity = *( keyValuePair.second );
 
 							// Execute object if it is "ok"
 							if( currentEntity.ok == true ) {

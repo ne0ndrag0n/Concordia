@@ -4,7 +4,7 @@
 #include <lauxlib.h>
 #include "containers/collection3d.hpp"
 #include "containers/conccollection3d.hpp"
-#include "scripting/lotentity.hpp"
+#include "scripting/serializableinstance.hpp"
 #include "scripting/lot.hpp"
 #include "log.hpp"
 #include "tools/utility.hpp"
@@ -170,7 +170,7 @@ namespace BlueBear {
 			// Push 'em on!
 			size_t tableIndex = 1;
 			for( auto& keyValuePair : lot->objects ) {
-				LotEntity& lotEntity = *( keyValuePair.second );
+				SerializableInstance& lotEntity = *( keyValuePair.second );
 
 				lua_rawgeti( L, LUA_REGISTRYINDEX, lotEntity.luaVMInstance );
 				lua_rawseti( L, -2, tableIndex++ );
@@ -199,7 +199,7 @@ namespace BlueBear {
 
 			// Iterate through each object on the lot, checking to see if each is an instance of "idKey"
 			for( auto& keyValuePair : lot->objects ) {
-				LotEntity& lotEntity = *( keyValuePair.second );
+				SerializableInstance& lotEntity = *( keyValuePair.second );
 
 				// Push bluebear global
 				lua_getglobal( L, "bluebear" );
@@ -279,9 +279,9 @@ namespace BlueBear {
 		/**
 		 * Create a lot entity from a JSON value
 		 */
-		int Lot::createLotEntityFromJSON( const Json::Value& serialEntity ) {
-			// Simple proxy to LotEntity's JSON constructor
-			std::unique_ptr< LotEntity > entity = std::make_unique< LotEntity >( L, currentTickReference, serialEntity );
+		int Lot::createSerializableInstanceFromJSON( const Json::Value& serialEntity ) {
+			// Simple proxy to SerializableInstance's JSON constructor
+			std::unique_ptr< SerializableInstance > entity = std::make_unique< SerializableInstance >( L, currentTickReference, serialEntity );
 
 			if( entity->ok ) {
 				int ref = entity->luaVMInstance;
@@ -298,8 +298,8 @@ namespace BlueBear {
 		/**
 		 * Create a new instance of "classID" from scratch
 		 */
-		int Lot::createLotEntity( const std::string& classID ) {
-			std::unique_ptr< LotEntity > entity = std::make_unique< LotEntity >( L, currentTickReference, classID );
+		int Lot::createSerializableInstance( const std::string& classID ) {
+			std::unique_ptr< SerializableInstance > entity = std::make_unique< SerializableInstance >( L, currentTickReference, classID );
 
 			// Add the pointer to our objects map if everything is A-OK
 			if( entity->ok ) {
@@ -315,9 +315,9 @@ namespace BlueBear {
 		}
 
 		/**
-		 * Proxies to Lot::createLotEntity
+		 * Proxies to Lot::createSerializableInstance
 		 */
-		int Lot::lua_createLotEntity( lua_State* L ) {
+		int Lot::lua_createSerializableInstance( lua_State* L ) {
 
 			Lot* lot = ( Lot* )lua_touserdata( L, lua_upvalueindex( 1 ) );
 
@@ -326,7 +326,7 @@ namespace BlueBear {
 			lua_pop( L, 1 );
 
 			// Create the lot entity itself
-			int reference = lot->createLotEntity( classID );
+			int reference = lot->createSerializableInstance( classID );
 
 			if( reference != -1 ) {
 				// Push instance on the stack

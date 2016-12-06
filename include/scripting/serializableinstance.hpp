@@ -10,7 +10,7 @@
 
 namespace BlueBear {
 	namespace Scripting {
-		class LotEntity {
+		class SerializableInstance {
 
 			private:
 				lua_State* L;
@@ -24,8 +24,8 @@ namespace BlueBear {
 				bool ok = false;
 				int luaVMInstance;
 				std::string classID;
-				LotEntity( lua_State* L, const Tick& currentTickReference, const Json::Value& serialEntity );
-				LotEntity( lua_State* L, const Tick& currentTickReference, const std::string& classID );
+				SerializableInstance( lua_State* L, const Tick& currentTickReference, const Json::Value& serialEntity );
+				SerializableInstance( lua_State* L, const Tick& currentTickReference, const std::string& classID );
 
 				void createEntityTable();
 				void deserializeEntity( const Json::Value& serialEntity );

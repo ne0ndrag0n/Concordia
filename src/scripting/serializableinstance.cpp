@@ -1,4 +1,4 @@
-#include "scripting/lotentity.hpp"
+#include "scripting/serializableinstance.hpp"
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -10,13 +10,13 @@
 
 namespace BlueBear {
 	namespace Scripting {
-		Json::FastWriter LotEntity::writer;
+		Json::FastWriter SerializableInstance::writer;
 
-		LotEntity::LotEntity( lua_State* L, const Tick& currentTickReference, const std::string& classID )
+		SerializableInstance::SerializableInstance( lua_State* L, const Tick& currentTickReference, const std::string& classID )
 			: L( L ), currentTickReference( currentTickReference ), classID( classID ) {
 				createEntityTable();
 
-				// When creating a plain LotEntity (one that is not loaded from JSON)
+				// When creating a plain SerializableInstance (one that is not loaded from JSON)
 				// call its on_create() method
 				if( ok ) {
 					ok = false;
@@ -25,7 +25,7 @@ namespace BlueBear {
 				}
 		}
 
-		LotEntity::LotEntity( lua_State* L, const Tick& currentTickReference, const Json::Value& serialEntity )
+		SerializableInstance::SerializableInstance( lua_State* L, const Tick& currentTickReference, const Json::Value& serialEntity )
 			: L( L ), currentTickReference( currentTickReference ), classID( serialEntity[ "classID" ].asString() ) {
 			createEntityTable();
 			if( ok ) {
@@ -38,7 +38,7 @@ namespace BlueBear {
 		/**
 		 * Call the on_create method of this Lua instance
 		 */
-		void LotEntity::onCreate() {
+		void SerializableInstance::onCreate() {
 			// instance
 			lua_rawgeti( L, LUA_REGISTRYINDEX, luaVMInstance );
 
@@ -50,7 +50,7 @@ namespace BlueBear {
 
 			if( lua_pcall( L, 1, 0, 0 ) != 0 ) {
 				// error instance
-				Log::getInstance().error( "LotEntity::onCreate", std::string( lua_tostring( L, -1 ) ) );
+				Log::getInstance().error( "SerializableInstance::onCreate", std::string( lua_tostring( L, -1 ) ) );
 			} else {
 				// instance
 
@@ -65,7 +65,7 @@ namespace BlueBear {
 			lua_pop( L, 2 );
 		}
 
-		void LotEntity::createEntityTable() {
+		void SerializableInstance::createEntityTable() {
 			// Get bluebear.classes
 			// bluebear
 			lua_getglobal( L, "bluebear" );
@@ -101,11 +101,11 @@ namespace BlueBear {
 					lua_pop( L, 2 );
 				} else {
 					// error instance Class bluebear
-					Log::getInstance().error( "LotEntity::createEntityTable", std::string( lua_tostring( L, -1 ) ) );
+					Log::getInstance().error( "SerializableInstance::createEntityTable", std::string( lua_tostring( L, -1 ) ) );
 					lua_pop( L, 4 );
 				}
 			} else {
-				Log::getInstance().error( "LotEntity::createEntityTable", "Could not find class " + classID );
+				Log::getInstance().error( "SerializableInstance::createEntityTable", "Could not find class " + classID );
 
 				lua_pop( L, 2 );
 			}
@@ -114,7 +114,7 @@ namespace BlueBear {
 		/**
 		 * Load from JSON or other saved format.
 		 */
-		void LotEntity::deserializeEntity( const Json::Value& serialEntity ) {
+		void SerializableInstance::deserializeEntity( const Json::Value& serialEntity ) {
 
 			// Grab a reference to the instance table
 			// instance
@@ -147,7 +147,7 @@ namespace BlueBear {
 				lua_remove( L, -2 );
 			} else {
 				// error JSON instance <load> instance
-				Log::getInstance().error( "LotEntity::deserializeEntity", "Problem deserialising using Lua JSON lib on " + classID );
+				Log::getInstance().error( "SerializableInstance::deserializeEntity", "Problem deserialising using Lua JSON lib on " + classID );
 
 				lua_pop( L, 5 );
 				return;
@@ -155,7 +155,7 @@ namespace BlueBear {
 
 			// instance
 			if( lua_pcall( L, 2, 0, 0 ) == 0 ) {
-				// Grab the _cid of the LotEntity and set the public "cid" property to this value
+				// Grab the _cid of the SerializableInstance and set the public "cid" property to this value
 				// cid instance
 				Tools::Utility::getTableValue( L, "_cid" );
 				if( lua_isstring( L, -1 ) ) {
@@ -164,7 +164,7 @@ namespace BlueBear {
 				}
 			} else {
 				// error instance
-				Log::getInstance().error( "LotEntity::deserializeEntity", std::string( lua_tostring( L, -1 ) ) );
+				Log::getInstance().error( "SerializableInstance::deserializeEntity", std::string( lua_tostring( L, -1 ) ) );
 			}
 
 			// EMPTY
@@ -178,10 +178,10 @@ namespace BlueBear {
 		 * function pops whatever is on the top of the stack.
 		 *
 		 * TODO: This function merely proxies into system.entity.base:register_callback. When
-		 * we're ready to make system.entity.base more of a LotEntity, this function should
+		 * we're ready to make system.entity.base more of a SerializableInstance, this function should
 		 * serve as the only way to register a callback (and not be overridden on system.entity.base).
 		 */
-		void LotEntity::registerCallback( const std::string& callback, Tick tick ) {
+		void SerializableInstance::registerCallback( const std::string& callback, Tick tick ) {
 			// Arguments on system.entity.base:register_callback are (self, tick, method, wrapped_arguments)
 
 			// instance table/nil
@@ -205,7 +205,7 @@ namespace BlueBear {
 			// instance table/nil
 			if( lua_pcall( L, 4, 0, 0 ) ) {
 				// error instance table/nil
-				Log::getInstance().error( "LotEntity::registerCallback", std::string( lua_tostring( L, -1 ) ) );
+				Log::getInstance().error( "SerializableInstance::registerCallback", std::string( lua_tostring( L, -1 ) ) );
 				lua_pop( L, 1 );
 			}
 
@@ -217,12 +217,12 @@ namespace BlueBear {
 		 * Defers to the next tick. Simply call registerCallback with the next tick. All the same stuff
 		 * with pushing a nil or table applies.
 		 */
-		void LotEntity::deferCallback( const std::string& callback ) {
+		void SerializableInstance::deferCallback( const std::string& callback ) {
 			Tick nextTick = currentTickReference + 1;
 			registerCallback( callback, nextTick );
 		}
 
-		void LotEntity::execute() {
+		void SerializableInstance::execute() {
 			// instance
 			lua_rawgeti( L, LUA_REGISTRYINDEX, luaVMInstance );
 
@@ -310,7 +310,7 @@ namespace BlueBear {
 					if( lua_pcall( L, totalArguments, 0, 0 ) != 0 ) {
 						// error object SFT 1 tick_array_table _sys._sched _sys instance
 						// We only get here if the function bombs out
-						Log::getInstance().error( "LotEntity::execute", "Error in lot entity: " + std::string( lua_tostring( L, -1 ) ) );
+						Log::getInstance().error( "SerializableInstance::execute", "Error in lot entity: " + std::string( lua_tostring( L, -1 ) ) );
 
 						lua_pop( L, 1 );
 

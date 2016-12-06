@@ -17,7 +17,7 @@
 
 namespace BlueBear {
 	namespace Scripting {
-		class LotEntity;
+		class SerializableInstance;
 		class Tile;
 		struct WallCell;
 
@@ -33,7 +33,7 @@ namespace BlueBear {
 				inline Threading::Lockable< Tile > getTile( int index, std::vector< Threading::Lockable< Tile > >& lookup );
 
 			public:
-				std::map< std::string, std::unique_ptr< LotEntity > > objects;
+				std::map< std::string, std::unique_ptr< SerializableInstance > > objects;
 				std::unique_ptr< Containers::ConcCollection3D< Threading::Lockable< Tile > > > floorMap;
 				std::unique_ptr< Containers::ConcCollection3D< Threading::Lockable< WallCell > > > wallMap;
 				int floorX;
@@ -45,13 +45,13 @@ namespace BlueBear {
 
 				Lot( lua_State* L, const Tick& currentTickReference, InfrastructureFactory& infrastructureFactory, Json::Value& rootObject );
 				int getLotObjectByCid( const std::string& cid );
-				int createLotEntity( const std::string& classID );
-				int createLotEntityFromJSON( const Json::Value& serialEntity );
+				int createSerializableInstance( const std::string& classID );
+				int createSerializableInstanceFromJSON( const Json::Value& serialEntity );
 
 				static int lua_getLotObjects( lua_State* L );
 				static int lua_getLotObjectsByType( lua_State* L );
 				static int lua_getLotObjectByCid( lua_State* L );
-				static int lua_createLotEntity( lua_State* L );
+				static int lua_createSerializableInstance( lua_State* L );
 		};
 	}
 }
