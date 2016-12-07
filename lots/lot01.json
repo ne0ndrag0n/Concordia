@@ -1,118 +1,124 @@
 {
 	"rev": 0,
-	"floorx": 6,
-	"floory": 6,
-	"stories": 1,
-	"subtr": 0,
-	"terrain": 1,
-	"ticks": 10,
-	"rot": 0,
-	"infr": {
-		"floor": {
-			"dict": [ "hardwood1", "hardwood2" ],
-			"levels": [
-				[
-					0, 0, 0, 0, 0, 0,
-					0, 1, 0, 0, 0, 0,
-					0, 0, 0, 0, 0, 0,
-					{ "run": 18, "value": 0 }
+
+	"lot": {
+		"floorx": 6,
+		"floory": 6,
+		"stories": 1,
+		"subtr": 0,
+		"terrain": 1,
+		"rot": 0,
+		"infr": {
+			"floor": {
+				"dict": [ "hardwood1", "hardwood2" ],
+				"levels": [
+					[
+						0, 0, 0, 0, 0, 0,
+						0, 1, 0, 0, 0, 0,
+						0, 0, 0, 0, 0, 0,
+						{ "run": 18, "value": 0 }
+					]
 				]
-			]
-		},
-		"wall": {
-			"dict": [ "_grey", "fancy", "star_test" ],
-			"levels": [
-				[
-					{ "run": 7, "value": -1 },
+			},
+			"wall": {
+				"dict": [ "_grey", "fancy", "star_test" ],
+				"levels": [
+					[
+						{ "run": 7, "value": -1 },
 
-					-1,
-					{ "x": { "f": 1, "b": 0 }, "y": { "f": 0, "b": 1 } },
-					{ "run": 2, "value": { "x": { "f": 1, "b": 0 } } },
-					{ "y": { "f": 0, "b": 1 } },
-					-1,
-					-1,
+						-1,
+						{ "x": { "f": 1, "b": 0 }, "y": { "f": 0, "b": 1 } },
+						{ "run": 2, "value": { "x": { "f": 1, "b": 0 } } },
+						{ "y": { "f": 0, "b": 1 } },
+						-1,
+						-1,
 
-					-1,
-					{ "y": { "f": 0, "b": 1 } },
-					{ "run": 2, "value": -1 },
-					{ "y": { "f": 1, "b": 0 } },
-					-1,
-					-1,
+						-1,
+						{ "y": { "f": 0, "b": 1 } },
+						{ "run": 2, "value": -1 },
+						{ "y": { "f": 1, "b": 0 } },
+						-1,
+						-1,
 
-					-1,
-					{ "y": { "f": 0, "b": 1 } },
-					{ "run": 2, "value": -1 },
-					{ "y": { "f": 1, "b": 0 } },
-					-1,
-					-1,
+						-1,
+						{ "y": { "f": 0, "b": 1 } },
+						{ "run": 2, "value": -1 },
+						{ "y": { "f": 1, "b": 0 } },
+						-1,
+						-1,
 
-					-1,
-					{ "y": { "f": 0, "b": 1 } },
-					{ "run": 2, "value": -1 },
-					{ "y": { "f": 1, "b": 0 } },
-					-1,
-					-1,
+						-1,
+						{ "y": { "f": 0, "b": 1 } },
+						{ "run": 2, "value": -1 },
+						{ "y": { "f": 1, "b": 0 } },
+						-1,
+						-1,
 
-					-1,
-					{ "x": { "f": 1, "b": 0 } },
-					{ "run": 2, "value": { "x": { "f": 0, "b": 1 } } },
-					-1,
-					-1,
+						-1,
+						{ "x": { "f": 1, "b": 0 } },
+						{ "run": 2, "value": { "x": { "f": 0, "b": 1 } } },
+						-1,
+						-1,
 
-					{ "run": 49, "value": -1 }
+						{ "run": 49, "value": -1 }
+					]
 				]
-			]
+			}
 		}
 	},
-	"cmap": {
-		"40.0": {
-			"classID": "game.flowers.base",
-			"method": "main",
-			"context": "bb1"
-		}
-	},
-	"objects": {
-		"bb1": {
-			"classID": "game.flowers.base",
-			"instance": {
-				"_cid": "bb1",
-				"_sys": {
-					"_sched": {
-						"40.0": [ { "method": "main" } ]
-					}
-				},
-				"_events": {
-					"test_event_on_myself": {
-						"bb2": "test_callback_individual"
-					}
-				},
-				"water_level": 100
+
+	"engine": {
+		"ticks": 10,
+		"cmap": {
+			"40.0": {
+				"classID": "game.flowers.base",
+				"method": "main",
+				"context": "bb1"
 			}
 		},
-		"bb2": {
-			"classID": "game.household.trashpile.base",
-			"instance": {
-				"_cid": "bb2",
-				"_sys": {
-					"_sched": {
-						"30.0": [	{ "method": "main" } ]
-					}
-				},
-				"stink": 0
-			}
-		},
-		"bb3": {
-			"classID": "game.doll.player",
-			"instance": {
-				"_cid": "bb3",
-				"_sys": {
-					"_sched": {
-						"30.0": [ {	"method": "decay_my_motives" }, {	"method": "main" } ]
-					}
-				},
-				"saved_motives": {
-					"game.motive.hunger.food": {
-						"value": 100
+		"objects": {
+			"bb1": {
+				"classID": "game.flowers.base",
+				"instance": {
+					"_cid": "bb1",
+					"_sys": {
+						"_sched": {
+							"40.0": [ { "method": "main" } ]
+						}
+					},
+					"_events": {
+						"test_event_on_myself": {
+							"bb2": "test_callback_individual"
+						}
+					},
+					"water_level": 100
+				}
+			},
+			"bb2": {
+				"classID": "game.household.trashpile.base",
+				"instance": {
+					"_cid": "bb2",
+					"_sys": {
+						"_sched": {
+							"30.0": [	{ "method": "main" } ]
+						}
+					},
+					"stink": 0
+				}
+			},
+			"bb3": {
+				"classID": "game.doll.player",
+				"instance": {
+					"_cid": "bb3",
+					"_sys": {
+						"_sched": {
+							"30.0": [ {	"method": "decay_my_motives" }, {	"method": "main" } ]
+						}
+					},
+					"saved_motives": {
+						"game.motive.hunger.food": {
+							"value": 100
+						}
 					}
 				}
 			}

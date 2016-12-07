@@ -351,26 +351,29 @@ namespace BlueBear {
 
 				// Set up JsonCpp options
 				// lotJSON is the root JSON object for the lot
-				Json::Value lotJSON;
+				Json::Value fileJSON;
 				// reader is an object used to parse the std::ifstream file into a JSON object
 				Json::Reader reader;
-				bool parseSuccessful = reader.parse( lot, lotJSON );
+				bool parseSuccessful = reader.parse( lot, fileJSON );
 
 				// If parse was successful, begin loading the lot
-				if( parseSuccessful && lotJSON.isObject() ) {
+				if( parseSuccessful && fileJSON.isObject() ) {
+					Json::Value lotJSON = fileJSON[ "lot" ];
+					Json::Value engineJSON = fileJSON[ "engine" ];
+
 					// Log some basic information about the loading of the lot
-					Log::getInstance().info( "Engine::loadLot", "[" + std::string( lotPath ) + "] Lot revision: " + lotJSON[ "rev" ].asString() );
+					Log::getInstance().info( "Engine::loadLot", "[" + std::string( lotPath ) + "] Lot revision: " + fileJSON[ "rev" ].asString() );
 
 					// Set world ticks to the one saved in the file
-					currentTick = lotJSON[ "ticks" ].asInt();
+					currentTick = engineJSON[ "ticks" ].asInt();
 
 					// Instantiate the lot
 					currentLot = std::make_shared< Lot >( L, currentTick, *infrastructureFactory, lotJSON );
 
 					// Setup global event manager
 					eventManager = std::make_unique< EventManager >( L, currentLot );
-					if( lotJSON.isMember( "global_events" ) ) {
-						eventManager->load( lotJSON[ "global_events" ] );
+					if( engineJSON.isMember( "global_events" ) ) {
+						eventManager->load( engineJSON[ "global_events" ] );
 					}
 
 					// Expose the lot and eventmanager methods to luasphere
@@ -380,7 +383,7 @@ namespace BlueBear {
 					currentLot->objects.clear();
 
 					// Iterate through the "objects" array
-					for( Json::Value& entity : lotJSON[ "objects" ] ) {
+					for( Json::Value& entity : engineJSON[ "objects" ] ) {
 						currentLot->createSerializableInstanceFromJSON( entity );
 					}
 
