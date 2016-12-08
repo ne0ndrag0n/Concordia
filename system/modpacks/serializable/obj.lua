@@ -10,8 +10,18 @@ bluebear.engine.require_modpack( "class" )
 
 local Object = class( 'system.serializable.base' )
 
-function Object:initialize()
-	self._cid = bluebear.util.get_cid()
+function Object:initialize( serialized )
+
+	if type( serialized ) == "table" then
+		-- De-serialising an item (call the load method)
+		self:load( serialized )
+	else
+		-- Creating a brand-new item
+		self._cid = bluebear.util.get_cid()
+	end
+
+	-- TODO: What goes here? Register the item globally using bluebear.engine.__private.reg_inst( self ). This method will take
+	-- the current table and add it to the std::map tracking all serializable instances floating around in the Luaverse
 end
 
 function Object:load( saved )

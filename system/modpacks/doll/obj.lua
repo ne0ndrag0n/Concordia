@@ -129,12 +129,12 @@ function Doll:update_motive( motive_id, value )
   end
 end
 
-function Doll:initialize()
-  bluebear.get_class( 'system.entity.base' ).initialize( self )
-
+function Doll:initialize( serialized )
   self.interaction_queue = {}
   self:create_motives()
   self:change_state( Doll.STATES.IDLE )
+
+  bluebear.get_class( 'system.entity.base' ).initialize( self, serialized )
 end
 
 --[[

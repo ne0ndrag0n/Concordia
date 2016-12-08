@@ -18,21 +18,12 @@ namespace BlueBear {
 
 				// When creating a plain SerializableInstance (one that is not loaded from JSON)
 				// call its on_create() method
-				if( ok ) {
-					ok = false;
-
-					onCreate();
-				}
+				onCreate();
 		}
 
 		SerializableInstance::SerializableInstance( lua_State* L, const Tick& currentTickReference, const Json::Value& serialEntity )
 			: L( L ), currentTickReference( currentTickReference ), classID( serialEntity[ "classID" ].asString() ) {
-			createEntityTable();
-			if( ok ) {
-				ok = false;
-
-				deserializeEntity( serialEntity );
-			}
+			createEntityTable( serialEntity );
 		}
 
 		/**
@@ -48,21 +39,17 @@ namespace BlueBear {
 			// instance <on_create> instance
 			lua_pushvalue( L, -2 );
 
+			// instance
 			if( lua_pcall( L, 1, 0, 0 ) != 0 ) {
 				// error instance
 				Log::getInstance().error( "SerializableInstance::onCreate", std::string( lua_tostring( L, -1 ) ) );
-			} else {
-				// instance
 
-				// cid instance
-				Tools::Utility::getTableValue( L, "_cid" );
-				if( lua_isstring( L, -1 ) ) {
-					cid = lua_tostring( L, -1 );
-					ok = true;
-				}
+				// instance
+				lua_pop( L, 1 );
 			}
 
-			lua_pop( L, 2 );
+			// EMPTY
+			lua_pop( L, 1 );
 		}
 
 		void SerializableInstance::createEntityTable() {
@@ -111,64 +98,92 @@ namespace BlueBear {
 			}
 		}
 
-		/**
-		 * Load from JSON or other saved format.
-		 */
-		void SerializableInstance::deserializeEntity( const Json::Value& serialEntity ) {
+		void SerializableInstance::createEntityTable( const Json::Value& serialEntity ) {
+			// Get bluebear.classes
+			// bluebear
+			lua_getglobal( L, "bluebear" );
 
-			// Grab a reference to the instance table
-			// instance
-			lua_rawgeti( L, LUA_REGISTRYINDEX, luaVMInstance );
+			// bluebear.classes bluebear
+			Tools::Utility::getTableValue( L, "classes" );
 
-			// Use the load method to deserialise
-			// <load> instance
-			Tools::Utility::getTableValue( L, "load" );
+			// Get the actual class referred to by this classID
+			// Class bluebear
+			Tools::Utility::getTableTreeValue( L, classID );
 
-			// instance <load> instance
-			lua_pushvalue( L, -2 );
+			// If "nil bluebear": Cannot continue: the class was not found
+			if( lua_istable( L, -1 ) ) {
+				// Class is at the top of the stack
+				// Let's start by creating a new instance
 
-			// Use JSON.decode( JSON, "serialisedInstance" ) to transform the serialised instance to a table
-			// JSON instance <load> instance
-			lua_getglobal( L, "JSON" );
+				// <new> Class bluebear
+				Tools::Utility::getTableValue( L, "new" );
 
-			// <decode> JSON instance <load> instance
-			Tools::Utility::getTableValue( L, "decode" );
+				// Class <new> Class bluebear
+				lua_pushvalue( L, -2 );
 
-			// JSON <decode> JSON instance <load> instance
-			lua_pushvalue( L, -2 );
+				// Use JSON.decode( JSON, "serialisedInstance" ) to transform the serialised instance to a table
+				// JSON Class <new> Class bluebear
+				lua_getglobal( L, "JSON" );
 
-			// "serialisedInstance" JSON <decode> JSON instance <load> instance
-			lua_pushstring( L, writer.write( serialEntity[ "instance" ] ).c_str() );
+				// <decode> JSON Class <new> Class bluebear
+				Tools::Utility::getTableValue( L, "decode" );
 
-			// deserialisedTable JSON instance <load> instance
-			if( lua_pcall( L, 2, 1, 0 ) == 0 ) {
-				// Prepare for the pcall that loads
-				// deserialisedTable instance <load> instance
-				lua_remove( L, -2 );
-			} else {
-				// error JSON instance <load> instance
-				Log::getInstance().error( "SerializableInstance::deserializeEntity", "Problem deserialising using Lua JSON lib on " + classID );
+				// JSON <decode> JSON Class <new> Class bluebear
+				lua_pushvalue( L, -2 );
 
-				lua_pop( L, 5 );
-				return;
-			}
+				// "serialisedInstance" JSON <decode> JSON Class <new> Class bluebear
+				lua_pushstring( L, writer.write( serialEntity[ "instance" ] ).c_str() );
 
-			// instance
-			if( lua_pcall( L, 2, 0, 0 ) == 0 ) {
-				// Grab the _cid of the SerializableInstance and set the public "cid" property to this value
-				// cid instance
-				Tools::Utility::getTableValue( L, "_cid" );
-				if( lua_isstring( L, -1 ) ) {
-					cid = lua_tostring( L, -1 );
-					ok = true;
+				// Deserialize the JSON object into a Lua table
+				// instanceTable JSON Class <new> Class bluebear
+				if( lua_pcall( L, 2, 1, 0 ) == 0 ) {
+					// Prepare for the pcall that makes the instance
+					// instanceTable Class <new> Class bluebear
+					lua_remove( L, -2 );
+				} else {
+					// error JSON Class <new> Class bluebear
+					Log::getInstance().error( "SerializableInstance::createEntityTable( const Json::Value& serialEntity )", "Problem deserialising using Lua JSON lib on " + classID );
+
+					lua_pop( L, 6 );
+					return;
+				}
+
+				// instance Class bluebear
+				if( lua_pcall( L, 2, 1, 0 ) == 0 ) {
+					// Instance is created!
+
+					// Get the cid. There is absolutely now a cid.
+					// cid instance Class bluebear
+					Tools::Utility::getTableValue( L, "_cid" );
+					if( lua_isstring( L, -1 ) ) {
+						cid = lua_tostring( L, -1 );
+						ok = true;
+					} else {
+						Log::getInstance().error( "SerializableInstance::createEntityTable( const Json::Value& serialEntity )", "Instance failed to deserialize or create a string-type cid!" );
+						// EMPTY
+						lua_pop( L, 4 );
+						return;
+					}
+
+					// instance Class bluebear
+					lua_pop( L, 1 );
+
+					// this->luaVMInstance holds a Lua registry index to the table returned by this function
+					// Class bluebear
+					luaVMInstance = luaL_ref( L, LUA_REGISTRYINDEX );
+
+					// EMPTY
+					lua_pop( L, 2 );
+				} else {
+					// error Class bluebear
+					Log::getInstance().error( "SerializableInstance::createEntityTable( const Json::Value& serialEntity )", std::string( lua_tostring( L, -1 ) ) );
+					lua_pop( L, 3 );
 				}
 			} else {
-				// error instance
-				Log::getInstance().error( "SerializableInstance::deserializeEntity", std::string( lua_tostring( L, -1 ) ) );
-			}
+				Log::getInstance().error( "SerializableInstance::createEntityTable( const Json::Value& serialEntity )", "Could not find class " + classID );
 
-			// EMPTY
-			lua_pop( L, 2 );
+				lua_pop( L, 2 );
+			}
 		}
 
 		/**

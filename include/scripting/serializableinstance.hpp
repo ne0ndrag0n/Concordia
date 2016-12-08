@@ -28,7 +28,7 @@ namespace BlueBear {
 				SerializableInstance( lua_State* L, const Tick& currentTickReference, const std::string& classID );
 
 				void createEntityTable();
-				void deserializeEntity( const Json::Value& serialEntity );
+				void createEntityTable( const Json::Value& serialEntity );
 				void registerCallback( const std::string& callback, Tick tick );
 				void deferCallback( const std::string& callback );
 				void onCreate();
