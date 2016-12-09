@@ -44,14 +44,7 @@ namespace BlueBear {
 				BlueBear::TerrainType terrainType;
 
 				Lot( lua_State* L, const Tick& currentTickReference, InfrastructureFactory& infrastructureFactory, Json::Value& rootObject );
-				int getLotObjectByCid( const std::string& cid );
-				int createSerializableInstance( const std::string& classID );
-				int createSerializableInstanceFromJSON( const Json::Value& serialEntity );
 
-				static int lua_getLotObjects( lua_State* L );
-				static int lua_getLotObjectsByType( lua_State* L );
-				static int lua_getLotObjectByCid( lua_State* L );
-				static int lua_createSerializableInstance( lua_State* L );
 		};
 	}
 }

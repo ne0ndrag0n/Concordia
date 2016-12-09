@@ -1,6 +1,7 @@
 #ifndef ENGINE
 #define ENGINE
 
+#include "scripting/serializableinstance.hpp"
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -49,6 +50,8 @@ namespace BlueBear {
 				void processCommands();
 
 			public:
+				std::map< std::string, std::unique_ptr< SerializableInstance > > objects;
+
 				Engine( Threading::CommandBus& commandBus );
 				~Engine();
 				void objectLoop();
@@ -58,9 +61,18 @@ namespace BlueBear {
 
 				bool loadModpackSet( const char* modpackDirectory );
 				bool loadModpack( const std::string& name );
+				int getLotObjectByCid( const std::string& cid );
+				int createSerializableInstanceFromJSON( const Json::Value& serialEntity );
+				int createSerializableInstance( const std::string& classID );
+
 				static int lua_loadModpack( lua_State* L );
 				static int lua_setupStemcell( lua_State* L );
 				static int lua_print( lua_State* L );
+
+				static int lua_createSerializableInstance( lua_State* L );
+				static int lua_getLotObjectByCid( lua_State* L );
+				static int lua_getLotObjects( lua_State* L );
+				static int lua_getLotObjectsByType( lua_State* L );
 
 				class Command {
 					public:

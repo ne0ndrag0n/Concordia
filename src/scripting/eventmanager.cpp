@@ -15,7 +15,7 @@
 namespace BlueBear {
   namespace Scripting {
 
-  EventManager::EventManager( lua_State* L, std::shared_ptr< Lot > currentLot ) : L( L ), currentLot( currentLot ) {}
+  EventManager::EventManager( lua_State* L, Engine& engine ) : L( L ), engine( engine ) {}
 
   void EventManager::reset() {
     events.clear();
@@ -62,8 +62,8 @@ namespace BlueBear {
 
         // On a global event manager, this should always succeed, but it may not succeed on an individual event manager.
         // If it doesn't succeed, the object no longer exists, and we should simply let this drop off.
-        if( currentLot->objects.count( cid ) ) {
-          SerializableInstance& entity = *( currentLot->objects[ cid ] );
+        if( engine.objects.count( cid ) ) {
+          SerializableInstance& entity = *( engine.objects[ cid ] );
 
           // Copy the item at the top of stack. It should be either table or nil, but there should have been
           // something you put here before calling broadcastEvent. If you don't push something, the behaviour

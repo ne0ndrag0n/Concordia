@@ -1,6 +1,7 @@
 #ifndef EVENTMANAGER
 #define EVENTMANAGER
 
+#include "scripting/engine.hpp"
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -21,10 +22,10 @@ namespace BlueBear {
       private:
         lua_State* L;
         std::map< std::string, EventMap > events;
-        std::shared_ptr< Lot > currentLot;
+        Engine& engine;
 
       public:
-        EventManager( lua_State* L, std::shared_ptr< Lot > currentLot );
+        EventManager( lua_State* L, Engine& engine );
         void reset();
         void registerEvent( const std::string& eventKey, const std::string& cid, const std::string& callback );
         void unregisterEvent( const std::string& eventKey, const std::string& cid );
