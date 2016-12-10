@@ -58,6 +58,8 @@ namespace BlueBear {
     void Display::openDisplay() {
       mainWindow.create( sf::VideoMode( x, y ), LocaleManager::getInstance().getString( "BLUEBEAR_WINDOW_TITLE" ), sf::Style::Close, sf::ContextSettings( 24, 8, 0, 3, 3 ) );
 
+      mainWindow.resetGLStates();
+
       // Set sync on window by these params:
       // vsync_limiter_overview = true or fps_overview
       if( ConfigManager::getInstance().getBoolValue( "vsync_limiter_overview" ) == true ) {
@@ -315,9 +317,7 @@ namespace BlueBear {
         }
       }
 
-      instance.mainWindow.pushGLStates();
-        processOsd();
-      instance.mainWindow.popGLStates();
+      processOsd();
 
       instance.mainWindow.display();
     }
@@ -396,8 +396,10 @@ namespace BlueBear {
       }
     }
     void Display::MainGameState::processOsd() {
+      glDisable( GL_DEPTH_TEST );
       gui.desktop.Update( gui.clock.restart().asSeconds() );
       instance.sfgui.Display( instance.mainWindow );
+      glEnable( GL_DEPTH_TEST );
     }
 
     // ---------- COMMANDS ----------
