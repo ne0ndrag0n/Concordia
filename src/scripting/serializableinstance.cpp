@@ -18,6 +18,9 @@ namespace BlueBear {
 
 				// When creating a plain SerializableInstance (one that is not loaded from JSON)
 				// call its on_create() method
+				// FIXME: The instance currently won't be tracked properly as it does not set the cid properly
+				// This will be resolved when the system.serializable.base constructor can register a cid using bluebear.engine methods
+				// Start by simplifying SerializableInstance, or even replacing it
 				onCreate();
 		}
 

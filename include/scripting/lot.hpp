@@ -33,7 +33,6 @@ namespace BlueBear {
 				inline Threading::Lockable< Tile > getTile( int index, std::vector< Threading::Lockable< Tile > >& lookup );
 
 			public:
-				std::map< std::string, std::unique_ptr< SerializableInstance > > objects;
 				std::unique_ptr< Containers::ConcCollection3D< Threading::Lockable< Tile > > > floorMap;
 				std::unique_ptr< Containers::ConcCollection3D< Threading::Lockable< WallCell > > > wallMap;
 				int floorX;
