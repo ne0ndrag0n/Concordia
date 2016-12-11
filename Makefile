@@ -10,7 +10,7 @@ SRCS += $(wildcard src/graphics/instance/*.cpp)
 SRCS += $(wildcard src/scripting/*.cpp)
 SRCS += $(wildcard src/threading/*.cpp)
 SRCS += $(wildcard src/tools/*.cpp)
-OBJS = $(SRCS:.c=.o)
+OBJS = $(SRCS:.cpp=.o)
 
 MAIN = bbexec
 
@@ -26,6 +26,7 @@ $(MAIN): $(OBJS)
 
 clean:
 		$(RM) *.o *~ $(MAIN)
+		find src/ -name "*.o" -type f -delete
 
 run:    ${MAIN}
 	./bbexec
