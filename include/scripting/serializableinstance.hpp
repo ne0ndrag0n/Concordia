@@ -21,7 +21,6 @@ namespace BlueBear {
 
 			public:
 				std::string cid;
-				bool ok = false;
 				int luaVMInstance;
 				std::string classID;
 				SerializableInstance( lua_State* L, const Tick& currentTickReference, const Json::Value& serialEntity );

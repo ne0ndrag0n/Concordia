@@ -80,9 +80,6 @@ namespace BlueBear {
 
 				// instance Class bluebear
 				if( lua_pcall( L, 1, 1, 0 ) == 0 ) {
-					// Instance is created!
-					ok = true;
-
 					// this->luaVMInstance holds a Lua registry index to the table returned by this function
 					// Class bluebear
 					luaVMInstance = luaL_ref( L, LUA_REGISTRYINDEX );
@@ -160,7 +157,6 @@ namespace BlueBear {
 					Tools::Utility::getTableValue( L, "_cid" );
 					if( lua_isstring( L, -1 ) ) {
 						cid = lua_tostring( L, -1 );
-						ok = true;
 					} else {
 						Log::getInstance().error( "SerializableInstance::createEntityTable( const Json::Value& serialEntity )", "Instance failed to deserialize or create a string-type cid!" );
 						// EMPTY
@@ -331,8 +327,6 @@ namespace BlueBear {
 						Log::getInstance().error( "SerializableInstance::execute", "Error in lot entity: " + std::string( lua_tostring( L, -1 ) ) );
 
 						lua_pop( L, 1 );
-
-						ok = false;
 					}
 
 					// object SFT 1 tick_array_table _sys._sched _sys instance

@@ -565,11 +565,8 @@ namespace BlueBear {
 						for( auto& keyValuePair : objects ) {
 							SerializableInstance& currentEntity = *( keyValuePair.second );
 
-							// Execute object if it is "ok"
-							if( currentEntity.ok == true ) {
-								// currentEntity.execute should leave the stack as it was when it was called!!
-								currentEntity.execute();
-							}
+							// currentEntity.execute should leave the stack as it was when it was called!!
+							currentEntity.execute();
 						}
 					}
 					// ** END THE SINGLE TICK LOOP **
@@ -747,12 +744,10 @@ namespace BlueBear {
 			 // Simple proxy to SerializableInstance's JSON constructor
 			 std::unique_ptr< SerializableInstance > entity = std::make_unique< SerializableInstance >( L, currentTick, serialEntity );
 
-			 if( entity->ok ) {
-				 int ref = entity->luaVMInstance;
-				 if( !objects.count( entity->cid ) ) {
-					 objects[ entity->cid ] = std::move( entity );
-					 return ref;
-				 }
+			 int ref = entity->luaVMInstance;
+			 if( !objects.count( entity->cid ) ) {
+				 objects[ entity->cid ] = std::move( entity );
+				 return ref;
 			 }
 
 			 // Entity didn't build successfully
@@ -765,13 +760,10 @@ namespace BlueBear {
 		 int Engine::createSerializableInstance( const std::string& classID ) {
 			 std::unique_ptr< SerializableInstance > entity = std::make_unique< SerializableInstance >( L, currentTick, classID );
 
-			 // Add the pointer to our objects map if everything is A-OK
-			 if( entity->ok ) {
-				 int ref = entity->luaVMInstance;
-				 if( !objects.count( entity->cid ) ) {
-					 objects[ entity->cid ] = std::move( entity );
-					 return ref;
-				 }
+			 int ref = entity->luaVMInstance;
+			 if( !objects.count( entity->cid ) ) {
+				 objects[ entity->cid ] = std::move( entity );
+				 return ref;
 			 }
 
 			 // Entity didn't build successfully
