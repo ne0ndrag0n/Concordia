@@ -73,12 +73,6 @@ namespace BlueBear {
 			lua_pushcclosure( L, &Engine::lua_getLotObjectByCid, 1 );
 			lua_settable( L, -3 );
 
-			// bluebear.engine.create_new_instance creates a new instance of an entity and registers it with the lot engine
-			lua_pushstring( L, "create_new_instance" );
-			lua_pushlightuserdata( L, this );
-			lua_pushcclosure( L, &Engine::lua_createSerializableInstance, 1 );
-			lua_settable( L, -3 );
-
 			// bluebear.engine.require_modpack
 			lua_pushstring( L, "require_modpack" );
 			lua_pushlightuserdata( L, this );
@@ -89,6 +83,12 @@ namespace BlueBear {
 			lua_pushstring( L, "setup_stemcell" );
 			lua_pushlightuserdata( L, this );
 			lua_pushcclosure( L, &Engine::lua_setupStemcell, 1 );
+			lua_settable( L, -3 );
+
+			// bluebear.engine.__track
+			lua_pushstring( L, "__track" );
+			lua_pushlightuserdata( L, this );
+			lua_pushcclosure( L, &Engine::lua_trackSerializableInstance, 1 );
 			lua_settable( L, -3 );
 
 			// bluebear.engine.tick_rate
@@ -771,28 +771,41 @@ namespace BlueBear {
 		 }
 
 		 /**
-			* Proxies to Lot::createSerializableInstance
+		  * Track the given table in Engine's "objects" list. This basically creates a new SerializableInstance, which is only a wrapper.
 			*/
-		 int Engine::lua_createSerializableInstance( lua_State* L ) {
+		 int Engine::lua_trackSerializableInstance( lua_State* L ) {
 
-			 Engine* engine = ( Engine* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+			 Engine* self = ( Engine* ) lua_touserdata( L, lua_upvalueindex( 1 ) );
 
-			 // Get argument (the class we are looking for) and remove it from the stack
-			 std::string classID( lua_tostring( L, -1 ) );
-			 lua_pop( L, 1 );
+			 // Top of stack should contain table
 
-			 // Create the lot entity itself
-			 int reference = engine->createSerializableInstance( classID );
-
-			 if( reference != -1 ) {
-				 // Push instance on the stack
-				 lua_rawgeti( L, LUA_REGISTRYINDEX, reference );
-			 } else {
-				 // Object didn't build successfully, there's no instance to return
-				 lua_pushnil( L );
+			 // table
+			 if( !lua_istable( L, -1 ) ) {
+				 Log::getInstance().error( "Engine::lua_trackSerializableInstance", "bluebear.engine.__track called on an item that isn't a table!" );
+				 return 0;
 			 }
 
+			 // Get cid
+
+			 // "cid" table
+			 Tools::Utility::getTableValue( L, "_cid" );
+
+			 if( !lua_isstring( L, -1 ) ) {
+				 Log::getInstance().error( "Engine::lua_trackSerializableInstance", "bluebear.engine.__track called on a table that is neither serializable or has a valid _cid!" );
+				 return 0;
+			 }
+
+			 std::string cid( lua_tostring( L, -1 ) );
+
+			 // table
+			 lua_pop( L, 1 );
+
+			 int luaVMInstance = luaL_ref( L, LUA_REGISTRYINDEX );
+
+			 self->objects[ cid ] = std::make_unique< SerializableInstance >( L, self->currentTick, luaVMInstance );
+
 			 return 1;
+
 		 }
 
 		// ---------- COMMANDS ----------

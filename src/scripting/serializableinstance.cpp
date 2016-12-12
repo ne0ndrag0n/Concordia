@@ -12,50 +12,39 @@ namespace BlueBear {
 	namespace Scripting {
 		Json::FastWriter SerializableInstance::writer;
 
-		SerializableInstance::SerializableInstance( lua_State* L, const Tick& currentTickReference, const std::string& classID )
-			: L( L ), currentTickReference( currentTickReference ), classID( classID ) {
-				createEntityTable();
-
-				// When creating a plain SerializableInstance (one that is not loaded from JSON)
-				// call its on_create() method
-				// FIXME: The instance currently won't be tracked properly as it does not set the cid properly
-				// This will be resolved when the system.serializable.base constructor can register a cid using bluebear.engine methods
-				// Start by simplifying SerializableInstance, or even replacing it
-				onCreate();
-		}
-
 		SerializableInstance::SerializableInstance( lua_State* L, const Tick& currentTickReference, const Json::Value& serialEntity )
-			: L( L ), currentTickReference( currentTickReference ), classID( serialEntity[ "classID" ].asString() ) {
-			createEntityTable( serialEntity );
+			: L( L ), currentTickReference( currentTickReference ) {
+			createEntityTable( serialEntity[ "classID" ].asString(), serialEntity );
 		}
 
-		/**
-		 * Call the on_create method of this Lua instance
-		 */
-		void SerializableInstance::onCreate() {
-			// instance
+		SerializableInstance::SerializableInstance( lua_State* L, const Tick& currentTickReference, int luaVMInstance ) : L( L ), luaVMInstance( luaVMInstance ), currentTickReference( currentTickReference ) {
+			// table
 			lua_rawgeti( L, LUA_REGISTRYINDEX, luaVMInstance );
 
-			// <on_create> instance
-			Tools::Utility::getTableValue( L, "on_create" );
-
-			// instance <on_create> instance
-			lua_pushvalue( L, -2 );
-
-			// instance
-			if( lua_pcall( L, 1, 0, 0 ) != 0 ) {
-				// error instance
-				Log::getInstance().error( "SerializableInstance::onCreate", std::string( lua_tostring( L, -1 ) ) );
-
-				// instance
+			if( !lua_istable( L, -1 ) ) {
+				Log::getInstance().error( "SerializableInstance::SerializableInstance", "Constructor called on an item that isn't a table!" );
+				// EMPTY
 				lua_pop( L, 1 );
+				throw InvalidLuaVMInstanceException();
 			}
 
+			// "cid" table
+			Tools::Utility::getTableValue( L, "_cid" );
+
+			if( !lua_isstring( L, -1 ) ) {
+				Log::getInstance().error( "SerializableInstance::SerializableInstance", "Constructor called on a table that is neither serializable or has a valid _cid!" );
+				// EMPTY
+				lua_pop( L, 2 );
+				throw LuaValueNotTableException();
+			}
+
+			cid = std::string( lua_tostring( L, -1 ) );
+
 			// EMPTY
-			lua_pop( L, 1 );
+			lua_pop( L, 2 );
 		}
 
-		void SerializableInstance::createEntityTable() {
+		void SerializableInstance::createEntityTable( const std::string& classID ) {
 			// Get bluebear.classes
 			// bluebear
 			lua_getglobal( L, "bluebear" );
@@ -98,7 +87,7 @@ namespace BlueBear {
 			}
 		}
 
-		void SerializableInstance::createEntityTable( const Json::Value& serialEntity ) {
+		void SerializableInstance::createEntityTable( const std::string& classID, const Json::Value& serialEntity ) {
 			// Get bluebear.classes
 			// bluebear
 			lua_getglobal( L, "bluebear" );

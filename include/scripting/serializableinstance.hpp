@@ -7,6 +7,7 @@
 #include <jsoncpp/json/json.h>
 #include "bbtypes.hpp"
 #include <string>
+#include <exception>
 
 namespace BlueBear {
 	namespace Scripting {
@@ -22,19 +23,30 @@ namespace BlueBear {
 			public:
 				std::string cid;
 				int luaVMInstance;
-				std::string classID;
 				SerializableInstance( lua_State* L, const Tick& currentTickReference, const Json::Value& serialEntity );
-				SerializableInstance( lua_State* L, const Tick& currentTickReference, const std::string& classID );
+				SerializableInstance( lua_State* L, const Tick& currentTickReference, int luaVMInstance );
 
-				void createEntityTable();
-				void createEntityTable( const Json::Value& serialEntity );
+				void createEntityTable( const std::string& classID );
+				void createEntityTable( const std::string& classID, const Json::Value& serialEntity );
 				void registerCallback( const std::string& callback, Tick tick );
 				void deferCallback( const std::string& callback );
-				void onCreate();
 				void execute();
-				char* save();
-				void load( char* pickledObject );
-				bool good();
+
+				struct InvalidLuaVMInstanceException : public std::exception {
+
+					const char* what() const throw() {
+						return "Invalid Lua VM instance ID given to SerializableInstance";
+					}
+
+				};
+
+				struct LuaValueNotTableException : public std::exception {
+
+					const char* what() const throw() {
+						return "Invalid table given to SerializableInstance";
+					}
+
+				};
 		};
 	}
 }
