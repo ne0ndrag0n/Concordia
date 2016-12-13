@@ -740,34 +740,121 @@ namespace BlueBear {
 		 /**
 			* Create a lot entity from a JSON value
 			*/
-		 int Engine::createSerializableInstanceFromJSON( const Json::Value& serialEntity ) {
-			 // Simple proxy to SerializableInstance's JSON constructor
-			 std::unique_ptr< SerializableInstance > entity = std::make_unique< SerializableInstance >( L, currentTick, serialEntity );
+		 void Engine::createSerializableInstanceFromJSON( const Json::Value& serialEntity ) {
+			 static Json::FastWriter writer;
 
-			 int ref = entity->luaVMInstance;
-			 if( !objects.count( entity->cid ) ) {
-				 objects[ entity->cid ] = std::move( entity );
-				 return ref;
+			 // classID field has class name
+			 // instance field has the serialized JSON for the object
+			 std::string classID( serialEntity[ "classID" ].asString() );
+
+			 // Get bluebear.classes
+			 // bluebear
+			 lua_getglobal( L, "bluebear" );
+
+			 // bluebear.classes bluebear
+			 Tools::Utility::getTableValue( L, "classes" );
+
+			 // Get the actual class referred to by this classID
+			 // Class bluebear
+			 Tools::Utility::getTableTreeValue( L, classID );
+
+			 // If "nil bluebear": Cannot continue: the class was not found
+			 if( lua_istable( L, -1 ) ) {
+				 // Class is at the top of the stack
+				 // Let's start by creating a new instance
+
+				 // <new> Class bluebear
+				 Tools::Utility::getTableValue( L, "new" );
+
+				 // Class <new> Class bluebear
+				 lua_pushvalue( L, -2 );
+
+				 // Use JSON.decode( JSON, "serialisedInstance" ) to transform the serialised instance to a table
+				 // JSON Class <new> Class bluebear
+				 lua_getglobal( L, "JSON" );
+
+				 // <decode> JSON Class <new> Class bluebear
+				 Tools::Utility::getTableValue( L, "decode" );
+
+				 // JSON <decode> JSON Class <new> Class bluebear
+				 lua_pushvalue( L, -2 );
+
+				 // "serialisedInstance" JSON <decode> JSON Class <new> Class bluebear
+				 lua_pushstring( L, writer.write( serialEntity[ "instance" ] ).c_str() );
+
+				 // Deserialize the JSON object into a Lua table
+				 // instanceTable JSON Class <new> Class bluebear
+				 if( lua_pcall( L, 2, 1, 0 ) == 0 ) {
+					 // Prepare for the pcall that makes the instance
+					 // instanceTable Class <new> Class bluebear
+					 lua_remove( L, -2 );
+				 } else {
+					 // error JSON Class <new> Class bluebear
+					 Log::getInstance().error( "Engine::createSerializableInstanceFromJSON", "Problem deserialising using Lua JSON lib on " + classID );
+
+					 lua_pop( L, 6 );
+					 return;
+				 }
+
+				 // instance Class bluebear
+				 if( lua_pcall( L, 2, 1, 0 ) != 0 ) {
+					 // error Class bluebear
+					 Log::getInstance().error( "Engine::createSerializableInstanceFromJSON", "Could not call \"new\" for creating instance: " + std::string( lua_tostring( L, -1 ) ) );
+				 }
+
+				 // Instance is created! It should have called bluebear.engine.__track( self ) in the superclass or its own constructor, where it is now being tracked!
+
+				 // EMPTY
+				 lua_pop( L, 3 );
+
+			 } else {
+				 Log::getInstance().error( "Engine::createSerializableInstanceFromJSON", "Could not find class " + classID );
+
+				 lua_pop( L, 2 );
 			 }
-
-			 // Entity didn't build successfully
-			 return -1;
 		 }
 
 		 /**
 			* Create a new instance of "classID" from scratch
 			*/
-		 int Engine::createSerializableInstance( const std::string& classID ) {
-			 std::unique_ptr< SerializableInstance > entity = std::make_unique< SerializableInstance >( L, currentTick, classID );
+		 void Engine::createSerializableInstance( const std::string& classID ) {
+			// Get bluebear.classes
+ 			// bluebear
+ 			lua_getglobal( L, "bluebear" );
 
-			 int ref = entity->luaVMInstance;
-			 if( !objects.count( entity->cid ) ) {
-				 objects[ entity->cid ] = std::move( entity );
-				 return ref;
-			 }
+ 			// bluebear.classes bluebear
+ 			Tools::Utility::getTableValue( L, "classes" );
 
-			 // Entity didn't build successfully
-			 return -1;
+ 			// Get the actual class referred to by this classID
+ 			// Class bluebear
+ 			Tools::Utility::getTableTreeValue( L, classID );
+
+ 			// If "nil bluebear": Cannot continue: the class was not found
+ 			if( lua_istable( L, -1 ) ) {
+ 				// Class is at the top of the stack
+ 				// Let's start by creating a new instance
+
+ 				// <new> Class bluebear
+ 				Tools::Utility::getTableValue( L, "new" );
+
+ 				// Class <new> Class bluebear
+ 				lua_pushvalue( L, -2 );
+
+ 				// instance Class bluebear
+ 				if( lua_pcall( L, 1, 1, 0 ) != 0 ) {
+ 					// error Class bluebear
+ 					Log::getInstance().error( "Engine::createSerializableInstance", std::string( lua_tostring( L, -1 ) ) );
+ 				}
+
+				// Instance is created! It should have called bluebear.engine.__track( self ) in the superclass or its own constructor, where it is now being tracked!
+
+				// EMPTY
+				lua_pop( L, 3 );
+ 			} else {
+ 				Log::getInstance().error( "Engine::createSerializableInstance", "Could not find class " + classID );
+
+ 				lua_pop( L, 2 );
+ 			}
 		 }
 
 		 /**
@@ -804,7 +891,7 @@ namespace BlueBear {
 
 			 self->objects[ cid ] = std::make_unique< SerializableInstance >( L, self->currentTick, luaVMInstance );
 
-			 return 1;
+			 return 0;
 
 		 }
 

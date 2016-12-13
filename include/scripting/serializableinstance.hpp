@@ -15,7 +15,6 @@ namespace BlueBear {
 
 			private:
 				lua_State* L;
-				static Json::FastWriter writer;
 				// Don't you EVER modify this value this outside of Engine! EVER!!
 				// Read-only!! Do not TOUCH!
 				const Tick& currentTickReference;
@@ -23,11 +22,8 @@ namespace BlueBear {
 			public:
 				std::string cid;
 				int luaVMInstance;
-				SerializableInstance( lua_State* L, const Tick& currentTickReference, const Json::Value& serialEntity );
 				SerializableInstance( lua_State* L, const Tick& currentTickReference, int luaVMInstance );
 
-				void createEntityTable( const std::string& classID );
-				void createEntityTable( const std::string& classID, const Json::Value& serialEntity );
 				void registerCallback( const std::string& callback, Tick tick );
 				void deferCallback( const std::string& callback );
 				void execute();

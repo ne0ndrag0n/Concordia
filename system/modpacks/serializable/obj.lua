@@ -20,8 +20,11 @@ function Object:initialize( serialized )
 		self._cid = bluebear.util.get_cid()
 	end
 
-	-- TODO: What goes here? Register the item globally using bluebear.engine.__private.reg_inst( self ). This method will take
-	-- the current table and add it to the std::map tracking all serializable instances floating around in the Luaverse
+	-- Register the item globally using bluebear.engine.__track( self ). This method will take the current table
+	-- and add it to the std::map tracking all serializable instances floating around in the Luaverse. Doing it this way
+	-- allows us to create objects in the Luaverse, and as long as you call the superclass, the engine will automatically track
+	-- everything you make here.
+	bluebear.engine.__track( self )
 end
 
 function Object:load( saved )
