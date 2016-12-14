@@ -69,13 +69,6 @@
 
 	"engine": {
 		"ticks": 10,
-		"cmap": {
-			"40.0": {
-				"classID": "game.flowers.base",
-				"method": "main",
-				"context": "bb1"
-			}
-		},
 		"objects": {
 			"bb1": {
 				"classID": "game.flowers.base",
@@ -86,40 +79,7 @@
 							"40.0": [ { "method": "main" } ]
 						}
 					},
-					"_events": {
-						"test_event_on_myself": {
-							"bb2": "test_callback_individual"
-						}
-					},
 					"water_level": 100
-				}
-			},
-			"bb2": {
-				"classID": "game.household.trashpile.base",
-				"instance": {
-					"_cid": "bb2",
-					"_sys": {
-						"_sched": {
-							"30.0": [	{ "method": "main" } ]
-						}
-					},
-					"stink": 0
-				}
-			},
-			"bb3": {
-				"classID": "game.doll.player",
-				"instance": {
-					"_cid": "bb3",
-					"_sys": {
-						"_sched": {
-							"30.0": [ {	"method": "decay_my_motives" }, {	"method": "main" } ]
-						}
-					},
-					"saved_motives": {
-						"game.motive.hunger.food": {
-							"value": 100
-						}
-					}
 				}
 			}
 		}

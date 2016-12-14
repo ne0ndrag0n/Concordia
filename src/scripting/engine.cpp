@@ -67,12 +67,6 @@ namespace BlueBear {
 			lua_pushcclosure( L, &Engine::lua_getLotObjectsByType, 1 );
 			lua_settable( L, -3 );
 
-			// bluebear.engine.get_object_by_cid retrieves a specific object by its cid
-			lua_pushstring( L, "get_object_by_cid" );
-			lua_pushlightuserdata( L, this );
-			lua_pushcclosure( L, &Engine::lua_getLotObjectByCid, 1 );
-			lua_settable( L, -3 );
-
 			// bluebear.engine.require_modpack
 			lua_pushstring( L, "require_modpack" );
 			lua_pushlightuserdata( L, this );
@@ -696,29 +690,6 @@ namespace BlueBear {
 
 			 return 1;
 
-		 }
-
-		 int Engine::lua_getLotObjectByCid( lua_State* L ) {
-
-			 // Because Lua requires methods be static in C closure, pop the first argument: the "this" pointer
-			 Engine* engine = ( Engine* )lua_touserdata( L, lua_upvalueindex( 1 ) );
-
-			 // Get argument (the class we are looking for) and remove it from the stack
-			 std::string keystring( lua_tostring( L, -1 ) );
-			 lua_pop( L, 1 );
-
-			 // Go looking for the item
-			 int reference = engine->getLotObjectByCid( keystring );
-
-			 if( reference != -1 ) {
-				 // Push table on the stack
-				 lua_rawgeti( L, LUA_REGISTRYINDEX, reference );
-			 } else {
-				 // The object wasn't found, push the nil value
-				 lua_pushnil( L );
-			 }
-
-			 return 1;
 		 }
 
 		 /**

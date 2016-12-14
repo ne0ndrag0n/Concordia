@@ -93,3 +93,13 @@ bluebear.util.time = {
     return bluebear.util.time.minutes_to_ticks( seconds / 60 )
   end
 }
+
+bluebear.util.print_upvalues = function( func )
+  local idx = 1
+  while true do
+    local name, val = debug.getupvalue(func, idx)
+    if not name then break end
+    print( "bluebear.util.print_upvalues", "[Upvalue "..tostring( idx ).."] "..name..", "..tostring( val ) )
+    idx = idx + 1
+  end
+end
