@@ -24,8 +24,6 @@ namespace BlueBear {
 				int luaVMInstance;
 				SerializableInstance( lua_State* L, const Tick& currentTickReference, int luaVMInstance );
 
-				void registerCallback( const std::string& callback, Tick tick );
-				void deferCallback( const std::string& callback );
 				void execute();
 
 				struct InvalidLuaVMInstanceException : public std::exception {

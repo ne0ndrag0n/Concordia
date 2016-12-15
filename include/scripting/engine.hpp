@@ -1,7 +1,6 @@
 #ifndef ENGINE
 #define ENGINE
 
-#include "scripting/serializableinstance.hpp"
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -11,6 +10,7 @@
 #include <vector>
 #include <map>
 #include <list>
+#include <jsoncpp/json/json.h>
 
 namespace BlueBear {
 	namespace Threading {
@@ -19,8 +19,8 @@ namespace BlueBear {
 
 	namespace Scripting {
 		class Lot;
-		class EventManager;
 		class InfrastructureFactory;
+		class SerializableInstance;
 
 		class Engine {
 
@@ -35,7 +35,6 @@ namespace BlueBear {
 				Tick currentTick;
 				Tick ticksPerSecond;
 				std::shared_ptr< Lot > currentLot;
-				std::unique_ptr< EventManager > eventManager;
 				std::unique_ptr< InfrastructureFactory > infrastructureFactory;
 				const char* currentModpackDirectory;
 				std::map< std::string, BlueBear::ModpackStatus > loadedModpacks;
@@ -45,12 +44,11 @@ namespace BlueBear {
 				unsigned int sleepInterval;
 
 				void callActionOnObject( const char* playerId, const char* objectId, const char* method );
-				bool deserializeFunctionRefs();
-				void setupLotEnvironment();
+				// TODO: New method to deserialise function refs will be needed in LuaKit::Serializer
 				void processCommands();
 
 			public:
-				std::map< std::string, std::unique_ptr< SerializableInstance > > objects;
+				std::vector< SerializableInstance > objects;
 
 				Engine( Threading::CommandBus& commandBus );
 				~Engine();
@@ -61,7 +59,6 @@ namespace BlueBear {
 
 				bool loadModpackSet( const char* modpackDirectory );
 				bool loadModpack( const std::string& name );
-				int getLotObjectByCid( const std::string& cid );
 				void createSerializableInstanceFromJSON( const Json::Value& serialEntity );
 				void createSerializableInstance( const std::string& classID );
 

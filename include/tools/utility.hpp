@@ -59,6 +59,8 @@ namespace BlueBear {
 				static std::string stringRtrim( std::string& s );
 
 				static std::string stringTrim( std::string& s );
+
+				static std::string pointerToString( const void* pointer );
 		};
 	}
 }

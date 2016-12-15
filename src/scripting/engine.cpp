@@ -9,8 +9,8 @@
 #include "threading/commandbus.hpp"
 #include "graphics/display.hpp"
 #include "configmanager.hpp"
-#include "scripting/eventmanager.hpp"
 #include "scripting/infrastructurefactory.hpp"
+#include "scripting/luakit/serializer.hpp"
 #include "log.hpp"
 #include <jsoncpp/json/json.h>
 #include <iterator>
@@ -20,9 +20,7 @@
 #include <chrono>
 #include <ratio>
 #include <thread>
-#include <regex>
 #include <memory>
-#include <mutex>
 #include <list>
 #include <stdexcept>
 
@@ -144,40 +142,6 @@ namespace BlueBear {
 		}
 
 		/**
-		 * Expose pieces of lot and eventmanager to the Luasphere
-		 */
-		void Engine::setupLotEnvironment() {
-			Lot* lot = currentLot.get();
-			EventManager* globalEventManager = eventManager.get();
-
-			// Push the "bluebear" global onto the stack
-			lua_getglobal( L, "bluebear" );
-
-			Tools::Utility::getTableValue( L, "engine" );
-
-			// listen_for instructs the Lot to listen for a specific broadcast for a specific object
-			lua_pushstring( L, "listen_for" );
-			lua_pushlightuserdata( L, globalEventManager );
-			lua_pushcclosure( L, &EventManager::lua_registerEvent, 1 );
-			lua_settable( L, -3 );
-
-			// stop_listening_for instructs the Lot that an object is no longer listening for this broadcast
-			lua_pushstring( L, "stop_listening_for" );
-			lua_pushlightuserdata( L, globalEventManager );
-			lua_pushcclosure( L, &EventManager::lua_unregisterEvent, 1 );
-			lua_settable( L, -3 );
-
-			// broadcast instructs the Lot to wake up all objects listening for the message that is broadcasted
-			lua_pushstring( L, "broadcast" );
-			lua_pushlightuserdata( L, globalEventManager );
-			lua_pushcclosure( L, &EventManager::lua_broadcastEvent, 1 );
-			lua_settable( L, -3 );
-
-			// Pop bluebear
-			lua_pop( L, 1 );
-		}
-
-		/**
 		 * Load a set of modpacks given a parent directory (const char* as they are ROM constants)
 		 */
 		bool Engine::loadModpackSet( const char* modpackDirectory ) {
@@ -271,56 +235,7 @@ namespace BlueBear {
 					std::string stemcellType( lua_tostring( L, -1 ) );
 					lua_pop( L, 1 );
 
-					// This leaves a lot to be desired
-					if( stemcellType == "event-manager" ) {
-						// "_inst" stemcell
-						lua_pushstring( L, "_inst" );
-
-						// ud "_inst" stemcell
-	 					EventManager** userdata = ( EventManager** )lua_newuserdata( L, sizeof( EventManager* ) );
-						*userdata = new EventManager( L, *engine );
-
-						// table ud "_inst" stemcell
-						lua_newtable( L );
-
-						// "_gc" table ud "_inst" stemcell
-						lua_pushstring( L, "__gc" );
-						// closure() "_gc" table ud "_inst" stemcell
-						lua_pushcfunction( L, EventManager::lua_gc );
-						// table ud "_inst" stemcell
-						lua_settable( L, -3 );
-
-						// ud "_inst" stemcell
-						lua_setmetatable( L, -2 );
-
-						// Set self._inst to the userdata
-						// stemcell
-						lua_settable( L, -3 );
-
-						// Transform the stemcell to an EventManager
-						lua_pushstring( L, "listen_for" );
-						lua_pushlightuserdata( L, *userdata );
-						lua_pushcclosure( L, &EventManager::lua_registerEvent, 1 );
-						lua_settable( L, -3 );
-
-						lua_pushstring( L, "stop_listening_for" );
-						lua_pushlightuserdata( L, *userdata );
-						lua_pushcclosure( L, &EventManager::lua_unregisterEvent, 1 );
-						lua_settable( L, -3 );
-
-						lua_pushstring( L, "broadcast" );
-						lua_pushlightuserdata( L, *userdata );
-						lua_pushcclosure( L, &EventManager::lua_broadcastEvent, 1 );
-						lua_settable( L, -3 );
-
-						lua_pushstring( L, "load" );
-						lua_pushlightuserdata( L, *userdata );
-						lua_pushcclosure( L, &EventManager::lua_load, 1 );
-						lua_settable( L, -3 );
-
-					} else {
-						return luaL_error( L, "'%s' is not a valid stemcell type.", stemcellType.c_str() );
-					}
+					return luaL_error( L, "'%s' is not a valid stemcell type.", stemcellType.c_str() );
 				}
 
 				return 0;
@@ -357,28 +272,12 @@ namespace BlueBear {
 					// Instantiate the lot
 					currentLot = std::make_shared< Lot >( L, currentTick, *infrastructureFactory, lotJSON );
 
-					// Setup global event manager
-					eventManager = std::make_unique< EventManager >( L, *this );
-					if( engineJSON.isMember( "global_events" ) ) {
-						eventManager->load( engineJSON[ "global_events" ] );
-					}
-
-					// Expose the lot and eventmanager methods to luasphere
-					setupLotEnvironment();
-
 					// Clear the std::map containing all objects
 					objects.clear();
 
 					// Iterate through the "objects" array
 					for( Json::Value& entity : engineJSON[ "objects" ] ) {
 						createSerializableInstanceFromJSON( entity );
-					}
-
-					// After the lot has all its LotEntities loaded, let's fix those serialized function references
-					if( !deserializeFunctionRefs() ) {
-						// If we're not able to deserialise a function ref, this lot is broken, and cannot be used
-						Log::getInstance().error( "Engine::loadLot", "Unable to load lot " + std::string( lotPath ) + ": This lot contains a missing entity." );
-						return false;
 					}
 				} else {
 					Log::getInstance().error( "Engine::loadLot", "Unable to parse " + std::string( lotPath ) );
@@ -387,114 +286,6 @@ namespace BlueBear {
 			} else {
 				Log::getInstance().error( "Engine::loadLot", "Unable to parse " + std::string( lotPath ) );
 				return false;
-			}
-
-			return true;
-		}
-
-		/**
-		 * For all serialized curried functions in _sys._sched, ask each object to deserialize the reference to another SerializableInstance
-		 */
-		bool Engine::deserializeFunctionRefs() {
-
-			// Set up the regex
-			std::regex serialTableReference( "^t\\/bb\\d+$" );
-
-			// Get fresh Lua stack
-			Tools::Utility::clearLuaStack( L );
-
-			for( auto& keyValuePair : objects ) {
-				// Dereference the pointer to the SerializableInstance
-				SerializableInstance& currentEntity = *( keyValuePair.second );
-
-				// Push this object's table onto the API stack
-				lua_rawgeti( L, LUA_REGISTRYINDEX, currentEntity.luaVMInstance );
-
-				// Start with a new adventure in the stack!
-				// Get system table
-				// _sys
-				Tools::Utility::getTableValue( L, "_sys" );
-				// Get schedule table inside
-				// _sys._sched _sys
-				Tools::Utility::getTableValue( L, "_sched" );
-
-				// For each key-value pair in _sys._sched, grab the arrays
-				// nil _sys._sched _sys
-				lua_pushnil( L );
-				while( lua_next( L, -2 ) != 0 ) {
-						// -1: the actual array, -2: the tick these functions have to execute
-						// [SFTs] "1337.0" _sys._sched _sys
-
-						// Now that we have an array of Serialised Function Tables (SFTs)
-						// start conducting what needs to be done on *those*
-						// nil [SFTs] "1337.0" _sys._sched _sys
-						lua_pushnil( L );
-						while( lua_next( L, -2 ) != 0 ) {
-								// -1: the SFT, -2: its position
-								// {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
-
-								// Grab the "arguments" array from the SFT
-								Tools::Utility::getTableValue( L, "arguments" );
-
-								if( lua_istable( L, -1 ) ) {
-									// [arguments] {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
-
-									// One more...go through THAT array
-									// nil [arguments] {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
-									lua_pushnil( L );
-									while( lua_next( L, -2 ) != 0 ) {
-										// -1: the argument, -2: its position
-										// argument 1 [arguments] {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
-
-										// If the argument is a string, check if it fits the pattern "^t/bb\d+$"
-										// and if it does, replace the value in that array with a dereferenced table
-										if( lua_isstring( L, -1 ) ) {
-											std::string argument( lua_tostring( L, -1 ) );
-
-											if( std::regex_match( argument, serialTableReference ) ) {
-												// Ask lot for numeric index of desired cid
-												std::string bbId = argument.substr( 2 );
-												int reference = getLotObjectByCid( bbId );
-												if( reference != -1 ) {
-													// Push that object onto the stack
-													// object_table argument 1 [arguments] {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
-													lua_rawgeti( L, LUA_REGISTRYINDEX, reference );
-													// Get our current index at -3 and replace the value in table (at -4)
-													// argument 1 [arguments] {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
-													lua_rawseti( L, -4, lua_tointeger( L, -3 ) );
-												} else {
-													// Fault tolerance. Very bad scenario! Game cannot continue...fail
-													// Pop everything we've been doing...
-													Tools::Utility::clearLuaStack( L );
-													return false;
-												}
-											}
-										}
-
-										// Get rid of the argument, leaving the index for the next iteration of this table
-										// 1 [arguments] {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
-										lua_pop( L, 1 );
-									}
-								} else {
-									// nil {SFT} 1 [SFTs] "1337.0" _sys._sched _sys
-								}
-
-								// Pop the arguments table and SFT; we're done and ready for the next SFT
-								// 1 [SFTs] "1337.0" _sys._sched _sys
-								lua_pop( L, 2 );
-						}
-						// [SFTs] "1337.0" _sys._sched _sys
-
-						// Pop the array of SFTs, and leave the previous key so we can work on the next one
-						// "1337.0" _sys._sched _sys
-						lua_pop( L, 1 );
-				}
-				// _sys.sched _sys
-
-				// Pop these two; we don't need 'em anymore
-				// <empty stack>
-				lua_pop( L, 2 );
-
 			}
 
 			return true;
@@ -556,9 +347,7 @@ namespace BlueBear {
 						// Set current_tick on bluebear.lot (inside the Luasphere, system/root.lua) to the current tick
 						Tools::Utility::setTableIntValue( L, "current_tick", currentTick );
 
-						for( auto& keyValuePair : objects ) {
-							SerializableInstance& currentEntity = *( keyValuePair.second );
-
+						for( SerializableInstance& currentEntity : objects ) {
 							// currentEntity.execute should leave the stack as it was when it was called!!
 							currentEntity.execute();
 						}
@@ -586,6 +375,10 @@ namespace BlueBear {
 			// TODO: Reenable when ready
 			//displayCommandList.push_back( std::make_unique< Graphics::Display::ChangeStateCommand >( Graphics::Display::ChangeStateCommand::State::STATE_TITLESCREEN ) );
 			//commandBus.produce( displayCommandList );
+
+			// TODO: Remove this. It's just some test stuff (need to get new serialised demo data for lot01.json)
+			LuaKit::Serializer serializer( L );
+			serializer.saveWorld( objects );
 
 			Log::getInstance().debug( "Engine::objectLoop", "Finished!" );
 		}
@@ -624,9 +417,7 @@ namespace BlueBear {
 
 			 // Push 'em on!
 			 size_t tableIndex = 1;
-			 for( auto& keyValuePair : engine->objects ) {
-				 SerializableInstance& lotEntity = *( keyValuePair.second );
-
+			 for( SerializableInstance& lotEntity : engine->objects ) {
 				 lua_rawgeti( L, LUA_REGISTRYINDEX, lotEntity.luaVMInstance );
 				 lua_rawseti( L, -2, tableIndex++ );
 			 }
@@ -653,9 +444,7 @@ namespace BlueBear {
 			 size_t tableIndex = 1;
 
 			 // Iterate through each object on the lot, checking to see if each is an instance of "idKey"
-			 for( auto& keyValuePair : engine->objects ) {
-				 SerializableInstance& lotEntity = *( keyValuePair.second );
-
+			 for( SerializableInstance& lotEntity : engine->objects ) {
 				 // Push bluebear global
 				 lua_getglobal( L, "bluebear" );
 
@@ -690,22 +479,6 @@ namespace BlueBear {
 
 			 return 1;
 
-		 }
-
-		 /**
-			* Get a lot object by its cid. cid takes the form of "bbXXX".
-			* @returns		-1 if the object wasn't found, the numeric object if it was
-			*/
-		 int Engine::getLotObjectByCid( const std::string& cid ) {
-			 // lot->objects is a map, reducing the cost of this operation
-			 auto object = objects.find( cid );
-
-			 if( object != objects.end() ) {
-				 // You can use this with lua_rawgeti( L, LUA_REGISTRYINDEX, <returned id> );
-				 return object->second->luaVMInstance;
-			 }
-
-			 return -1;
 		 }
 
 		 /**
@@ -860,7 +633,7 @@ namespace BlueBear {
 
 			 int luaVMInstance = luaL_ref( L, LUA_REGISTRYINDEX );
 
-			 self->objects[ cid ] = std::make_unique< SerializableInstance >( L, self->currentTick, luaVMInstance );
+			 self->objects.emplace_back( L, self->currentTick, luaVMInstance );
 
 			 return 0;
 

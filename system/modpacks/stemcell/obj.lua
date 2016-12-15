@@ -12,7 +12,7 @@ bluebear.engine.require_modpack( "class" )
 local Stemcell = class( 'system.stemcell' )
 
 Stemcell.TYPES = {
-  EVENT_MANAGER = 'event-manager'
+
 }
 
 function Stemcell:initialize( type )

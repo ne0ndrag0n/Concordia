@@ -12,6 +12,7 @@
 #include <iterator>
 #include <fstream>
 #include <vector>
+#include <sstream>
 
 // Not X-Platform
 #ifndef _WIN32
@@ -341,6 +342,12 @@ namespace BlueBear {
 			std::string rTrimmed = Utility::stringRtrim( s );
 
 			return Utility::stringLtrim( rTrimmed );
+		}
+
+		std::string Utility::pointerToString( const void* pointer ) {
+			std::stringstream ss;
+			ss << pointer;
+			return ss.str();
 		}
 	}
 }

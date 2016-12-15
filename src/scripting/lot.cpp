@@ -10,7 +10,6 @@
 #include "tools/utility.hpp"
 #include "threading/lockable.hpp"
 #include <jsoncpp/json/json.h>
-#include "scripting/eventmanager.hpp"
 #include "scripting/tile.hpp"
 #include "scripting/wallcell.hpp"
 #include "scripting/wallpaper.hpp"

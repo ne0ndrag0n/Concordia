@@ -13,11 +13,6 @@ function Entity:load( saved )
   local data = saved or {}
 
   self._sys = data._sys
-
-  -- deserialise for event manager
-  if type( data._events ) == 'table' then
-    self.event_manager.load( data._events )
-  end
 end
 
 function Entity:save()
@@ -53,8 +48,6 @@ function Entity:initialize( serialized )
   self._sys = {
     _sched = {}
   }
-
-  self.event_manager = Stemcell:new( Stemcell.TYPES.EVENT_MANAGER )
 
   bluebear.get_class( 'system.serializable.base' ).initialize( self, serialized )
 end
@@ -145,21 +138,6 @@ function Entity:animate( sequence )
   local animation_ticks = bluebear.engine.current_tick + 1
 
   return bluebear.get_class( 'system.promise.timer' ):new( self, animation_ticks )
-end
-
---[[
-  Proxy to self.event_manager
---]]
-function Entity:listen_for( event, instance, callback )
-  return self.event_manager.listen_for( event, instance._cid, callback )
-end
-
-function Entity:stop_listenening_for( event, instance )
-  return self.event_manger.stop_listening_for( event, instance._cid )
-end
-
-function Entity:trigger( event, ... )
-  return self.event_manager.broadcast( event, ... )
 end
 
 --[[
