@@ -103,3 +103,27 @@ bluebear.util.print_upvalues = function( func )
     idx = idx + 1
   end
 end
+
+--[[
+  Binds "instance-type" functions (functions which accept instance as first argument)
+--]]
+bluebear.util.bind = function( f, c, ... )
+  local func = f
+  local context = c
+  local args = { ... }
+
+  return function( ... )
+    local newargs = { ... }
+    local allargs = {}
+
+    for k,v in pairs( args ) do
+      table.insert( allargs, v )
+    end
+
+    for k,v in pairs( newargs ) do
+      table.insert( allargs, v )
+    end
+
+    func( context or _G, table.unpack( allargs ) )
+  end
+end

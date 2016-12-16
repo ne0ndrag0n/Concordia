@@ -39,6 +39,8 @@ namespace BlueBear {
           createTableOnMasterList();
         }
 
+        Log::getInstance().debug( "LuaKit::Serializer::saveWorld", "\n" + world.toStyledString() );
+
         // Restart the garbage collector, and give it a good cycle
         lua_gc( L, LUA_GCRESTART, 0 );
         lua_gc( L, LUA_GCCOLLECT, 0 );
@@ -112,29 +114,31 @@ namespace BlueBear {
             break;
           case Tools::Utility::hash( "table" ):
             {
+
               isClassTable( keyIsClass ); // ("classID" || nil) table
-
               if( lua_isstring( L, -1 ) ) {
-
                 pair[ field ] = createClassReference(); // table
-
-              } else {
-                // Normal table
-
-                lua_pop( L, 1 ); // table
-
-                // If this table was already found in world, then simply create the reference. Else, expose table to world, then create the reference.
-                std::string worldPointer = Tools::Utility::pointerToString( lua_topointer( L, -1 ) );
-
-                if( !world.isMember( worldPointer ) ) {
-                  // Need to create the table
-                  // Copy the stack value as createTableOnMasterList will remove it
-                  lua_pushvalue( L, -1 ); // table table
-                  createTableOnMasterList(); // table
-                }
-
-                pair[ field ] = createReference();
+                break;
               }
+
+              lua_pop( L, 1 ); // table
+
+              // TODO: next special case table check here...
+
+              // Normal table
+
+              // If this table was already found in world, then simply create the reference. Else, expose table to world, then create the reference.
+              std::string worldPointer = Tools::Utility::pointerToString( lua_topointer( L, -1 ) );
+
+              if( !world.isMember( worldPointer ) ) {
+                // Need to create the table
+                // Copy the stack value as createTableOnMasterList will remove it
+                lua_pushvalue( L, -1 ); // table table
+                createTableOnMasterList(); // table
+              }
+
+              pair[ field ] = createReference();
+
             }
             break;
           case Tools::Utility::hash( "function" ):

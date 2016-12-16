@@ -376,6 +376,9 @@ namespace BlueBear {
 			//displayCommandList.push_back( std::make_unique< Graphics::Display::ChangeStateCommand >( Graphics::Display::ChangeStateCommand::State::STATE_TITLESCREEN ) );
 			//commandBus.produce( displayCommandList );
 
+			LuaKit::Serializer serializer( L );
+			serializer.saveWorld( objects );
+
 			Log::getInstance().debug( "Engine::objectLoop", "Finished!" );
 		}
 
