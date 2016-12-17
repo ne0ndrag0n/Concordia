@@ -115,13 +115,11 @@ namespace BlueBear {
           case Tools::Utility::hash( "table" ):
             {
 
-              isClassTable( keyIsClass ); // ("classID" || nil) table
-              if( lua_isstring( L, -1 ) ) {
-                pair[ field ] = createClassReference(); // table
+              // Soon replacing this with "substitutions"
+              if( isClassTable( keyIsClass ) ) {
+                pair[ field ] = createClassReference();
                 break;
               }
-
-              lua_pop( L, 1 ); // table
 
               // TODO: next special case table check here...
 
@@ -171,17 +169,20 @@ namespace BlueBear {
       /**
        * Return a JSON file representing a reference to a class.
        *
-       * STACK ARGS: "classID"
-       * RETURNS: EMPTY
+       * STACK ARGS: table
+       * (Stack is unmodified after call)
        */
       Json::Value Serializer::createClassReference() {
         Json::Value val( Json::objectValue );
 
         val[ "type" ] = Serializer::TYPE_CLASSID;
-        lua_pushvalue( L, -1 ); // string string
+        lua_pushstring( L, "name" ); // "name" table
+        lua_gettable( L, -2 ); // "class.name" table
+        // copy so lua_next doesn't get fucked up
+        lua_pushvalue( L, -1 ); // "class.name" "class.name" table
         val[ "id" ] = lua_tostring( L, -1 );
 
-        lua_pop( L, 2 ); // EMPTY
+        lua_pop( L, 2 ); // table
 
         return val;
       }
@@ -190,23 +191,33 @@ namespace BlueBear {
        * Determine if the table is a class table. A class table has a table named "class" within, with a field named "name" further within.
        *
        * STACK ARGS: table
-       * RETURNS: ("string" if class, nil if not a class) table
+       * (Stack is unmodified after call)
        */
-      void Serializer::isClassTable( bool keyIsClass ) {
+      bool Serializer::isClassTable( bool keyIsClass ) {
 
           if( keyIsClass && lua_istable( L, -1 ) ) {
             lua_pushstring( L, "name" ); // "name" table
             lua_gettable( L, -2 ); // "class.name" table
 
             if( lua_isstring( L, -1 ) ) {
-              return;
+              lua_pop( L, 1 ); // table
+              return true;
             } else {
               lua_pop( L, 1 ); // table
             }
 
           }
 
-          lua_pushnil( L ); // nil table
+          return false;
+      }
+
+      /**
+       * Builds substitutions. These are specific table pointers that require an alternate route to be taken when serializing the table. That route is the value
+       * of the "substitutions" map.
+       */
+      void Serializer::buildSubstitutions() {
+        // Substitution 1: all classes
+        // Every currently registered class needs a substitution. When we encounter these pointers as we save instances, pivot to createClassReference.
       }
     }
   }

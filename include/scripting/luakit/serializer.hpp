@@ -7,6 +7,8 @@
 #include <jsoncpp/json/json.h>
 #include <vector>
 #include <string>
+#include <functional>
+#include <map>
 
 namespace BlueBear {
   namespace Scripting {
@@ -22,16 +24,23 @@ namespace BlueBear {
 
         static const std::string FIELD_CLASS;
 
+        // These callbacks should leave the stack unmodified
+        // They should accept table as the first argument on the stack
+        using Callback = std::function< Json::Value() >;
+
         lua_State* L;
         Json::Value world;
+        std::map< std::string, Callback > substitutions;
 
-        void isClassTable( bool keyIsClass );
+        bool isClassTable( bool keyIsClass );
 
         void createTableOnMasterList();
         void inferType( Json::Value& pair, const std::string& field, bool keyIsClass = false );
 
         Json::Value createReference();
         Json::Value createClassReference();
+
+        void buildSubstitutions();
 
       public:
         Serializer( lua_State* L );
