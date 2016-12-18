@@ -3,7 +3,7 @@
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
-#include <json/json.h>
+#include <jsoncpp/json/json.h>
 #include <SFML/Window/Keyboard.hpp>
 #include <fstream>
 

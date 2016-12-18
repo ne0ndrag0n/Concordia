@@ -6,7 +6,7 @@
 #include "log.hpp"
 #include <fstream>
 #include <string>
-#include <json/json.h>
+#include <jsoncpp/json/json.h>
 #include <SFML/Graphics.hpp>
 #include <exception>
 #include <utility>

@@ -5,7 +5,7 @@
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
-#include <json/json.h>
+#include <jsoncpp/json/json.h>
 #include <string>
 
 namespace BlueBear {
@@ -89,7 +89,7 @@ namespace BlueBear {
        *
        * STACK ARGS: (any lua type to infer)
        * RETURNS: EMPTY
-       */
+       */        
 
       void Serializer::inferType( Json::Value& pair, const std::string& field ) {
 

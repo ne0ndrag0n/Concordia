@@ -1,5 +1,5 @@
 #include "localemanager.hpp"
-#include <json/json.h>
+#include <jsoncpp/json/json.h>
 #include <fstream>
 #include "configmanager.hpp"
 #include "log.hpp"

@@ -1,7 +1,7 @@
 #ifndef L10NMANAGER
 #define L10NMANAGER
 
-#include <json/json.h>
+#include <jsoncpp/json/json.h>
 
 namespace BlueBear {
 

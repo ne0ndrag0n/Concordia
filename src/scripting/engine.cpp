@@ -12,7 +12,7 @@
 #include "scripting/infrastructurefactory.hpp"
 #include "scripting/luakit/serializer.hpp"
 #include "log.hpp"
-#include <json/json.h>
+#include <jsoncpp/json/json.h>
 #include <iterator>
 #include <string>
 #include <sstream>
