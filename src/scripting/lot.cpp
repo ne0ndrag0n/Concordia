@@ -9,7 +9,7 @@
 #include "log.hpp"
 #include "tools/utility.hpp"
 #include "threading/lockable.hpp"
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 #include "scripting/tile.hpp"
 #include "scripting/wallcell.hpp"
 #include "scripting/wallpaper.hpp"

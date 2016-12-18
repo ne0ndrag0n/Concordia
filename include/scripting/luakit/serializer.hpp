@@ -4,7 +4,7 @@
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 #include <vector>
 #include <string>
 #include <functional>

@@ -4,7 +4,7 @@
 #include "threading/lockable.hpp"
 #include <string>
 #include <exception>
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 #include <memory>
 #include <map>
 

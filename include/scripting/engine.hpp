@@ -10,7 +10,7 @@
 #include <vector>
 #include <map>
 #include <list>
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 
 namespace BlueBear {
 	namespace Threading {

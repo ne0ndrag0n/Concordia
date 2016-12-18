@@ -5,7 +5,7 @@
 #include <lualib.h>
 #include <lauxlib.h>
 #include <cstdint>
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 #include <cstddef>
 #include <fstream>
 #include <vector>

@@ -5,7 +5,7 @@
 #include "tools/utility.hpp"
 #include "threading/lockable.hpp"
 #include <algorithm>
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 #include <string>
 #include <fstream>
 #include <memory>

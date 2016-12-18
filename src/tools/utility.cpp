@@ -7,7 +7,7 @@
 #include <cstdio>
 #include <string>
 #include <cstring>
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 #include <string>
 #include <iterator>
 #include <fstream>
