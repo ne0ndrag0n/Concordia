@@ -89,7 +89,7 @@ namespace BlueBear {
        *
        * STACK ARGS: (any lua type to infer)
        * RETURNS: EMPTY
-       */        static const std::string FIELD_CLASS;
+       */        
 
       void Serializer::inferType( Json::Value& pair, const std::string& field ) {
 
