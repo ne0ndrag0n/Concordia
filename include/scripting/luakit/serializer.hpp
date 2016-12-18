@@ -21,8 +21,9 @@ namespace BlueBear {
         static const std::string TYPE_TABLE;
         static const std::string TYPE_REF;
         static const std::string TYPE_CLASSID;
+        static const std::string TYPE_ENVREF;
 
-        static const std::string FIELD_CLASS;
+        static const std::string ENVREF_MODE_BBGLOBAL;
 
         // These callbacks should leave the stack unmodified
         // They should accept table as the first argument on the stack
@@ -30,17 +31,18 @@ namespace BlueBear {
 
         lua_State* L;
         Json::Value world;
+        // Pointer-to-substitution map usable by both upvalues and tables
         std::map< std::string, Callback > substitutions;
 
-        bool isClassTable( bool keyIsClass );
-
         void createTableOnMasterList();
-        void inferType( Json::Value& pair, const std::string& field, bool keyIsClass = false );
+        void inferType( Json::Value& pair, const std::string& field );
 
         Json::Value createReference();
         Json::Value createClassReference();
+        Json::Value createConcordiaNSReference();
 
         void buildSubstitutions();
+        void traverseTableForSubstitutions();
 
       public:
         Serializer( lua_State* L );

@@ -15,8 +15,9 @@ namespace BlueBear {
       const std::string Serializer::TYPE_TABLE = "table";
       const std::string Serializer::TYPE_REF = "ref";
       const std::string Serializer::TYPE_CLASSID = "class";
+      const std::string Serializer::TYPE_ENVREF = "envref";
 
-      const std::string Serializer::FIELD_CLASS = "class";
+      const std::string Serializer::ENVREF_MODE_BBGLOBAL = "bbglobal";
 
       Serializer::Serializer( lua_State* L ) : L( L ) {}
 
@@ -30,6 +31,9 @@ namespace BlueBear {
         // Lua currently doesn't move items around as part of garbage collection (I think) but relying
         // on it is still undefined behaviour
         lua_gc( L, LUA_GCSTOP, 0 );
+
+        // Build all required substitutions (classes, the bluebear global)
+        buildSubstitutions();
 
         for( SerializableInstance& instance : objects ) {
           // table
@@ -68,14 +72,7 @@ namespace BlueBear {
           // { "key": <objtype>, "value": <objtype> }
           Json::Value pair = Json::Value( Json::objectValue );
 
-          lua_pushvalue( L, -2 ); // key value key table
-          bool keyIsClass = false;
-          if( lua_isstring( L, -1 ) ) {
-            keyIsClass = std::string( lua_tostring( L, -1 ) ) == FIELD_CLASS;
-          }
-          lua_pop( L, 1 ); // value key table
-
-          inferType( pair, "value", keyIsClass ); // key table
+          inferType( pair, "value" ); // key table
 
           lua_pushvalue( L, -1 ); // key key table
           inferType( pair, "key" ); // key table
@@ -92,8 +89,9 @@ namespace BlueBear {
        *
        * STACK ARGS: (any lua type to infer)
        * RETURNS: EMPTY
-       */
-      void Serializer::inferType( Json::Value& pair, const std::string& field, bool keyIsClass ) {
+       */        static const std::string FIELD_CLASS;
+
+      void Serializer::inferType( Json::Value& pair, const std::string& field ) {
 
         // Get type
         const char* type = lua_typename( L, lua_type( L, -1 ) );
@@ -115,27 +113,25 @@ namespace BlueBear {
           case Tools::Utility::hash( "table" ):
             {
 
-              // Soon replacing this with "substitutions"
-              if( isClassTable( keyIsClass ) ) {
-                pair[ field ] = createClassReference();
-                break;
-              }
-
-              // TODO: next special case table check here...
-
-              // Normal table
-
               // If this table was already found in world, then simply create the reference. Else, expose table to world, then create the reference.
               std::string worldPointer = Tools::Utility::pointerToString( lua_topointer( L, -1 ) );
+              auto substitution = substitutions.find( worldPointer );
 
-              if( !world.isMember( worldPointer ) ) {
-                // Need to create the table
-                // Copy the stack value as createTableOnMasterList will remove it
-                lua_pushvalue( L, -1 ); // table table
-                createTableOnMasterList(); // table
+              if( substitution == substitutions.end() ) {
+                // This is a plain old table that does not require any special action ("substitution")
+
+                if( !world.isMember( worldPointer ) ) {
+                  // Need to create the table
+                  // Copy the stack value as createTableOnMasterList will remove it
+                  lua_pushvalue( L, -1 ); // table table
+                  createTableOnMasterList(); // table
+                }
+
+                pair[ field ] = createReference();
+              } else {
+                // This involves a substitution
+                pair[ field ] = substitution->second();
               }
-
-              pair[ field ] = createReference();
 
             }
             break;
@@ -188,36 +184,76 @@ namespace BlueBear {
       }
 
       /**
-       * Determine if the table is a class table. A class table has a table named "class" within, with a field named "name" further within.
+       * Create a reference to the "bluebear" global
        *
        * STACK ARGS: table
        * (Stack is unmodified after call)
        */
-      bool Serializer::isClassTable( bool keyIsClass ) {
+      Json::Value Serializer::createConcordiaNSReference() {
+        Json::Value val( Json::objectValue );
 
-          if( keyIsClass && lua_istable( L, -1 ) ) {
-            lua_pushstring( L, "name" ); // "name" table
-            lua_gettable( L, -2 ); // "class.name" table
+        val[ "type" ] = Serializer::TYPE_ENVREF;
+        val[ "object" ] = Serializer::ENVREF_MODE_BBGLOBAL;
 
-            if( lua_isstring( L, -1 ) ) {
-              lua_pop( L, 1 ); // table
-              return true;
-            } else {
-              lua_pop( L, 1 ); // table
-            }
-
-          }
-
-          return false;
+        return val;
       }
 
       /**
        * Builds substitutions. These are specific table pointers that require an alternate route to be taken when serializing the table. That route is the value
        * of the "substitutions" map.
+       *
+       * STACK ARGS: none
+       * (Stack is unmodified after call)
        */
       void Serializer::buildSubstitutions() {
         // Substitution 1: all classes
         // Every currently registered class needs a substitution. When we encounter these pointers as we save instances, pivot to createClassReference.
+
+        lua_getglobal( L, "bluebear" ); // bluebear
+        lua_pushstring( L, "classes" ); // "classes" bluebear
+        lua_gettable( L, -2 ); // bluebear.classes bluebear
+
+        traverseTableForSubstitutions(); // bluebear
+
+        // Substitution 2: The bluebear table itself
+        // This object, if it's referred to anywhere, needs to be serialized as "the bluebear table"
+        substitutions[ Tools::Utility::pointerToString( lua_topointer( L, -1 ) ) ] = std::bind( &Serializer::createConcordiaNSReference, this );
+
+        lua_pop( L, 1 ); // EMPTY
+      }
+
+      /**
+       * Traverses a class table for substitutions
+       *
+       * STACK ARGS: table
+       * RETURNS: EMPTY
+       */
+      void Serializer::traverseTableForSubstitutions() {
+
+        lua_pushnil( L ); // nil table
+        while( lua_next( L, -2 ) != 0 ) { // subtable "name" table
+
+          lua_pushstring( L, "__middleclass" ); // "__middleclass" subtable "name" table
+          lua_gettable( L, -2 ); // boolean subtable "name" table
+          if( lua_isboolean( L, -1 ) && lua_toboolean( L, -1 ) ) {
+            // Subtable is an actual class
+
+            lua_pop( L, 1 ); // subtable "name" table
+
+            // Type is a proper middleclass object
+            substitutions[ Tools::Utility::pointerToString( lua_topointer( L, -1 ) ) ] = std::bind( &Serializer::createClassReference, this );
+
+            lua_pop( L, 1 ); // "name" table
+          } else {
+            // Subtable is just another part of the namespace and needs to be traversed
+
+            lua_pop( L, 1 ); // subtable "name" table
+            traverseTableForSubstitutions(); // "name" table
+          }
+        } // table
+
+        lua_pop( L, 1 ); // EMPTY
+
       }
     }
   }
