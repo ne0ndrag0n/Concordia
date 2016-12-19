@@ -7,17 +7,22 @@
 #include <lauxlib.h>
 #include <jsoncpp/json/json.h>
 #include <string>
+#include <sstream>
+#include <iomanip>
+#include <regex>
 
 namespace BlueBear {
   namespace Scripting {
     namespace LuaKit {
 
       const std::string Serializer::TYPE_TABLE = "table";
+      const std::string Serializer::TYPE_FUNCTION = "function";
       const std::string Serializer::TYPE_REF = "ref";
       const std::string Serializer::TYPE_CLASSID = "class";
       const std::string Serializer::TYPE_ENVREF = "envref";
 
-      const std::string Serializer::ENVREF_MODE_BBGLOBAL = "bbglobal";
+      const std::string Serializer::ENVREF_MODE_BBGLOBAL = "bluebear";
+      const std::string Serializer::ENVREF_MODE_G = "_G";
 
       Serializer::Serializer( lua_State* L ) : L( L ) {}
 
@@ -43,7 +48,8 @@ namespace BlueBear {
           createTableOnMasterList();
         }
 
-        Log::getInstance().debug( "LuaKit::Serializer::saveWorld", "\n" + world.toStyledString() );
+        // Use this regex when saving to a file, it fixes an annoying thing with JsonCpp where the "\u" is replaced by "\\u"
+        Log::getInstance().debug( "LuaKit::Serializer::saveWorld", "\n" + std::regex_replace( world.toStyledString(), std::regex( R"(\\\\u)" ), "\\u" ) );
 
         // Restart the garbage collector, and give it a good cycle
         lua_gc( L, LUA_GCRESTART, 0 );
@@ -89,8 +95,7 @@ namespace BlueBear {
        *
        * STACK ARGS: (any lua type to infer)
        * RETURNS: EMPTY
-       */        
-
+       */
       void Serializer::inferType( Json::Value& pair, const std::string& field ) {
 
         // Get type
@@ -136,7 +141,53 @@ namespace BlueBear {
             }
             break;
           case Tools::Utility::hash( "function" ):
-            // TODO: The big function case
+            {
+              /*
+              // TODO: Serialize its associated upvalues
+              for( int i = 1; const char* upvalueId = lua_getupvalue( L, -1, i ); i++ ) { // upvalue function
+                lua_pop( L, 1 ); // function
+              }
+              */
+              Json::Value func( Json::objectValue );
+              func[ "type" ] = Serializer::TYPE_FUNCTION;
+
+              // Serialize the text/function body of a closure
+              lua_getglobal( L, "string" ); // string function
+              lua_pushstring( L, "dump" ); // "dump" string function
+              lua_gettable( L, -2 ); // <string.dump> string function
+              lua_pushvalue( L, -3 ); // function <string.dump> string function
+
+              if( lua_pcall( L, 1, 1, 0 ) == 0 ) { // "serialized" string function
+                int serializedLength = lua_rawlen( L, -1 );
+                const char* serialized = lua_tostring( L, -1 );
+
+                std::stringstream stringBuilder;
+                for( int i = 0; i != serializedLength; i++ ) {
+                  char c = serialized[ i ];
+                  unsigned char uc = ( unsigned char ) c;
+                  int ic = ( int )uc;
+
+                  if( ic < 32 || ic > 126 ) {
+                    // Spit out '\uxxxx'
+                    stringBuilder << "\\u" << std::setfill( '0' ) << std::setw( 4 ) << std::hex << ic;
+                  } else {
+                    // Spit out the literal, printable character
+                    stringBuilder << c;
+                  }
+                }
+
+                func[ "body" ] = stringBuilder.str();
+                func[ "len" ] = serializedLength;
+
+                pair[ field ] = func;
+
+                lua_pop( L, 2 ); // function
+              } else { // "error" string function
+                Log::getInstance().warn( "LuaKit::Serializer::inferType", "Could not serialize function: " + std::string( lua_tostring( L, -1 ) ) );
+                pair[ field ] = Json::Value::null;
+                lua_pop( L, 2 ); // function
+              }
+            }
             break;
           default:
             Log::getInstance().warn( "LuaKit::Serializer::inferType", "Invalid type: " + std::string( type ) + ", substituting null." );
@@ -199,6 +250,21 @@ namespace BlueBear {
       }
 
       /**
+       * Create a reference to _G, the global table
+       *
+       * STACK ARGS: table
+       * (Stack is unmodified after call)
+       */
+      Json::Value Serializer::createGReference() {
+        Json::Value val( Json::objectValue );
+
+        val[ "type" ] = Serializer::TYPE_ENVREF;
+        val[ "object" ] = Serializer::ENVREF_MODE_G;
+
+        return val;
+      }
+
+      /**
        * Builds substitutions. These are specific table pointers that require an alternate route to be taken when serializing the table. That route is the value
        * of the "substitutions" map.
        *
@@ -219,7 +285,11 @@ namespace BlueBear {
         // This object, if it's referred to anywhere, needs to be serialized as "the bluebear table"
         substitutions[ Tools::Utility::pointerToString( lua_topointer( L, -1 ) ) ] = std::bind( &Serializer::createConcordiaNSReference, this );
 
-        lua_pop( L, 1 ); // EMPTY
+        // Substitution 3: The _G/_ENV variable
+        lua_getglobal( L, "_G" ); // _G bluebear
+        substitutions[ Tools::Utility::pointerToString( lua_topointer( L, -1 ) ) ] = std::bind( &Serializer::createGReference, this );
+
+        lua_pop( L, 2 ); // EMPTY
       }
 
       /**

@@ -19,11 +19,13 @@ namespace BlueBear {
       class Serializer {
 
         static const std::string TYPE_TABLE;
+        static const std::string TYPE_FUNCTION;
         static const std::string TYPE_REF;
         static const std::string TYPE_CLASSID;
         static const std::string TYPE_ENVREF;
 
         static const std::string ENVREF_MODE_BBGLOBAL;
+        static const std::string ENVREF_MODE_G;
 
         // These callbacks should leave the stack unmodified
         // They should accept table as the first argument on the stack
@@ -40,6 +42,7 @@ namespace BlueBear {
         Json::Value createReference();
         Json::Value createClassReference();
         Json::Value createConcordiaNSReference();
+        Json::Value createGReference();
 
         void buildSubstitutions();
         void traverseTableForSubstitutions();
