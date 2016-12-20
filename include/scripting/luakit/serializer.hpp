@@ -20,6 +20,7 @@ namespace BlueBear {
 
         static const std::string TYPE_TABLE;
         static const std::string TYPE_FUNCTION;
+        static const std::string TYPE_SFUNCTION;
         static const std::string TYPE_REF;
         static const std::string TYPE_CLASSID;
         static const std::string TYPE_ENVREF;
@@ -28,7 +29,7 @@ namespace BlueBear {
         static const std::string ENVREF_MODE_G;
 
         // These callbacks should leave the stack unmodified
-        // They should accept table as the first argument on the stack
+        // They should accept table/function as the first argument on the stack
         using Callback = std::function< Json::Value() >;
 
         lua_State* L;
@@ -37,6 +38,7 @@ namespace BlueBear {
         std::map< std::string, Callback > substitutions;
 
         void createTableOnMasterList();
+        void createFunctionOnMasterList();
         void inferType( Json::Value& pair, const std::string& field );
 
         Json::Value createReference();
@@ -46,6 +48,11 @@ namespace BlueBear {
 
         void buildSubstitutions();
         void traverseTableForSubstitutions();
+
+        bool canCreateSfunction();
+
+        void getUpvalueByName( const std::string& name );
+        void addUpvalues( Json::Value& funcType );
 
       public:
         Serializer( lua_State* L );

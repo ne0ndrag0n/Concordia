@@ -17,6 +17,7 @@ namespace BlueBear {
 
       const std::string Serializer::TYPE_TABLE = "table";
       const std::string Serializer::TYPE_FUNCTION = "function";
+      const std::string Serializer::TYPE_SFUNCTION = "sfunction";
       const std::string Serializer::TYPE_REF = "ref";
       const std::string Serializer::TYPE_CLASSID = "class";
       const std::string Serializer::TYPE_ENVREF = "envref";
@@ -59,7 +60,7 @@ namespace BlueBear {
       }
 
       /**
-       * Print the contents of a table (for now...)
+       * Create a table on the master list
        *
        * STACK ARGS: table
        * RETURNS: none
@@ -68,7 +69,10 @@ namespace BlueBear {
 
         // As soon as a table is found, go ahead and throw it on the pile
         std::string this_table( Tools::Utility::pointerToString( lua_topointer( L, -1 ) ) );
-        Json::Value& item = world[ this_table ] = Json::Value( Json::arrayValue );
+        Json::Value& parentItem = world[ this_table ] = Json::Value( Json::objectValue );
+
+        parentItem[ "type" ] = Serializer::TYPE_TABLE;
+        Json::Value& item = parentItem[ "entries" ] = Json::Value( Json::arrayValue );
 
         lua_pushnil( L ); // nil table
 
@@ -89,6 +93,61 @@ namespace BlueBear {
 
         lua_pop( L, 1 ); // EMPTY
       }
+
+      /**
+       * Create a function on the master list
+       *
+       * STACK ARGS: function
+       * RETURNS: none
+       */
+       void Serializer::createFunctionOnMasterList() {
+
+         std::string thisTable( Tools::Utility::pointerToString( lua_topointer( L, -1 ) ) );
+
+         Json::Value func( Json::objectValue );
+         func[ "type" ] = Serializer::TYPE_FUNCTION;
+
+         // Serialize the text/function body of a closure
+         lua_getglobal( L, "string" ); // string function
+         lua_pushstring( L, "dump" ); // "dump" string function
+         lua_gettable( L, -2 ); // <string.dump> string function
+         lua_pushvalue( L, -3 ); // function <string.dump> string function
+
+         if( lua_pcall( L, 1, 1, 0 ) == 0 ) { // "serialized" string function
+           int serializedLength = lua_rawlen( L, -1 );
+           const char* serialized = lua_tostring( L, -1 );
+
+           std::stringstream stringBuilder;
+           for( int i = 0; i != serializedLength; i++ ) {
+             char c = serialized[ i ];
+             unsigned char uc = ( unsigned char ) c;
+             int ic = ( int )uc;
+
+             if( ic < 32 || ic > 126 ) {
+               // Spit out '\uxxxx'
+               stringBuilder << "\\u" << std::setfill( '0' ) << std::setw( 4 ) << std::hex << ic;
+             } else {
+               // Spit out the literal, printable character
+               stringBuilder << c;
+             }
+           }
+
+           func[ "body" ] = stringBuilder.str();
+           func[ "len" ] = serializedLength;
+
+           lua_pop( L, 2 ); // function
+
+           // Now serialize the associated upvalues
+           addUpvalues( func );
+
+           world[ thisTable ] = func;
+         } else { // "error" string function
+            Log::getInstance().error( "LuaKit::Serializer::createFunctionOnMasterList", "Could not serialize function: " + std::string( lua_tostring( L, -1 ) ) );
+            lua_pop( L, 2 ); // function
+         }
+
+         lua_pop( L, 1 ); // EMPTY
+       }
 
       /**
        * Infer the type, load references if necessary, and place it into pair[field]
@@ -142,50 +201,58 @@ namespace BlueBear {
             break;
           case Tools::Utility::hash( "function" ):
             {
-              /*
-              // TODO: Serialize its associated upvalues
-              for( int i = 1; const char* upvalueId = lua_getupvalue( L, -1, i ); i++ ) { // upvalue function
-                lua_pop( L, 1 ); // function
-              }
-              */
-              Json::Value func( Json::objectValue );
-              func[ "type" ] = Serializer::TYPE_FUNCTION;
+              std::string worldPointer = Tools::Utility::pointerToString( lua_topointer( L, -1 ) );
+              auto substitution = substitutions.find( worldPointer );
 
-              // Serialize the text/function body of a closure
-              lua_getglobal( L, "string" ); // string function
-              lua_pushstring( L, "dump" ); // "dump" string function
-              lua_gettable( L, -2 ); // <string.dump> string function
-              lua_pushvalue( L, -3 ); // function <string.dump> string function
+              if( substitution == substitutions.end() ) {
+                // No substitution required for this function.
 
-              if( lua_pcall( L, 1, 1, 0 ) == 0 ) { // "serialized" string function
-                int serializedLength = lua_rawlen( L, -1 );
-                const char* serialized = lua_tostring( L, -1 );
+                // Now determine if we need to create a reference to this function, or we need to create an "sfunction", by peeping at the upvalues.
+                if( canCreateSfunction() ) {
+                  // This sfunction can be created
+                  Json::Value sfunction( Json::objectValue );
+                  sfunction[ "type" ] = Serializer::TYPE_SFUNCTION;
 
-                std::stringstream stringBuilder;
-                for( int i = 0; i != serializedLength; i++ ) {
-                  char c = serialized[ i ];
-                  unsigned char uc = ( unsigned char ) c;
-                  int ic = ( int )uc;
+                  // Build everything we need to create an sfunction
 
-                  if( ic < 32 || ic > 126 ) {
-                    // Spit out '\uxxxx'
-                    stringBuilder << "\\u" << std::setfill( '0' ) << std::setw( 4 ) << std::hex << ic;
-                  } else {
-                    // Spit out the literal, printable character
-                    stringBuilder << c;
+                  getUpvalueByName( "__derived_class" ); // "__derived_class" function
+                  sfunction[ "class" ] = lua_tostring( L, -1 );
+                  lua_pop( L, 1 ); // function
+
+                  getUpvalueByName( "__derived_func" ); // "__derived_func" function
+                  sfunction[ "method" ] = lua_tostring( L, -1 );
+                  lua_pop( L, 1 ); // function
+
+                  getUpvalueByName( "context" ); // context function
+                  inferType( sfunction, "context" ); // function
+
+                  Json::Value& args = sfunction[ "args" ] = Json::Value( Json::arrayValue );
+                  getUpvalueByName( "args" ); // args function
+                  lua_pushnil( L ); // nil args function
+                  while( lua_next( L, -2 ) != 0 ) { // arg index args function
+                    Json::Value container = Json::Value( Json::objectValue );
+                    inferType( container, "value" ); // index args function
+                    args.append( container[ "value" ] );
+                  } // args function
+
+                  lua_pop( L, 1 ); // function
+
+                  pair[ field ] = sfunction;
+                } else {
+                  // We need to serialize code directly to the file
+                  if( !world.isMember( worldPointer ) ) {
+                    // Need to create the function
+                    lua_pushvalue( L, -1 ); // function function
+                    createFunctionOnMasterList(); // function
                   }
+
+                  pair[ field ] = createReference();
+
                 }
 
-                func[ "body" ] = stringBuilder.str();
-                func[ "len" ] = serializedLength;
-
-                pair[ field ] = func;
-
-                lua_pop( L, 2 ); // function
-              } else { // "error" string function
-                Log::getInstance().warn( "LuaKit::Serializer::inferType", "Could not serialize function: " + std::string( lua_tostring( L, -1 ) ) );
-                pair[ field ] = Json::Value::null;
-                lua_pop( L, 2 ); // function
+              } else {
+                // This involves a substitution
+                pair[ field ] = substitution->second();
               }
             }
             break;
@@ -196,6 +263,70 @@ namespace BlueBear {
         }
 
         lua_pop( L, 1 ); // EMPTY
+      }
+
+      /**
+       * Adds the function's upvalues to the function-type JSON object defined in funcType (on the "upvalues" field).
+       *
+       * STACK ARGS: function
+       * (Stack is unmodified after call)
+       */
+      void Serializer::addUpvalues( Json::Value& funcType ) {
+        Json::Value& upvalues = funcType[ "upvalues" ] = Json::Value( Json::arrayValue );
+
+        for( int i = 1; const char* upvalueId = lua_getupvalue( L, -1, i ); i++ ) { // upvalue function
+          Json::Value upvalue = Json::Value( Json::objectValue );
+
+          upvalue[ "key" ] = upvalueId;
+          inferType( upvalue, "value" ); // function
+
+          upvalues.append( upvalue );
+        }
+      }
+
+      /**
+       * Determine if the closure is an sfunction (serialisable function). This condition is met if there are two upvalues present, __derived_class and __derived_func,
+       * each with string values. If this is an sfunction, we can save it in a safer manner that doesn't require us to write code to the lot file.
+       *
+       * STACK ARGS: function
+       * (Stack is unmodified after call)
+       */
+      bool Serializer::canCreateSfunction() {
+        bool derivedClassIsString = false;
+        bool derivedFuncIsString = false;
+
+        for( int i = 1; const char* upvalueId = lua_getupvalue( L, -1, i ); i++ ) { // upvalue function
+          std::string key( upvalueId );
+
+          derivedClassIsString = derivedClassIsString || ( key == "__derived_class" && lua_isstring( L, -1 ) );
+          derivedFuncIsString = derivedFuncIsString || ( key == "__derived_func" && lua_isstring( L, -1 ) );
+
+          lua_pop( L, 1 ); // function
+        }
+
+        return derivedClassIsString && derivedFuncIsString;
+      }
+
+      /**
+       * Gets an upvalue by name. This will push the upvalue if it exists, nil otherwise.
+       * O(n) method, use with care.
+       *
+       * STACK ARGS: function
+       * RETURNS: (upvalue || nil) function
+       */
+      void Serializer::getUpvalueByName( const std::string& name ) {
+
+        for( int i = 1; const char* upvalueId = lua_getupvalue( L, -1, i ); i++ ) { // upvalue function
+          std::string key( upvalueId );
+
+          if( key == name ) {
+            return;
+          }
+
+          lua_pop( L, 1 ); // function
+        }
+
+        lua_pushnil( L ); // nil function
       }
 
       /**

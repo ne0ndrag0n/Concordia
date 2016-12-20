@@ -130,3 +130,50 @@ bluebear.instance_of = function( identifier, instance )
 
   return instance:isInstanceOf( Class )
 end
+
+-- Plugins to util
+
+--[[
+  Binds "instance-type" functions (functions which accept instance as first argument). This is part of the class module, as its functionality
+  depends on class for "safe" serialization.
+--]]
+bluebear.util.bind = function( f, c, ... )
+  local func
+  local context = c
+  local args = { ... }
+
+	local __derived_class
+	local __derived_func
+
+	if type( f ) == "string" then
+		local split = bluebear.util.split( f, ':' )
+		__derived_class = split[ 1 ]
+		__derived_func = split[ 2 ]
+
+		-- Complete func
+		func = bluebear.get_class( __derived_class )[ __derived_func ]
+	else
+		func = f
+	end
+
+  return function( ... )
+    local newargs = { ... }
+    local allargs = {}
+
+		-- Hack for upvalue serialization. When __derived_class and __derived_func are not nil, these are used to
+		-- create a "sfunction" entry when saving the game state. "sfunction" entries are better because they
+		-- allow you to upgrade modpacks without risking changes in behaviour when the game next loads.
+		local __derived_class = __derived_class
+		local __derived_func = __derived_func
+
+    for k,v in pairs( args ) do
+      table.insert( allargs, v )
+    end
+
+    for k,v in pairs( newargs ) do
+      table.insert( allargs, v )
+    end
+
+    func( context or _G, table.unpack( allargs ) )
+  end
+end
