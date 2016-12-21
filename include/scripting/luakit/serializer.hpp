@@ -19,6 +19,7 @@ namespace BlueBear {
       class Serializer {
 
         static const std::string TYPE_TABLE;
+        static const std::string TYPE_ITABLE;
         static const std::string TYPE_FUNCTION;
         static const std::string TYPE_SFUNCTION;
         static const std::string TYPE_REF;

@@ -16,10 +16,16 @@ namespace BlueBear {
     namespace LuaKit {
 
       const std::string Serializer::TYPE_TABLE = "table";
+      // itables are tables we need to re-create an instance from first, then overlaying the data onto it from file
+      const std::string Serializer::TYPE_ITABLE = "itable";
       const std::string Serializer::TYPE_FUNCTION = "function";
+      // sfunctions are serialized function bindings that can be recreated at runtime without saving actual code to file
       const std::string Serializer::TYPE_SFUNCTION = "sfunction";
+      // refs are references to lua referenceable items (functions and tables only)
       const std::string Serializer::TYPE_REF = "ref";
+      // class is a reference to a class type. This allows us to serialise a lot without saving the class/class code in the lot JSON file
       const std::string Serializer::TYPE_CLASSID = "class";
+      // An envref refers to a system-level global present in all instances of a Concordia lot (e.g. the "bluebear" global)
       const std::string Serializer::TYPE_ENVREF = "envref";
 
       const std::string Serializer::ENVREF_MODE_BBGLOBAL = "bluebear";
@@ -70,26 +76,71 @@ namespace BlueBear {
         // As soon as a table is found, go ahead and throw it on the pile
         std::string this_table( Tools::Utility::pointerToString( lua_topointer( L, -1 ) ) );
         Json::Value& parentItem = world[ this_table ] = Json::Value( Json::objectValue );
-
-        parentItem[ "type" ] = Serializer::TYPE_TABLE;
         Json::Value& item = parentItem[ "entries" ] = Json::Value( Json::arrayValue );
+
+        // Is this an INSTANCE-TYPE table? Instance-type tables have a "class" field pointing to a table with the __middleclass system property set to "true"
+        std::string instanceClassID;
+        bool isInstanceTable = false;
+        lua_pushstring( L, "class" ); // "class" table
+        lua_gettable( L, -2 ); // Class table
+        if( lua_istable( L, -1 ) ) {
+
+          lua_pushstring( L, "__middleclass" ); // "__middleclass" Class table
+          lua_gettable( L, -2 ); // Class.__middleclass Class table
+
+          if( lua_isboolean( L, -1 ) && lua_toboolean( L, -1 ) ) {
+            lua_pop( L, 1 ); // Class table
+
+            lua_pushstring( L, "name" ); // "name" Class table
+            lua_gettable( L, -2 ); // Class.name Class table
+            parentItem[ "classID" ] = instanceClassID = std::string( lua_tostring( L, -1 ) );
+          }
+
+          lua_pop( L, 2 ); // table
+
+        } else {
+          lua_pop( L, 1 ); // table
+        }
+        isInstanceTable = !( instanceClassID.empty() );
+
+        parentItem[ "type" ] = isInstanceTable ? Serializer::TYPE_ITABLE : Serializer::TYPE_TABLE;
 
         lua_pushnil( L ); // nil table
 
         // Iterate over the contents of this table
         while( lua_next( L, -2 ) != 0 ) { // value key table
 
-          // { "key": <objtype>, "value": <objtype> }
-          Json::Value pair = Json::Value( Json::objectValue );
+          lua_pushvalue( L, -2 ); // key value key table
+          if( isInstanceTable && lua_isstring( L, -1 ) && std::string( lua_tostring( L, -1 ) ) == "class" ) {
+            // Don't do anything for this key-value pair
+            lua_pop( L, 2 ); // key table
+          } else {
+            lua_pop( L, 1 ); // value key table
 
-          inferType( pair, "value" ); // key table
+            // { "key": <objtype>, "value": <objtype> }
+            Json::Value pair = Json::Value( Json::objectValue );
 
-          lua_pushvalue( L, -1 ); // key key table
-          inferType( pair, "key" ); // key table
+            inferType( pair, "value" ); // key table
 
-          item.append( pair );
+            lua_pushvalue( L, -1 ); // key key table
+            inferType( pair, "key" ); // key table
+
+            item.append( pair );
+          }
         } // table
 
+        if( !isInstanceTable && lua_getmetatable( L, -1 ) ) { // metatable table
+          std::string worldPointer( Tools::Utility::pointerToString( lua_topointer( L, -1 ) ) );
+
+          if( !world.isMember( worldPointer ) ) {
+            lua_pushvalue( L, -1 ); // metatable metatable table
+            createTableOnMasterList(); // metatable table
+          }
+
+          parentItem[ "metatable" ] = createReference();
+
+          lua_pop( L, 1 ); // table
+        }
 
         lua_pop( L, 1 ); // EMPTY
       }
@@ -222,9 +273,6 @@ namespace BlueBear {
                   getUpvalueByName( "__derived_func" ); // "__derived_func" function
                   sfunction[ "method" ] = lua_tostring( L, -1 );
                   lua_pop( L, 1 ); // function
-
-                  getUpvalueByName( "context" ); // context function
-                  inferType( sfunction, "context" ); // function
 
                   Json::Value& args = sfunction[ "args" ] = Json::Value( Json::arrayValue );
                   getUpvalueByName( "args" ); // args function

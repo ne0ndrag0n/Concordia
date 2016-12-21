@@ -137,9 +137,8 @@ end
   Binds "instance-type" functions (functions which accept instance as first argument). This is part of the class module, as its functionality
   depends on class for "safe" serialization.
 --]]
-bluebear.util.bind = function( f, c, ... )
+bluebear.util.bind = function( f, ... )
   local func
-  local context = c
   local args = { ... }
 
 	local __derived_class
@@ -174,6 +173,6 @@ bluebear.util.bind = function( f, c, ... )
       table.insert( allargs, v )
     end
 
-    func( context or _G, table.unpack( allargs ) )
+    func( table.unpack( allargs ) )
   end
 end
