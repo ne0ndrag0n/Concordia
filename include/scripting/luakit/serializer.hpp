@@ -37,7 +37,11 @@ namespace BlueBear {
         Json::Value world;
         // Pointer-to-substitution map usable by both upvalues and tables
         std::map< std::string, Callback > substitutions;
+        // When loading a lot from disk, use these maps to track top-level objects
+        std::map< std::string, int > globalEntities;
+        std::map< std::string, int > globalInstanceEntities;
 
+        // --- saving ---
         void createTableOnMasterList();
         void createFunctionOnMasterList();
         void inferType( Json::Value& pair, const std::string& field );
@@ -55,6 +59,13 @@ namespace BlueBear {
         void getUpvalueByName( const std::string& name );
         void addUpvalues( Json::Value& funcType );
 
+        // --- loading ---
+        int createGlobalItem( const std::string& addressKey );
+        int createTable( const std::string& addressKey, Json::Value& tableDefinition );
+        void getReference( const std::string& addressKey );
+        void inferTypeFromJSON( Json::Value& objectToken );
+        bool globalItemExists( const std::string& addressKey );
+
       public:
         Serializer( lua_State* L );
 
@@ -62,6 +73,7 @@ namespace BlueBear {
          * Save the world to JSON value
          */
         Json::Value saveWorld( std::vector< SerializableInstance >& objects );
+        std::vector< SerializableInstance > loadWorld( Json::Value& engineDefinition );
       };
 
     }

@@ -66,6 +66,130 @@ namespace BlueBear {
       }
 
       /**
+       * Load (deserialise) the game world.
+       */
+      std::vector< SerializableInstance > Serializer::loadWorld( Json::Value& engineDefinition ) {
+        world = engineDefinition[ "objects" ];
+
+        globalEntities.clear();
+        globalInstanceEntities.clear();
+
+        // STOP the garbage collector so pointer references remain intact as we operate
+        lua_gc( L, LUA_GCSTOP, 0 );
+
+        for( Json::Value::iterator jsonIterator = world.begin(); jsonIterator != world.end(); ++jsonIterator ) {
+          std::string addressKey = jsonIterator.key().asString();
+
+          // This address key may have been already been scooped up by a prior getReference() call
+          if( !globalItemExists( addressKey ) ) {
+            int ref = createGlobalItem( addressKey );
+          }
+        }
+
+        // Release references to items we no longer require
+        for( auto& entityPair : globalEntities ) {
+          luaL_unref( L, LUA_REGISTRYINDEX, entityPair.second );
+        }
+
+        // After we're done, restart the garbage collector and give it a good cycle
+        // If, for some reason, there's any disconnected item in the original file...it will be discarded here
+        lua_gc( L, LUA_GCRESTART, 0 );
+        lua_gc( L, LUA_GCCOLLECT, 0 );
+      }
+
+      /**
+       * Create a "global" Lua item. These are at the top level of world and can be table, itable, function, or sfunction.
+       */
+      int Serializer::createGlobalItem( const std::string& addressKey ) {
+        Json::Value& item = world[ addressKey ];
+
+        switch( Tools::Utility::hash( item[ "type" ].asCString() ) ) {
+          case Tools::Utility::hash( "table" ):
+            return createTable( addressKey, item );
+          case Tools::Utility::hash( "itable" ):
+            return -1;
+          case Tools::Utility::hash( "function" ):
+            return -1;
+          case Tools::Utility::hash( "sfunction" ):
+            return -1;
+        }
+      }
+
+      /**
+       * Create a table in RAM and associate it with the given address. Register it with globalEntities, return the reference we just created.
+       */
+      int Serializer::createTable( const std::string& addressKey, Json::Value& tableDefinition ) {
+        lua_newtable( L ); // table
+
+        for( Json::Value& pair : tableDefinition[ "entries" ] ) {
+          inferTypeFromJSON( pair[ "key" ] ); // key_object table
+          inferTypeFromJSON( pair[ "value" ] ); // value_object key_object table
+
+          lua_settable( L, -3 ); // table
+        }
+
+        return globalEntities[ addressKey ] = luaL_ref( L, LUA_REGISTRYINDEX ); // EMPTY
+      }
+
+      /**
+       * Using the given objectToken, determine what value to push onto the lua stack from the given token.
+       *
+       * STACK ARGS: none
+       * RETURNS: (One of any lua type)
+       */
+      void Serializer::inferTypeFromJSON( Json::Value& objectToken ) {
+        switch( objectToken.type() ) {
+          case Json::ValueType::intValue:
+          case Json::ValueType::uintValue:
+          case Json::ValueType::realValue:
+            lua_pushnumber( L, objectToken.asDouble() ); // number
+            return;
+          case Json::ValueType::stringValue:
+            lua_pushstring( L, objectToken.asCString() ); // string
+            return;
+          case Json::ValueType::objectValue:
+            // From within a table, looks like the only thing we need to worry about for now is a ref - objectValue is ref
+            getReference( objectToken[ "ptr" ].asString() ); // (table or function)
+            return;
+          case Json::ValueType::nullValue:
+          default:
+            lua_pushnil( L ); // nil
+            return;
+        }
+      }
+
+      /**
+       * Push the referred object onto the stack (and create it if necessary)
+       *
+       * STACK ARGS: none
+       * RETURNS: (table or function)
+       */
+      void Serializer::getReference( const std::string& addressKey ) {
+        // Does the item need to be created or does it already exist?
+        auto geEntry = globalEntities.find( addressKey );
+        if( geEntry != globalEntities.end() ) {
+          lua_rawgeti( L, LUA_REGISTRYINDEX, geEntry->second ); // item
+          return;
+        }
+
+        auto gieEntry = globalInstanceEntities.find( addressKey );
+        if( gieEntry != globalInstanceEntities.end() ) {
+          lua_rawgeti( L, LUA_REGISTRYINDEX, gieEntry->second ); // item
+          return;
+        }
+
+        // If we got here, then it looks like we need to create the item before pushing it onto the stack
+        lua_rawgeti( L, LUA_REGISTRYINDEX, createGlobalItem( addressKey ) ); // item
+      }
+
+      /**
+       * Returns true if the addressKey is defined in either globalEntities or globalInstanceEntities
+       */
+      bool Serializer::globalItemExists( const std::string& addressKey ) {
+        return ( globalEntities.find( addressKey ) != globalEntities.end() ) || ( globalInstanceEntities.find( addressKey ) != globalInstanceEntities.end() );
+      }
+
+      /**
        * Create a table on the master list
        *
        * STACK ARGS: table
