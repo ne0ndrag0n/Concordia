@@ -9,6 +9,7 @@
 #include <string>
 #include <functional>
 #include <map>
+#include <regex>
 
 namespace BlueBear {
   namespace Scripting {
@@ -29,6 +30,8 @@ namespace BlueBear {
         static const std::string ENVREF_MODE_BBGLOBAL;
         static const std::string ENVREF_MODE_G;
 
+        static const std::string LUA_CAPTURE_UPVALUE_FUNCTION;
+
         // These callbacks should leave the stack unmodified
         // They should accept table/function as the first argument on the stack
         using Callback = std::function< Json::Value() >;
@@ -40,6 +43,8 @@ namespace BlueBear {
         // When loading a lot from disk, use these maps to track top-level objects
         std::map< std::string, int > globalEntities;
         std::map< std::string, int > globalInstanceEntities;
+        // "Global" list to plop items on, wich Serializer::loadWorld will return
+        std::vector< SerializableInstance > serializableInstances;
 
         // --- saving ---
         void createTableOnMasterList();
@@ -56,15 +61,22 @@ namespace BlueBear {
 
         bool canCreateSfunction();
 
-        void getUpvalueByName( const std::string& name );
+        int getUpvalueByName( const std::string& name );
         void addUpvalues( Json::Value& funcType );
 
         // --- loading ---
         int createGlobalItem( const std::string& addressKey );
         int createTable( const std::string& addressKey, Json::Value& tableDefinition );
+        int createITable( const std::string& addressKey, Json::Value& tableDefinition );
+        int createFunction( const std::string& addressKey, Json::Value& tableDefinition );
+        int createSFunction( const std::string& addressKey, Json::Value& tableDefinition );
         void getReference( const std::string& addressKey );
+        void getEnvReference( const std::string& envRefKey );
+        void determineInnerItem( Json::Value& objectToken );
         void inferTypeFromJSON( Json::Value& objectToken );
         bool globalItemExists( const std::string& addressKey );
+        void unpackUpvalues( Json::Value& upvalues );
+        void setUpvalueByIndex( int upvalueIndex );
 
       public:
         Serializer( lua_State* L );

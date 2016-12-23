@@ -93,6 +93,9 @@ local Flowers = bluebear.extend( "system.entity.base", "game.flowers.base", {
 } )
 
 function Flowers:main()
+	--self.sfunc = bluebear.util.bind( 'game.flowers.base:replenish_water', self )
+	--self.func = function() print( "simple" ) end
+
 	if self.water_level > 0 then
 		self.water_level = self.water_level - 10
 	end

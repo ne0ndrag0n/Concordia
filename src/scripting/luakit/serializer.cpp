@@ -31,6 +31,8 @@ namespace BlueBear {
       const std::string Serializer::ENVREF_MODE_BBGLOBAL = "bluebear";
       const std::string Serializer::ENVREF_MODE_G = "_G";
 
+      const std::string Serializer::LUA_CAPTURE_UPVALUE_FUNCTION = "function() return bluebear.__setting_upvalue end";
+
       Serializer::Serializer( lua_State* L ) : L( L ) {}
 
       /**
@@ -73,6 +75,7 @@ namespace BlueBear {
 
         globalEntities.clear();
         globalInstanceEntities.clear();
+        serializableInstances.clear();
 
         // STOP the garbage collector so pointer references remain intact as we operate
         lua_gc( L, LUA_GCSTOP, 0 );
@@ -82,7 +85,7 @@ namespace BlueBear {
 
           // This address key may have been already been scooped up by a prior getReference() call
           if( !globalItemExists( addressKey ) ) {
-            int ref = createGlobalItem( addressKey );
+            createGlobalItem( addressKey );
           }
         }
 
@@ -95,6 +98,8 @@ namespace BlueBear {
         // If, for some reason, there's any disconnected item in the original file...it will be discarded here
         lua_gc( L, LUA_GCRESTART, 0 );
         lua_gc( L, LUA_GCCOLLECT, 0 );
+
+        return serializableInstances;
       }
 
       /**
@@ -107,11 +112,11 @@ namespace BlueBear {
           case Tools::Utility::hash( "table" ):
             return createTable( addressKey, item );
           case Tools::Utility::hash( "itable" ):
-            return -1;
+            return createITable( addressKey, item );
           case Tools::Utility::hash( "function" ):
-            return -1;
+            return createFunction( addressKey, item );
           case Tools::Utility::hash( "sfunction" ):
-            return -1;
+            return createSFunction( addressKey, item );
         }
       }
 
@@ -128,7 +133,157 @@ namespace BlueBear {
           lua_settable( L, -3 ); // table
         }
 
+        // Now set the metatable if it exists
+        if( tableDefinition.isMember( "metatable" ) ) {
+          Json::Value& metatable = tableDefinition[ "metatable" ];
+          determineInnerItem( metatable ); // metatable table
+          lua_setmetatable( L, -2 ); // table
+        }
+
         return globalEntities[ addressKey ] = luaL_ref( L, LUA_REGISTRYINDEX ); // EMPTY
+      }
+
+      /**
+       * Create an itable, which requires first getting the instance of the specified classID, then overlaying the specified properties.
+       */
+      int Serializer::createITable( const std::string& addressKey, Json::Value& tableDefinition ) {
+        lua_getglobal( L, "bluebear" ); // bluebear
+        lua_pushstring( L, "get_class" ); // "get_class" bluebear
+        lua_gettable( L, -2 ); // <bluebear.get_class> bluebear
+
+        std::string classID = tableDefinition[ "classID" ].asString();
+        lua_pushstring( L, classID.c_str() ); // "classID" <bluebear.get_class> bluebear
+
+        if( lua_pcall( L, 1, 1, 0 ) != 0 ) { // "error" bluebear
+          Log::getInstance().error( "LuaKit::Serializer::createITable", "Class " + classID + " doesn't appear to be loaded!" );
+          lua_pop( L, 2 ); // EMPTY
+          return -1;
+        } // Class bluebear
+
+        // "new" for any object shouldn't take any arguments
+        lua_pushstring( L, "new" ); // "new" Class bluebear
+        lua_gettable( L, -2 ); // <Class.new> Class bluebear
+        lua_pushvalue( L, -2 ); // Class <Class.new> Class bluebear
+
+        if( lua_pcall( L, 1, 1, 0 ) != 0 ) { // "error" Class bluebear
+          Log::getInstance().error( "LuaKit::Serializer::createITable", "Could not initialize class: " + std::string( lua_tostring( L, -1 ) ) );
+          lua_pop( L, 3 ); // EMPTY
+          return -1;
+        } // instance Class bluebear
+
+        // Using instance, overlay all properties specified in tableDefinition
+        for( Json::Value& pair : tableDefinition[ "entries" ] ) {
+          inferTypeFromJSON( pair[ "key" ] ); // key_object instance Class bluebear
+          inferTypeFromJSON( pair[ "value" ] ); // value_object key_object instance Class bluebear
+
+          lua_settable( L, -3 ); // instance Class bluebear
+        }
+
+        // No metatable? itable-type objects should never set a metatable because middleclass already does that. Consequently, you should never fuck with the metatable in your game entities.
+
+        // Set reference
+        int ref = globalInstanceEntities[ addressKey ] = luaL_ref( L, LUA_REGISTRYINDEX ); // Class bluebear
+
+        // TODO: See that "global" serializableInstances list? Now, we need to take "ref" and put it in here, so that loadWorld can return it in the list.
+
+        lua_pop( L, 2 ); // EMPTY
+
+        return ref;
+      }
+
+      /**
+       * Create a function from its serialized function text and set its upvalues. You generally shouldn't use this functionality; instead, write code to create sfunctions instead.
+       */
+      int Serializer::createFunction( const std::string& addressKey, Json::Value& tableDefinition ) {
+
+        // push the function definition
+        std::string functionBody = Tools::Utility::decodeUTF8( tableDefinition[ "body" ].asString() );
+        if( luaL_loadbuffer( L, functionBody.c_str(), functionBody.length(), "__serialized_lua_chunk" ) ) { // error
+          Log::getInstance().error( "LuaKit::Serializer::createFunction", "Could not load a serialized function chunk: " + std::string( lua_tostring( L, -1 ) ) );
+          lua_pop( L, 1 ); // EMPTY
+          return -1;
+        } // <function>
+
+        unpackUpvalues( tableDefinition[ "upvalues" ] );
+
+        return globalEntities[ addressKey ] = luaL_ref( L, LUA_REGISTRYINDEX ); // EMPTY
+      }
+
+      /**
+       * Create an sfunction, a serialized form of function where the function body is accessible via a reference to a modpack-registered class.
+       */
+      int Serializer::createSFunction( const std::string& addressKey, Json::Value& tableDefinition ) {
+        // Set up a standard sfunction-type bluebear.util.bind function without any arguments
+
+        lua_getglobal( L, "bluebear" ); // bluebear
+        lua_pushstring( L, "util" ); // "util" bluebear
+        lua_gettable( L, -2 ); // bluebear.util bluebear
+
+        lua_pushstring( L, "bind" ); // "bind" bluebear.util bluebear
+        lua_gettable( L, -2 ); // <bind> bluebear.util bluebear
+
+        std::string key = tableDefinition[ "class" ].asString() + ":" + tableDefinition[ "method" ].asString();
+        lua_pushstring( L, key.c_str() ); // "namespace.class:method" <bind> bluebear.util bluebear
+
+        if( lua_pcall( L, 1, 1, 0 ) != 0 ) { // "error" bluebear.util bluebear
+          Log::getInstance().error( "LuaKit::Serializer::createSFunction", "Error creating sfunction: " + std::string( lua_tostring( L, -1 ) ) );
+          lua_pop( L, 3 ); // EMPTY
+          return -1;
+        } // <bound> bluebear.util bluebear
+
+        // Now take <bound> and modify its "args" upvalue to point to the table it originally pointed to
+        int upvalueIndex = getUpvalueByName( "args" ); // args <bound> bluebear.util bluebear
+        // We only wanted the index
+        lua_pop( L, 1 ); // <bound> bluebear.util bluebear
+
+        determineInnerItem( tableDefinition[ "args" ] ); // args <bound> bluebear.util bluebear
+        setUpvalueByIndex( upvalueIndex ); // <bound> bluebear.util bluebear
+
+        int ref = globalEntities[ addressKey ] = luaL_ref( L, LUA_REGISTRYINDEX ); // bluebear.util bluebear
+
+        lua_pop( L, 2 ); // EMPTY
+
+        return ref;
+      }
+
+      /**
+       * Add upvalues to the function on top of the stack.
+       *
+       * STACK ARGS: <function>
+       * (Stack is unmodified after call)
+       */
+      void Serializer::unpackUpvalues( Json::Value& upvalues ) {
+        unsigned int upvalueIndex = 1;
+        for( Json::Value& upvalue : upvalues ) {
+          inferTypeFromJSON( upvalue ); // upvalue <function>
+
+          setUpvalueByIndex( upvalueIndex ); // <function>
+
+          upvalueIndex++;
+        }
+      }
+
+      /**
+       * Given a function and a value, set function's upvalueIndex-th upvalue to value using the lua_upvaluejoin hack.
+       *
+       * STACK ARGS: value <function>
+       * RETURNS: <function>
+       */
+      void Serializer::setUpvalueByIndex( int upvalueIndex ) {
+        // Set bluebear.__setting_upvalue to this value so LUA_CAPTURE_UPVALUE_FUNCTION can capture it
+        lua_getglobal( L, "bluebear" ); // bluebear value <function>
+        lua_pushstring( L, "__setting_upvalue" ); // "__setting_upvalue" bluebear value <function>
+        lua_pushvalue( L, -3 ); // value "__setting_upvalue" bluebear value <function>
+        lua_settable( L, -3 ); // bluebear value <function>
+
+        lua_pop( L, 2 ); // <function>
+
+        // Set upvalues the usual Lua hacky way with lua_upvaluejoin and LUA_CAPTURE_UPVALUE_FUNCTION
+        // Don't bother checking here, it should never fail unless there's bigger problems going on...
+        luaL_loadbuffer( L, LUA_CAPTURE_UPVALUE_FUNCTION.c_str(), LUA_CAPTURE_UPVALUE_FUNCTION.length(), "__capture_function" ); // <capture_function> <function>
+        lua_upvaluejoin( L, -2, upvalueIndex, -1, 1 );
+
+        lua_pop( L, 1 ); // <function>
       }
 
       /**
@@ -148,8 +303,7 @@ namespace BlueBear {
             lua_pushstring( L, objectToken.asCString() ); // string
             return;
           case Json::ValueType::objectValue:
-            // From within a table, looks like the only thing we need to worry about for now is a ref - objectValue is ref
-            getReference( objectToken[ "ptr" ].asString() ); // (table or function)
+            determineInnerItem( objectToken ); // (table, function, or nil)
             return;
           case Json::ValueType::nullValue:
           default:
@@ -180,6 +334,46 @@ namespace BlueBear {
 
         // If we got here, then it looks like we need to create the item before pushing it onto the stack
         lua_rawgeti( L, LUA_REGISTRYINDEX, createGlobalItem( addressKey ) ); // item
+      }
+
+      /**
+       * Push the correct envref object from the given envKey.
+       *
+       * STACK ARGS: none
+       * RETURNS: (table or function)
+       */
+      void Serializer::determineInnerItem( Json::Value& objectToken ) {
+        const char* type = objectToken[ "type" ].asCString();
+
+        switch( Tools::Utility::hash( type ) ) {
+          case Tools::Utility::hash( "ref" ):
+            getReference( objectToken[ "ptr" ].asString() ); // (table or function)
+            return;
+          case Tools::Utility::hash( "envref" ):
+            getEnvReference( objectToken[ "object" ].asString() ); // (table or function)
+            return;
+          default:
+            lua_pushnil( L ); // nil
+        }
+      }
+
+      /**
+       * Determine what kind of non-unique "envref" to give back is.
+       *
+       * STACK ARGS: none
+       * RETURNS: (table or function)
+       */
+      void Serializer::getEnvReference( const std::string& envRefKey ) {
+        const char* key = envRefKey.c_str();
+
+        switch( Tools::Utility::hash( key ) ) {
+          case Tools::Utility::hash( "bluebear" ):
+            lua_getglobal( L, "bluebear" ); // bluebear
+            return;
+          case Tools::Utility::hash( "_G" ):
+            lua_getglobal( L, "_G" ); // _G
+            return;
+        }
       }
 
       /**
@@ -270,7 +464,7 @@ namespace BlueBear {
       }
 
       /**
-       * Create a function on the master list
+       * Create a function/sfunction on the master list
        *
        * STACK ARGS: function
        * RETURNS: none
@@ -280,45 +474,69 @@ namespace BlueBear {
          std::string thisTable( Tools::Utility::pointerToString( lua_topointer( L, -1 ) ) );
 
          Json::Value func( Json::objectValue );
-         func[ "type" ] = Serializer::TYPE_FUNCTION;
 
-         // Serialize the text/function body of a closure
-         lua_getglobal( L, "string" ); // string function
-         lua_pushstring( L, "dump" ); // "dump" string function
-         lua_gettable( L, -2 ); // <string.dump> string function
-         lua_pushvalue( L, -3 ); // function <string.dump> string function
+         if( canCreateSfunction() ) {
+           // This sfunction can be created
+           func[ "type" ] = Serializer::TYPE_SFUNCTION;
 
-         if( lua_pcall( L, 1, 1, 0 ) == 0 ) { // "serialized" string function
-           int serializedLength = lua_rawlen( L, -1 );
-           const char* serialized = lua_tostring( L, -1 );
+           // Build everything we need to create an sfunction
 
-           std::stringstream stringBuilder;
-           for( int i = 0; i != serializedLength; i++ ) {
-             char c = serialized[ i ];
-             unsigned char uc = ( unsigned char ) c;
-             int ic = ( int )uc;
+           getUpvalueByName( "__derived_class" ); // "__derived_class" function
+           func[ "class" ] = lua_tostring( L, -1 );
+           lua_pop( L, 1 ); // function
 
-             if( ic < 32 || ic > 126 ) {
-               // Spit out '\uxxxx'
-               stringBuilder << "\\u" << std::setfill( '0' ) << std::setw( 4 ) << std::hex << ic;
-             } else {
-               // Spit out the literal, printable character
-               stringBuilder << c;
-             }
+           getUpvalueByName( "__derived_func" ); // "__derived_func" function
+           func[ "method" ] = lua_tostring( L, -1 );
+           lua_pop( L, 1 ); // function
+
+           getUpvalueByName( "args" ); // args function
+           std::string upvaluePointer( Tools::Utility::pointerToString( lua_topointer( L, -1 ) ) );
+           if( !world.isMember( upvaluePointer ) ) {
+             lua_pushvalue( L, -1 ); // args args function
+             createTableOnMasterList(); // args function
            }
 
-           func[ "body" ] = stringBuilder.str();
-           func[ "len" ] = serializedLength;
+           func[ "args" ] = createReference();
 
-           lua_pop( L, 2 ); // function
-
-           // Now serialize the associated upvalues
-           addUpvalues( func );
+           lua_pop( L, 1 ); // function
 
            world[ thisTable ] = func;
-         } else { // "error" string function
-            Log::getInstance().error( "LuaKit::Serializer::createFunctionOnMasterList", "Could not serialize function: " + std::string( lua_tostring( L, -1 ) ) );
-            lua_pop( L, 2 ); // function
+         } else {
+           func[ "type" ] = Serializer::TYPE_FUNCTION;
+
+           // Serialize the text/function body of a closure
+           lua_getglobal( L, "string" ); // string function
+           lua_pushstring( L, "dump" ); // "dump" string function
+           lua_gettable( L, -2 ); // <string.dump> string function
+           lua_pushvalue( L, -3 ); // function <string.dump> string function
+
+           if( lua_pcall( L, 1, 1, 0 ) == 0 ) { // "serialized" string function
+             int serializedLength = lua_rawlen( L, -1 );
+             const char* serialized = lua_tostring( L, -1 );
+
+             std::stringstream stringBuilder;
+             for( int i = 0; i != serializedLength; i++ ) {
+               char c = serialized[ i ];
+               unsigned char uc = ( unsigned char ) c;
+               int ic = ( int )uc;
+
+               // Spit out '\uxxxx'
+               stringBuilder << "\\u" << std::setfill( '0' ) << std::setw( 4 ) << std::hex << ic;
+             }
+
+             func[ "body" ] = stringBuilder.str();
+
+             lua_pop( L, 2 ); // function
+
+             // Now serialize the associated upvalues
+             addUpvalues( func );
+
+             world[ thisTable ] = func;
+           } else { // "error" string function
+              Log::getInstance().error( "LuaKit::Serializer::createFunctionOnMasterList", "Could not serialize function: " + std::string( lua_tostring( L, -1 ) ) );
+              lua_pop( L, 2 ); // function
+           }
+
          }
 
          lua_pop( L, 1 ); // EMPTY
@@ -381,47 +599,14 @@ namespace BlueBear {
 
               if( substitution == substitutions.end() ) {
                 // No substitution required for this function.
-
-                // Now determine if we need to create a reference to this function, or we need to create an "sfunction", by peeping at the upvalues.
-                if( canCreateSfunction() ) {
-                  // This sfunction can be created
-                  Json::Value sfunction( Json::objectValue );
-                  sfunction[ "type" ] = Serializer::TYPE_SFUNCTION;
-
-                  // Build everything we need to create an sfunction
-
-                  getUpvalueByName( "__derived_class" ); // "__derived_class" function
-                  sfunction[ "class" ] = lua_tostring( L, -1 );
-                  lua_pop( L, 1 ); // function
-
-                  getUpvalueByName( "__derived_func" ); // "__derived_func" function
-                  sfunction[ "method" ] = lua_tostring( L, -1 );
-                  lua_pop( L, 1 ); // function
-
-                  Json::Value& args = sfunction[ "args" ] = Json::Value( Json::arrayValue );
-                  getUpvalueByName( "args" ); // args function
-                  lua_pushnil( L ); // nil args function
-                  while( lua_next( L, -2 ) != 0 ) { // arg index args function
-                    Json::Value container = Json::Value( Json::objectValue );
-                    inferType( container, "value" ); // index args function
-                    args.append( container[ "value" ] );
-                  } // args function
-
-                  lua_pop( L, 1 ); // function
-
-                  pair[ field ] = sfunction;
-                } else {
-                  // We need to serialize code directly to the file
-                  if( !world.isMember( worldPointer ) ) {
-                    // Need to create the function
-                    lua_pushvalue( L, -1 ); // function function
-                    createFunctionOnMasterList(); // function
-                  }
-
-                  pair[ field ] = createReference();
-
+                // We need to serialize code directly to the file
+                if( !world.isMember( worldPointer ) ) {
+                  // Need to create the function
+                  lua_pushvalue( L, -1 ); // function function
+                  createFunctionOnMasterList(); // function
                 }
 
+                pair[ field ] = createReference();
               } else {
                 // This involves a substitution
                 pair[ field ] = substitution->second();
@@ -449,10 +634,9 @@ namespace BlueBear {
         for( int i = 1; const char* upvalueId = lua_getupvalue( L, -1, i ); i++ ) { // upvalue function
           Json::Value upvalue = Json::Value( Json::objectValue );
 
-          upvalue[ "key" ] = upvalueId;
           inferType( upvalue, "value" ); // function
 
-          upvalues.append( upvalue );
+          upvalues.append( upvalue[ "value" ] );
         }
       }
 
@@ -481,24 +665,25 @@ namespace BlueBear {
 
       /**
        * Gets an upvalue by name. This will push the upvalue if it exists, nil otherwise.
-       * O(n) method, use with care.
+       * O(n) method, use with care. Returns upvalue index in C++.
        *
        * STACK ARGS: function
        * RETURNS: (upvalue || nil) function
        */
-      void Serializer::getUpvalueByName( const std::string& name ) {
+      int Serializer::getUpvalueByName( const std::string& name ) {
 
         for( int i = 1; const char* upvalueId = lua_getupvalue( L, -1, i ); i++ ) { // upvalue function
           std::string key( upvalueId );
 
           if( key == name ) {
-            return;
+            return i;
           }
 
           lua_pop( L, 1 ); // function
         }
 
         lua_pushnil( L ); // nil function
+        return -1;
       }
 
       /**

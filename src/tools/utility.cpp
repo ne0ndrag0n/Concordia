@@ -349,5 +349,33 @@ namespace BlueBear {
 			ss << pointer;
 			return ss.str();
 		}
+
+		/**
+		 * Shitty decode method for the UTF-8 strings JsonCpp produces
+		 */
+		std::string Utility::decodeUTF8( const std::string& encoded ) {
+			std::stringstream stringBuilder;
+
+			for( int i = 0; i < encoded.length(); i++ ) {
+				char c = encoded[ i ];
+				unsigned char uc = ( unsigned char ) c;
+				int ic = ( int )uc;
+
+				if( ic == 0xC2 ) {
+					// Drop 0xC2 and use the next byte directly.
+					i++;
+					stringBuilder << encoded[ i ];
+				} else if( ic == 0xC3 ) {
+					// Drop 0xC3, add 0x40 to the next byte, and use that.
+					i++;
+					stringBuilder << ( char )( encoded[ i ] + 0x40 );
+				} else {
+					// Use the byte as-is.
+					stringBuilder << c;
+				}
+			}
+
+			return stringBuilder.str();
+		}
 	}
 }
