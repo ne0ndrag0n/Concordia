@@ -69,19 +69,113 @@
 
 	"engine": {
 		"ticks": 10,
-		"objects": {
-			"bb1": {
-				"classID": "game.flowers.base",
-				"instance": {
-					"_cid": "bb1",
-					"_sys": {
-						"_sched": {
-							"40.0": [ { "method": "main" } ]
-						}
-					},
-					"water_level": 100
-				}
-			}
+		"scheduler": {
+			"upcoming": {
+				"40.0": "0xffffffffffff"
+			},
+			"queued": [
+
+			]
+		},
+		"world": {
+		   "0x5609738a1550" : {
+		      "entries" : [
+		         {
+		            "key" : "_sched",
+		            "value" : {
+		               "ptr" : "0x5609738a1680",
+		               "type" : "ref"
+		            }
+		         }
+		      ],
+		      "type" : "table"
+		   },
+		   "0x5609738a1680" : {
+		      "entries" : [
+		         {
+		            "key" : "340.0",
+		            "value" : {
+		               "ptr" : "0x7f4a480034b0",
+		               "type" : "ref"
+		            }
+		         }
+		      ],
+		      "type" : "table"
+		   },
+		   "0x5609738a47e0" : {
+		      "classID" : "game.flowers.base",
+		      "entries" : [
+		         {
+		            "key" : "water_level",
+		            "value" : 80
+		         },
+		         {
+		            "key" : "_cid",
+		            "value" : "bb1"
+		         },
+		         {
+		            "key" : "_sys",
+		            "value" : {
+		               "ptr" : "0x5609738a1550",
+		               "type" : "ref"
+		            }
+		         }
+		      ],
+		      "type" : "itable"
+		   },
+			 "0xffffffffffff" : {
+				 "type": "sfunction",
+				 "class": "game.flowers.base",
+				 "method": "simple_callback_test",
+				 "args": {
+					 "type": "ref",
+					 "ptr": "0xfffffffffffe"
+				 }
+			 },
+			 "0xfffffffffffe" : {
+				 "type": "table",
+				 "entries": [
+					 {
+						 "key": 1,
+						 "value": {
+							 "type": "ref",
+							 "ptr": "0x5609738a47e0"
+						 }
+					 }
+				 ]
+			 },
+		   "0x7f4a48003470" : {
+		      "entries" : [],
+		      "type" : "table"
+		   },
+		   "0x7f4a480034b0" : {
+		      "entries" : [
+		         {
+		            "key" : 1,
+		            "value" : {
+		               "ptr" : "0x7f4a480034f0",
+		               "type" : "ref"
+		            }
+		         }
+		      ],
+		      "type" : "table"
+		   },
+		   "0x7f4a480034f0" : {
+		      "entries" : [
+		         {
+		            "key" : "arguments",
+		            "value" : {
+		               "ptr" : "0x7f4a48003470",
+		               "type" : "ref"
+		            }
+		         },
+		         {
+		            "key" : "method",
+		            "value" : "main"
+		         }
+		      ],
+		      "type" : "table"
+		   }
 		}
 	}
 }

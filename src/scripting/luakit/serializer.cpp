@@ -1,5 +1,5 @@
 #include "scripting/luakit/serializer.hpp"
-#include "scripting/serializableinstance.hpp"
+#include "scripting/event/scheduler.hpp"
 #include "tools/utility.hpp"
 #include "log.hpp"
 #include <lua.h>
@@ -38,7 +38,7 @@ namespace BlueBear {
       /**
        * Using the Engine-tracked index of system.entity.base objects as a starting point, save the current state of the Lua world.
        */
-      Json::Value Serializer::saveWorld( std::vector< SerializableInstance >& objects ) {
+      Json::Value Serializer::saveWorld( std::vector< LuaReference >& objects ) {
         world = Json::Value( Json::objectValue );
 
         // STOP the garbage collector so pointer references remain intact as we operate
@@ -49,9 +49,9 @@ namespace BlueBear {
         // Build all required substitutions (classes, the bluebear global)
         buildSubstitutions();
 
-        for( SerializableInstance& instance : objects ) {
+        for( int instance : objects ) {
           // table
-          lua_rawgeti( L, LUA_REGISTRYINDEX, instance.luaVMInstance );
+          lua_rawgeti( L, LUA_REGISTRYINDEX, instance );
 
           // EMPTY
           createTableOnMasterList();
@@ -70,12 +70,11 @@ namespace BlueBear {
       /**
        * Load (deserialise) the game world.
        */
-      std::vector< SerializableInstance > Serializer::loadWorld( Json::Value& engineDefinition ) {
+      std::vector< LuaReference > Serializer::loadWorld( Json::Value& engineDefinition, Event::Scheduler& scheduler ) {
         world = engineDefinition[ "objects" ];
 
         globalEntities.clear();
         globalInstanceEntities.clear();
-        serializableInstances.clear();
 
         // STOP the garbage collector so pointer references remain intact as we operate
         lua_gc( L, LUA_GCSTOP, 0 );
@@ -99,13 +98,19 @@ namespace BlueBear {
         lua_gc( L, LUA_GCRESTART, 0 );
         lua_gc( L, LUA_GCCOLLECT, 0 );
 
+        // Return the globalInstanceEntities map as a vector
+        std::vector< int > serializableInstances;
+        for( auto& instancePair : globalInstanceEntities ) {
+          serializableInstances.push_back( instancePair.second );
+        }
+
         return serializableInstances;
       }
 
       /**
        * Create a "global" Lua item. These are at the top level of world and can be table, itable, function, or sfunction.
        */
-      int Serializer::createGlobalItem( const std::string& addressKey ) {
+      LuaReference Serializer::createGlobalItem( const std::string& addressKey ) {
         Json::Value& item = world[ addressKey ];
 
         switch( Tools::Utility::hash( item[ "type" ].asCString() ) ) {
@@ -123,7 +128,7 @@ namespace BlueBear {
       /**
        * Create a table in RAM and associate it with the given address. Register it with globalEntities, return the reference we just created.
        */
-      int Serializer::createTable( const std::string& addressKey, Json::Value& tableDefinition ) {
+      LuaReference Serializer::createTable( const std::string& addressKey, Json::Value& tableDefinition ) {
         lua_newtable( L ); // table
 
         for( Json::Value& pair : tableDefinition[ "entries" ] ) {
@@ -146,7 +151,7 @@ namespace BlueBear {
       /**
        * Create an itable, which requires first getting the instance of the specified classID, then overlaying the specified properties.
        */
-      int Serializer::createITable( const std::string& addressKey, Json::Value& tableDefinition ) {
+      LuaReference Serializer::createITable( const std::string& addressKey, Json::Value& tableDefinition ) {
         lua_getglobal( L, "bluebear" ); // bluebear
         lua_pushstring( L, "get_class" ); // "get_class" bluebear
         lua_gettable( L, -2 ); // <bluebear.get_class> bluebear
@@ -184,8 +189,6 @@ namespace BlueBear {
         // Set reference
         int ref = globalInstanceEntities[ addressKey ] = luaL_ref( L, LUA_REGISTRYINDEX ); // Class bluebear
 
-        // TODO: See that "global" serializableInstances list? Now, we need to take "ref" and put it in here, so that loadWorld can return it in the list.
-
         lua_pop( L, 2 ); // EMPTY
 
         return ref;
@@ -194,7 +197,7 @@ namespace BlueBear {
       /**
        * Create a function from its serialized function text and set its upvalues. You generally shouldn't use this functionality; instead, write code to create sfunctions instead.
        */
-      int Serializer::createFunction( const std::string& addressKey, Json::Value& tableDefinition ) {
+      LuaReference Serializer::createFunction( const std::string& addressKey, Json::Value& tableDefinition ) {
 
         // push the function definition
         std::string functionBody = Tools::Utility::decodeUTF8( tableDefinition[ "body" ].asString() );
@@ -212,7 +215,7 @@ namespace BlueBear {
       /**
        * Create an sfunction, a serialized form of function where the function body is accessible via a reference to a modpack-registered class.
        */
-      int Serializer::createSFunction( const std::string& addressKey, Json::Value& tableDefinition ) {
+      LuaReference Serializer::createSFunction( const std::string& addressKey, Json::Value& tableDefinition ) {
         // Set up a standard sfunction-type bluebear.util.bind function without any arguments
 
         lua_getglobal( L, "bluebear" ); // bluebear

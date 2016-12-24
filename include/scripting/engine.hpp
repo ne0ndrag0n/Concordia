@@ -20,7 +20,6 @@ namespace BlueBear {
 	namespace Scripting {
 		class Lot;
 		class InfrastructureFactory;
-		class SerializableInstance;
 
 		class Engine {
 
@@ -48,7 +47,7 @@ namespace BlueBear {
 				void processCommands();
 
 			public:
-				std::vector< SerializableInstance > objects;
+				std::vector< LuaReference > objects;
 
 				Engine( Threading::CommandBus& commandBus );
 				~Engine();
@@ -68,8 +67,6 @@ namespace BlueBear {
 
 				static int lua_getLotObjects( lua_State* L );
 				static int lua_getLotObjectsByType( lua_State* L );
-
-				static int lua_trackSerializableInstance( lua_State* L );
 
 				class Command {
 					public:

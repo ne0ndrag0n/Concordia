@@ -122,4 +122,8 @@ function Flowers:test_config()
 	print( Flowers.name, ticks_per_second )
 end
 
+function Flowers:simple_callback_test()
+	print( "game.flowers.base", "Callback successful" )
+end
+
 bluebear.register_class( Flowers )

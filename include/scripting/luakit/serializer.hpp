@@ -1,6 +1,7 @@
 #ifndef LUA_SERIALIZER
 #define LUA_SERIALIZER
 
+#include "bbtypes.hpp"
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -13,7 +14,9 @@
 
 namespace BlueBear {
   namespace Scripting {
-    class SerializableInstance;
+    namespace Event {
+      class Scheduler;
+    }
 
     namespace LuaKit {
 
@@ -41,10 +44,8 @@ namespace BlueBear {
         // Pointer-to-substitution map usable by both upvalues and tables
         std::map< std::string, Callback > substitutions;
         // When loading a lot from disk, use these maps to track top-level objects
-        std::map< std::string, int > globalEntities;
-        std::map< std::string, int > globalInstanceEntities;
-        // "Global" list to plop items on, wich Serializer::loadWorld will return
-        std::vector< SerializableInstance > serializableInstances;
+        std::map< std::string, LuaReference > globalEntities;
+        std::map< std::string, LuaReference > globalInstanceEntities;
 
         // --- saving ---
         void createTableOnMasterList();
@@ -65,11 +66,11 @@ namespace BlueBear {
         void addUpvalues( Json::Value& funcType );
 
         // --- loading ---
-        int createGlobalItem( const std::string& addressKey );
-        int createTable( const std::string& addressKey, Json::Value& tableDefinition );
-        int createITable( const std::string& addressKey, Json::Value& tableDefinition );
-        int createFunction( const std::string& addressKey, Json::Value& tableDefinition );
-        int createSFunction( const std::string& addressKey, Json::Value& tableDefinition );
+        LuaReference createGlobalItem( const std::string& addressKey );
+        LuaReference createTable( const std::string& addressKey, Json::Value& tableDefinition );
+        LuaReference createITable( const std::string& addressKey, Json::Value& tableDefinition );
+        LuaReference createFunction( const std::string& addressKey, Json::Value& tableDefinition );
+        LuaReference createSFunction( const std::string& addressKey, Json::Value& tableDefinition );
         void getReference( const std::string& addressKey );
         void getEnvReference( const std::string& envRefKey );
         void determineInnerItem( Json::Value& objectToken );
@@ -84,8 +85,8 @@ namespace BlueBear {
         /**
          * Save the world to JSON value
          */
-        Json::Value saveWorld( std::vector< SerializableInstance >& objects );
-        std::vector< SerializableInstance > loadWorld( Json::Value& engineDefinition );
+        Json::Value saveWorld( std::vector< LuaReference >& objects );
+        std::vector< LuaReference > loadWorld( Json::Value& engineDefinition, Event::Scheduler& scheduler );
       };
 
     }

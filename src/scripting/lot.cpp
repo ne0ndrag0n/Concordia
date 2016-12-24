@@ -4,7 +4,6 @@
 #include <lauxlib.h>
 #include "containers/collection3d.hpp"
 #include "containers/conccollection3d.hpp"
-#include "scripting/serializableinstance.hpp"
 #include "scripting/lot.hpp"
 #include "log.hpp"
 #include "tools/utility.hpp"

@@ -3,7 +3,6 @@
 #include <lualib.h>
 #include <lauxlib.h>
 #include "tools/utility.hpp"
-#include "scripting/serializableinstance.hpp"
 #include "scripting/lot.hpp"
 #include "scripting/engine.hpp"
 #include "threading/commandbus.hpp"
@@ -75,12 +74,6 @@ namespace BlueBear {
 			lua_pushstring( L, "setup_stemcell" );
 			lua_pushlightuserdata( L, this );
 			lua_pushcclosure( L, &Engine::lua_setupStemcell, 1 );
-			lua_settable( L, -3 );
-
-			// bluebear.engine.__track
-			lua_pushstring( L, "__track" );
-			lua_pushlightuserdata( L, this );
-			lua_pushcclosure( L, &Engine::lua_trackSerializableInstance, 1 );
 			lua_settable( L, -3 );
 
 			// bluebear.engine.tick_rate
@@ -275,10 +268,7 @@ namespace BlueBear {
 					// Clear the std::map containing all objects
 					objects.clear();
 
-					// Iterate through the "objects" array
-					for( Json::Value& entity : engineJSON[ "objects" ] ) {
-						createSerializableInstanceFromJSON( entity );
-					}
+					// TODO: Load using the new pointer-eventqueue method using a LuaKit::Serializer
 				} else {
 					Log::getInstance().error( "Engine::loadLot", "Unable to parse " + std::string( lotPath ) );
 					return false;
@@ -344,13 +334,7 @@ namespace BlueBear {
 						// On every tick, increment currentTick
 						currentTick++;
 
-						// Set current_tick on bluebear.lot (inside the Luasphere, system/root.lua) to the current tick
-						Tools::Utility::setTableIntValue( L, "current_tick", currentTick );
-
-						for( SerializableInstance& currentEntity : objects ) {
-							// currentEntity.execute should leave the stack as it was when it was called!!
-							currentEntity.execute();
-						}
+						// TODO: The new pointer-eventqueue magic happens here...
 					}
 					// ** END THE SINGLE TICK LOOP **
 				}
@@ -369,15 +353,6 @@ namespace BlueBear {
 				// Guarantees that one second will elapse every "ticksPerSecond" ticks
 				std::this_thread::sleep_until( startTime + std::chrono::milliseconds( sleepInterval ) );
 			}
-
-			// Transition back to Idle or TitleScreen state when the loop is done
-			// Enqueue state change command, then force commit
-			// TODO: Reenable when ready
-			//displayCommandList.push_back( std::make_unique< Graphics::Display::ChangeStateCommand >( Graphics::Display::ChangeStateCommand::State::STATE_TITLESCREEN ) );
-			//commandBus.produce( displayCommandList );
-
-			LuaKit::Serializer serializer( L );
-			serializer.saveWorld( objects );
 
 			Log::getInstance().debug( "Engine::objectLoop", "Finished!" );
 		}
@@ -416,8 +391,8 @@ namespace BlueBear {
 
 			 // Push 'em on!
 			 size_t tableIndex = 1;
-			 for( SerializableInstance& lotEntity : engine->objects ) {
-				 lua_rawgeti( L, LUA_REGISTRYINDEX, lotEntity.luaVMInstance );
+			 for( int lotEntity : engine->objects ) {
+				 lua_rawgeti( L, LUA_REGISTRYINDEX, lotEntity );
 				 lua_rawseti( L, -2, tableIndex++ );
 			 }
 
@@ -436,14 +411,14 @@ namespace BlueBear {
 			 const char* idKey = keystring.c_str();
 			 lua_pop( L, 1 );
 
-			 // This table will be the array of matching lot objects
+			 // This table will be the array of matching lot
 			 lua_newtable( L );
 
 			 // Start at index number 1 - Lua arrays (tables) start at 1
 			 size_t tableIndex = 1;
 
 			 // Iterate through each object on the lot, checking to see if each is an instance of "idKey"
-			 for( SerializableInstance& lotEntity : engine->objects ) {
+			 for( int lotEntity : engine->objects ) {
 				 // Push bluebear global
 				 lua_getglobal( L, "bluebear" );
 
@@ -452,7 +427,7 @@ namespace BlueBear {
 
 				 // Push the two arguments: identifier, and instance
 				 lua_pushstring( L, idKey );
-				 lua_rawgeti( L, LUA_REGISTRYINDEX, lotEntity.luaVMInstance );
+				 lua_rawgeti( L, LUA_REGISTRYINDEX, lotEntity );
 
 				 // We're ready to call instance_of on object!
 				 if( lua_pcall( L, 2, 1, 0 ) == 0 ) {
@@ -469,7 +444,7 @@ namespace BlueBear {
 					 // If this object is a descendant of idKey, push it onto the table
 					 if( isInstance ) {
 						 // Re-push the instance onto the stack
-						 lua_rawgeti( L, LUA_REGISTRYINDEX, lotEntity.luaVMInstance );
+						 lua_rawgeti( L, LUA_REGISTRYINDEX, lotEntity );
 						 // Push it onto the table on our stack
 						 lua_rawseti( L, -2, tableIndex++ );
 					 }
@@ -598,44 +573,6 @@ namespace BlueBear {
 
  				lua_pop( L, 2 );
  			}
-		 }
-
-		 /**
-		  * Track the given table in Engine's "objects" list. This basically creates a new SerializableInstance, which is only a wrapper.
-			*/
-		 int Engine::lua_trackSerializableInstance( lua_State* L ) {
-
-			 Engine* self = ( Engine* ) lua_touserdata( L, lua_upvalueindex( 1 ) );
-
-			 // Top of stack should contain table
-
-			 // table
-			 if( !lua_istable( L, -1 ) ) {
-				 Log::getInstance().error( "Engine::lua_trackSerializableInstance", "bluebear.engine.__track called on an item that isn't a table!" );
-				 return 0;
-			 }
-
-			 // Get cid
-
-			 // "cid" table
-			 Tools::Utility::getTableValue( L, "_cid" );
-
-			 if( !lua_isstring( L, -1 ) ) {
-				 Log::getInstance().error( "Engine::lua_trackSerializableInstance", "bluebear.engine.__track called on a table that is neither serializable or has a valid _cid!" );
-				 return 0;
-			 }
-
-			 std::string cid( lua_tostring( L, -1 ) );
-
-			 // table
-			 lua_pop( L, 1 );
-
-			 int luaVMInstance = luaL_ref( L, LUA_REGISTRYINDEX );
-
-			 self->objects.emplace_back( L, self->currentTick, luaVMInstance );
-
-			 return 0;
-
 		 }
 
 		// ---------- COMMANDS ----------
