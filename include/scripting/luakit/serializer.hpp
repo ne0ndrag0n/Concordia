@@ -14,9 +14,7 @@
 
 namespace BlueBear {
   namespace Scripting {
-    namespace Event {
-      class Scheduler;
-    }
+    class Engine;
 
     namespace LuaKit {
 
@@ -86,7 +84,7 @@ namespace BlueBear {
          * Save the world to JSON value
          */
         Json::Value saveWorld( std::vector< LuaReference >& objects );
-        std::vector< LuaReference > loadWorld( Json::Value& engineDefinition, Event::Scheduler& scheduler );
+        std::vector< LuaReference > loadWorld( Json::Value& engineDefinition, Engine& engine );
       };
 
     }

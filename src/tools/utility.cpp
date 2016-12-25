@@ -350,6 +350,15 @@ namespace BlueBear {
 			return ss.str();
 		}
 
+		void* Utility::stringToPointer( const std::string& str ) {
+			std::stringstream ss;
+			ss << str;
+
+			uintptr_t ptr = 0x0;
+			ss >> std::hex >> ptr;
+			return reinterpret_cast< void* >( ptr );
+		}
+
 		/**
 		 * Shitty decode method for the UTF-8 strings JsonCpp produces
 		 */

@@ -69,13 +69,10 @@
 
 	"engine": {
 		"ticks": 10,
-		"scheduler": {
-			"upcoming": {
-				"40.0": "0xffffffffffff"
-			},
-			"queued": [
-
-			]
+		"waitingTable": {
+			"timerMap": {
+				"40": [ "0xffffffffffff" ]
+			}
 		},
 		"world": {
 		   "0x5609738a1550" : {

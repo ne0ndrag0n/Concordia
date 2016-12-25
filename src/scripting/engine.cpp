@@ -10,6 +10,7 @@
 #include "configmanager.hpp"
 #include "scripting/infrastructurefactory.hpp"
 #include "scripting/luakit/serializer.hpp"
+#include "scripting/event/waitingtable.hpp"
 #include "log.hpp"
 #include <jsoncpp/json/json.h>
 #include <iterator>
@@ -28,8 +29,9 @@ namespace BlueBear {
 
 		Engine::Engine( Threading::CommandBus& commandBus ) :
 		 L( luaL_newstate() ),
-		 currentModpackDirectory( nullptr ),
 		 ticksPerSecond( ConfigManager::getInstance().getIntValue( "ticks_per_second" ) ),
+		 waitingTable( Event::WaitingTable( callbacks ) ),
+		 currentModpackDirectory( nullptr ),
 		 commandBus( commandBus ),
 		 cancel( false ) {
 			luaL_openlibs( L );

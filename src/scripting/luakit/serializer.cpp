@@ -1,5 +1,5 @@
 #include "scripting/luakit/serializer.hpp"
-#include "scripting/event/scheduler.hpp"
+#include "scripting/engine.hpp"
 #include "tools/utility.hpp"
 #include "log.hpp"
 #include <lua.h>
@@ -70,8 +70,8 @@ namespace BlueBear {
       /**
        * Load (deserialise) the game world.
        */
-      std::vector< LuaReference > Serializer::loadWorld( Json::Value& engineDefinition, Event::Scheduler& scheduler ) {
-        world = engineDefinition[ "objects" ];
+      std::vector< LuaReference > Serializer::loadWorld( Json::Value& engineDefinition, Engine& engine ) {
+        world = engineDefinition[ "world" ];
 
         globalEntities.clear();
         globalInstanceEntities.clear();
@@ -87,6 +87,8 @@ namespace BlueBear {
             createGlobalItem( addressKey );
           }
         }
+
+        engine.waitingTable.loadFromJSON( engineDefinition[ "waitingTable" ], globalEntities );
 
         // Release references to items we no longer require
         for( auto& entityPair : globalEntities ) {

@@ -1,6 +1,7 @@
 #ifndef ENGINE
 #define ENGINE
 
+#include "scripting/event/waitingtable.hpp"
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -10,6 +11,7 @@
 #include <vector>
 #include <map>
 #include <list>
+#include <queue>
 #include <jsoncpp/json/json.h>
 
 namespace BlueBear {
@@ -18,6 +20,10 @@ namespace BlueBear {
 	}
 
 	namespace Scripting {
+		namespace LuaKit {
+			class Serializer;
+		}
+
 		class Lot;
 		class InfrastructureFactory;
 
@@ -33,6 +39,10 @@ namespace BlueBear {
 				lua_State* L;
 				Tick currentTick;
 				Tick ticksPerSecond;
+
+				std::queue< LuaReference > callbacks;
+				Event::WaitingTable waitingTable;
+
 				std::shared_ptr< Lot > currentLot;
 				std::unique_ptr< InfrastructureFactory > infrastructureFactory;
 				const char* currentModpackDirectory;
@@ -45,6 +55,8 @@ namespace BlueBear {
 				void callActionOnObject( const char* playerId, const char* objectId, const char* method );
 				// TODO: New method to deserialise function refs will be needed in LuaKit::Serializer
 				void processCommands();
+
+				friend class LuaKit::Serializer;
 
 			public:
 				std::vector< LuaReference > objects;
