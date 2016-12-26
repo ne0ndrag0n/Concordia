@@ -38,7 +38,7 @@ namespace BlueBear {
       /**
        * Using the Engine-tracked index of system.entity.base objects as a starting point, save the current state of the Lua world.
        */
-      Json::Value Serializer::saveWorld( std::vector< LuaReference >& objects ) {
+      Json::Value Serializer::saveWorld( std::vector< LuaReference >& objects, Engine& engine ) {
         world = Json::Value( Json::objectValue );
 
         // STOP the garbage collector so pointer references remain intact as we operate
@@ -49,7 +49,8 @@ namespace BlueBear {
         // Build all required substitutions (classes, the bluebear global)
         buildSubstitutions();
 
-        for( int instance : objects ) {
+        // First scoop up our system.entity.base objects that are tracked in the objects std::vector
+        for( LuaReference instance : objects ) {
           // table
           lua_rawgeti( L, LUA_REGISTRYINDEX, instance );
 
@@ -57,14 +58,42 @@ namespace BlueBear {
           createTableOnMasterList();
         }
 
+        // Next, scoop up any items that are known only to the engine, but don't have any reference anywhere else in the game world.
+        lua_pushvalue( L, LUA_REGISTRYINDEX ); // registry
+        lua_pushnil( L ); // nil registry
+        while( lua_next( L, -2 ) ) { // item 1 registry
+          std::string pointer = Tools::Utility::pointerToString( lua_topointer( L, -1 ) );
+          if( !world.isMember( pointer ) ) {
+            // Needs to be scooped up and saved, it's a part of the Luasphere that is known to the engine but not the game world itself
+            // ORDINARILY, these should only be table or function refs.
+            if( lua_istable( L, -1 ) ) {
+              createTableOnMasterList(); // 1 registry
+            } else if ( lua_isfunction( L, -1 ) ) {
+              createFunctionOnMasterList(); // 1 registry
+            } else {
+              Log::getInstance().error( "LuaKit::Serializer::saveWorld", "Engine tracked a non-table, non-function Lua reference, and I can't serialize it. Bitch at ne0ndrag0n because this is a fully preventable bug." );
+              lua_pop( L, 1 ); // 1 registry
+            }
+          } else {
+            lua_pop( L, 1 ); // 1 registry
+          }
+        } // registry
+
+        lua_pop( L, 1 ); // EMPTY
+
+        Json::Value result = Json::Value( Json::objectValue );
+        result[ "world" ] = world;
+        result[ "waitingTable" ] = engine.waitingTable.saveToJSON( L );
+
         // Use this regex when saving to a file, it fixes an annoying thing with JsonCpp where the "\u" is replaced by "\\u"
-        Log::getInstance().debug( "LuaKit::Serializer::saveWorld", "\n" + std::regex_replace( world.toStyledString(), std::regex( R"(\\\\u)" ), "\\u" ) );
+        // TODO: Remove when we actually save to file
+        Log::getInstance().debug( "LuaKit::Serializer::saveWorld", "\n" + std::regex_replace( result.toStyledString(), std::regex( R"(\\\\u)" ), "\\u" ) );
 
         // Restart the garbage collector, and give it a good cycle
         lua_gc( L, LUA_GCRESTART, 0 );
         lua_gc( L, LUA_GCCOLLECT, 0 );
 
-        return world;
+        return result;
       }
 
       /**

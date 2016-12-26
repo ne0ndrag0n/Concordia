@@ -3,6 +3,9 @@
 
 #include "bbtypes.hpp"
 #include <jsoncpp/json/json.h>
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
 #include <map>
 #include <list>
 #include <queue>
@@ -32,7 +35,7 @@ namespace BlueBear {
         WaitingTable( std::queue< LuaReference >& engineQueue );
 
         void loadFromJSON( Json::Value& loadingTable, std::map< std::string, LuaReference >& entities );
-        Json::Value saveToJSON();
+        Json::Value saveToJSON( lua_State* L );
 
         std::string waitForTick( Tick deadline, LuaReference function );
         void cancelTick( const std::string& handle );

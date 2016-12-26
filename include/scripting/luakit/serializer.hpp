@@ -83,7 +83,7 @@ namespace BlueBear {
         /**
          * Save the world to JSON value
          */
-        Json::Value saveWorld( std::vector< LuaReference >& objects );
+        Json::Value saveWorld( std::vector< LuaReference >& objects, Engine& engine );
         std::vector< LuaReference > loadWorld( Json::Value& engineDefinition, Engine& engine );
       };
 

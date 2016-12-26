@@ -29,10 +29,26 @@ namespace BlueBear {
         }
       }
 
-      Json::Value WaitingTable::saveToJSON() {
+      /**
+       * Recommended that you disable garbage collection before saving the WaitingTable (pointer may save incorrectly)
+       * The assumption here is that any pointer we scoop up here is in the world table by now!
+       */
+      Json::Value WaitingTable::saveToJSON( lua_State* L ) {
         Json::Value json;
 
-        // TODO
+        Json::Value& timerMapJSON = json[ "timerMap" ] = Json::Value( Json::objectValue );
+
+        for( auto& pair : timerMap ) {
+          Json::Value& entry = timerMapJSON[ std::to_string( pair.first ) ] = Json::Value( Json::arrayValue );
+
+          for( LuaReference reference : pair.second ) {
+            lua_rawgeti( L, LUA_REGISTRYINDEX, reference ); // reference
+
+            entry.append( Tools::Utility::pointerToString( lua_topointer( L, -1 ) ) );
+
+            lua_pop( L, 1 ); // EMPTY
+          }
+        }
 
         return json;
       }

@@ -78,6 +78,12 @@ namespace BlueBear {
 			lua_pushcclosure( L, &Engine::lua_setupStemcell, 1 );
 			lua_settable( L, -3 );
 
+			// bluebear.engine.set_timeout
+			lua_pushstring( L, "set_timeout" );
+			lua_pushlightuserdata( L, this );
+			lua_pushcclosure( L, &Engine::lua_setTimeout, 1 );
+			lua_settable( L, -3 );
+
 			// bluebear.engine.tick_rate
 			lua_pushstring( L, "tick_rate" );
 			lua_pushnumber( L, ticksPerSecond );
@@ -383,6 +389,38 @@ namespace BlueBear {
 			 return 0;
 		 }
 
+		 /**
+		  *
+			* STACK ARGS: interval function
+			* RETURNS: stringhandle
+			*/
+		 int Engine::lua_setTimeout( lua_State* L ) {
+
+			 Engine* self = ( Engine* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+
+			 // First argument on the stack should be a function
+			 // The rightmost argument is on the top of the stack
+			 if( lua_isfunction( L, -2 ) && lua_isnumber( L, -1 ) ) {
+				 // warning: watch the type of Tick
+				 Tick interval = lua_tointeger( L, -1 );
+
+				 lua_pop( L, 1 ); // function
+
+				 // This reference should be a reference owned by the queue-waiting table pair, and should never be used anywhere else.
+				 // When the engine consumes the function, the reference should be luaL_unref'd and freed.
+				 // If you don't do this, you'll get horriffic memory leaks that slowly worsen as a lot is played.
+				 std::string handle = self->waitingTable.waitForTick( self->currentTick + interval, luaL_ref( L, LUA_REGISTRYINDEX ) ); // EMPTY
+
+				 lua_pushstring( L, handle.c_str() ); // "handle"
+
+				 return 1;
+			 } else {
+				 Log::getInstance().warn( "Engine::lua_setTimeout", "Invalid arguments provided to bluebear.engine.set_timeout: Argument 1 is a function and argument 2 is a number." );
+
+				 return 0;
+			 }
+		 }
+
 		 int Engine::lua_getLotObjects( lua_State* L ) {
 
 			 // Pop the lot off the stack
@@ -455,126 +493,6 @@ namespace BlueBear {
 
 			 return 1;
 
-		 }
-
-		 /**
-			* Create a lot entity from a JSON value
-			*/
-		 void Engine::createSerializableInstanceFromJSON( const Json::Value& serialEntity ) {
-			 static Json::FastWriter writer;
-
-			 // classID field has class name
-			 // instance field has the serialized JSON for the object
-			 std::string classID( serialEntity[ "classID" ].asString() );
-
-			 // Get bluebear.classes
-			 // bluebear
-			 lua_getglobal( L, "bluebear" );
-
-			 // bluebear.classes bluebear
-			 Tools::Utility::getTableValue( L, "classes" );
-
-			 // Get the actual class referred to by this classID
-			 // Class bluebear
-			 Tools::Utility::getTableTreeValue( L, classID );
-
-			 // If "nil bluebear": Cannot continue: the class was not found
-			 if( lua_istable( L, -1 ) ) {
-				 // Class is at the top of the stack
-				 // Let's start by creating a new instance
-
-				 // <new> Class bluebear
-				 Tools::Utility::getTableValue( L, "new" );
-
-				 // Class <new> Class bluebear
-				 lua_pushvalue( L, -2 );
-
-				 // Use JSON.decode( JSON, "serialisedInstance" ) to transform the serialised instance to a table
-				 // JSON Class <new> Class bluebear
-				 lua_getglobal( L, "JSON" );
-
-				 // <decode> JSON Class <new> Class bluebear
-				 Tools::Utility::getTableValue( L, "decode" );
-
-				 // JSON <decode> JSON Class <new> Class bluebear
-				 lua_pushvalue( L, -2 );
-
-				 // "serialisedInstance" JSON <decode> JSON Class <new> Class bluebear
-				 lua_pushstring( L, writer.write( serialEntity[ "instance" ] ).c_str() );
-
-				 // Deserialize the JSON object into a Lua table
-				 // instanceTable JSON Class <new> Class bluebear
-				 if( lua_pcall( L, 2, 1, 0 ) == 0 ) {
-					 // Prepare for the pcall that makes the instance
-					 // instanceTable Class <new> Class bluebear
-					 lua_remove( L, -2 );
-				 } else {
-					 // error JSON Class <new> Class bluebear
-					 Log::getInstance().error( "Engine::createSerializableInstanceFromJSON", "Problem deserialising using Lua JSON lib on " + classID );
-
-					 lua_pop( L, 6 );
-					 return;
-				 }
-
-				 // instance Class bluebear
-				 if( lua_pcall( L, 2, 1, 0 ) != 0 ) {
-					 // error Class bluebear
-					 Log::getInstance().error( "Engine::createSerializableInstanceFromJSON", "Could not call \"new\" for creating instance: " + std::string( lua_tostring( L, -1 ) ) );
-				 }
-
-				 // Instance is created! It should have called bluebear.engine.__track( self ) in the superclass or its own constructor, where it is now being tracked!
-
-				 // EMPTY
-				 lua_pop( L, 3 );
-
-			 } else {
-				 Log::getInstance().error( "Engine::createSerializableInstanceFromJSON", "Could not find class " + classID );
-
-				 lua_pop( L, 2 );
-			 }
-		 }
-
-		 /**
-			* Create a new instance of "classID" from scratch
-			*/
-		 void Engine::createSerializableInstance( const std::string& classID ) {
-			// Get bluebear.classes
- 			// bluebear
- 			lua_getglobal( L, "bluebear" );
-
- 			// bluebear.classes bluebear
- 			Tools::Utility::getTableValue( L, "classes" );
-
- 			// Get the actual class referred to by this classID
- 			// Class bluebear
- 			Tools::Utility::getTableTreeValue( L, classID );
-
- 			// If "nil bluebear": Cannot continue: the class was not found
- 			if( lua_istable( L, -1 ) ) {
- 				// Class is at the top of the stack
- 				// Let's start by creating a new instance
-
- 				// <new> Class bluebear
- 				Tools::Utility::getTableValue( L, "new" );
-
- 				// Class <new> Class bluebear
- 				lua_pushvalue( L, -2 );
-
- 				// instance Class bluebear
- 				if( lua_pcall( L, 1, 1, 0 ) != 0 ) {
- 					// error Class bluebear
- 					Log::getInstance().error( "Engine::createSerializableInstance", std::string( lua_tostring( L, -1 ) ) );
- 				}
-
-				// Instance is created! It should have called bluebear.engine.__track( self ) in the superclass or its own constructor, where it is now being tracked!
-
-				// EMPTY
-				lua_pop( L, 3 );
- 			} else {
- 				Log::getInstance().error( "Engine::createSerializableInstance", "Could not find class " + classID );
-
- 				lua_pop( L, 2 );
- 			}
 		 }
 
 		// ---------- COMMANDS ----------

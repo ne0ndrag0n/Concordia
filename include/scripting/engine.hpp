@@ -70,13 +70,11 @@ namespace BlueBear {
 
 				bool loadModpackSet( const char* modpackDirectory );
 				bool loadModpack( const std::string& name );
-				void createSerializableInstanceFromJSON( const Json::Value& serialEntity );
-				void createSerializableInstance( const std::string& classID );
 
 				static int lua_loadModpack( lua_State* L );
 				static int lua_setupStemcell( lua_State* L );
 				static int lua_print( lua_State* L );
-
+				static int lua_setTimeout( lua_State* L );
 				static int lua_getLotObjects( lua_State* L );
 				static int lua_getLotObjectsByType( lua_State* L );
 
