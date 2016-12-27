@@ -1,22 +1,14 @@
 local Promise = ...
 local TimedPromise = bluebear.extend( 'system.promise.base', 'system.promise.timer' )
 
-function TimedPromise:initialize( obj_ref, start_tick )
-	Promise.initialize( self, obj_ref )
+--[[
+  A TimedPromise is simply a promise that resolves after the given time interval. This Promise will either go unfulfilled, or resolve, but never fail.
+--]]
 
-	self.next_tick = start_tick
-end
-
-function TimedPromise:then_call_on( entity, func_name, ... )
-	local descriptor = entity:register_callback( self.next_tick, func_name, { ... } )
-
-	self.last.tick = self.next_tick
-	self.last.callback = descriptor
-
-	-- any future "then_call" statements will be called tick per tick
-	self.next_tick = self.next_tick + 1
-
-	return self
+function TimedPromise:initialize( timeout )
+  return Promise.initialize( self, function( resolve )
+    bluebear.engine.set_timeout( bluebear.util.bind( 'system.promise.base:resolve', self ), timeout )
+  end )
 end
 
 bluebear.register_class( TimedPromise )

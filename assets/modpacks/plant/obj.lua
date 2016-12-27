@@ -35,7 +35,7 @@ local Flowers = bluebear.extend( "system.entity.base", "game.flowers.base", {
 				-- walk_to returns a promise that makes a request to the C++ Engine to find a path. Engine
 				-- will use a thread pool to find the path, and the callback will be fired on the tick
 				-- that is after the current tick when the thread pool task completes.
-				doll:walk_to( object ):then_call( 'change_state', Doll.STATES.INTERACTING )
+				-- TODO
 			end,
 			-- This function is called once when the interacting doll switches its state to Doll.STATES.INTERACTING
 			-- This is normally where you conduct activities required to fulfill the interaction. If it's a simple
@@ -48,9 +48,8 @@ local Flowers = bluebear.extend( "system.entity.base", "game.flowers.base", {
 				-- After those animations are played, call the replenish_water method which will increase the water_level
 				-- back to 100 and then change the object frame to healthy plants if necessary. After *that* completes,
 				-- call change_state on the doll to CONCLUDING to give the doll its reward
-				doll:animate( Doll.ANIMATIONS.WATERING_CAN )
-					:then_call_on( object, 'replenish_water' )
-					:then_call( 'change_state', Doll.STATES.CONCLUDING )
+
+				-- TODO
 			end,
 			-- This function is called once when the interacting doll switches its state to Doll.STATES.CONCLUDING
 			-- Here, you grant the doll its motive reward and release it from the interaction by switching it back
@@ -102,7 +101,7 @@ function Flowers:main()
 
 	print( Flowers.name, "Hello from Lua! I am object instance ("..self._cid..") and my water level is now "..self.water_level )
 
-	self:sleep( bluebear.util.time.minutes_to_ticks( 5 ) ):then_call( 'main' )
+	self:sleep( bluebear.util.time.minutes_to_ticks( 5 ) ):then_call( bluebear.util.bind( 'game.flowers.base:main', self ) )
 end
 
 function Flowers:load( saved )

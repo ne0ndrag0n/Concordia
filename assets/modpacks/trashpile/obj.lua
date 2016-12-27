@@ -11,7 +11,7 @@ local TrashPile = bluebear.extend( "system.entity.base", "game.household.trashpi
 function TrashPile:main()
 	print( TrashPile.name, "Hello from Lua! I am object instance ("..self._cid..")" )
 
-	self:sleep( bluebear.util.time.minutes_to_ticks( 1 ) ):then_call( 'main' )
+	self:sleep( bluebear.util.time.minutes_to_ticks( 1 ) ):then_call( bluebear.util.bind( 'game.household.trashpile.base:main', self ) )
 end
 
 function TrashPile:load( saved )

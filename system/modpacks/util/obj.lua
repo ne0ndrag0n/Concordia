@@ -103,3 +103,13 @@ bluebear.util.print_upvalues = function( func )
     idx = idx + 1
   end
 end
+
+bluebear.util.get_upvalue_by_name = function( func, name )
+  local i = 1
+  while true do
+    local n, v = debug.getupvalue(func, i)
+    if not n then break end
+    if n == name then return v end
+    i = i + 1
+  end
+end

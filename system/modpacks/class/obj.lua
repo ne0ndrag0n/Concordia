@@ -153,6 +153,10 @@ bluebear.util.bind = function( f, ... )
 		func = bluebear.get_class( __derived_class )[ __derived_func ]
 	else
 		func = f
+
+		-- These will just be nil if they don't exist
+		__derived_class = bluebear.util.get_upvalue_by_name( func, "__derived_class" )
+		__derived_func = bluebear.util.get_upvalue_by_name( func, "__derived_func" )
 	end
 
   return function( ... )

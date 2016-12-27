@@ -63,36 +63,6 @@ function Entity:sleep( numTicks )
 end
 
 --[[
-  Simple defer (schedule this for the next available tick, without increment)
---]]
-function Entity:defer()
-  return bluebear.get_class( 'system.promise.base' ):new( self )
-end
-
---[[
-	Enter in a callback on this object's _sys._sched table for the destination tick
---]]
-function Entity:register_callback( tick, method, wrapped_arguments )
-	local ticks_key = tostring( tick )
-	local ticks_table
-
-	if self._sys._sched[ ticks_key ] == nil then
-		self._sys._sched[ ticks_key ] = {}
-	end
-
-	ticks_table = self._sys._sched[ ticks_key ]
-
-  local descriptor = {
-    method = method,
-    arguments = wrapped_arguments
-  }
-
-	table.insert( ticks_table, descriptor )
-
-  return descriptor
-end
-
---[[
   Gets a curated list of interactions visible to the passed-in player.
 
   Probably something we can do in C++ during the Picasso milestone. This will
@@ -109,16 +79,6 @@ function Entity:get_interactions( player )
   end
 
   return eligible_interactions
-end
-
---[[
-  Given a cancelable, cancel an upcoming callback before it happens.
---]]
-function Entity:cancel_callback( cancelable )
-  -- Find the callback using the information provided in the cancelable
-  local array = self._sys._sched[ cancelable.tick ]
-
-  table.remove( array, bluebear.util.array_index_of( array, cancelable.callback ) )
 end
 
 --[[

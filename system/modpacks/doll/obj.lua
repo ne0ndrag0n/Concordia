@@ -187,8 +187,7 @@ end
   Kick off the virtual thread that decays this doll's motives.
 --]]
 function Doll:on_create()
-  self:defer():then_call( 'main' )
-  self:defer():then_call( 'decay_my_motives' )
+  -- TODO ?
 end
 
 --[[
@@ -206,7 +205,8 @@ function Doll:main()
       -- Account for waiting (the doll should be able to just stand there for a bit)
     end
   end
-  self:sleep( Doll.HEARTBEAT_INTERVAL ):then_call( 'main' )
+  -- TODO: Think about getting the current class ID instead of just rattling off system.doll.base:main. This won't work when main is extended.
+  self:sleep( Doll.HEARTBEAT_INTERVAL ):then_call( bluebear.util.bind( 'system.doll.base:main', self ) )
 end
 
 --[[
@@ -218,7 +218,8 @@ function Doll:decay_my_motives()
       motive:decay()
   end
 
-  self:sleep( bluebear.util.time.minutes_to_ticks( 1 ) ):then_call( 'decay_my_motives' )
+  -- TODO: Think about getting the current class ID instead of just rattling off system.doll.base:decay_my_motives. This won't work when main is extended.
+  self:sleep( bluebear.util.time.minutes_to_ticks( 1 ) ):then_call( bluebear.util.bind( 'system.doll.base:decay_my_motives', self ) )
 end
 
 --[[
