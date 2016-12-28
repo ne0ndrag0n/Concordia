@@ -44,7 +44,7 @@ namespace BlueBear {
 			Json::Value levels = wall[ "levels" ];
 
 			// Create the vector reference of shared_ptrs by iterating through dict
-			std::vector< Threading::Lockable< Wallpaper > > lookup;
+			std::vector< std::shared_ptr< Wallpaper > > lookup;
 			for( const Json::Value& dictEntry : dict ) {
 				auto wallpaper = infrastructureFactory.getWallpaper( dictEntry.asString() );
 				lookup.push_back( wallpaper );
@@ -73,7 +73,7 @@ namespace BlueBear {
 		/**
 		 * Build the wall cell in all four possible dimensions
 		 */
-		Threading::Lockable< WallCell > Lot::getWallCell( Json::Value& object, std::vector< Threading::Lockable< Wallpaper > >& lookup ) {
+		Threading::Lockable< WallCell > Lot::getWallCell( Json::Value& object, std::vector< std::shared_ptr< Wallpaper > >& lookup ) {
 			Threading::Lockable< WallCell > wallCell;
 
 			if( object.isObject() && !object.isNumeric() ) {

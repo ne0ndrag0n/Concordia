@@ -1,7 +1,6 @@
 #ifndef WALLCELL
 #define WALLCELL
 
-#include "threading/lockable.hpp"
 #include <memory>
 
 namespace BlueBear {
@@ -12,11 +11,11 @@ namespace BlueBear {
 
       public:
         struct Segment {
-          Threading::Lockable< Wallpaper > front;
-          Threading::Lockable< Wallpaper > back;
+          std::shared_ptr< Wallpaper > front;
+          std::shared_ptr< Wallpaper > back;
 
           public:
-            Segment( Threading::Lockable< Wallpaper > front, Threading::Lockable< Wallpaper > back ) : front( front ), back( back ) {}
+            Segment( std::shared_ptr< Wallpaper > front, std::shared_ptr< Wallpaper > back ) : front( front ), back( back ) {}
         };
 
         std::unique_ptr< Segment > x;

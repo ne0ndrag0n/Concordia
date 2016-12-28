@@ -96,7 +96,7 @@ namespace BlueBear {
       return tileRegistry.at( key );
     }
 
-    Threading::Lockable< Wallpaper > InfrastructureFactory::getWallpaper( const std::string& key ) {
+    std::shared_ptr< Wallpaper > InfrastructureFactory::getWallpaper( const std::string& key ) {
       return wallpaperRegistry.at( key );
     }
 
@@ -109,7 +109,7 @@ namespace BlueBear {
     void InfrastructureFactory::registerWallpapers() {
       // First and foremost - register _grey, the standard, hardcoded grey wallaper.
       // No more constexpr - GCC bug breaks them randomly
-      wallpaperRegistry[ "_grey" ] = Threading::Lockable< Wallpaper >::create( "_grey", GREY_SYSTEM_WALLPAPER, 0.0 );
+      wallpaperRegistry[ "_grey" ] = std::make_shared< Wallpaper >( "_grey", GREY_SYSTEM_WALLPAPER, 0.0 );
 
       std::vector< std::string > directories = Tools::Utility::getSubdirectoryList( WALL_ASSETS_PATH );
       std::for_each( directories.begin(), directories.end(), [ & ]( std::string& directory ) {
@@ -133,7 +133,7 @@ namespace BlueBear {
             Json::Value wallpaperDefinition = *jsonIterator;
 
             if( wallpaperDefinition.isMember( "image" ) ) {
-              wallpaperRegistry[ key ] = Threading::Lockable< Wallpaper >::create(
+              wallpaperRegistry[ key ] = std::make_shared< Wallpaper >(
                 key,
                 path + "/" + wallpaperDefinition[ "image" ].asString(),
                 wallpaperDefinition[ "price" ].asDouble()
