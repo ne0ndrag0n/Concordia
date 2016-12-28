@@ -36,6 +36,8 @@ namespace BlueBear {
 
 				static int lua_getFileList( lua_State* L );
 
+				static int lua_getPointer( lua_State* L );
+
 				static void clearLuaStack( lua_State* L );
 
 				static void getTableValue( lua_State* L, const char* key );

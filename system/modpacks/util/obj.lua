@@ -113,3 +113,7 @@ bluebear.util.get_upvalue_by_name = function( func, name )
     i = i + 1
   end
 end
+
+bluebear.util.set_upvalue_by_index = function( func, index, upvalue )
+  debug.upvaluejoin( func, index, ( function() return upvalue end ), 1 )
+end

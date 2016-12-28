@@ -92,22 +92,13 @@ local Flowers = bluebear.extend( "system.entity.base", "game.flowers.base", {
 } )
 
 function Flowers:main()
-	--self.sfunc = bluebear.util.bind( 'game.flowers.base:replenish_water', self )
-	--self.func = function() print( "simple" ) end
-
 	if self.water_level > 0 then
 		self.water_level = self.water_level - 10
 	end
 
-	print( Flowers.name, "Hello from Lua! I am object instance ("..self._cid..") and my water level is now "..self.water_level )
+	print( Flowers.name, "Hello from Lua! I am object instance ("..bluebear.util.get_pointer( self )..") and my water level is now "..self.water_level )
 
 	self:sleep( bluebear.util.time.minutes_to_ticks( 5 ) ):then_call( bluebear.util.bind( 'game.flowers.base:main', self ) )
-end
-
-function Flowers:load( saved )
-	bluebear.get_class( 'system.entity.base' ).load( self, saved )
-
-	self.water_level = saved.water_level
 end
 
 function Flowers:replenish_water()
@@ -119,10 +110,6 @@ end
 function Flowers:test_config()
 	local ticks_per_second = bluebear.config.get_value( "ticks_per_second" )
 	print( Flowers.name, ticks_per_second )
-end
-
-function Flowers:simple_callback_test()
-	print( "game.flowers.base", "Callback successful" )
 end
 
 bluebear.register_class( Flowers )

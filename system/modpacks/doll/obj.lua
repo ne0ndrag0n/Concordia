@@ -78,19 +78,6 @@ local Doll = bluebear.extend( "system.entity.base", "system.doll.base", {
 } )
 
 --[[
-  Load a doll entity
---]]
-function Doll:load( data )
-  bluebear.get_class( 'system.entity.base' ).load( self, data )
-
-  -- Load motives
-  for class_name, serial_instance in pairs( data.saved_motives ) do
-    -- Deserialise the nested motive data
-    self.motives[ class_name ]:load( serial_instance )
-  end
-end
-
---[[
   Populate the doll with its motives
 --]]
 function Doll:create_motives()
@@ -129,12 +116,12 @@ function Doll:update_motive( motive_id, value )
   end
 end
 
-function Doll:initialize( serialized )
+function Doll:initialize()
   self.interaction_queue = {}
   self:create_motives()
   self:change_state( Doll.STATES.IDLE )
 
-  bluebear.get_class( 'system.entity.base' ).initialize( self, serialized )
+  bluebear.get_class( 'system.entity.base' ).initialize( self )
 end
 
 --[[

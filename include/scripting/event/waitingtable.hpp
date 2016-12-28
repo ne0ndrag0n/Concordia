@@ -10,6 +10,7 @@
 #include <list>
 #include <queue>
 #include <string>
+#include <unordered_set>
 
 namespace BlueBear {
   namespace Scripting {
@@ -34,7 +35,7 @@ namespace BlueBear {
       public:
         WaitingTable( std::queue< LuaReference >& engineQueue );
 
-        void loadFromJSON( Json::Value& loadingTable, std::map< std::string, LuaReference >& entities );
+        std::unordered_set< LuaReference > loadFromJSON( Json::Value& loadingTable, std::map< std::string, LuaReference >& entities );
         Json::Value saveToJSON( lua_State* L );
 
         std::string waitForTick( Tick deadline, LuaReference function );

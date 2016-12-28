@@ -225,6 +225,15 @@ namespace BlueBear {
 			return 1;
 		}
 
+		/**
+		 * Don't use this in your mods.
+		 */
+		int Utility::lua_getPointer( lua_State* L ) {
+			lua_pushstring( L, Tools::Utility::pointerToString( lua_topointer( L, -1 ) ).c_str() );
+
+			return 1;
+		}
+
 		void Utility::clearLuaStack( lua_State* L ) {
 			lua_settop( L, 0 );
 		}

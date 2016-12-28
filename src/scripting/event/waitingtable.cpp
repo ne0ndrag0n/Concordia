@@ -10,7 +10,9 @@ namespace BlueBear {
 
       WaitingTable::WaitingTable( std::queue< LuaReference >& engineQueue ) : engineQueue( engineQueue ) {}
 
-      void WaitingTable::loadFromJSON( Json::Value& loadingTable, std::map< std::string, LuaReference >& entities ) {
+      std::unordered_set< LuaReference > WaitingTable::loadFromJSON( Json::Value& loadingTable, std::map< std::string, LuaReference >& entities ) {
+        std::unordered_set< LuaReference > visitedItems;
+
         // do timerMap
         Json::Value& timerMap = loadingTable[ "timerMap" ];
 
@@ -24,9 +26,13 @@ namespace BlueBear {
           for( Json::Value& pVal : array ) {
             std::string pointer = pVal.asString();
 
-            bucket.push_back( entities.at( pointer ) );
+            LuaReference function = entities.at( pointer );
+            bucket.push_back( function );
+            visitedItems.insert( function );
           }
         }
+
+        return visitedItems;
       }
 
       /**

@@ -10,6 +10,7 @@
 #include <sstream>
 #include <iomanip>
 #include <regex>
+#include <unordered_set>
 
 namespace BlueBear {
   namespace Scripting {
@@ -30,8 +31,6 @@ namespace BlueBear {
 
       const std::string Serializer::ENVREF_MODE_BBGLOBAL = "bluebear";
       const std::string Serializer::ENVREF_MODE_G = "_G";
-
-      const std::string Serializer::LUA_CAPTURE_UPVALUE_FUNCTION = "function() return bluebear.__setting_upvalue end";
 
       Serializer::Serializer( lua_State* L ) : L( L ) {}
 
@@ -117,11 +116,15 @@ namespace BlueBear {
           }
         }
 
-        engine.waitingTable.loadFromJSON( engineDefinition[ "waitingTable" ], globalEntities );
+        // Load waiting functions into waitingTableExclusions, returning a list of items that should NOT be unref'd
+        // TODO: This is shit. Would it kill us to repurpose globalInstanceEntities into a general list where references are not released?
+        std::unordered_set< LuaReference > waitingTableExclusions = engine.waitingTable.loadFromJSON( engineDefinition[ "waitingTable" ], globalEntities );
 
-        // Release references to items we no longer require
+        // Release references to items we no longer require. This allows the engine to start discarding items it no longer requires.
         for( auto& entityPair : globalEntities ) {
-          luaL_unref( L, LUA_REGISTRYINDEX, entityPair.second );
+          if( waitingTableExclusions.find( entityPair.second ) == waitingTableExclusions.end() ) {
+            luaL_unref( L, LUA_REGISTRYINDEX, entityPair.second );
+          }
         }
 
         // After we're done, restart the garbage collector and give it a good cycle
@@ -130,7 +133,7 @@ namespace BlueBear {
         lua_gc( L, LUA_GCCOLLECT, 0 );
 
         // Return the globalInstanceEntities map as a vector
-        std::vector< int > serializableInstances;
+        std::vector< LuaReference > serializableInstances;
         for( auto& instancePair : globalInstanceEntities ) {
           serializableInstances.push_back( instancePair.second );
         }
@@ -299,25 +302,35 @@ namespace BlueBear {
 
       /**
        * Given a function and a value, set function's upvalueIndex-th upvalue to value using the lua_upvaluejoin hack.
+       * We have to proxy into bluebear.util.set_upvalue_by_index as it appears there's no way to create a function with an upvalue referring to local scope in C.
        *
        * STACK ARGS: value <function>
        * RETURNS: <function>
        */
       void Serializer::setUpvalueByIndex( int upvalueIndex ) {
-        // Set bluebear.__setting_upvalue to this value so LUA_CAPTURE_UPVALUE_FUNCTION can capture it
+
         lua_getglobal( L, "bluebear" ); // bluebear value <function>
-        lua_pushstring( L, "__setting_upvalue" ); // "__setting_upvalue" bluebear value <function>
-        lua_pushvalue( L, -3 ); // value "__setting_upvalue" bluebear value <function>
-        lua_settable( L, -3 ); // bluebear value <function>
 
-        lua_pop( L, 2 ); // <function>
+        lua_pushstring( L, "util" ); // "util" bluebear value <function>
+        lua_gettable( L, -2 ); // bluebear.util bluebear value <function>
 
-        // Set upvalues the usual Lua hacky way with lua_upvaluejoin and LUA_CAPTURE_UPVALUE_FUNCTION
-        // Don't bother checking here, it should never fail unless there's bigger problems going on...
-        luaL_loadbuffer( L, LUA_CAPTURE_UPVALUE_FUNCTION.c_str(), LUA_CAPTURE_UPVALUE_FUNCTION.length(), "__capture_function" ); // <capture_function> <function>
-        lua_upvaluejoin( L, -2, upvalueIndex, -1, 1 );
+        lua_pushstring( L, "set_upvalue_by_index" ); // "set_upvalue_by_index" bluebear.util bluebear value <function>
+        lua_gettable( L, -2 ); // <set_upvalue_by_index> bluebear.util bluebear value <function>
 
-        lua_pop( L, 1 ); // <function>
+        lua_pushvalue( L, -5 ); // <function> <set_upvalue_by_index> bluebear.util bluebear value <function>
+
+        lua_pushnumber( L, upvalueIndex ); // index <function> <set_upvalue_by_index> bluebear.util bluebear value <function>
+
+        lua_pushvalue( L, -6 ); // value index <function> <set_upvalue_by_index> bluebear.util bluebear value <function>
+
+        if( lua_pcall( L, 3, 0, 0 ) ) { // "error" bluebear.util bluebear value <function>
+          Log::getInstance().error( "LuaKit::Serializer::setUpvalueByIndex", std::string( lua_tostring( L, -1 ) ) );
+          lua_pop( L, 4 ); // <function>
+          return;
+        } // bluebear.util bluebear value <function>
+
+        lua_pop( L, 3 ); // <function>
+
       }
 
       /**

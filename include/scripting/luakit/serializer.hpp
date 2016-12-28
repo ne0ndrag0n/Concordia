@@ -31,8 +31,6 @@ namespace BlueBear {
         static const std::string ENVREF_MODE_BBGLOBAL;
         static const std::string ENVREF_MODE_G;
 
-        static const std::string LUA_CAPTURE_UPVALUE_FUNCTION;
-
         // These callbacks should leave the stack unmodified
         // They should accept table/function as the first argument on the stack
         using Callback = std::function< Json::Value() >;

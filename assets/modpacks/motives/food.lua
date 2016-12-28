@@ -28,14 +28,6 @@ local Food = bluebear.extend( "system.motive.base", "game.motive.hunger.food", {
   time_to_starve = bluebear.util.time.hours_to_ticks( 72 )
 } )
 
-function Food:load( data )
-  bluebear.get_class( 'system.motive.base' ).load( self, data )
-
-  if type( data.decay_rate ) == 'number' then self.decay_rate = data.decay_rate end
-  if type( data.starvation_threshold ) == 'number' then self.starvation_threshold = data.starvation_threshold end
-  if type( data.first_starving_at ) == 'number' then self.first_starving_at = data.first_starving_at end
-end
-
 --[[
   Describes how the Food motive decays:
 

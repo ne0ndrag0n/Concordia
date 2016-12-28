@@ -114,6 +114,11 @@ namespace BlueBear {
 			lua_pushcfunction( L, &Tools::Utility::lua_getFileList );
 			lua_settable( L, -3 );
 
+			// bluebear.util.get_pointer
+			lua_pushstring( L, "get_pointer" );
+			lua_pushcfunction( L, &Tools::Utility::lua_getPointer );
+			lua_settable( L, -3 );
+
 			// Set the util table on "bluebear"
 			lua_settable( L, -3 );
 
@@ -276,7 +281,9 @@ namespace BlueBear {
 					// Clear the std::map containing all objects
 					objects.clear();
 
-					// TODO: Load using the new pointer-eventqueue method using a LuaKit::Serializer
+					// Deserialize the world
+					LuaKit::Serializer serializer( L );
+					objects = serializer.loadWorld( engineJSON, *this );
 				} else {
 					Log::getInstance().error( "Engine::loadLot", "Unable to parse " + std::string( lotPath ) );
 					return false;
@@ -309,11 +316,6 @@ namespace BlueBear {
 		void Engine::objectLoop() {
 			Log::getInstance().debug( "Engine::objectLoop", "Starting world engine with a tick count of " + std::to_string( currentTick ) );
 
-			// Push the bluebear global onto the stack - leave it there
-			lua_getglobal( L, "bluebear" );
-			// Push table value "current_tick" onto the stack - leave it there too
-			Tools::Utility::getTableValue( L, "engine" );
-
 			// This single container holds our list of commands to send to the display
 			Graphics::Display::CommandList displayCommandList;
 			// This pointer holds the direction to our list of incoming engine commands
@@ -339,10 +341,43 @@ namespace BlueBear {
 					// Complete a tick set: currentTick up to the next time it is evenly divisible by ticksPerSecond
 					int ticksRemaining = ticksPerSecond;
 					while( ticksRemaining-- ) {
+						// All the action of a single tick occurs here.
+
+						// Move items waiting for this tick out of the waiting table into the callback queue
+						waitingTable.triggerTick( currentTick );
+
+						// If there are any callbacks, update bluebear.engine.current_tick
+						if( !callbacks.empty() ) {
+							lua_getglobal( L, "bluebear" ); // bluebear
+							lua_pushstring( L, "engine" ); // "engine" bluebear
+							lua_gettable( L, -2 ); // bluebear.engine bluebear
+
+							lua_pushstring( L, "current_tick" ); // "current_tick" bluebear.engine bluebear
+							lua_pushnumber( L, currentTick ); // currentTick "current_tick" bluebear.engine bluebear
+							lua_settable( L, -3 ); // bluebear.engine bluebear
+
+							lua_pop( L, 2 ); // EMPTY
+						}
+
+						// Burn out every function scheduled for this tick
+						while( !callbacks.empty() ) {
+							LuaReference function = callbacks.front();
+							lua_rawgeti( L, LUA_REGISTRYINDEX, function ); // <function>
+
+							if( lua_pcall( L, 0, 0, 0 ) ) { // error
+								Log::getInstance().error( "Engine::objectLoop", "Exception thrown on tick " + std::to_string( currentTick ) + ": " + lua_tostring( L, -1 ) );
+								lua_pop( L, 1 ); // EMPTY
+							} // EMPTY
+
+							// Only YOU can prevent memory leaks!
+							// The "function" reference should have not been used anywhere else in the pipeline (enqueued to now)
+							luaL_unref( L, LUA_REGISTRYINDEX, function );
+
+							callbacks.pop();
+						}
+
 						// On every tick, increment currentTick
 						currentTick++;
-
-						// TODO: The new pointer-eventqueue magic happens here...
 					}
 					// ** END THE SINGLE TICK LOOP **
 				}
@@ -409,9 +444,21 @@ namespace BlueBear {
 				 // This reference should be a reference owned by the queue-waiting table pair, and should never be used anywhere else.
 				 // When the engine consumes the function, the reference should be luaL_unref'd and freed.
 				 // If you don't do this, you'll get horriffic memory leaks that slowly worsen as a lot is played.
-				 std::string handle = self->waitingTable.waitForTick( self->currentTick + interval, luaL_ref( L, LUA_REGISTRYINDEX ) ); // EMPTY
+				 LuaReference function = luaL_ref( L, LUA_REGISTRYINDEX ); // EMPTY
 
-				 lua_pushstring( L, handle.c_str() ); // "handle"
+				 if( interval == 0 ) {
+					 // This function was scheduled to run in the same tick, but when the current stack has completed.
+					 // You GENERALLY shouldn't do this but it's got its use cases.
+					 self->callbacks.push( function );
+
+					 // You'll get a nil handle because a callback scheduled to go on the current tick cannot be cancelled.
+					 lua_pushnil( L ); // nil
+				 } else {
+					 // This function was scheduled to run at tick+1 or after
+					 std::string handle = self->waitingTable.waitForTick( self->currentTick + interval, function );
+
+					 lua_pushstring( L, handle.c_str() ); // "handle"
+				 }
 
 				 return 1;
 			 } else {

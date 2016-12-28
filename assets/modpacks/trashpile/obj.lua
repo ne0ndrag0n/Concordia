@@ -14,10 +14,4 @@ function TrashPile:main()
 	self:sleep( bluebear.util.time.minutes_to_ticks( 1 ) ):then_call( bluebear.util.bind( 'game.household.trashpile.base:main', self ) )
 end
 
-function TrashPile:load( saved )
-	bluebear.get_class( 'system.entity.base' ).load( self, saved )
-
-	self.stink = saved.stink
-end
-
 bluebear.register_class( TrashPile )
