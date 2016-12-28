@@ -86,7 +86,6 @@ namespace BlueBear {
 				Json::Value d = object.get( "d", Json::nullValue );
 				Json::Value r = object.get( "r", Json::nullValue );
 
-				// unsafe operations are okay here since it's a brand new Lockable
 				if( !x.isNull() ) {
 					wallCell->x = std::make_unique< WallCell::Segment >( lookup.at( x[ "f" ].asUInt() ), lookup.at( x[ "b" ].asUInt() ) );
 				}
