@@ -123,7 +123,7 @@ namespace BlueBear {
     /**
      * Given a lot, build floorInstanceCollection and translate the Tiles/Wallpanels to instances on the lot. Additionally, send the rotation status.
      */
-    void Display::loadInfrastructure( unsigned int currentRotation, Containers::ConcCollection3D< std::shared_ptr< Scripting::Tile > >& floorMap, Containers::ConcCollection3D< Threading::Lockable< Scripting::WallCell > >& wallMap ) {
+    void Display::loadInfrastructure( unsigned int currentRotation, Containers::ConcCollection3D< std::shared_ptr< Scripting::Tile > >& floorMap, Containers::ConcCollection3D< std::shared_ptr< Scripting::WallCell > >& wallMap ) {
 
       std::unique_ptr< Display::MainGameState > mainGameStatePtr = std::make_unique< Display::MainGameState >( *this, currentRotation, floorMap, wallMap );
 
@@ -162,7 +162,7 @@ namespace BlueBear {
     /**
      * Display renderer state for the main game loop
      */
-    Display::MainGameState::MainGameState( Display& instance, unsigned int currentRotation, Containers::ConcCollection3D< std::shared_ptr< Scripting::Tile > >& floorMap, Containers::ConcCollection3D< Threading::Lockable< Scripting::WallCell > >& wallMap ) :
+    Display::MainGameState::MainGameState( Display& instance, unsigned int currentRotation, Containers::ConcCollection3D< std::shared_ptr< Scripting::Tile > >& floorMap, Containers::ConcCollection3D< std::shared_ptr< Scripting::WallCell > >& wallMap ) :
       Display::State::State( instance ),
       defaultShader( Shader( "system/shaders/default_vertex.glsl", "system/shaders/default_fragment.glsl" ) ),
       camera( Camera( defaultShader.Program, instance.x, instance.y ) ),
@@ -256,7 +256,7 @@ namespace BlueBear {
         for( unsigned int yCounter = 0; yCounter != dimensions.y; yCounter++ ) {
           for( unsigned int xCounter = 0; xCounter != dimensions.x; xCounter++ ) {
 
-            Threading::Lockable< Scripting::WallCell > wallCellPtr = wallMap.getItem( zCounter, xCounter, yCounter );
+            std::shared_ptr< Scripting::WallCell > wallCellPtr = wallMap.getItem( zCounter, xCounter, yCounter );
             std::shared_ptr< WallCellBundler > wallCellBundler;
             if( wallCellPtr ) {
               // Several different kinds of wall panel models depending on the type, and several kinds of orientations

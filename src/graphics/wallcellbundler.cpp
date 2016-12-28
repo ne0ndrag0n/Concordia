@@ -37,7 +37,7 @@ namespace BlueBear {
     float WallCellBundler::xOrigin = 0.0f;
     float WallCellBundler::yOrigin = 0.0f;
 
-    WallCellBundler::WallCellBundler( Threading::Lockable< Scripting::WallCell > hostCell, Containers::Collection3D< std::shared_ptr< WallCellBundler > >& hostCollection, glm::vec3 counter, unsigned int currentRotation, TextureCache& hostTextureCache, ImageCache& hostImageCache, unsigned int shader ) :
+    WallCellBundler::WallCellBundler( std::shared_ptr< Scripting::WallCell > hostCell, Containers::Collection3D< std::shared_ptr< WallCellBundler > >& hostCollection, glm::vec3 counter, unsigned int currentRotation, TextureCache& hostTextureCache, ImageCache& hostImageCache, unsigned int shader ) :
      currentRotation( currentRotation ),
      hostTextureCache( hostTextureCache ),
      hostImageCache( hostImageCache ),
@@ -50,7 +50,7 @@ namespace BlueBear {
        std::string frontPath;
        std::string backPath;
 
-       if( hostCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.x ); } ) ) {
+       if( isWallDimensionPresent( frontPath, backPath, hostCellPtr->x ) ) {
          try {
            newXWallInstance( hostCollection, frontPath, backPath );
          } catch( std::exception& e ) {
@@ -61,7 +61,7 @@ namespace BlueBear {
          }
        }
 
-       if( hostCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.y ); } ) ) {
+       if( isWallDimensionPresent( frontPath, backPath, hostCellPtr->y ) ) {
          try {
            newYWallInstance( hostCollection, frontPath, backPath );
          } catch( std::exception& e ) {
@@ -72,7 +72,7 @@ namespace BlueBear {
          }
        }
 
-       if( hostCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.d ); } ) ) {
+       if( isWallDimensionPresent( frontPath, backPath, hostCellPtr->d ) ) {
          try {
            newDWallInstance( hostCollection, frontPath, backPath );
          } catch( std::exception& e ) {
@@ -83,7 +83,7 @@ namespace BlueBear {
          }
        }
 
-       if( hostCellPtr.lock< bool >( [ & ]( Scripting::WallCell& wallCell ) { return isWallDimensionPresent( frontPath, backPath, wallCell.r ); } ) ) {
+       if( isWallDimensionPresent( frontPath, backPath, hostCellPtr->r ) ) {
          try{
            newRWallInstance( hostCollection, frontPath, backPath );
          } catch( std::exception& e ) {
@@ -211,9 +211,7 @@ namespace BlueBear {
               }
 
               // Get "upperFront", which is the front image path for the Y-segment wall
-              std::string upperFront = top->hostCellPtr.lock< std::string >( [ & ]( Scripting::WallCell& wallCell ) {
-                return wallCell.y->front->imagePath;
-              } );
+              std::string upperFront = top->hostCellPtr->y->front->imagePath;
 
               // Using upperFront, emplace Side2 as the rightSegment image pointer for that path
               settings.emplace( std::make_pair( "Side2", std::make_unique< PointerImageSource >( getSegmentBundle( upperFront, false, false, true ).rightSegment, "0xs2 " + upperFront ) ) );
@@ -255,9 +253,7 @@ namespace BlueBear {
             if( upperRightContainsY ) {
               upperRight->y->children.erase( "RightCorner" );
 
-              std::string upperRightBack = upperRight->hostCellPtr.lock< std::string >( [ & ]( Scripting::WallCell& wallCell ) {
-                return wallCell.y->back->imagePath;
-              } );
+              std::string upperRightBack = upperRight->hostCellPtr->y->back->imagePath;
 
               settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( getSegmentBundle( upperRightBack, true, false, false ).leftSegment, "1xs1 " + upperRightBack ) ) );
             } else {
@@ -307,9 +303,7 @@ namespace BlueBear {
             bool upperRightContainsY = upperRight && upperRight->y;
             if( upperRightContainsY ) {
               // All we have to do is retexture Side1!
-              std::string back = upperRight->hostCellPtr.lock< std::string >( [ & ]( Scripting::WallCell& wallCell ) {
-                return wallCell.y->back->imagePath;
-              } );
+              std::string back = upperRight->hostCellPtr->y->back->imagePath;
 
               settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( getSegmentBundle( back, false, false, true ).rightSegment, "2xs1 " + back ) ) );
             } else {
@@ -361,9 +355,7 @@ namespace BlueBear {
               // CASE: Placing an X in this cell, there is a Y on top, and no X in the left cell. An incomplete corner occurs.
 
               // Need to get front wallpaper for Y panel on top and apply it to Side2
-              std::string frontWallpaper = top->hostCellPtr.lock< std::string >( [ & ]( Scripting::WallCell& wallCell ) {
-                return wallCell.y->front->imagePath;
-              } );
+              std::string frontWallpaper = top->hostCellPtr->y->front->imagePath;
 
               settings.emplace( std::make_pair( "Side2", std::make_unique< PointerImageSource >( getSegmentBundle( frontWallpaper, true, false, true ).leftSegment, "3xs2 " + frontWallpaper ) ) );
             } else {
@@ -503,17 +495,13 @@ namespace BlueBear {
             if( leftContainsX ) {
               left->x->children.erase( "LeftCorner" );
 
-              std::string leftFront = left->hostCellPtr.lock< std::string >( [ & ]( Scripting::WallCell& wallCell ) {
-                return wallCell.x->front->imagePath;
-              } );
+              std::string leftFront = left->hostCellPtr->x->front->imagePath;
 
               settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( getSegmentBundle( leftFront, true, false, false ).leftSegment, "2ys1 " + leftFront ) ) );
             } else {
               // CASE: If no X segment is to the left, but there is an X segment in the current cell, this forms an incomplete corner.
               if( currentContainsX ) {
-                std::string xFront = hostCellPtr.lock< std::string >( [ & ]( Scripting::WallCell& wallCell ) {
-                  return wallCell.x->front->imagePath;
-                } );
+                std::string xFront = hostCellPtr->x->front->imagePath;
 
                 settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( getSegmentBundle( xFront, true, false, false ).leftSegment, "2ys1 " + xFront ) ) );
               } else {
@@ -540,18 +528,14 @@ namespace BlueBear {
 
             if( leftContainsX && !currentContainsX ) {
               // CASE: This cell only has a Y piece and there's an X piece to the left. Get its front texture and apply it to Side1
-              std::string xFront = left->hostCellPtr.lock< std::string >( [ & ]( Scripting::WallCell& wallCell ) {
-                return wallCell.x->front->imagePath;
-              } );
+              std::string xFront = left->hostCellPtr->x->front->imagePath;
 
               settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( getSegmentBundle( xFront, false, false, true ).rightSegment, "3ys1 " + xFront ) ) );
             } else if ( currentContainsX ) {
               // CASE: There's an X piece in this cell but none to the left. A collision occurs in the same cell!
               x->children.erase( "RightCorner" );
 
-              std::string xFront = hostCellPtr.lock< std::string >( [ & ]( Scripting::WallCell& wallCell ) {
-                return wallCell.x->front->imagePath;
-              } );
+              std::string xFront = hostCellPtr->x->front->imagePath;
 
               settings.emplace( std::make_pair( "Side1", std::make_unique< PointerImageSource >( getSegmentBundle( xFront, false, false, true ).rightSegment, "3ys1 " + xFront ) ) );
             } else {

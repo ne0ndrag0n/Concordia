@@ -56,7 +56,7 @@ namespace BlueBear {
 
       void openDisplay();
       void start();
-      void loadInfrastructure( unsigned int currentRotation, Containers::ConcCollection3D< std::shared_ptr< Scripting::Tile > >& floorMap, Containers::ConcCollection3D< Threading::Lockable< Scripting::WallCell > >& wallMap );
+      void loadInfrastructure( unsigned int currentRotation, Containers::ConcCollection3D< std::shared_ptr< Scripting::Tile > >& floorMap, Containers::ConcCollection3D< std::shared_ptr< Scripting::WallCell > >& wallMap );
 
       // ---------- STATES ----------
       class State {
@@ -98,7 +98,7 @@ namespace BlueBear {
           } gui;
           // These are from the lot!
           Containers::ConcCollection3D< std::shared_ptr< Scripting::Tile > >& floorMap;
-          Containers::ConcCollection3D< Threading::Lockable< Scripting::WallCell > >& wallMap;
+          Containers::ConcCollection3D< std::shared_ptr< Scripting::WallCell > >& wallMap;
           // These are ours!
           std::unique_ptr< Containers::Collection3D< std::shared_ptr< Instance > > > floorInstanceCollection;
           std::unique_ptr< Containers::Collection3D< std::shared_ptr< WallCellBundler > > > wallInstanceCollection;
@@ -111,7 +111,7 @@ namespace BlueBear {
         public:
           void execute();
           void handleEvent( sf::Event& event );
-          MainGameState( Display& instance, unsigned int currentRotation, Containers::ConcCollection3D< std::shared_ptr< Scripting::Tile > >& floorMap, Containers::ConcCollection3D< Threading::Lockable< Scripting::WallCell > >& wallMap );
+          MainGameState( Display& instance, unsigned int currentRotation, Containers::ConcCollection3D< std::shared_ptr< Scripting::Tile > >& floorMap, Containers::ConcCollection3D< std::shared_ptr< Scripting::WallCell > >& wallMap );
           ~MainGameState();
       };
       // ----------------------------
@@ -130,7 +130,7 @@ namespace BlueBear {
       class SendInfrastructureCommand : public Command {
         unsigned int rotation;
         Containers::ConcCollection3D< std::shared_ptr< Scripting::Tile > >& floorMap;
-        Containers::ConcCollection3D< Threading::Lockable< Scripting::WallCell > >& wallMap;
+        Containers::ConcCollection3D< std::shared_ptr< Scripting::WallCell > >& wallMap;
         public:
           SendInfrastructureCommand( Scripting::Lot& lot );
           void execute( Display& instance );

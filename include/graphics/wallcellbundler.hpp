@@ -49,10 +49,10 @@ namespace BlueBear {
       static float xOrigin;
       static float yOrigin;
 
-      Threading::Lockable< Scripting::WallCell > hostCellPtr;
+      std::shared_ptr< Scripting::WallCell > hostCellPtr;
 
       WallCellBundler(
-        Threading::Lockable< Scripting::WallCell > hostCell,
+        std::shared_ptr< Scripting::WallCell > hostCell,
         Containers::Collection3D< std::shared_ptr< WallCellBundler > >& hostCollection,
         glm::vec3 counter,
         unsigned int currentRotation, TextureCache& hostTextureCache, ImageCache& hostImageCache, unsigned int shader

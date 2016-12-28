@@ -50,13 +50,13 @@ namespace BlueBear {
 				lookup.push_back( wallpaper );
 			}
 
-			wallMap = std::make_unique< Containers::ConcCollection3D< Threading::Lockable< WallCell > > >( stories, floorX + 1, floorY + 1 );
+			wallMap = std::make_unique< Containers::ConcCollection3D< std::shared_ptr< WallCell > > >( stories, floorX + 1, floorY + 1 );
 
 			for( Json::Value& level : levels ) {
 				for( Json::Value& object : level ) {
 					if( Tools::Utility::isRLEObject( object ) ) {
 						// De-RLE the object
-						Threading::Lockable< WallCell > wallCell = getWallCell( object[ "value" ], lookup );
+						std::shared_ptr< WallCell > wallCell = getWallCell( object[ "value" ], lookup );
 
 						unsigned int run = object[ "run" ].asUInt();
 						for( unsigned int i = 0; i != run; i++ ) {
@@ -73,12 +73,12 @@ namespace BlueBear {
 		/**
 		 * Build the wall cell in all four possible dimensions
 		 */
-		Threading::Lockable< WallCell > Lot::getWallCell( Json::Value& object, std::vector< std::shared_ptr< Wallpaper > >& lookup ) {
-			Threading::Lockable< WallCell > wallCell;
+		std::shared_ptr< WallCell > Lot::getWallCell( Json::Value& object, std::vector< std::shared_ptr< Wallpaper > >& lookup ) {
+			std::shared_ptr< WallCell > wallCell;
 
 			if( object.isObject() && !object.isNumeric() ) {
 				// usable object
-				wallCell = Threading::Lockable< WallCell >::create();
+				wallCell = std::make_shared< WallCell >();
 
 				// Check for dimensions x, y, d, and r
 				Json::Value x = object.get( "x", Json::nullValue );
@@ -88,24 +88,16 @@ namespace BlueBear {
 
 				// unsafe operations are okay here since it's a brand new Lockable
 				if( !x.isNull() ) {
-					wallCell.unsafe< void >( [ & ]( WallCell& wallCell ) {
-						wallCell.x = std::make_unique< WallCell::Segment >( lookup.at( x[ "f" ].asUInt() ), lookup.at( x[ "b" ].asUInt() ) );
-					} );
+					wallCell->x = std::make_unique< WallCell::Segment >( lookup.at( x[ "f" ].asUInt() ), lookup.at( x[ "b" ].asUInt() ) );
 				}
 				if( !y.isNull() ) {
-					wallCell.unsafe< void >( [ & ]( WallCell& wallCell ) {
-						wallCell.y = std::make_unique< WallCell::Segment >( lookup.at( y[ "f" ].asUInt() ), lookup.at( y[ "b" ].asUInt() ) );
-					} );
+					wallCell->y = std::make_unique< WallCell::Segment >( lookup.at( y[ "f" ].asUInt() ), lookup.at( y[ "b" ].asUInt() ) );
 				}
 				if( !d.isNull() ) {
-					wallCell.unsafe< void >( [ & ]( WallCell& wallCell ) {
-						wallCell.d = std::make_unique< WallCell::Segment >( lookup.at( d[ "f" ].asUInt() ), lookup.at( d[ "b" ].asUInt() ) );
-					} );
+					wallCell->d = std::make_unique< WallCell::Segment >( lookup.at( d[ "f" ].asUInt() ), lookup.at( d[ "b" ].asUInt() ) );
 				}
 				if( !r.isNull() ) {
-					wallCell.unsafe< void >( [ & ]( WallCell& wallCell ) {
-						wallCell.r = std::make_unique< WallCell::Segment >( lookup.at( r[ "f" ].asUInt() ), lookup.at( r[ "b" ].asUInt() ) );
-					} );
+					wallCell->r = std::make_unique< WallCell::Segment >( lookup.at( r[ "f" ].asUInt() ), lookup.at( r[ "b" ].asUInt() ) );
 				}
 			}
 
