@@ -108,8 +108,6 @@ namespace BlueBear {
       std::unique_ptr< Display::MainGameState > mainGameStatePtr = std::make_unique< Display::MainGameState >( *this, currentRotation, floorMap, wallMap );
 
       currentState = std::move( mainGameStatePtr );
-
-      // TODO: signal to engine that this is now ready
     }
 
     // ---------- STATES ----------

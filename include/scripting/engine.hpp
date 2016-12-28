@@ -41,7 +41,6 @@ namespace BlueBear {
 				std::queue< LuaReference > callbacks;
 				Event::WaitingTable waitingTable;
 
-				std::shared_ptr< Lot > currentLot;
 				std::unique_ptr< InfrastructureFactory > infrastructureFactory;
 				const char* currentModpackDirectory;
 				std::map< std::string, BlueBear::ModpackStatus > loadedModpacks;
@@ -57,6 +56,7 @@ namespace BlueBear {
 
 			public:
 				std::vector< LuaReference > objects;
+				std::shared_ptr< Lot > currentLot;
 
 				Engine();
 				~Engine();
