@@ -5,7 +5,6 @@
 #include "tools/utility.hpp"
 #include "scripting/lot.hpp"
 #include "scripting/engine.hpp"
-#include "threading/commandbus.hpp"
 #include "graphics/display.hpp"
 #include "configmanager.hpp"
 #include "scripting/infrastructurefactory.hpp"
@@ -27,12 +26,12 @@
 namespace BlueBear {
 	namespace Scripting {
 
-		Engine::Engine( Threading::CommandBus& commandBus ) :
+		Engine::Engine() :
+		 lastExecuted( std::chrono::steady_clock::now() ),
 		 L( luaL_newstate() ),
 		 ticksPerSecond( ConfigManager::getInstance().getIntValue( "ticks_per_second" ) ),
 		 waitingTable( Event::WaitingTable( callbacks ) ),
 		 currentModpackDirectory( nullptr ),
-		 commandBus( commandBus ),
 		 cancel( false ) {
 			luaL_openlibs( L );
 			setActiveState( false );
@@ -314,90 +313,57 @@ namespace BlueBear {
 		 * Where the magic happens
 		 */
 		void Engine::objectLoop() {
-			Log::getInstance().debug( "Engine::objectLoop", "Starting world engine with a tick count of " + std::to_string( currentTick ) );
 
-			// This single container holds our list of commands to send to the display
-			Graphics::Display::CommandList displayCommandList;
-			// This pointer holds the direction to our list of incoming engine commands
-			Scripting::Engine::CommandList engineCommandList;
+			auto diff = std::chrono::duration_cast< std::chrono::milliseconds >( std::chrono::steady_clock::now() - lastExecuted );
+			// diff should be at least one second
+			unsigned long count = diff.count();
 
-			// Send infrastructure. When display is finished loading, it will send back the activation signal, changing the sleepInterval to a full second
-			// and unlocking the main loop to perform other operations.
-			displayCommandList.push_back( std::make_unique< Graphics::Display::SendInfrastructureCommand >( *currentLot ) );
+			// Proceed if count is greater than 1000ms
+			if( count >= 1000 ) {
+				// Complete a tick set: currentTick up to the next time it is evenly divisible by ticksPerSecond
+				int ticksRemaining = ticksPerSecond;
+				while( ticksRemaining-- ) {
+					// All the action of a single tick occurs here.
 
-			while( !cancel ) {
-				// Let's set up a start and end duration
-				auto startTime = std::chrono::steady_clock::now();
+					// Move items waiting for this tick out of the waiting table into the callback queue
+					waitingTable.triggerTick( currentTick );
 
-				// Attempt to consume items in the engineCommandList
-				commandBus.attemptConsume( engineCommandList );
-				for( auto& command : engineCommandList ) {
-	        command->execute( *this );
-	      }
-	      engineCommandList.clear();
+					// If there are any callbacks, update bluebear.engine.current_tick
+					if( !callbacks.empty() ) {
+						lua_getglobal( L, "bluebear" ); // bluebear
+						lua_pushstring( L, "engine" ); // "engine" bluebear
+						lua_gettable( L, -2 ); // bluebear.engine bluebear
 
-				if( active == true ) {
-					// ** START THE SINGLE TICK LOOP **
-					// Complete a tick set: currentTick up to the next time it is evenly divisible by ticksPerSecond
-					int ticksRemaining = ticksPerSecond;
-					while( ticksRemaining-- ) {
-						// All the action of a single tick occurs here.
+						lua_pushstring( L, "current_tick" ); // "current_tick" bluebear.engine bluebear
+						lua_pushnumber( L, currentTick ); // currentTick "current_tick" bluebear.engine bluebear
+						lua_settable( L, -3 ); // bluebear.engine bluebear
 
-						// Move items waiting for this tick out of the waiting table into the callback queue
-						waitingTable.triggerTick( currentTick );
-
-						// If there are any callbacks, update bluebear.engine.current_tick
-						if( !callbacks.empty() ) {
-							lua_getglobal( L, "bluebear" ); // bluebear
-							lua_pushstring( L, "engine" ); // "engine" bluebear
-							lua_gettable( L, -2 ); // bluebear.engine bluebear
-
-							lua_pushstring( L, "current_tick" ); // "current_tick" bluebear.engine bluebear
-							lua_pushnumber( L, currentTick ); // currentTick "current_tick" bluebear.engine bluebear
-							lua_settable( L, -3 ); // bluebear.engine bluebear
-
-							lua_pop( L, 2 ); // EMPTY
-						}
-
-						// Burn out every function scheduled for this tick
-						while( !callbacks.empty() ) {
-							LuaReference function = callbacks.front();
-							lua_rawgeti( L, LUA_REGISTRYINDEX, function ); // <function>
-
-							if( lua_pcall( L, 0, 0, 0 ) ) { // error
-								Log::getInstance().error( "Engine::objectLoop", "Exception thrown on tick " + std::to_string( currentTick ) + ": " + lua_tostring( L, -1 ) );
-								lua_pop( L, 1 ); // EMPTY
-							} // EMPTY
-
-							// Only YOU can prevent memory leaks!
-							// The "function" reference should have not been used anywhere else in the pipeline (enqueued to now)
-							luaL_unref( L, LUA_REGISTRYINDEX, function );
-
-							callbacks.pop();
-						}
-
-						// On every tick, increment currentTick
-						currentTick++;
+						lua_pop( L, 2 ); // EMPTY
 					}
-					// ** END THE SINGLE TICK LOOP **
+
+					// Burn out every function scheduled for this tick
+					while( !callbacks.empty() ) {
+						LuaReference function = callbacks.front();
+						lua_rawgeti( L, LUA_REGISTRYINDEX, function ); // <function>
+
+						if( lua_pcall( L, 0, 0, 0 ) ) { // error
+							Log::getInstance().error( "Engine::objectLoop", "Exception thrown on tick " + std::to_string( currentTick ) + ": " + lua_tostring( L, -1 ) );
+							lua_pop( L, 1 ); // EMPTY
+						} // EMPTY
+
+						// Only YOU can prevent memory leaks!
+						// The "function" reference should have not been used anywhere else in the pipeline (enqueued to now)
+						luaL_unref( L, LUA_REGISTRYINDEX, function );
+
+						callbacks.pop();
+					}
+
+					// On every tick, increment currentTick
+					currentTick++;
 				}
 
-				// Try to empty out the list and send it to the commandbus
-				if( displayCommandList.size() > 0 ) {
-					commandBus.attemptProduce( displayCommandList );
-				}
-
-				// TODO: Get rid of this when the time is right
-				if( currentTick >= WORLD_TICKS_MAX ) {
-					cancel = true;
-				}
-
-				// Wait the difference between one second, and however long it took for this shit to finish
-				// Guarantees that one second will elapse every "ticksPerSecond" ticks
-				std::this_thread::sleep_until( startTime + std::chrono::milliseconds( sleepInterval ) );
+				lastExecuted = std::chrono::steady_clock::now();
 			}
-
-			Log::getInstance().debug( "Engine::objectLoop", "Finished!" );
 		}
 
 		/**

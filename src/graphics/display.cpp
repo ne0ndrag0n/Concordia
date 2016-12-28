@@ -16,7 +16,6 @@
 #include "scripting/engine.hpp"
 #include "scripting/wallcell.hpp"
 #include "scripting/wallpaper.hpp"
-#include "threading/commandbus.hpp"
 #include "localemanager.hpp"
 #include "configmanager.hpp"
 #include "log.hpp"
@@ -32,9 +31,6 @@
 #include <utility>
 #include <functional>
 
-static BlueBear::Graphics::Display::CommandList displayCommandList;
-static BlueBear::Scripting::Engine::CommandList engineCommandList;
-
 namespace BlueBear {
   namespace Graphics {
 
@@ -42,7 +38,7 @@ namespace BlueBear {
     const std::string Display::WALLPANEL_MODEL_DR_PATH = "system/models/wall/diagwall.dae";
     const std::string Display::FLOOR_MODEL_PATH = "system/models/floor/floor.dae";
 
-    Display::Display( Threading::CommandBus& commandBus ) : commandBus( commandBus ) {
+    Display::Display() {
       // Get our settings out of the config manager
       x = ConfigManager::getInstance().getIntValue( "viewport_x" );
       y = ConfigManager::getInstance().getIntValue( "viewport_y" );
@@ -81,41 +77,27 @@ namespace BlueBear {
       glEnable( GL_CULL_FACE );
     }
 
-    void Display::start() {
-      while( mainWindow.isOpen() ) {
-        // Process incoming commands - the passed-in list should always be empty
-        commandBus.attemptConsume( displayCommandList );
+    bool Display::update() {
+      // Handle rendering
+      currentState->execute();
 
-        for( auto& command : displayCommandList ) {
-          command->execute( *this );
-        }
-
-        displayCommandList.clear();
-
-        // Handle rendering
-        currentState->execute();
-
-        // Handle events
-        sf::Event event;
-        while( mainWindow.pollEvent( event ) ) {
-          // This might be all we need for now
-          switch( event.type ) {
-            case sf::Event::Closed:
-              mainWindow.close();
-              break;
-            default:
-              // Any event not handled by Display itself
-              // is passed along to currentState
-              currentState->handleEvent( event );
-              break;
-          }
-        }
-
-        // Process outgoing commands
-        if( engineCommandList.size() > 0 ) {
-          commandBus.attemptProduce( engineCommandList );
+      // Handle events
+      sf::Event event;
+      while( mainWindow.pollEvent( event ) ) {
+        // This might be all we need for now
+        switch( event.type ) {
+          case sf::Event::Closed:
+            mainWindow.close();
+            return false;
+          default:
+            // Any event not handled by Display itself
+            // is passed along to currentState
+            currentState->handleEvent( event );
+            break;
         }
       }
+
+      return true;
     }
 
     /**
@@ -127,8 +109,7 @@ namespace BlueBear {
 
       currentState = std::move( mainGameStatePtr );
 
-      // Drop a SetLockState command for Engine
-      engineCommandList.push_back( std::make_unique< Scripting::Engine::SetLockState >( true ) );
+      // TODO: signal to engine that this is now ready
     }
 
     // ---------- STATES ----------
@@ -396,19 +377,6 @@ namespace BlueBear {
       gui.desktop.Update( gui.clock.restart().asSeconds() );
       instance.sfgui.Display( instance.mainWindow );
       glEnable( GL_DEPTH_TEST );
-    }
-
-    // ---------- COMMANDS ----------
-    void Display::NewEntityCommand::execute( Graphics::Display& instance ) {
-      Log::getInstance().info( "NewEntityCommand", "Called registerNewEntity, hang in there..." );
-    }
-
-    Display::SendInfrastructureCommand::SendInfrastructureCommand( Scripting::Lot& lot ) :
-      rotation( lot.currentRotation ),
-      floorMap( *lot.floorMap ),
-      wallMap( *lot.wallMap ) {}
-    void Display::SendInfrastructureCommand::execute( Graphics::Display& instance ) {
-      instance.loadInfrastructure( rotation, floorMap, wallMap );
     }
   }
 }

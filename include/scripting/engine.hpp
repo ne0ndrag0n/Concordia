@@ -15,10 +15,6 @@
 #include <jsoncpp/json/json.h>
 
 namespace BlueBear {
-	namespace Threading {
-		class CommandBus;
-	}
-
 	namespace Scripting {
 		namespace LuaKit {
 			class Serializer;
@@ -36,6 +32,8 @@ namespace BlueBear {
 				static constexpr const char* MODPACK_MAIN_SCRIPT = "obj.lua";
 				static constexpr const Tick WORLD_TICKS_MAX = 300;
 
+				std::chrono::time_point< std::chrono::steady_clock > lastExecuted;
+
 				lua_State* L;
 				Tick currentTick;
 				Tick ticksPerSecond;
@@ -47,7 +45,6 @@ namespace BlueBear {
 				std::unique_ptr< InfrastructureFactory > infrastructureFactory;
 				const char* currentModpackDirectory;
 				std::map< std::string, BlueBear::ModpackStatus > loadedModpacks;
-				Threading::CommandBus& commandBus;
 				bool active;
 				bool cancel;
 				unsigned int sleepInterval;
@@ -61,7 +58,7 @@ namespace BlueBear {
 			public:
 				std::vector< LuaReference > objects;
 
-				Engine( Threading::CommandBus& commandBus );
+				Engine();
 				~Engine();
 				void objectLoop();
 				bool loadLot( const char* lotPath );

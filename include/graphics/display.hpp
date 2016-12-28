@@ -49,11 +49,11 @@ namespace BlueBear {
       static const std::string FLOOR_MODEL_PATH;
 
       // RAII style
-      Display( Threading::CommandBus& commandBus );
+      Display();
       ~Display();
 
       void openDisplay();
-      void start();
+      bool update();
       void loadInfrastructure( unsigned int currentRotation, Containers::Collection3D< std::shared_ptr< Scripting::Tile > >& floorMap, Containers::Collection3D< std::shared_ptr< Scripting::WallCell > >& wallMap );
 
       // ---------- STATES ----------
@@ -114,34 +114,11 @@ namespace BlueBear {
       };
       // ----------------------------
 
-      class Command {
-        public:
-          virtual void execute( Display& instance ) = 0;
-      };
-
-      class NewEntityCommand : public Command {
-        glm::vec3 position;
-        public:
-          void execute( Display& instance );
-      };
-
-      class SendInfrastructureCommand : public Command {
-        unsigned int rotation;
-        Containers::Collection3D< std::shared_ptr< Scripting::Tile > >& floorMap;
-        Containers::Collection3D< std::shared_ptr< Scripting::WallCell > >& wallMap;
-        public:
-          SendInfrastructureCommand( Scripting::Lot& lot );
-          void execute( Display& instance );
-      };
-
-      using CommandList = std::list< std::unique_ptr< Command > >;
-
       private:
         using ViewportDimension = int;
         ViewportDimension x;
         ViewportDimension y;
         sf::RenderWindow mainWindow;
-        Threading::CommandBus& commandBus;
         sfg::SFGUI sfgui;
 
         std::unique_ptr< State > currentState;
