@@ -25,8 +25,6 @@ namespace BlueBear {
     configRoot[ "viewport_x" ] = 1024;
     configRoot[ "viewport_y" ] = 768;
     configRoot[ "current_locale" ] = "en_US";
-    configRoot[ "threadpool_count" ] = 2;
-    configRoot[ "threadpool_detect" ] = true;
     configRoot[ "key_switch_perspective" ] = sf::Keyboard::P;
     configRoot[ "key_move_up" ] = sf::Keyboard::Up;
     configRoot[ "key_move_down" ] = sf::Keyboard::Down;

@@ -33,4 +33,4 @@ Concordia
 * GLM
 * GLEW
 * Assimp
-* Amanieu/asyncplusplus (manual install required, make sure libasync++.so is in /usr/lib)
+* Intel Threading Building Blocks (TBB) 4.4

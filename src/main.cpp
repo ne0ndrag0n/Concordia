@@ -37,7 +37,6 @@ int main() {
 
 	// Fully de-threaded..."functional decomposition" turned out to be shite
 	// Keep the application responsive by splitting out heavy-duty tasks into threads, "Destiny" style
-	// TODO: Dump amanieu/asyncplusplus for Intel TBB or C++17
 	bool active = true;
 	while( active ) {
 		// update the game state first

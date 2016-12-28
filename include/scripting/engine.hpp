@@ -74,33 +74,6 @@ namespace BlueBear {
 				static int lua_setTimeout( lua_State* L );
 				static int lua_getLotObjects( lua_State* L );
 				static int lua_getLotObjectsByType( lua_State* L );
-
-				class Command {
-					public:
-						virtual void execute( Engine& instance ) = 0;
-				};
-
-				class RegisterInstance : public Command {
-					unsigned int instanceId;
-
-					public:
-						RegisterInstance( unsigned int instanceId );
-						void execute( Engine& instance );
-				};
-
-				class SetLockState : public Command {
-					bool status;
-					public:
-						SetLockState( bool status );
-						void execute( Engine& instance );
-				};
-
-				class ShutdownEngine : public Command {
-					public:
-						void execute( Engine& instance );
-				};
-
-				using CommandList = std::list< std::unique_ptr< Command > >;
 		};
 	}
 }

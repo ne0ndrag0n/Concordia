@@ -507,24 +507,5 @@ namespace BlueBear {
 			 return 1;
 
 		 }
-
-		// ---------- COMMANDS ----------
-		Engine::RegisterInstance::RegisterInstance( unsigned int instanceId )
-			: instanceId( instanceId ) {}
-
-		void Engine::RegisterInstance::execute( Engine& instance ) {
-			std::stringstream ss;
-			ss << "Registered this new entity " << instanceId;
-			Log::getInstance().info( "RegisterInstance", ss.str() );
-		}
-
-		Engine::SetLockState::SetLockState( bool status ) : status( status ) {}
-		void Engine::SetLockState::execute( Engine& instance ) {
-			instance.setActiveState( status );
-		}
-
-		void Engine::ShutdownEngine::execute( Engine& instance ) {
-			instance.cancel = true;
-		}
 	}
 }
