@@ -1,7 +1,6 @@
 #ifndef INFRASTRUCTUREFACTORY
 #define INFRASTRUCTUREFACTORY
 
-#include "threading/lockable.hpp"
 #include <string>
 #include <exception>
 #include <jsoncpp/json/json.h>

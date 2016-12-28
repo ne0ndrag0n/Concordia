@@ -17,7 +17,6 @@
 #include "scripting/wallcell.hpp"
 #include "scripting/wallpaper.hpp"
 #include "threading/commandbus.hpp"
-#include "threading/lockable.hpp"
 #include "localemanager.hpp"
 #include "configmanager.hpp"
 #include "log.hpp"

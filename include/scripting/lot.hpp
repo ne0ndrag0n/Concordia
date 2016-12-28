@@ -3,7 +3,6 @@
 
 #include "containers/collection3d.hpp"
 #include "scripting/infrastructurefactory.hpp"
-#include "threading/lockable.hpp"
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>

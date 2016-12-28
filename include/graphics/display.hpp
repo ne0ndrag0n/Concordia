@@ -23,7 +23,6 @@
 #include "graphics/shader.hpp"
 #include "graphics/model.hpp"
 #include "graphics/camera.hpp"
-#include "threading/lockable.hpp"
 
 namespace BlueBear {
   namespace Scripting {

@@ -4,7 +4,6 @@
 #include "containers/collection3d.hpp"
 #include "graphics/imagecache.hpp"
 #include "graphics/texturecache.hpp"
-#include "threading/lockable.hpp"
 #include "scripting/wallcell.hpp"
 #include <memory>
 #include <SFML/Graphics.hpp>

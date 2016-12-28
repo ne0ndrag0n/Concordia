@@ -9,7 +9,6 @@
 #include "graphics/imagebuilder/pointerimagesource.hpp"
 #include "graphics/material.hpp"
 #include "containers/collection3d.hpp"
-#include "threading/lockable.hpp"
 #include "scripting/wallcell.hpp"
 #include "scripting/wallpaper.hpp"
 #include "log.hpp"
