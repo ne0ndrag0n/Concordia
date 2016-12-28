@@ -117,21 +117,21 @@ namespace BlueBear {
 			Json::Value levels = floor[ "levels" ];
 
 			// Create the vector reference of shared_ptrs by iterating through dict
-			std::vector< Threading::Lockable< Tile > > lookup;
+			std::vector< std::shared_ptr< Tile > > lookup;
 			for( const Json::Value& dictEntry : dict ) {
 				auto tile = infrastructureFactory.getFloorTile( dictEntry.asString() );
 				lookup.push_back( tile );
 			}
 
 			// Use the pointer lookup to create the floormap
-			floorMap = std::make_unique< Containers::ConcCollection3D< Threading::Lockable< Tile > > >( stories, floorX, floorY );
+			floorMap = std::make_unique< Containers::ConcCollection3D< std::shared_ptr< Tile > > >( stories, floorX, floorY );
 
 			for( Json::Value& level : levels ) {
 				for( Json::Value& object : level ) {
 					if( Tools::Utility::isRLEObject( object ) ) {
 						// De-RLE the object
 						unsigned int run = object[ "run" ].asUInt();
-						Threading::Lockable< Tile > entry = getTile( object[ "value" ].asInt(), lookup );
+						std::shared_ptr< Tile > entry = getTile( object[ "value" ].asInt(), lookup );
 
 						for( unsigned int i = 0; i != run; i++ ) {
 							floorMap->pushDirect( entry );
@@ -147,8 +147,8 @@ namespace BlueBear {
 		 * Return a tile given a JSON object and a lookup of tiles. This is a simple inline function that just checks to see
 		 * if the entry is blank or not; if it's not blank (index of -1), the lookup is performed.
 		 */
-		Threading::Lockable< Tile > Lot::getTile( int index, std::vector< Threading::Lockable< Tile > >& lookup ) {
-			Threading::Lockable< Tile > entry;
+		std::shared_ptr< Tile > Lot::getTile( int index, std::vector< std::shared_ptr< Tile > >& lookup ) {
+			std::shared_ptr< Tile > entry;
 
 			if( index >= 0 ) {
 				entry = lookup.at( index );

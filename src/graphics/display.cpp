@@ -123,7 +123,7 @@ namespace BlueBear {
     /**
      * Given a lot, build floorInstanceCollection and translate the Tiles/Wallpanels to instances on the lot. Additionally, send the rotation status.
      */
-    void Display::loadInfrastructure( unsigned int currentRotation, Containers::ConcCollection3D< Threading::Lockable< Scripting::Tile > >& floorMap, Containers::ConcCollection3D< Threading::Lockable< Scripting::WallCell > >& wallMap ) {
+    void Display::loadInfrastructure( unsigned int currentRotation, Containers::ConcCollection3D< std::shared_ptr< Scripting::Tile > >& floorMap, Containers::ConcCollection3D< Threading::Lockable< Scripting::WallCell > >& wallMap ) {
 
       std::unique_ptr< Display::MainGameState > mainGameStatePtr = std::make_unique< Display::MainGameState >( *this, currentRotation, floorMap, wallMap );
 
@@ -162,7 +162,7 @@ namespace BlueBear {
     /**
      * Display renderer state for the main game loop
      */
-    Display::MainGameState::MainGameState( Display& instance, unsigned int currentRotation, Containers::ConcCollection3D< Threading::Lockable< Scripting::Tile > >& floorMap, Containers::ConcCollection3D< Threading::Lockable< Scripting::WallCell > >& wallMap ) :
+    Display::MainGameState::MainGameState( Display& instance, unsigned int currentRotation, Containers::ConcCollection3D< std::shared_ptr< Scripting::Tile > >& floorMap, Containers::ConcCollection3D< Threading::Lockable< Scripting::WallCell > >& wallMap ) :
       Display::State::State( instance ),
       defaultShader( Shader( "system/shaders/default_vertex.glsl", "system/shaders/default_fragment.glsl" ) ),
       camera( Camera( defaultShader.Program, instance.x, instance.y ) ),
@@ -221,7 +221,7 @@ namespace BlueBear {
 
             glm::vec3 floorCoords( xOrigin + xCounter, yOrigin - yCounter, zCounter * 2.0f );
 
-            Threading::Lockable< Scripting::Tile > tilePtr = floorMap.getItem( zCounter, xCounter, yCounter );
+            std::shared_ptr< Scripting::Tile > tilePtr = floorMap.getItem( zCounter, xCounter, yCounter );
 
             if( tilePtr ) {
               // Create instance from the model, and change its material using the material cache
@@ -229,9 +229,7 @@ namespace BlueBear {
 
               Drawable& floorDrawable = *( instance->drawable );
 
-              tilePtr.lock( [ & ]( Scripting::Tile& tile ) {
-                floorDrawable.material = std::make_shared< Material >( TextureList{ texCache.get( tile.imagePath ) } );
-              } );
+              floorDrawable.material = std::make_shared< Material >( TextureList{ texCache.get( tilePtr->imagePath ) } );
 
               instance->setPosition( floorCoords );
 

@@ -30,10 +30,10 @@ namespace BlueBear {
 				void buildFloorMap( Json::Value& floor );
 				void buildWallMap( Json::Value& walls );
 				Threading::Lockable< WallCell > getWallCell( Json::Value& object, std::vector< std::shared_ptr< Wallpaper > >& lookup );
-				inline Threading::Lockable< Tile > getTile( int index, std::vector< Threading::Lockable< Tile > >& lookup );
+				inline std::shared_ptr< Tile > getTile( int index, std::vector< std::shared_ptr< Tile > >& lookup );
 
 			public:
-				std::unique_ptr< Containers::ConcCollection3D< Threading::Lockable< Tile > > > floorMap;
+				std::unique_ptr< Containers::ConcCollection3D< std::shared_ptr< Tile > > > floorMap;
 				std::unique_ptr< Containers::ConcCollection3D< Threading::Lockable< WallCell > > > wallMap;
 				int floorX;
 				int floorY;
