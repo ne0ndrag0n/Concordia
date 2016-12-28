@@ -1,6 +1,5 @@
 #include "graphics/display.hpp"
 #include "containers/collection3d.hpp"
-#include "containers/conccollection3d.hpp"
 #include "graphics/imagebuilder/imagesource.hpp"
 #include "graphics/imagebuilder/pathimagesource.hpp"
 #include "graphics/instance/instance.hpp"
@@ -123,7 +122,7 @@ namespace BlueBear {
     /**
      * Given a lot, build floorInstanceCollection and translate the Tiles/Wallpanels to instances on the lot. Additionally, send the rotation status.
      */
-    void Display::loadInfrastructure( unsigned int currentRotation, Containers::ConcCollection3D< std::shared_ptr< Scripting::Tile > >& floorMap, Containers::ConcCollection3D< std::shared_ptr< Scripting::WallCell > >& wallMap ) {
+    void Display::loadInfrastructure( unsigned int currentRotation, Containers::Collection3D< std::shared_ptr< Scripting::Tile > >& floorMap, Containers::Collection3D< std::shared_ptr< Scripting::WallCell > >& wallMap ) {
 
       std::unique_ptr< Display::MainGameState > mainGameStatePtr = std::make_unique< Display::MainGameState >( *this, currentRotation, floorMap, wallMap );
 
@@ -162,7 +161,7 @@ namespace BlueBear {
     /**
      * Display renderer state for the main game loop
      */
-    Display::MainGameState::MainGameState( Display& instance, unsigned int currentRotation, Containers::ConcCollection3D< std::shared_ptr< Scripting::Tile > >& floorMap, Containers::ConcCollection3D< std::shared_ptr< Scripting::WallCell > >& wallMap ) :
+    Display::MainGameState::MainGameState( Display& instance, unsigned int currentRotation, Containers::Collection3D< std::shared_ptr< Scripting::Tile > >& floorMap, Containers::Collection3D< std::shared_ptr< Scripting::WallCell > >& wallMap ) :
       Display::State::State( instance ),
       defaultShader( Shader( "system/shaders/default_vertex.glsl", "system/shaders/default_fragment.glsl" ) ),
       camera( Camera( defaultShader.Program, instance.x, instance.y ) ),

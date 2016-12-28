@@ -2,7 +2,6 @@
 #define LOT
 
 #include "containers/collection3d.hpp"
-#include "containers/conccollection3d.hpp"
 #include "scripting/infrastructurefactory.hpp"
 #include "threading/lockable.hpp"
 #include <lua.h>
@@ -33,8 +32,8 @@ namespace BlueBear {
 				inline std::shared_ptr< Tile > getTile( int index, std::vector< std::shared_ptr< Tile > >& lookup );
 
 			public:
-				std::unique_ptr< Containers::ConcCollection3D< std::shared_ptr< Tile > > > floorMap;
-				std::unique_ptr< Containers::ConcCollection3D< std::shared_ptr< WallCell > > > wallMap;
+				std::unique_ptr< Containers::Collection3D< std::shared_ptr< Tile > > > floorMap;
+				std::unique_ptr< Containers::Collection3D< std::shared_ptr< WallCell > > > wallMap;
 				int floorX;
 				int floorY;
 				int stories;
