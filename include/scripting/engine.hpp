@@ -2,6 +2,7 @@
 #define ENGINE
 
 #include "scripting/event/waitingtable.hpp"
+#include "eventmanager.hpp"
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -32,6 +33,8 @@ namespace BlueBear {
 				static constexpr const char* MODPACK_MAIN_SCRIPT = "obj.lua";
 				static constexpr const Tick WORLD_TICKS_MAX = 300;
 
+				const EventManager& eventManager;
+
 				std::chrono::time_point< std::chrono::steady_clock > lastExecuted;
 
 				lua_State* L;
@@ -58,11 +61,11 @@ namespace BlueBear {
 				std::vector< LuaReference > objects;
 				std::shared_ptr< Lot > currentLot;
 
-				Engine();
+				Engine( const EventManager& eventManager );
 				~Engine();
 				void objectLoop();
 				bool loadLot( const char* lotPath );
-				bool setupRootEnvironment();
+				bool submitLuaContributions();
 				void setActiveState( bool status );
 
 				bool loadModpackSet( const char* modpackDirectory );

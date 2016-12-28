@@ -26,7 +26,8 @@
 namespace BlueBear {
 	namespace Scripting {
 
-		Engine::Engine() :
+		Engine::Engine( const EventManager& eventManager ) :
+		 eventManager( eventManager ),
 		 lastExecuted( std::chrono::steady_clock::now() ),
 		 L( luaL_newstate() ),
 		 ticksPerSecond( ConfigManager::getInstance().getIntValue( "ticks_per_second" ) ),
@@ -44,7 +45,7 @@ namespace BlueBear {
 		/**
 		 * Setup the global environment all Engine mods will run within. This method sets up required global objects used by each mod.
 		 */
-		bool Engine::setupRootEnvironment() {
+		bool Engine::submitLuaContributions() {
 
 			// bluebear
 			lua_newtable( L );

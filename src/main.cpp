@@ -5,6 +5,7 @@
 #include "log.hpp"
 #include "graphics/display.hpp"
 #include "localemanager.hpp"
+#include "eventmanager.hpp"
 #include "scripting/lot.hpp"
 #include <thread>
 #include <SFML/Window.hpp>
@@ -17,12 +18,14 @@ int main() {
 	Log::getInstance().info( "Main", LocaleManager::getInstance().getString( "BLUEBEAR_WELCOME_MESSAGE" ) );
 	sf::err().rdbuf( NULL );
 
-	Graphics::Display display;
-	Scripting::Engine engine;
+	const EventManager eventManager;
+
+	Graphics::Display display( eventManager );
+	Scripting::Engine engine( eventManager );
 
 	display.openDisplay();
 
-	if ( !engine.setupRootEnvironment() ) {
+	if ( !engine.submitLuaContributions() ) {
 		Log::getInstance().error( "main", "Failed to load BlueBear!" );
 		return 1;
 	}
@@ -33,7 +36,7 @@ int main() {
 	}
 
 	// send engine lot data to display
-	display.loadInfrastructure( engine.currentLot->currentRotation, *engine.currentLot->floorMap, *engine.currentLot->wallMap );
+	display.changeToMainGameState( engine.currentLot->currentRotation, *engine.currentLot->floorMap, *engine.currentLot->wallMap );
 
 	// Fully de-threaded..."functional decomposition" turned out to be shite
 	// Keep the application responsive by splitting out heavy-duty tasks into threads, "Destiny" style

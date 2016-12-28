@@ -1,5 +1,6 @@
 #include "graphics/display.hpp"
 #include "containers/collection3d.hpp"
+#include "graphics/gui/sfgroot.hpp"
 #include "graphics/imagebuilder/imagesource.hpp"
 #include "graphics/imagebuilder/pathimagesource.hpp"
 #include "graphics/instance/instance.hpp"
@@ -18,6 +19,7 @@
 #include "scripting/wallpaper.hpp"
 #include "localemanager.hpp"
 #include "configmanager.hpp"
+#include "tools/utility.hpp"
 #include "log.hpp"
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
@@ -38,7 +40,7 @@ namespace BlueBear {
     const std::string Display::WALLPANEL_MODEL_DR_PATH = "system/models/wall/diagwall.dae";
     const std::string Display::FLOOR_MODEL_PATH = "system/models/floor/floor.dae";
 
-    Display::Display() {
+    Display::Display( const EventManager& eventManager ) : eventManager( eventManager ) {
       // Get our settings out of the config manager
       x = ConfigManager::getInstance().getIntValue( "viewport_x" );
       y = ConfigManager::getInstance().getIntValue( "viewport_y" );
@@ -77,6 +79,10 @@ namespace BlueBear {
       glEnable( GL_CULL_FACE );
     }
 
+    bool Display::submitLuaContributions() {
+      return true;
+    }
+
     bool Display::update() {
       // Handle rendering
       currentState->execute();
@@ -103,7 +109,7 @@ namespace BlueBear {
     /**
      * Given a lot, build floorInstanceCollection and translate the Tiles/Wallpanels to instances on the lot. Additionally, send the rotation status.
      */
-    void Display::loadInfrastructure( unsigned int currentRotation, Containers::Collection3D< std::shared_ptr< Scripting::Tile > >& floorMap, Containers::Collection3D< std::shared_ptr< Scripting::WallCell > >& wallMap ) {
+    void Display::changeToMainGameState( unsigned int currentRotation, Containers::Collection3D< std::shared_ptr< Scripting::Tile > >& floorMap, Containers::Collection3D< std::shared_ptr< Scripting::WallCell > >& wallMap ) {
 
       std::unique_ptr< Display::MainGameState > mainGameStatePtr = std::make_unique< Display::MainGameState >( *this, currentRotation, floorMap, wallMap );
 
@@ -176,9 +182,12 @@ namespace BlueBear {
       WidgetBuilder builder( "system/ui/main/debug/debug.xml" );
       std::vector< std::shared_ptr< sfg::Widget > > widgets = builder.getWidgets();
 
+      // Go back to adding widgets directly to the desktop if we start getting style problems
+      gui.rootContainer = GUI::RootContainer::Create();
       for( std::shared_ptr< sfg::Widget > widget : widgets ) {
-        gui.desktop.Add( widget );
+        gui.rootContainer->Add( widget );
       }
+      gui.desktop.Add( gui.rootContainer );
 
       if( !gui.desktop.LoadThemeFromFile( ConfigManager::getInstance().getValue( "ui_theme" ) ) ) {
         Log::getInstance().warn( "Display::MainGameState::MainGameState", "ui_theme unable to load." );

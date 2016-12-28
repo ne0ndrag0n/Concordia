@@ -5,6 +5,7 @@ LIBS = -lpthread -ltbb -lassimp -lGLEW -lGL -lsfml-graphics -lsfml-window -lsfml
 
 SRCS = $(wildcard src/*.cpp)
 SRCS += $(wildcard src/graphics/*.cpp)
+SRCS += $(wildcard src/graphics/gui/*.cpp)
 SRCS += $(wildcard src/graphics/imagebuilder/*.cpp)
 SRCS += $(wildcard src/graphics/instance/*.cpp)
 SRCS += $(wildcard src/scripting/*.cpp)

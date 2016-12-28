@@ -15,10 +15,12 @@
 #include <glm/glm.hpp>
 #include <string>
 #include <map>
+#include "eventmanager.hpp"
 #include "graphics/texturecache.hpp"
 #include "graphics/imagecache.hpp"
 #include "scripting/tile.hpp"
 #include "scripting/wallcell.hpp"
+#include "graphics/gui/sfgroot.hpp"
 #include "graphics/imagebuilder/imagesource.hpp"
 #include "graphics/shader.hpp"
 #include "graphics/model.hpp"
@@ -49,12 +51,13 @@ namespace BlueBear {
       static const std::string FLOOR_MODEL_PATH;
 
       // RAII style
-      Display();
+      Display( const EventManager& eventManager );
       ~Display();
 
       void openDisplay();
+      bool submitLuaContributions();
       bool update();
-      void loadInfrastructure( unsigned int currentRotation, Containers::Collection3D< std::shared_ptr< Scripting::Tile > >& floorMap, Containers::Collection3D< std::shared_ptr< Scripting::WallCell > >& wallMap );
+      void changeToMainGameState( unsigned int currentRotation, Containers::Collection3D< std::shared_ptr< Scripting::Tile > >& floorMap, Containers::Collection3D< std::shared_ptr< Scripting::WallCell > >& wallMap );
 
       // ---------- STATES ----------
       class State {
@@ -92,6 +95,7 @@ namespace BlueBear {
           ImageCache imageCache;
           struct {
             sfg::Desktop desktop;
+            std::shared_ptr< sfg::Container > rootContainer;
             sf::Clock clock;
           } gui;
           // These are from the lot!
@@ -116,6 +120,7 @@ namespace BlueBear {
 
       private:
         using ViewportDimension = int;
+        const EventManager& eventManager;
         ViewportDimension x;
         ViewportDimension y;
         sf::RenderWindow mainWindow;
