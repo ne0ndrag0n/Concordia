@@ -19,21 +19,18 @@ int main() {
 	sf::err().rdbuf( NULL );
 
 	const EventManager eventManager;
-
-	Graphics::Display display( eventManager );
 	Scripting::Engine engine( eventManager );
-
-	display.openDisplay();
-
 	if ( !engine.submitLuaContributions() ) {
 		Log::getInstance().error( "main", "Failed to load BlueBear!" );
 		return 1;
 	}
-
 	// Load a lot object
 	if( !engine.loadLot( "lots/lot01.json" ) ) {
 		Log::getInstance().error( "main", "Failed to load demo lot!" );
 	}
+
+	Graphics::Display display( engine.L, eventManager );
+	display.openDisplay();
 
 	// send engine lot data to display
 	display.changeToMainGameState( engine.currentLot->currentRotation, *engine.currentLot->floorMap, *engine.currentLot->wallMap );

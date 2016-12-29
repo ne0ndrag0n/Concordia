@@ -37,7 +37,6 @@ namespace BlueBear {
 
 				std::chrono::time_point< std::chrono::steady_clock > lastExecuted;
 
-				lua_State* L;
 				Tick currentTick;
 				Tick ticksPerSecond;
 
@@ -58,6 +57,8 @@ namespace BlueBear {
 				friend class LuaKit::Serializer;
 
 			public:
+				lua_State* L;
+
 				std::vector< LuaReference > objects;
 				std::shared_ptr< Lot > currentLot;
 

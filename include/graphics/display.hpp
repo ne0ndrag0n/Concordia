@@ -5,6 +5,9 @@
  * Abstracted class representing the display device that is available to BlueBear.
  */
 #include "containers/collection3d.hpp"
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <SFGUI/SFGUI.hpp>
@@ -51,11 +54,10 @@ namespace BlueBear {
       static const std::string FLOOR_MODEL_PATH;
 
       // RAII style
-      Display( const EventManager& eventManager );
+      Display( lua_State* L, const EventManager& eventManager );
       ~Display();
 
       void openDisplay();
-      bool submitLuaContributions();
       bool update();
       void changeToMainGameState( unsigned int currentRotation, Containers::Collection3D< std::shared_ptr< Scripting::Tile > >& floorMap, Containers::Collection3D< std::shared_ptr< Scripting::WallCell > >& wallMap );
 
@@ -108,8 +110,10 @@ namespace BlueBear {
           void loadInfrastructure();
           void createFloorInstances();
           void createWallInstances();
-          void setupDefaultWindows();
+          void setupGUI();
+          void submitLuaContributions( lua_State* L );
           sfg::Desktop getDesktopFromXML();
+          static int lua_loadXMLWidgets( lua_State* L );
         public:
           void execute();
           void handleEvent( sf::Event& event );
@@ -119,6 +123,7 @@ namespace BlueBear {
       // ----------------------------
 
       private:
+        lua_State* L;
         using ViewportDimension = int;
         const EventManager& eventManager;
         ViewportDimension x;
@@ -128,7 +133,7 @@ namespace BlueBear {
 
         std::unique_ptr< State > currentState;
 
-        void main();
+        friend class Display::MainGameState;
     };
 
   }

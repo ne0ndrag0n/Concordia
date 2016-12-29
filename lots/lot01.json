@@ -71,7 +71,8 @@
 		"ticks": 10,
 		"waitingTable": {
 			"timerMap": {
-				"30": [ "0xffffffffffff" ]
+				"30": [ "0xffffffffffff" ],
+				"60": [ "0xfffffffffffc" ]
 			}
 		},
 		"world": {
@@ -85,6 +86,32 @@
 		      ],
 		      "type" : "itable"
 		   },
+			 "0xfffffffffffd" : {
+				 "type": "itable",
+				 "classID": "system.provider.gui",
+				 "entries": []
+			 },
+			 "0xfffffffffffc" : {
+				 "type": "sfunction",
+				 "class": "system.provider.gui",
+				 "method": "open_debug_ui",
+				 "args": {
+					 "type": "ref",
+					 "ptr": "0xfffffffffffb"
+				 }
+			 },
+			 "0xfffffffffffb" : {
+				 "type": "table",
+				 "entries": [
+					 {
+						 "key": 1,
+						 "value": {
+							 "type": "ref",
+							 "ptr": "0xfffffffffffd"
+						 }
+					 }
+				 ]
+			 },
 			 "0xffffffffffff" : {
 				 "type": "sfunction",
 				 "class": "game.flowers.base",

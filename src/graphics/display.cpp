@@ -40,7 +40,7 @@ namespace BlueBear {
     const std::string Display::WALLPANEL_MODEL_DR_PATH = "system/models/wall/diagwall.dae";
     const std::string Display::FLOOR_MODEL_PATH = "system/models/floor/floor.dae";
 
-    Display::Display( const EventManager& eventManager ) : eventManager( eventManager ) {
+    Display::Display( lua_State* L, const EventManager& eventManager ) : L( L ), eventManager( eventManager ) {
       // Get our settings out of the config manager
       x = ConfigManager::getInstance().getIntValue( "viewport_x" );
       y = ConfigManager::getInstance().getIntValue( "viewport_y" );
@@ -77,10 +77,6 @@ namespace BlueBear {
       glViewport( 0, 0, x, y );
       glEnable( GL_DEPTH_TEST );
       glEnable( GL_CULL_FACE );
-    }
-
-    bool Display::submitLuaContributions() {
-      return true;
     }
 
     bool Display::update() {
@@ -162,14 +158,8 @@ namespace BlueBear {
       // Setup camera
       camera.setRotationDirect( currentRotation );
 
-      try {
-        setupDefaultWindows();
-      } catch( ... ) {
-        Log::getInstance().error(
-          "Display::MainGameState::MainGameState",
-          "Failed to create debug panel!"
-        );
-      }
+      setupGUI();
+      submitLuaContributions( instance.L );
 
       // Moving much of Display::loadInfrastructure here
       loadInfrastructure();
@@ -178,15 +168,28 @@ namespace BlueBear {
       WallCellBundler::Piece.reset();
       WallCellBundler::DPiece.reset();
     }
-    void Display::MainGameState::setupDefaultWindows() {
-      WidgetBuilder builder( "system/ui/main/debug/debug.xml" );
-      std::vector< std::shared_ptr< sfg::Widget > > widgets = builder.getWidgets();
+    /**
+     * bluebear.gui and associated commands to create and manage windows
+     */
+    void Display::MainGameState::submitLuaContributions( lua_State* L ) {
+      lua_getglobal( L, "bluebear" ); // bluebear
 
-      // Go back to adding widgets directly to the desktop if we start getting style problems
+      lua_pushstring( L, "gui" ); // "gui" bluebear
+      lua_newtable( L ); // {} "gui" bluebear
+
+      lua_pushstring( L, "load_widgets" ); // string {} "gui" bluebear
+      lua_pushlightuserdata( L, this ); // this string {} "gui" bluebear
+      lua_pushcclosure( L, &Display::MainGameState::lua_loadXMLWidgets, 1 ); // closure string {} "gui" bluebear
+      lua_settable( L, -3 ); // {} "gui" bluebear
+
+      // TODO: Methods to remove and listen on elements (queried and accessed by simple selectors we can parse)
+
+      lua_settable( L, -3 ); // bluebear
+
+      lua_pop( L, 1 ); // EMPTY
+    }
+    void Display::MainGameState::setupGUI() {
       gui.rootContainer = GUI::RootContainer::Create();
-      for( std::shared_ptr< sfg::Widget > widget : widgets ) {
-        gui.rootContainer->Add( widget );
-      }
       gui.desktop.Add( gui.rootContainer );
 
       if( !gui.desktop.LoadThemeFromFile( ConfigManager::getInstance().getValue( "ui_theme" ) ) ) {
@@ -384,6 +387,34 @@ namespace BlueBear {
       gui.desktop.Update( gui.clock.restart().asSeconds() );
       instance.sfgui.Display( instance.mainWindow );
       glEnable( GL_DEPTH_TEST );
+    }
+    int Display::MainGameState::lua_loadXMLWidgets( lua_State* L ) {
+
+      Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+
+      // Stack contains string to path of XML file
+
+      if( lua_isstring( L, -1 ) ) {
+        std::string path( lua_tostring( L, -1 ) );
+
+        try {
+          // Create a WidgetBuilder and dump its widgets into the root container
+          // This should run in the engine objectLoop stage, and it will be caught on subsequent render
+          WidgetBuilder builder( path );
+          std::vector< std::shared_ptr< sfg::Widget > > widgets = builder.getWidgets();
+          for( auto& widget : widgets ) {
+            self->gui.rootContainer->Add( widget );
+          }
+        } catch( ... ) {
+          Log::getInstance().error( "Display::MainGameState::lua_loadXMLWidgets", "Failed to create a WidgetBuilder for path " + path );
+        }
+      } else {
+        Log::getInstance().warn( "Display::MainGameState::lua_loadXMLWidgets", "Argument 1 provided to bluebear.gui.load_widgets is not a string." );
+      }
+
+      lua_pop( L, 1 ); // EMPTY
+
+      return 0;
     }
   }
 }
