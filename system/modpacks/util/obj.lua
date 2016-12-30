@@ -82,8 +82,7 @@ end
 
 bluebear.util.time = {
   hours_to_ticks = function( hours )
-    -- TODO update
-    --return bluebear.util.time.minutes_to_ticks( hours * 60 )
+    return bluebear.util.time.minutes_to_ticks( hours * 60 )
   end,
 
   minutes_to_ticks = function( minutes )
@@ -91,8 +90,7 @@ bluebear.util.time = {
   end,
 
   seconds_to_ticks = function( seconds )
-    -- TODO update
-    --return bluebear.util.time.minutes_to_ticks( seconds / 60 )
+    return bluebear.util.time.minutes_to_ticks( seconds / 60 )
   end
 }
 
