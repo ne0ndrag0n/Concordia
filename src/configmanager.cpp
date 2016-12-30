@@ -16,7 +16,6 @@ namespace BlueBear {
   ConfigManager::ConfigManager() {
     configRoot[ "fps_overview" ] = 30;
     configRoot[ "vsync_limiter_overview" ] = false;
-    configRoot[ "ticks_per_second" ] = 30;
     configRoot[ "min_log_level" ] = 0;
     configRoot[ "logfile_path" ] = "bluebear.log";
     configRoot[ "logger_mode" ] = 0;

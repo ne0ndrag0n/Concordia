@@ -107,9 +107,4 @@ function Flowers:replenish_water()
 	self:change_graphic( 0, 0, Flowers.GRAPHICS.ALIVE )
 end
 
-function Flowers:test_config()
-	local ticks_per_second = bluebear.config.get_value( "ticks_per_second" )
-	print( Flowers.name, ticks_per_second )
-end
-
 bluebear.register_class( Flowers )

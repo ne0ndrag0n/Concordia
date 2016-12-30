@@ -30,7 +30,7 @@ namespace BlueBear {
 		 eventManager( eventManager ),
 		 lastExecuted( std::chrono::steady_clock::now() ),
 		 L( luaL_newstate() ),
-		 ticksPerSecond( ConfigManager::getInstance().getIntValue( "ticks_per_second" ) ),
+		 ticksPerSecond( 1000 / ConfigManager::getInstance().getIntValue( "fps_overview" ) ),
 		 currentModpackDirectory( nullptr ),
 		 cancel( false ) {
 			luaL_openlibs( L );
@@ -325,56 +325,42 @@ namespace BlueBear {
 		 */
 		void Engine::objectLoop() {
 
-			auto diff = std::chrono::duration_cast< std::chrono::milliseconds >( std::chrono::steady_clock::now() - lastExecuted );
-			// diff should be at least one second
-			unsigned long count = diff.count();
+			// Move items waiting for this tick out of the waiting table into the callback queue
+			waitingTable.triggerTick( currentTick );
 
-			// Proceed if count is greater than 1000ms
-			if( count >= 1000 ) {
-				// Complete a tick set: currentTick up to the next time it is evenly divisible by ticksPerSecond
-				int ticksRemaining = ticksPerSecond;
-				while( ticksRemaining-- ) {
-					// All the action of a single tick occurs here.
+			// If there are any callbacks, update bluebear.engine.current_tick
+			if( !waitingTable.queuedCallbacks.empty() ) {
+				lua_getglobal( L, "bluebear" ); // bluebear
+				lua_pushstring( L, "engine" ); // "engine" bluebear
+				lua_gettable( L, -2 ); // bluebear.engine bluebear
 
-					// Move items waiting for this tick out of the waiting table into the callback queue
-					waitingTable.triggerTick( currentTick );
+				lua_pushstring( L, "current_tick" ); // "current_tick" bluebear.engine bluebear
+				lua_pushnumber( L, currentTick ); // currentTick "current_tick" bluebear.engine bluebear
+				lua_settable( L, -3 ); // bluebear.engine bluebear
 
-					// If there are any callbacks, update bluebear.engine.current_tick
-					if( !waitingTable.queuedCallbacks.empty() ) {
-						lua_getglobal( L, "bluebear" ); // bluebear
-						lua_pushstring( L, "engine" ); // "engine" bluebear
-						lua_gettable( L, -2 ); // bluebear.engine bluebear
+				lua_pop( L, 2 ); // EMPTY
 
-						lua_pushstring( L, "current_tick" ); // "current_tick" bluebear.engine bluebear
-						lua_pushnumber( L, currentTick ); // currentTick "current_tick" bluebear.engine bluebear
-						lua_settable( L, -3 ); // bluebear.engine bluebear
+				// Burn out every function scheduled for this tick
+				while( !waitingTable.queuedCallbacks.empty() ) {
+					LuaReference function = waitingTable.queuedCallbacks.front();
+					lua_rawgeti( L, LUA_REGISTRYINDEX, function ); // <function>
 
-						lua_pop( L, 2 ); // EMPTY
+					if( lua_pcall( L, 0, 0, 0 ) ) { // error
+						Log::getInstance().error( "Engine::objectLoop", "Exception thrown on tick " + std::to_string( currentTick ) + ": " + lua_tostring( L, -1 ) );
+						lua_pop( L, 1 ); // EMPTY
+					} // EMPTY
 
-						// Burn out every function scheduled for this tick
-						while( !waitingTable.queuedCallbacks.empty() ) {
-							LuaReference function = waitingTable.queuedCallbacks.front();
-							lua_rawgeti( L, LUA_REGISTRYINDEX, function ); // <function>
+					// Only YOU can prevent memory leaks!
+					// The "function" reference should have not been used anywhere else in the pipeline (enqueued to now)
+					luaL_unref( L, LUA_REGISTRYINDEX, function );
 
-							if( lua_pcall( L, 0, 0, 0 ) ) { // error
-								Log::getInstance().error( "Engine::objectLoop", "Exception thrown on tick " + std::to_string( currentTick ) + ": " + lua_tostring( L, -1 ) );
-								lua_pop( L, 1 ); // EMPTY
-							} // EMPTY
-
-							// Only YOU can prevent memory leaks!
-							// The "function" reference should have not been used anywhere else in the pipeline (enqueued to now)
-							luaL_unref( L, LUA_REGISTRYINDEX, function );
-
-							waitingTable.queuedCallbacks.pop();
-						}
-					}
-
-					// On every tick, increment currentTick
-					currentTick++;
+					waitingTable.queuedCallbacks.pop();
 				}
-
-				lastExecuted = std::chrono::steady_clock::now();
 			}
+
+			// On every tick, increment currentTick
+			currentTick++;
+
 		}
 
 		/**
