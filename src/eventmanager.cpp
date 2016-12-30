@@ -2,35 +2,17 @@
 
 namespace BlueBear {
 
-  void EventManager::listen( EventManager::Signal signal, KeyType key, EventManager::Callback callback ) {
-    Bucket& bucket = signals[ signal ];
-
-    bucket[ key ] = callback;
+  void UIActionEvent::listen( void* key, std::function< void( LuaReference ) > callback ) {
+    listeners[ key ] = callback;
   }
 
-  void EventManager::stopListening( EventManager::Signal signal, KeyType key ) {
-    auto pair = signals.find( signal );
-
-    if( pair != signals.end() ) {
-      Bucket& bucket = pair->second;
-
-      bucket.erase( key );
-
-      if( bucket.empty() ) {
-        signals.erase( signal );
-      }
-    }
+  void UIActionEvent::stopListening( void* key ) {
+    listeners.erase( key );
   }
 
-  void EventManager::trigger( EventManager::Signal signal ) {
-    auto pair = signals.find( signal );
-
-    if( pair != signals.end() ) {
-      Bucket& bucket = pair->second;
-
-      for( auto& nestedPair : bucket ) {
-        nestedPair.second();
-      }
+  void UIActionEvent::trigger( LuaReference param ) {
+    for( auto& nestedPair : listeners ) {
+      nestedPair.second( param );
     }
   }
 }

@@ -2,7 +2,6 @@
 #define ENGINE
 
 #include "scripting/event/waitingtable.hpp"
-#include "eventmanager.hpp"
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -16,6 +15,8 @@
 #include <jsoncpp/json/json.h>
 
 namespace BlueBear {
+	class EventManager;
+
 	namespace Scripting {
 		namespace LuaKit {
 			class Serializer;
@@ -33,14 +34,13 @@ namespace BlueBear {
 				static constexpr const char* MODPACK_MAIN_SCRIPT = "obj.lua";
 				static constexpr const Tick WORLD_TICKS_MAX = 300;
 
-				const EventManager& eventManager;
+				EventManager& eventManager;
 
 				std::chrono::time_point< std::chrono::steady_clock > lastExecuted;
 
 				Tick currentTick;
 				Tick ticksPerSecond;
 
-				std::queue< LuaReference > callbacks;
 				Event::WaitingTable waitingTable;
 
 				std::unique_ptr< InfrastructureFactory > infrastructureFactory;
@@ -62,8 +62,9 @@ namespace BlueBear {
 				std::vector< LuaReference > objects;
 				std::shared_ptr< Lot > currentLot;
 
-				Engine( const EventManager& eventManager );
+				Engine( EventManager& eventManager );
 				~Engine();
+				void setupEvents();
 				void objectLoop();
 				bool loadLot( const char* lotPath );
 				bool submitLuaContributions();

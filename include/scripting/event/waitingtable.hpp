@@ -26,14 +26,12 @@ namespace BlueBear {
        */
       class WaitingTable {
 
-        std::queue< LuaReference >& engineQueue;
-
         std::map< Tick, std::list< LuaReference > > timerMap;
 
         std::list< LuaReference >& getBucket( Tick key );
 
       public:
-        WaitingTable( std::queue< LuaReference >& engineQueue );
+        std::queue< LuaReference > queuedCallbacks;
 
         std::unordered_set< LuaReference > loadFromJSON( Json::Value& loadingTable, std::map< std::string, LuaReference >& entities );
         Json::Value saveToJSON( lua_State* L );

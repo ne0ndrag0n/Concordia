@@ -18,7 +18,8 @@ int main() {
 	Log::getInstance().info( "Main", LocaleManager::getInstance().getString( "BLUEBEAR_WELCOME_MESSAGE" ) );
 	sf::err().rdbuf( NULL );
 
-	const EventManager eventManager;
+	EventManager eventManager;
+
 	Scripting::Engine engine( eventManager );
 	if ( !engine.submitLuaContributions() ) {
 		Log::getInstance().error( "main", "Failed to load BlueBear!" );

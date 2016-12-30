@@ -19,9 +19,8 @@
 namespace BlueBear {
 	namespace Scripting {
 
-		Lot::Lot( lua_State* L, const Tick& currentTickReference, InfrastructureFactory& infrastructureFactory, Json::Value& rootObject ) :
+		Lot::Lot( lua_State* L, InfrastructureFactory& infrastructureFactory, Json::Value& rootObject ) :
 			L( L ),
-			currentTickReference( currentTickReference ),
 			infrastructureFactory( infrastructureFactory ),
 			floorX( rootObject[ "floorx" ].asInt() ),
 			floorY( rootObject[ "floory" ].asInt() ),

@@ -10,6 +10,11 @@ function GUIProvider:open_debug_ui()
   print( "system.provider.gui", "Providing the debug UI from "..path )
 
   bluebear.gui.load_widgets( path )
+  bluebear.gui.get_widget_by_id( "rot_l" ):on( "click", function() print( "Called!" ) end )
+end
+
+function GUIProvider:handle_error( error )
+  print( "system.provider.gui", error )
 end
 
 bluebear.register_class( GUIProvider )

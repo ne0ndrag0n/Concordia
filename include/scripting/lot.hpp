@@ -23,7 +23,6 @@ namespace BlueBear {
 
 			private:
 				lua_State* L;
-				const Tick& currentTickReference;
 				InfrastructureFactory& infrastructureFactory;
 				void buildFloorMap( Json::Value& floor );
 				void buildWallMap( Json::Value& walls );
@@ -40,7 +39,7 @@ namespace BlueBear {
 				unsigned int currentRotation;
 				BlueBear::TerrainType terrainType;
 
-				Lot( lua_State* L, const Tick& currentTickReference, InfrastructureFactory& infrastructureFactory, Json::Value& rootObject );
+				Lot( lua_State* L, InfrastructureFactory& infrastructureFactory, Json::Value& rootObject );
 
 		};
 	}

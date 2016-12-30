@@ -1,6 +1,7 @@
 #include "scripting/luakit/serializer.hpp"
 #include "scripting/engine.hpp"
 #include "tools/utility.hpp"
+#include "scripting/event/waitingtable.hpp"
 #include "log.hpp"
 #include <lua.h>
 #include <lualib.h>

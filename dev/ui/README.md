@@ -109,3 +109,22 @@ Everything is case-sensitive.
 | min-height        | float     | Minimum height                                                           |
 | alignment_x       | float     | Set alignment of widget in the X direction (leftmost is 0.0)             |
 | alignment_y       | float     | Set alignment of widget in the Y direction (topmost is 0.0)              |
+
+
+ConcordiaME GUI API
+===================
+
+**TODO:** Much work in progress
+
+Example of setting a callback to a GUI element:
+
+`bluebear.gui.get_element_by_id( '#id' )` - Returns a wrapper to sfg::Widget
+`bluebear.gui.get_element_by_class( '.class' )` - Returns a wrapper to sfg::Widget
+
+
+Element API:
+
+`get_element_by_id` and `get_element_by_class`  
+`on( event, callback )` - Register an event. Initial tests will only reveal the "click" event.
+
+Element objects are just functions wrapping the shared_ptr for the sfg::Widget inside the game engine. That is, you can let Lua GC these objects, and the only thing that should happen is that the reference count is decremented. When you call up the same object using a subsequent get_element_by_id/get_element_by_class. 

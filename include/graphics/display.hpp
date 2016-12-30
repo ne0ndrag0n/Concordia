@@ -18,7 +18,6 @@
 #include <glm/glm.hpp>
 #include <string>
 #include <map>
-#include "eventmanager.hpp"
 #include "graphics/texturecache.hpp"
 #include "graphics/imagecache.hpp"
 #include "scripting/tile.hpp"
@@ -30,6 +29,8 @@
 #include "graphics/camera.hpp"
 
 namespace BlueBear {
+  class EventManager;
+
   namespace Scripting {
     class Lot;
   }
@@ -54,7 +55,7 @@ namespace BlueBear {
       static const std::string FLOOR_MODEL_PATH;
 
       // RAII style
-      Display( lua_State* L, const EventManager& eventManager );
+      Display( lua_State* L, EventManager& eventManager );
       ~Display();
 
       void openDisplay();
@@ -85,6 +86,7 @@ namespace BlueBear {
       };
 
       class MainGameState : public State {
+          lua_State* L;
           struct {
             std::string ISOMETRIC;
             std::string FIRST_PERSON;
@@ -111,9 +113,13 @@ namespace BlueBear {
           void createFloorInstances();
           void createWallInstances();
           void setupGUI();
-          void submitLuaContributions( lua_State* L );
+          void submitLuaContributions();
           sfg::Desktop getDesktopFromXML();
           static int lua_loadXMLWidgets( lua_State* L );
+          static int lua_Widget_gc( lua_State* L );
+          static int lua_Widget_getWidgetByID( lua_State* L );
+          static int lua_Widget_onEvent( lua_State* L );
+          static int lua_getWidgetByID( lua_State* L );
         public:
           void execute();
           void handleEvent( sf::Event& event );
@@ -124,8 +130,8 @@ namespace BlueBear {
 
       private:
         lua_State* L;
+        EventManager& eventManager;
         using ViewportDimension = int;
-        const EventManager& eventManager;
         ViewportDimension x;
         ViewportDimension y;
         sf::RenderWindow mainWindow;

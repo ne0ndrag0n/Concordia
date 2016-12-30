@@ -7,9 +7,9 @@
 #include "scripting/engine.hpp"
 #include "graphics/display.hpp"
 #include "configmanager.hpp"
+#include "eventmanager.hpp"
 #include "scripting/infrastructurefactory.hpp"
 #include "scripting/luakit/serializer.hpp"
-#include "scripting/event/waitingtable.hpp"
 #include "log.hpp"
 #include <jsoncpp/json/json.h>
 #include <iterator>
@@ -26,20 +26,30 @@
 namespace BlueBear {
 	namespace Scripting {
 
-		Engine::Engine( const EventManager& eventManager ) :
+		Engine::Engine( EventManager& eventManager ) :
 		 eventManager( eventManager ),
 		 lastExecuted( std::chrono::steady_clock::now() ),
 		 L( luaL_newstate() ),
 		 ticksPerSecond( ConfigManager::getInstance().getIntValue( "ticks_per_second" ) ),
-		 waitingTable( Event::WaitingTable( callbacks ) ),
 		 currentModpackDirectory( nullptr ),
 		 cancel( false ) {
 			luaL_openlibs( L );
 			setActiveState( false );
+
+			setupEvents();
 		}
 
 		Engine::~Engine() {
 			lua_close( L );
+		}
+
+		/**
+		 * Hook into eventmanager for everything we need
+		 */
+		void Engine::setupEvents() {
+			eventManager.UI_ACTION_EVENT.listen( this, [ & ]( LuaReference function ) {
+				waitingTable.waitForTick( currentTick + 1, function );
+			} );
 		}
 
 		/**
@@ -276,7 +286,7 @@ namespace BlueBear {
 					currentTick = engineJSON[ "ticks" ].asInt();
 
 					// Instantiate the lot
-					currentLot = std::make_shared< Lot >( L, currentTick, *infrastructureFactory, lotJSON );
+					currentLot = std::make_shared< Lot >( L, *infrastructureFactory, lotJSON );
 
 					// Clear the std::map containing all objects
 					objects.clear();
@@ -330,7 +340,7 @@ namespace BlueBear {
 					waitingTable.triggerTick( currentTick );
 
 					// If there are any callbacks, update bluebear.engine.current_tick
-					if( !callbacks.empty() ) {
+					if( !waitingTable.queuedCallbacks.empty() ) {
 						lua_getglobal( L, "bluebear" ); // bluebear
 						lua_pushstring( L, "engine" ); // "engine" bluebear
 						lua_gettable( L, -2 ); // bluebear.engine bluebear
@@ -340,23 +350,23 @@ namespace BlueBear {
 						lua_settable( L, -3 ); // bluebear.engine bluebear
 
 						lua_pop( L, 2 ); // EMPTY
-					}
 
-					// Burn out every function scheduled for this tick
-					while( !callbacks.empty() ) {
-						LuaReference function = callbacks.front();
-						lua_rawgeti( L, LUA_REGISTRYINDEX, function ); // <function>
+						// Burn out every function scheduled for this tick
+						while( !waitingTable.queuedCallbacks.empty() ) {
+							LuaReference function = waitingTable.queuedCallbacks.front();
+							lua_rawgeti( L, LUA_REGISTRYINDEX, function ); // <function>
 
-						if( lua_pcall( L, 0, 0, 0 ) ) { // error
-							Log::getInstance().error( "Engine::objectLoop", "Exception thrown on tick " + std::to_string( currentTick ) + ": " + lua_tostring( L, -1 ) );
-							lua_pop( L, 1 ); // EMPTY
-						} // EMPTY
+							if( lua_pcall( L, 0, 0, 0 ) ) { // error
+								Log::getInstance().error( "Engine::objectLoop", "Exception thrown on tick " + std::to_string( currentTick ) + ": " + lua_tostring( L, -1 ) );
+								lua_pop( L, 1 ); // EMPTY
+							} // EMPTY
 
-						// Only YOU can prevent memory leaks!
-						// The "function" reference should have not been used anywhere else in the pipeline (enqueued to now)
-						luaL_unref( L, LUA_REGISTRYINDEX, function );
+							// Only YOU can prevent memory leaks!
+							// The "function" reference should have not been used anywhere else in the pipeline (enqueued to now)
+							luaL_unref( L, LUA_REGISTRYINDEX, function );
 
-						callbacks.pop();
+							waitingTable.queuedCallbacks.pop();
+						}
 					}
 
 					// On every tick, increment currentTick
@@ -416,7 +426,7 @@ namespace BlueBear {
 				 if( interval == 0 ) {
 					 // This function was scheduled to run in the same tick, but when the current stack has completed.
 					 // You GENERALLY shouldn't do this but it's got its use cases.
-					 self->callbacks.push( function );
+					 self->waitingTable.queuedCallbacks.push( function );
 
 					 // You'll get a nil handle because a callback scheduled to go on the current tick cannot be cancelled.
 					 lua_pushnil( L ); // nil

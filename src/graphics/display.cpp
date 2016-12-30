@@ -19,6 +19,7 @@
 #include "scripting/wallpaper.hpp"
 #include "localemanager.hpp"
 #include "configmanager.hpp"
+#include "eventmanager.hpp"
 #include "tools/utility.hpp"
 #include "log.hpp"
 #include <SFML/Graphics.hpp>
@@ -40,7 +41,7 @@ namespace BlueBear {
     const std::string Display::WALLPANEL_MODEL_DR_PATH = "system/models/wall/diagwall.dae";
     const std::string Display::FLOOR_MODEL_PATH = "system/models/floor/floor.dae";
 
-    Display::Display( lua_State* L, const EventManager& eventManager ) : L( L ), eventManager( eventManager ) {
+    Display::Display( lua_State* L, EventManager& eventManager ) : L( L ), eventManager( eventManager ) {
       // Get our settings out of the config manager
       x = ConfigManager::getInstance().getIntValue( "viewport_x" );
       y = ConfigManager::getInstance().getIntValue( "viewport_y" );
@@ -143,6 +144,7 @@ namespace BlueBear {
      */
     Display::MainGameState::MainGameState( Display& instance, unsigned int currentRotation, Containers::Collection3D< std::shared_ptr< Scripting::Tile > >& floorMap, Containers::Collection3D< std::shared_ptr< Scripting::WallCell > >& wallMap ) :
       Display::State::State( instance ),
+      L( instance.L ),
       defaultShader( Shader( "system/shaders/default_vertex.glsl", "system/shaders/default_fragment.glsl" ) ),
       camera( Camera( defaultShader.Program, instance.x, instance.y ) ),
       floorModel( Model( Display::FLOOR_MODEL_PATH ) ),
@@ -159,7 +161,7 @@ namespace BlueBear {
       camera.setRotationDirect( currentRotation );
 
       setupGUI();
-      submitLuaContributions( instance.L );
+      submitLuaContributions();
 
       // Moving much of Display::loadInfrastructure here
       loadInfrastructure();
@@ -171,7 +173,7 @@ namespace BlueBear {
     /**
      * bluebear.gui and associated commands to create and manage windows
      */
-    void Display::MainGameState::submitLuaContributions( lua_State* L ) {
+    void Display::MainGameState::submitLuaContributions() {
       lua_getglobal( L, "bluebear" ); // bluebear
 
       lua_pushstring( L, "gui" ); // "gui" bluebear
@@ -182,9 +184,38 @@ namespace BlueBear {
       lua_pushcclosure( L, &Display::MainGameState::lua_loadXMLWidgets, 1 ); // closure string {} "gui" bluebear
       lua_settable( L, -3 ); // {} "gui" bluebear
 
-      // TODO: Methods to remove and listen on elements (queried and accessed by simple selectors we can parse)
+      // TODO: get_widget_by_class
+      lua_pushstring( L, "get_widget_by_id" );
+      lua_pushlightuserdata( L, this );
+      lua_pushcclosure( L, &Display::MainGameState::lua_getWidgetByID, 1 );
+      lua_settable( L, -3 );
 
       lua_settable( L, -3 ); // bluebear
+
+      lua_pop( L, 1 ); // EMPTY
+
+      // Register internal sfg::Widget wrappers
+      luaL_Reg elementFuncs[] = {
+        { "get_widget_by_id", Display::MainGameState::lua_getWidgetByID },
+        { "on", Display::MainGameState::lua_Widget_onEvent },
+        { "__gc", Display::MainGameState::lua_Widget_gc },
+        { NULL, NULL }
+      };
+
+      // TODO: Make sure these metatables in the registry don't fuck up the serialization save process!
+      if( luaL_newmetatable( L, "bluebear_widget" ) ) { // metatable
+        // If it returns 1, this metatable was newly created and has to get built.
+
+        // Push the upvalue for this, we're gonna need it in some functions
+        lua_pushlightuserdata( L, this ); // upvalue metatable
+
+        luaL_setfuncs( L, elementFuncs, 1 ); // metatable
+
+        lua_pushvalue( L, -1 ); // metatable metatable
+
+        // HOLY SHIT THIS FUNCTION EXISTS?!
+        lua_setfield( L, -2, "__index" ); // metatable
+      }
 
       lua_pop( L, 1 ); // EMPTY
     }
@@ -413,6 +444,89 @@ namespace BlueBear {
       }
 
       lua_pop( L, 1 ); // EMPTY
+
+      return 0;
+    }
+    int Display::MainGameState::lua_getWidgetByID( lua_State* L ) {
+
+      std::string selector;
+
+      // called from bluebear.gui.get_widget_by_id
+      if( lua_isstring( L, -1 ) ) {
+        selector = std::string( lua_tostring( L, -1 ) );
+      } else {
+        Log::getInstance().warn( "Display::MainGameState::lua_getWidgetByID", "Argument provided to get_widget_by_id was not a string." );
+        return 0;
+      }
+
+      Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+      std::shared_ptr< sfg::Widget > parentWidget;
+      if( lua_gettop( L ) == 1 ) {
+        parentWidget = self->gui.rootContainer;
+      } else {
+        std::shared_ptr< sfg::Widget >* widgetPtr = *( ( std::shared_ptr< sfg::Widget >** ) luaL_checkudata( L, 1, "bluebear_widget" ) );
+        parentWidget = *widgetPtr;
+      }
+
+      // Holy moly is this going to get confusing quick
+      // I also have the least amount of confidence in this code you could possibly imagine
+      std::shared_ptr< sfg::Widget > widget = parentWidget->GetWidgetById( selector );
+      if( widget ) {
+        Log::getInstance().debug( "Display::MainGameState::lua_getWidgetByID", "Creating a userdata for the found element " + selector );
+        std::shared_ptr< sfg::Widget >** userData = ( std::shared_ptr< sfg::Widget >** )lua_newuserdata( L, sizeof( std::shared_ptr< sfg::Widget >* ) ); // userdata
+        *userData = new std::shared_ptr< sfg::Widget >( widget );
+
+        luaL_getmetatable( L, "bluebear_widget" ); // metatable userdata
+        lua_setmetatable( L, -2 ); // userdata
+
+        return 1;
+      } else {
+        std::string error = std::string( "Could not find widget with ID " ) + selector;
+        return luaL_error( L, error.c_str() );
+      }
+    }
+    int Display::MainGameState::lua_Widget_gc( lua_State* L ) {
+      std::shared_ptr< sfg::Widget >* widgetPtr = *( ( std::shared_ptr< sfg::Widget >** ) luaL_checkudata( L, 1, "bluebear_widget" ) );
+
+      // Destroy the std::shared_ptr< sfg::Widget >. This should decrease the reference count by one.
+      delete widgetPtr;
+
+      return 0;
+    }
+    int Display::MainGameState::lua_Widget_onEvent( lua_State* L ) {
+      std::shared_ptr< sfg::Widget >** userData = ( std::shared_ptr< sfg::Widget >** ) luaL_checkudata( L, 1, "bluebear_widget" );
+
+      Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+
+      // function "event" self
+
+      if( lua_isstring( L, -2 ) ) {
+        const char* eventType = lua_tostring( L, -2 );
+
+        switch( Tools::Utility::hash( eventType ) ) {
+          case Tools::Utility::hash( "click" ):
+            {
+              std::shared_ptr< sfg::Widget > widget = **userData;
+              // TODO: Store this in a table somewhere on the object so it can unref it on GC!!
+              // If we don't then every function passed to an "on" will get serialized (then GC'd when the game is next loaded so i guess nothing too-too bad, but not ideal)
+              // We can probably remedy this down the line by making the userdata a struct { std::shared_ptr< sfg::Widget > widget; std::vector< LuaReference > masterReferences; }
+              LuaReference masterReference = luaL_ref( L, LUA_REGISTRYINDEX ); // "event" self
+              widget->GetSignal( sfg::Widget::OnLeftClick ).Connect( [ L, self, masterReference ]() {
+                // Create new "disposable" reference that will get ferried through
+                lua_rawgeti( L, LUA_REGISTRYINDEX, masterReference ); // object
+                self->instance.eventManager.UI_ACTION_EVENT.trigger( luaL_ref( L, LUA_REGISTRYINDEX ) ); // EMPTY
+              } );
+
+              lua_pushboolean( L, true ); // true "event" self
+              return 1; // true
+            }
+            break;
+          default:
+            Log::getInstance().warn( "Display::MainGameState::lua_Widget_onEvent", "Invalid event type specified: " + std::string( eventType ) );
+        }
+      } else {
+        Log::getInstance().warn( "Display::MainGameState::lua_Widget_onEvent", "Invalid event passed to on()" );
+      }
 
       return 0;
     }

@@ -8,8 +8,6 @@ namespace BlueBear {
   namespace Scripting {
     namespace Event {
 
-      WaitingTable::WaitingTable( std::queue< LuaReference >& engineQueue ) : engineQueue( engineQueue ) {}
-
       std::unordered_set< LuaReference > WaitingTable::loadFromJSON( Json::Value& loadingTable, std::map< std::string, LuaReference >& entities ) {
         std::unordered_set< LuaReference > visitedItems;
 
@@ -117,7 +115,7 @@ namespace BlueBear {
 
           // Push everything in this bucket
           for( LuaReference reference : bucket ) {
-            engineQueue.push( reference );
+            queuedCallbacks.push( reference );
           }
 
           // Destroy the bucket, no need for it any longer
