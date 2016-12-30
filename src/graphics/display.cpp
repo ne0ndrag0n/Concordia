@@ -184,6 +184,16 @@ namespace BlueBear {
       lua_pushcclosure( L, &Display::MainGameState::lua_loadXMLWidgets, 1 ); // closure string {} "gui" bluebear
       lua_settable( L, -3 ); // {} "gui" bluebear
 
+      lua_pushstring( L, "rotate_left" );
+      lua_pushlightuserdata( L, this );
+      lua_pushcclosure( L, &Display::MainGameState::lua_rotateWorldLeft, 1 );
+      lua_settable( L, -3 );
+
+      lua_pushstring( L, "rotate_right" );
+      lua_pushlightuserdata( L, this );
+      lua_pushcclosure( L, &Display::MainGameState::lua_rotateWorldRight, 1 );
+      lua_settable( L, -3 );
+
       // TODO: get_widget_by_class
       lua_pushstring( L, "get_widget_by_id" );
       lua_pushlightuserdata( L, this );
@@ -447,6 +457,18 @@ namespace BlueBear {
 
       return 0;
     }
+    int Display::MainGameState::lua_rotateWorldLeft( lua_State* L ) {
+      Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+
+      self->currentRotation = self->camera.rotateLeft();
+      self->createWallInstances();
+    }
+    int Display::MainGameState::lua_rotateWorldRight( lua_State* L ) {
+      Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+
+      self->currentRotation = self->camera.rotateRight();
+      self->createWallInstances();
+    }
     int Display::MainGameState::lua_getWidgetByID( lua_State* L ) {
 
       std::string selector;
@@ -490,11 +512,6 @@ namespace BlueBear {
     int Display::MainGameState::lua_Widget_gc( lua_State* L ) {
       LuaElement* widgetPtr = *( ( LuaElement** ) luaL_checkudata( L, 1, "bluebear_widget" ) );
 
-      // We're done with these function references
-      for( auto& pair : widgetPtr->usedRefs ) {
-        luaL_unref( L, LUA_REGISTRYINDEX, pair.second );
-      }
-
       // Destroy the std::shared_ptr< sfg::Widget >. This should decrease the reference count by one.
       delete widgetPtr;
 
@@ -515,13 +532,19 @@ namespace BlueBear {
             {
               LuaElement& element = **userData;
 
-              LuaReference masterReference = luaL_ref( L, LUA_REGISTRYINDEX ); // "event" self
+              // Create the bucket for this widget if it doesn't exist, otherwise, return a new bucket
+              SignalMap& signalMap = self->masterSignalMap[ element.widget.get() ];
 
-              auto pair = element.usedRefs.find( sfg::Widget::OnLeftClick );
-              if( pair != element.usedRefs.end() ) {
+              // If there's a previous sfg::Widget::OnLeftClick registered for this widget instance, unref and kill it
+              auto pair = signalMap.find( sfg::Widget::OnLeftClick );
+              if( pair != signalMap.end() ) {
+                // Un-ref this element we're about to erase
                 luaL_unref( L, LUA_REGISTRYINDEX, pair->second );
               }
-              element.usedRefs[ sfg::Widget::OnLeftClick ] = masterReference;
+
+              // Track the master reference
+              // Unref this if the pointer is ever removed!
+              LuaReference masterReference = signalMap[ sfg::Widget::OnLeftClick ] = luaL_ref( L, LUA_REGISTRYINDEX ); // "event" self
 
               element.widget->GetSignal( sfg::Widget::OnLeftClick ).Connect( [ L, self, masterReference ]() {
                 // Create new "disposable" reference that will get ferried through

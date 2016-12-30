@@ -10,7 +10,17 @@ function GUIProvider:open_debug_ui()
   print( "system.provider.gui", "Providing the debug UI from "..path )
 
   bluebear.gui.load_widgets( path )
-  bluebear.gui.get_widget_by_id( "rot_l" ):on( "click", function() print( "Called!" ) end )
+
+  bluebear.gui.get_widget_by_id( "rot_l" ):on( "click", bluebear.util.bind( "system.provider.gui:on_click_rot_l", self ) )
+  bluebear.gui.get_widget_by_id( "rot_r" ):on( "click", bluebear.util.bind( "system.provider.gui:on_click_rot_r", self ) )
+end
+
+function GUIProvider:on_click_rot_l()
+  bluebear.gui.rotate_left()
+end
+
+function GUIProvider:on_click_rot_r()
+  bluebear.gui.rotate_right()
 end
 
 function GUIProvider:handle_error( error )
