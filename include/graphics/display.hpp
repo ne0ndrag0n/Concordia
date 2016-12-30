@@ -4,6 +4,7 @@
 /**
  * Abstracted class representing the display device that is available to BlueBear.
  */
+#include "bbtypes.hpp"
 #include "containers/collection3d.hpp"
 #include <lua.h>
 #include <lualib.h>
@@ -102,6 +103,10 @@ namespace BlueBear {
             std::shared_ptr< sfg::Container > rootContainer;
             sf::Clock clock;
           } gui;
+          struct LuaElement {
+            std::shared_ptr< sfg::Widget > widget;
+            std::map< sfg::Signal::SignalID, LuaReference > usedRefs;
+          };
           // These are from the lot!
           Containers::Collection3D< std::shared_ptr< Scripting::Tile > >& floorMap;
           Containers::Collection3D< std::shared_ptr< Scripting::WallCell > >& wallMap;

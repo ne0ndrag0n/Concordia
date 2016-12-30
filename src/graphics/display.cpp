@@ -473,8 +473,10 @@ namespace BlueBear {
       std::shared_ptr< sfg::Widget > widget = parentWidget->GetWidgetById( selector );
       if( widget ) {
         Log::getInstance().debug( "Display::MainGameState::lua_getWidgetByID", "Creating a userdata for the found element " + selector );
-        std::shared_ptr< sfg::Widget >** userData = ( std::shared_ptr< sfg::Widget >** )lua_newuserdata( L, sizeof( std::shared_ptr< sfg::Widget >* ) ); // userdata
-        *userData = new std::shared_ptr< sfg::Widget >( widget );
+        LuaElement** userData = ( LuaElement** )lua_newuserdata( L, sizeof( LuaElement* ) ); // userdata
+        *userData = new LuaElement();
+
+        ( **userData ).widget = widget;
 
         luaL_getmetatable( L, "bluebear_widget" ); // metatable userdata
         lua_setmetatable( L, -2 ); // userdata
@@ -486,7 +488,12 @@ namespace BlueBear {
       }
     }
     int Display::MainGameState::lua_Widget_gc( lua_State* L ) {
-      std::shared_ptr< sfg::Widget >* widgetPtr = *( ( std::shared_ptr< sfg::Widget >** ) luaL_checkudata( L, 1, "bluebear_widget" ) );
+      LuaElement* widgetPtr = *( ( LuaElement** ) luaL_checkudata( L, 1, "bluebear_widget" ) );
+
+      // We're done with these function references
+      for( auto& pair : widgetPtr->usedRefs ) {
+        luaL_unref( L, LUA_REGISTRYINDEX, pair.second );
+      }
 
       // Destroy the std::shared_ptr< sfg::Widget >. This should decrease the reference count by one.
       delete widgetPtr;
@@ -494,7 +501,7 @@ namespace BlueBear {
       return 0;
     }
     int Display::MainGameState::lua_Widget_onEvent( lua_State* L ) {
-      std::shared_ptr< sfg::Widget >** userData = ( std::shared_ptr< sfg::Widget >** ) luaL_checkudata( L, 1, "bluebear_widget" );
+      LuaElement** userData = ( LuaElement** ) luaL_checkudata( L, 1, "bluebear_widget" );
 
       Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
 
@@ -506,12 +513,17 @@ namespace BlueBear {
         switch( Tools::Utility::hash( eventType ) ) {
           case Tools::Utility::hash( "click" ):
             {
-              std::shared_ptr< sfg::Widget > widget = **userData;
-              // TODO: Store this in a table somewhere on the object so it can unref it on GC!!
-              // If we don't then every function passed to an "on" will get serialized (then GC'd when the game is next loaded so i guess nothing too-too bad, but not ideal)
-              // We can probably remedy this down the line by making the userdata a struct { std::shared_ptr< sfg::Widget > widget; std::vector< LuaReference > masterReferences; }
+              LuaElement& element = **userData;
+
               LuaReference masterReference = luaL_ref( L, LUA_REGISTRYINDEX ); // "event" self
-              widget->GetSignal( sfg::Widget::OnLeftClick ).Connect( [ L, self, masterReference ]() {
+
+              auto pair = element.usedRefs.find( sfg::Widget::OnLeftClick );
+              if( pair != element.usedRefs.end() ) {
+                luaL_unref( L, LUA_REGISTRYINDEX, pair->second );
+              }
+              element.usedRefs[ sfg::Widget::OnLeftClick ] = masterReference;
+
+              element.widget->GetSignal( sfg::Widget::OnLeftClick ).Connect( [ L, self, masterReference ]() {
                 // Create new "disposable" reference that will get ferried through
                 lua_rawgeti( L, LUA_REGISTRYINDEX, masterReference ); // object
                 self->instance.eventManager.UI_ACTION_EVENT.trigger( luaL_ref( L, LUA_REGISTRYINDEX ) ); // EMPTY
