@@ -63,6 +63,9 @@ namespace BlueBear {
 
       directory = path.substr( 0, path.find_last_of( '/' ) );
 
+      // Assimp's mRootNode mTransformation is NOT CORRECT!!
+      scene->mRootNode->mTransformation = aiMatrix4x4();
+
       // If the root node has no meshes and only one child, just skip to that child
       if( scene->mRootNode->mNumChildren == 1 && scene->mRootNode->mNumMeshes == 0 ) {
         processNode( scene->mRootNode->mChildren[ 0 ], scene, aiMatrix4x4() );

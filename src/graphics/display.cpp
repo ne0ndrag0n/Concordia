@@ -148,6 +148,7 @@ namespace BlueBear {
       defaultShader( Shader( "system/shaders/default_vertex.glsl", "system/shaders/default_fragment.glsl" ) ),
       camera( Camera( defaultShader.Program, instance.x, instance.y ) ),
       floorModel( Model( Display::FLOOR_MODEL_PATH ) ),
+      __debugModel( Model( "dev/box/box.dae" ) ),
       floorMap( floorMap ),
       wallMap( wallMap ),
       currentRotation( currentRotation ) {
@@ -162,6 +163,8 @@ namespace BlueBear {
 
       setupGUI();
       submitLuaContributions();
+
+      __debugInstances.emplace_back( __debugModel, defaultShader.Program );
 
       // Moving much of Display::loadInfrastructure here
       loadInfrastructure();
@@ -324,6 +327,11 @@ namespace BlueBear {
       // Use default shader and position camera
       defaultShader.use();
       camera.position();
+
+      // Draw some stuff while we refine the graphics engine
+      for( auto& instance : __debugInstances ) {
+        instance.drawEntity();
+      }
 
       // Draw entities of each type
       // Floor & Walls with nudging

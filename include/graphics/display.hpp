@@ -28,6 +28,7 @@
 #include "graphics/shader.hpp"
 #include "graphics/model.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/instance/instance.hpp"
 
 namespace BlueBear {
   class EventManager;
@@ -98,6 +99,8 @@ namespace BlueBear {
           Model floorModel;
           TextureCache texCache;
           ImageCache imageCache;
+          Model __debugModel;
+          std::vector< Graphics::Instance > __debugInstances;
           struct {
             sfg::Desktop desktop;
             std::shared_ptr< sfg::Container > rootContainer;
