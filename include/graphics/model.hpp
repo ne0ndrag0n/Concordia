@@ -21,7 +21,7 @@ namespace BlueBear {
 
       public:
         std::unique_ptr< Drawable > drawable;
-        std::map< std::string, std::unique_ptr< Model > > children;
+        std::map< std::string, std::shared_ptr< Model > > children;
 
         Model( std::string path );
         Model( aiNode* node, const aiScene* scene, std::string& directory, aiMatrix4x4 parentTransform, unsigned int level );
@@ -40,6 +40,10 @@ namespace BlueBear {
         void processMesh( aiMesh* mesh, const aiScene* scene, std::string nodeTitle, glm::mat4 transformation );
 
         TextureList loadMaterialTextures( aiMaterial* material, aiTextureType type );
+
+        std::shared_ptr< Model > findChildById( const std::string& id );
+
+        void loadAnimations( aiAnimation** animations, unsigned int count );
     };
   }
 }

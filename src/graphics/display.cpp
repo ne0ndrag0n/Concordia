@@ -148,7 +148,7 @@ namespace BlueBear {
       defaultShader( Shader( "system/shaders/default_vertex.glsl", "system/shaders/default_fragment.glsl" ) ),
       camera( Camera( defaultShader.Program, instance.x, instance.y ) ),
       floorModel( Model( Display::FLOOR_MODEL_PATH ) ),
-      __debugModel( Model( "dev/box/box.dae" ) ),
+      __debugModel( Model( ConfigManager::getInstance().getValue( "__debug_file" ) ) ),
       floorMap( floorMap ),
       wallMap( wallMap ),
       currentRotation( currentRotation ) {
@@ -195,6 +195,16 @@ namespace BlueBear {
       lua_pushstring( L, "rotate_right" );
       lua_pushlightuserdata( L, this );
       lua_pushcclosure( L, &Display::MainGameState::lua_rotateWorldRight, 1 );
+      lua_settable( L, -3 );
+
+      lua_pushstring( L, "zoom_in" );
+      lua_pushlightuserdata( L, this );
+      lua_pushcclosure( L, &Display::MainGameState::lua_zoomIn, 1 );
+      lua_settable( L, -3 );
+
+      lua_pushstring( L, "zoom_out" );
+      lua_pushlightuserdata( L, this );
+      lua_pushcclosure( L, &Display::MainGameState::lua_zoomOut, 1 );
       lua_settable( L, -3 );
 
       // TODO: get_widget_by_class
@@ -464,6 +474,16 @@ namespace BlueBear {
       lua_pop( L, 1 ); // EMPTY
 
       return 0;
+    }
+    int Display::MainGameState::lua_zoomIn( lua_State* L ) {
+      Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+
+      self->camera.zoomIn();
+    }
+    int Display::MainGameState::lua_zoomOut( lua_State* L ) {
+      Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+
+      self->camera.zoomOut();
     }
     int Display::MainGameState::lua_rotateWorldLeft( lua_State* L ) {
       Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );

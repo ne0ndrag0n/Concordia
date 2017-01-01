@@ -13,6 +13,16 @@ function GUIProvider:open_debug_ui()
 
   bluebear.gui.get_widget_by_id( "rot_l" ):on( "click", bluebear.util.bind( "system.provider.gui:on_click_rot_l", self ) )
   bluebear.gui.get_widget_by_id( "rot_r" ):on( "click", bluebear.util.bind( "system.provider.gui:on_click_rot_r", self ) )
+  bluebear.gui.get_widget_by_id( "zoom_in" ):on( "click", bluebear.util.bind( "system.provider.gui:on_click_zoom_in", self ) )
+  bluebear.gui.get_widget_by_id( "zoom_out" ):on( "click", bluebear.util.bind( "system.provider.gui:on_click_zoom_out", self ) )
+end
+
+function GUIProvider:on_click_zoom_in()
+  bluebear.gui.zoom_in()
+end
+
+function GUIProvider:on_click_zoom_out()
+  bluebear.gui.zoom_out()
 end
 
 function GUIProvider:on_click_rot_l()

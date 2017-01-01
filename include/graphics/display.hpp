@@ -127,6 +127,8 @@ namespace BlueBear {
           sfg::Desktop getDesktopFromXML();
           static int lua_rotateWorldLeft( lua_State* L );
           static int lua_rotateWorldRight( lua_State* L );
+          static int lua_zoomIn( lua_State* L );
+          static int lua_zoomOut( lua_State* L );
           static int lua_loadXMLWidgets( lua_State* L );
           static int lua_Widget_gc( lua_State* L );
           static int lua_Widget_getWidgetByID( lua_State* L );

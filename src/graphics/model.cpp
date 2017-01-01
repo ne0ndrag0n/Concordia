@@ -3,6 +3,7 @@
 #include "graphics/mesh.hpp"
 #include "graphics/drawable.hpp"
 #include "graphics/texture.hpp"
+#include "tools/utility.hpp"
 #include "log.hpp"
 #include <string>
 #include <sstream>
@@ -10,6 +11,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <glm/glm.hpp>
+#include <glm/ext.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <memory>
@@ -63,7 +65,7 @@ namespace BlueBear {
 
       directory = path.substr( 0, path.find_last_of( '/' ) );
 
-      // Assimp's mRootNode mTransformation is NOT CORRECT!!
+      // Assimp's mRootNode mTransformation is NOT CORRECT for COLLADA imports!!
       scene->mRootNode->mTransformation = aiMatrix4x4();
 
       // If the root node has no meshes and only one child, just skip to that child
@@ -71,6 +73,12 @@ namespace BlueBear {
         processNode( scene->mRootNode->mChildren[ 0 ], scene, aiMatrix4x4() );
       } else {
         processNode( scene->mRootNode, scene, aiMatrix4x4() );
+      }
+
+      // After everything is done, walk the tree for animations and apply them to the correct nodes
+      if( scene->HasAnimations() ) {
+        Log::getInstance().debug( "Model::loadModel", "Loading animations for " + path );
+        loadAnimations( scene->mAnimations, scene->mNumAnimations );
       }
     }
 
@@ -145,6 +153,62 @@ namespace BlueBear {
       }
 
       return textures;
+    }
+
+    /**
+     * Recursively discover a node name
+     */
+    std::shared_ptr< Model > Model::findChildById( const std::string& id ) {
+
+      auto pair = children.find( id );
+      if( pair != children.end() ) {
+        return pair->second;
+      }
+
+      for( auto& pair : children ) {
+        std::shared_ptr< Model > temp_ptr = findChildById( id );
+        if( temp_ptr ) {
+          return temp_ptr;
+        }
+      }
+
+      return std::shared_ptr< Model >( nullptr );
+    }
+
+    /**
+     * Load animations at the top-level of the scene graph ONLY
+     */
+    void Model::loadAnimations( aiAnimation** animations, unsigned int count ) {
+      for( int i = 0; i != count; i++ ) {
+        aiAnimation* animation = animations[ i ];
+
+        Log::getInstance().debug( "Model::loadAnimations",
+          std::string( "ANIMATION INFO: " ) + "\n\t\t\t\t\t\t " +
+          "ID: " + std::to_string( i ) + "\n\t\t\t\t\t\t " +
+          "Name: " + animation->mName.C_Str() + "\n\t\t\t\t\t\t " +
+          "FPS: " + std::to_string( animation->mTicksPerSecond ) + "\n\t\t\t\t\t\t " +
+          "Duration: " + std::to_string( animation->mDuration )  + "\n\t\t\t\t\t\t " +
+          "Channels: " + std::to_string( animation->mNumChannels ) + "\n\t\t\t\t\t\t " +
+          "Mesh Channels: " + std::to_string( animation->mNumMeshChannels )
+        );
+
+        // Each channel controls the behaviour of one particular node
+        for( int i = 0; i != animation->mNumChannels; i++ ) {
+          aiNodeAnim* nodeAnimation = animation->mChannels[ i ];
+          std::shared_ptr< Model > node = findChildById( nodeAnimation->mNodeName.C_Str() );
+
+          Log::getInstance().debug( "Model::loadAnimation",
+            std::string( "Position Keys: " ) + std::to_string( nodeAnimation->mNumPositionKeys ) + "\n\t\t\t\t\t\t " +
+            "Rotation Keys: " + std::to_string( nodeAnimation->mNumRotationKeys ) + "\n\t\t\t\t\t\t " +
+            "Scaling Keys: " + std::to_string( nodeAnimation->mNumScalingKeys )
+          );
+
+          // Create new Graphics::Animation object with fields:
+          // duration: ( animation->mDuration / animation->mTicksPerSecond ) * 1000 to get duration in ms
+
+        }
+
+      }
     }
 
   }
