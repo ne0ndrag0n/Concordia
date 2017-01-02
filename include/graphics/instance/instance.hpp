@@ -24,9 +24,10 @@ namespace BlueBear {
       private:
         GLuint shaderProgram;
         Transform transform;
-        bool dirty = true;
 
         void prepareInstanceRecursive( const Model& model );
+
+        void drawEntity( const glm::mat4& parent, bool dirty );
 
       public:
         std::shared_ptr< Drawable > drawable;
@@ -38,12 +39,6 @@ namespace BlueBear {
 
         void drawEntity();
 
-        void drawEntity( glm::mat4& parent );
-
-        void nudgeDrawEntity( const glm::vec3& nudge );
-
-        void markDirty();
-
         glm::vec3 getPosition();
 
         void setPosition( const glm::vec3& position );
@@ -52,13 +47,11 @@ namespace BlueBear {
 
         void setScale( const glm::vec3& scale );
 
-        glm::vec3 getRotationAxes();
-
-        void setRotationAxes( const glm::vec3& rotationAxes );
-
         GLfloat getRotationAngle();
 
-        void setRotationAngle( GLfloat rotationAngle );
+        glm::vec3 getRotationAxes();
+
+        void setRotationAngle( GLfloat rotationAngle, const glm::vec3& rotationAxes = glm::vec3( 0.0f, 0.0f, 1.0f ) );
     };
   }
 }

@@ -12,6 +12,8 @@
 #include <assimp/postprocess.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
+#include <glm/gtx/matrix_decompose.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <memory>
@@ -47,6 +49,17 @@ namespace BlueBear {
       result.y = vector.y;
       result.z = vector.z;
       result.w = 1.0f;
+
+      return result;
+    }
+
+    glm::dquat Model::aiToGLMquat( aiQuaternion& quaternion ) {
+      glm::dquat result;
+
+      result.x = quaternion.x;
+      result.y = quaternion.y;
+      result.z = quaternion.z;
+      result.w = quaternion.w;
 
       return result;
     }
@@ -91,6 +104,7 @@ namespace BlueBear {
       Log::getInstance().debug( "Model::processNode", indentation + "Processing " + std::string( node->mName.C_Str() ) + " { " );
 
       aiMatrix4x4 resultantTransform = parentTransform * node->mTransformation;
+      transform = aiToGLMmat4( resultantTransform );
 
       if( node->mNumMeshes ) {
         // Generally we're only going to worry about the first mesh here. Where is there ever more meshes? Blender doesn't seem to permit >1 mesh. I'll probably regret undoing this.
@@ -98,7 +112,7 @@ namespace BlueBear {
 
         Log::getInstance().debug( "Model::processNode", indentation + "\tLoading mesh " + mesh->mName.C_Str() );
 
-        this->processMesh( mesh, scene, node->mName.C_Str(), aiToGLMmat4( resultantTransform ) );
+        this->processMesh( mesh, scene, node->mName.C_Str(), transform );
       }
 
       for( int i = 0; i < node->mNumChildren; i++ ) {
@@ -197,15 +211,42 @@ namespace BlueBear {
           aiNodeAnim* nodeAnimation = animation->mChannels[ i ];
           std::shared_ptr< Model > node = findChildById( nodeAnimation->mNodeName.C_Str() );
 
+          // Decompose node transform into its constituents
+          // TODO
+          glm::vec3 scale;
+          glm::quat rotation;
+          glm::vec3 translation;
+          glm::vec3 skew;
+          glm::vec4 perspective;
+          glm::decompose( node->transform, scale, rotation, translation, skew, perspective );
+          rotation = glm::conjugate( rotation );
+
           Log::getInstance().debug( "Model::loadAnimation",
-            std::string( "Position Keys: " ) + std::to_string( nodeAnimation->mNumPositionKeys ) + "\n\t\t\t\t\t\t " +
-            "Rotation Keys: " + std::to_string( nodeAnimation->mNumRotationKeys ) + "\n\t\t\t\t\t\t " +
-            "Scaling Keys: " + std::to_string( nodeAnimation->mNumScalingKeys )
+            std::string( "Position Keys: " ) + std::to_string( nodeAnimation->mNumPositionKeys ) + "\n\t\t\t\t\t\t" +
+            "Rotation Keys: " + std::to_string( nodeAnimation->mNumRotationKeys ) + "\n\t\t\t\t\t\t" +
+            "Scaling Keys: " + std::to_string( nodeAnimation->mNumScalingKeys ) + "\n\t\t\t\t\t\t" +
+            "Node ID: " + nodeAnimation->mNodeName.C_Str()  + "\n\t\t\t\t\t\t" +
+            "Node Position: " + glm::to_string( translation )
           );
 
           // Create new Graphics::Animation object with fields:
           // duration: ( animation->mDuration / animation->mTicksPerSecond ) * 1000 to get duration in ms
+          for( int i = 0; i != nodeAnimation->mNumPositionKeys; i++ ) {
+            // TODO
+            aiVector3D& keyframe = nodeAnimation->mPositionKeys[ i ].mValue;
+            glm::vec3 position = glm::vec3( keyframe.x, keyframe.y, keyframe.z );
 
+          }
+
+          for( int i = 0; i != nodeAnimation->mNumScalingKeys; i++ ) {
+            // TODO
+          }
+
+          for( int i = 0; i != nodeAnimation->mNumRotationKeys; i++ ) {
+            glm::dquat glmQuat = aiToGLMquat( nodeAnimation->mRotationKeys[ i ].mValue );
+
+            // TODO
+          }
         }
 
       }

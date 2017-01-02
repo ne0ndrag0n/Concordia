@@ -9,6 +9,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -21,6 +22,9 @@ namespace BlueBear {
 
       public:
         std::unique_ptr< Drawable > drawable;
+        // This is generally not useful anywhere but loadAnimations, where relative vectors
+        // need to be computed
+        glm::mat4 transform;
         std::map< std::string, std::shared_ptr< Model > > children;
 
         Model( std::string path );
@@ -32,6 +36,8 @@ namespace BlueBear {
         glm::mat4 aiToGLMmat4( aiMatrix4x4& matrix );
 
         glm::vec4 aiToGLMvec4( aiVector3D& vector );
+
+        glm::dquat aiToGLMquat( aiQuaternion& quaternion );
 
         void loadModel( std::string path );
 

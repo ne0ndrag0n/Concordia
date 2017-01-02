@@ -24,6 +24,7 @@
 				"dict": [ "_grey", "fancy", "star_test" ],
 				"levels": [
 					[
+						{ "x": { "f": 0, "b": 0 } },
 						{ "run": 49, "value": -1 }
 					]
 				]

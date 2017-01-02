@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 #include <glm/glm.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -36,81 +37,63 @@ namespace BlueBear {
       return children[ name ];
     }
 
+    /**
+     * drawEntity public interface
+     */
     void Instance::drawEntity() {
-      // Pass an identity matrix to mix-in
-      glm::mat4 identity;
-      drawEntity( identity );
+      drawEntity( glm::mat4(), false );
     }
 
-    void Instance::drawEntity( glm::mat4& parent ) {
-      glm::mat4 nextParent = transform.sendToShader( shaderProgram, parent, dirty );
+    /**
+     * drawEntity private implementation
+     */
+    void Instance::drawEntity( const glm::mat4& parent, bool dirty ) {
+
+      // If we find one transform at this level that's dirty, every subsequent transform needs to get updated
+      if( ( dirty = dirty || transform.dirty ) ) {
+        transform.update( parent );
+      }
 
       if( drawable ) {
+        transform.sendToShader( shaderProgram );
         drawable->render( shaderProgram );
       }
 
       for( auto& pair : children ) {
         // Apply the same transform of the parent
-        pair.second->drawEntity( nextParent );
-      }
-    }
-
-    /**
-     * Bit of a hackish way to draw an entity with a "nudge" (temporary position)
-     */
-    void Instance::nudgeDrawEntity( const glm::vec3& nudge ) {
-      Transform originalTransform = transform;
-
-      transform.position += nudge;
-
-      markDirty();
-      drawEntity();
-
-      transform = originalTransform;
-    }
-
-    void Instance::markDirty() {
-      dirty = true;
-
-      for( auto& pair : children ) {
-        pair.second->markDirty();
+        // If "dirty" was true here, it'll get passed down to subsequent instances. But if "dirty" was false, and this call ends up being "dirty",
+        // it should only propagate to its own children since dirty is passed by value here.
+        pair.second->drawEntity( transform.matrix, dirty );
       }
     }
 
     glm::vec3 Instance::getPosition() {
-      return transform.position;
+      return transform.getPosition();
     }
 
     void Instance::setPosition( const glm::vec3& position ) {
-      transform.position = position;
-      markDirty();
+      transform.setPosition( position );
     }
 
     glm::vec3 Instance::getScale() {
-      return transform.scale;
+      return transform.getScale();
     }
 
     void Instance::setScale( const glm::vec3& scale ) {
-      transform.scale = scale;
-      markDirty();
-    }
-
-    glm::vec3 Instance::getRotationAxes() {
-      return transform.rotationAxes;
-    }
-
-    void Instance::setRotationAxes( const glm::vec3& rotationAxes ) {
-      transform.rotationAxes = rotationAxes;
-      markDirty();
+      transform.setScale( scale );
     }
 
     GLfloat Instance::getRotationAngle() {
-      return transform.rotationAngle;
+      return transform.getRotationAngle();
     }
 
-    void Instance::setRotationAngle( GLfloat rotationAngle ) {
-      transform.rotationAngle = rotationAngle;
-      markDirty();
+    glm::vec3 Instance::getRotationAxes() {
+      return transform.getRotationAxes();
+    }
+
+    void Instance::setRotationAngle( GLfloat rotationAngle, const glm::vec3& rotationAxes ) {
+      // Generate new quat
+      transform.setRotationAngle( rotationAngle, rotationAxes );
     }
 
   }
