@@ -35,6 +35,12 @@ namespace BlueBear {
       dirty = false;
     }
 
+    glm::mat4 Transform::getUpdatedMatrix() {
+      update();
+
+      return matrix;
+    }
+
     void Transform::sendToShader( GLuint shaderProgram ) {
       // Set the uniform for the shader
       glUniformMatrix4fv( glGetUniformLocation( shaderProgram, "model" ), 1, GL_FALSE, glm::value_ptr( matrix ) );
@@ -74,6 +80,14 @@ namespace BlueBear {
       // Generate new quat
       rotation = glm::angleAxis( rotationAngle, rotationAxes );
       dirty = true;
+    }
+
+    void Transform::setRotation( const glm::quat& rotation ) {
+      this->rotation = rotation;
+    }
+
+    glm::quat Transform::getRotation() {
+      return rotation;
     }
 
   }
