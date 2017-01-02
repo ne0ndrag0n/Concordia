@@ -6,11 +6,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <GL/glew.h>
+#include <memory>
 
 namespace BlueBear {
   namespace Graphics {
     class Transform {
 
+      std::shared_ptr< Transform > parent;
       glm::vec3 position = glm::vec3( 0.0f, 0.0f, 0.0f );
       glm::vec3 scale = glm::vec3( 1.0f, 1.0f, 1.0f );
       glm::quat rotation = glm::quat( 1.0f, 0.0f, 0.0f, 0.0f );
@@ -21,8 +23,10 @@ namespace BlueBear {
 
         Transform();
 
-        void update( const glm::mat4& mixin );
+        void update();
         void sendToShader( GLuint shaderProgram );
+
+        void setParent( std::shared_ptr< Transform > parent );
 
         // new methods to change position, scale, and rotation
         glm::vec3 getPosition();

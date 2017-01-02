@@ -23,11 +23,9 @@ namespace BlueBear {
 
       private:
         GLuint shaderProgram;
-        Transform transform;
+        std::shared_ptr< Transform > transform;
 
         void prepareInstanceRecursive( const Model& model );
-
-        void drawEntity( const glm::mat4& parent, bool dirty );
 
       public:
         std::shared_ptr< Drawable > drawable;
@@ -37,7 +35,7 @@ namespace BlueBear {
 
         std::shared_ptr< Instance > findChildByName( std::string name );
 
-        void drawEntity();
+        void drawEntity( bool dirty = false );
 
         glm::vec3 getPosition();
 

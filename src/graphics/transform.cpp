@@ -12,8 +12,12 @@ namespace BlueBear {
 
     Transform::Transform() {}
 
-    void Transform::update( const glm::mat4& mixin ) {
-      matrix = glm::mat4();
+    void Transform::update() {
+      glm::mat4 mixin;
+
+      if( parent ) {
+        mixin = parent->matrix;
+      }
 
       // Mixin the parent matrix
       matrix = matrix * mixin;
@@ -34,6 +38,10 @@ namespace BlueBear {
     void Transform::sendToShader( GLuint shaderProgram ) {
       // Set the uniform for the shader
       glUniformMatrix4fv( glGetUniformLocation( shaderProgram, "model" ), 1, GL_FALSE, glm::value_ptr( matrix ) );
+    }
+
+    void Transform::setParent( std::shared_ptr< Transform > parent ) {
+      this->parent = parent;
     }
 
     glm::vec3 Transform::getPosition() {

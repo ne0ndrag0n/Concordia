@@ -12,7 +12,7 @@
 namespace BlueBear {
   namespace Graphics {
 
-    Instance::Instance( const Model& model, GLuint shaderProgram ) : shaderProgram( shaderProgram ) {
+    Instance::Instance( const Model& model, GLuint shaderProgram ) : transform( std::make_shared< Transform >() ), shaderProgram( shaderProgram ) {
       prepareInstanceRecursive( model );
     }
 
@@ -26,7 +26,10 @@ namespace BlueBear {
         auto& child = *( pair.second );
 
         // Hand down the same transform as the parent to this model
-        children.emplace( pair.first, std::make_shared< Instance >( child, shaderProgram ) );
+        auto instance = std::make_shared< Instance >( child, shaderProgram );
+        instance->transform->setParent( transform );
+
+        children[ pair.first ] = instance;
       }
     }
 
@@ -37,63 +40,52 @@ namespace BlueBear {
       return children[ name ];
     }
 
-    /**
-     * drawEntity public interface
-     */
-    void Instance::drawEntity() {
-      drawEntity( glm::mat4(), false );
-    }
-
-    /**
-     * drawEntity private implementation
-     */
-    void Instance::drawEntity( const glm::mat4& parent, bool dirty ) {
+    void Instance::drawEntity( bool dirty ) {
 
       // If we find one transform at this level that's dirty, every subsequent transform needs to get updated
-      if( ( dirty = dirty || transform.dirty ) ) {
-        transform.update( parent );
+      if( ( dirty = dirty || transform->dirty ) ) {
+        transform->update();
       }
 
       if( drawable ) {
-        transform.sendToShader( shaderProgram );
+        transform->sendToShader( shaderProgram );
         drawable->render( shaderProgram );
       }
 
       for( auto& pair : children ) {
-        // Apply the same transform of the parent
         // If "dirty" was true here, it'll get passed down to subsequent instances. But if "dirty" was false, and this call ends up being "dirty",
         // it should only propagate to its own children since dirty is passed by value here.
-        pair.second->drawEntity( transform.matrix, dirty );
+        pair.second->drawEntity( dirty );
       }
     }
 
     glm::vec3 Instance::getPosition() {
-      return transform.getPosition();
+      return transform->getPosition();
     }
 
     void Instance::setPosition( const glm::vec3& position ) {
-      transform.setPosition( position );
+      transform->setPosition( position );
     }
 
     glm::vec3 Instance::getScale() {
-      return transform.getScale();
+      return transform->getScale();
     }
 
     void Instance::setScale( const glm::vec3& scale ) {
-      transform.setScale( scale );
+      transform->setScale( scale );
     }
 
     GLfloat Instance::getRotationAngle() {
-      return transform.getRotationAngle();
+      return transform->getRotationAngle();
     }
 
     glm::vec3 Instance::getRotationAxes() {
-      return transform.getRotationAxes();
+      return transform->getRotationAxes();
     }
 
     void Instance::setRotationAngle( GLfloat rotationAngle, const glm::vec3& rotationAxes ) {
       // Generate new quat
-      transform.setRotationAngle( rotationAngle, rotationAxes );
+      transform->setRotationAngle( rotationAngle, rotationAxes );
     }
 
   }
