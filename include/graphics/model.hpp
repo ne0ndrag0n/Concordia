@@ -17,14 +17,12 @@
 namespace BlueBear {
   namespace Graphics {
     class Drawable;
+    class Transform;
 
     class Model {
 
       public:
         std::unique_ptr< Drawable > drawable;
-        // This is generally not useful anywhere but loadAnimations, where relative vectors
-        // need to be computed
-        glm::mat4 transform;
         std::map< std::string, std::shared_ptr< Model > > children;
 
         Model( std::string path );
@@ -32,6 +30,7 @@ namespace BlueBear {
 
       private:
         std::string directory;
+        std::shared_ptr< Transform > absoluteTransform;
 
         glm::mat4 aiToGLMmat4( aiMatrix4x4& matrix );
 

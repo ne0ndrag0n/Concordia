@@ -2,6 +2,7 @@
 #include "log.hpp"
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
+#include <glm/gtx/matrix_decompose.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -12,12 +13,25 @@ namespace BlueBear {
 
     Transform::Transform() {}
 
-    void Transform::update() {
+    Transform::Transform( const glm::mat4& existingTransform ) : matrix( existingTransform ) {
+
+      // these just get thrown out for now
+      glm::vec3 skew;
+      glm::vec4 perspective;
+
+      glm::decompose( matrix, scale, rotation, position, skew, perspective );
+      rotation = glm::conjugate( rotation );
+    }
+
+    void Transform::update( const glm::mat4& composure ) {
       glm::mat4 mixin;
 
       if( parent ) {
         mixin = parent->matrix;
       }
+
+      // Mixin any prior composure (animations)
+      matrix = matrix * composure;
 
       // Mixin the parent matrix
       matrix = matrix * mixin;

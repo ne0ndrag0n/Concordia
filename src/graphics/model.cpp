@@ -3,6 +3,7 @@
 #include "graphics/mesh.hpp"
 #include "graphics/drawable.hpp"
 #include "graphics/texture.hpp"
+#include "graphics/transform.hpp"
 #include "tools/utility.hpp"
 #include "log.hpp"
 #include <string>
@@ -104,7 +105,9 @@ namespace BlueBear {
       Log::getInstance().debug( "Model::processNode", indentation + "Processing " + std::string( node->mName.C_Str() ) + " { " );
 
       aiMatrix4x4 resultantTransform = parentTransform * node->mTransformation;
-      transform = aiToGLMmat4( resultantTransform );
+      glm::mat4 glmResultantTransform = aiToGLMmat4( resultantTransform );
+
+      absoluteTransform = std::make_shared< Transform >( glmResultantTransform );
 
       if( node->mNumMeshes ) {
         // Generally we're only going to worry about the first mesh here. Where is there ever more meshes? Blender doesn't seem to permit >1 mesh. I'll probably regret undoing this.
@@ -112,7 +115,7 @@ namespace BlueBear {
 
         Log::getInstance().debug( "Model::processNode", indentation + "\tLoading mesh " + mesh->mName.C_Str() );
 
-        this->processMesh( mesh, scene, node->mName.C_Str(), transform );
+        this->processMesh( mesh, scene, node->mName.C_Str(), glmResultantTransform );
       }
 
       for( int i = 0; i < node->mNumChildren; i++ ) {
@@ -210,23 +213,14 @@ namespace BlueBear {
         for( int i = 0; i != animation->mNumChannels; i++ ) {
           aiNodeAnim* nodeAnimation = animation->mChannels[ i ];
           std::shared_ptr< Model > node = findChildById( nodeAnimation->mNodeName.C_Str() );
-
-          // Decompose node transform into its constituents
-          // TODO
-          glm::vec3 scale;
-          glm::quat rotation;
-          glm::vec3 translation;
-          glm::vec3 skew;
-          glm::vec4 perspective;
-          glm::decompose( node->transform, scale, rotation, translation, skew, perspective );
-          rotation = glm::conjugate( rotation );
+          std::shared_ptr< Transform > nodeAbsoluteTransform = node->absoluteTransform;
 
           Log::getInstance().debug( "Model::loadAnimation",
             std::string( "Position Keys: " ) + std::to_string( nodeAnimation->mNumPositionKeys ) + "\n\t\t\t\t\t\t" +
             "Rotation Keys: " + std::to_string( nodeAnimation->mNumRotationKeys ) + "\n\t\t\t\t\t\t" +
             "Scaling Keys: " + std::to_string( nodeAnimation->mNumScalingKeys ) + "\n\t\t\t\t\t\t" +
             "Node ID: " + nodeAnimation->mNodeName.C_Str()  + "\n\t\t\t\t\t\t" +
-            "Node Position: " + glm::to_string( translation )
+            "Node AbsXform Position: " + glm::to_string( nodeAbsoluteTransform->getPosition() )
           );
 
           // Create new Graphics::Animation object with fields:

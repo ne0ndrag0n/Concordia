@@ -22,8 +22,9 @@ namespace BlueBear {
         glm::mat4 matrix;
 
         Transform();
+        Transform( const glm::mat4& existingTransform );
 
-        void update();
+        void update( const glm::mat4& composure = glm::mat4() );
         glm::mat4 getUpdatedMatrix();
         void sendToShader( GLuint shaderProgram );
 
