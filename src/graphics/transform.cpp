@@ -13,6 +13,9 @@ namespace BlueBear {
 
     Transform::Transform() {}
 
+    Transform::Transform( const glm::vec3& position, const glm::quat& rotation, const glm::vec3& scale ) :
+      position( position ), rotation( rotation ), scale( scale ) {}
+
     Transform::Transform( const glm::mat4& existingTransform ) : matrix( existingTransform ) {
 
       // these just get thrown out for now

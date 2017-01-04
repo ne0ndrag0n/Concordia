@@ -212,7 +212,6 @@ namespace BlueBear {
         for( int i = 0; i != anim->mNumChannels; i++ ) {
           aiNodeAnim* nodeAnimation = anim->mChannels[ i ];
           std::shared_ptr< Model > node = findChildById( nodeAnimation->mNodeName.C_Str() );
-          glm::mat4 nodeTransformInverse = glm::inverse( node->transform );
 
           std::map< double, KeyframeBuilder > builder;
 
@@ -234,9 +233,7 @@ namespace BlueBear {
             builder[ scalingKey.mTime ].scalingKey = &scalingKey;
           }
 
-          Animation& animation = node->animations[ anim->mName.C_Str() ] = Animation();
-          animation.rate = anim->mTicksPerSecond;
-          animation.duration = anim->mDuration;
+          Animation& animation = node->animations[ anim->mName.C_Str() ] = Animation( anim->mTicksPerSecond, anim->mDuration, glm::inverse( node->transform ) );
 
           // Use the keyframes in builder to assemble a premade list of transformation matrices
           // If there is a nullptr in any of the keys, use the one previous to the one in the list
@@ -263,57 +260,35 @@ namespace BlueBear {
 
             first.scalingKey = scalingKey.get();
           }
+
           // Do the first keyframe manually
-          Transform firstTransform;
-          firstTransform.setPosition(
-            glm::vec3(
-              first.positionKey->mValue.x,
-              first.positionKey->mValue.y,
-              first.positionKey->mValue.z
+          animation.addKeyframe(
+            key,
+            Transform(
+              glm::vec3( first.positionKey->mValue.x, first.positionKey->mValue.y, first.positionKey->mValue.z ),
+              glm::quat( first.rotationKey->mValue.w, first.rotationKey->mValue.x, first.rotationKey->mValue.y, first.rotationKey->mValue.z ),
+              glm::vec3( first.scalingKey->mValue.x, first.scalingKey->mValue.y, first.scalingKey->mValue.z )
             )
           );
-          firstTransform.setRotation(
-            glm::quat(
-              first.rotationKey->mValue.w,
-              first.rotationKey->mValue.x,
-              first.rotationKey->mValue.y,
-              first.rotationKey->mValue.z
-            )
-          );
-          firstTransform.setScale(
-            glm::vec3(
-              first.scalingKey->mValue.x,
-              first.scalingKey->mValue.y,
-              first.scalingKey->mValue.z
-            )
-          );
-          animation.keyframes.emplace_back( key, firstTransform.getUpdatedMatrix() );
 
           for( auto i = std::next( builder.begin(), 1 ); i != builder.end(); ++i ) {
-            Transform relativeTransform;
             KeyframeBuilder& current = i->second;
             KeyframeBuilder& previous = std::prev( i )->second;
 
-            relativeTransform.setPosition(
-              current.positionKey == nullptr ?
-                glm::vec3( previous.positionKey->mValue.x, previous.positionKey->mValue.y, previous.positionKey->mValue.z ) :
-                glm::vec3( current.positionKey->mValue.x, current.positionKey->mValue.y, current.positionKey->mValue.z )
+            animation.addKeyframe(
+              i->first,
+              Transform(
+                current.positionKey == nullptr ?
+                  glm::vec3( previous.positionKey->mValue.x, previous.positionKey->mValue.y, previous.positionKey->mValue.z ) :
+                  glm::vec3( current.positionKey->mValue.x, current.positionKey->mValue.y, current.positionKey->mValue.z ),
+                current.rotationKey == nullptr ?
+                  glm::quat( previous.rotationKey->mValue.w, previous.rotationKey->mValue.x, previous.rotationKey->mValue.y, previous.rotationKey->mValue.z ) :
+                  glm::quat( current.rotationKey->mValue.w, current.rotationKey->mValue.x, current.rotationKey->mValue.y, current.rotationKey->mValue.z ),
+                current.scalingKey == nullptr ?
+                  glm::vec3( previous.scalingKey->mValue.x, previous.scalingKey->mValue.y, previous.scalingKey->mValue.z ) :
+                  glm::vec3( current.scalingKey->mValue.x, current.scalingKey->mValue.y, current.scalingKey->mValue.z )
+              )
             );
-
-            relativeTransform.setRotation(
-              current.rotationKey == nullptr ?
-                glm::quat( previous.rotationKey->mValue.w, previous.rotationKey->mValue.x, previous.rotationKey->mValue.y, previous.rotationKey->mValue.z ) :
-                glm::quat( current.rotationKey->mValue.w, current.rotationKey->mValue.x, current.rotationKey->mValue.y, current.rotationKey->mValue.z )
-            );
-
-            relativeTransform.setScale(
-              current.scalingKey == nullptr ?
-                glm::vec3( previous.scalingKey->mValue.x, previous.scalingKey->mValue.y, previous.scalingKey->mValue.z ) :
-                glm::vec3( current.scalingKey->mValue.x, current.scalingKey->mValue.y, current.scalingKey->mValue.z )
-            );
-
-            // TODO: Check this matrix!!
-            animation.keyframes.emplace_back( i->first, nodeTransformInverse * relativeTransform.getUpdatedMatrix() );
           }
 
         }

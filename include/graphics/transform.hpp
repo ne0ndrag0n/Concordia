@@ -22,6 +22,7 @@ namespace BlueBear {
         glm::mat4 matrix;
 
         Transform();
+        Transform( const glm::vec3& position, const glm::quat& rotation, const glm::vec3& scale );
         Transform( const glm::mat4& existingTransform );
 
         void update( const glm::mat4& composure = glm::mat4() );
