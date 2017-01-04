@@ -240,53 +240,34 @@ namespace BlueBear {
           auto vectorKey = std::make_unique< aiVectorKey >();
           auto rotationKey = std::make_unique< aiQuatKey >();
           auto scalingKey = std::make_unique< aiVectorKey >();
-          double key = builder.begin()->first;
-          KeyframeBuilder& first = builder.begin()->second;
-          if( first.positionKey == nullptr ) {
-            vectorKey->mTime = key;
-            vectorKey->mValue = aiVector3D();
+          auto key = builder.begin()->first;
 
-            first.positionKey = vectorKey.get();
-          }
-          if( first.rotationKey == nullptr ) {
-            rotationKey->mTime = key;
-            rotationKey->mValue = aiQuaternion( 1.0f, 0.0f, 0.0f, 0.0f );
+          vectorKey->mTime = key;
+          vectorKey->mValue = aiVector3D();
 
-            first.rotationKey = rotationKey.get();
-          }
-          if( first.scalingKey == nullptr ) {
-            scalingKey->mTime = key;
-            scalingKey->mValue = aiVector3D( 1.0f, 1.0f, 1.0f );
+          rotationKey->mTime = key;
+          rotationKey->mValue = aiQuaternion( 1.0f, 0.0f, 0.0f, 0.0f );
 
-            first.scalingKey = scalingKey.get();
-          }
+          scalingKey->mTime = key;
+          scalingKey->mValue = aiVector3D( 1.0f, 1.0f, 1.0f );
 
-          // Do the first keyframe manually
-          animation.addKeyframe(
-            key,
-            Transform(
-              glm::vec3( first.positionKey->mValue.x, first.positionKey->mValue.y, first.positionKey->mValue.z ),
-              glm::quat( first.rotationKey->mValue.w, first.rotationKey->mValue.x, first.rotationKey->mValue.y, first.rotationKey->mValue.z ),
-              glm::vec3( first.scalingKey->mValue.x, first.scalingKey->mValue.y, first.scalingKey->mValue.z )
-            )
-          );
+          aiVectorKey* usablePositionKey = vectorKey.get();
+          aiQuatKey* usableRotationKey = rotationKey.get();
+          aiVectorKey* usableScalingKey = scalingKey.get();
 
-          for( auto i = std::next( builder.begin(), 1 ); i != builder.end(); ++i ) {
-            KeyframeBuilder& current = i->second;
-            KeyframeBuilder& previous = std::prev( i )->second;
+          for( auto& kvPair : builder ) {
+            KeyframeBuilder& kb = kvPair.second;
 
-            animation.addKeyframe(
-              i->first,
+            // Set the next group of usable keys - nulls will just use the last one set
+            if( kb.positionKey != nullptr ) { usablePositionKey = kb.positionKey; }
+            if( kb.rotationKey != nullptr ) { usableRotationKey = kb.rotationKey; }
+            if( kb.scalingKey != nullptr ) { usableScalingKey = kb.scalingKey; }
+
+            animation.addKeyframe( kvPair.first,
               Transform(
-                current.positionKey == nullptr ?
-                  glm::vec3( previous.positionKey->mValue.x, previous.positionKey->mValue.y, previous.positionKey->mValue.z ) :
-                  glm::vec3( current.positionKey->mValue.x, current.positionKey->mValue.y, current.positionKey->mValue.z ),
-                current.rotationKey == nullptr ?
-                  glm::quat( previous.rotationKey->mValue.w, previous.rotationKey->mValue.x, previous.rotationKey->mValue.y, previous.rotationKey->mValue.z ) :
-                  glm::quat( current.rotationKey->mValue.w, current.rotationKey->mValue.x, current.rotationKey->mValue.y, current.rotationKey->mValue.z ),
-                current.scalingKey == nullptr ?
-                  glm::vec3( previous.scalingKey->mValue.x, previous.scalingKey->mValue.y, previous.scalingKey->mValue.z ) :
-                  glm::vec3( current.scalingKey->mValue.x, current.scalingKey->mValue.y, current.scalingKey->mValue.z )
+                glm::vec3( usablePositionKey->mValue.x, usablePositionKey->mValue.y, usablePositionKey->mValue.z ),
+                glm::quat( usableRotationKey->mValue.w, usableRotationKey->mValue.x, usableRotationKey->mValue.y, usableRotationKey->mValue.z ),
+                glm::vec3( usableScalingKey->mValue.x, usableScalingKey->mValue.y, usableScalingKey->mValue.z )
               )
             );
           }

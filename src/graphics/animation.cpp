@@ -1,6 +1,7 @@
 #include "graphics/animation.hpp"
 #include "log.hpp"
 #include <string>
+#include <glm/ext.hpp>
 
 namespace BlueBear {
   namespace Graphics {
