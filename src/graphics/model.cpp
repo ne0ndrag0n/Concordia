@@ -19,6 +19,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <memory>
 #include <vector>
+#include <algorithm>
 
 namespace BlueBear {
   namespace Graphics {
@@ -105,9 +106,7 @@ namespace BlueBear {
       Log::getInstance().debug( "Model::processNode", indentation + "Processing " + std::string( node->mName.C_Str() ) + " { " );
 
       aiMatrix4x4 resultantTransform = parentTransform * node->mTransformation;
-      glm::mat4 glmResultantTransform = aiToGLMmat4( resultantTransform );
-
-      absoluteTransform = std::make_shared< Transform >( glmResultantTransform );
+      transform = aiToGLMmat4( resultantTransform );
 
       if( node->mNumMeshes ) {
         // Generally we're only going to worry about the first mesh here. Where is there ever more meshes? Blender doesn't seem to permit >1 mesh. I'll probably regret undoing this.
@@ -115,7 +114,7 @@ namespace BlueBear {
 
         Log::getInstance().debug( "Model::processNode", indentation + "\tLoading mesh " + mesh->mName.C_Str() );
 
-        this->processMesh( mesh, scene, node->mName.C_Str(), glmResultantTransform );
+        this->processMesh( mesh, scene, node->mName.C_Str(), transform );
       }
 
       for( int i = 0; i < node->mNumChildren; i++ ) {
@@ -195,54 +194,129 @@ namespace BlueBear {
     /**
      * Load animations at the top-level of the scene graph ONLY
      */
-    void Model::loadAnimations( aiAnimation** animations, unsigned int count ) {
+    void Model::loadAnimations( aiAnimation** anims, unsigned int count ) {
       for( int i = 0; i != count; i++ ) {
-        aiAnimation* animation = animations[ i ];
+        aiAnimation* anim = anims[ i ];
 
         Log::getInstance().debug( "Model::loadAnimations",
           std::string( "ANIMATION INFO: " ) + "\n\t\t\t\t\t\t " +
           "ID: " + std::to_string( i ) + "\n\t\t\t\t\t\t " +
-          "Name: " + animation->mName.C_Str() + "\n\t\t\t\t\t\t " +
-          "FPS: " + std::to_string( animation->mTicksPerSecond ) + "\n\t\t\t\t\t\t " +
-          "Duration: " + std::to_string( animation->mDuration )  + "\n\t\t\t\t\t\t " +
-          "Channels: " + std::to_string( animation->mNumChannels ) + "\n\t\t\t\t\t\t " +
-          "Mesh Channels: " + std::to_string( animation->mNumMeshChannels )
+          "Name: " + anim->mName.C_Str() + "\n\t\t\t\t\t\t " +
+          "FPS: " + std::to_string( anim->mTicksPerSecond ) + "\n\t\t\t\t\t\t " +
+          "Duration: " + std::to_string( anim->mDuration )  + "\n\t\t\t\t\t\t " +
+          "Channels: " + std::to_string( anim->mNumChannels ) + "\n\t\t\t\t\t\t " +
+          "Mesh Channels: " + std::to_string( anim->mNumMeshChannels )
         );
 
         // Each channel controls the behaviour of one particular node
-        for( int i = 0; i != animation->mNumChannels; i++ ) {
-          aiNodeAnim* nodeAnimation = animation->mChannels[ i ];
+        for( int i = 0; i != anim->mNumChannels; i++ ) {
+          aiNodeAnim* nodeAnimation = anim->mChannels[ i ];
           std::shared_ptr< Model > node = findChildById( nodeAnimation->mNodeName.C_Str() );
-          std::shared_ptr< Transform > nodeAbsoluteTransform = node->absoluteTransform;
+          glm::mat4 nodeTransformInverse = glm::inverse( node->transform );
 
-          Log::getInstance().debug( "Model::loadAnimation",
-            std::string( "Position Keys: " ) + std::to_string( nodeAnimation->mNumPositionKeys ) + "\n\t\t\t\t\t\t" +
-            "Rotation Keys: " + std::to_string( nodeAnimation->mNumRotationKeys ) + "\n\t\t\t\t\t\t" +
-            "Scaling Keys: " + std::to_string( nodeAnimation->mNumScalingKeys ) + "\n\t\t\t\t\t\t" +
-            "Node ID: " + nodeAnimation->mNodeName.C_Str()  + "\n\t\t\t\t\t\t" +
-            "Node AbsXform Position: " + glm::to_string( nodeAbsoluteTransform->getPosition() )
-          );
+          std::map< double, KeyframeBuilder > builder;
 
-          // Create new Graphics::Animation object with fields:
-          // duration: ( animation->mDuration / animation->mTicksPerSecond ) * 1000 to get duration in ms
           for( int i = 0; i != nodeAnimation->mNumPositionKeys; i++ ) {
-            // TODO
-            aiVector3D& keyframe = nodeAnimation->mPositionKeys[ i ].mValue;
-            glm::vec3 position = glm::vec3( keyframe.x, keyframe.y, keyframe.z );
+            aiVectorKey& positionKey = nodeAnimation->mPositionKeys[ i ];
 
-          }
-
-          for( int i = 0; i != nodeAnimation->mNumScalingKeys; i++ ) {
-            // TODO
+            builder[ positionKey.mTime ].positionKey = &positionKey;
           }
 
           for( int i = 0; i != nodeAnimation->mNumRotationKeys; i++ ) {
-            glm::dquat glmQuat = aiToGLMquat( nodeAnimation->mRotationKeys[ i ].mValue );
+            aiQuatKey& rotationKey = nodeAnimation->mRotationKeys[ i ];
 
-            // TODO
+            builder[ rotationKey.mTime ].rotationKey = &rotationKey;
           }
-        }
 
+          for( int i = 0; i != nodeAnimation->mNumScalingKeys; i++ ) {
+            aiVectorKey& scalingKey = nodeAnimation->mScalingKeys[ i ];
+
+            builder[ scalingKey.mTime ].scalingKey = &scalingKey;
+          }
+
+          Animation& animation = node->animations[ anim->mName.C_Str() ] = Animation();
+          animation.rate = anim->mTicksPerSecond;
+          animation.duration = anim->mDuration;
+
+          // Use the keyframes in builder to assemble a premade list of transformation matrices
+          // If there is a nullptr in any of the keys, use the one previous to the one in the list
+          auto vectorKey = std::make_unique< aiVectorKey >();
+          auto rotationKey = std::make_unique< aiQuatKey >();
+          auto scalingKey = std::make_unique< aiVectorKey >();
+          double key = builder.begin()->first;
+          KeyframeBuilder& first = builder.begin()->second;
+          if( first.positionKey == nullptr ) {
+            vectorKey->mTime = key;
+            vectorKey->mValue = aiVector3D();
+
+            first.positionKey = vectorKey.get();
+          }
+          if( first.rotationKey == nullptr ) {
+            rotationKey->mTime = key;
+            rotationKey->mValue = aiQuaternion( 1.0f, 0.0f, 0.0f, 0.0f );
+
+            first.rotationKey = rotationKey.get();
+          }
+          if( first.scalingKey == nullptr ) {
+            scalingKey->mTime = key;
+            scalingKey->mValue = aiVector3D( 1.0f, 1.0f, 1.0f );
+
+            first.scalingKey = scalingKey.get();
+          }
+          // Do the first keyframe manually
+          Transform firstTransform;
+          firstTransform.setPosition(
+            glm::vec3(
+              first.positionKey->mValue.x,
+              first.positionKey->mValue.y,
+              first.positionKey->mValue.z
+            )
+          );
+          firstTransform.setRotation(
+            glm::quat(
+              first.rotationKey->mValue.w,
+              first.rotationKey->mValue.x,
+              first.rotationKey->mValue.y,
+              first.rotationKey->mValue.z
+            )
+          );
+          firstTransform.setScale(
+            glm::vec3(
+              first.scalingKey->mValue.x,
+              first.scalingKey->mValue.y,
+              first.scalingKey->mValue.z
+            )
+          );
+          animation.keyframes.emplace_back( key, firstTransform.getUpdatedMatrix() );
+
+          for( auto i = std::next( builder.begin(), 1 ); i != builder.end(); ++i ) {
+            Transform relativeTransform;
+            KeyframeBuilder& current = i->second;
+            KeyframeBuilder& previous = std::prev( i )->second;
+
+            relativeTransform.setPosition(
+              current.positionKey == nullptr ?
+                glm::vec3( previous.positionKey->mValue.x, previous.positionKey->mValue.y, previous.positionKey->mValue.z ) :
+                glm::vec3( current.positionKey->mValue.x, current.positionKey->mValue.y, current.positionKey->mValue.z )
+            );
+
+            relativeTransform.setRotation(
+              current.rotationKey == nullptr ?
+                glm::quat( previous.rotationKey->mValue.w, previous.rotationKey->mValue.x, previous.rotationKey->mValue.y, previous.rotationKey->mValue.z ) :
+                glm::quat( current.rotationKey->mValue.w, current.rotationKey->mValue.x, current.rotationKey->mValue.y, current.rotationKey->mValue.z )
+            );
+
+            relativeTransform.setScale(
+              current.scalingKey == nullptr ?
+                glm::vec3( previous.scalingKey->mValue.x, previous.scalingKey->mValue.y, previous.scalingKey->mValue.z ) :
+                glm::vec3( current.scalingKey->mValue.x, current.scalingKey->mValue.y, current.scalingKey->mValue.z )
+            );
+
+            // TODO: Check this matrix!!
+            animation.keyframes.emplace_back( i->first, nodeTransformInverse * relativeTransform.getUpdatedMatrix() );
+          }
+
+        }
       }
     }
 

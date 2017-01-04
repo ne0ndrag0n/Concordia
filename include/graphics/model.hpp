@@ -3,6 +3,7 @@
 
 #include "graphics/material.hpp"
 #include "graphics/drawable.hpp"
+#include "graphics/animation.hpp"
 #include <string>
 #include <map>
 #include <memory>
@@ -24,13 +25,19 @@ namespace BlueBear {
       public:
         std::unique_ptr< Drawable > drawable;
         std::map< std::string, std::shared_ptr< Model > > children;
+        std::map< std::string, Animation > animations;
 
         Model( std::string path );
         Model( aiNode* node, const aiScene* scene, std::string& directory, aiMatrix4x4 parentTransform, unsigned int level );
 
       private:
+        struct KeyframeBuilder {
+          aiVectorKey* positionKey;
+          aiQuatKey* rotationKey;
+          aiVectorKey* scalingKey;
+        };
         std::string directory;
-        std::shared_ptr< Transform > absoluteTransform;
+        glm::mat4 transform;
 
         glm::mat4 aiToGLMmat4( aiMatrix4x4& matrix );
 
@@ -48,7 +55,7 @@ namespace BlueBear {
 
         std::shared_ptr< Model > findChildById( const std::string& id );
 
-        void loadAnimations( aiAnimation** animations, unsigned int count );
+        void loadAnimations( aiAnimation** anims, unsigned int count );
     };
   }
 }
