@@ -233,7 +233,13 @@ namespace BlueBear {
             builder[ scalingKey.mTime ].scalingKey = &scalingKey;
           }
 
-          Animation& animation = node->animations[ anim->mName.C_Str() ] = Animation( anim->mTicksPerSecond, anim->mDuration, glm::inverse( node->transform ) );
+          if( !node->animations ) {
+            node->animations = std::make_shared< std::map< std::string, Animation > >();
+          }
+
+          std::map< std::string, Animation >& nodeAnimList = *node->animations;
+
+          Animation& animation = nodeAnimList[ anim->mName.C_Str() ] = Animation( anim->mTicksPerSecond, anim->mDuration, glm::inverse( node->transform ) );
 
           // Add an identity transform at 0.0 to ensure correct interpolation
           animation.addKeyframe( 0.0, Transform() );

@@ -14,6 +14,8 @@
 namespace BlueBear {
   namespace Graphics {
     class Model;
+    class Animation;
+    class AnimPlayer;
 
     /**
      * A GFXInstance is a specific instance of a graphic model placed on a lot. It contains
@@ -24,6 +26,8 @@ namespace BlueBear {
       private:
         GLuint shaderProgram;
         std::shared_ptr< Transform > transform;
+        std::shared_ptr< std::map< std::string, Animation > > animations;
+        std::shared_ptr< AnimPlayer > animPlayer;
 
         void prepareInstanceRecursive( const Model& model );
 
@@ -32,6 +36,8 @@ namespace BlueBear {
         std::map< std::string, std::shared_ptr< Instance > > children;
 
         Instance( const Model& model, GLuint shaderProgram );
+
+        void setAnimation( const std::string& animKey );
 
         std::shared_ptr< Instance > findChildByName( std::string name );
 

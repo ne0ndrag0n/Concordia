@@ -33,11 +33,11 @@ namespace BlueBear {
         mixin = parent->matrix;
       }
 
-      // Mixin any prior composure (animations)
-      matrix = matrix * composure;
-
       // Mixin the parent matrix
       matrix = matrix * mixin;
+
+      // Mixin any prior composure (animations)
+      matrix = matrix * composure;
 
       // There's always going to be a translation
       matrix = glm::translate( matrix, position );

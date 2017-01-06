@@ -1,6 +1,8 @@
 #include "graphics/instance/instance.hpp"
 #include "graphics/model.hpp"
 #include "graphics/drawable.hpp"
+#include "graphics/animplayer.hpp"
+#include "log.hpp"
 #include <GL/glew.h>
 #include <memory>
 #include <string>
@@ -22,6 +24,9 @@ namespace BlueBear {
         drawable = std::make_shared< Drawable >( *model.drawable );
       }
 
+      // Copy the anim pointer
+      animations = model.animations;
+
       for( auto& pair : model.children ) {
         auto& child = *( pair.second );
 
@@ -40,11 +45,29 @@ namespace BlueBear {
       return children[ name ];
     }
 
+    void Instance::setAnimation( const std::string& animKey ) {
+      if( !animations ) {
+        Log::getInstance().warn( "Instance::setAnimation", "Tried to play animation " + animKey + " but node doesn't have animations." );
+        return;
+      }
+
+      auto pair = animations->find( animKey );
+      if( pair == animations->end() ) {
+        Log::getInstance().warn( "Instance::setAnimation", "Tried to play animation " + animKey + " but it doesn't exist on this node." );
+        return;
+      }
+
+      animPlayer = std::make_shared< AnimPlayer >( pair->second );
+    }
+
     void Instance::drawEntity( bool dirty ) {
 
       // If we find one transform at this level that's dirty, every subsequent transform needs to get updated
-      if( ( dirty = dirty || transform->dirty ) ) {
-        transform->update();
+      dirty = dirty || transform->dirty || ( animPlayer && animPlayer->generateNextFrame() );
+
+      // Update if dirty
+      if( dirty ) {
+        transform->update( animPlayer ? animPlayer->nextMatrix : glm::mat4() );
       }
 
       if( drawable ) {

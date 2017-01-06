@@ -25,7 +25,7 @@ namespace BlueBear {
       public:
         std::unique_ptr< Drawable > drawable;
         std::map< std::string, std::shared_ptr< Model > > children;
-        std::map< std::string, Animation > animations;
+        std::shared_ptr< std::map< std::string, Animation > > animations;
 
         Model( std::string path );
         Model( aiNode* node, const aiScene* scene, std::string& directory, aiMatrix4x4 parentTransform, unsigned int level );
