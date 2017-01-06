@@ -27,6 +27,7 @@ namespace BlueBear {
 
         void update( const glm::mat4& composure = glm::mat4() );
         glm::mat4 getUpdatedMatrix();
+        glm::mat4 getMatrix();
         void sendToShader( GLuint shaderProgram );
 
         void setParent( std::shared_ptr< Transform > parent );
@@ -49,6 +50,8 @@ namespace BlueBear {
         void setRotation( const glm::quat& rotation );
 
         glm::quat getRotation();
+
+        static Transform interpolate( Transform& t1, Transform& t2, float alpha );
     };
   }
 }

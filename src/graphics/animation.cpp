@@ -13,14 +13,25 @@ namespace BlueBear {
     }
 
     glm::mat4 Animation::getTransformForFrame( double frame ) {
-      unsigned long iPart = ( unsigned long ) frame;
-      double fPart = frame - iPart;
+      auto pair = keyframes.find( frame );
 
-      if( fPart == 0 ) {
-        // No interpolation required
+      if( pair != keyframes.end() ) {
+        // Use keyframe directly
+        return inverseBase * pair->second.getUpdatedMatrix();
       } else {
-        // Interpolate between nearest keyframes
-        // Begin with keyframes[ iPart ] and interpolate up to keyframes[ iPart + 1 ], using fPart as the alpha
+        // Need to interpolate between two frames
+        auto lastIterator = keyframes.upper_bound( frame );
+        auto firstIterator = std::prev( lastIterator, 1 );
+
+        Transform keyTransform = Transform::interpolate( firstIterator->second, lastIterator->second, ( ( frame - firstIterator->first ) / ( lastIterator->first - firstIterator->first ) ) );
+
+        // Store on "frame" if we are caching interpolations
+        if( cacheInterpolations ) {
+          keyframes[ frame ] = keyTransform;
+        }
+
+        // Interpolate the two animations using the alpha
+        return inverseBase * keyTransform.getUpdatedMatrix();
       }
     }
   }

@@ -15,6 +15,10 @@ namespace BlueBear {
     public:
       double rate;
       double duration;
+      /**
+       * Quicker, caches transforms generated but uses more ram
+       */
+      bool cacheInterpolations = false;
 
       Animation() = default;
       Animation( double rate, double duration, const glm::mat4& inverseBase );

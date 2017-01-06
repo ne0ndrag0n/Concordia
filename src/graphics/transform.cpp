@@ -58,6 +58,17 @@ namespace BlueBear {
       return matrix;
     }
 
+    /**
+     * Get matrix a slightly more efficient way (don't generate the matrix again if not dirty)
+     */
+    glm::mat4 Transform::getMatrix() {
+      if( dirty ) {
+        update();
+      }
+
+      return matrix;
+    }
+
     void Transform::sendToShader( GLuint shaderProgram ) {
       // Set the uniform for the shader
       glUniformMatrix4fv( glGetUniformLocation( shaderProgram, "model" ), 1, GL_FALSE, glm::value_ptr( matrix ) );
@@ -105,6 +116,14 @@ namespace BlueBear {
 
     glm::quat Transform::getRotation() {
       return rotation;
+    }
+
+    Transform Transform::interpolate( Transform& t1, Transform& t2, float alpha ) {
+      return Transform(
+        glm::mix( t1.getPosition(), t2.getPosition(), alpha ),
+        glm::mix( t1.getRotation(), t2.getRotation(), alpha ),
+        glm::mix( t1.getScale(), t2.getScale(), alpha )
+      );
     }
 
   }

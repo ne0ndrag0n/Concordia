@@ -235,6 +235,9 @@ namespace BlueBear {
 
           Animation& animation = node->animations[ anim->mName.C_Str() ] = Animation( anim->mTicksPerSecond, anim->mDuration, glm::inverse( node->transform ) );
 
+          // Add an identity transform at 0.0 to ensure correct interpolation
+          animation.addKeyframe( 0.0, Transform() );
+
           // Use the keyframes in builder to assemble a premade list of transformation matrices
           // If there is a nullptr in any of the keys, use the one previous to the one in the list
           auto vectorKey = std::make_unique< aiVectorKey >();
