@@ -1,6 +1,7 @@
 #include "graphics/animplayer.hpp"
 #include "graphics/animation.hpp"
 #include "configmanager.hpp"
+#include "log.hpp"
 
 namespace BlueBear {
   namespace Graphics {

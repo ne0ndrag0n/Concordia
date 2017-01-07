@@ -165,6 +165,8 @@ namespace BlueBear {
       submitLuaContributions();
 
       __debugInstances.emplace_back( __debugModel, defaultShader.Program );
+      auto& inst = __debugInstances[ 0 ];
+      inst.children[ "Cube.001" ]->setAnimation( "Cube.001|Rotate45" );
 
       // Moving much of Display::loadInfrastructure here
       loadInfrastructure();
