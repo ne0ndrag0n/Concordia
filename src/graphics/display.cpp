@@ -147,16 +147,12 @@ namespace BlueBear {
       L( instance.L ),
       defaultShader( Shader( "system/shaders/default_vertex.glsl", "system/shaders/default_fragment.glsl" ) ),
       camera( Camera( defaultShader.Program, instance.x, instance.y ) ),
-      floorModel( Model( Display::FLOOR_MODEL_PATH ) ),
-      __debugModel( Model( ConfigManager::getInstance().getValue( "__debug_file" ) ) ),
       floorMap( floorMap ),
       wallMap( wallMap ),
       currentRotation( currentRotation ) {
 
-      // Load infrastructure models
-      // Setup static pointer
-      WallCellBundler::Piece = std::make_unique< Model >( Display::WALLPANEL_MODEL_XY_PATH );
-      WallCellBundler::DPiece = std::make_unique< Model >( Display::WALLPANEL_MODEL_DR_PATH );
+      // Setup all system-level models used by this state
+      loadIntrinsicModels();
 
       // Setup camera
       camera.setRotationDirect( currentRotation );
@@ -164,7 +160,7 @@ namespace BlueBear {
       setupGUI();
       submitLuaContributions();
 
-      __debugInstances.emplace_back( __debugModel, defaultShader.Program );
+      __debugInstances.emplace_back( *__debugModel, defaultShader.Program );
 
       // Moving much of Display::loadInfrastructure here
       loadInfrastructure();
@@ -172,6 +168,13 @@ namespace BlueBear {
     Display::MainGameState::~MainGameState() {
       WallCellBundler::Piece.reset();
       WallCellBundler::DPiece.reset();
+    }
+    void Display::MainGameState::loadIntrinsicModels() {
+      WallCellBundler::Piece = std::make_unique< Model >( Display::WALLPANEL_MODEL_XY_PATH );
+      WallCellBundler::DPiece = std::make_unique< Model >( Display::WALLPANEL_MODEL_DR_PATH );
+
+      floorModel = std::make_unique< Model >( Display::FLOOR_MODEL_PATH );
+      __debugModel = std::make_unique< Model >( ConfigManager::getInstance().getValue( "__debug_file" ) );
     }
     /**
      * bluebear.gui and associated commands to create and manage windows
@@ -279,7 +282,7 @@ namespace BlueBear {
 
             if( tilePtr ) {
               // Create instance from the model, and change its material using the material cache
-              std::shared_ptr< Instance > instance = std::make_shared< Instance >( floorModel, defaultShader.Program );
+              std::shared_ptr< Instance > instance = std::make_shared< Instance >( *floorModel, defaultShader.Program );
 
               Drawable& floorDrawable = *( instance->drawable );
 

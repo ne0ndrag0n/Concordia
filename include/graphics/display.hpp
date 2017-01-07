@@ -96,10 +96,10 @@ namespace BlueBear {
           unsigned int currentRotation;
           Shader defaultShader;
           Camera camera;
-          Model floorModel;
+          std::unique_ptr< Model > floorModel;
+          std::unique_ptr< Model > __debugModel;
           TextureCache texCache;
           ImageCache imageCache;
-          Model __debugModel;
           std::vector< Graphics::Instance > __debugInstances;
           struct {
             sfg::Desktop desktop;
@@ -118,6 +118,7 @@ namespace BlueBear {
           // These are ours!
           std::unique_ptr< Containers::Collection3D< std::shared_ptr< Instance > > > floorInstanceCollection;
           std::unique_ptr< Containers::Collection3D< std::shared_ptr< WallCellBundler > > > wallInstanceCollection;
+          void loadIntrinsicModels();
           void processOsd();
           void loadInfrastructure();
           void createFloorInstances();
