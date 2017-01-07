@@ -27,6 +27,9 @@ namespace BlueBear {
     }
 
     void Transform::update( const glm::mat4& composure ) {
+      // When we update, CLEAR THE MATRIX!
+      matrix = glm::mat4();
+
       glm::mat4 mixin;
 
       if( parent ) {

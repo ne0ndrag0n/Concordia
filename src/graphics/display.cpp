@@ -165,8 +165,6 @@ namespace BlueBear {
       submitLuaContributions();
 
       __debugInstances.emplace_back( __debugModel, defaultShader.Program );
-      auto& inst = __debugInstances[ 0 ];
-      inst.children[ "Cube.001" ]->setAnimation( "Cube.001|Rotate45" );
 
       // Moving much of Display::loadInfrastructure here
       loadInfrastructure();
@@ -213,6 +211,17 @@ namespace BlueBear {
       lua_pushstring( L, "get_widget_by_id" );
       lua_pushlightuserdata( L, this );
       lua_pushcclosure( L, &Display::MainGameState::lua_getWidgetByID, 1 );
+      lua_settable( L, -3 );
+
+      // XXX: Remove when demo branch is over
+      lua_pushstring( L, "__internal__playanim1" );
+      lua_pushlightuserdata( L, this );
+      lua_pushcclosure( L, &Display::MainGameState::lua_playanim1, 1 );
+      lua_settable( L, -3 );
+
+      lua_pushstring( L, "__internal__playanim2" );
+      lua_pushlightuserdata( L, this );
+      lua_pushcclosure( L, &Display::MainGameState::lua_playanim2, 1 );
       lua_settable( L, -3 );
 
       lua_settable( L, -3 ); // bluebear
@@ -594,6 +603,19 @@ namespace BlueBear {
       }
 
       return 0;
+    }
+    // XXX: Remove after demo branch
+    int Display::MainGameState::lua_playanim1( lua_State* L ) {
+      Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+
+      auto& inst = self->__debugInstances[ 0 ].children[ "Cube.001" ];
+      inst->setAnimation( "Cube.001|Rotate45" );
+    }
+    int Display::MainGameState::lua_playanim2( lua_State* L ) {
+      Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+
+      auto& inst = self->__debugInstances[ 0 ].children[ "Cube.001" ];
+      inst->setAnimation( "Cube.001|RotateNeg45" );
     }
   }
 }

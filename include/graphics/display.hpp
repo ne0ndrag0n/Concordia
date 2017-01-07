@@ -134,6 +134,10 @@ namespace BlueBear {
           static int lua_Widget_getWidgetByID( lua_State* L );
           static int lua_Widget_onEvent( lua_State* L );
           static int lua_getWidgetByID( lua_State* L );
+
+          // XXX: remove after demo branch
+          static int lua_playanim1( lua_State* L );
+          static int lua_playanim2( lua_State* L );
         public:
           void execute();
           void handleEvent( sf::Event& event );
