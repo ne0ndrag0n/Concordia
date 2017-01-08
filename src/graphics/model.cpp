@@ -182,7 +182,7 @@ namespace BlueBear {
       }
 
       for( auto& pair : children ) {
-        std::shared_ptr< Model > temp_ptr = findChildById( id );
+        std::shared_ptr< Model > temp_ptr = pair.second->findChildById( id );
         if( temp_ptr ) {
           return temp_ptr;
         }
