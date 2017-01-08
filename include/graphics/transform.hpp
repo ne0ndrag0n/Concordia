@@ -52,6 +52,8 @@ namespace BlueBear {
         glm::quat getRotation();
 
         static Transform interpolate( Transform& t1, Transform& t2, float alpha );
+
+        void printToLog();
     };
   }
 }

@@ -24,12 +24,12 @@
 namespace BlueBear {
   namespace Graphics {
 
-    Model::Model( std::string path ) {
+    Model::Model( std::string path ) : parent( nullptr ) {
       loadModel( path );
     }
 
     // Used internally to generate child nodes
-    Model::Model( aiNode* node, const aiScene* scene, std::string& directory, aiMatrix4x4 parentTransform, unsigned int level ) : directory( directory ) {
+    Model::Model( Model* parent, aiNode* node, const aiScene* scene, std::string& directory, aiMatrix4x4 parentTransform, unsigned int level ) : parent( parent ), directory( directory ) {
       processNode( node, scene, parentTransform, level );
     }
 
@@ -118,7 +118,7 @@ namespace BlueBear {
       }
 
       for( int i = 0; i < node->mNumChildren; i++ ) {
-        children.emplace( node->mChildren[ i ]->mName.C_Str(), std::make_unique< Model >( node->mChildren[ i ], scene, directory, resultantTransform, level + 1 ) );
+        children.emplace( node->mChildren[ i ]->mName.C_Str(), std::make_unique< Model >( this, node->mChildren[ i ], scene, directory, resultantTransform, level + 1 ) );
       }
 
       Log::getInstance().debug( "Model::processNode", indentation + "}" );
@@ -155,7 +155,32 @@ namespace BlueBear {
         defaultMaterial = std::make_shared< Material >( loadMaterialTextures( material, aiTextureType_DIFFUSE ) );
       }
 
+      if( mesh->HasBones() ) {
+        for( int i = 0; i != mesh->mNumBones; i++ ) {
+          // Can we assume that bone data is already available and in Model? Do all export formats do this?
+
+          aiBone* boneData = mesh->mBones[ i ];
+          Model* root = getRootOfThis();
+          Log::getInstance().debug( "Model::processMesh", "Involved bone: " + std::string( boneData->mName.C_Str() ) );
+          std::shared_ptr< Model > bone = root->findChildById( boneData->mName.C_Str() );
+
+          // TODO
+        }
+      }
+
       drawable = std::make_unique< Drawable >( std::make_shared< Mesh >( vertices, indices ), defaultMaterial );
+    }
+
+    Model* Model::getRootOfThis() {
+      Model* root = this;
+      Model* next = this;
+
+      while( next != nullptr ) {
+        root = next;
+        next = next->parent;
+      }
+
+      return root;
     }
 
     TextureList Model::loadMaterialTextures( aiMaterial* material, aiTextureType type ) {

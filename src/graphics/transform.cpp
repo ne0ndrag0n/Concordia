@@ -129,5 +129,14 @@ namespace BlueBear {
       );
     }
 
+    void Transform::printToLog() {
+      Log::getInstance().debug( "Transform::printToLog", std::string( "\n" ) +
+        "Transform Info: " + "\n" +
+        "Position: " + glm::to_string( position ) + "\n" +
+        "Scale: " + glm::to_string( scale ) + "\n" +
+        "Rotation: " + glm::to_string( rotation ) 
+      );
+    }
+
   }
 }
