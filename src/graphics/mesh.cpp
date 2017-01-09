@@ -6,9 +6,8 @@
 namespace BlueBear {
   namespace Graphics {
 
-    Mesh::Mesh( std::vector< Vertex > vertices, std::vector< Index > indices ) :
-      vertices( vertices ), indices( indices ) {
-      setupMesh();
+    Mesh::Mesh( std::vector< Vertex >& vertices, std::vector< Index >& indices ) : size( indices.size() ) {
+      setupMesh( vertices, indices );
     }
 
     Mesh::~Mesh() {
@@ -17,7 +16,7 @@ namespace BlueBear {
       glDeleteBuffers( 1, &EBO );
     }
 
-    void Mesh::setupMesh() {
+    void Mesh::setupMesh( std::vector< Vertex >& vertices, std::vector< Index >& indices ) {
       glGenVertexArrays( 1, &VAO );
       glGenBuffers( 1, &VBO );
       glGenBuffers( 1, &EBO );
@@ -42,7 +41,7 @@ namespace BlueBear {
 
     void Mesh::drawElements() {
       glBindVertexArray( VAO );
-        glDrawElements( GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0 );
+        glDrawElements( GL_TRIANGLES, size, GL_UNSIGNED_INT, 0 );
       glBindVertexArray( 0 );
     }
 

@@ -20,16 +20,15 @@ namespace BlueBear {
     class Mesh {
       private:
         GLuint VAO, VBO, EBO;
+        unsigned int size;
         // Meshes depend on OpenGL global states - You really shouldn't be copying 'em.
         Mesh( const Mesh& );
         Mesh& operator=( const Mesh& );
-        std::vector< Vertex > vertices;
-        std::vector< Index > indices;
 
       public:
-        Mesh( std::vector< Vertex > vertices, std::vector< Index > indices );
+        Mesh( std::vector< Vertex >& vertices, std::vector< Index >& indices );
         ~Mesh();
-        void setupMesh();
+        void setupMesh( std::vector< Vertex >& vertices, std::vector< Index >& indices );
         void drawElements();
     };
   }
