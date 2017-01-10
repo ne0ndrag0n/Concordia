@@ -9,12 +9,13 @@
 
 namespace BlueBear {
   namespace Graphics {
+    class Shader;
+
     class Camera {
 
       private:
         glm::mat4 view;
         glm::mat4 projection;
-        GLuint program;
 
         GLfloat cameraHeight = 3.0f;
         glm::vec3 lookingAt = glm::vec3( 0.0f, 0.0f, -9.0f );
@@ -39,13 +40,14 @@ namespace BlueBear {
       public:
         glm::vec3 direction = originalDirection;
         bool ortho = true;
-        Camera( GLuint program, int screenWidth, int screenHeight );
+        Camera( int screenWidth, int screenHeight );
         void move( GLfloat x, GLfloat y, GLfloat z );
         bool setOrthographic( bool flag );
         float zoomIn();
         float zoomOut();
         float setZoom( float zoomSetting );
         void position();
+        void sendToShader( Shader& shader );
         glm::mat4 getOrthoView();
         glm::mat4 getOrthoMatrix();
         void walkForward();

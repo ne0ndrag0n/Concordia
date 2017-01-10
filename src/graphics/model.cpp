@@ -164,6 +164,15 @@ namespace BlueBear {
           Log::getInstance().debug( "Model::processMesh", "Involved bone: " + std::string( boneData->mName.C_Str() ) );
           std::shared_ptr< Model > bone = root->findChildById( boneData->mName.C_Str() );
 
+          // I don't know if we're exporting properly using the FBX format. It looks like we need to take the inverse of mOffsetMatrix, not the actual matrix.
+          // The matrix as given takes you from bone to mesh, and not mesh to bone.
+          /*
+          if( i == 0 ) {
+            Transform( glm::inverse( aiToGLMmat4( boneData->mOffsetMatrix ) ) ).printToLog();
+            Transform( bone->transform ).printToLog();
+          }
+          */
+
           // TODO
         }
       }

@@ -6,13 +6,14 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include "graphics/shader.hpp"
 #include "localemanager.hpp"
 #include "log.hpp"
 
 namespace BlueBear {
   namespace Graphics {
 
-    Camera::Camera( GLuint program, int screenWidth, int screenHeight ) : program( program ) {
+    Camera::Camera( int screenWidth, int screenHeight ) {
       widthHalf = ( (float)screenWidth / 2 );
       heightHalf = ( (float)screenHeight / 2 );
       perspectiveAspectRatio = (float)screenWidth / (float)screenHeight;
@@ -91,9 +92,11 @@ namespace BlueBear {
 
         dirty = false;
       }
-      // Set uniforms
-      glUniformMatrix4fv( glGetUniformLocation( program, "view" ), 1, GL_FALSE, glm::value_ptr( view ) );
-      glUniformMatrix4fv( glGetUniformLocation( program, "projection" ), 1, GL_FALSE, glm::value_ptr( projection ) );
+    }
+
+    void Camera::sendToShader( Shader& shader ) {
+      glUniformMatrix4fv( glGetUniformLocation( shader.Program, "view" ), 1, GL_FALSE, glm::value_ptr( view ) );
+      glUniformMatrix4fv( glGetUniformLocation( shader.Program, "projection" ), 1, GL_FALSE, glm::value_ptr( projection ) );
     }
 
     glm::mat4 Camera::getOrthoView() {

@@ -12,6 +12,7 @@
 #include "graphics/texture.hpp"
 #include "graphics/wallcellbundler.hpp"
 #include "graphics/widgetbuilder.hpp"
+#include "graphics/shaderinstancebundle.hpp"
 #include "scripting/lot.hpp"
 #include "scripting/tile.hpp"
 #include "scripting/engine.hpp"
@@ -146,7 +147,7 @@ namespace BlueBear {
       Display::State::State( instance ),
       L( instance.L ),
       defaultShader( Shader( "system/shaders/default_vertex.glsl", "system/shaders/default_fragment.glsl" ) ),
-      camera( Camera( defaultShader.Program, instance.x, instance.y ) ),
+      camera( Camera( instance.x, instance.y ) ),
       floorMap( floorMap ),
       wallMap( wallMap ),
       currentRotation( currentRotation ) {
@@ -160,7 +161,8 @@ namespace BlueBear {
       setupGUI();
       submitLuaContributions();
 
-      __debugInstances.emplace_back( *__debugModel, defaultShader.Program );
+      dynamicInstances.emplace_back( "system/shaders/default_vertex.glsl", "system/shaders/default_fragment.glsl" );
+      dynamicInstances[ 0 ].instances.emplace_back( *__debugModel, dynamicInstances[ 0 ].shader.Program );
 
       // Moving much of Display::loadInfrastructure here
       loadInfrastructure();
@@ -348,17 +350,14 @@ namespace BlueBear {
       glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
       glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-      // Use default shader and position camera
-      defaultShader.use();
+
       camera.position();
 
-      // Draw some stuff while we refine the graphics engine
-      for( auto& instance : __debugInstances ) {
-        instance.drawEntity();
-      }
-
+      // USES DEFAULT SHADER
       // Draw entities of each type
       // Floor & Walls with nudging
+      defaultShader.use();
+      camera.sendToShader( defaultShader );
       auto length = floorInstanceCollection->getLength();
       for( auto i = 0; i != length; i++ ) {
         std::shared_ptr< Instance > floorInstance = floorInstanceCollection->getItemDirect( i );
@@ -375,6 +374,11 @@ namespace BlueBear {
         if( wallCellBundler ) {
           wallCellBundler->render();
         }
+      }
+
+      // USES VARYING SHADERS
+      for( ShaderInstanceBundle& bundle : dynamicInstances ) {
+        bundle.drawInstances( camera );
       }
 
       processOsd();
@@ -610,15 +614,9 @@ namespace BlueBear {
     // XXX: Remove after demo branch
     int Display::MainGameState::lua_playanim1( lua_State* L ) {
       Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
-
-      auto& inst = self->__debugInstances[ 0 ].children[ "Cube.001" ];
-      inst->setAnimation( "Cube.001|Rotate45" );
     }
     int Display::MainGameState::lua_playanim2( lua_State* L ) {
       Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
-
-      auto& inst = self->__debugInstances[ 0 ].children[ "Cube.001" ];
-      inst->setAnimation( "Cube.001|RotateNeg45" );
     }
   }
 }

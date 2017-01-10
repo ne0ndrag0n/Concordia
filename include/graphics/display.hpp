@@ -49,6 +49,7 @@ namespace BlueBear {
     class DWallInstance;
     class RWallInstance;
     class WallCellBundler;
+    class ShaderInstanceBundle;
 
     class Display {
     public:
@@ -100,7 +101,7 @@ namespace BlueBear {
           std::unique_ptr< Model > __debugModel;
           TextureCache texCache;
           ImageCache imageCache;
-          std::vector< Graphics::Instance > __debugInstances;
+          std::vector< ShaderInstanceBundle > dynamicInstances;
           struct {
             sfg::Desktop desktop;
             std::shared_ptr< sfg::Container > rootContainer;

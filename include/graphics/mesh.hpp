@@ -25,9 +25,11 @@ namespace BlueBear {
         Mesh( const Mesh& );
         Mesh& operator=( const Mesh& );
 
+        virtual void sendMetadataToShader();
+
       public:
         Mesh( std::vector< Vertex >& vertices, std::vector< Index >& indices );
-        ~Mesh();
+        virtual ~Mesh();
         void setupMesh( std::vector< Vertex >& vertices, std::vector< Index >& indices );
         void drawElements();
     };

@@ -40,9 +40,18 @@ namespace BlueBear {
     }
 
     void Mesh::drawElements() {
+      sendMetadataToShader();
+
       glBindVertexArray( VAO );
         glDrawElements( GL_TRIANGLES, size, GL_UNSIGNED_INT, 0 );
       glBindVertexArray( 0 );
+    }
+
+    /**
+     * This is mainly used by descendant classes to send additional uniform metadata to the shader (mode uniform, bones)
+     */
+    void Mesh::sendMetadataToShader() {
+
     }
 
   }
