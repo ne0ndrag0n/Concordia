@@ -36,11 +36,10 @@ namespace BlueBear {
     float WallCellBundler::xOrigin = 0.0f;
     float WallCellBundler::yOrigin = 0.0f;
 
-    WallCellBundler::WallCellBundler( std::shared_ptr< Scripting::WallCell > hostCell, Containers::Collection3D< std::shared_ptr< WallCellBundler > >& hostCollection, glm::vec3 counter, unsigned int currentRotation, TextureCache& hostTextureCache, ImageCache& hostImageCache, unsigned int shader ) :
+    WallCellBundler::WallCellBundler( std::shared_ptr< Scripting::WallCell > hostCell, Containers::Collection3D< std::shared_ptr< WallCellBundler > >& hostCollection, glm::vec3 counter, unsigned int currentRotation, TextureCache& hostTextureCache, ImageCache& hostImageCache ) :
      currentRotation( currentRotation ),
      hostTextureCache( hostTextureCache ),
      hostImageCache( hostImageCache ),
-     shader( shader ),
      hostCellPtr( hostCell ),
      counter( counter ) {
 
@@ -172,7 +171,7 @@ namespace BlueBear {
     }
 
     void WallCellBundler::newXWallInstance( Containers::Collection3D< std::shared_ptr< WallCellBundler > >& hostCollection, std::string& frontWallpaper, std::string& backWallpaper ) {
-      x = std::make_unique< Instance >( *WallCellBundler::Piece, shader );
+      x = std::make_unique< Instance >( *WallCellBundler::Piece );
 
       glm::vec3 position( center.x, center.y + 0.9f, center.z );
 
@@ -374,7 +373,7 @@ namespace BlueBear {
     }
 
     void WallCellBundler::newYWallInstance( Containers::Collection3D< std::shared_ptr< WallCellBundler > >& hostCollection, std::string& frontWallpaper, std::string& backWallpaper ) {
-      y = std::make_unique< Instance >( *WallCellBundler::Piece, shader );
+      y = std::make_unique< Instance >( *WallCellBundler::Piece );
 
       glm::vec3 position( center.x - 0.9f, center.y, center.z );
 
@@ -555,7 +554,7 @@ namespace BlueBear {
     }
 
     void WallCellBundler::newDWallInstance( Containers::Collection3D< std::shared_ptr< WallCellBundler > >& hostCollection, std::string& frontWallpaper, std::string& backWallpaper ) {
-      d = std::make_unique< Instance >( *WallCellBundler::DPiece, shader );
+      d = std::make_unique< Instance >( *WallCellBundler::DPiece );
 
       glm::vec3 position( center.x, center.y, center.z );
 
@@ -651,7 +650,7 @@ namespace BlueBear {
     }
 
     void WallCellBundler::newRWallInstance( Containers::Collection3D< std::shared_ptr< WallCellBundler > >& hostCollection, std::string& frontWallpaper, std::string& backWallpaper ) {
-      r = std::make_unique< Instance >( *WallCellBundler::DPiece, shader );
+      r = std::make_unique< Instance >( *WallCellBundler::DPiece );
 
       glm::vec3 position( center.x, center.y, center.z );
 

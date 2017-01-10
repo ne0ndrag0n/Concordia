@@ -1,4 +1,5 @@
 #include "graphics/transform.hpp"
+#include "tools/opengl.hpp"
 #include "log.hpp"
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
@@ -72,9 +73,9 @@ namespace BlueBear {
       return matrix;
     }
 
-    void Transform::sendToShader( GLuint shaderProgram ) {
+    void Transform::sendToShader() {
       // Set the uniform for the shader
-      glUniformMatrix4fv( glGetUniformLocation( shaderProgram, "model" ), 1, GL_FALSE, glm::value_ptr( matrix ) );
+      glUniformMatrix4fv( Tools::OpenGL::getUniformLocation( "model" ), 1, GL_FALSE, glm::value_ptr( matrix ) );
     }
 
     void Transform::setParent( std::shared_ptr< Transform > parent ) {
@@ -134,7 +135,7 @@ namespace BlueBear {
         "Transform Info: " + "\n" +
         "Position: " + glm::to_string( position ) + "\n" +
         "Scale: " + glm::to_string( scale ) + "\n" +
-        "Rotation: " + glm::to_string( rotation ) 
+        "Rotation: " + glm::to_string( rotation )
       );
     }
 

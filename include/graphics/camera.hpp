@@ -47,7 +47,7 @@ namespace BlueBear {
         float zoomOut();
         float setZoom( float zoomSetting );
         void position();
-        void sendToShader( Shader& shader );
+        void sendToShader();
         glm::mat4 getOrthoView();
         glm::mat4 getOrthoMatrix();
         void walkForward();

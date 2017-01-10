@@ -11,11 +11,12 @@ namespace BlueBear {
 
     class ShaderInstanceBundle {
     public:
+      Camera& camera;
       Shader shader;
       std::vector< Instance > instances;
 
-      ShaderInstanceBundle( const std::string& vertexPath, const std::string& fragmentPath );
-      void drawInstances( Camera& camera );
+      ShaderInstanceBundle( Camera& camera, const std::string& vertexPath, const std::string& fragmentPath );
+      void drawInstances();
     };
 
   }

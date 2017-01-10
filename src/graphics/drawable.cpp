@@ -10,8 +10,8 @@ namespace BlueBear {
     Drawable::Drawable( std::shared_ptr< Mesh > mesh, std::shared_ptr< Material > material ) :
       mesh( mesh ), material( material ) {}
 
-    void Drawable::render( GLuint shaderID ) {
-      material->sendToShader( shaderID );
+    void Drawable::render() {
+      material->sendToShader();
       mesh->drawElements();
     }
 

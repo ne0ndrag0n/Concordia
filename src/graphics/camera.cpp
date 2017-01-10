@@ -1,5 +1,5 @@
 #include "graphics/camera.hpp"
-
+#include "tools/opengl.hpp"
 #include <string>
 #include <sstream>
 #include <GL/glew.h>
@@ -94,9 +94,9 @@ namespace BlueBear {
       }
     }
 
-    void Camera::sendToShader( Shader& shader ) {
-      glUniformMatrix4fv( glGetUniformLocation( shader.Program, "view" ), 1, GL_FALSE, glm::value_ptr( view ) );
-      glUniformMatrix4fv( glGetUniformLocation( shader.Program, "projection" ), 1, GL_FALSE, glm::value_ptr( projection ) );
+    void Camera::sendToShader() {
+      glUniformMatrix4fv( Tools::OpenGL::getUniformLocation( "view" ), 1, GL_FALSE, glm::value_ptr( view ) );
+      glUniformMatrix4fv( Tools::OpenGL::getUniformLocation( "projection" ), 1, GL_FALSE, glm::value_ptr( projection ) );
     }
 
     glm::mat4 Camera::getOrthoView() {

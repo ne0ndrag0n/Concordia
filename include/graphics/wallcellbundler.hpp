@@ -18,7 +18,6 @@ namespace BlueBear {
       static const std::string WALLATLAS_PATH;
       static const std::string WALLATLAS_COARSE_PATH;
 
-      unsigned int shader;
       unsigned int currentRotation;
       TextureCache& hostTextureCache;
       ImageCache& hostImageCache;
@@ -54,7 +53,7 @@ namespace BlueBear {
         std::shared_ptr< Scripting::WallCell > hostCell,
         Containers::Collection3D< std::shared_ptr< WallCellBundler > >& hostCollection,
         glm::vec3 counter,
-        unsigned int currentRotation, TextureCache& hostTextureCache, ImageCache& hostImageCache, unsigned int shader
+        unsigned int currentRotation, TextureCache& hostTextureCache, ImageCache& hostImageCache
       );
 
       std::unique_ptr< Instance > x;

@@ -24,7 +24,6 @@ namespace BlueBear {
     class Instance {
 
       private:
-        GLuint shaderProgram;
         std::shared_ptr< Transform > transform;
         std::shared_ptr< std::map< std::string, Animation > > animations;
         std::shared_ptr< AnimPlayer > animPlayer;
@@ -35,7 +34,7 @@ namespace BlueBear {
         std::shared_ptr< Drawable > drawable;
         std::map< std::string, std::shared_ptr< Instance > > children;
 
-        Instance( const Model& model, GLuint shaderProgram );
+        Instance( const Model& model );
 
         void setAnimation( const std::string& animKey );
 

@@ -14,7 +14,7 @@
 namespace BlueBear {
   namespace Graphics {
 
-    Instance::Instance( const Model& model, GLuint shaderProgram ) : transform( std::make_shared< Transform >() ), shaderProgram( shaderProgram ) {
+    Instance::Instance( const Model& model ) : transform( std::make_shared< Transform >() ) {
       prepareInstanceRecursive( model );
     }
 
@@ -31,7 +31,7 @@ namespace BlueBear {
         auto& child = *( pair.second );
 
         // Hand down the same transform as the parent to this model
-        auto instance = std::make_shared< Instance >( child, shaderProgram );
+        auto instance = std::make_shared< Instance >( child );
         instance->transform->setParent( transform );
 
         children[ pair.first ] = instance;
@@ -71,8 +71,8 @@ namespace BlueBear {
       }
 
       if( drawable ) {
-        transform->sendToShader( shaderProgram );
-        drawable->render( shaderProgram );
+        transform->sendToShader();
+        drawable->render();
       }
 
       for( auto& pair : children ) {

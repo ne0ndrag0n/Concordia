@@ -28,7 +28,7 @@ namespace BlueBear {
         void update( const glm::mat4& composure = glm::mat4() );
         glm::mat4 getUpdatedMatrix();
         glm::mat4 getMatrix();
-        void sendToShader( GLuint shaderProgram );
+        void sendToShader();
 
         void setParent( std::shared_ptr< Transform > parent );
 

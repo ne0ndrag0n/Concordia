@@ -161,8 +161,8 @@ namespace BlueBear {
       setupGUI();
       submitLuaContributions();
 
-      dynamicInstances.emplace_back( "system/shaders/default_vertex.glsl", "system/shaders/default_fragment.glsl" );
-      dynamicInstances[ 0 ].instances.emplace_back( *__debugModel, dynamicInstances[ 0 ].shader.Program );
+      dynamicInstances.emplace_back( camera, "system/shaders/default_vertex.glsl", "system/shaders/default_fragment.glsl" );
+      dynamicInstances[ 0 ].instances.emplace_back( *__debugModel );
 
       // Moving much of Display::loadInfrastructure here
       loadInfrastructure();
@@ -284,7 +284,7 @@ namespace BlueBear {
 
             if( tilePtr ) {
               // Create instance from the model, and change its material using the material cache
-              std::shared_ptr< Instance > instance = std::make_shared< Instance >( *floorModel, defaultShader.Program );
+              std::shared_ptr< Instance > instance = std::make_shared< Instance >( *floorModel );
 
               Drawable& floorDrawable = *( instance->drawable );
 
@@ -324,7 +324,7 @@ namespace BlueBear {
                  wallCellPtr,
                  *wallInstanceCollection,
                  glm::vec3( xCounter, yCounter, zCounter ),
-                 currentRotation, texCache, imageCache, defaultShader.Program
+                 currentRotation, texCache, imageCache
                );
             }
 
@@ -357,7 +357,7 @@ namespace BlueBear {
       // Draw entities of each type
       // Floor & Walls with nudging
       defaultShader.use();
-      camera.sendToShader( defaultShader );
+      camera.sendToShader();
       auto length = floorInstanceCollection->getLength();
       for( auto i = 0; i != length; i++ ) {
         std::shared_ptr< Instance > floorInstance = floorInstanceCollection->getItemDirect( i );
@@ -378,7 +378,7 @@ namespace BlueBear {
 
       // USES VARYING SHADERS
       for( ShaderInstanceBundle& bundle : dynamicInstances ) {
-        bundle.drawInstances( camera );
+        bundle.drawInstances();
       }
 
       processOsd();

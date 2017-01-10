@@ -4,12 +4,12 @@
 namespace BlueBear {
   namespace Graphics {
 
-    ShaderInstanceBundle::ShaderInstanceBundle( const std::string& vertexPath, const std::string& fragmentPath ) :
-      shader( Shader( vertexPath.c_str(), fragmentPath.c_str() ) ) {}
+    ShaderInstanceBundle::ShaderInstanceBundle( Camera& camera, const std::string& vertexPath, const std::string& fragmentPath ) :
+      shader( Shader( vertexPath.c_str(), fragmentPath.c_str() ) ), camera( camera ) {}
 
-    void ShaderInstanceBundle::drawInstances( Camera& camera ) {
+    void ShaderInstanceBundle::drawInstances() {
       shader.use();
-      camera.sendToShader( shader );
+      camera.sendToShader();
 
       for( auto& instance : instances ) {
         instance.drawEntity();

@@ -22,7 +22,7 @@ namespace BlueBear {
         Material( TextureList diffuseTextures );
         Material( TextureList diffuseTextures, TextureList specularTextures );
 
-        void sendToShader( GLuint shaderProgram );
+        void sendToShader();
     };
   }
 }

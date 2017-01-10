@@ -1,5 +1,6 @@
 #include "graphics/material.hpp"
 #include "graphics/texture.hpp"
+#include "tools/opengl.hpp"
 #include <GL/glew.h>
 #include <string>
 #include <sstream>
@@ -14,7 +15,7 @@ namespace BlueBear {
       diffuseTextures.push_back( diffuseTexture );
     }
 
-    void Material::sendToShader( GLuint shaderProgram ) {
+    void Material::sendToShader() {
       auto numTextures = diffuseTextures.size();
 
       for( int i = 0; i != numTextures; i++ ) {
@@ -23,7 +24,7 @@ namespace BlueBear {
           stream << "diffuse" << i;
           std::string uniformName = stream.str();
           glBindTexture( GL_TEXTURE_2D, diffuseTextures[ i ]->id );
-          glUniform1i( glGetUniformLocation( shaderProgram, uniformName.c_str() ), i );
+          glUniform1i( Tools::OpenGL::getUniformLocation( uniformName ), i );
       }
     }
 
