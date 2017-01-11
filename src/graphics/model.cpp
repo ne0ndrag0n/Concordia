@@ -4,6 +4,7 @@
 #include "graphics/drawable.hpp"
 #include "graphics/texture.hpp"
 #include "graphics/transform.hpp"
+#include "graphics/vertex.hpp"
 #include "tools/utility.hpp"
 #include "log.hpp"
 #include <string>
@@ -177,7 +178,7 @@ namespace BlueBear {
         }
       }
 
-      drawable = std::make_unique< Drawable >( std::make_shared< Mesh >( vertices, indices ), defaultMaterial );
+      drawable = std::make_unique< Drawable >( std::make_shared< StandardMesh >( vertices, indices ), defaultMaterial );
     }
 
     Model* Model::getRootOfThis() {
