@@ -24,12 +24,12 @@
 namespace BlueBear {
   namespace Graphics {
 
-    Model::Model( std::string path ) : parent( nullptr ) {
+    Model::Model( std::string path ) {
       loadModel( path );
     }
 
     // Used internally to generate child nodes
-    Model::Model( Model* parent, aiNode* node, const aiScene* scene, std::string& directory, aiMatrix4x4 parentTransform, unsigned int level ) : parent( parent ), directory( directory ) {
+    Model::Model( aiNode* node, const aiScene* scene, std::string& directory, aiMatrix4x4 parentTransform, unsigned int level ) : directory( directory ) {
       processNode( node, scene, parentTransform, level );
     }
 
@@ -118,7 +118,7 @@ namespace BlueBear {
       }
 
       for( int i = 0; i < node->mNumChildren; i++ ) {
-        children.emplace( node->mChildren[ i ]->mName.C_Str(), std::make_unique< Model >( this, node->mChildren[ i ], scene, directory, resultantTransform, level + 1 ) );
+        children.emplace( node->mChildren[ i ]->mName.C_Str(), std::make_unique< Model >( node->mChildren[ i ], scene, directory, resultantTransform, level + 1 ) );
       }
 
       Log::getInstance().debug( "Model::processNode", indentation + "}" );
@@ -160,9 +160,7 @@ namespace BlueBear {
           // Can we assume that bone data is already available and in Model? Do all export formats do this?
 
           aiBone* boneData = mesh->mBones[ i ];
-          Model* root = getRootOfThis();
           Log::getInstance().debug( "Model::processMesh", "Involved bone: " + std::string( boneData->mName.C_Str() ) );
-          std::shared_ptr< Model > bone = root->findChildById( boneData->mName.C_Str() );
 
           // I don't know if we're exporting properly using the FBX format. It looks like we need to take the inverse of mOffsetMatrix, not the actual matrix.
           // The matrix as given takes you from bone to mesh, and not mesh to bone.
@@ -178,18 +176,6 @@ namespace BlueBear {
       }
 
       drawable = std::make_unique< Drawable >( std::make_shared< Mesh >( vertices, indices ), defaultMaterial );
-    }
-
-    Model* Model::getRootOfThis() {
-      Model* root = this;
-      Model* next = this;
-
-      while( next != nullptr ) {
-        root = next;
-        next = next->parent;
-      }
-
-      return root;
     }
 
     TextureList Model::loadMaterialTextures( aiMaterial* material, aiTextureType type ) {

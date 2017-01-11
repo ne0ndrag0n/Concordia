@@ -24,13 +24,11 @@ namespace BlueBear {
 
       public:
         std::unique_ptr< Drawable > drawable;
-        // not acceptable if we eventually develop the ability to "break off" pieces of a model
-        Model* parent;
         std::map< std::string, std::shared_ptr< Model > > children;
         std::shared_ptr< std::map< std::string, Animation > > animations;
 
         Model( std::string path );
-        Model( Model* parent, aiNode* node, const aiScene* scene, std::string& directory, aiMatrix4x4 parentTransform, unsigned int level );
+        Model( aiNode* node, const aiScene* scene, std::string& directory, aiMatrix4x4 parentTransform, unsigned int level );
 
       private:
         struct KeyframeBuilder {
@@ -46,8 +44,6 @@ namespace BlueBear {
         glm::vec4 aiToGLMvec4( aiVector3D& vector );
 
         glm::dquat aiToGLMquat( aiQuaternion& quaternion );
-
-        Model* getRootOfThis();
 
         void loadModel( std::string path );
 
