@@ -9,31 +9,29 @@
 
 namespace BlueBear {
   namespace Graphics {
-    struct Vertex;
 
+    struct Vertex {
+      glm::vec3 position;
+      glm::vec3 normal;
+      glm::vec2 textureCoordinates;
+    };
     using Index = GLuint;
 
     class Mesh {
-        // Meshes depend on OpenGL global states - You really shouldn't be copying 'em.
-        Mesh( const Mesh& ) = delete;
-        Mesh& operator=( const Mesh& ) = delete;
-
-      protected:
+      private:
         GLuint VAO, VBO, EBO;
         unsigned int size;
-        virtual void sendMetadataToShader() = 0;
+        // Meshes depend on OpenGL global states - You really shouldn't be copying 'em.
+        Mesh( const Mesh& );
+        Mesh& operator=( const Mesh& );
+
+        virtual void sendMetadataToShader();
 
       public:
-        Mesh( unsigned int size );
+        Mesh( std::vector< Vertex >& vertices, std::vector< Index >& indices );
         virtual ~Mesh();
+        void setupMesh( std::vector< Vertex >& vertices, std::vector< Index >& indices );
         void drawElements();
-    };
-
-    class StandardMesh : public Mesh {
-    public:
-      StandardMesh( std::vector< Vertex >& vertices, std::vector< Index >& indices );
-    protected:
-      virtual void sendMetadataToShader();
     };
   }
 }
