@@ -4,6 +4,7 @@
 #include "graphics/material.hpp"
 #include "graphics/drawable.hpp"
 #include "graphics/animation.hpp"
+#include "graphics/mesh.hpp"
 #include <string>
 #include <map>
 #include <memory>
@@ -28,13 +29,19 @@ namespace BlueBear {
         std::shared_ptr< std::map< std::string, Animation > > animations;
 
         Model( std::string path );
-        Model( aiNode* node, const aiScene* scene, std::string& directory, aiMatrix4x4 parentTransform, unsigned int level );
+        Model( aiNode* node, const aiScene* scene, Model& root, std::shared_ptr< BoneList > boneList, std::string& directory, aiMatrix4x4 parentTransform, unsigned int level );
 
       private:
         struct KeyframeBuilder {
           aiVectorKey* positionKey;
           aiQuatKey* rotationKey;
           aiVectorKey* scalingKey;
+        };
+        struct VertexBoneBuilder {
+          std::vector< unsigned int > boneIDs;
+          std::vector< float > boneWeights;
+
+          bool containsBoneID( unsigned int boneID );
         };
         std::string directory;
         glm::mat4 transform;
@@ -45,11 +52,13 @@ namespace BlueBear {
 
         glm::dquat aiToGLMquat( aiQuaternion& quaternion );
 
+        unsigned int getIndexOfNode( std::shared_ptr< BoneList > boneList, std::shared_ptr< Model > bone );
+
         void loadModel( std::string path );
 
-        void processNode( aiNode* node, const aiScene* scene, aiMatrix4x4 parentTransform, unsigned int level = 0 );
+        void processNode( aiNode* node, const aiScene* scene, Model& root, std::shared_ptr< BoneList > boneList, aiMatrix4x4 parentTransform, unsigned int level = 0 );
 
-        void processMesh( aiMesh* mesh, const aiScene* scene, std::string nodeTitle, glm::mat4 transformation );
+        void processMesh( aiMesh* mesh, const aiScene* scene, Model& root, std::shared_ptr< BoneList > boneList, std::string nodeTitle, glm::mat4 transformation );
 
         TextureList loadMaterialTextures( aiMaterial* material, aiTextureType type );
 

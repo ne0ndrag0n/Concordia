@@ -1,14 +1,18 @@
 #ifndef WORLDOBJECT
 #define WORLDOBJECT
 
+// Do not include model!
+// If you need to include Model in this file, BoneList needs its own file.
 #include <vector>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <GL/glew.h>
+#include <memory>
 
 namespace BlueBear {
   namespace Graphics {
+    class Model;
 
     struct Vertex {
       glm::vec3 position;
@@ -16,6 +20,7 @@ namespace BlueBear {
       glm::vec2 textureCoordinates;
     };
     using Index = GLuint;
+    using BoneList = std::vector< std::shared_ptr< Model > >;
 
     class Mesh {
       private:

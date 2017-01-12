@@ -5,6 +5,7 @@
 #include "graphics/texture.hpp"
 #include "graphics/transform.hpp"
 #include "tools/utility.hpp"
+#include "exceptions/itemnotfound.hpp"
 #include "log.hpp"
 #include <string>
 #include <sstream>
@@ -29,8 +30,8 @@ namespace BlueBear {
     }
 
     // Used internally to generate child nodes
-    Model::Model( aiNode* node, const aiScene* scene, std::string& directory, aiMatrix4x4 parentTransform, unsigned int level ) : directory( directory ) {
-      processNode( node, scene, parentTransform, level );
+    Model::Model( aiNode* node, const aiScene* scene, Model& root, std::shared_ptr< BoneList > boneList, std::string& directory, aiMatrix4x4 parentTransform, unsigned int level ) : directory( directory ) {
+      processNode( node, scene, root, boneList, parentTransform, level );
     }
 
     glm::mat4 Model::aiToGLMmat4( aiMatrix4x4& matrix ) {
@@ -83,11 +84,15 @@ namespace BlueBear {
       // Assimp's mRootNode mTransformation is NOT CORRECT for COLLADA imports!!
       scene->mRootNode->mTransformation = aiMatrix4x4();
 
+      std::shared_ptr< BoneList > boneList = std::make_shared< BoneList >();
+      // push a nullptr at position 0
+      boneList->emplace_back( nullptr );
+
       // If the root node has no meshes and only one child, just skip to that child
       if( scene->mRootNode->mNumChildren == 1 && scene->mRootNode->mNumMeshes == 0 ) {
-        processNode( scene->mRootNode->mChildren[ 0 ], scene, aiMatrix4x4() );
+        processNode( scene->mRootNode->mChildren[ 0 ], scene, *this, boneList, aiMatrix4x4() );
       } else {
-        processNode( scene->mRootNode, scene, aiMatrix4x4() );
+        processNode( scene->mRootNode, scene, *this, boneList, aiMatrix4x4() );
       }
 
       // After everything is done, walk the tree for animations and apply them to the correct nodes
@@ -97,7 +102,7 @@ namespace BlueBear {
       }
     }
 
-    void Model::processNode( aiNode* node, const aiScene* scene, aiMatrix4x4 parentTransform, unsigned int level ) {
+    void Model::processNode( aiNode* node, const aiScene* scene, Model& root, std::shared_ptr< BoneList > boneList, aiMatrix4x4 parentTransform, unsigned int level ) {
       std::string indentation;
       for( int i = 0; i != level; i++ ) {
         indentation = indentation + "\t";
@@ -114,18 +119,19 @@ namespace BlueBear {
 
         Log::getInstance().debug( "Model::processNode", indentation + "\tLoading mesh " + mesh->mName.C_Str() );
 
-        this->processMesh( mesh, scene, node->mName.C_Str(), transform );
+        this->processMesh( mesh, scene, root, boneList, node->mName.C_Str(), transform );
       }
 
       for( int i = 0; i < node->mNumChildren; i++ ) {
-        children.emplace( node->mChildren[ i ]->mName.C_Str(), std::make_unique< Model >( node->mChildren[ i ], scene, directory, resultantTransform, level + 1 ) );
+        children.emplace( node->mChildren[ i ]->mName.C_Str(), std::make_unique< Model >( node->mChildren[ i ], scene, root, boneList, directory, resultantTransform, level + 1 ) );
       }
 
       Log::getInstance().debug( "Model::processNode", indentation + "}" );
      }
 
-    void Model::processMesh( aiMesh* mesh, const aiScene* scene, std::string nodeTitle, glm::mat4 transformation ) {
+    void Model::processMesh( aiMesh* mesh, const aiScene* scene, Model& root, std::shared_ptr< BoneList > boneList, std::string nodeTitle, glm::mat4 transformation ) {
       std::vector< Vertex > vertices;
+      std::vector< VertexBoneBuilder > boneBuilders;
       std::vector< Index > indices;
 
       std::shared_ptr< Material > defaultMaterial;
@@ -156,26 +162,40 @@ namespace BlueBear {
       }
 
       if( mesh->HasBones() ) {
+        boneBuilders.resize( vertices.size() );
+
         for( int i = 0; i != mesh->mNumBones; i++ ) {
           // Can we assume that bone data is already available and in Model? Do all export formats do this?
-
           aiBone* boneData = mesh->mBones[ i ];
-          Log::getInstance().debug( "Model::processMesh", "Involved bone: " + std::string( boneData->mName.C_Str() ) );
+          //Log::getInstance().debug( "Model::processMesh", "Involved bone: " + std::string( boneData->mName.C_Str() ) );
+          std::shared_ptr< Model > bone = root.findChildById( boneData->mName.C_Str() );
 
-          // I don't know if we're exporting properly using the FBX format. It looks like we need to take the inverse of mOffsetMatrix, not the actual matrix.
-          // The matrix as given takes you from bone to mesh, and not mesh to bone.
-          /*
-          if( i == 0 ) {
-            Transform( glm::inverse( aiToGLMmat4( boneData->mOffsetMatrix ) ) ).printToLog();
-            Transform( bone->transform ).printToLog();
-          }
-          */
-
+          unsigned int boneID = getIndexOfNode( boneList, bone );
+          // In mWeights, get the vertices + weights
+          // Each mWeight has an mVertexId and mWeight
+          // Use the mVertexId as an index into boneBuilders, then add boneID (if it exists) and mWeight
           // TODO
         }
       }
 
+      // TODO: Overlay vertex bone builders onto vertices
+
       drawable = std::make_unique< Drawable >( std::make_shared< Mesh >( vertices, indices ), defaultMaterial );
+    }
+
+    /**
+     * O(n) method, can we find a way around this?
+     */
+    unsigned int Model::getIndexOfNode( std::shared_ptr< BoneList > boneList, std::shared_ptr< Model > bone ) {
+      for( unsigned int i = 0; i != boneList->size(); i++ ) {
+        if( ( *boneList )[ i ] == bone ) {
+          return i;
+        }
+      }
+
+      // It doesn't exist
+      boneList->push_back( bone );
+      return boneList->size() - 1;
     }
 
     TextureList Model::loadMaterialTextures( aiMaterial* material, aiTextureType type ) {
@@ -208,7 +228,7 @@ namespace BlueBear {
         }
       }
 
-      return std::shared_ptr< Model >( nullptr );
+      throw Exceptions::ItemNotFoundException();
     }
 
     /**
@@ -303,6 +323,19 @@ namespace BlueBear {
 
         }
       }
+    }
+
+    /**
+     * OK, this is starting to get really shitty, but it's probably the best we can do for now. At most we're looking at something containing up to four elements only.
+     */
+    bool Model::VertexBoneBuilder::containsBoneID( unsigned int boneID ) {
+      for( unsigned int id : boneIDs ) {
+        if( id == boneID ) {
+          return true;
+        }
+      }
+
+      return false;
     }
 
   }
