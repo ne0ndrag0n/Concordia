@@ -18,9 +18,10 @@ namespace BlueBear {
       glm::vec3 position;
       glm::vec3 normal;
       glm::vec2 textureCoordinates;
+      glm::ivec4 boneIDs = glm::ivec4( 0, 0, 0, 0 );
+      glm::vec4 boneWeights = glm::vec4( 1.0f, 0.0f, 0.0f, 0.0f );
     };
     using Index = GLuint;
-    using BoneList = std::vector< std::shared_ptr< Model > >;
 
     class Mesh {
       private:

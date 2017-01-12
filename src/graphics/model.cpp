@@ -86,7 +86,7 @@ namespace BlueBear {
 
       std::shared_ptr< BoneList > boneList = std::make_shared< BoneList >();
       // push a nullptr at position 0
-      boneList->emplace_back( nullptr );
+      boneList->push_back( Bone< Model >{ std::shared_ptr< Model >(), glm::mat4() } );
 
       // If the root node has no meshes and only one child, just skip to that child
       if( scene->mRootNode->mNumChildren == 1 && scene->mRootNode->mNumMeshes == 0 ) {
@@ -131,7 +131,7 @@ namespace BlueBear {
 
     void Model::processMesh( aiMesh* mesh, const aiScene* scene, Model& root, std::shared_ptr< BoneList > boneList, std::string nodeTitle, glm::mat4 transformation ) {
       std::vector< Vertex > vertices;
-      std::vector< VertexBoneBuilder > boneBuilders;
+      std::vector< std::vector< BoneData > > boneBuilders;
       std::vector< Index > indices;
 
       std::shared_ptr< Material > defaultMaterial;
@@ -169,12 +169,18 @@ namespace BlueBear {
           aiBone* boneData = mesh->mBones[ i ];
           //Log::getInstance().debug( "Model::processMesh", "Involved bone: " + std::string( boneData->mName.C_Str() ) );
           std::shared_ptr< Model > bone = root.findChildById( boneData->mName.C_Str() );
+          unsigned int boneID = getIndexOfNode( boneList, bone, boneData->mOffsetMatrix );
 
-          unsigned int boneID = getIndexOfNode( boneList, bone );
-          // In mWeights, get the vertices + weights
-          // Each mWeight has an mVertexId and mWeight
-          // Use the mVertexId as an index into boneBuilders, then add boneID (if it exists) and mWeight
-          // TODO
+          for( int i = 0; i != boneData->mNumWeights; i++ ) {
+            aiVertexWeight& vertexAndWeight = boneData->mWeights[ i ];
+            std::vector< BoneData >& vertexBoneData = boneBuilders.at( vertexAndWeight.mVertexId );
+
+            if( vertexBoneData.size() == 4 ) {
+              throw TooManyBonesException();
+            }
+
+            vertexBoneData.push_back( { boneID, vertexAndWeight.mWeight } );
+          }
         }
       }
 
@@ -186,15 +192,15 @@ namespace BlueBear {
     /**
      * O(n) method, can we find a way around this?
      */
-    unsigned int Model::getIndexOfNode( std::shared_ptr< BoneList > boneList, std::shared_ptr< Model > bone ) {
+    unsigned int Model::getIndexOfNode( std::shared_ptr< BoneList > boneList, std::shared_ptr< Model > bone, aiMatrix4x4& ibpMatrix ) {
       for( unsigned int i = 0; i != boneList->size(); i++ ) {
-        if( ( *boneList )[ i ] == bone ) {
+        if( ( *boneList )[ i ].node == bone ) {
           return i;
         }
       }
 
       // It doesn't exist
-      boneList->push_back( bone );
+      boneList->push_back( Bone< Model >{ bone, aiToGLMmat4( ibpMatrix ) } );
       return boneList->size() - 1;
     }
 
@@ -324,19 +330,5 @@ namespace BlueBear {
         }
       }
     }
-
-    /**
-     * OK, this is starting to get really shitty, but it's probably the best we can do for now. At most we're looking at something containing up to four elements only.
-     */
-    bool Model::VertexBoneBuilder::containsBoneID( unsigned int boneID ) {
-      for( unsigned int id : boneIDs ) {
-        if( id == boneID ) {
-          return true;
-        }
-      }
-
-      return false;
-    }
-
   }
 }

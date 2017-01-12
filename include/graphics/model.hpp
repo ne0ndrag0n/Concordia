@@ -4,7 +4,8 @@
 #include "graphics/material.hpp"
 #include "graphics/drawable.hpp"
 #include "graphics/animation.hpp"
-#include "graphics/mesh.hpp"
+#include "graphics/bone.hpp"
+#include <exception>
 #include <string>
 #include <map>
 #include <memory>
@@ -22,6 +23,7 @@ namespace BlueBear {
     class Transform;
 
     class Model {
+      using BoneList = std::vector< Bone< Model > >;
 
       public:
         std::unique_ptr< Drawable > drawable;
@@ -37,11 +39,16 @@ namespace BlueBear {
           aiQuatKey* rotationKey;
           aiVectorKey* scalingKey;
         };
-        struct VertexBoneBuilder {
-          std::vector< unsigned int > boneIDs;
-          std::vector< float > boneWeights;
+        struct BoneData {
+          unsigned int boneID;
+          float boneWeight;
+        };
+        struct TooManyBonesException : public std::exception {
 
-          bool containsBoneID( unsigned int boneID );
+          const char* what() const throw() {
+            return "Too many bones for this vertex!";
+          }
+
         };
         std::string directory;
         glm::mat4 transform;
@@ -52,7 +59,7 @@ namespace BlueBear {
 
         glm::dquat aiToGLMquat( aiQuaternion& quaternion );
 
-        unsigned int getIndexOfNode( std::shared_ptr< BoneList > boneList, std::shared_ptr< Model > bone );
+        unsigned int getIndexOfNode( std::shared_ptr< BoneList > boneList, std::shared_ptr< Model > bone, aiMatrix4x4& ibpMatrix );
 
         void loadModel( std::string path );
 

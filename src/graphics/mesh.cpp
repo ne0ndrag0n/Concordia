@@ -30,9 +30,13 @@ namespace BlueBear {
         glEnableVertexAttribArray( 0 );
         glEnableVertexAttribArray( 1 );
         glEnableVertexAttribArray( 2 );
+        glEnableVertexAttribArray( 3 );
+        glEnableVertexAttribArray( 4 );
         glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, sizeof( Vertex ), ( GLvoid* ) 0 );
         glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, sizeof( Vertex ), ( GLvoid* ) offsetof( Vertex, normal ) );
         glVertexAttribPointer( 2, 2, GL_FLOAT, GL_FALSE, sizeof( Vertex ), ( GLvoid* ) offsetof( Vertex, textureCoordinates ) );
+        glVertexAttribIPointer( 3, 4, GL_INT, sizeof( Vertex ), ( GLvoid* ) offsetof( Vertex, boneIDs ) );
+        glVertexAttribPointer( 4, 4, GL_FLOAT, GL_FALSE, sizeof( Vertex ), ( GLvoid* ) offsetof( Vertex, boneWeights ) );
 
         glBindBuffer( GL_ARRAY_BUFFER, 0 );
 
