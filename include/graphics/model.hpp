@@ -30,6 +30,9 @@ namespace BlueBear {
         std::map< std::string, std::shared_ptr< Model > > children;
         std::shared_ptr< std::map< std::string, Animation > > animations;
 
+        // lazy
+        std::shared_ptr< BoneList > boneList;
+
         Model( std::string path );
         Model( aiNode* node, const aiScene* scene, Model& root, std::shared_ptr< BoneList > boneList, std::string& directory, aiMatrix4x4 parentTransform, unsigned int level );
 
@@ -59,13 +62,13 @@ namespace BlueBear {
 
         glm::dquat aiToGLMquat( aiQuaternion& quaternion );
 
-        unsigned int getIndexOfNode( std::shared_ptr< BoneList > boneList, std::shared_ptr< Model > bone, aiMatrix4x4& ibpMatrix );
+        unsigned int getIndexOfNode( std::shared_ptr< Model > bone, aiMatrix4x4& ibpMatrix );
 
         void loadModel( std::string path );
 
-        void processNode( aiNode* node, const aiScene* scene, Model& root, std::shared_ptr< BoneList > boneList, aiMatrix4x4 parentTransform, unsigned int level = 0 );
+        void processNode( aiNode* node, const aiScene* scene, Model& root, aiMatrix4x4 parentTransform, unsigned int level = 0 );
 
-        void processMesh( aiMesh* mesh, const aiScene* scene, Model& root, std::shared_ptr< BoneList > boneList, std::string nodeTitle, glm::mat4 transformation );
+        void processMesh( aiMesh* mesh, const aiScene* scene, Model& root, std::string nodeTitle, glm::mat4 transformation );
 
         TextureList loadMaterialTextures( aiMaterial* material, aiTextureType type );
 

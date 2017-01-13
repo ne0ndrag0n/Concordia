@@ -30,8 +30,8 @@ namespace BlueBear {
     }
 
     // Used internally to generate child nodes
-    Model::Model( aiNode* node, const aiScene* scene, Model& root, std::shared_ptr< BoneList > boneList, std::string& directory, aiMatrix4x4 parentTransform, unsigned int level ) : directory( directory ) {
-      processNode( node, scene, root, boneList, parentTransform, level );
+    Model::Model( aiNode* node, const aiScene* scene, Model& root, std::shared_ptr< BoneList > boneList, std::string& directory, aiMatrix4x4 parentTransform, unsigned int level ) : boneList( boneList ), directory( directory ) {
+      processNode( node, scene, root, parentTransform, level );
     }
 
     glm::mat4 Model::aiToGLMmat4( aiMatrix4x4& matrix ) {
@@ -84,15 +84,15 @@ namespace BlueBear {
       // Assimp's mRootNode mTransformation is NOT CORRECT for COLLADA imports!!
       scene->mRootNode->mTransformation = aiMatrix4x4();
 
-      std::shared_ptr< BoneList > boneList = std::make_shared< BoneList >();
+      boneList = std::make_shared< BoneList >();
       // push a nullptr at position 0
       boneList->push_back( Bone< Model >{ std::shared_ptr< Model >(), glm::mat4() } );
 
       // If the root node has no meshes and only one child, just skip to that child
       if( scene->mRootNode->mNumChildren == 1 && scene->mRootNode->mNumMeshes == 0 ) {
-        processNode( scene->mRootNode->mChildren[ 0 ], scene, *this, boneList, aiMatrix4x4() );
+        processNode( scene->mRootNode->mChildren[ 0 ], scene, *this, aiMatrix4x4() );
       } else {
-        processNode( scene->mRootNode, scene, *this, boneList, aiMatrix4x4() );
+        processNode( scene->mRootNode, scene, *this, aiMatrix4x4() );
       }
 
       // After everything is done, walk the tree for animations and apply them to the correct nodes
@@ -102,7 +102,7 @@ namespace BlueBear {
       }
     }
 
-    void Model::processNode( aiNode* node, const aiScene* scene, Model& root, std::shared_ptr< BoneList > boneList, aiMatrix4x4 parentTransform, unsigned int level ) {
+    void Model::processNode( aiNode* node, const aiScene* scene, Model& root, aiMatrix4x4 parentTransform, unsigned int level ) {
       std::string indentation;
       for( int i = 0; i != level; i++ ) {
         indentation = indentation + "\t";
@@ -119,7 +119,7 @@ namespace BlueBear {
 
         Log::getInstance().debug( "Model::processNode", indentation + "\tLoading mesh " + mesh->mName.C_Str() );
 
-        this->processMesh( mesh, scene, root, boneList, node->mName.C_Str(), transform );
+        this->processMesh( mesh, scene, root, node->mName.C_Str(), transform );
       }
 
       for( int i = 0; i < node->mNumChildren; i++ ) {
@@ -129,7 +129,7 @@ namespace BlueBear {
       Log::getInstance().debug( "Model::processNode", indentation + "}" );
      }
 
-    void Model::processMesh( aiMesh* mesh, const aiScene* scene, Model& root, std::shared_ptr< BoneList > boneList, std::string nodeTitle, glm::mat4 transformation ) {
+    void Model::processMesh( aiMesh* mesh, const aiScene* scene, Model& root, std::string nodeTitle, glm::mat4 transformation ) {
       std::vector< Vertex > vertices;
       std::vector< std::vector< BoneData > > boneBuilders;
       std::vector< Index > indices;
@@ -167,9 +167,8 @@ namespace BlueBear {
         for( int i = 0; i != mesh->mNumBones; i++ ) {
           // Can we assume that bone data is already available and in Model? Do all export formats do this?
           aiBone* boneData = mesh->mBones[ i ];
-          //Log::getInstance().debug( "Model::processMesh", "Involved bone: " + std::string( boneData->mName.C_Str() ) );
           std::shared_ptr< Model > bone = root.findChildById( boneData->mName.C_Str() );
-          unsigned int boneID = getIndexOfNode( boneList, bone, boneData->mOffsetMatrix );
+          unsigned int boneID = getIndexOfNode( bone, boneData->mOffsetMatrix );
 
           for( int i = 0; i != boneData->mNumWeights; i++ ) {
             aiVertexWeight& vertexAndWeight = boneData->mWeights[ i ];
@@ -184,7 +183,17 @@ namespace BlueBear {
         }
       }
 
-      // TODO: Overlay vertex bone builders onto vertices
+      for( int vertexIndex = 0; vertexIndex != boneBuilders.size(); vertexIndex++ ) {
+        std::vector< BoneData >& vertexBoneData = boneBuilders.at( vertexIndex );
+        Vertex& vertex = vertices.at( vertexIndex );
+
+        for( int boneDataIndex = 0; boneDataIndex != vertexBoneData.size(); boneDataIndex++ ) {
+          BoneData& boneData = vertexBoneData.at( boneDataIndex );
+
+          vertex.boneIDs[ boneDataIndex ] = boneData.boneID;
+          vertex.boneWeights[ boneDataIndex ] = boneData.boneWeight;
+        }
+      }
 
       drawable = std::make_unique< Drawable >( std::make_shared< Mesh >( vertices, indices ), defaultMaterial );
     }
@@ -192,7 +201,7 @@ namespace BlueBear {
     /**
      * O(n) method, can we find a way around this?
      */
-    unsigned int Model::getIndexOfNode( std::shared_ptr< BoneList > boneList, std::shared_ptr< Model > bone, aiMatrix4x4& ibpMatrix ) {
+    unsigned int Model::getIndexOfNode( std::shared_ptr< Model > bone, aiMatrix4x4& ibpMatrix ) {
       for( unsigned int i = 0; i != boneList->size(); i++ ) {
         if( ( *boneList )[ i ].node == bone ) {
           return i;
@@ -200,7 +209,9 @@ namespace BlueBear {
       }
 
       // It doesn't exist
-      boneList->push_back( Bone< Model >{ bone, aiToGLMmat4( ibpMatrix ) } );
+      // This has to be inverse because the FBX exporter in blender is completely broken
+      // TODO: To support a diverse number of formats, put this under a flag?
+      boneList->push_back( Bone< Model >{ bone, glm::inverse( aiToGLMmat4( ibpMatrix ) ) } );
       return boneList->size() - 1;
     }
 

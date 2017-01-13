@@ -15,6 +15,15 @@ namespace BlueBear {
   namespace Graphics {
 
     Instance::Instance( const Model& model ) : transform( std::make_shared< Transform >() ) {
+      // TODO: Contribute to boneList by comparing model against model's bone list
+
+      boneList = std::make_shared< BoneList >();
+      boneList->push_back( Bone< Instance >{ std::shared_ptr< Instance >(), glm::mat4() } );
+
+      prepareInstanceRecursive( model );
+    }
+
+    Instance::Instance( const Model& model, std::shared_ptr< BoneList > boneList ) : boneList( boneList ), transform( std::make_shared< Transform >() ) {
       prepareInstanceRecursive( model );
     }
 
@@ -31,7 +40,7 @@ namespace BlueBear {
         auto& child = *( pair.second );
 
         // Hand down the same transform as the parent to this model
-        auto instance = std::make_shared< Instance >( child );
+        auto instance = std::make_shared< Instance >( child, boneList );
         instance->transform->setParent( transform );
 
         children[ pair.first ] = instance;
@@ -60,7 +69,16 @@ namespace BlueBear {
       animPlayer = std::make_shared< AnimPlayer >( pair->second );
     }
 
-    void Instance::drawEntity( bool dirty ) {
+    /**
+     * Public-facing overload
+     */
+    void Instance::drawEntity() {
+      drawEntity( false, false );
+    }
+
+    void Instance::drawEntity( bool dirty, bool sentBones ) {
+
+      // TODO: Bone loading, sending
 
       // If we find one transform at this level that's dirty, every subsequent transform needs to get updated
       dirty = dirty || transform->dirty || ( animPlayer && animPlayer->generateNextFrame() );
@@ -78,7 +96,7 @@ namespace BlueBear {
       for( auto& pair : children ) {
         // If "dirty" was true here, it'll get passed down to subsequent instances. But if "dirty" was false, and this call ends up being "dirty",
         // it should only propagate to its own children since dirty is passed by value here.
-        pair.second->drawEntity( dirty );
+        pair.second->drawEntity( dirty, sentBones );
       }
     }
 

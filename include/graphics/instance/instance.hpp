@@ -3,6 +3,8 @@
 
 #include "graphics/transform.hpp"
 #include "graphics/drawable.hpp"
+#include "graphics/bone.hpp"
+#include <vector>
 #include <string>
 #include <memory>
 #include <map>
@@ -28,19 +30,25 @@ namespace BlueBear {
         std::shared_ptr< std::map< std::string, Animation > > animations;
         std::shared_ptr< AnimPlayer > animPlayer;
 
+        // Again, lazy
+        using BoneList = std::vector< Bone< Instance > >;
+        std::shared_ptr< BoneList > boneList;
+
         void prepareInstanceRecursive( const Model& model );
+        void drawEntity( bool dirty, bool sentBones );
 
       public:
         std::shared_ptr< Drawable > drawable;
         std::map< std::string, std::shared_ptr< Instance > > children;
 
         Instance( const Model& model );
+        Instance( const Model& model, std::shared_ptr< BoneList > boneList );
 
         void setAnimation( const std::string& animKey );
 
         std::shared_ptr< Instance > findChildByName( std::string name );
 
-        void drawEntity( bool dirty = false );
+        void drawEntity();
 
         glm::vec3 getPosition();
 
