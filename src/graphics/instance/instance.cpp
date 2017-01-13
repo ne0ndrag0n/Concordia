@@ -15,19 +15,19 @@ namespace BlueBear {
   namespace Graphics {
 
     Instance::Instance( const Model& model ) : transform( std::make_shared< Transform >() ) {
-      // TODO: Contribute to boneList by comparing model against model's bone list
-
       boneList = std::make_shared< BoneList >();
-      boneList->push_back( Bone< Instance >{ std::shared_ptr< Instance >(), glm::mat4() } );
+      for( int i = 0; i < model.boneList->size(); i++ ) {
+        boneList->push_back( Bone< Instance >{ std::shared_ptr< Instance >(), glm::mat4() } );
+      }
 
-      prepareInstanceRecursive( model );
+      prepareInstanceRecursive( model, model.boneList );
     }
 
-    Instance::Instance( const Model& model, std::shared_ptr< BoneList > boneList ) : boneList( boneList ), transform( std::make_shared< Transform >() ) {
-      prepareInstanceRecursive( model );
+    Instance::Instance( const Model& model, std::shared_ptr< BoneList > boneList, std::shared_ptr< ModelBoneList > modelBones ) : boneList( boneList ), transform( std::make_shared< Transform >() ) {
+      prepareInstanceRecursive( model, modelBones );
     }
 
-    void Instance::prepareInstanceRecursive( const Model& model ) {
+    void Instance::prepareInstanceRecursive( const Model& model, std::shared_ptr< ModelBoneList > modelBones ) {
       // Copy the drawable
       if( model.drawable ) {
         drawable = std::make_shared< Drawable >( *model.drawable );
@@ -40,10 +40,27 @@ namespace BlueBear {
         auto& child = *( pair.second );
 
         // Hand down the same transform as the parent to this model
-        auto instance = std::make_shared< Instance >( child, boneList );
+        auto instance = std::make_shared< Instance >( child, boneList, modelBones );
+        findMatchingSubmodel( modelBones, pair.second, instance );
         instance->transform->setParent( transform );
 
         children[ pair.first ] = instance;
+      }
+    }
+
+    /**
+     * Given a particular model node, see if it can be used to populate boneList
+     */
+    void Instance::findMatchingSubmodel( std::shared_ptr< ModelBoneList > modelBones, std::shared_ptr< Model > model, std::shared_ptr< Instance > inst ) {
+      for( int i = 1; i != modelBones->size(); i++ ) {
+        Bone< Model >& modelBone = modelBones->at( i );
+
+        if( modelBone.node == model ) {
+          Bone< Instance >& boneData = boneList->at( i );
+          boneData.node = inst;
+          boneData.inverseBindPose = modelBone.inverseBindPose;
+          return;
+        }
       }
     }
 
