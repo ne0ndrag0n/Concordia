@@ -92,10 +92,10 @@ namespace BlueBear {
      * Public-facing overload
      */
     void Instance::drawEntity() {
-      drawEntity( false, false );
+      drawEntity( false, false, *this );
     }
 
-    void Instance::drawEntity( bool dirty, bool sentBones ) {
+    void Instance::drawEntity( bool dirty, bool sentBones, Instance& rootInstance ) {
 
       // TODO: Bone loading, sending
 
@@ -108,7 +108,7 @@ namespace BlueBear {
       }
 
       if( drawable ) {
-        sendBonesToShader( sentBones );
+        sendBonesToShader( sentBones, rootInstance );
         transform->sendToShader();
         drawable->render();
       }
@@ -116,14 +116,16 @@ namespace BlueBear {
       for( auto& pair : children ) {
         // If "dirty" was true here, it'll get passed down to subsequent instances. But if "dirty" was false, and this call ends up being "dirty",
         // it should only propagate to its own children since dirty is passed by value here.
-        pair.second->drawEntity( dirty, sentBones );
+        pair.second->drawEntity( dirty, sentBones, rootInstance );
       }
     }
 
-    void Instance::sendBonesToShader( bool& sentBones ) {
+    void Instance::sendBonesToShader( bool& sentBones, Instance& rootInstance ) {
       // This method will get called on encountering the first drawable. We're assuming bones have been transformed and conquered before any meshes.
       // Do this expensive operation ONCE. Also makes the assumption that bones will be transformed before meshes; check your file formats.
       if( !sentBones ) {
+        glm::mat4 inverseRoot = glm::inverse( rootInstance.transform->matrix );
+
         std::vector< glm::mat4 > matrices;
         // The first one is always identity
         matrices.push_back( glm::mat4() );
@@ -131,7 +133,7 @@ namespace BlueBear {
         for( int i = 1; i < boneList->size(); i++ ) {
           Bone< Instance >& bone = boneList->at( i );
 
-          matrices.push_back( glm::mat4() /* bone.node->transform->relativeMatrix */ );
+          matrices.push_back( inverseRoot * bone.node->transform->matrix );
         }
 
         // TODO: Uncomment when actually ready to use. OpenGL optimizes out "bones"
