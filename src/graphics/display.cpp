@@ -28,6 +28,7 @@
 #include <SFML/OpenGL.hpp>
 #include <GL/glew.h>
 #include <glm/glm.hpp>
+#include <glm/ext.hpp>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -163,6 +164,8 @@ namespace BlueBear {
 
       dynamicInstances.emplace_back( camera, "system/shaders/default_vertex.glsl", "system/shaders/default_fragment.glsl" );
       dynamicInstances[ 0 ].instances.emplace_back( *__debugModel );
+      //dynamicInstances[ 0 ].instances[ 0 ].setPosition( glm::vec3( -2.5f, 2.5f, 0.0f ) );
+      //dynamicInstances[ 0 ].instances[ 0 ].children.at( "Armature" )->children.at( "Bone" )->children.at( "Bone.001" )->setRotationAngle( glm::radians( 50.0f ) );
 
       // Moving much of Display::loadInfrastructure here
       loadInfrastructure();

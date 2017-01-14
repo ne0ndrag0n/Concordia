@@ -2,11 +2,13 @@
 #include "graphics/model.hpp"
 #include "graphics/drawable.hpp"
 #include "graphics/animplayer.hpp"
+#include "tools/opengl.hpp"
 #include "log.hpp"
 #include <GL/glew.h>
 #include <memory>
 #include <string>
 #include <glm/glm.hpp>
+#include <glm/ext.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -106,6 +108,7 @@ namespace BlueBear {
       }
 
       if( drawable ) {
+        sendBonesToShader( sentBones );
         transform->sendToShader();
         drawable->render();
       }
@@ -114,6 +117,28 @@ namespace BlueBear {
         // If "dirty" was true here, it'll get passed down to subsequent instances. But if "dirty" was false, and this call ends up being "dirty",
         // it should only propagate to its own children since dirty is passed by value here.
         pair.second->drawEntity( dirty, sentBones );
+      }
+    }
+
+    void Instance::sendBonesToShader( bool& sentBones ) {
+      // This method will get called on encountering the first drawable. We're assuming bones have been transformed and conquered before any meshes.
+      // Do this expensive operation ONCE. Also makes the assumption that bones will be transformed before meshes; check your file formats.
+      if( !sentBones ) {
+        std::vector< glm::mat4 > matrices;
+        // The first one is always identity
+        matrices.push_back( glm::mat4() );
+
+        for( int i = 1; i < boneList->size(); i++ ) {
+          Bone< Instance >& bone = boneList->at( i );
+
+          // FIXME: These need to be identity matrices.
+          glm::mat4 boneMatrix = bone.node->transform->matrix;
+          matrices.push_back( boneMatrix );
+        }
+
+        // TODO: Uncomment when actually ready to use. OpenGL optimizes out "bones"
+        glUniformMatrix4fv( Tools::OpenGL::getUniformLocation( "bones" ), matrices.size(), GL_FALSE, glm::value_ptr( matrices[ 0 ] ) );
+        sentBones = true;
       }
     }
 

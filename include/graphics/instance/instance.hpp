@@ -38,6 +38,7 @@ namespace BlueBear {
         void prepareInstanceRecursive( const Model& model, std::shared_ptr< ModelBoneList > modelBones );
         void drawEntity( bool dirty, bool sentBones );
         void findMatchingSubmodel( std::shared_ptr< ModelBoneList > modelBones, std::shared_ptr< Model > model, std::shared_ptr< Instance > inst );
+        void sendBonesToShader( bool& sentBones );
 
       public:
         std::shared_ptr< Drawable > drawable;
