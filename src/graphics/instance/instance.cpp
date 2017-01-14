@@ -131,7 +131,7 @@ namespace BlueBear {
         for( int i = 1; i < boneList->size(); i++ ) {
           Bone< Instance >& bone = boneList->at( i );
 
-          matrices.push_back( bone.node->transform->relativeMatrix );
+          matrices.push_back( glm::mat4() /* bone.node->transform->relativeMatrix */ );
         }
 
         // TODO: Uncomment when actually ready to use. OpenGL optimizes out "bones"
