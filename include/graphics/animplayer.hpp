@@ -5,17 +5,17 @@
 
 namespace BlueBear {
   namespace Graphics {
-    class Animation;
+    class KeyframeBundle;
 
     class AnimPlayer {
-      Animation& animation;
+      KeyframeBundle& animation;
       double interval;
       double step = 0.0;
 
     public:
       glm::mat4 nextMatrix;
 
-      AnimPlayer( Animation& animation );
+      AnimPlayer( KeyframeBundle& animation );
       void reset();
       bool generateNextFrame();
     };

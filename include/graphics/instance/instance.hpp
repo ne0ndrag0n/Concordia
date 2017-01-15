@@ -16,7 +16,7 @@
 namespace BlueBear {
   namespace Graphics {
     class Model;
-    class Animation;
+    class KeyframeBundle;
     class AnimPlayer;
 
     /**
@@ -27,7 +27,7 @@ namespace BlueBear {
 
       private:
         std::shared_ptr< Transform > transform;
-        std::shared_ptr< std::map< std::string, Animation > > animations;
+        std::shared_ptr< std::map< std::string, KeyframeBundle > > animations;
         std::shared_ptr< AnimPlayer > animPlayer;
 
         // Again, lazy

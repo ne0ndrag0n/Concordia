@@ -8,7 +8,7 @@
 namespace BlueBear {
   namespace Graphics {
 
-    class Animation {
+    class KeyframeBundle {
       std::map< double, Transform > keyframes;
       glm::mat4 inverseBase;
 
@@ -20,8 +20,8 @@ namespace BlueBear {
        */
       bool cacheInterpolations = false;
 
-      Animation() = default;
-      Animation( double rate, double duration, const glm::mat4& inverseBase );
+      KeyframeBundle() = default;
+      KeyframeBundle( double rate, double duration, const glm::mat4& inverseBase );
 
       void addKeyframe( double frame, const Transform& transform );
       glm::mat4 getTransformForFrame( double frame );

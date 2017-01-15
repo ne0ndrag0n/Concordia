@@ -3,7 +3,7 @@
 
 #include "graphics/material.hpp"
 #include "graphics/drawable.hpp"
-#include "graphics/animation.hpp"
+#include "graphics/keyframebundle.hpp"
 #include "graphics/bone.hpp"
 #include <exception>
 #include <string>
@@ -28,7 +28,7 @@ namespace BlueBear {
       public:
         std::unique_ptr< Drawable > drawable;
         std::map< std::string, std::shared_ptr< Model > > children;
-        std::shared_ptr< std::map< std::string, Animation > > animations;
+        std::shared_ptr< std::map< std::string, KeyframeBundle > > animations;
 
         // lazy
         std::shared_ptr< BoneList > boneList;

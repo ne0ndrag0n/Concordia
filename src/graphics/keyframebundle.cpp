@@ -1,4 +1,4 @@
-#include "graphics/animation.hpp"
+#include "graphics/keyframebundle.hpp"
 #include "log.hpp"
 #include <string>
 #include <glm/ext.hpp>
@@ -6,13 +6,13 @@
 namespace BlueBear {
   namespace Graphics {
 
-    Animation::Animation( double rate, double duration, const glm::mat4& inverseBase ) : rate( rate ), duration( duration ), inverseBase( inverseBase ) {}
+    KeyframeBundle::KeyframeBundle( double rate, double duration, const glm::mat4& inverseBase ) : rate( rate ), duration( duration ), inverseBase( inverseBase ) {}
 
-    void Animation::addKeyframe( double frame, const Transform& transform ) {
+    void KeyframeBundle::addKeyframe( double frame, const Transform& transform ) {
       keyframes.emplace( frame, transform );
     }
 
-    glm::mat4 Animation::getTransformForFrame( double frame ) {
+    glm::mat4 KeyframeBundle::getTransformForFrame( double frame ) {
       auto pair = keyframes.find( frame );
 
       if( pair != keyframes.end() ) {

@@ -291,12 +291,12 @@ namespace BlueBear {
           }
 
           if( !node->animations ) {
-            node->animations = std::make_shared< std::map< std::string, Animation > >();
+            node->animations = std::make_shared< std::map< std::string, KeyframeBundle > >();
           }
 
-          std::map< std::string, Animation >& nodeAnimList = *node->animations;
+          std::map< std::string, KeyframeBundle >& nodeAnimList = *node->animations;
 
-          Animation& animation = nodeAnimList[ anim->mName.C_Str() ] = Animation( anim->mTicksPerSecond, anim->mDuration, glm::inverse( node->transform ) );
+          KeyframeBundle& animation = nodeAnimList[ anim->mName.C_Str() ] = KeyframeBundle( anim->mTicksPerSecond, anim->mDuration, glm::inverse( node->transform ) );
 
           // Add an identity transform at 0.0 to ensure correct interpolation
           animation.addKeyframe( 0.0, Transform() );
