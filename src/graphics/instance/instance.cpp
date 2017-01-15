@@ -97,8 +97,6 @@ namespace BlueBear {
 
     void Instance::drawEntity( bool dirty, bool sentBones, Instance& rootInstance ) {
 
-      // TODO: Bone loading, sending
-
       // If we find one transform at this level that's dirty, every subsequent transform needs to get updated
       dirty = dirty || transform->dirty || ( animPlayer && animPlayer->generateNextFrame() );
 
