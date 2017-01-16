@@ -21,11 +21,13 @@ namespace BlueBear {
       for( int i = 0; i < model.boneList->size(); i++ ) {
         boneList->push_back( Bone< Instance >{ std::shared_ptr< Instance >(), glm::mat4() } );
       }
+      animationList = std::make_shared< AnimationList >();
 
       prepareInstanceRecursive( model, model.boneList );
     }
 
-    Instance::Instance( const Model& model, std::shared_ptr< BoneList > boneList, std::shared_ptr< ModelBoneList > modelBones ) : boneList( boneList ), transform( std::make_shared< Transform >() ) {
+    Instance::Instance( const Model& model, std::shared_ptr< BoneList > boneList, std::shared_ptr< ModelBoneList > modelBones, std::shared_ptr< AnimationList > animationList )
+      : animationList( animationList ), boneList( boneList ), transform( std::make_shared< Transform >() ) {
       prepareInstanceRecursive( model, modelBones );
     }
 
@@ -42,7 +44,14 @@ namespace BlueBear {
         auto& child = *( pair.second );
 
         // Hand down the same transform as the parent to this model
-        auto instance = std::make_shared< Instance >( child, boneList, modelBones );
+        std::shared_ptr< Instance > instance = std::make_shared< Instance >( child, boneList, modelBones, animationList );
+        // Collect its animations into the master animation list
+        if( instance->animations ) {
+          for( auto& pair : *instance->animations ) {
+            ( *animationList )[ pair.first ].push_back( instance );
+          }
+        }
+
         findMatchingSubmodel( modelBones, pair.second, instance );
         instance->transform->setParent( transform );
 

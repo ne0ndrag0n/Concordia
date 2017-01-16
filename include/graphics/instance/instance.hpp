@@ -33,7 +33,9 @@ namespace BlueBear {
         // Again, lazy
         using BoneList = std::vector< Bone< Instance > >;
         using ModelBoneList = std::vector< Bone< Model > >;
+        using AnimationList = std::map< std::string, std::vector< std::shared_ptr< Instance > > >;
         std::shared_ptr< BoneList > boneList;
+        std::shared_ptr< AnimationList > animationList;
 
         void prepareInstanceRecursive( const Model& model, std::shared_ptr< ModelBoneList > modelBones );
         void drawEntity( bool dirty, bool sentBones, Instance& rootInstance );
@@ -45,7 +47,7 @@ namespace BlueBear {
         std::map< std::string, std::shared_ptr< Instance > > children;
 
         Instance( const Model& model );
-        Instance( const Model& model, std::shared_ptr< BoneList > boneList, std::shared_ptr< ModelBoneList > modelBones );
+        Instance( const Model& model, std::shared_ptr< BoneList > boneList, std::shared_ptr< ModelBoneList > modelBones, std::shared_ptr< AnimationList > animationList );
 
         void setAnimation( const std::string& animKey );
 
