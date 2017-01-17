@@ -291,15 +291,15 @@ namespace BlueBear {
           }
 
           if( !node->animations ) {
-            node->animations = std::make_shared< std::map< std::string, KeyframeBundle > >();
+            node->animations = std::make_shared< std::map< std::string, std::shared_ptr< KeyframeBundle > > >();
           }
 
-          std::map< std::string, KeyframeBundle >& nodeAnimList = *node->animations;
+          std::map< std::string, std::shared_ptr< KeyframeBundle > >& nodeAnimList = *node->animations;
 
-          KeyframeBundle& animation = nodeAnimList[ anim->mName.C_Str() ] = KeyframeBundle( anim->mTicksPerSecond, anim->mDuration, glm::inverse( node->transform ) );
+          std::shared_ptr< KeyframeBundle > animation = nodeAnimList[ anim->mName.C_Str() ] = std::make_shared< KeyframeBundle >( anim->mTicksPerSecond, anim->mDuration, glm::inverse( node->transform ) );
 
           // Add an identity transform at 0.0 to ensure correct interpolation
-          animation.addKeyframe( 0.0, Transform() );
+          animation->addKeyframe( 0.0, Transform() );
 
           // Use the keyframes in builder to assemble a premade list of transformation matrices
           // If there is a nullptr in any of the keys, use the one previous to the one in the list
@@ -329,7 +329,7 @@ namespace BlueBear {
             if( kb.rotationKey != nullptr ) { usableRotationKey = kb.rotationKey; }
             if( kb.scalingKey != nullptr ) { usableScalingKey = kb.scalingKey; }
 
-            animation.addKeyframe( kvPair.first,
+            animation->addKeyframe( kvPair.first,
               Transform(
                 glm::vec3( usablePositionKey->mValue.x, usablePositionKey->mValue.y, usablePositionKey->mValue.z ),
                 glm::quat( usableRotationKey->mValue.w, usableRotationKey->mValue.x, usableRotationKey->mValue.y, usableRotationKey->mValue.z ),

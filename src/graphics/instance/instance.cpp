@@ -2,6 +2,7 @@
 #include "graphics/model.hpp"
 #include "graphics/drawable.hpp"
 #include "graphics/animplayer.hpp"
+#include "tools/utility.hpp"
 #include "tools/opengl.hpp"
 #include "log.hpp"
 #include <GL/glew.h>
@@ -37,18 +38,15 @@ namespace BlueBear {
         drawable = std::make_shared< Drawable >( *model.drawable );
       }
 
-      // Copy the anim pointer
-      animations = model.animations;
-
       for( auto& pair : model.children ) {
         auto& child = *( pair.second );
 
         // Hand down the same transform as the parent to this model
         std::shared_ptr< Instance > instance = std::make_shared< Instance >( child, boneList, modelBones, animationList );
         // Collect its animations into the master animation list
-        if( instance->animations ) {
-          for( auto& pair : *instance->animations ) {
-            ( *animationList )[ pair.first ].push_back( instance );
+        if( child.animations ) {
+          for( auto& pair : *child.animations ) {
+            ( *animationList )[ pair.first ].push_back( { instance, pair.second } );
           }
         }
 
@@ -82,19 +80,20 @@ namespace BlueBear {
       return children[ name ];
     }
 
+
+    /**
+     * setAnimation will act the same whether or not it's called on a child node or the root node. It will activate all animations as if called from the top of the scene graph.
+     */
     void Instance::setAnimation( const std::string& animKey ) {
-      if( !animations ) {
-        Log::getInstance().warn( "Instance::setAnimation", "Tried to play animation " + animKey + " but node doesn't have animations." );
-        return;
-      }
+      auto pair = animationList->find( animKey );
 
-      auto pair = animations->find( animKey );
-      if( pair == animations->end() ) {
-        Log::getInstance().warn( "Instance::setAnimation", "Tried to play animation " + animKey + " but it doesn't exist on this node." );
-        return;
+      if( pair != animationList->end() ) {
+        for( auto& animationBundle : pair->second ) {
+          animationBundle.instance->animPlayer = std::make_shared< AnimPlayer >( *animationBundle.keyframes );
+        }
+      } else {
+        Log::getInstance().warn( "Instance::setAnimation", "Could not find animation " + animKey );
       }
-
-      animPlayer = std::make_shared< AnimPlayer >( pair->second );
     }
 
     /**
@@ -107,7 +106,7 @@ namespace BlueBear {
     void Instance::drawEntity( bool dirty, bool sentBones, Instance& rootInstance ) {
 
       // If we find one transform at this level that's dirty, every subsequent transform needs to get updated
-      dirty = dirty || transform->dirty || ( animPlayer && animPlayer->generateNextFrame() );
+      dirty = ( animPlayer && animPlayer->generateNextFrame() ) || transform->dirty || dirty;
 
       // Update if dirty
       if( dirty ) {

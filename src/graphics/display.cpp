@@ -163,6 +163,7 @@ namespace BlueBear {
       submitLuaContributions();
 
       dynamicInstances.emplace_back( camera, "system/shaders/default_vertex.glsl", "system/shaders/default_fragment.glsl" );
+
       dynamicInstances[ 0 ].instances.emplace_back( *__debugModel );
       dynamicInstances[ 0 ].instances[ 0 ].setPosition( glm::vec3( 0.0f, 2.5f, 0.0f ) );
 
@@ -617,7 +618,7 @@ namespace BlueBear {
     int Display::MainGameState::lua_playanim1( lua_State* L ) {
       Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
 
-      //self->dynamicInstances[ 0 ].instances[ 0 ].children.at( "Armature" )->children.at( "Bone" )->children.at( "Bone.001" )->setAnimation( "Armature|ArmatureAction" );
+      self->dynamicInstances[ 0 ].instances[ 0 ].setAnimation( "Armature|ArmatureAction" );
     }
     int Display::MainGameState::lua_playanim2( lua_State* L ) {
       Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );

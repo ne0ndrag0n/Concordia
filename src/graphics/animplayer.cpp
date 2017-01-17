@@ -1,5 +1,6 @@
 #include "graphics/animplayer.hpp"
 #include "graphics/keyframebundle.hpp"
+#include "tools/utility.hpp"
 #include "configmanager.hpp"
 #include "log.hpp"
 

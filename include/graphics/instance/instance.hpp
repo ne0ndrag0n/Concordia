@@ -27,13 +27,16 @@ namespace BlueBear {
 
       private:
         std::shared_ptr< Transform > transform;
-        std::shared_ptr< std::map< std::string, KeyframeBundle > > animations;
         std::shared_ptr< AnimPlayer > animPlayer;
 
         // Again, lazy
         using BoneList = std::vector< Bone< Instance > >;
         using ModelBoneList = std::vector< Bone< Model > >;
-        using AnimationList = std::map< std::string, std::vector< std::shared_ptr< Instance > > >;
+        struct AnimationBundle {
+          std::shared_ptr< Instance > instance;
+          std::shared_ptr< KeyframeBundle > keyframes;
+        };
+        using AnimationList = std::map< std::string, std::vector< AnimationBundle > >;
         std::shared_ptr< BoneList > boneList;
         std::shared_ptr< AnimationList > animationList;
 
