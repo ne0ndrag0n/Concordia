@@ -245,7 +245,7 @@ namespace BlueBear {
         }
       }
 
-      throw Exceptions::ItemNotFoundException();
+      return std::shared_ptr< Model >( nullptr );
     }
 
     /**
@@ -269,7 +269,7 @@ namespace BlueBear {
         for( int i = 0; i != anim->mNumChannels; i++ ) {
           aiNodeAnim* nodeAnimation = anim->mChannels[ i ];
           std::shared_ptr< Model > node = findChildById( nodeAnimation->mNodeName.C_Str() );
-
+          glm::mat4 nodeInverse = glm::inverse( node->transform );
           std::map< double, KeyframeBuilder > builder;
 
           for( int i = 0; i != nodeAnimation->mNumPositionKeys; i++ ) {
@@ -296,7 +296,7 @@ namespace BlueBear {
 
           std::map< std::string, std::shared_ptr< KeyframeBundle > >& nodeAnimList = *node->animations;
 
-          std::shared_ptr< KeyframeBundle > animation = nodeAnimList[ anim->mName.C_Str() ] = std::make_shared< KeyframeBundle >( anim->mTicksPerSecond, anim->mDuration, glm::inverse( node->transform ) );
+          std::shared_ptr< KeyframeBundle > animation = nodeAnimList[ anim->mName.C_Str() ] = std::make_shared< KeyframeBundle >( anim->mTicksPerSecond, anim->mDuration );
 
           // Add an identity transform at 0.0 to ensure correct interpolation
           animation->addKeyframe( 0.0, Transform() );
@@ -321,6 +321,14 @@ namespace BlueBear {
           aiQuatKey* usableRotationKey = rotationKey.get();
           aiVectorKey* usableScalingKey = scalingKey.get();
 
+          /*
+          std::string nodeID( nodeAnimation->mNodeName.C_Str() );
+          if( nodeID == "hips" || nodeID == "lk_foot.L" || nodeID == "lk_foot.R" ) {
+            Log::getInstance().debug( "Node " + std::string( nodeAnimation->mNodeName.C_Str() ), "Transform for this node:" );
+            Transform( node->transform ).printToLog();
+          }
+          */
+
           for( auto& kvPair : builder ) {
             KeyframeBuilder& kb = kvPair.second;
 
@@ -329,13 +337,13 @@ namespace BlueBear {
             if( kb.rotationKey != nullptr ) { usableRotationKey = kb.rotationKey; }
             if( kb.scalingKey != nullptr ) { usableScalingKey = kb.scalingKey; }
 
-            animation->addKeyframe( kvPair.first,
-              Transform(
-                glm::vec3( usablePositionKey->mValue.x, usablePositionKey->mValue.y, usablePositionKey->mValue.z ),
-                glm::quat( usableRotationKey->mValue.w, usableRotationKey->mValue.x, usableRotationKey->mValue.y, usableRotationKey->mValue.z ),
-                glm::vec3( usableScalingKey->mValue.x, usableScalingKey->mValue.y, usableScalingKey->mValue.z )
-              )
-            );
+            glm::mat4 transform;
+            transform = glm::translate( transform, glm::vec3( usablePositionKey->mValue.x, usablePositionKey->mValue.y, usablePositionKey->mValue.z ) );
+            transform = transform * glm::toMat4( glm::quat( usableRotationKey->mValue.w, usableRotationKey->mValue.x, usableRotationKey->mValue.y, usableRotationKey->mValue.z ) );
+            transform = glm::scale( transform, glm::vec3( usableScalingKey->mValue.x, usableScalingKey->mValue.y, usableScalingKey->mValue.z ) );
+            transform = nodeInverse * transform;
+
+            animation->addKeyframe( kvPair.first, Transform( transform ) );
           }
 
         }

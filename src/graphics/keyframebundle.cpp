@@ -6,7 +6,7 @@
 namespace BlueBear {
   namespace Graphics {
 
-    KeyframeBundle::KeyframeBundle( double rate, double duration, const glm::mat4& inverseBase ) : rate( rate ), duration( duration ), inverseBase( inverseBase ) {}
+    KeyframeBundle::KeyframeBundle( double rate, double duration ) : rate( rate ), duration( duration ) {}
 
     void KeyframeBundle::addKeyframe( double frame, const Transform& transform ) {
       keyframes.emplace( frame, transform );
@@ -17,7 +17,7 @@ namespace BlueBear {
 
       if( pair != keyframes.end() ) {
         // Use keyframe directly
-        return inverseBase * pair->second.getUpdatedMatrix();
+        return pair->second.getUpdatedMatrix();
       } else {
         // Need to interpolate between two frames
         auto lastIterator = keyframes.upper_bound( frame );
@@ -31,7 +31,7 @@ namespace BlueBear {
         }
 
         // Interpolate the two animations using the alpha
-        return inverseBase * keyTransform.getUpdatedMatrix();
+        return keyTransform.getUpdatedMatrix();
       }
     }
   }
