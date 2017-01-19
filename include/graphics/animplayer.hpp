@@ -1,11 +1,14 @@
 #ifndef ANIMPLAYER
 #define ANIMPLAYER
 
+#include "graphics/transform.hpp"
 #include <glm/glm.hpp>
+#include <memory>
 
 namespace BlueBear {
   namespace Graphics {
     class KeyframeBundle;
+    class Transform;
 
     class AnimPlayer {
       KeyframeBundle& animation;
@@ -13,11 +16,9 @@ namespace BlueBear {
       double step = 0.0;
 
     public:
-      glm::mat4 nextMatrix;
-
       AnimPlayer( KeyframeBundle& animation );
       void reset();
-      bool generateNextFrame();
+      std::shared_ptr< Transform > generateNextFrame();
     };
 
   }

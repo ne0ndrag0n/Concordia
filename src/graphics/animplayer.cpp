@@ -15,16 +15,17 @@ namespace BlueBear {
       step = 0.0;
     }
 
-    bool AnimPlayer::generateNextFrame() {
-
+    /**
+     * AnimPlayer should "suicide" once this is completed (from instance)
+     */
+    std::shared_ptr< Transform > AnimPlayer::generateNextFrame() {
       step += interval;
-      bool generatable = step <= animation.duration;
 
-      if( generatable ) {
-        nextMatrix = animation.getTransformForFrame( step );
+      if( step <= animation.duration ) {
+        return animation.getTransformForFrame( step );
+      } else {
+        return std::shared_ptr< Transform >( nullptr );
       }
-
-      return generatable;
     }
   }
 }

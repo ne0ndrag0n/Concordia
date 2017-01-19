@@ -27,9 +27,10 @@ namespace BlueBear {
       rotation = glm::conjugate( rotation );
     }
 
-    void Transform::update( const glm::mat4& composure ) {
+    void Transform::update() {
       // When we update, CLEAR THE MATRIX!
       matrix = glm::mat4();
+      localMatrix = glm::mat4();
 
       glm::mat4 mixin;
 
@@ -40,17 +41,16 @@ namespace BlueBear {
       // Mixin the parent matrix
       matrix = matrix * mixin;
 
-      // Mixin any prior composure (animations)
-      matrix = matrix * composure;
-
       // There's always going to be a translation
-      matrix = glm::translate( matrix, position );
+      localMatrix = glm::translate( localMatrix, position );
 
       // Then rotate
-      matrix = matrix * glm::toMat4( rotation );
+      localMatrix = localMatrix * glm::toMat4( rotation );
 
       // Then scale
-      matrix = glm::scale( matrix, scale );
+      localMatrix = glm::scale( localMatrix, scale );
+
+      matrix = matrix * localMatrix;
 
       // This is now updated.
       dirty = false;

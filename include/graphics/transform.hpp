@@ -12,20 +12,22 @@ namespace BlueBear {
   namespace Graphics {
     class Transform {
 
-      std::shared_ptr< Transform > parent;
       glm::vec3 position = glm::vec3( 0.0f, 0.0f, 0.0f );
       glm::vec3 scale = glm::vec3( 1.0f, 1.0f, 1.0f );
       glm::quat rotation = glm::quat( 1.0f, 0.0f, 0.0f, 0.0f );
 
       public:
+        std::shared_ptr< Transform > parent;
+
         bool dirty = true;
         glm::mat4 matrix;
+        glm::mat4 localMatrix;
 
         Transform();
         Transform( const glm::vec3& position, const glm::quat& rotation, const glm::vec3& scale );
         Transform( const glm::mat4& existingTransform );
 
-        void update( const glm::mat4& composure = glm::mat4() );
+        void update();
         glm::mat4 getUpdatedMatrix();
         glm::mat4 getMatrix();
         void sendToShader();

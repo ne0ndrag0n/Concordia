@@ -106,11 +106,30 @@ namespace BlueBear {
     void Instance::drawEntity( bool dirty, bool sentBones, Instance& rootInstance ) {
 
       // If we find one transform at this level that's dirty, every subsequent transform needs to get updated
-      dirty = ( animPlayer && animPlayer->generateNextFrame() ) || transform->dirty || dirty;
+      if( animPlayer ) {
+        std::shared_ptr< Transform > keyframeTransform = animPlayer->generateNextFrame();
+
+        // If there is another keyframe, replace this instance's transform with the keyframe transform
+        if( keyframeTransform ) {
+          std::shared_ptr< Transform > originalParent = transform->parent;
+          transform = keyframeTransform;
+          keyframeTransform->setParent( originalParent );
+        } else {
+          // There are no frames left. Suicide this animPlayer
+          animPlayer = nullptr;
+
+          // New, original transform
+          transform = std::make_shared< Transform >();
+        }
+
+        dirty = true;
+      } else {
+        dirty = dirty || transform->dirty;
+      }
 
       // Update if dirty
       if( dirty ) {
-        transform->update( animPlayer ? animPlayer->nextMatrix : glm::mat4() );
+        transform->update();
       }
 
       if( drawable ) {
@@ -130,8 +149,6 @@ namespace BlueBear {
       // This method will get called on encountering the first drawable. We're assuming bones have been transformed and conquered before any meshes.
       // Do this expensive operation ONCE. Also makes the assumption that bones will be transformed before meshes; check your file formats.
       if( !sentBones ) {
-        glm::mat4 inverseRoot = glm::inverse( rootInstance.transform->matrix );
-
         std::vector< glm::mat4 > matrices;
         // The first one is always identity
         matrices.push_back( glm::mat4() );
@@ -139,7 +156,7 @@ namespace BlueBear {
         for( int i = 1; i < boneList->size(); i++ ) {
           Bone< Instance >& bone = boneList->at( i );
 
-          matrices.push_back( inverseRoot * bone.node->transform->matrix );
+          matrices.push_back( bone.node->transform->localMatrix );
         }
 
         // TODO: Uncomment when actually ready to use. OpenGL optimizes out "bones"
