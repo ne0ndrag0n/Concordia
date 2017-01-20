@@ -269,8 +269,6 @@ namespace BlueBear {
         for( int i = 0; i != anim->mNumChannels; i++ ) {
           aiNodeAnim* nodeAnimation = anim->mChannels[ i ];
           std::shared_ptr< Model > node = findChildById( nodeAnimation->mNodeName.C_Str() );
-          //Log::getInstance().debug( "Node " + std::string( nodeAnimation->mNodeName.C_Str() ), "Node transform:" );
-          //Transform( node->transform ).printToLog();
           glm::mat4 nodeInverse = glm::inverse( node->transform );
           std::map< double, KeyframeBuilder > builder;
 
@@ -323,7 +321,12 @@ namespace BlueBear {
           aiQuatKey* usableRotationKey = rotationKey.get();
           aiVectorKey* usableScalingKey = scalingKey.get();
 
-          //Log::getInstance().debug( "assertion", "For animation " + std::string( nodeAnimation->mNodeName.C_Str() ) );
+          /*
+          if( std::string( nodeAnimation->mNodeName.C_Str() ) == "Bone.001" ) {
+            Log::getInstance().debug( "assertion", std::string( nodeAnimation->mNodeName.C_Str() ) );
+            Transform( node->transform ).printToLog();
+          }
+          */
 
           for( auto& kvPair : builder ) {
             KeyframeBuilder& kb = kvPair.second;
@@ -337,8 +340,12 @@ namespace BlueBear {
             transform = glm::translate( transform, glm::vec3( usablePositionKey->mValue.x, usablePositionKey->mValue.y, usablePositionKey->mValue.z ) );
             transform = transform * glm::toMat4( glm::quat( usableRotationKey->mValue.w, usableRotationKey->mValue.x, usableRotationKey->mValue.y, usableRotationKey->mValue.z ) );
             transform = glm::scale( transform, glm::vec3( usableScalingKey->mValue.x, usableScalingKey->mValue.y, usableScalingKey->mValue.z ) );
-            //Log::getInstance().debug( "Keyframe " + std::to_string( kvPair.first ), "This unmodified transform is:" );
-            //Transform( transform ).printToLog();
+            /*
+            if( std::string( nodeAnimation->mNodeName.C_Str() ) == "Bone.001" && kvPair.first == 60.0 ) {
+              Log::getInstance().debug( "Keyframe " + std::to_string( kvPair.first ), "This unmodified transform is:" );
+              Transform( transform ).printToLog();
+            }
+            */
             // ¯\_(ツ)_/¯ not sure if we need this. i think the blender exporter is just fucked.
             // keyframes are treating Y as the up axis when it's supposed to be Z
             transform = nodeInverse * transform;

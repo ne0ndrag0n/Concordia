@@ -135,7 +135,9 @@ namespace BlueBear {
         "Transform Info: " + "\n" +
         "Position: " + glm::to_string( position ) + "\n" +
         "Scale: " + glm::to_string( scale ) + "\n" +
-        "Rotation: " + glm::to_string( rotation )
+        "Rotation: " + glm::to_string( rotation ) + "\n" +
+        "Rotation Angle: " + std::to_string( glm::degrees( getRotationAngle() ) ) + "\n" +
+        "Rotation Axes: " + glm::to_string( getRotationAxes() )
       );
     }
 
