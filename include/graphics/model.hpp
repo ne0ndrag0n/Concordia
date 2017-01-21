@@ -60,6 +60,8 @@ namespace BlueBear {
 
         glm::vec4 aiToGLMvec4( aiVector3D& vector );
 
+        glm::vec3 aiToGLMvec3( aiVector3D& vector );
+
         glm::dquat aiToGLMquat( aiQuaternion& quaternion );
 
         unsigned int getIndexOfNode( std::shared_ptr< Model > bone, aiMatrix4x4& ibpMatrix );

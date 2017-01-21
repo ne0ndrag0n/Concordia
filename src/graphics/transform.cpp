@@ -130,14 +130,27 @@ namespace BlueBear {
       );
     }
 
+    glm::mat4 Transform::componentsToMatrix( const glm::vec3& position, const glm::quat& rotation, const glm::vec3& scale ) {
+      glm::mat4 quickMatrix;
+
+      // There's always going to be a translation
+      quickMatrix = glm::translate( quickMatrix, position );
+
+      // Then rotate
+      quickMatrix = quickMatrix * glm::toMat4( rotation );
+
+      // Then scale
+      quickMatrix = glm::scale( quickMatrix, scale );
+
+      return quickMatrix;
+    }
+
     void Transform::printToLog() {
       Log::getInstance().debug( "Transform::printToLog", std::string( "\n" ) +
         "Transform Info: " + "\n" +
         "Position: " + glm::to_string( position ) + "\n" +
         "Scale: " + glm::to_string( scale ) + "\n" +
-        "Rotation: " + glm::to_string( rotation ) + "\n" +
-        "Rotation Angle: " + std::to_string( glm::degrees( getRotationAngle() ) ) + "\n" +
-        "Rotation Axes: " + glm::to_string( getRotationAxes() )
+        "Rotation: " + glm::to_string( rotation )
       );
     }
 

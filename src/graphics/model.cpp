@@ -56,6 +56,16 @@ namespace BlueBear {
       return result;
     }
 
+    glm::vec3 Model::aiToGLMvec3( aiVector3D& vector ) {
+      glm::vec3 result;
+
+      result.x = vector.x;
+      result.y = vector.y;
+      result.z = vector.z;
+
+      return result;
+    }
+
     glm::dquat Model::aiToGLMquat( aiQuaternion& quaternion ) {
       glm::dquat result;
 
@@ -269,7 +279,6 @@ namespace BlueBear {
         for( int i = 0; i != anim->mNumChannels; i++ ) {
           aiNodeAnim* nodeAnimation = anim->mChannels[ i ];
           std::shared_ptr< Model > node = findChildById( nodeAnimation->mNodeName.C_Str() );
-          glm::mat4 nodeInverse = glm::inverse( node->transform );
           std::map< double, KeyframeBuilder > builder;
 
           for( int i = 0; i != nodeAnimation->mNumPositionKeys; i++ ) {
@@ -306,27 +315,45 @@ namespace BlueBear {
           auto vectorKey = std::make_unique< aiVectorKey >();
           auto rotationKey = std::make_unique< aiQuatKey >();
           auto scalingKey = std::make_unique< aiVectorKey >();
-          auto key = builder.begin()->first;
 
-          vectorKey->mTime = key;
+          auto firstElementIterator = builder.begin();
+          auto firstElementKey = firstElementIterator->first;
+          KeyframeBuilder& firstElementBuilder = firstElementIterator->second;
+
+          vectorKey->mTime = firstElementKey;
           vectorKey->mValue = aiVector3D();
 
-          rotationKey->mTime = key;
+          rotationKey->mTime = firstElementKey;
           rotationKey->mValue = aiQuaternion( 1.0f, 0.0f, 0.0f, 0.0f );
 
-          scalingKey->mTime = key;
+          scalingKey->mTime = firstElementKey;
           scalingKey->mValue = aiVector3D( 1.0f, 1.0f, 1.0f );
 
           aiVectorKey* usablePositionKey = vectorKey.get();
           aiQuatKey* usableRotationKey = rotationKey.get();
           aiVectorKey* usableScalingKey = scalingKey.get();
 
-          /*
+          // TODO: boneToPose matrix. Built once using the first keyframe.
+          // boneToPose = glm::inverse( bone->transform ) * first file keyframe
+          // Using the zeroth keyframe, build the matrix that brings the bone to the animation pose
+          glm::mat4 firstFileKeyframe = Transform::componentsToMatrix(
+            aiToGLMvec3( firstElementBuilder.positionKey != nullptr ? firstElementBuilder.positionKey->mValue : vectorKey->mValue ),
+            aiToGLMquat( firstElementBuilder.rotationKey != nullptr ? firstElementBuilder.rotationKey->mValue : rotationKey->mValue ),
+            aiToGLMvec3( firstElementBuilder.scalingKey != nullptr ? firstElementBuilder.scalingKey->mValue : scalingKey->mValue )
+          );
+          glm::mat4 overlayOnAll = glm::inverse( glm::inverse( node->transform ) * firstFileKeyframe );
+
+
           if( std::string( nodeAnimation->mNodeName.C_Str() ) == "Bone.001" ) {
-            Log::getInstance().debug( "assertion", std::string( nodeAnimation->mNodeName.C_Str() ) );
+            Log::getInstance().debug( "Assert", "Bone transform:" );
             Transform( node->transform ).printToLog();
+
+            Log::getInstance().debug( "Assert", "First keyframe:" );
+            Transform( firstFileKeyframe ).printToLog();
+
+            Log::getInstance().debug( "Assert", "This must be done on all keyframes to undo the file pose:" );
+            Transform( overlayOnAll ).printToLog();
           }
-          */
 
           for( auto& kvPair : builder ) {
             KeyframeBuilder& kb = kvPair.second;
@@ -336,21 +363,14 @@ namespace BlueBear {
             if( kb.rotationKey != nullptr ) { usableRotationKey = kb.rotationKey; }
             if( kb.scalingKey != nullptr ) { usableScalingKey = kb.scalingKey; }
 
-            glm::mat4 transform;
-            transform = glm::translate( transform, glm::vec3( usablePositionKey->mValue.x, usablePositionKey->mValue.y, usablePositionKey->mValue.z ) );
-            transform = transform * glm::toMat4( glm::quat( usableRotationKey->mValue.w, usableRotationKey->mValue.x, usableRotationKey->mValue.y, usableRotationKey->mValue.z ) );
-            transform = glm::scale( transform, glm::vec3( usableScalingKey->mValue.x, usableScalingKey->mValue.y, usableScalingKey->mValue.z ) );
-            /*
-            if( std::string( nodeAnimation->mNodeName.C_Str() ) == "Bone.001" && kvPair.first == 60.0 ) {
-              Log::getInstance().debug( "Keyframe " + std::to_string( kvPair.first ), "This unmodified transform is:" );
-              Transform( transform ).printToLog();
-            }
-            */
-            // ¯\_(ツ)_/¯ not sure if we need this. i think the blender exporter is just fucked.
-            // keyframes are treating Y as the up axis when it's supposed to be Z
-            transform = nodeInverse * transform;
+            glm::mat4 absoluteKeyframe;
+            absoluteKeyframe = glm::translate( absoluteKeyframe, glm::vec3( usablePositionKey->mValue.x, usablePositionKey->mValue.y, usablePositionKey->mValue.z ) );
+            absoluteKeyframe = absoluteKeyframe * glm::toMat4( glm::quat( usableRotationKey->mValue.w, usableRotationKey->mValue.x, usableRotationKey->mValue.y, usableRotationKey->mValue.z ) );
+            absoluteKeyframe = glm::scale( absoluteKeyframe, glm::vec3( usableScalingKey->mValue.x, usableScalingKey->mValue.y, usableScalingKey->mValue.z ) );
 
-            animation->addKeyframe( kvPair.first, Transform( transform ) );
+            glm::mat4 relativeKeyframe = glm::inverse( node->transform ) * absoluteKeyframe;
+
+            animation->addKeyframe( kvPair.first, Transform( relativeKeyframe ) );
           }
 
         }
