@@ -4,7 +4,6 @@
 #include "graphics/material.hpp"
 #include "graphics/drawable.hpp"
 #include "graphics/keyframebundle.hpp"
-#include "graphics/bone.hpp"
 #include <exception>
 #include <string>
 #include <map>
@@ -23,7 +22,6 @@ namespace BlueBear {
     class Transform;
 
     class Model {
-      using BoneList = std::vector< Bone< Model > >;
 
       public:
         std::unique_ptr< Drawable > drawable;

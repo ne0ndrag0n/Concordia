@@ -3,7 +3,6 @@
 
 #include "graphics/transform.hpp"
 #include "graphics/drawable.hpp"
-#include "graphics/bone.hpp"
 #include <vector>
 #include <string>
 #include <memory>
