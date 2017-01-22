@@ -30,7 +30,7 @@ namespace BlueBear {
     }
 
     // Used internally to generate child nodes
-    Model::Model( aiNode* node, const aiScene* scene, Model& root, std::shared_ptr< BoneList > boneList, std::string& directory, aiMatrix4x4 parentTransform, unsigned int level ) : boneList( boneList ), directory( directory ) {
+    Model::Model( aiNode* node, const aiScene* scene, Model& root, std::string& directory, aiMatrix4x4 parentTransform, unsigned int level ) : directory( directory ) {
       processNode( node, scene, root, parentTransform, level );
     }
 
@@ -94,10 +94,6 @@ namespace BlueBear {
       // Assimp's mRootNode mTransformation is NOT CORRECT for COLLADA imports!!
       scene->mRootNode->mTransformation = aiMatrix4x4();
 
-      boneList = std::make_shared< BoneList >();
-      // push a nullptr at position 0
-      boneList->push_back( Bone< Model >{ std::shared_ptr< Model >(), glm::mat4() } );
-
       // If the root node has no meshes and only one child, just skip to that child
       if( scene->mRootNode->mNumChildren == 1 && scene->mRootNode->mNumMeshes == 0 ) {
         processNode( scene->mRootNode->mChildren[ 0 ], scene, *this, aiMatrix4x4() );
@@ -133,7 +129,7 @@ namespace BlueBear {
       }
 
       for( int i = 0; i < node->mNumChildren; i++ ) {
-        children.emplace( node->mChildren[ i ]->mName.C_Str(), std::make_unique< Model >( node->mChildren[ i ], scene, root, boneList, directory, resultantTransform, level + 1 ) );
+        children.emplace( node->mChildren[ i ]->mName.C_Str(), std::make_unique< Model >( node->mChildren[ i ], scene, root, directory, resultantTransform, level + 1 ) );
       }
 
       Log::getInstance().debug( "Model::processNode", indentation + "}" );
@@ -212,17 +208,7 @@ namespace BlueBear {
      * O(n) method, can we find a way around this?
      */
     unsigned int Model::getIndexOfNode( std::shared_ptr< Model > bone, aiMatrix4x4& ibpMatrix ) {
-      for( unsigned int i = 0; i != boneList->size(); i++ ) {
-        if( ( *boneList )[ i ].node == bone ) {
-          return i;
-        }
-      }
 
-      // It doesn't exist
-      // This has to be inverse because the FBX exporter in blender is completely broken
-      // TODO: To support a diverse number of formats, put this under a flag?
-      boneList->push_back( Bone< Model >{ bone, glm::inverse( aiToGLMmat4( ibpMatrix ) ) } );
-      return boneList->size() - 1;
     }
 
     TextureList Model::loadMaterialTextures( aiMaterial* material, aiTextureType type ) {
@@ -333,28 +319,6 @@ namespace BlueBear {
           aiQuatKey* usableRotationKey = rotationKey.get();
           aiVectorKey* usableScalingKey = scalingKey.get();
 
-          // TODO: boneToPose matrix. Built once using the first keyframe.
-          // boneToPose = glm::inverse( bone->transform ) * first file keyframe
-          // Using the zeroth keyframe, build the matrix that brings the bone to the animation pose
-          glm::mat4 firstFileKeyframe = Transform::componentsToMatrix(
-            aiToGLMvec3( firstElementBuilder.positionKey != nullptr ? firstElementBuilder.positionKey->mValue : vectorKey->mValue ),
-            aiToGLMquat( firstElementBuilder.rotationKey != nullptr ? firstElementBuilder.rotationKey->mValue : rotationKey->mValue ),
-            aiToGLMvec3( firstElementBuilder.scalingKey != nullptr ? firstElementBuilder.scalingKey->mValue : scalingKey->mValue )
-          );
-          glm::mat4 overlayOnAll = glm::inverse( glm::inverse( node->transform ) * firstFileKeyframe );
-
-
-          if( std::string( nodeAnimation->mNodeName.C_Str() ) == "Bone.001" ) {
-            Log::getInstance().debug( "Assert", "Bone transform:" );
-            Transform( node->transform ).printToLog();
-
-            Log::getInstance().debug( "Assert", "First keyframe:" );
-            Transform( firstFileKeyframe ).printToLog();
-
-            Log::getInstance().debug( "Assert", "This must be done on all keyframes to undo the file pose:" );
-            Transform( overlayOnAll ).printToLog();
-          }
-
           for( auto& kvPair : builder ) {
             KeyframeBuilder& kb = kvPair.second;
 
@@ -368,9 +332,7 @@ namespace BlueBear {
             absoluteKeyframe = absoluteKeyframe * glm::toMat4( glm::quat( usableRotationKey->mValue.w, usableRotationKey->mValue.x, usableRotationKey->mValue.y, usableRotationKey->mValue.z ) );
             absoluteKeyframe = glm::scale( absoluteKeyframe, glm::vec3( usableScalingKey->mValue.x, usableScalingKey->mValue.y, usableScalingKey->mValue.z ) );
 
-            glm::mat4 relativeKeyframe = glm::inverse( node->transform ) * absoluteKeyframe;
-
-            animation->addKeyframe( kvPair.first, Transform( relativeKeyframe ) );
+            animation->addKeyframe( kvPair.first, Transform( absoluteKeyframe ) );
           }
 
         }

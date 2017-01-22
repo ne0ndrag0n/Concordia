@@ -24,7 +24,8 @@ void main()
     vec4 pos = boneTransform * vec4( position, 1.0f );
 
     mat4 mvp = projection * view * model;
-    gl_Position = mvp * pos;
+    //gl_Position = mvp * pos;
+    gl_Position = mvp * vec4( position, 1.0f );
 
     fragTexture = texture;
 }

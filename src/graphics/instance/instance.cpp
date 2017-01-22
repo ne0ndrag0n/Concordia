@@ -18,21 +18,17 @@ namespace BlueBear {
   namespace Graphics {
 
     Instance::Instance( const Model& model ) : transform( std::make_shared< Transform >() ) {
-      boneList = std::make_shared< BoneList >();
-      for( int i = 0; i < model.boneList->size(); i++ ) {
-        boneList->push_back( Bone< Instance >{ std::shared_ptr< Instance >(), glm::mat4() } );
-      }
       animationList = std::make_shared< AnimationList >();
 
-      prepareInstanceRecursive( model, model.boneList );
+      prepareInstanceRecursive( model );
     }
 
-    Instance::Instance( const Model& model, std::shared_ptr< BoneList > boneList, std::shared_ptr< ModelBoneList > modelBones, std::shared_ptr< AnimationList > animationList )
-      : animationList( animationList ), boneList( boneList ), transform( std::make_shared< Transform >() ) {
-      prepareInstanceRecursive( model, modelBones );
+    Instance::Instance( const Model& model, std::shared_ptr< AnimationList > animationList )
+      : animationList( animationList ), transform( std::make_shared< Transform >() ) {
+      prepareInstanceRecursive( model );
     }
 
-    void Instance::prepareInstanceRecursive( const Model& model, std::shared_ptr< ModelBoneList > modelBones ) {
+    void Instance::prepareInstanceRecursive( const Model& model ) {
       // Copy the drawable
       if( model.drawable ) {
         drawable = std::make_shared< Drawable >( *model.drawable );
@@ -42,34 +38,10 @@ namespace BlueBear {
         auto& child = *( pair.second );
 
         // Hand down the same transform as the parent to this model
-        std::shared_ptr< Instance > instance = std::make_shared< Instance >( child, boneList, modelBones, animationList );
-        // Collect its animations into the master animation list
-        if( child.animations ) {
-          for( auto& pair : *child.animations ) {
-            ( *animationList )[ pair.first ].push_back( { instance, pair.second } );
-          }
-        }
-
-        findMatchingSubmodel( modelBones, pair.second, instance );
+        std::shared_ptr< Instance > instance = std::make_shared< Instance >( child, animationList );
         instance->transform->setParent( transform );
 
         children[ pair.first ] = instance;
-      }
-    }
-
-    /**
-     * Given a particular model node, see if it can be used to populate boneList
-     */
-    void Instance::findMatchingSubmodel( std::shared_ptr< ModelBoneList > modelBones, std::shared_ptr< Model > model, std::shared_ptr< Instance > inst ) {
-      for( int i = 1; i != modelBones->size(); i++ ) {
-        Bone< Model >& modelBone = modelBones->at( i );
-
-        if( modelBone.node == model ) {
-          Bone< Instance >& boneData = boneList->at( i );
-          boneData.node = inst;
-          boneData.inverseBindPose = modelBone.inverseBindPose;
-          return;
-        }
       }
     }
 
@@ -100,10 +72,10 @@ namespace BlueBear {
      * Public-facing overload
      */
     void Instance::drawEntity() {
-      drawEntity( false, false, *this );
+      drawEntity( false, *this );
     }
 
-    void Instance::drawEntity( bool dirty, bool sentBones, Instance& rootInstance ) {
+    void Instance::drawEntity( bool dirty, Instance& rootInstance ) {
 
       // If we find one transform at this level that's dirty, every subsequent transform needs to get updated
       if( animPlayer ) {
@@ -133,7 +105,6 @@ namespace BlueBear {
       }
 
       if( drawable ) {
-        sendBonesToShader( sentBones, rootInstance );
         transform->sendToShader();
         drawable->render();
       }
@@ -141,27 +112,7 @@ namespace BlueBear {
       for( auto& pair : children ) {
         // If "dirty" was true here, it'll get passed down to subsequent instances. But if "dirty" was false, and this call ends up being "dirty",
         // it should only propagate to its own children since dirty is passed by value here.
-        pair.second->drawEntity( dirty, sentBones, rootInstance );
-      }
-    }
-
-    void Instance::sendBonesToShader( bool& sentBones, Instance& rootInstance ) {
-      // This method will get called on encountering the first drawable. We're assuming bones have been transformed and conquered before any meshes.
-      // Do this expensive operation ONCE. Also makes the assumption that bones will be transformed before meshes; check your file formats.
-      if( !sentBones ) {
-        std::vector< glm::mat4 > matrices;
-        // The first one is always identity
-        matrices.push_back( glm::mat4() );
-
-        for( int i = 1; i < boneList->size(); i++ ) {
-          Bone< Instance >& bone = boneList->at( i );
-
-          matrices.push_back( bone.node->transform->localMatrix );
-        }
-
-        // TODO: Uncomment when actually ready to use. OpenGL optimizes out "bones"
-        glUniformMatrix4fv( Tools::OpenGL::getUniformLocation( "bones" ), matrices.size(), GL_FALSE, glm::value_ptr( matrices[ 0 ] ) );
-        sentBones = true;
+        pair.second->drawEntity( dirty, rootInstance );
       }
     }
 

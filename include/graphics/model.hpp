@@ -30,11 +30,8 @@ namespace BlueBear {
         std::map< std::string, std::shared_ptr< Model > > children;
         std::shared_ptr< std::map< std::string, std::shared_ptr< KeyframeBundle > > > animations;
 
-        // lazy
-        std::shared_ptr< BoneList > boneList;
-
         Model( std::string path );
-        Model( aiNode* node, const aiScene* scene, Model& root, std::shared_ptr< BoneList > boneList, std::string& directory, aiMatrix4x4 parentTransform, unsigned int level );
+        Model( aiNode* node, const aiScene* scene, Model& root, std::string& directory, aiMatrix4x4 parentTransform, unsigned int level );
 
       private:
         struct KeyframeBuilder {

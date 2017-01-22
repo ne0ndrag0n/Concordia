@@ -30,27 +30,22 @@ namespace BlueBear {
         std::shared_ptr< AnimPlayer > animPlayer;
 
         // Again, lazy
-        using BoneList = std::vector< Bone< Instance > >;
-        using ModelBoneList = std::vector< Bone< Model > >;
         struct AnimationBundle {
           std::shared_ptr< Instance > instance;
           std::shared_ptr< KeyframeBundle > keyframes;
         };
         using AnimationList = std::map< std::string, std::vector< AnimationBundle > >;
-        std::shared_ptr< BoneList > boneList;
         std::shared_ptr< AnimationList > animationList;
 
-        void prepareInstanceRecursive( const Model& model, std::shared_ptr< ModelBoneList > modelBones );
-        void drawEntity( bool dirty, bool sentBones, Instance& rootInstance );
-        void findMatchingSubmodel( std::shared_ptr< ModelBoneList > modelBones, std::shared_ptr< Model > model, std::shared_ptr< Instance > inst );
-        void sendBonesToShader( bool& sentBones, Instance& instance );
+        void prepareInstanceRecursive( const Model& model );
+        void drawEntity( bool dirty, Instance& rootInstance );
 
       public:
         std::shared_ptr< Drawable > drawable;
         std::map< std::string, std::shared_ptr< Instance > > children;
 
         Instance( const Model& model );
-        Instance( const Model& model, std::shared_ptr< BoneList > boneList, std::shared_ptr< ModelBoneList > modelBones, std::shared_ptr< AnimationList > animationList );
+        Instance( const Model& model, std::shared_ptr< AnimationList > animationList );
 
         void setAnimation( const std::string& animKey );
 
