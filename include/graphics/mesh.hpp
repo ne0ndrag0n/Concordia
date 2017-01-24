@@ -27,6 +27,8 @@ namespace BlueBear {
       private:
         GLuint VAO, VBO, EBO;
         unsigned int size;
+        std::vector< glm::mat4 > meshBoneTransforms;
+
         // Meshes depend on OpenGL global states - You really shouldn't be copying 'em.
         Mesh( const Mesh& );
         Mesh& operator=( const Mesh& );

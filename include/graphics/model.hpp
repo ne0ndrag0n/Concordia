@@ -29,9 +29,18 @@ namespace BlueBear {
         std::shared_ptr< std::map< std::string, std::shared_ptr< KeyframeBundle > > > animations;
 
         Model( std::string path );
-        Model( aiNode* node, const aiScene* scene, Model& root, std::string& directory, aiMatrix4x4 parentTransform, unsigned int level );
+        Model(
+          aiNode* node,
+          const aiScene* scene,
+          Model& root,
+          std::string& directory,
+          aiMatrix4x4 parentTransform,
+          unsigned int level,
+          Model* parent
+        );
 
       private:
+        Model* parent = nullptr;
         struct KeyframeBuilder {
           aiVectorKey* positionKey;
           aiQuatKey* rotationKey;
@@ -50,6 +59,10 @@ namespace BlueBear {
         };
         std::string directory;
         glm::mat4 transform;
+        /* This is used to track data that may be called back by an assimp method */
+        struct {
+          aiMatrix4x4 localTransform;
+        } assimpData;
 
         glm::mat4 aiToGLMmat4( aiMatrix4x4& matrix );
 
@@ -59,7 +72,9 @@ namespace BlueBear {
 
         glm::dquat aiToGLMquat( aiQuaternion& quaternion );
 
-        unsigned int getIndexOfNode( std::shared_ptr< Model > bone, aiMatrix4x4& ibpMatrix );
+        unsigned int getBoneId( std::vector< std::shared_ptr< Model > >& list, std::shared_ptr< Model > node );
+
+        glm::mat4 generatePoseMatrix( std::shared_ptr< Model > bone, aiMatrix4x4& inverseBindPose );
 
         void loadModel( std::string path );
 

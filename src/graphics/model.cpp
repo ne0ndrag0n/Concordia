@@ -30,7 +30,15 @@ namespace BlueBear {
     }
 
     // Used internally to generate child nodes
-    Model::Model( aiNode* node, const aiScene* scene, Model& root, std::string& directory, aiMatrix4x4 parentTransform, unsigned int level ) : directory( directory ) {
+    Model::Model(
+      aiNode* node,
+      const aiScene* scene,
+      Model& root,
+      std::string& directory,
+      aiMatrix4x4 parentTransform,
+      unsigned int level,
+      Model* parent
+    ) : parent( parent ), directory( directory ) {
       processNode( node, scene, root, parentTransform, level );
     }
 
@@ -116,7 +124,9 @@ namespace BlueBear {
 
       Log::getInstance().debug( "Model::processNode", indentation + "Processing " + std::string( node->mName.C_Str() ) + " { " );
 
-      aiMatrix4x4 resultantTransform = parentTransform * node->mTransformation;
+      assimpData.localTransform = node->mTransformation;
+
+      aiMatrix4x4 resultantTransform = parentTransform * assimpData.localTransform;
       transform = aiToGLMmat4( resultantTransform );
 
       if( node->mNumMeshes ) {
@@ -129,7 +139,7 @@ namespace BlueBear {
       }
 
       for( int i = 0; i < node->mNumChildren; i++ ) {
-        children.emplace( node->mChildren[ i ]->mName.C_Str(), std::make_unique< Model >( node->mChildren[ i ], scene, root, directory, resultantTransform, level + 1 ) );
+        children.emplace( node->mChildren[ i ]->mName.C_Str(), std::make_unique< Model >( node->mChildren[ i ], scene, root, directory, resultantTransform, level + 1, this ) );
       }
 
       Log::getInstance().debug( "Model::processNode", indentation + "}" );
@@ -167,6 +177,13 @@ namespace BlueBear {
         defaultMaterial = std::make_shared< Material >( loadMaterialTextures( material, aiTextureType_DIFFUSE ) );
       }
 
+      // This vector is used to insert and track nodes. O(n) but your data set should be small.
+      std::vector< std::shared_ptr< Model > > nodeTracker;
+      nodeTracker.emplace_back( nullptr );
+      // The indices here should match nodeTracker
+      std::vector< glm::mat4 > meshBoneTransforms;
+      nodeTracker.emplace_back();
+
       if( mesh->HasBones() ) {
         boneBuilders.resize( vertices.size() );
 
@@ -174,17 +191,23 @@ namespace BlueBear {
           // Can we assume that bone data is already available and in Model? Do all export formats do this?
           aiBone* boneData = mesh->mBones[ i ];
           std::shared_ptr< Model > bone = root.findChildById( boneData->mName.C_Str() );
-          unsigned int boneID = getIndexOfNode( bone, boneData->mOffsetMatrix );
+          unsigned int boneID = getBoneId( nodeTracker, bone );
+
+          if( nodeTracker.size() > meshBoneTransforms.size() ) {
+            // This occurs when a new bone was added to the nodeTracker
+            // The bone needs to have an accompanying meshBoneTransform added
+            meshBoneTransforms.emplace_back( generatePoseMatrix( bone, boneData->mOffsetMatrix ) );
+          }
 
           for( int i = 0; i != boneData->mNumWeights; i++ ) {
             aiVertexWeight& vertexAndWeight = boneData->mWeights[ i ];
-            std::vector< BoneData >& vertexBoneData = boneBuilders.at( vertexAndWeight.mVertexId );
+            std::vector< BoneData >& vertexBones = boneBuilders.at( vertexAndWeight.mVertexId );
 
-            if( vertexBoneData.size() == 4 ) {
+            if( vertexBones.size() == 4 ) {
               throw TooManyBonesException();
             }
 
-            vertexBoneData.push_back( { boneID, vertexAndWeight.mWeight } );
+            vertexBones.push_back( { boneID, vertexAndWeight.mWeight } );
           }
         }
       }
@@ -204,11 +227,28 @@ namespace BlueBear {
       drawable = std::make_unique< Drawable >( std::make_shared< Mesh >( vertices, indices ), defaultMaterial );
     }
 
-    /**
-     * O(n) method, can we find a way around this?
-     */
-    unsigned int Model::getIndexOfNode( std::shared_ptr< Model > bone, aiMatrix4x4& ibpMatrix ) {
+    unsigned int Model::getBoneId( std::vector< std::shared_ptr< Model > >& list, std::shared_ptr< Model > node ) {
+      auto it = std::find( list.begin(), list.end(), node );
 
+      if( it != list.end() ) {
+        return std::distance( list.begin(), it );
+      } else {
+        list.push_back( node );
+
+        return list.size() - 1;
+      }
+    }
+
+    glm::mat4 Model::generatePoseMatrix( std::shared_ptr< Model > bone, aiMatrix4x4& inverseBindPose ) {
+      aiMatrix4x4 result = inverseBindPose;
+      Model* node = bone.get();
+
+      while( node ) {
+        result *= node->assimpData.localTransform;
+        node = node->parent;
+      }
+
+      return aiToGLMmat4( result );
     }
 
     TextureList Model::loadMaterialTextures( aiMaterial* material, aiTextureType type ) {
