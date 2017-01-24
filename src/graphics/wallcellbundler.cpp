@@ -362,7 +362,7 @@ namespace BlueBear {
           }
       }
 
-      x->setPosition( position );
+      x->setPositionBy( position );
       x->setRotationAngle( glm::radians( 180.0f ) );
 
       std::shared_ptr< Material > material = std::make_shared< Material >( hostTextureCache.getUsingAtlas( WALLATLAS_PATH, settings ) );
@@ -543,7 +543,7 @@ namespace BlueBear {
           }
       }
 
-      y->setPosition( position );
+      y->setPositionBy( position );
       y->setRotationAngle( glm::radians( -90.0f ) );
 
       std::shared_ptr< Material > material = std::make_shared< Material >( hostTextureCache.getUsingAtlas( WALLATLAS_PATH, settings ) );
@@ -644,7 +644,7 @@ namespace BlueBear {
           break;
       }
 
-      d->setPosition( position );
+      d->setPositionBy( position );
       d->setRotationAngle( glm::radians( -45.0f ) );
       d->drawable->material = std::make_shared< Material >( hostTextureCache.getUsingAtlas( WALLATLAS_COARSE_PATH, settings ) );
     }
@@ -713,7 +713,7 @@ namespace BlueBear {
             break;
       }
 
-      r->setPosition( position );
+      r->setPositionBy( position );
       r->setRotationAngle( glm::radians( 45.0f ) );
       r->drawable->material = std::make_shared< Material >( hostTextureCache.getUsingAtlas( WALLATLAS_COARSE_PATH, settings ) );
     }

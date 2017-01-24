@@ -35,11 +35,10 @@ namespace BlueBear {
       const aiScene* scene,
       Model& root,
       std::string& directory,
-      aiMatrix4x4 parentTransform,
       unsigned int level,
       Model* parent
     ) : parent( parent ), directory( directory ) {
-      processNode( node, scene, root, parentTransform, level );
+      processNode( node, scene, root, level );
     }
 
     glm::mat4 Model::aiToGLMmat4( aiMatrix4x4& matrix ) {
@@ -104,9 +103,9 @@ namespace BlueBear {
 
       // If the root node has no meshes and only one child, just skip to that child
       if( scene->mRootNode->mNumChildren == 1 && scene->mRootNode->mNumMeshes == 0 ) {
-        processNode( scene->mRootNode->mChildren[ 0 ], scene, *this, aiMatrix4x4() );
+        processNode( scene->mRootNode->mChildren[ 0 ], scene, *this );
       } else {
-        processNode( scene->mRootNode, scene, *this, aiMatrix4x4() );
+        processNode( scene->mRootNode, scene, *this );
       }
 
       // After everything is done, walk the tree for animations and apply them to the correct nodes
@@ -116,7 +115,7 @@ namespace BlueBear {
       }
     }
 
-    void Model::processNode( aiNode* node, const aiScene* scene, Model& root, aiMatrix4x4 parentTransform, unsigned int level ) {
+    void Model::processNode( aiNode* node, const aiScene* scene, Model& root, unsigned int level ) {
       std::string indentation;
       for( int i = 0; i != level; i++ ) {
         indentation = indentation + "\t";
@@ -125,9 +124,7 @@ namespace BlueBear {
       Log::getInstance().debug( "Model::processNode", indentation + "Processing " + std::string( node->mName.C_Str() ) + " { " );
 
       assimpData.localTransform = node->mTransformation;
-
-      aiMatrix4x4 resultantTransform = parentTransform * assimpData.localTransform;
-      transform = aiToGLMmat4( resultantTransform );
+      transform = aiToGLMmat4( assimpData.localTransform );
 
       if( node->mNumMeshes ) {
         // Generally we're only going to worry about the first mesh here. Where is there ever more meshes? Blender doesn't seem to permit >1 mesh. I'll probably regret undoing this.
@@ -135,17 +132,17 @@ namespace BlueBear {
 
         Log::getInstance().debug( "Model::processNode", indentation + "\tLoading mesh " + mesh->mName.C_Str() );
 
-        this->processMesh( mesh, scene, root, node->mName.C_Str(), transform );
+        this->processMesh( mesh, scene, root, node->mName.C_Str() );
       }
 
       for( int i = 0; i < node->mNumChildren; i++ ) {
-        children.emplace( node->mChildren[ i ]->mName.C_Str(), std::make_unique< Model >( node->mChildren[ i ], scene, root, directory, resultantTransform, level + 1, this ) );
+        children.emplace( node->mChildren[ i ]->mName.C_Str(), std::make_unique< Model >( node->mChildren[ i ], scene, root, directory, level + 1, this ) );
       }
 
       Log::getInstance().debug( "Model::processNode", indentation + "}" );
      }
 
-    void Model::processMesh( aiMesh* mesh, const aiScene* scene, Model& root, std::string nodeTitle, glm::mat4 transformation ) {
+    void Model::processMesh( aiMesh* mesh, const aiScene* scene, Model& root, std::string nodeTitle ) {
       std::vector< Vertex > vertices;
       std::vector< std::vector< BoneData > > boneBuilders;
       std::vector< Index > indices;
@@ -154,7 +151,7 @@ namespace BlueBear {
 
       for( int i = 0; i < mesh->mNumVertices; i++ ) {
         Vertex vertex;
-        vertex.position = glm::vec3( transformation * aiToGLMvec4( mesh->mVertices[ i ] ) );
+        vertex.position = glm::vec3( aiToGLMvec4( mesh->mVertices[ i ] ) );
         vertex.normal = glm::vec3( mesh->mNormals[ i ].x, mesh->mNormals[ i ].y, mesh->mNormals[ i ].z );
         if( mesh->mTextureCoords[ 0 ] ) {
           vertex.textureCoordinates = glm::vec2( mesh->mTextureCoords[ 0 ][ i ].x, mesh->mTextureCoords[ 0 ][ i ].y );
@@ -177,6 +174,7 @@ namespace BlueBear {
         defaultMaterial = std::make_shared< Material >( loadMaterialTextures( material, aiTextureType_DIFFUSE ) );
       }
 
+      /*
       // This vector is used to insert and track nodes. O(n) but your data set should be small.
       std::vector< std::shared_ptr< Model > > nodeTracker;
       nodeTracker.emplace_back( nullptr );
@@ -223,6 +221,7 @@ namespace BlueBear {
           vertex.boneWeights[ boneDataIndex ] = boneData.boneWeight;
         }
       }
+      */
 
       drawable = std::make_unique< Drawable >( std::make_shared< Mesh >( vertices, indices ), defaultMaterial );
     }
@@ -240,6 +239,7 @@ namespace BlueBear {
     }
 
     glm::mat4 Model::generatePoseMatrix( std::shared_ptr< Model > bone, aiMatrix4x4& inverseBindPose ) {
+      /*
       aiMatrix4x4 result = inverseBindPose;
       Model* node = bone.get();
 
@@ -249,6 +249,7 @@ namespace BlueBear {
       }
 
       return aiToGLMmat4( result );
+      */
     }
 
     TextureList Model::loadMaterialTextures( aiMaterial* material, aiTextureType type ) {

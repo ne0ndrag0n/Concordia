@@ -17,14 +17,14 @@
 namespace BlueBear {
   namespace Graphics {
 
-    Instance::Instance( const Model& model ) : transform( std::make_shared< Transform >() ) {
+    Instance::Instance( const Model& model ) {
       animationList = std::make_shared< AnimationList >();
 
       prepareInstanceRecursive( model );
     }
 
     Instance::Instance( const Model& model, std::shared_ptr< AnimationList > animationList )
-      : animationList( animationList ), transform( std::make_shared< Transform >() ) {
+      : animationList( animationList ) {
       prepareInstanceRecursive( model );
     }
 
@@ -34,12 +34,14 @@ namespace BlueBear {
         drawable = std::make_shared< Drawable >( *model.drawable );
       }
 
+      transform = Transform( model.transform );
+
       for( auto& pair : model.children ) {
         auto& child = *( pair.second );
 
         // Hand down the same transform as the parent to this model
         std::shared_ptr< Instance > instance = std::make_shared< Instance >( child, animationList );
-        instance->transform->setParent( transform );
+        instance->transform.setParent( &transform );
 
         children[ pair.first ] = instance;
       }
@@ -52,20 +54,11 @@ namespace BlueBear {
       return children[ name ];
     }
 
-
     /**
-     * setAnimation will act the same whether or not it's called on a child node or the root node. It will activate all animations as if called from the top of the scene graph.
+     *
      */
     void Instance::setAnimation( const std::string& animKey ) {
-      auto pair = animationList->find( animKey );
-
-      if( pair != animationList->end() ) {
-        for( auto& animationBundle : pair->second ) {
-          animationBundle.instance->animPlayer = std::make_shared< AnimPlayer >( *animationBundle.keyframes );
-        }
-      } else {
-        Log::getInstance().warn( "Instance::setAnimation", "Could not find animation " + animKey );
-      }
+      // TODO
     }
 
     /**
@@ -76,36 +69,15 @@ namespace BlueBear {
     }
 
     void Instance::drawEntity( bool dirty, Instance& rootInstance ) {
-
-      // If we find one transform at this level that's dirty, every subsequent transform needs to get updated
-      if( animPlayer ) {
-        std::shared_ptr< Transform > keyframeTransform = animPlayer->generateNextFrame();
-
-        // If there is another keyframe, replace this instance's transform with the keyframe transform
-        if( keyframeTransform ) {
-          std::shared_ptr< Transform > originalParent = transform->parent;
-          transform = keyframeTransform;
-          keyframeTransform->setParent( originalParent );
-        } else {
-          // There are no frames left. Suicide this animPlayer
-          animPlayer = nullptr;
-
-          // New, original transform
-          transform = std::make_shared< Transform >();
-        }
-
-        dirty = true;
-      } else {
-        dirty = dirty || transform->dirty;
-      }
+      dirty = dirty || transform.dirty;
 
       // Update if dirty
       if( dirty ) {
-        transform->update();
+        transform.update();
       }
 
       if( drawable ) {
-        transform->sendToShader();
+        transform.sendToShader();
         drawable->render();
       }
 
@@ -117,32 +89,36 @@ namespace BlueBear {
     }
 
     glm::vec3 Instance::getPosition() {
-      return transform->getPosition();
+      return transform.getPosition();
     }
 
     void Instance::setPosition( const glm::vec3& position ) {
-      transform->setPosition( position );
+      transform.setPosition( position );
+    }
+
+    void Instance::setPositionBy( const glm::vec3& position ) {
+      transform.setPosition( transform.getPosition() + position );
     }
 
     glm::vec3 Instance::getScale() {
-      return transform->getScale();
+      return transform.getScale();
     }
 
     void Instance::setScale( const glm::vec3& scale ) {
-      transform->setScale( scale );
+      transform.setScale( scale );
     }
 
     GLfloat Instance::getRotationAngle() {
-      return transform->getRotationAngle();
+      return transform.getRotationAngle();
     }
 
     glm::vec3 Instance::getRotationAxes() {
-      return transform->getRotationAxes();
+      return transform.getRotationAxes();
     }
 
     void Instance::setRotationAngle( GLfloat rotationAngle, const glm::vec3& rotationAxes ) {
       // Generate new quat
-      transform->setRotationAngle( rotationAngle, rotationAxes );
+      transform.setRotationAngle( rotationAngle, rotationAxes );
     }
 
   }

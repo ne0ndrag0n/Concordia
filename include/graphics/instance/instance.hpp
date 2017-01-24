@@ -25,7 +25,7 @@ namespace BlueBear {
     class Instance {
 
       private:
-        std::shared_ptr< Transform > transform;
+        Transform transform;
         std::shared_ptr< AnimPlayer > animPlayer;
 
         // Again, lazy
@@ -55,6 +55,8 @@ namespace BlueBear {
         glm::vec3 getPosition();
 
         void setPosition( const glm::vec3& position );
+
+        void setPositionBy( const glm::vec3& position );
 
         glm::vec3 getScale();
 

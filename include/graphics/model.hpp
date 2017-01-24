@@ -24,6 +24,7 @@ namespace BlueBear {
     class Model {
 
       public:
+        glm::mat4 transform;
         std::unique_ptr< Drawable > drawable;
         std::map< std::string, std::shared_ptr< Model > > children;
         std::shared_ptr< std::map< std::string, std::shared_ptr< KeyframeBundle > > > animations;
@@ -34,7 +35,6 @@ namespace BlueBear {
           const aiScene* scene,
           Model& root,
           std::string& directory,
-          aiMatrix4x4 parentTransform,
           unsigned int level,
           Model* parent
         );
@@ -58,7 +58,6 @@ namespace BlueBear {
 
         };
         std::string directory;
-        glm::mat4 transform;
         /* This is used to track data that may be called back by an assimp method */
         struct {
           aiMatrix4x4 localTransform;
@@ -78,9 +77,9 @@ namespace BlueBear {
 
         void loadModel( std::string path );
 
-        void processNode( aiNode* node, const aiScene* scene, Model& root, aiMatrix4x4 parentTransform, unsigned int level = 0 );
+        void processNode( aiNode* node, const aiScene* scene, Model& root, unsigned int level = 0 );
 
-        void processMesh( aiMesh* mesh, const aiScene* scene, Model& root, std::string nodeTitle, glm::mat4 transformation );
+        void processMesh( aiMesh* mesh, const aiScene* scene, Model& root, std::string nodeTitle );
 
         TextureList loadMaterialTextures( aiMaterial* material, aiTextureType type );
 

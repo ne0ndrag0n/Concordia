@@ -78,7 +78,7 @@ namespace BlueBear {
       glUniformMatrix4fv( Tools::OpenGL::getUniformLocation( "model" ), 1, GL_FALSE, glm::value_ptr( matrix ) );
     }
 
-    void Transform::setParent( std::shared_ptr< Transform > parent ) {
+    void Transform::setParent( Transform* parent ) {
       this->parent = parent;
     }
 
