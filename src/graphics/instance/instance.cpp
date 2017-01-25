@@ -121,5 +121,9 @@ namespace BlueBear {
       transform.setRotationAngle( rotationAngle, rotationAxes );
     }
 
+    Transform& Instance::getTransform() {
+      return transform;
+    }
+
   }
 }

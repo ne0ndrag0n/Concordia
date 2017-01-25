@@ -173,7 +173,7 @@ namespace BlueBear {
     void WallCellBundler::newXWallInstance( Containers::Collection3D< std::shared_ptr< WallCellBundler > >& hostCollection, std::string& frontWallpaper, std::string& backWallpaper ) {
       x = std::make_unique< Instance >( *WallCellBundler::Piece );
 
-      glm::vec3 position( center.x, center.y + 0.9f, center.z );
+      glm::vec3 position( center.x, center.y, center.z );
 
       std::map< std::string, std::unique_ptr< ImageSource > > settings;
       SegmentBundle front = getSegmentBundle( frontWallpaper );
@@ -375,7 +375,7 @@ namespace BlueBear {
     void WallCellBundler::newYWallInstance( Containers::Collection3D< std::shared_ptr< WallCellBundler > >& hostCollection, std::string& frontWallpaper, std::string& backWallpaper ) {
       y = std::make_unique< Instance >( *WallCellBundler::Piece );
 
-      glm::vec3 position( center.x - 0.9f, center.y, center.z );
+      glm::vec3 position( center.x - 0.45f, center.y - 0.45f, center.z );
 
       std::map< std::string, std::unique_ptr< ImageSource > > settings;
       SegmentBundle front = getSegmentBundle( frontWallpaper );
