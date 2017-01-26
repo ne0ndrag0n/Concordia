@@ -174,13 +174,12 @@ namespace BlueBear {
         defaultMaterial = std::make_shared< Material >( loadMaterialTextures( material, aiTextureType_DIFFUSE ) );
       }
 
-      /*
       // This vector is used to insert and track nodes. O(n) but your data set should be small.
       std::vector< std::shared_ptr< Model > > nodeTracker;
       nodeTracker.emplace_back( nullptr );
       // The indices here should match nodeTracker
-      std::vector< glm::mat4 > meshBoneTransforms;
-      nodeTracker.emplace_back();
+      std::vector< glm::mat4 > inverseBindPoses;
+      inverseBindPoses.emplace_back();
 
       if( mesh->HasBones() ) {
         boneBuilders.resize( vertices.size() );
@@ -191,10 +190,10 @@ namespace BlueBear {
           std::shared_ptr< Model > bone = root.findChildById( boneData->mName.C_Str() );
           unsigned int boneID = getBoneId( nodeTracker, bone );
 
-          if( nodeTracker.size() > meshBoneTransforms.size() ) {
+          if( nodeTracker.size() > inverseBindPoses.size() ) {
             // This occurs when a new bone was added to the nodeTracker
             // The bone needs to have an accompanying meshBoneTransform added
-            meshBoneTransforms.emplace_back( generatePoseMatrix( bone, boneData->mOffsetMatrix ) );
+            inverseBindPoses.emplace_back( generateInversePoseMatrix( bone ) );
           }
 
           for( int i = 0; i != boneData->mNumWeights; i++ ) {
@@ -221,7 +220,6 @@ namespace BlueBear {
           vertex.boneWeights[ boneDataIndex ] = boneData.boneWeight;
         }
       }
-      */
 
       drawable = std::make_unique< Drawable >( std::make_shared< Mesh >( vertices, indices ), defaultMaterial );
     }
@@ -238,18 +236,16 @@ namespace BlueBear {
       }
     }
 
-    glm::mat4 Model::generatePoseMatrix( std::shared_ptr< Model > bone, aiMatrix4x4& inverseBindPose ) {
-      /*
-      aiMatrix4x4 result = inverseBindPose;
+    glm::mat4 Model::generateInversePoseMatrix( std::shared_ptr< Model > bone ) {
+      glm::mat4 result;
       Model* node = bone.get();
 
       while( node ) {
-        result *= node->assimpData.localTransform;
+        result = node->transform * result;
         node = node->parent;
       }
 
-      return aiToGLMmat4( result );
-      */
+      return glm::inverse( result );
     }
 
     TextureList Model::loadMaterialTextures( aiMaterial* material, aiTextureType type ) {

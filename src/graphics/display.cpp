@@ -165,7 +165,7 @@ namespace BlueBear {
       dynamicInstances.emplace_back( camera, "system/shaders/default_vertex.glsl", "system/shaders/default_fragment.glsl" );
 
       dynamicInstances[ 0 ].instances.emplace_back( *__debugModel );
-      dynamicInstances[ 0 ].instances[ 0 ].setPositionBy( glm::vec3( 0.0f, 2.5f, 0.0f ) );
+      //dynamicInstances[ 0 ].instances[ 0 ].setPositionBy( glm::vec3( 0.0f, 2.5f, 0.0f ) );
 
       // Moving much of Display::loadInfrastructure here
       loadInfrastructure();

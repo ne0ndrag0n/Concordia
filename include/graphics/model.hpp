@@ -73,7 +73,7 @@ namespace BlueBear {
 
         unsigned int getBoneId( std::vector< std::shared_ptr< Model > >& list, std::shared_ptr< Model > node );
 
-        glm::mat4 generatePoseMatrix( std::shared_ptr< Model > bone, aiMatrix4x4& inverseBindPose );
+        glm::mat4 generateInversePoseMatrix( std::shared_ptr< Model > bone );
 
         void loadModel( std::string path );
 
