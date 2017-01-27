@@ -8,6 +8,7 @@
 #include <string>
 #include <map>
 #include <memory>
+#include <functional>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -20,6 +21,7 @@ namespace BlueBear {
   namespace Graphics {
     class Drawable;
     class Transform;
+    class Armature;
 
     class Model {
 
@@ -28,6 +30,7 @@ namespace BlueBear {
         std::unique_ptr< Drawable > drawable;
         std::map< std::string, std::shared_ptr< Model > > children;
         std::shared_ptr< std::map< std::string, std::shared_ptr< KeyframeBundle > > > animations;
+        std::shared_ptr< Armature > inverseBind;
 
         Model( std::string path );
         Model(
@@ -38,6 +41,14 @@ namespace BlueBear {
           unsigned int level,
           Model* parent
         );
+
+        static glm::mat4 aiToGLMmat4( aiMatrix4x4& matrix );
+
+        static glm::vec4 aiToGLMvec4( aiVector3D& vector );
+
+        static glm::vec3 aiToGLMvec3( aiVector3D& vector );
+
+        static glm::dquat aiToGLMquat( aiQuaternion& quaternion );
 
       private:
         Model* parent = nullptr;
@@ -63,13 +74,7 @@ namespace BlueBear {
           aiMatrix4x4 localTransform;
         } assimpData;
 
-        glm::mat4 aiToGLMmat4( aiMatrix4x4& matrix );
-
-        glm::vec4 aiToGLMvec4( aiVector3D& vector );
-
-        glm::vec3 aiToGLMvec3( aiVector3D& vector );
-
-        glm::dquat aiToGLMquat( aiQuaternion& quaternion );
+        bool alternateAction( aiNode* node, Model& root );
 
         unsigned int getBoneId( std::vector< std::shared_ptr< Model > >& list, std::shared_ptr< Model > node );
 

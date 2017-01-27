@@ -4,6 +4,7 @@
 #include "graphics/drawable.hpp"
 #include "graphics/texture.hpp"
 #include "graphics/transform.hpp"
+#include "graphics/armature/armature.hpp"
 #include "tools/utility.hpp"
 #include "exceptions/itemnotfound.hpp"
 #include "log.hpp"
@@ -110,8 +111,8 @@ namespace BlueBear {
 
       // After everything is done, walk the tree for animations and apply them to the correct nodes
       if( scene->HasAnimations() ) {
-        Log::getInstance().debug( "Model::loadModel", "Loading animations for " + path );
-        loadAnimations( scene->mAnimations, scene->mNumAnimations );
+        //Log::getInstance().debug( "Model::loadModel", "Loading animations for " + path );
+        //loadAnimations( scene->mAnimations, scene->mNumAnimations );
       }
     }
 
@@ -136,11 +137,30 @@ namespace BlueBear {
       }
 
       for( int i = 0; i < node->mNumChildren; i++ ) {
-        children.emplace( node->mChildren[ i ]->mName.C_Str(), std::make_unique< Model >( node->mChildren[ i ], scene, root, directory, level + 1, this ) );
+        // If mName fits a special case, call that and don't add the node! Otherwise, add it.
+        aiNode* nextNode = node->mChildren[ i ];
+
+        if( !alternateAction( nextNode, root ) ) {
+          children.emplace( nextNode->mName.C_Str(), std::make_unique< Model >( nextNode, scene, root, directory, level + 1, this ) );
+        } else {
+          Log::getInstance().debug( "Model::processNode", indentation + "\tLoaded " + std::string( nextNode->mName.C_Str() ) );
+        }
       }
 
       Log::getInstance().debug( "Model::processNode", indentation + "}" );
      }
+
+    bool Model::alternateAction( aiNode* node, Model& root ) {
+      const char* id = node->mName.C_Str();
+
+      switch( Tools::Utility::hash( id ) ) {
+        case Tools::Utility::hash( "Armature" ):
+          root.inverseBind = std::make_shared< Armature >( node, true );
+          return true;
+        default:
+          return false;
+      }
+    }
 
     void Model::processMesh( aiMesh* mesh, const aiScene* scene, Model& root, std::string nodeTitle ) {
       std::vector< Vertex > vertices;
@@ -174,6 +194,7 @@ namespace BlueBear {
         defaultMaterial = std::make_shared< Material >( loadMaterialTextures( material, aiTextureType_DIFFUSE ) );
       }
 
+      /*
       // This vector is used to insert and track nodes. O(n) but your data set should be small.
       std::vector< std::shared_ptr< Model > > nodeTracker;
       nodeTracker.emplace_back( nullptr );
@@ -220,6 +241,7 @@ namespace BlueBear {
           vertex.boneWeights[ boneDataIndex ] = boneData.boneWeight;
         }
       }
+      */
 
       drawable = std::make_unique< Drawable >( std::make_shared< Mesh >( vertices, indices ), defaultMaterial );
     }
