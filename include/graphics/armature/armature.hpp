@@ -11,11 +11,11 @@ namespace BlueBear {
     public:
       Skeleton skeletons;
 
-      void invertSkeletons();
+      void invertSkeletons( Skeleton& currentLevel );
       Armature( aiNode* armatureNode, bool invert = false );
 
     private:
-      void loadLevel( aiNode* node, Skeleton& currentLevel, glm::mat4 cumulativeTransform );
+      void loadLevel( aiNode* node, Skeleton& currentLevel, glm::mat4 parentTransform );
     };
 
   }
