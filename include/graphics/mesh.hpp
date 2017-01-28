@@ -12,6 +12,7 @@
 
 namespace BlueBear {
   namespace Graphics {
+    class Armature;
     class Model;
 
     struct Vertex {
@@ -27,19 +28,24 @@ namespace BlueBear {
       private:
         GLuint VAO, VBO, EBO;
         unsigned int size;
-        std::vector< glm::mat4 > meshBoneTransforms;
+
+        std::vector< std::string > boneIndices;
+        std::shared_ptr< Armature > inverseBind;
 
         // Meshes depend on OpenGL global states - You really shouldn't be copying 'em.
         Mesh( const Mesh& );
         Mesh& operator=( const Mesh& );
 
-        virtual void sendMetadataToShader();
-
       public:
-        Mesh( std::vector< Vertex >& vertices, std::vector< Index >& indices );
+        Mesh(
+          std::vector< Vertex >& vertices,
+          std::vector< Index >& indices,
+          std::vector< std::string > boneIndices,
+          std::shared_ptr< Armature > inverseBind
+        );
         virtual ~Mesh();
         void setupMesh( std::vector< Vertex >& vertices, std::vector< Index >& indices );
-        void drawElements();
+        void drawElements( std::shared_ptr< Armature > currentPose = nullptr );
     };
   }
 }

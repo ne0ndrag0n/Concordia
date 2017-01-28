@@ -1,4 +1,7 @@
 #include "graphics/mesh.hpp"
+#include "graphics/armature/armature.hpp"
+#include "tools/opengl.hpp"
+#include <memory>
 #include <vector>
 #include <GL/glew.h>
 
@@ -6,7 +9,12 @@
 namespace BlueBear {
   namespace Graphics {
 
-    Mesh::Mesh( std::vector< Vertex >& vertices, std::vector< Index >& indices ) : size( indices.size() ) {
+    Mesh::Mesh(
+      std::vector< Vertex >& vertices,
+      std::vector< Index >& indices,
+      std::vector< std::string > boneIndices,
+      std::shared_ptr< Armature > inverseBind
+    ) : boneIndices( boneIndices ), inverseBind( inverseBind ), size( indices.size() ) {
       setupMesh( vertices, indices );
     }
 
@@ -43,20 +51,26 @@ namespace BlueBear {
       glBindVertexArray( 0 );
     }
 
-    void Mesh::drawElements() {
-      sendMetadataToShader();
+    void Mesh::drawElements( std::shared_ptr< Armature > currentPose ) {
+      std::vector< glm::mat4 > boneUniform;
+      // Bone uniform 0 is always identity (for boneless meshes)
+      boneUniform.push_back( glm::mat4() );
+
+      if( inverseBind && currentPose ) {
+        // Mesh has associated bones that must be computed
+        for( std::string& bone : boneIndices ) {
+          boneUniform.push_back(
+            inverseBind->getMatrix( bone ) * currentPose->getMatrix( bone )
+          );
+        }
+      }
+
+      // Write uniforms to shader
+      //glUniformMatrix4fv( Tools::OpenGL::getUniformLocation( "bones" ), boneUniform.size(), GL_FALSE, glm::value_ptr( boneUniform[ 0 ] ) );
 
       glBindVertexArray( VAO );
         glDrawElements( GL_TRIANGLES, size, GL_UNSIGNED_INT, 0 );
       glBindVertexArray( 0 );
     }
-
-    /**
-     * This is mainly used by descendant classes to send additional uniform metadata to the shader (mode uniform, bones)
-     */
-    void Mesh::sendMetadataToShader() {
-
-    }
-
   }
 }

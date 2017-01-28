@@ -33,5 +33,37 @@ namespace BlueBear {
       }
     }
 
+    glm::mat4 Armature::getMatrix( const std::string& id ) {
+      glm::mat4* intermediate = getMatrixProxy( id, skeletons );
+
+      if( intermediate ) {
+        return *intermediate;
+      }
+
+      throw BoneNotFoundException();
+    }
+
+    glm::mat4* Armature::getMatrixProxy( const std::string& id, Skeleton& level ) {
+      // Exhibit A: Why RAII is shit
+
+      auto it = level.find( id );
+
+      if( it != level.end() ) {
+        return &it->second.transform;
+      }
+
+      for( auto& pair : level ) {
+        Bone& bone = pair.second;
+
+        glm::mat4* result = getMatrixProxy( id, bone.children );
+        if( result ) {
+          return result;
+        }
+      }
+
+      return nullptr;
+
+    }
+
   }
 }

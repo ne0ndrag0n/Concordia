@@ -194,28 +194,14 @@ namespace BlueBear {
         defaultMaterial = std::make_shared< Material >( loadMaterialTextures( material, aiTextureType_DIFFUSE ) );
       }
 
-      /*
-      // This vector is used to insert and track nodes. O(n) but your data set should be small.
-      std::vector< std::shared_ptr< Model > > nodeTracker;
-      nodeTracker.emplace_back( nullptr );
-      // The indices here should match nodeTracker
-      std::vector< glm::mat4 > inverseBindPoses;
-      inverseBindPoses.emplace_back();
+      std::vector< std::string > boneIndices;
 
       if( mesh->HasBones() ) {
         boneBuilders.resize( vertices.size() );
 
         for( int i = 0; i != mesh->mNumBones; i++ ) {
-          // Can we assume that bone data is already available and in Model? Do all export formats do this?
           aiBone* boneData = mesh->mBones[ i ];
-          std::shared_ptr< Model > bone = root.findChildById( boneData->mName.C_Str() );
-          unsigned int boneID = getBoneId( nodeTracker, bone );
-
-          if( nodeTracker.size() > inverseBindPoses.size() ) {
-            // This occurs when a new bone was added to the nodeTracker
-            // The bone needs to have an accompanying meshBoneTransform added
-            inverseBindPoses.emplace_back( generateInversePoseMatrix( bone ) );
-          }
+          unsigned int boneID = getBoneId( boneIndices, boneData->mName.C_Str() );
 
           for( int i = 0; i != boneData->mNumWeights; i++ ) {
             aiVertexWeight& vertexAndWeight = boneData->mWeights[ i ];
@@ -241,33 +227,24 @@ namespace BlueBear {
           vertex.boneWeights[ boneDataIndex ] = boneData.boneWeight;
         }
       }
-      */
 
-      drawable = std::make_unique< Drawable >( std::make_shared< Mesh >( vertices, indices ), defaultMaterial );
+      drawable = std::make_unique< Drawable >(
+        std::make_shared< Mesh >( vertices, indices, boneIndices, inverseBind ),
+        defaultMaterial
+      );
     }
 
-    unsigned int Model::getBoneId( std::vector< std::shared_ptr< Model > >& list, std::shared_ptr< Model > node ) {
-      auto it = std::find( list.begin(), list.end(), node );
+    unsigned int Model::getBoneId( std::vector< std::string >& list, const std::string& nodeID ) {
+      auto it = std::find( list.begin(), list.end(), nodeID );
 
       if( it != list.end() ) {
-        return std::distance( list.begin(), it );
+        return std::distance( list.begin(), it ) + 1;
       } else {
-        list.push_back( node );
+        list.push_back( nodeID );
 
-        return list.size() - 1;
+        // Implicitly add "1" to every index because index 0 is an identity matrix for non-boned meshes
+        return list.size();
       }
-    }
-
-    glm::mat4 Model::generateInversePoseMatrix( std::shared_ptr< Model > bone ) {
-      glm::mat4 result;
-      Model* node = bone.get();
-
-      while( node ) {
-        result = node->transform * result;
-        node = node->parent;
-      }
-
-      return glm::inverse( result );
     }
 
     TextureList Model::loadMaterialTextures( aiMaterial* material, aiTextureType type ) {
