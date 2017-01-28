@@ -111,8 +111,8 @@ namespace BlueBear {
 
       // After everything is done, walk the tree for animations and apply them to the correct nodes
       if( scene->HasAnimations() ) {
-        //Log::getInstance().debug( "Model::loadModel", "Loading animations for " + path );
-        //loadAnimations( scene->mAnimations, scene->mNumAnimations );
+        Log::getInstance().debug( "Model::loadModel", "Loading animations for " + path );
+        loadAnimations( scene->mAnimations, scene->mNumAnimations );
       }
     }
 
@@ -301,7 +301,8 @@ namespace BlueBear {
         // Each channel controls the behaviour of one particular node
         for( int i = 0; i != anim->mNumChannels; i++ ) {
           aiNodeAnim* nodeAnimation = anim->mChannels[ i ];
-          std::shared_ptr< Model > node = findChildById( nodeAnimation->mNodeName.C_Str() );
+          std::string nodeID = nodeAnimation->mNodeName.C_Str();
+          Log::getInstance().debug( "Model::loadAnimations", "Series of keyframes for node: " + nodeID );
           std::map< double, KeyframeBuilder > builder;
 
           for( int i = 0; i != nodeAnimation->mNumPositionKeys; i++ ) {
@@ -322,11 +323,7 @@ namespace BlueBear {
             builder[ scalingKey.mTime ].scalingKey = &scalingKey;
           }
 
-          if( !node->animations ) {
-            node->animations = std::make_shared< std::map< std::string, std::shared_ptr< KeyframeBundle > > >();
-          }
-
-          std::map< std::string, std::shared_ptr< KeyframeBundle > >& nodeAnimList = *node->animations;
+          std::map< std::string, std::shared_ptr< KeyframeBundle > > nodeAnimList;
 
           std::shared_ptr< KeyframeBundle > animation = nodeAnimList[ anim->mName.C_Str() ] = std::make_shared< KeyframeBundle >( anim->mTicksPerSecond, anim->mDuration );
 
