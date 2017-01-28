@@ -156,7 +156,6 @@ namespace BlueBear {
       switch( Tools::Utility::hash( id ) ) {
         case Tools::Utility::hash( "Armature" ):
           root.bind = std::make_shared< Armature >( node );
-          root.inverseBind = std::make_shared< Armature >( node, true );
           return true;
         default:
           return false;
@@ -230,7 +229,7 @@ namespace BlueBear {
       }
 
       drawable = std::make_unique< Drawable >(
-        std::make_shared< Mesh >( vertices, indices, boneIndices, root.inverseBind ),
+        std::make_shared< Mesh >( vertices, indices, boneIndices, root.bind ),
         defaultMaterial
       );
     }

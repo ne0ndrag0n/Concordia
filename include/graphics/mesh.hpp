@@ -30,7 +30,7 @@ namespace BlueBear {
         unsigned int size;
 
         std::vector< std::string > boneIndices;
-        std::shared_ptr< Armature > inverseBind;
+        std::shared_ptr< Armature > bind;
 
         // Meshes depend on OpenGL global states - You really shouldn't be copying 'em.
         Mesh( const Mesh& );
@@ -41,7 +41,7 @@ namespace BlueBear {
           std::vector< Vertex >& vertices,
           std::vector< Index >& indices,
           std::vector< std::string > boneIndices,
-          std::shared_ptr< Armature > inverseBind
+          std::shared_ptr< Armature > bind
         );
         virtual ~Mesh();
         void setupMesh( std::vector< Vertex >& vertices, std::vector< Index >& indices );

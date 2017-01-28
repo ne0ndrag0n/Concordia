@@ -6,62 +6,50 @@
 namespace BlueBear {
   namespace Graphics {
 
-    Armature::Armature( aiNode* armatureNode, bool invert ) {
-      loadLevel( armatureNode, skeletons, glm::mat4() );
-
-      if( invert ) {
-        invertSkeletons( skeletons );
-      }
+    Armature::Armature( aiNode* armatureNode ) {
+      loadLevel( armatureNode, skeletons );
     }
 
-    void Armature::invertSkeletons( Skeleton& currentLevel ) {
-      for( auto& pair : currentLevel ) {
-        pair.second.transform = glm::inverse( pair.second.transform );
-
-        invertSkeletons( pair.second.children );
-      }
-    }
-
-    void Armature::loadLevel( aiNode* node, Skeleton& currentLevel, glm::mat4 parentTransform ) {
+    void Armature::loadLevel( aiNode* node, Skeleton& currentLevel ) {
       for( int i = 0; i < node->mNumChildren; i++ ) {
         aiNode* boneNode = node->mChildren[ i ];
-        glm::mat4 boneTransform = parentTransform * Model::aiToGLMmat4( boneNode->mTransformation );
 
-        Bone& newBone = currentLevel[ boneNode->mName.C_Str() ] = Bone{ boneTransform, Skeleton() };
+        Bone& newBone = currentLevel[ boneNode->mName.C_Str() ] = Bone{ Model::aiToGLMmat4( boneNode->mTransformation ), Skeleton() };
 
-        loadLevel( boneNode, newBone.children, boneTransform );
+        loadLevel( boneNode, newBone.children );
       }
     }
 
     glm::mat4 Armature::getMatrix( const std::string& id ) {
-      glm::mat4* intermediate = getMatrixProxy( id, skeletons );
+      BoneDiscovery intermediate = getMatrixProxy( id, skeletons, glm::mat4() );
 
-      if( intermediate ) {
-        return *intermediate;
+      if( intermediate.result ) {
+        return intermediate.hierarchy * *intermediate.result;
       }
 
       throw BoneNotFoundException();
     }
 
-    glm::mat4* Armature::getMatrixProxy( const std::string& id, Skeleton& level ) {
+    Armature::BoneDiscovery Armature::getMatrixProxy( const std::string& id, Skeleton& level, glm::mat4 parent ) {
       // Exhibit A: Why RAII is shit
 
       auto it = level.find( id );
 
       if( it != level.end() ) {
-        return &it->second.transform;
+        return BoneDiscovery{ parent, &it->second.transform };
       }
 
       for( auto& pair : level ) {
         Bone& bone = pair.second;
 
-        glm::mat4* result = getMatrixProxy( id, bone.children );
-        if( result ) {
+        BoneDiscovery result = getMatrixProxy( id, bone.children, bone.transform * parent );
+        if( result.result ) {
           return result;
         }
       }
 
-      return nullptr;
+      // The value of hierarchy for a BoneDiscovery when result is nullptr is unusable and undefined behaviour
+      return BoneDiscovery{ parent, nullptr };
 
     }
 

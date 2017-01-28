@@ -16,8 +16,8 @@ namespace BlueBear {
       std::vector< Vertex >& vertices,
       std::vector< Index >& indices,
       std::vector< std::string > boneIndices,
-      std::shared_ptr< Armature > inverseBind
-    ) : boneIndices( boneIndices ), inverseBind( inverseBind ), size( indices.size() ) {
+      std::shared_ptr< Armature > bind
+    ) : boneIndices( boneIndices ), bind( bind ), size( indices.size() ) {
       setupMesh( vertices, indices );
     }
 
@@ -59,10 +59,12 @@ namespace BlueBear {
       // Bone uniform 0 is always identity (for boneless meshes)
       boneUniform.push_back( glm::mat4() );
 
-      if( inverseBind && currentPose ) {
+      if( bind && currentPose ) {
         // Mesh has associated bones that must be computed
         for( std::string& bone : boneIndices ) {
-          boneUniform.push_back( inverseBind->getMatrix( bone ) * currentPose->getMatrix( bone ) );
+          boneUniform.push_back(
+            glm::inverse( bind->getMatrix( bone ) ) * currentPose->getMatrix( bone ) 
+          );
         }
       }
 

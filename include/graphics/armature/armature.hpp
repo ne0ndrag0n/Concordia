@@ -13,7 +13,7 @@ namespace BlueBear {
       Skeleton skeletons;
 
       void invertSkeletons( Skeleton& currentLevel );
-      Armature( aiNode* armatureNode, bool invert = false );
+      Armature( aiNode* armatureNode );
       struct BoneNotFoundException : public std::exception {
         const char* what() const throw() {
           return "Bone ID not found!";
@@ -23,9 +23,13 @@ namespace BlueBear {
       glm::mat4 getMatrix( const std::string& id );
 
     private:
-      void loadLevel( aiNode* node, Skeleton& currentLevel, glm::mat4 parentTransform );
+      struct BoneDiscovery {
+        glm::mat4 hierarchy;
+        glm::mat4* result;
+      };
+      void loadLevel( aiNode* node, Skeleton& currentLevel );
 
-      glm::mat4* getMatrixProxy( const std::string& id, Skeleton& level );
+      BoneDiscovery getMatrixProxy( const std::string& id, Skeleton& level, glm::mat4 parent );
     };
 
   }
