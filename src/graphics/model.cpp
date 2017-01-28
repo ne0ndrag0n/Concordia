@@ -112,6 +112,7 @@ namespace BlueBear {
       // After everything is done, walk the tree for animations and apply them to the correct nodes
       if( scene->HasAnimations() ) {
         Log::getInstance().debug( "Model::loadModel", "Loading animations for " + path );
+        animations = std::make_shared< std::map< std::string, KeyframeBundleMap > >();
         loadAnimations( scene->mAnimations, scene->mNumAnimations );
       }
     }
@@ -297,77 +298,79 @@ namespace BlueBear {
           "Mesh Channels: " + std::to_string( anim->mNumMeshChannels )
         );
 
+        KeyframeBundleMap& currentAnimation = ( *animations )[ anim->mName.C_Str() ];
+
         // Each channel controls the behaviour of one particular node
         for( int i = 0; i != anim->mNumChannels; i++ ) {
           aiNodeAnim* nodeAnimation = anim->mChannels[ i ];
           std::string nodeID = nodeAnimation->mNodeName.C_Str();
-          Log::getInstance().debug( "Model::loadAnimations", "Series of keyframes for node: " + nodeID );
-          std::map< double, KeyframeBuilder > builder;
 
-          for( int i = 0; i != nodeAnimation->mNumPositionKeys; i++ ) {
-            aiVectorKey& positionKey = nodeAnimation->mPositionKeys[ i ];
+          if( nodeID != "Armature" ) {
+            Log::getInstance().debug( "Model::loadAnimations", "Adding " + std::string( anim->mName.C_Str() ) + " keyframes for node " + nodeID );
+            std::map< double, KeyframeBuilder > builder;
 
-            builder[ positionKey.mTime ].positionKey = &positionKey;
+            for( int i = 0; i != nodeAnimation->mNumPositionKeys; i++ ) {
+              aiVectorKey& positionKey = nodeAnimation->mPositionKeys[ i ];
+
+              builder[ positionKey.mTime ].positionKey = &positionKey;
+            }
+
+            for( int i = 0; i != nodeAnimation->mNumRotationKeys; i++ ) {
+              aiQuatKey& rotationKey = nodeAnimation->mRotationKeys[ i ];
+
+              builder[ rotationKey.mTime ].rotationKey = &rotationKey;
+            }
+
+            for( int i = 0; i != nodeAnimation->mNumScalingKeys; i++ ) {
+              aiVectorKey& scalingKey = nodeAnimation->mScalingKeys[ i ];
+
+              builder[ scalingKey.mTime ].scalingKey = &scalingKey;
+            }
+
+            KeyframeBundle& nodeSet = currentAnimation[ nodeID ];
+
+            // Add an identity transform at 0.0 to ensure correct interpolation
+            nodeSet.addKeyframe( 0.0, Transform() );
+
+            // Use the keyframes in builder to assemble a premade list of transformation matrices
+            // If there is a nullptr in any of the keys, use the one previous to the one in the list
+            auto vectorKey = std::make_unique< aiVectorKey >();
+            auto rotationKey = std::make_unique< aiQuatKey >();
+            auto scalingKey = std::make_unique< aiVectorKey >();
+
+            auto firstElementIterator = builder.begin();
+            auto firstElementKey = firstElementIterator->first;
+            KeyframeBuilder& firstElementBuilder = firstElementIterator->second;
+
+            vectorKey->mTime = firstElementKey;
+            vectorKey->mValue = aiVector3D();
+
+            rotationKey->mTime = firstElementKey;
+            rotationKey->mValue = aiQuaternion( 1.0f, 0.0f, 0.0f, 0.0f );
+
+            scalingKey->mTime = firstElementKey;
+            scalingKey->mValue = aiVector3D( 1.0f, 1.0f, 1.0f );
+
+            aiVectorKey* usablePositionKey = vectorKey.get();
+            aiQuatKey* usableRotationKey = rotationKey.get();
+            aiVectorKey* usableScalingKey = scalingKey.get();
+
+            for( auto& kvPair : builder ) {
+              KeyframeBuilder& kb = kvPair.second;
+
+              // Set the next group of usable keys - nulls will just use the last one set
+              if( kb.positionKey != nullptr ) { usablePositionKey = kb.positionKey; }
+              if( kb.rotationKey != nullptr ) { usableRotationKey = kb.rotationKey; }
+              if( kb.scalingKey != nullptr ) { usableScalingKey = kb.scalingKey; }
+
+              glm::mat4 absoluteKeyframe;
+              absoluteKeyframe = glm::translate( absoluteKeyframe, glm::vec3( usablePositionKey->mValue.x, usablePositionKey->mValue.y, usablePositionKey->mValue.z ) );
+              absoluteKeyframe = absoluteKeyframe * glm::toMat4( glm::quat( usableRotationKey->mValue.w, usableRotationKey->mValue.x, usableRotationKey->mValue.y, usableRotationKey->mValue.z ) );
+              absoluteKeyframe = glm::scale( absoluteKeyframe, glm::vec3( usableScalingKey->mValue.x, usableScalingKey->mValue.y, usableScalingKey->mValue.z ) );
+
+              nodeSet.addKeyframe( kvPair.first, Transform( absoluteKeyframe ) );
+            }
           }
-
-          for( int i = 0; i != nodeAnimation->mNumRotationKeys; i++ ) {
-            aiQuatKey& rotationKey = nodeAnimation->mRotationKeys[ i ];
-
-            builder[ rotationKey.mTime ].rotationKey = &rotationKey;
-          }
-
-          for( int i = 0; i != nodeAnimation->mNumScalingKeys; i++ ) {
-            aiVectorKey& scalingKey = nodeAnimation->mScalingKeys[ i ];
-
-            builder[ scalingKey.mTime ].scalingKey = &scalingKey;
-          }
-
-          std::map< std::string, std::shared_ptr< KeyframeBundle > > nodeAnimList;
-
-          std::shared_ptr< KeyframeBundle > animation = nodeAnimList[ anim->mName.C_Str() ] = std::make_shared< KeyframeBundle >( anim->mTicksPerSecond, anim->mDuration );
-
-          // Add an identity transform at 0.0 to ensure correct interpolation
-          animation->addKeyframe( 0.0, Transform() );
-
-          // Use the keyframes in builder to assemble a premade list of transformation matrices
-          // If there is a nullptr in any of the keys, use the one previous to the one in the list
-          auto vectorKey = std::make_unique< aiVectorKey >();
-          auto rotationKey = std::make_unique< aiQuatKey >();
-          auto scalingKey = std::make_unique< aiVectorKey >();
-
-          auto firstElementIterator = builder.begin();
-          auto firstElementKey = firstElementIterator->first;
-          KeyframeBuilder& firstElementBuilder = firstElementIterator->second;
-
-          vectorKey->mTime = firstElementKey;
-          vectorKey->mValue = aiVector3D();
-
-          rotationKey->mTime = firstElementKey;
-          rotationKey->mValue = aiQuaternion( 1.0f, 0.0f, 0.0f, 0.0f );
-
-          scalingKey->mTime = firstElementKey;
-          scalingKey->mValue = aiVector3D( 1.0f, 1.0f, 1.0f );
-
-          aiVectorKey* usablePositionKey = vectorKey.get();
-          aiQuatKey* usableRotationKey = rotationKey.get();
-          aiVectorKey* usableScalingKey = scalingKey.get();
-
-          for( auto& kvPair : builder ) {
-            KeyframeBuilder& kb = kvPair.second;
-
-            // Set the next group of usable keys - nulls will just use the last one set
-            if( kb.positionKey != nullptr ) { usablePositionKey = kb.positionKey; }
-            if( kb.rotationKey != nullptr ) { usableRotationKey = kb.rotationKey; }
-            if( kb.scalingKey != nullptr ) { usableScalingKey = kb.scalingKey; }
-
-            glm::mat4 absoluteKeyframe;
-            absoluteKeyframe = glm::translate( absoluteKeyframe, glm::vec3( usablePositionKey->mValue.x, usablePositionKey->mValue.y, usablePositionKey->mValue.z ) );
-            absoluteKeyframe = absoluteKeyframe * glm::toMat4( glm::quat( usableRotationKey->mValue.w, usableRotationKey->mValue.x, usableRotationKey->mValue.y, usableRotationKey->mValue.z ) );
-            absoluteKeyframe = glm::scale( absoluteKeyframe, glm::vec3( usableScalingKey->mValue.x, usableScalingKey->mValue.y, usableScalingKey->mValue.z ) );
-
-            animation->addKeyframe( kvPair.first, Transform( absoluteKeyframe ) );
-          }
-
         }
       }
     }

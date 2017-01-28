@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 #include <memory>
 #include <map>
+#include <string>
 
 namespace BlueBear {
   namespace Graphics {
@@ -22,6 +23,8 @@ namespace BlueBear {
       void addKeyframe( double frame, const Transform& transform );
       std::shared_ptr< Transform > getTransformForFrame( double frame );
     };
+
+    using KeyframeBundleMap = std::map< std::string, KeyframeBundle >;
 
   }
 }
