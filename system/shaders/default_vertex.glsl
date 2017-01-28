@@ -22,7 +22,7 @@ void main()
     ( bones[ boneIDs[ 3 ] ] * boneWeights[ 3 ] );
 
   mat4 mvp = projection * view * model;
-  gl_Position = mvp /* * boneTransform */ * vec4( position, 1.0f );
+  gl_Position = mvp * boneTransform * vec4( position, 1.0f );
 
   fragTexture = texture;
 }

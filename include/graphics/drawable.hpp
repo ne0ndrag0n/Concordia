@@ -8,6 +8,7 @@ namespace BlueBear {
   namespace Graphics {
     class Mesh;
     class Material;
+    class Armature;
 
     class Drawable {
 
@@ -17,7 +18,7 @@ namespace BlueBear {
 
         Drawable( std::shared_ptr< Mesh > mesh, std::shared_ptr< Material > material );
 
-        void render();
+        void render( std::shared_ptr< Armature > bindPose );
     };
   }
 }

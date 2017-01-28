@@ -45,7 +45,7 @@ namespace BlueBear {
         );
         virtual ~Mesh();
         void setupMesh( std::vector< Vertex >& vertices, std::vector< Index >& indices );
-        void drawElements( std::shared_ptr< Armature > currentPose = nullptr );
+        void drawElements( std::shared_ptr< Armature > currentPose );
     };
   }
 }

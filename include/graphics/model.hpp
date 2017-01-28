@@ -30,7 +30,9 @@ namespace BlueBear {
         std::unique_ptr< Drawable > drawable;
         std::map< std::string, std::shared_ptr< Model > > children;
         std::shared_ptr< std::map< std::string, std::shared_ptr< KeyframeBundle > > > animations;
+
         std::shared_ptr< Armature > inverseBind;
+        std::shared_ptr< Armature > bind;
 
         Model( std::string path );
         Model(

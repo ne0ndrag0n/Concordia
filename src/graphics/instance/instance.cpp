@@ -1,4 +1,5 @@
 #include "graphics/instance/instance.hpp"
+#include "graphics/armature/armature.hpp"
 #include "graphics/model.hpp"
 #include "graphics/drawable.hpp"
 #include "graphics/animplayer.hpp"
@@ -20,12 +21,18 @@ namespace BlueBear {
     Instance::Instance( const Model& model ) {
       animationList = std::make_shared< AnimationList >();
 
+      setRootLevelItems( model );
+
       prepareInstanceRecursive( model );
     }
 
     Instance::Instance( const Model& model, std::shared_ptr< AnimationList > animationList )
       : animationList( animationList ) {
       prepareInstanceRecursive( model );
+    }
+
+    void Instance::setRootLevelItems( const Model& root ) {
+      currentPose = root.bind;
     }
 
     void Instance::prepareInstanceRecursive( const Model& model ) {
@@ -78,7 +85,7 @@ namespace BlueBear {
 
       if( drawable ) {
         transform.sendToShader();
-        drawable->render();
+        drawable->render( rootInstance.currentPose );
       }
 
       for( auto& pair : children ) {

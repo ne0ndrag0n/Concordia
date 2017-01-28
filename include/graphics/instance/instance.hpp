@@ -14,6 +14,7 @@
 
 namespace BlueBear {
   namespace Graphics {
+    class Armature;
     class Model;
     class KeyframeBundle;
     class AnimPlayer;
@@ -28,7 +29,8 @@ namespace BlueBear {
         Transform transform;
         std::shared_ptr< AnimPlayer > animPlayer;
 
-        // Again, lazy
+        // Root-level items
+        std::shared_ptr< Armature > currentPose;
         struct AnimationBundle {
           std::shared_ptr< Instance > instance;
           std::shared_ptr< KeyframeBundle > keyframes;
@@ -38,6 +40,8 @@ namespace BlueBear {
 
         void prepareInstanceRecursive( const Model& model );
         void drawEntity( bool dirty, Instance& rootInstance );
+
+        void setRootLevelItems( const Model& root );
 
       public:
         std::shared_ptr< Drawable > drawable;
