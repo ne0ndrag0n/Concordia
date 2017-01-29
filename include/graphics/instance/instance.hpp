@@ -42,6 +42,7 @@ namespace BlueBear {
       public:
         std::shared_ptr< Transform > transform;
 
+        static bool display;
 
         std::shared_ptr< Drawable > drawable;
         std::map< std::string, std::shared_ptr< Instance > > children;

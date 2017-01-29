@@ -360,23 +360,6 @@ namespace BlueBear {
       // Floor & Walls with nudging
       defaultShader.use();
       camera.sendToShader();
-      auto length = floorInstanceCollection->getLength();
-      for( auto i = 0; i != length; i++ ) {
-        std::shared_ptr< Instance > floorInstance = floorInstanceCollection->getItemDirect( i );
-
-        if( floorInstance ) {
-          floorInstance->drawEntity();
-        }
-      }
-
-      auto wallLength = wallInstanceCollection->getLength();
-      for( auto i = 0; i != wallLength; i++ ) {
-        std::shared_ptr< WallCellBundler > wallCellBundler = wallInstanceCollection->getItemDirect( i );
-
-        if( wallCellBundler ) {
-          wallCellBundler->render();
-        }
-      }
 
       // USES VARYING SHADERS
       for( ShaderInstanceBundle& bundle : dynamicInstances ) {
@@ -618,6 +601,10 @@ namespace BlueBear {
       Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
 
       self->dynamicInstances[ 0 ].instances[ 0 ].children.at( "Armature" )->children.at( "Bone" )->children.at( "Bone.001" )->transform->setRotation( glm::quat( 0.988f, 0.156f, 0.000f, 0.000f ) );
+      Log::getInstance().debug( "Assert", glm::to_string( self->dynamicInstances[ 0 ].instances[ 0 ].children.at( "Armature" )->children.at( "Bone" )->children.at( "Bone.001" )->transform->getUpdatedMatrix() ) );
+      self->dynamicInstances[ 0 ].instances[ 0 ].children.at( "Armature" )->children.at( "Bone" )->children.at( "Bone.001" )->transform->printToLog();
+
+      Instance::display = true;
     }
     int Display::MainGameState::lua_playanim2( lua_State* L ) {
       Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );

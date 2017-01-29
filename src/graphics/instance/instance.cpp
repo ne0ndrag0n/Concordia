@@ -16,6 +16,8 @@
 namespace BlueBear {
   namespace Graphics {
 
+    bool Instance::display = false;
+
     Instance::Instance( const Model& model ) : transform( std::make_shared< Transform >() ) {
       boneList = std::make_shared< BoneList >();
       for( int i = 0; i < model.boneList->size(); i++ ) {
@@ -92,7 +94,7 @@ namespace BlueBear {
      * Public-facing overload
      */
     void Instance::drawEntity() {
-      drawEntity( true, false, *this );
+      drawEntity( false, false, *this );
     }
 
     void Instance::drawEntity( bool dirty, bool sentBones, Instance& rootInstance ) {
@@ -131,8 +133,17 @@ namespace BlueBear {
         for( int i = 1; i < boneList->size(); i++ ) {
           Bone< Instance >& bone = boneList->at( i );
 
-          matrices.push_back( inverseRoot * bone.node->transform->matrix );
+          glm::mat4 matrix = inverseRoot * bone.node->transform->matrix;
+
+          if( display ) {
+            Log::getInstance().debug( "Bone ID:", std::to_string( i ) );
+            Transform( matrix ).printToLog();
+          }
+
+          matrices.push_back( matrix );
         }
+
+        display = false;
 
         // TODO: Uncomment when actually ready to use. OpenGL optimizes out "bones"
         glUniformMatrix4fv( Tools::OpenGL::getUniformLocation( "bones" ), matrices.size(), GL_FALSE, glm::value_ptr( matrices[ 0 ] ) );
