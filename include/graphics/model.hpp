@@ -32,7 +32,7 @@ namespace BlueBear {
 
         // Root-level objects
         std::shared_ptr< Armature > bind;
-        std::shared_ptr< std::map< std::string, KeyframeBundleMap > > animations;
+        std::shared_ptr< std::map< std::string, Animation > > animations;
 
         Model( std::string path );
         Model(

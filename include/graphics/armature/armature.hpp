@@ -21,6 +21,7 @@ namespace BlueBear {
       };
 
       glm::mat4 getMatrix( const std::string& id );
+      void replaceMatrix( const std::string& id, glm::mat4 replacement );
 
     private:
       struct BoneDiscovery {

@@ -11,6 +11,7 @@
 #include <string>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
+#include <glm/gtx/matrix_decompose.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -19,20 +20,19 @@ namespace BlueBear {
   namespace Graphics {
 
     Instance::Instance( const Model& model ) {
-      animationList = std::make_shared< AnimationList >();
-
       setRootLevelItems( model );
 
       prepareInstanceRecursive( model );
     }
 
-    Instance::Instance( const Model& model, std::shared_ptr< AnimationList > animationList )
-      : animationList( animationList ) {
+    Instance::Instance( const Model& model, bool noRoot ) {
       prepareInstanceRecursive( model );
     }
 
     void Instance::setRootLevelItems( const Model& root ) {
-      currentPose = root.bind;
+      bindPose = currentPose = root.bind;
+
+      animations = root.animations;
     }
 
     void Instance::prepareInstanceRecursive( const Model& model ) {
@@ -47,7 +47,7 @@ namespace BlueBear {
         auto& child = *( pair.second );
 
         // Hand down the same transform as the parent to this model
-        std::shared_ptr< Instance > instance = std::make_shared< Instance >( child, animationList );
+        std::shared_ptr< Instance > instance = std::make_shared< Instance >( child, true );
         instance->transform.setParent( &transform );
 
         children[ pair.first ] = instance;
@@ -65,13 +65,41 @@ namespace BlueBear {
      *
      */
     void Instance::setAnimation( const std::string& animKey ) {
-      // TODO
+      if( !animations ) {
+        Log::getInstance().warn( "Instance::setAnimation", "This instance has no animations." );
+        return;
+      }
+
+      auto it = animations->find( animKey );
+      if( it == animations->end() ) {
+        Log::getInstance().warn( "Instance::setAnimation", "Instance does not have animation with ID " + animKey );
+        return;
+      }
+
+      currentAnimation = std::make_shared< AnimPlayer >( it->second );
+    }
+
+    /**
+     * Update the animation pose if an AnimPlayer is attached.
+     */
+    void Instance::updateAnimationPose() {
+      if( currentAnimation ) {
+        // Use currentAnimation to get new Armature based off the bind pose
+        currentPose = currentAnimation->generateNextFrame( bindPose );
+
+        // When we get back the bind pose, we're done playing this animation
+        if( currentPose == bindPose ) {
+          currentAnimation = nullptr;
+        }
+      }
     }
 
     /**
      * Public-facing overload
      */
     void Instance::drawEntity() {
+      updateAnimationPose();
+
       drawEntity( false, *this );
     }
 

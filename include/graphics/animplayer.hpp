@@ -2,23 +2,25 @@
 #define ANIMPLAYER
 
 #include "graphics/transform.hpp"
+#include "graphics/keyframebundle.hpp"
 #include <glm/glm.hpp>
 #include <memory>
+#include <string>
 
 namespace BlueBear {
   namespace Graphics {
-    class KeyframeBundle;
     class Transform;
+    class Armature;
 
     class AnimPlayer {
-      KeyframeBundle& animation;
+      Animation& animation;
       double interval;
       double step = 0.0;
 
     public:
-      AnimPlayer( KeyframeBundle& animation );
+      AnimPlayer( Animation& animation );
       void reset();
-      std::shared_ptr< Transform > generateNextFrame();
+      std::shared_ptr< Armature > generateNextFrame( std::shared_ptr< Armature > bindPose );
     };
 
   }

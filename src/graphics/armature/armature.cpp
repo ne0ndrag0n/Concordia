@@ -27,7 +27,20 @@ namespace BlueBear {
         return intermediate.hierarchy * *intermediate.result;
       }
 
+      Log::getInstance().error( "Armature::getMatrix", "Could not locate bone " + id + " in this armature." );
       throw BoneNotFoundException();
+    }
+
+    void Armature::replaceMatrix( const std::string& id, glm::mat4 replacement ) {
+      BoneDiscovery foundTransform = getMatrixProxy( id, skeletons, glm::mat4() );
+
+      if( foundTransform.result ) {
+        *foundTransform.result = replacement;
+      } else {
+        Log::getInstance().error( "Armature::replaceMatrix", "Could not locate bone " + id + " in this armature." );
+
+        throw BoneNotFoundException();
+      }
     }
 
     Armature::BoneDiscovery Armature::getMatrixProxy( const std::string& id, Skeleton& level, glm::mat4 parent ) {

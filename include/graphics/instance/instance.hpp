@@ -3,6 +3,7 @@
 
 #include "graphics/transform.hpp"
 #include "graphics/drawable.hpp"
+#include "graphics/keyframebundle.hpp"
 #include <vector>
 #include <string>
 #include <memory>
@@ -30,13 +31,10 @@ namespace BlueBear {
         std::shared_ptr< AnimPlayer > animPlayer;
 
         // Root-level items
+        std::shared_ptr< Armature > bindPose;
         std::shared_ptr< Armature > currentPose;
-        struct AnimationBundle {
-          std::shared_ptr< Instance > instance;
-          std::shared_ptr< KeyframeBundle > keyframes;
-        };
-        using AnimationList = std::map< std::string, std::vector< AnimationBundle > >;
-        std::shared_ptr< AnimationList > animationList;
+        std::shared_ptr< std::map< std::string, Animation > > animations;
+        std::shared_ptr< AnimPlayer > currentAnimation;
 
         void prepareInstanceRecursive( const Model& model );
         void drawEntity( bool dirty, Instance& rootInstance );
@@ -48,7 +46,9 @@ namespace BlueBear {
         std::map< std::string, std::shared_ptr< Instance > > children;
 
         Instance( const Model& model );
-        Instance( const Model& model, std::shared_ptr< AnimationList > animationList );
+        Instance( const Model& model, bool noRoot );
+
+        void updateAnimationPose();
 
         void setAnimation( const std::string& animKey );
 

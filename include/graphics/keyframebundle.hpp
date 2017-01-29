@@ -21,11 +21,15 @@ namespace BlueBear {
       KeyframeBundle( double rate, double duration );
 
       void addKeyframe( double frame, const Transform& transform );
-      std::shared_ptr< Transform > getTransformForFrame( double frame );
+      Transform getTransformForFrame( double frame );
     };
 
     using KeyframeBundleMap = std::map< std::string, KeyframeBundle >;
-
+    struct Animation {
+      KeyframeBundleMap keyframes;
+      double duration;
+      double frameRate;
+    };
   }
 }
 

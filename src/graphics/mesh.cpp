@@ -63,7 +63,7 @@ namespace BlueBear {
         // Mesh has associated bones that must be computed
         for( std::string& bone : boneIndices ) {
           boneUniform.push_back(
-            glm::inverse( bind->getMatrix( bone ) ) * currentPose->getMatrix( bone ) 
+            glm::inverse( bind->getMatrix( bone ) ) * currentPose->getMatrix( bone )
           );
         }
       }

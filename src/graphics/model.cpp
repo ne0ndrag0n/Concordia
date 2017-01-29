@@ -112,7 +112,7 @@ namespace BlueBear {
       // After everything is done, walk the tree for animations and apply them to the correct nodes
       if( scene->HasAnimations() ) {
         Log::getInstance().debug( "Model::loadModel", "Loading animations for " + path );
-        animations = std::make_shared< std::map< std::string, KeyframeBundleMap > >();
+        animations = std::make_shared< std::map< std::string, Animation > >();
         loadAnimations( scene->mAnimations, scene->mNumAnimations );
       }
     }
@@ -298,7 +298,9 @@ namespace BlueBear {
           "Mesh Channels: " + std::to_string( anim->mNumMeshChannels )
         );
 
-        KeyframeBundleMap& currentAnimation = ( *animations )[ anim->mName.C_Str() ];
+        Animation& currentAnimation = ( *animations )[ anim->mName.C_Str() ];
+        currentAnimation.duration = anim->mDuration;
+        currentAnimation.frameRate = anim->mTicksPerSecond;
 
         // Each channel controls the behaviour of one particular node
         for( int i = 0; i != anim->mNumChannels; i++ ) {
@@ -327,7 +329,7 @@ namespace BlueBear {
               builder[ scalingKey.mTime ].scalingKey = &scalingKey;
             }
 
-            KeyframeBundle& nodeSet = currentAnimation[ nodeID ];
+            KeyframeBundle& nodeSet = currentAnimation.keyframes[ nodeID ];
 
             // Add an identity transform at 0.0 to ensure correct interpolation
             nodeSet.addKeyframe( 0.0, Transform() );
