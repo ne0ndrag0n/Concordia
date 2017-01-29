@@ -135,15 +135,21 @@ namespace BlueBear {
 
           glm::mat4 matrix = inverseRoot * bone.node->transform->matrix;
 
-          if( display ) {
-            Log::getInstance().debug( "Bone ID:", std::to_string( i ) );
-            Transform( matrix ).printToLog();
-          }
-
           matrices.push_back( matrix );
         }
 
-        display = false;
+        if( display ) {
+          for( int i = 0; i != matrices.size(); i++ ) {
+            glm::mat4 matrix = matrices[ i ];
+
+            Log::getInstance().debug( "Bone ID", std::to_string( i ) );
+            Transform( matrix ).printToLog();
+
+            Log::getInstance().debug( "Matrix", glm::to_string( matrix ) );
+
+            display = false;
+          }
+        }
 
         // TODO: Uncomment when actually ready to use. OpenGL optimizes out "bones"
         glUniformMatrix4fv( Tools::OpenGL::getUniformLocation( "bones" ), matrices.size(), GL_FALSE, glm::value_ptr( matrices[ 0 ] ) );
