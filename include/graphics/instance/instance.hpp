@@ -26,7 +26,6 @@ namespace BlueBear {
     class Instance {
 
       private:
-        std::shared_ptr< Transform > transform;
         std::shared_ptr< std::map< std::string, Animation > > animations;
         std::shared_ptr< AnimPlayer > animPlayer;
 
@@ -41,6 +40,9 @@ namespace BlueBear {
         void sendBonesToShader( bool& sentBones, Instance& instance );
 
       public:
+        std::shared_ptr< Transform > transform;
+
+
         std::shared_ptr< Drawable > drawable;
         std::map< std::string, std::shared_ptr< Instance > > children;
 

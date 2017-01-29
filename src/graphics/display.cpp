@@ -617,7 +617,7 @@ namespace BlueBear {
     int Display::MainGameState::lua_playanim1( lua_State* L ) {
       Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
 
-      self->dynamicInstances[ 0 ].instances[ 0 ].children.at( "Armature" )->children.at( "Bone" )->children.at( "Bone.001" )->setAnimation( "Armature|ArmatureAction" );
+      self->dynamicInstances[ 0 ].instances[ 0 ].children.at( "Armature" )->children.at( "Bone" )->children.at( "Bone.001" )->transform->setRotation( glm::quat( 0.988f, 0.156f, 0.000f, 0.000f ) );
     }
     int Display::MainGameState::lua_playanim2( lua_State* L ) {
       Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );

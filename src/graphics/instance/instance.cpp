@@ -92,7 +92,7 @@ namespace BlueBear {
      * Public-facing overload
      */
     void Instance::drawEntity() {
-      drawEntity( false, false, *this );
+      drawEntity( true, false, *this );
     }
 
     void Instance::drawEntity( bool dirty, bool sentBones, Instance& rootInstance ) {
