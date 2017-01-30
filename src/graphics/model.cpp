@@ -36,10 +36,11 @@ namespace BlueBear {
       const aiScene* scene,
       Model& root,
       std::string& directory,
+      aiMatrix4x4 parentTransform,
       unsigned int level,
       Model* parent
     ) : parent( parent ), directory( directory ) {
-      processNode( node, scene, root, level );
+      processNode( node, scene, root, parentTransform, level );
     }
 
     glm::mat4 Model::aiToGLMmat4( aiMatrix4x4& matrix ) {
@@ -104,9 +105,9 @@ namespace BlueBear {
 
       // If the root node has no meshes and only one child, just skip to that child
       if( scene->mRootNode->mNumChildren == 1 && scene->mRootNode->mNumMeshes == 0 ) {
-        processNode( scene->mRootNode->mChildren[ 0 ], scene, *this );
+        processNode( scene->mRootNode->mChildren[ 0 ], scene, *this, aiMatrix4x4() );
       } else {
-        processNode( scene->mRootNode, scene, *this );
+        processNode( scene->mRootNode, scene, *this, aiMatrix4x4() );
       }
 
       // After everything is done, walk the tree for animations and apply them to the correct nodes
@@ -117,7 +118,7 @@ namespace BlueBear {
       }
     }
 
-    void Model::processNode( aiNode* node, const aiScene* scene, Model& root, unsigned int level ) {
+    void Model::processNode( aiNode* node, const aiScene* scene, Model& root, aiMatrix4x4 parentTransform, unsigned int level ) {
       std::string indentation;
       for( int i = 0; i != level; i++ ) {
         indentation = indentation + "\t";
@@ -126,7 +127,9 @@ namespace BlueBear {
       Log::getInstance().debug( "Model::processNode", indentation + "Processing " + std::string( node->mName.C_Str() ) + " { " );
 
       assimpData.localTransform = node->mTransformation;
-      transform = aiToGLMmat4( assimpData.localTransform );
+
+      aiMatrix4x4 resultantTransform = parentTransform * assimpData.localTransform;
+      transform = aiToGLMmat4( resultantTransform );
 
       if( node->mNumMeshes ) {
         // Generally we're only going to worry about the first mesh here. Where is there ever more meshes? Blender doesn't seem to permit >1 mesh. I'll probably regret undoing this.
@@ -134,7 +137,7 @@ namespace BlueBear {
 
         Log::getInstance().debug( "Model::processNode", indentation + "\tLoading mesh " + mesh->mName.C_Str() );
 
-        this->processMesh( mesh, scene, root, node->mName.C_Str() );
+        this->processMesh( mesh, scene, root, node->mName.C_Str(), transform );
       }
 
       for( int i = 0; i < node->mNumChildren; i++ ) {
@@ -142,7 +145,7 @@ namespace BlueBear {
         aiNode* nextNode = node->mChildren[ i ];
 
         if( !alternateAction( nextNode, root ) ) {
-          children.emplace( nextNode->mName.C_Str(), std::make_unique< Model >( nextNode, scene, root, directory, level + 1, this ) );
+          children.emplace( nextNode->mName.C_Str(), std::make_unique< Model >( nextNode, scene, root, directory, resultantTransform, level + 1, this ) );
         } else {
           Log::getInstance().debug( "Model::processNode", indentation + "\tLoaded " + std::string( nextNode->mName.C_Str() ) );
         }
@@ -163,7 +166,7 @@ namespace BlueBear {
       }
     }
 
-    void Model::processMesh( aiMesh* mesh, const aiScene* scene, Model& root, std::string nodeTitle ) {
+    void Model::processMesh( aiMesh* mesh, const aiScene* scene, Model& root, std::string nodeTitle, glm::mat4 transformation ) {
       std::vector< Vertex > vertices;
       std::vector< std::vector< BoneData > > boneBuilders;
       std::vector< Index > indices;
@@ -172,7 +175,7 @@ namespace BlueBear {
 
       for( int i = 0; i < mesh->mNumVertices; i++ ) {
         Vertex vertex;
-        vertex.position = glm::vec3( aiToGLMvec4( mesh->mVertices[ i ] ) );
+        vertex.position = glm::vec3( transformation * aiToGLMvec4( mesh->mVertices[ i ] ) );
         vertex.normal = glm::vec3( mesh->mNormals[ i ].x, mesh->mNormals[ i ].y, mesh->mNormals[ i ].z );
         if( mesh->mTextureCoords[ 0 ] ) {
           vertex.textureCoordinates = glm::vec2( mesh->mTextureCoords[ 0 ][ i ].x, mesh->mTextureCoords[ 0 ][ i ].y );

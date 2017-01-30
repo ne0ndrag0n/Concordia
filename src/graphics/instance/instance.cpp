@@ -19,13 +19,13 @@
 namespace BlueBear {
   namespace Graphics {
 
-    Instance::Instance( const Model& model ) {
+    Instance::Instance( const Model& model ) : transform( std::make_shared< Transform >() ) {
       setRootLevelItems( model );
 
       prepareInstanceRecursive( model );
     }
 
-    Instance::Instance( const Model& model, bool noRoot ) {
+    Instance::Instance( const Model& model, bool noRoot ) : transform( std::make_shared< Transform >() ) {
       prepareInstanceRecursive( model );
     }
 
@@ -41,14 +41,12 @@ namespace BlueBear {
         drawable = std::make_shared< Drawable >( *model.drawable );
       }
 
-      transform = Transform( model.transform );
-
       for( auto& pair : model.children ) {
         auto& child = *( pair.second );
 
         // Hand down the same transform as the parent to this model
         std::shared_ptr< Instance > instance = std::make_shared< Instance >( child, true );
-        instance->transform.setParent( &transform );
+        instance->transform->setParent( transform );
 
         children[ pair.first ] = instance;
       }
@@ -61,8 +59,9 @@ namespace BlueBear {
       return children[ name ];
     }
 
+
     /**
-     *
+     * setAnimation will act the same whether or not it's called on a child node or the root node. It will activate all animations as if called from the top of the scene graph.
      */
     void Instance::setAnimation( const std::string& animKey ) {
       if( !animations ) {
@@ -104,15 +103,15 @@ namespace BlueBear {
     }
 
     void Instance::drawEntity( bool dirty, Instance& rootInstance ) {
-      dirty = dirty || transform.dirty;
+      dirty = dirty || transform->dirty;
 
       // Update if dirty
       if( dirty ) {
-        transform.update();
+        transform->update();
       }
 
       if( drawable ) {
-        transform.sendToShader();
+        transform->sendToShader();
         drawable->render( rootInstance.currentPose );
       }
 
@@ -124,36 +123,32 @@ namespace BlueBear {
     }
 
     glm::vec3 Instance::getPosition() {
-      return transform.getPosition();
+      return transform->getPosition();
     }
 
     void Instance::setPosition( const glm::vec3& position ) {
-      transform.setPosition( position );
-    }
-
-    void Instance::setPositionBy( const glm::vec3& position ) {
-      transform.setPosition( transform.getPosition() + position );
+      transform->setPosition( position );
     }
 
     glm::vec3 Instance::getScale() {
-      return transform.getScale();
+      return transform->getScale();
     }
 
     void Instance::setScale( const glm::vec3& scale ) {
-      transform.setScale( scale );
+      transform->setScale( scale );
     }
 
     GLfloat Instance::getRotationAngle() {
-      return transform.getRotationAngle();
+      return transform->getRotationAngle();
     }
 
     glm::vec3 Instance::getRotationAxes() {
-      return transform.getRotationAxes();
+      return transform->getRotationAxes();
     }
 
     void Instance::setRotationAngle( GLfloat rotationAngle, const glm::vec3& rotationAxes ) {
       // Generate new quat
-      transform.setRotationAngle( rotationAngle, rotationAxes );
+      transform->setRotationAngle( rotationAngle, rotationAxes );
     }
 
   }

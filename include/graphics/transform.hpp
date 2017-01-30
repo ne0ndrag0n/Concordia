@@ -17,7 +17,7 @@ namespace BlueBear {
       glm::quat rotation = glm::quat( 1.0f, 0.0f, 0.0f, 0.0f );
 
       public:
-        Transform* parent = nullptr;
+        std::shared_ptr< Transform > parent;
 
         bool dirty = true;
         glm::mat4 matrix;
@@ -32,7 +32,7 @@ namespace BlueBear {
         glm::mat4 getMatrix();
         void sendToShader();
 
-        void setParent( Transform* parent );
+        void setParent( std::shared_ptr< Transform > parent );
 
         // new methods to change position, scale, and rotation
         glm::vec3 getPosition();
