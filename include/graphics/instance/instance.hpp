@@ -71,8 +71,6 @@ namespace BlueBear {
         glm::vec3 getRotationAxes();
 
         void setRotationAngle( GLfloat rotationAngle, const glm::vec3& rotationAxes = glm::vec3( 0.0f, 0.0f, 1.0f ) );
-
-        Transform& getTransform();
     };
   }
 }
