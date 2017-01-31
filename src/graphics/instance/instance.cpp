@@ -75,7 +75,20 @@ namespace BlueBear {
         return;
       }
 
-      currentAnimation = std::make_shared< AnimPlayer >( it->second );
+      //currentAnimation = std::make_shared< AnimPlayer >( it->second );
+
+      // XXX
+      /*
+      std::shared_ptr< Armature > newPose = std::make_shared< Armature >( *bindPose );
+
+      Transform t( bindPose->getMatrix( "Bone.003" ) );
+      t.setRotation( glm::quat( 0.713f, 0.000f, -0.702f, 0.000f ) );
+      newPose->replaceMatrix( "Bone.003", t.getUpdatedMatrix() );
+
+      currentPose = newPose;
+
+      Transform( glm::inverse( bindPose->getMatrix( "Bone.003" ) ) * newPose->getMatrix( "Bone.003" ) ).printToLog();
+      */
     }
 
     /**

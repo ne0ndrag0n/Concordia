@@ -19,6 +19,6 @@
       <Button id="zoom_out">-</Button>
     </Box>
     <Button id="animate1">play anim 1</Button>
-    <Button id="animate2">play anim 2</Button>
+    <Button id="animate2">print debug info</Button>
   </Box>
 </Window>
