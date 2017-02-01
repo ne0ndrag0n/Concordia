@@ -232,6 +232,19 @@ namespace BlueBear {
         }
       }
 
+      if( std::string( mesh->mName.C_Str() ) == "Cylinder.001" ) {
+        for( int i = 0; i != vertices.size(); i++ ) {
+          std::string out;
+          Vertex& vertex = vertices.at( i );
+
+          out += "pos: " + glm::to_string( vertex.position ) + " ";
+          out += "bone ids: " + glm::to_string( vertex.boneIDs ) + " ";
+          out += "weights: " + glm::to_string( vertex.boneWeights );
+
+          Log::getInstance().debug( "Vertex " + std::to_string( i ), out );
+        }
+      }
+
       drawable = std::make_unique< Drawable >(
         std::make_shared< Mesh >( vertices, indices, boneIndices, root.bind ),
         defaultMaterial
