@@ -88,7 +88,7 @@ namespace BlueBear {
 
     void Model::loadModel( std::string path ) {
       Assimp::Importer importer;
-      const aiScene* scene = importer.ReadFile( path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals );
+      const aiScene* scene = importer.ReadFile( path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices );
 
       if( !scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode ) {
         // god this is an abomination fucking piece of shit c++ not having a fucking formatted print for god damn std::string
@@ -232,12 +232,13 @@ namespace BlueBear {
         }
       }
 
-      if( std::string( mesh->mName.C_Str() ) == "Cylinder.001" ) {
+      if( std::string( mesh->mName.C_Str() ) == "12Vert" ) {
         for( int i = 0; i != vertices.size(); i++ ) {
           std::string out;
           Vertex& vertex = vertices.at( i );
 
           out += "pos: " + glm::to_string( vertex.position ) + " ";
+          out += "normal: " + glm::to_string( vertex.normal ) + " ";
           out += "bone ids: " + glm::to_string( vertex.boneIDs ) + " ";
           out += "weights: " + glm::to_string( vertex.boneWeights );
 

@@ -87,6 +87,8 @@ namespace BlueBear {
       newPose->replaceMatrix( "Bone.003", t.getUpdatedMatrix() );
 
       currentPose = newPose;
+
+      children[ "12Vert" ]->drawable->mesh->debug = true;
     }
 
     /**
