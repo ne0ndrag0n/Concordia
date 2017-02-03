@@ -29,10 +29,9 @@ namespace BlueBear {
 
     void Transform::update() {
       // When we update, CLEAR THE MATRIX!
-      matrix = glm::mat4();
-      localMatrix = glm::mat4();
+      matrix = glm::mat4( 1.0f );
 
-      glm::mat4 mixin;
+      glm::mat4 mixin( 1.0f );
 
       if( parent ) {
         mixin = parent->matrix;
@@ -42,15 +41,13 @@ namespace BlueBear {
       matrix = matrix * mixin;
 
       // There's always going to be a translation
-      localMatrix = glm::translate( localMatrix, position );
+      matrix *= glm::translate( position );
 
       // Then rotate
-      localMatrix = localMatrix * glm::toMat4( rotation );
+      matrix *= glm::toMat4( rotation );
 
       // Then scale
-      localMatrix = glm::scale( localMatrix, scale );
-
-      matrix = matrix * localMatrix;
+      matrix *= glm::scale( scale );
 
       // This is now updated.
       dirty = false;
@@ -146,12 +143,7 @@ namespace BlueBear {
     }
 
     void Transform::printToLog() {
-      Log::getInstance().debug( "Transform::printToLog", std::string( "\n" ) +
-        "Transform Info: " + "\n" +
-        "Position: " + glm::to_string( position ) + "\n" +
-        "Scale: " + glm::to_string( scale ) + "\n" +
-        "Rotation: " + glm::to_string( rotation )
-      );
+      Log::getInstance().debug( "Transform::printToLog", "T: " + glm::to_string( position ) + " S: " + glm::to_string( scale ) + " R: " + glm::to_string( rotation ) );
     }
 
   }

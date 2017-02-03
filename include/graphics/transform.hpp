@@ -21,7 +21,6 @@ namespace BlueBear {
 
         bool dirty = true;
         glm::mat4 matrix;
-        glm::mat4 localMatrix;
 
         Transform();
         Transform( const glm::vec3& position, const glm::quat& rotation, const glm::vec3& scale );

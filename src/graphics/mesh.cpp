@@ -71,6 +71,7 @@ namespace BlueBear {
       // XXX
       if( debug ) {
         for( int i = 0; i != boneUniform.size(); i++ ) {
+          Log::getInstance().debug( "Matrix " + std::to_string( i ), glm::to_string( boneUniform[ i ] ) );
           Transform( boneUniform[ i ] ).printToLog();
         }
 
