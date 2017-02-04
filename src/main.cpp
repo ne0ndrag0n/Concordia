@@ -4,6 +4,7 @@
 #include <lauxlib.h>
 #include "log.hpp"
 #include "graphics/display.hpp"
+#include "graphics/transform.hpp"
 #include "localemanager.hpp"
 #include "eventmanager.hpp"
 #include "scripting/lot.hpp"
@@ -11,12 +12,39 @@
 #include <SFML/Window.hpp>
 #include <SFML/System.hpp>
 #include <memory>
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
 
 using namespace BlueBear;
 
 int main() {
 	Log::getInstance().info( "Main", LocaleManager::getInstance().getString( "BLUEBEAR_WELCOME_MESSAGE" ) );
 	sf::err().rdbuf( NULL );
+
+	// ~ TESTING ~
+	Log::getInstance().info( "Main", "Commencing test of some sort..." );
+	float bone003cont[16] = {
+		0.0143919587f, 0.0f, 1.00105202f, 0.0f,
+		0.0f, 1.0f, 0.0f, 0.0f,
+		-1.00105202f, 0, 0.0143919587f, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f
+	};
+	glm::mat4 id( 1.0f );
+	glm::mat4 bone( 1.0f );
+	glm::mat4 bone002( 1.0f );
+	glm::mat4 bone003 = glm::make_mat4( bone003cont );
+
+	BlueBear::Graphics::Transform( bone003 ).printToLog();
+
+	glm::mat4 xform =
+		( bone002 * 0.0870833993f ) +
+		( bone003 * 0.911155462f ) +
+		( id * 0 ) +
+		( id * 0 );
+
+	glm::vec4 point = xform * glm::vec4( glm::vec3( -0.5f, -0.5f, 4.0f ), 1.0f );
+	Log::getInstance().debug( "Assert", glm::to_string( point ) );
+	return 0;
 
 	EventManager eventManager;
 
