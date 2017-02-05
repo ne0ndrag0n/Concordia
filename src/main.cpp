@@ -17,10 +17,7 @@
 
 using namespace BlueBear;
 
-int main() {
-	Log::getInstance().info( "Main", LocaleManager::getInstance().getString( "BLUEBEAR_WELCOME_MESSAGE" ) );
-	sf::err().rdbuf( NULL );
-
+void test() {
 	// ~ TESTING ~
 	Log::getInstance().info( "Main", "Commencing test of some sort..." );
 	float bone003cont[16] = {
@@ -29,22 +26,33 @@ int main() {
 		-1.00105202f, 0, 0.0143919587f, 0.0f,
 		0.0f, 0.0f, 0.0f, 1.0f
 	};
-	glm::mat4 id( 1.0f );
-	glm::mat4 bone( 1.0f );
-	glm::mat4 bone002( 1.0f );
-	glm::mat4 bone003 = glm::make_mat4( bone003cont );
 
-	BlueBear::Graphics::Transform( bone003 ).printToLog();
+	glm::mat4 id( 1.0f ); // ID 0
+	glm::mat4 bone( 1.0f ); // ID 1
+	glm::mat4 bone002( 1.0f ); // ID 2
+	glm::mat4 bone003( 1.0f ); // ID 3
+
+	// Keyframe is set to rotate bone003 -89.113 degrees along Y
+	bone003 *= glm::make_mat4( bone003cont );
+
+	Log::getInstance().debug( "Assert", glm::to_string( bone003 ) );
 
 	glm::mat4 xform =
-		( bone002 * 0.0870833993f ) +
-		( bone003 * 0.911155462f ) +
+		( bone002 * 0.087f ) +
+		( bone003 * 0.911f ) +
 		( id * 0 ) +
 		( id * 0 );
 
+	// Vertex position is -0.5, -0.5, 4.0
 	glm::vec4 point = xform * glm::vec4( glm::vec3( -0.5f, -0.5f, 4.0f ), 1.0f );
+	// According to blender, should be -0.95638, -0.5, 2.63086
+	// Instead, result is -3.694115, -0.499000, -0.051035
 	Log::getInstance().debug( "Assert", glm::to_string( point ) );
-	return 0;
+}
+
+int main() {
+	Log::getInstance().info( "Main", LocaleManager::getInstance().getString( "BLUEBEAR_WELCOME_MESSAGE" ) );
+	sf::err().rdbuf( NULL );
 
 	EventManager eventManager;
 

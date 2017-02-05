@@ -67,13 +67,13 @@ namespace BlueBear {
     void Instance::setAnimation( const std::string& animKey ) {
       if( !animations ) {
         Log::getInstance().warn( "Instance::setAnimation", "This instance has no animations." );
-        return;
+        //return;
       }
 
       auto it = animations->find( animKey );
       if( it == animations->end() ) {
         Log::getInstance().warn( "Instance::setAnimation", "Instance does not have animation with ID " + animKey );
-        return;
+        //return;
       }
 
       //currentAnimation = std::make_shared< AnimPlayer >( it->second );
@@ -81,6 +81,8 @@ namespace BlueBear {
       // XXX
       std::shared_ptr< Armature > newPose = std::make_shared< Armature >( *bindPose );
 
+      // For 12Vert
+      /*
       Transform t( glm::inverse( bindPose->getMatrix( "Bone.002" ) ) * bindPose->getMatrix( "Bone.003" ) );
       t.setRotation( glm::quat( 0.713f, 0.000f, -0.702f, 0.000f ) );
 
@@ -89,6 +91,18 @@ namespace BlueBear {
       currentPose = newPose;
 
       children[ "12Vert" ]->drawable->mesh->debug = true;
+      */
+
+      // For even_simpler_2
+      glm::mat4 bone = newPose->skeletons[ "Bone" ].transform;
+      Transform t( bone );
+      t.setRotation( glm::quat( 0.707, 0, 0.707, 0 ) );
+
+      newPose->skeletons[ "Bone" ].transform = t.getUpdatedMatrix();
+
+      currentPose = newPose;
+
+      children[ "Cube" ]->drawable->mesh->debug = true;
     }
 
     /**
