@@ -94,15 +94,19 @@ namespace BlueBear {
       */
 
       // For even_simpler_2
-      glm::mat4 bone = newPose->skeletons[ "Bone" ].transform;
-      Transform t( bone );
-      t.setRotation( glm::quat( 0.707, 0, 0.707, 0 ) );
+      Transform( bindPose->skeletons[ "Bone" ].transform ).printToLog();
+      Transform( bindPose->skeletons[ "Bone" ].children[ "Bone.001" ].transform ).printToLog();
 
+      Transform t( bindPose->skeletons[ "Bone" ].transform );
+      t.setRotation( glm::quat( 0.707, 0, 0.707, 0 ) );
       newPose->skeletons[ "Bone" ].transform = t.getUpdatedMatrix();
 
-      currentPose = newPose;
+      Log::getInstance().debug( "Assert", "Bones after transforms:" );
+      Transform( glm::inverse( newPose->getMatrix( "Bone" ) ) ).printToLog();
+      Transform( newPose->getMatrix( "Bone" ) ).printToLog();
 
-      children[ "Cube" ]->drawable->mesh->debug = true;
+      Transform( glm::inverse( newPose->getMatrix( "Bone.001" ) ) ).printToLog();
+      Transform( newPose->getMatrix( "Bone.001" ) ).printToLog();
     }
 
     /**
