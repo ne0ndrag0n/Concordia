@@ -20,12 +20,6 @@ using namespace BlueBear;
 void test() {
 	// ~ TESTING ~
 	Log::getInstance().info( "Main", "Commencing test of some sort..." );
-	float bone003cont[16] = {
-		0.0143919587f, 0.0f, 1.00105202f, 0.0f,
-		0.0f, 1.0f, 0.0f, 0.0f,
-		-1.00105202f, 0, 0.0143919587f, 0.0f,
-		0.0f, 0.0f, 0.0f, 1.0f
-	};
 
 	glm::mat4 id( 1.0f ); // ID 0
 	glm::mat4 bone( 1.0f ); // ID 1
@@ -33,7 +27,9 @@ void test() {
 	glm::mat4 bone003( 1.0f ); // ID 3
 
 	// Keyframe is set to rotate bone003 -89.113 degrees along Y
-	bone003 *= glm::make_mat4( bone003cont );
+	bone003 *= glm::translate( glm::vec3( 0.0f, 0.0f, 3.0f ) );
+	bone003 *= glm::toMat4( glm::angleAxis( (float)glm::radians( -89.113 ), glm::vec3( 0.0f, 1.0f, 0.0f ) ) );
+	bone003 *= glm::translate( glm::vec3( 0.0f, 0.0f, -3.0f ) );
 
 	Log::getInstance().debug( "Assert", glm::to_string( bone003 ) );
 
