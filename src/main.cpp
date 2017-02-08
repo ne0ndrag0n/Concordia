@@ -26,10 +26,16 @@ void test() {
 	glm::mat4 bone002( 1.0f ); // ID 2
 	glm::mat4 bone003( 1.0f ); // ID 3
 
+	BlueBear::Graphics::Transform t;
+	t.setPosition( glm::vec3( 0.0f, 0.0f, 3.0f ) );
+	t.setRotation( glm::angleAxis( (float)glm::radians( -89.113 ), glm::vec3( 0.0f, 1.0f, 0.0f ) ) );
+
+	BlueBear::Graphics::Transform ibp;
+	ibp.setPosition( glm::vec3( 0.0f, 0.0f, -3.0f ) );
+
 	// Keyframe is set to rotate bone003 -89.113 degrees along Y
-	bone003 *= glm::translate( glm::vec3( 0.0f, 0.0f, 3.0f ) );
-	bone003 *= glm::toMat4( glm::angleAxis( (float)glm::radians( -89.113 ), glm::vec3( 0.0f, 1.0f, 0.0f ) ) );
-	bone003 *= glm::translate( glm::vec3( 0.0f, 0.0f, -3.0f ) );
+	bone003 *= t.getUpdatedMatrix(); // move into bone space
+	bone003 *= ibp.getUpdatedMatrix(); // move out of bone space
 
 	Log::getInstance().debug( "Assert", glm::to_string( bone003 ) );
 

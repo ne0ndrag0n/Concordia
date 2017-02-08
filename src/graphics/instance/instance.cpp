@@ -76,37 +76,19 @@ namespace BlueBear {
         //return;
       }
 
-      //currentAnimation = std::make_shared< AnimPlayer >( it->second );
+      currentAnimation = std::make_shared< AnimPlayer >( it->second );
 
       // XXX
+      /*
       std::shared_ptr< Armature > newPose = std::make_shared< Armature >( *bindPose );
 
-      // For 12Vert
-      /*
       Transform t( glm::inverse( bindPose->getMatrix( "Bone.002" ) ) * bindPose->getMatrix( "Bone.003" ) );
-      t.setRotation( glm::quat( 0.713f, 0.000f, -0.702f, 0.000f ) );
+      t.setRotation( glm::quat( 0.923f, 0.000f, -0.386f, 0.000f ) );
 
       newPose->replaceMatrix( "Bone.003", t.getUpdatedMatrix() );
 
       currentPose = newPose;
-
-      children[ "12Vert" ]->drawable->mesh->debug = true;
       */
-
-      // For even_simpler_2
-      Transform( bindPose->skeletons[ "Bone" ].transform ).printToLog();
-      Transform( bindPose->skeletons[ "Bone" ].children[ "Bone.001" ].transform ).printToLog();
-
-      Transform t( bindPose->skeletons[ "Bone" ].transform );
-      t.setRotation( glm::quat( 0.707, 0, 0.707, 0 ) );
-      newPose->skeletons[ "Bone" ].transform = t.getUpdatedMatrix();
-
-      Log::getInstance().debug( "Assert", "Bones after transforms:" );
-      Transform( glm::inverse( newPose->getMatrix( "Bone" ) ) ).printToLog();
-      Transform( newPose->getMatrix( "Bone" ) ).printToLog();
-
-      Transform( glm::inverse( newPose->getMatrix( "Bone.001" ) ) ).printToLog();
-      Transform( newPose->getMatrix( "Bone.001" ) ).printToLog();
     }
 
     /**

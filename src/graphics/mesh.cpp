@@ -63,12 +63,13 @@ namespace BlueBear {
         // Mesh has associated bones that must be computed
         for( std::string& bone : boneIndices ) {
           boneUniform.push_back(
-            glm::inverse( bind->getMatrix( bone ) ) * currentPose->getMatrix( bone )
+            currentPose->getMatrix( bone ) * glm::inverse( bind->getMatrix( bone ) )
           );
         }
       }
 
       // XXX
+      /*
       if( debug ) {
         for( int i = 0; i != boneUniform.size(); i++ ) {
           Log::getInstance().debug( "Matrix " + std::to_string( i ) + " which is named " + ( i == 0 ? "<identity>" : boneIndices.at( i - 1 ) ), glm::to_string( boneUniform[ i ] ) );
@@ -77,6 +78,7 @@ namespace BlueBear {
 
         debug = false;
       }
+      */
 
       // Write uniforms to shader
       glUniformMatrix4fv( Tools::OpenGL::getUniformLocation( "bones" ), boneUniform.size(), GL_FALSE, glm::value_ptr( boneUniform[ 0 ] ) );

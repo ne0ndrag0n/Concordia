@@ -373,6 +373,11 @@ namespace BlueBear {
               absoluteKeyframe = absoluteKeyframe * glm::toMat4( glm::quat( usableRotationKey->mValue.w, usableRotationKey->mValue.x, usableRotationKey->mValue.y, usableRotationKey->mValue.z ) );
               absoluteKeyframe = glm::scale( absoluteKeyframe, glm::vec3( usableScalingKey->mValue.x, usableScalingKey->mValue.y, usableScalingKey->mValue.z ) );
 
+              // XXX
+              if( nodeID == "Bone.003" && kvPair.first == 60 ) {
+                Transform( absoluteKeyframe ).printToLog();
+              }
+
               nodeSet.addKeyframe( kvPair.first, Transform( absoluteKeyframe ) );
             }
           }
