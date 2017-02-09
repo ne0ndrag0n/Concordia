@@ -67,13 +67,13 @@ namespace BlueBear {
     void Instance::setAnimation( const std::string& animKey ) {
       if( !animations ) {
         Log::getInstance().warn( "Instance::setAnimation", "This instance has no animations." );
-        //return;
+        return;
       }
 
       auto it = animations->find( animKey );
       if( it == animations->end() ) {
         Log::getInstance().warn( "Instance::setAnimation", "Instance does not have animation with ID " + animKey );
-        //return;
+        return;
       }
 
       currentAnimation = std::make_shared< AnimPlayer >( it->second );
@@ -82,10 +82,14 @@ namespace BlueBear {
       /*
       std::shared_ptr< Armature > newPose = std::make_shared< Armature >( *bindPose );
 
-      Transform t( glm::inverse( bindPose->getMatrix( "Bone.002" ) ) * bindPose->getMatrix( "Bone.003" ) );
-      t.setRotation( glm::quat( 0.923f, 0.000f, -0.386f, 0.000f ) );
+      Transform bone002( newPose->getMatrix( "Bone.002" ) * glm::inverse( newPose->getMatrix( "Bone.001" ) ) );
+      bone002.setRotation( glm::quat( 0.707, 0.707, 0, 0 ) );
 
-      newPose->replaceMatrix( "Bone.003", t.getUpdatedMatrix() );
+      Transform bone003( newPose->getMatrix( "Bone.003" ) * glm::inverse( newPose->getMatrix( "Bone.002" ) ) );
+      bone003.setRotation( glm::quat( 0.707, -0.707, 0, 0 ) );
+
+      newPose->replaceMatrix( "Bone.002", bone002.getUpdatedMatrix() );
+      newPose->replaceMatrix( "Bone.003", bone003.getUpdatedMatrix() );
 
       currentPose = newPose;
       */

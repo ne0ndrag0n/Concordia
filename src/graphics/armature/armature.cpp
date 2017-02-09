@@ -55,7 +55,7 @@ namespace BlueBear {
       for( auto& pair : level ) {
         Bone& bone = pair.second;
 
-        BoneDiscovery result = getMatrixProxy( id, bone.children, bone.transform * parent );
+        BoneDiscovery result = getMatrixProxy( id, bone.children, parent * bone.transform );
         if( result.result ) {
           return result;
         }
