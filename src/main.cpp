@@ -18,38 +18,15 @@
 using namespace BlueBear;
 
 void test() {
-	// ~ TESTING ~
-	Log::getInstance().info( "Main", "Commencing test of some sort..." );
+	std::map< double, std::string > t;
 
-	glm::mat4 id( 1.0f ); // ID 0
-	glm::mat4 bone( 1.0f ); // ID 1
-	glm::mat4 bone002( 1.0f ); // ID 2
-	glm::mat4 bone003( 1.0f ); // ID 3
+	t[ 0 ] = "a";
+	t[ 1 ] = "b";
+	t[ 2 ] = "c";
 
-	BlueBear::Graphics::Transform t;
-	t.setPosition( glm::vec3( 0.0f, 0.0f, 3.0f ) );
-	t.setRotation( glm::angleAxis( (float)glm::radians( -89.113 ), glm::vec3( 0.0f, 1.0f, 0.0f ) ) );
+	auto it = t.upper_bound( 1 );
 
-	BlueBear::Graphics::Transform ibp;
-	ibp.setPosition( glm::vec3( 0.0f, 0.0f, -3.0f ) );
-
-	// Keyframe is set to rotate bone003 -89.113 degrees along Y
-	bone003 *= t.getUpdatedMatrix(); // move into bone space
-	bone003 *= ibp.getUpdatedMatrix(); // move out of bone space
-
-	Log::getInstance().debug( "Assert", glm::to_string( bone003 ) );
-
-	glm::mat4 xform =
-		( bone002 * 0.087f ) +
-		( bone003 * 0.911f ) +
-		( id * 0 ) +
-		( id * 0 );
-
-	// Vertex position is -0.5, -0.5, 4.0
-	glm::vec4 point = xform * glm::vec4( glm::vec3( -0.5f, -0.5f, 4.0f ), 1.0f );
-	// According to blender, should be -0.95638, -0.5, 2.63086
-	// Instead, result is -3.694115, -0.499000, -0.051035
-	Log::getInstance().debug( "Assert", glm::to_string( point ) );
+	Log::getInstance().debug( "Assert", it->second );
 }
 
 int main() {

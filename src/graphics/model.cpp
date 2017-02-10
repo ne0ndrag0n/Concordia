@@ -334,9 +334,6 @@ namespace BlueBear {
 
             KeyframeBundle& nodeSet = currentAnimation.keyframes[ nodeID ];
 
-            // Add an identity transform at 0.0 to ensure correct interpolation
-            nodeSet.addKeyframe( 0.0, Transform() );
-
             // Use the keyframes in builder to assemble a premade list of transformation matrices
             // If there is a nullptr in any of the keys, use the one previous to the one in the list
             auto vectorKey = std::make_unique< aiVectorKey >();
@@ -375,6 +372,19 @@ namespace BlueBear {
 
               nodeSet.addKeyframe( kvPair.first, Transform( absoluteKeyframe ) );
             }
+
+            // Boundary checks - there must be keyframes in both 0 and <duration>
+            // This could be potentially problematic as it's a hamfisted attempt to fix a bad file
+            if( nodeSet.keyframes.find( anim->mDuration ) == nodeSet.keyframes.end() ) {
+              Log::getInstance().warn( "Model::loadAnimations", "No keyframe at end for anim " + std::string( anim->mName.C_Str() ) + " bone " + nodeID + ", inserting end keyframe." );
+              auto last = --nodeSet.keyframes.end();
+              nodeSet.addKeyframe( anim->mDuration, Transform( last->second ) );
+            }
+            if( nodeSet.keyframes.find( 0.0 ) == nodeSet.keyframes.end() ) {
+              Log::getInstance().warn( "Model::loadAnimations", "No keyframe at 0 for anim " + std::string( anim->mName.C_Str() ) + " bone " + nodeID + ", inserting zero keyframe." );
+              nodeSet.addKeyframe( 0.0, Transform( nodeSet.keyframes.begin()->second ) );
+            }
+
           }
         }
       }

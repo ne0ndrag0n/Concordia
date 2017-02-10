@@ -165,6 +165,7 @@ namespace BlueBear {
       dynamicInstances.emplace_back( camera, "system/shaders/default_vertex.glsl", "system/shaders/default_fragment.glsl" );
 
       dynamicInstances[ 0 ].instances.emplace_back( *__debugModel );
+      dynamicInstances[ 0 ].instances[ 0 ].setPosition( glm::vec3( 2.5f, 2.5f, 0.0f ) );
 
       // Moving much of Display::loadInfrastructure here
       loadInfrastructure();
@@ -617,7 +618,7 @@ namespace BlueBear {
     int Display::MainGameState::lua_playanim1( lua_State* L ) {
       Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
 
-      self->dynamicInstances[ 0 ].instances[ 0 ].setAnimation( "Armature|Action" );
+      self->dynamicInstances[ 0 ].instances[ 0 ].setAnimation( "Armature|ArmatureAction.002" );
     }
     int Display::MainGameState::lua_playanim2( lua_State* L ) {
       Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
