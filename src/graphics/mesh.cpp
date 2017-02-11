@@ -68,18 +68,6 @@ namespace BlueBear {
         }
       }
 
-      // XXX
-      /*
-      if( debug ) {
-        for( int i = 0; i != boneUniform.size(); i++ ) {
-          Log::getInstance().debug( "Matrix " + std::to_string( i ) + " which is named " + ( i == 0 ? "<identity>" : boneIndices.at( i - 1 ) ), glm::to_string( boneUniform[ i ] ) );
-          Transform( boneUniform[ i ] ).printToLog();
-        }
-
-        debug = false;
-      }
-      */
-
       // Write uniforms to shader
       glUniformMatrix4fv( Tools::OpenGL::getUniformLocation( "bones" ), boneUniform.size(), GL_FALSE, glm::value_ptr( boneUniform[ 0 ] ) );
 

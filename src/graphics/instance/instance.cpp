@@ -77,22 +77,6 @@ namespace BlueBear {
       }
 
       currentAnimation = std::make_shared< AnimPlayer >( it->second );
-
-      // XXX
-      /*
-      std::shared_ptr< Armature > newPose = std::make_shared< Armature >( *bindPose );
-
-      Transform bone002( newPose->getMatrix( "Bone.002" ) * glm::inverse( newPose->getMatrix( "Bone.001" ) ) );
-      bone002.setRotation( glm::quat( 0.707, 0.707, 0, 0 ) );
-
-      Transform bone003( newPose->getMatrix( "Bone.003" ) * glm::inverse( newPose->getMatrix( "Bone.002" ) ) );
-      bone003.setRotation( glm::quat( 0.707, -0.707, 0, 0 ) );
-
-      newPose->replaceMatrix( "Bone.002", bone002.getUpdatedMatrix() );
-      newPose->replaceMatrix( "Bone.003", bone003.getUpdatedMatrix() );
-
-      currentPose = newPose;
-      */
     }
 
     /**

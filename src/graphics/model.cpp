@@ -311,7 +311,6 @@ namespace BlueBear {
           std::string nodeID = nodeAnimation->mNodeName.C_Str();
 
           if( nodeID != "Armature" ) {
-            Log::getInstance().debug( "Model::loadAnimations", "Adding " + std::string( anim->mName.C_Str() ) + " keyframes for node " + nodeID );
             std::map< double, KeyframeBuilder > builder;
 
             for( int i = 0; i != nodeAnimation->mNumPositionKeys; i++ ) {

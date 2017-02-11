@@ -37,9 +37,6 @@ namespace BlueBear {
         Mesh& operator=( const Mesh& );
 
       public:
-        // XXX
-        bool debug = false;
-
         Mesh(
           std::vector< Vertex >& vertices,
           std::vector< Index >& indices,
