@@ -29,6 +29,7 @@
 #include "graphics/model.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/instance/instance.hpp"
+#include "graphics/input/inputmanager.hpp"
 
 namespace BlueBear {
   class EventManager;
@@ -90,10 +91,7 @@ namespace BlueBear {
 
       class MainGameState : public State {
           lua_State* L;
-          struct {
-            std::string ISOMETRIC;
-            std::string FIRST_PERSON;
-          } strings;
+          Input::InputManager inputManager;
           unsigned int currentRotation;
           Shader defaultShader;
           Camera camera;
@@ -119,6 +117,7 @@ namespace BlueBear {
           // These are ours!
           std::unique_ptr< Containers::Collection3D< std::shared_ptr< Instance > > > floorInstanceCollection;
           std::unique_ptr< Containers::Collection3D< std::shared_ptr< WallCellBundler > > > wallInstanceCollection;
+          void registerEvents();
           void loadIntrinsicModels();
           void processOsd();
           void loadInfrastructure();

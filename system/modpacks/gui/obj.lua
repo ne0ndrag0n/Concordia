@@ -18,7 +18,6 @@ function GUIProvider:open_debug_ui()
 
   -- XXX: Remove after demo
   bluebear.gui.get_widget_by_id( "animate1" ):on( "click", bluebear.gui.__internal__playanim1 )
-  bluebear.gui.get_widget_by_id( "animate2" ):on( "click", bluebear.gui.__internal__playanim2 )
 end
 
 function GUIProvider:on_click_zoom_in()

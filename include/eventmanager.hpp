@@ -30,8 +30,29 @@ namespace BlueBear {
     void trigger( LuaReference param );
   };
 
+  /**
+   * This is mainly meant to be a many-to-one mapping for internal use
+   */
+  class SFGUISignalEvent {
+  public:
+    enum class Event {
+      DISABLE_KEYBOARD_EVENTS,
+      ENABLE_KEYBOARD_EVENTS
+    };
+
+    void listen( Event event, std::function< void() > callback );
+
+    void stopListening( Event event );
+
+    void trigger( Event event );
+
+  private:
+    std::map< Event, std::function< void() > > listeners;
+  };
+
   struct EventManager {
     UIActionEvent UI_ACTION_EVENT;
+    SFGUISignalEvent SFGUI_SIGNAL_EVENT;
   };
 
   // eventManager.UI_ACTION_EVENT.listen( this, [ & ]( LuaReference luaref ) { engine queues up passed-in lua reference } )

@@ -10,6 +10,7 @@
 #include <SFGUI/Alignment.hpp>
 #include <SFGUI/Misc.hpp>
 #include <SFGUI/Button.hpp>
+#include <SFGUI/Entry.hpp>
 #include <string>
 #include <memory>
 #include <exception>
@@ -32,6 +33,7 @@ namespace BlueBear {
       std::shared_ptr< sfg::Box > newBoxWidget( tinyxml2::XMLElement* element );
       std::shared_ptr< sfg::Alignment > newAlignmentWidget( tinyxml2::XMLElement* element );
       std::shared_ptr< sfg::Button > newButtonWidget( tinyxml2::XMLElement* element );
+      std::shared_ptr< sfg::Entry > newEntryWidget( tinyxml2::XMLElement* element );
 
       void setAlignment( std::shared_ptr< sfg::Misc > widget, tinyxml2::XMLElement* element );
       void setIdAndClass( std::shared_ptr< sfg::Widget > widget, tinyxml2::XMLElement* element );

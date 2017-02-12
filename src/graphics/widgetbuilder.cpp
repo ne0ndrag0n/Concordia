@@ -80,6 +80,10 @@ namespace BlueBear {
           /* addChildren( std::static_pointer_cast< sfg::Container >( widget ), element ); */
           break;
 
+        case hash( "Entry" ):
+          widget = newEntryWidget( element );
+          break;
+
         default:
           Log::getInstance().error( "WidgetBuilder::nodeToWidget", "Invalid CME tag specified: " + std::string( tagType ) );
           throw InvalidCMEWidgetException();
@@ -277,6 +281,18 @@ namespace BlueBear {
       setAllocationAndRequisition( button, element );
 
       return button;
+    }
+
+    std::shared_ptr< sfg::Entry > WidgetBuilder::newEntryWidget( tinyxml2::XMLElement* element ) {
+      std::shared_ptr< sfg::Entry > entry = sfg::Entry::Create( element->GetText() );
+
+      setIdAndClass( entry, element );
+      setAllocationAndRequisition( entry, element );
+
+      // TODO: Use eventManager to trigger a disable key events on eventManager.SFGUI_SIGNAL_EVENT when focusing in,
+      // and an enable key events when focusing out.
+
+      return entry;
     }
 
   }

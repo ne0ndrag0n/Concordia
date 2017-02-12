@@ -147,6 +147,7 @@ namespace BlueBear {
     Display::MainGameState::MainGameState( Display& instance, unsigned int currentRotation, Containers::Collection3D< std::shared_ptr< Scripting::Tile > >& floorMap, Containers::Collection3D< std::shared_ptr< Scripting::WallCell > >& wallMap ) :
       Display::State::State( instance ),
       L( instance.L ),
+      inputManager( instance.eventManager ),
       defaultShader( Shader( "system/shaders/default_vertex.glsl", "system/shaders/default_fragment.glsl" ) ),
       camera( Camera( instance.x, instance.y ) ),
       floorMap( floorMap ),
@@ -169,10 +170,59 @@ namespace BlueBear {
 
       // Moving much of Display::loadInfrastructure here
       loadInfrastructure();
+
+      // Register keyboard events
+      registerEvents();
     }
     Display::MainGameState::~MainGameState() {
       WallCellBundler::Piece.reset();
       WallCellBundler::DPiece.reset();
+    }
+    void Display::MainGameState::registerEvents() {
+      // Lay out some statics
+      static sf::Keyboard::Key KEY_PERSPECTIVE = ( sf::Keyboard::Key ) ConfigManager::getInstance().getIntValue( "key_switch_perspective" );
+      static sf::Keyboard::Key KEY_ROTATE_RIGHT = ( sf::Keyboard::Key ) ConfigManager::getInstance().getIntValue( "key_rotate_right" );
+      static sf::Keyboard::Key KEY_ROTATE_LEFT = ( sf::Keyboard::Key ) ConfigManager::getInstance().getIntValue( "key_rotate_left" );
+      static sf::Keyboard::Key KEY_UP = ( sf::Keyboard::Key ) ConfigManager::getInstance().getIntValue( "key_move_up" );
+      static sf::Keyboard::Key KEY_DOWN = ( sf::Keyboard::Key ) ConfigManager::getInstance().getIntValue( "key_move_down" );
+      static sf::Keyboard::Key KEY_LEFT = ( sf::Keyboard::Key ) ConfigManager::getInstance().getIntValue( "key_move_left" );
+      static sf::Keyboard::Key KEY_RIGHT = ( sf::Keyboard::Key ) ConfigManager::getInstance().getIntValue( "key_move_right" );
+      static sf::Keyboard::Key KEY_ZOOM_IN = ( sf::Keyboard::Key ) ConfigManager::getInstance().getIntValue( "key_zoom_in" );
+      static sf::Keyboard::Key KEY_ZOOM_OUT = ( sf::Keyboard::Key ) ConfigManager::getInstance().getIntValue( "key_zoom_out" );
+
+      inputManager.listen( KEY_ROTATE_RIGHT, [ & ]() {
+        currentRotation = camera.rotateRight();
+        createWallInstances();
+      } );
+
+      inputManager.listen( KEY_ROTATE_LEFT, [ & ]() {
+        currentRotation = camera.rotateLeft();
+        createWallInstances();
+      } );
+
+      inputManager.listen( KEY_UP, [ & ]() {
+        camera.move( 0.0f, -0.1f, 0.0f );
+      } );
+
+      inputManager.listen( KEY_DOWN, [ & ]() {
+        camera.move( 0.0f, 0.1f, 0.0f );
+      } );
+
+      inputManager.listen( KEY_LEFT, [ & ]() {
+        camera.move( 0.1f, 0.0f, 0.0f );
+      } );
+
+      inputManager.listen( KEY_RIGHT, [ & ]() {
+        camera.move( -0.1f, 0.0f, 0.0f );
+      } );
+
+      inputManager.listen( KEY_ZOOM_IN, [ & ]() {
+        camera.zoomIn();
+      } );
+
+      inputManager.listen( KEY_ZOOM_OUT, [ & ]() {
+        camera.zoomOut();
+      } );
     }
     void Display::MainGameState::loadIntrinsicModels() {
       WallCellBundler::Piece = std::make_unique< Model >( Display::WALLPANEL_MODEL_XY_PATH );
@@ -389,78 +439,8 @@ namespace BlueBear {
       instance.mainWindow.display();
     }
     void Display::MainGameState::handleEvent( sf::Event& event ) {
-      // Lay out some statics
-      static int KEY_PERSPECTIVE = ConfigManager::getInstance().getIntValue( "key_switch_perspective" );
-      static int KEY_ROTATE_RIGHT = ConfigManager::getInstance().getIntValue( "key_rotate_right" );
-      static int KEY_ROTATE_LEFT = ConfigManager::getInstance().getIntValue( "key_rotate_left" );
-      static int KEY_UP = ConfigManager::getInstance().getIntValue( "key_move_up" );
-      static int KEY_DOWN = ConfigManager::getInstance().getIntValue( "key_move_down" );
-      static int KEY_LEFT = ConfigManager::getInstance().getIntValue( "key_move_left" );
-      static int KEY_RIGHT = ConfigManager::getInstance().getIntValue( "key_move_right" );
-      static int KEY_ZOOM_IN = ConfigManager::getInstance().getIntValue( "key_zoom_in" );
-      static int KEY_ZOOM_OUT = ConfigManager::getInstance().getIntValue( "key_zoom_out" );
-
       gui.desktop.HandleEvent( event );
-
-      // Main game has a few events mostly relating to camera
-      switch( event.type ) {
-        case sf::Event::KeyPressed:
-          // absolutely disgusting
-          {
-            auto keyCode = event.key.code;
-
-            /*
-            if( keyCode == KEY_PERSPECTIVE ) {
-              if( camera.ortho ) {
-                camera.setOrthographic( false );
-                //instance.mainWindow.setMouseCursorVisible( false );
-                // there is no center yet
-                //sf::Mouse::setPosition( center, instance.mainWindow );
-                // just forget about this for now
-                //instance.mainWindow.setFramerateLimit( 60 );
-              } else {
-                camera.setOrthographic( true );
-                //instance.mainWindow.setMouseCursorVisible( true );
-                // just forget about this for now
-                //instance.mainWindow.setFramerateLimit( 30 );
-              }
-            }
-            */
-
-            if( keyCode == KEY_ROTATE_RIGHT ) {
-              currentRotation = camera.rotateRight();
-              createWallInstances();
-            }
-
-            if( keyCode == KEY_ROTATE_LEFT ) {
-              currentRotation = camera.rotateLeft();
-              createWallInstances();
-            }
-
-            if( keyCode == KEY_UP ) {
-              camera.move( 0.0f, -0.1f, 0.0f );
-            }
-            if( keyCode == KEY_DOWN ) {
-              camera.move( 0.0f, 0.1f, 0.0f );
-            }
-            if( keyCode == KEY_LEFT ) {
-              camera.move( 0.1f, 0.0f, 0.0f );
-            }
-            if( keyCode == KEY_RIGHT ) {
-              camera.move( -0.1f, 0.0f, 0.0f );
-            }
-            if( keyCode == KEY_ZOOM_IN ) {
-              camera.zoomIn();
-            }
-            if( keyCode == KEY_ZOOM_OUT ) {
-              camera.zoomOut();
-            }
-
-            break;
-          }
-        default:
-          break;
-      }
+      inputManager.handleEvent( event );
     }
     void Display::MainGameState::processOsd() {
       glDisable( GL_DEPTH_TEST );
@@ -485,8 +465,8 @@ namespace BlueBear {
           for( auto& widget : widgets ) {
             self->gui.rootContainer->Add( widget );
           }
-        } catch( ... ) {
-          Log::getInstance().error( "Display::MainGameState::lua_loadXMLWidgets", "Failed to create a WidgetBuilder for path " + path );
+        } catch( const std::exception& e ) {
+          Log::getInstance().error( "Display::MainGameState::lua_loadXMLWidgets", "Failed to create a WidgetBuilder for path " + path + ": " + e.what() );
         }
       } else {
         Log::getInstance().warn( "Display::MainGameState::lua_loadXMLWidgets", "Argument 1 provided to bluebear.gui.load_widgets is not a string." );
