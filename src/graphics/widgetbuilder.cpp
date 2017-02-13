@@ -2,6 +2,7 @@
 #include "configmanager.hpp"
 #include "log.hpp"
 #include "tools/utility.hpp"
+#include "eventmanager.hpp"
 #include <string>
 #include <memory>
 #include <SFGUI/Widget.hpp>
@@ -19,7 +20,7 @@
 namespace BlueBear {
   namespace Graphics {
 
-    WidgetBuilder::WidgetBuilder( const std::string& path ) {
+    WidgetBuilder::WidgetBuilder( EventManager& eventManager, const std::string& path ) : eventManager( eventManager ) {
       document.LoadFile( path.c_str() );
 
       // Object is unusable if the file failed to load
@@ -289,8 +290,14 @@ namespace BlueBear {
       setIdAndClass( entry, element );
       setAllocationAndRequisition( entry, element );
 
-      // TODO: Use eventManager to trigger a disable key events on eventManager.SFGUI_SIGNAL_EVENT when focusing in,
+      // Use eventManager to trigger a disable key events on eventManager.SFGUI_SIGNAL_EVENT when focusing in,
       // and an enable key events when focusing out.
+      entry->GetSignal( sfg::Widget::OnGainFocus ).Connect( [ &eventManager = eventManager ]() {
+        eventManager.SFGUI_SIGNAL_EVENT.trigger( SFGUISignalEvent::Event::DISABLE_KEYBOARD_EVENTS );
+      } );
+      entry->GetSignal( sfg::Widget::OnLostFocus ).Connect( [ &eventManager = eventManager ]() {
+        eventManager.SFGUI_SIGNAL_EVENT.trigger( SFGUISignalEvent::Event::ENABLE_KEYBOARD_EVENTS );
+      } );
 
       return entry;
     }

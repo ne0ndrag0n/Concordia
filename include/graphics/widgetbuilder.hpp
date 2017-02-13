@@ -17,9 +17,12 @@
 #include <vector>
 
 namespace BlueBear {
+  class EventManager;
+
   namespace Graphics {
 
     class WidgetBuilder {
+      EventManager& eventManager;
       tinyxml2::XMLDocument document;
       static constexpr unsigned int hash(const char* str, int h = 0);
 
@@ -45,7 +48,7 @@ namespace BlueBear {
       void correctYBoundary( float* input );
 
     public:
-      WidgetBuilder( const std::string& path );
+      WidgetBuilder( EventManager& eventManager, const std::string& path );
       std::vector< std::shared_ptr< sfg::Widget > > getWidgets();
     };
 

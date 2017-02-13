@@ -1,4 +1,5 @@
 #include "eventmanager.hpp"
+#include "log.hpp"
 
 namespace BlueBear {
 

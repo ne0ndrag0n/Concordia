@@ -460,7 +460,7 @@ namespace BlueBear {
         try {
           // Create a WidgetBuilder and dump its widgets into the root container
           // This should run in the engine objectLoop stage, and it will be caught on subsequent render
-          WidgetBuilder builder( path );
+          WidgetBuilder builder( self->instance.eventManager, path );
           std::vector< std::shared_ptr< sfg::Widget > > widgets = builder.getWidgets();
           for( auto& widget : widgets ) {
             self->gui.rootContainer->Add( widget );
