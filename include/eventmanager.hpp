@@ -33,11 +33,11 @@ namespace BlueBear {
   /**
    * This is mainly meant to be a many-to-one mapping for internal use
    */
-  class SFGUISignalEvent {
+  class SFGUIEatEvent {
   public:
     enum class Event {
-      DISABLE_KEYBOARD_EVENTS,
-      ENABLE_KEYBOARD_EVENTS
+      EAT_KEYBOARD_EVENT,
+      EAT_MOUSE_EVENT
     };
 
     void listen( Event event, std::function< void() > callback );
@@ -52,7 +52,7 @@ namespace BlueBear {
 
   struct EventManager {
     UIActionEvent UI_ACTION_EVENT;
-    SFGUISignalEvent SFGUI_SIGNAL_EVENT;
+    SFGUIEatEvent SFGUI_EAT_EVENT;
   };
 
   // eventManager.UI_ACTION_EVENT.listen( this, [ & ]( LuaReference luaref ) { engine queues up passed-in lua reference } )

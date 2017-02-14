@@ -147,6 +147,19 @@ namespace BlueBear {
       }
     }
 
+    /**
+     * Attach events that should be on every widget
+     */
+    void WidgetBuilder::setDefaultEvents( std::shared_ptr< sfg::Widget > widget, tinyxml2::XMLElement* element ) {
+      widget->GetSignal( sfg::Widget::OnLeftClick ).Connect( [ &eventManager = eventManager ]() {
+        eventManager.SFGUI_EAT_EVENT.trigger( SFGUIEatEvent::Event::EAT_MOUSE_EVENT );
+      } );
+
+      widget->GetSignal( sfg::Widget::OnRightClick ).Connect( [ &eventManager = eventManager ]() {
+        eventManager.SFGUI_EAT_EVENT.trigger( SFGUIEatEvent::Event::EAT_MOUSE_EVENT );
+      } );
+    }
+
     void WidgetBuilder::setAlignment( std::shared_ptr< sfg::Misc > widget, tinyxml2::XMLElement* element ) {
       sf::Vector2f alignment = widget->GetAlignment();
 
@@ -181,6 +194,7 @@ namespace BlueBear {
 
       setIdAndClass( window, element );
       setAllocationAndRequisition( window, element );
+      setDefaultEvents( window, element );
 
       const char* title = element->Attribute( "title" );
       if( title ) {
@@ -229,6 +243,8 @@ namespace BlueBear {
         label = sfg::Label::Create( "" );
       }
 
+      setDefaultEvents( label, element );
+
       return label;
     }
 
@@ -258,6 +274,7 @@ namespace BlueBear {
 
       box = sfg::Box::Create( orientationFlag, spacing );
       setIdAndClass( box, element );
+      setDefaultEvents( box, element );
 
       return box;
     }
@@ -268,6 +285,7 @@ namespace BlueBear {
       setIdAndClass( alignment, element );
       setAllocationAndRequisition( alignment, element );
       setAlignment( alignment, element );
+      setDefaultEvents( alignment, element );
 
       return alignment;
     }
@@ -280,6 +298,7 @@ namespace BlueBear {
 
       setIdAndClass( button, element );
       setAllocationAndRequisition( button, element );
+      setDefaultEvents( button, element );
 
       return button;
     }
@@ -289,14 +308,12 @@ namespace BlueBear {
 
       setIdAndClass( entry, element );
       setAllocationAndRequisition( entry, element );
+      setDefaultEvents( entry, element );
 
       // Use eventManager to trigger a disable key events on eventManager.SFGUI_SIGNAL_EVENT when focusing in,
       // and an enable key events when focusing out.
-      entry->GetSignal( sfg::Widget::OnGainFocus ).Connect( [ &eventManager = eventManager ]() {
-        eventManager.SFGUI_SIGNAL_EVENT.trigger( SFGUISignalEvent::Event::DISABLE_KEYBOARD_EVENTS );
-      } );
-      entry->GetSignal( sfg::Widget::OnLostFocus ).Connect( [ &eventManager = eventManager ]() {
-        eventManager.SFGUI_SIGNAL_EVENT.trigger( SFGUISignalEvent::Event::ENABLE_KEYBOARD_EVENTS );
+      entry->GetSignal( sfg::Widget::OnKeyPress ).Connect( [ &eventManager = eventManager ]() {
+        eventManager.SFGUI_EAT_EVENT.trigger( SFGUIEatEvent::Event::EAT_KEYBOARD_EVENT );
       } );
 
       return entry;

@@ -15,7 +15,8 @@ namespace BlueBear {
       class InputManager {
         EventManager& eventManager;
         std::map< sf::Keyboard::Key, std::function< void() > > keyEvents;
-        bool enableKeyEvents = true;
+        bool eatKeyEvents = false;
+        bool eatMouseEvents = false;
 
       public:
         InputManager( EventManager& eventManager );

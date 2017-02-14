@@ -17,15 +17,15 @@ namespace BlueBear {
     }
   }
 
-  void SFGUISignalEvent::listen( SFGUISignalEvent::Event event, std::function< void() > callback ) {
+  void SFGUIEatEvent::listen( SFGUIEatEvent::Event event, std::function< void() > callback ) {
     listeners[ event ] = callback;
   }
 
-  void SFGUISignalEvent::stopListening( SFGUISignalEvent::Event event ) {
+  void SFGUIEatEvent::stopListening( SFGUIEatEvent::Event event ) {
     listeners.erase( event );
   }
 
-  void SFGUISignalEvent::trigger( SFGUISignalEvent::Event event ) {
+  void SFGUIEatEvent::trigger( SFGUIEatEvent::Event event ) {
     listeners.at( event )();
   }
 }
