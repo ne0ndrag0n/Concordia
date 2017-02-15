@@ -345,8 +345,8 @@ namespace BlueBear {
 					LuaReference function = waitingTable.queuedCallbacks.front();
 					lua_rawgeti( L, LUA_REGISTRYINDEX, function ); // <function>
 
-					if( lua_pcall( L, 0, 0, 0 ) ) { // error
-						Log::getInstance().error( "Engine::objectLoop", "Exception thrown on tick " + std::to_string( currentTick ) + ": " + lua_tostring( L, -1 ) );
+					if( int stat = lua_pcall( L, 0, 0, 0 ) ) { // error
+						Log::getInstance().error( "Engine::objectLoop", "Exception thrown on tick " + std::to_string( currentTick ) + ": " + ( stat == -1 ? "<C++ exception>" : lua_tostring( L, -1 ) ) );
 						lua_pop( L, 1 ); // EMPTY
 					} // EMPTY
 

@@ -315,6 +315,8 @@ namespace BlueBear {
       gui.rootContainer = GUI::RootContainer::Create();
       gui.desktop.Add( gui.rootContainer );
 
+      inputManager.setRootContainer( gui.rootContainer );
+
       if( !gui.desktop.LoadThemeFromFile( ConfigManager::getInstance().getValue( "ui_theme" ) ) ) {
         Log::getInstance().warn( "Display::MainGameState::MainGameState", "ui_theme unable to load." );
       }
