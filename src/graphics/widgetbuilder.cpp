@@ -151,11 +151,11 @@ namespace BlueBear {
      * Attach events that should be on every widget
      */
     void WidgetBuilder::setDefaultEvents( std::shared_ptr< sfg::Widget > widget, tinyxml2::XMLElement* element ) {
-      widget->GetSignal( sfg::Widget::OnLeftClick ).Connect( [ &eventManager = eventManager ]() {
+      widget->GetSignal( sfg::Widget::OnMouseLeftRelease ).Connect( [ &eventManager = eventManager ]() {
         eventManager.SFGUI_EAT_EVENT.trigger( SFGUIEatEvent::Event::EAT_MOUSE_EVENT );
       } );
 
-      widget->GetSignal( sfg::Widget::OnRightClick ).Connect( [ &eventManager = eventManager ]() {
+      widget->GetSignal( sfg::Widget::OnMouseRightRelease ).Connect( [ &eventManager = eventManager ]() {
         eventManager.SFGUI_EAT_EVENT.trigger( SFGUIEatEvent::Event::EAT_MOUSE_EVENT );
       } );
     }

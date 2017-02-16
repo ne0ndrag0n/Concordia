@@ -12,7 +12,6 @@ namespace BlueBear {
         } );
 
         eventManager.SFGUI_EAT_EVENT.listen( SFGUIEatEvent::Event::EAT_MOUSE_EVENT, [ & ]() {
-          //Log::getInstance().debug( "Assert", "Staging to eat mouse event..." );
           eatMouseEvents = true;
         } );
       }
@@ -22,8 +21,7 @@ namespace BlueBear {
       }
 
       void InputManager::removeSFGUIFocus() {
-        // FIXME the focus on the rootcontainer goofs things up a bit
-        //this->rootContainer->GrabFocus();
+        this->rootContainer->GrabFocus();
       }
 
       void InputManager::listen( sf::Keyboard::Key key, std::function< void() > callback ) {
@@ -45,14 +43,12 @@ namespace BlueBear {
               }
             }
             break;
-          case sf::Event::MouseButtonPressed:
+          case sf::Event::MouseButtonReleased:
             {
               if( eatMouseEvents == false ) {
-                //Log::getInstance().debug( "Assert", "GUI didn't eat this event" );
                 removeSFGUIFocus();
                 // TODO mouse shit
               } else {
-                //Log::getInstance().debug( "Assert", "GUI ate this event" );
                 eatMouseEvents = false;
               }
             }
