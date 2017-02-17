@@ -105,8 +105,6 @@ namespace BlueBear {
             std::shared_ptr< sfg::Container > rootContainer;
             sf::Clock clock;
           } gui;
-          using SignalMap = std::map< sfg::Signal::SignalID, LuaReference >;
-          std::map< void*, SignalMap > masterSignalMap;
           // These are from the lot!
           Containers::Collection3D< std::shared_ptr< Scripting::Tile > >& floorMap;
           Containers::Collection3D< std::shared_ptr< Scripting::WallCell > >& wallMap;
@@ -129,13 +127,15 @@ namespace BlueBear {
           static int lua_loadXMLWidgets( lua_State* L );
           static int lua_Widget_gc( lua_State* L );
           static int lua_Widget_getWidgetByID( lua_State* L );
-          static int lua_Widget_onEvent( lua_State* L );
           static int lua_getWidgetByID( lua_State* L );
 
           // XXX: remove after demo branch
           static int lua_playanim1( lua_State* L );
           static int lua_playanim2( lua_State* L );
         public:
+          using SignalMap = std::map< sfg::Signal::SignalID, LuaReference >;
+          std::map< void*, SignalMap > masterSignalMap;
+
           void execute();
           void handleEvent( sf::Event& event );
           MainGameState( Display& instance, unsigned int currentRotation, Containers::Collection3D< std::shared_ptr< Scripting::Tile > >& floorMap, Containers::Collection3D< std::shared_ptr< Scripting::WallCell > >& wallMap );
@@ -143,9 +143,9 @@ namespace BlueBear {
       };
       // ----------------------------
 
+        EventManager& eventManager;
       private:
         lua_State* L;
-        EventManager& eventManager;
         using ViewportDimension = int;
         ViewportDimension x;
         ViewportDimension y;
@@ -153,8 +153,6 @@ namespace BlueBear {
         sfg::SFGUI sfgui;
 
         std::unique_ptr< State > currentState;
-
-        friend class Display::MainGameState;
     };
 
   }
