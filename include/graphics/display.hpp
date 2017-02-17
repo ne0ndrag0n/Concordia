@@ -105,10 +105,6 @@ namespace BlueBear {
             std::shared_ptr< sfg::Container > rootContainer;
             sf::Clock clock;
           } gui;
-          // Reserve space for additional elements we may need for a LuaElement type.
-          struct LuaElement {
-            std::shared_ptr< sfg::Widget > widget;
-          };
           using SignalMap = std::map< sfg::Signal::SignalID, LuaReference >;
           std::map< void*, SignalMap > masterSignalMap;
           // These are from the lot!

@@ -1,6 +1,7 @@
 #include "graphics/display.hpp"
 #include "containers/collection3d.hpp"
 #include "graphics/gui/sfgroot.hpp"
+#include "graphics/gui/luaelement.hpp"
 #include "graphics/imagebuilder/imagesource.hpp"
 #include "graphics/imagebuilder/pathimagesource.hpp"
 #include "graphics/instance/instance.hpp"
