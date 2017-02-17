@@ -16,6 +16,8 @@ namespace BlueBear {
         std::shared_ptr< sfg::Widget > widget;
 
         static int lua_onEvent( lua_State* L );
+        static int lua_getWidgetByID( lua_State* L );
+        static int lua_gc( lua_State* L );
       };
     }
   }

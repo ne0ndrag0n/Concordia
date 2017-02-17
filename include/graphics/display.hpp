@@ -100,11 +100,6 @@ namespace BlueBear {
           TextureCache texCache;
           ImageCache imageCache;
           std::vector< ShaderInstanceBundle > dynamicInstances;
-          struct {
-            sfg::Desktop desktop;
-            std::shared_ptr< sfg::Container > rootContainer;
-            sf::Clock clock;
-          } gui;
           // These are from the lot!
           Containers::Collection3D< std::shared_ptr< Scripting::Tile > >& floorMap;
           Containers::Collection3D< std::shared_ptr< Scripting::WallCell > >& wallMap;
@@ -125,9 +120,6 @@ namespace BlueBear {
           static int lua_zoomIn( lua_State* L );
           static int lua_zoomOut( lua_State* L );
           static int lua_loadXMLWidgets( lua_State* L );
-          static int lua_Widget_gc( lua_State* L );
-          static int lua_Widget_getWidgetByID( lua_State* L );
-          static int lua_getWidgetByID( lua_State* L );
 
           // XXX: remove after demo branch
           static int lua_playanim1( lua_State* L );
@@ -135,6 +127,11 @@ namespace BlueBear {
         public:
           using SignalMap = std::map< sfg::Signal::SignalID, LuaReference >;
           std::map< void*, SignalMap > masterSignalMap;
+          struct {
+            sfg::Desktop desktop;
+            std::shared_ptr< sfg::Container > rootContainer;
+            sf::Clock clock;
+          } gui;
 
           void execute();
           void handleEvent( sf::Event& event );

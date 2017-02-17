@@ -269,7 +269,7 @@ namespace BlueBear {
       // TODO: get_widget_by_class
       lua_pushstring( L, "get_widget_by_id" );
       lua_pushlightuserdata( L, this );
-      lua_pushcclosure( L, &Display::MainGameState::lua_getWidgetByID, 1 );
+      lua_pushcclosure( L, &GUI::LuaElement::lua_getWidgetByID, 1 );
       lua_settable( L, -3 );
 
       // XXX: Remove when demo branch is over
@@ -289,9 +289,9 @@ namespace BlueBear {
 
       // Register internal sfg::Widget wrappers
       luaL_Reg elementFuncs[] = {
-        { "get_widget_by_id", Display::MainGameState::lua_getWidgetByID },
+        { "get_widget_by_id", GUI::LuaElement::lua_getWidgetByID },
         { "on", GUI::LuaElement::lua_onEvent },
-        { "__gc", Display::MainGameState::lua_Widget_gc },
+        { "__gc", GUI::LuaElement::lua_gc },
         { NULL, NULL }
       };
 
@@ -500,54 +500,6 @@ namespace BlueBear {
 
       self->currentRotation = self->camera.rotateRight();
       self->createWallInstances();
-    }
-    int Display::MainGameState::lua_getWidgetByID( lua_State* L ) {
-
-      std::string selector;
-
-      // called from bluebear.gui.get_widget_by_id
-      if( lua_isstring( L, -1 ) ) {
-        selector = std::string( lua_tostring( L, -1 ) );
-      } else {
-        Log::getInstance().warn( "Display::MainGameState::lua_getWidgetByID", "Argument provided to get_widget_by_id was not a string." );
-        return 0;
-      }
-
-      Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
-      std::shared_ptr< sfg::Widget > parentWidget;
-      if( lua_gettop( L ) == 1 ) {
-        parentWidget = self->gui.rootContainer;
-      } else {
-        std::shared_ptr< sfg::Widget >* widgetPtr = *( ( std::shared_ptr< sfg::Widget >** ) luaL_checkudata( L, 1, "bluebear_widget" ) );
-        parentWidget = *widgetPtr;
-      }
-
-      // Holy moly is this going to get confusing quick
-      // I also have the least amount of confidence in this code you could possibly imagine
-      std::shared_ptr< sfg::Widget > widget = parentWidget->GetWidgetById( selector );
-      if( widget ) {
-        Log::getInstance().debug( "Display::MainGameState::lua_getWidgetByID", "Creating a userdata for the found element " + selector );
-        GUI::LuaElement** userData = ( GUI::LuaElement** )lua_newuserdata( L, sizeof( GUI::LuaElement* ) ); // userdata
-        *userData = new GUI::LuaElement();
-
-        ( **userData ).widget = widget;
-
-        luaL_getmetatable( L, "bluebear_widget" ); // metatable userdata
-        lua_setmetatable( L, -2 ); // userdata
-
-        return 1;
-      } else {
-        std::string error = std::string( "Could not find widget with ID " ) + selector;
-        return luaL_error( L, error.c_str() );
-      }
-    }
-    int Display::MainGameState::lua_Widget_gc( lua_State* L ) {
-      GUI::LuaElement* widgetPtr = *( ( GUI::LuaElement** ) luaL_checkudata( L, 1, "bluebear_widget" ) );
-
-      // Destroy the std::shared_ptr< sfg::Widget >. This should decrease the reference count by one.
-      delete widgetPtr;
-
-      return 0;
     }
     // XXX: Remove after demo branch
     int Display::MainGameState::lua_playanim1( lua_State* L ) {

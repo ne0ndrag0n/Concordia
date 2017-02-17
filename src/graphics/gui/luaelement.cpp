@@ -12,6 +12,9 @@ namespace BlueBear {
   namespace Graphics {
     namespace GUI {
 
+      /**
+       * @static
+       */
       int LuaElement::lua_onEvent( lua_State* L ) {
         LuaElement** userData = ( LuaElement** ) luaL_checkudata( L, 1, "bluebear_widget" );
         Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
@@ -56,6 +59,68 @@ namespace BlueBear {
         } else {
           Log::getInstance().warn( "LuaElement::lua_onEvent", "Invalid event passed to on()" );
         }
+
+        return 0;
+      }
+
+      /**
+       * @static
+       */
+      int LuaElement::lua_getWidgetByID( lua_State* L ) {
+        std::string selector;
+
+        // called from bluebear.gui.get_widget_by_id
+        if( lua_isstring( L, -1 ) ) {
+          selector = std::string( lua_tostring( L, -1 ) );
+        } else {
+          Log::getInstance().warn( "LuaElement::lua_getWidgetByID", "Argument provided to get_widget_by_id was not a string." );
+          return 0;
+        }
+
+        Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+        std::shared_ptr< sfg::Widget > parentWidget;
+        if( lua_gettop( L ) == 1 ) {
+          parentWidget = self->gui.rootContainer;
+        } else {
+          std::shared_ptr< sfg::Widget >* widgetPtr = *( ( std::shared_ptr< sfg::Widget >** ) luaL_checkudata( L, 1, "bluebear_widget" ) );
+          parentWidget = *widgetPtr;
+        }
+
+        // Holy moly is this going to get confusing quick
+        // I also have the least amount of confidence in this code you could possibly imagine
+        std::shared_ptr< sfg::Widget > widget = parentWidget->GetWidgetById( selector );
+        if( widget ) {
+          LuaElement** userData = ( LuaElement** )lua_newuserdata( L, sizeof( LuaElement* ) ); // userdata
+          *userData = new LuaElement();
+
+          ( **userData ).widget = widget;
+
+          luaL_getmetatable( L, "bluebear_widget" ); // metatable userdata
+          lua_setmetatable( L, -2 ); // userdata
+
+          /*
+          Log::getInstance().debug(
+            "LuaElement::lua_getWidgetByID",
+            "Creating a userdata for the found element " + selector + ", " + Tools::Utility::pointerToString( *userData )
+          );
+          */
+
+          return 1;
+        } else {
+          std::string error = std::string( "Could not find widget with ID " ) + selector;
+          return luaL_error( L, error.c_str() );
+        }
+      }
+
+      /**
+       * @static
+       */
+      int LuaElement::lua_gc( lua_State* L ) {
+        LuaElement* widgetPtr = *( ( LuaElement** ) luaL_checkudata( L, 1, "bluebear_widget" ) );
+
+        // Destroy the std::shared_ptr< sfg::Widget >. This should decrease the reference count by one.
+        //Log::getInstance().debug( "LuaElement::lua_gc", "Deleting " + Tools::Utility::pointerToString( widgetPtr ) );
+        delete widgetPtr;
 
         return 0;
       }
