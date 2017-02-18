@@ -313,6 +313,8 @@ namespace BlueBear {
       lua_pop( L, 1 ); // EMPTY
     }
     void Display::MainGameState::setupGUI() {
+      GUI::LuaElement::masterSignalMap.clear();
+
       gui.rootContainer = GUI::RootContainer::Create();
       gui.desktop.Add( gui.rootContainer );
 

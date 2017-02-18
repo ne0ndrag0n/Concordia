@@ -125,8 +125,6 @@ namespace BlueBear {
           static int lua_playanim1( lua_State* L );
           static int lua_playanim2( lua_State* L );
         public:
-          using SignalMap = std::map< sfg::Signal::SignalID, LuaReference >;
-          std::map< void*, SignalMap > masterSignalMap;
           struct {
             sfg::Desktop desktop;
             std::shared_ptr< sfg::Container > rootContainer;

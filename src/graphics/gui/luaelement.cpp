@@ -12,6 +12,8 @@ namespace BlueBear {
   namespace Graphics {
     namespace GUI {
 
+      std::map< void*, std::map< sfg::Signal::SignalID, LuaElement::SignalBinding > > LuaElement::masterSignalMap;
+
       /**
        * @static
        */
@@ -30,24 +32,29 @@ namespace BlueBear {
                 LuaElement& element = **userData;
 
                 // Create the bucket for this widget if it doesn't exist, otherwise, return a new bucket
-                Display::MainGameState::SignalMap& signalMap = self->masterSignalMap[ element.widget.get() ];
+                auto& signalMap = masterSignalMap[ element.widget.get() ];
 
                 // If there's a previous sfg::Widget::OnLeftClick registered for this widget instance, unref and kill it
                 auto pair = signalMap.find( sfg::Widget::OnLeftClick );
                 if( pair != signalMap.end() ) {
-                  // Un-ref this element we're about to erase
-                  luaL_unref( L, LUA_REGISTRYINDEX, pair->second );
+                  // One click listener at a time
+                  // Disconnect the handler
+                  element.widget->GetSignal( sfg::Widget::OnLeftClick ).Disconnect( pair->second.slotHandle );
+
+                  // Un-ref this function we're about to erase
+                  luaL_unref( L, LUA_REGISTRYINDEX, pair->second.reference );
                 }
 
                 // Track the master reference
                 // Unref this if the pointer is ever removed!
-                LuaReference masterReference = signalMap[ sfg::Widget::OnLeftClick ] = luaL_ref( L, LUA_REGISTRYINDEX ); // "event" self
-
-                element.widget->GetSignal( sfg::Widget::OnLeftClick ).Connect( [ L, self, masterReference ]() {
+                LuaReference masterReference = luaL_ref( L, LUA_REGISTRYINDEX ); // "event" self
+                unsigned int handle = element.widget->GetSignal( sfg::Widget::OnLeftClick ).Connect( [ L, self, masterReference ]() {
                   // Create new "disposable" reference that will get ferried through
                   lua_rawgeti( L, LUA_REGISTRYINDEX, masterReference ); // object
                   self->instance.eventManager.UI_ACTION_EVENT.trigger( luaL_ref( L, LUA_REGISTRYINDEX ) ); // EMPTY
                 } );
+
+                signalMap[ sfg::Widget::OnLeftClick ] = LuaElement::SignalBinding{ masterReference, handle };
 
                 lua_pushboolean( L, true ); // true "event" self
                 return 1; // true
