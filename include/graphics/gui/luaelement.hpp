@@ -32,6 +32,8 @@ namespace BlueBear {
         static int lua_getWidgetByID( lua_State* L );
         static int lua_getWidgetsByClass( lua_State* L );
         static int lua_gc( lua_State* L );
+        static int lua_getText( lua_State* L );
+        static int lua_setText( lua_State* L );
 
         static void getUserdataFromWidget( lua_State* L, std::shared_ptr< sfg::Widget > widget );
       };

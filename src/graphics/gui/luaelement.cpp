@@ -196,6 +196,86 @@ namespace BlueBear {
       /**
        * @static
        */
+      int LuaElement::lua_getText( lua_State* L ) {
+        LuaElement* widgetPtr = *( ( LuaElement** ) luaL_checkudata( L, 1, "bluebear_widget" ) );
+
+        std::string widgetType = widgetPtr->widget->GetName();
+        switch( Tools::Utility::hash( widgetType.c_str() ) ) {
+          case Tools::Utility::hash( "Entry" ):
+            {
+              std::shared_ptr< sfg::Entry > entry = std::static_pointer_cast< sfg::Entry >( widgetPtr->widget );
+              // See what happens when you try to reinvent the string??
+              lua_pushstring( L, std::string( entry->GetText() ).c_str() ); // "entry"
+            }
+            break;
+          case Tools::Utility::hash( "Label" ):
+            {
+              std::shared_ptr< sfg::Label > label = std::static_pointer_cast< sfg::Label >( widgetPtr->widget );
+              lua_pushstring( L, std::string( label->GetText() ).c_str() ); // "entry"
+            }
+            break;
+          case Tools::Utility::hash( "Button" ):
+            {
+              std::shared_ptr< sfg::Button > button = std::static_pointer_cast< sfg::Button >( widgetPtr->widget );
+              lua_pushstring( L, std::string( button->GetLabel() ).c_str() ); // "entry"
+            }
+            break;
+          default:
+            {
+              Log::getInstance().warn( "LuaElement::lua_getText", "Object of type " + widgetType + " has no convertible \"text\" field." );
+              lua_pushstring( L, "" ); // ""
+            }
+        }
+
+        // Better have a string ready to return to the user here
+        return 1;
+      }
+
+      /**
+       * @static
+       */
+      int LuaElement::lua_setText( lua_State* L ) {
+        // "text" self
+        if( !lua_isstring( L, -1 ) ) {
+          Log::getInstance().warn( "LuaElement::lua_setText", "Argument 1 of set_text must be a string." );
+          return 0;
+        }
+
+        LuaElement* widgetPtr = *( ( LuaElement** ) luaL_checkudata( L, 1, "bluebear_widget" ) );
+        std::string widgetType = widgetPtr->widget->GetName();
+        std::string text = lua_tostring( L, -1 );
+
+        switch( Tools::Utility::hash( widgetType.c_str() ) ) {
+          case Tools::Utility::hash( "Entry" ):
+            {
+              std::shared_ptr< sfg::Entry > entry = std::static_pointer_cast< sfg::Entry >( widgetPtr->widget );
+              entry->SetText( text );
+            }
+            break;
+          case Tools::Utility::hash( "Label" ):
+            {
+              std::shared_ptr< sfg::Label > label = std::static_pointer_cast< sfg::Label >( widgetPtr->widget );
+              label->SetText( text );
+            }
+            break;
+          case Tools::Utility::hash( "Button" ):
+            {
+              std::shared_ptr< sfg::Button > button = std::static_pointer_cast< sfg::Button >( widgetPtr->widget );
+              button->SetLabel( text );
+            }
+            break;
+          default:
+            {
+              Log::getInstance().warn( "LuaElement::lua_setText", "Object of type " + widgetType + " has no convertible \"text\" field." );
+            }
+        }
+
+        return 0;
+      }
+
+      /**
+       * @static
+       */
       int LuaElement::lua_gc( lua_State* L ) {
         LuaElement* widgetPtr = *( ( LuaElement** ) luaL_checkudata( L, 1, "bluebear_widget" ) );
 

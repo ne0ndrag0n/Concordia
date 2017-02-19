@@ -297,6 +297,8 @@ namespace BlueBear {
         { "get_widgets_by_class", GUI::LuaElement::lua_getWidgetsByClass },
         { "on", GUI::LuaElement::lua_onEvent },
         { "off", GUI::LuaElement::lua_offEvent },
+        { "get_text", GUI::LuaElement::lua_getText },
+        { "set_text", GUI::LuaElement::lua_setText },
         { "__gc", GUI::LuaElement::lua_gc },
         { NULL, NULL }
       };

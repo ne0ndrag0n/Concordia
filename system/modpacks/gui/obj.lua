@@ -16,8 +16,14 @@ function GUIProvider:open_debug_ui()
   bluebear.gui.get_widget_by_id( "zoom_in" ):on( "click", bluebear.util.bind( "system.provider.gui:on_click_zoom_in", self ) )
   bluebear.gui.get_widget_by_id( "zoom_out" ):on( "click", bluebear.util.bind( "system.provider.gui:on_click_zoom_out", self ) )
 
+  bluebear.gui.get_widget_by_id( "misc" ):on( "click", bluebear.util.bind( "system.provider.gui:do_something", self ) )
+
   -- XXX: Remove after demo
   bluebear.gui.get_widget_by_id( "animate1" ):on( "click", bluebear.gui.__internal__playanim1 )
+end
+
+function GUIProvider:do_something()
+
 end
 
 function GUIProvider:on_click_zoom_in()
