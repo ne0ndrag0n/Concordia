@@ -114,7 +114,6 @@ namespace BlueBear {
           void createWallInstances();
           void setupGUI();
           void submitLuaContributions();
-          sfg::Desktop getDesktopFromXML();
           static int lua_rotateWorldLeft( lua_State* L );
           static int lua_rotateWorldRight( lua_State* L );
           static int lua_zoomIn( lua_State* L );

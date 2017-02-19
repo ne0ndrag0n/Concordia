@@ -19,6 +19,7 @@
       <Button id="zoom_out">-</Button>
     </Box>
     <Button id="animate1">play anim</Button>
+    <Button id="misc">do interesting thing</Button>
     <Box id="inputs" spacing="5.0">
       <Entry id="inp1"></Entry>
       <Button id="apply">Apply</Button>

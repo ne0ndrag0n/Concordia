@@ -28,8 +28,12 @@ namespace BlueBear {
          */
         static std::map< void*, std::map< sfg::Signal::SignalID, SignalBinding > > masterSignalMap;
         static int lua_onEvent( lua_State* L );
+        static int lua_offEvent( lua_State* L );
         static int lua_getWidgetByID( lua_State* L );
+        static int lua_getWidgetsByClass( lua_State* L );
         static int lua_gc( lua_State* L );
+
+        static void getUserdataFromWidget( lua_State* L, std::shared_ptr< sfg::Widget > widget );
       };
     }
   }

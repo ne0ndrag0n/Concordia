@@ -266,10 +266,14 @@ namespace BlueBear {
       lua_pushcclosure( L, &Display::MainGameState::lua_zoomOut, 1 );
       lua_settable( L, -3 );
 
-      // TODO: get_widget_by_class
       lua_pushstring( L, "get_widget_by_id" );
       lua_pushlightuserdata( L, this );
       lua_pushcclosure( L, &GUI::LuaElement::lua_getWidgetByID, 1 );
+      lua_settable( L, -3 );
+
+      lua_pushstring( L, "get_widgets_by_class" );
+      lua_pushlightuserdata( L, this );
+      lua_pushcclosure( L, &GUI::LuaElement::lua_getWidgetsByClass, 1 );
       lua_settable( L, -3 );
 
       // XXX: Remove when demo branch is over
@@ -290,7 +294,9 @@ namespace BlueBear {
       // Register internal sfg::Widget wrappers
       luaL_Reg elementFuncs[] = {
         { "get_widget_by_id", GUI::LuaElement::lua_getWidgetByID },
+        { "get_widgets_by_class", GUI::LuaElement::lua_getWidgetsByClass },
         { "on", GUI::LuaElement::lua_onEvent },
+        { "off", GUI::LuaElement::lua_offEvent },
         { "__gc", GUI::LuaElement::lua_gc },
         { NULL, NULL }
       };
