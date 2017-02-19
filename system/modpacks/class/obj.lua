@@ -177,6 +177,7 @@ bluebear.util.bind = function( f, ... )
       table.insert( allargs, v )
     end
 
-    func( table.unpack( allargs ) )
+		-- 2/19/17 we now return result of function, possible oversight from before
+    return func( table.unpack( allargs ) )
   end
 end
