@@ -10,6 +10,7 @@ namespace BlueBear {
     // Abstract !!
     class ImageSource {
       public:
+        virtual ~ImageSource() = default;
         virtual sf::Image getImage() = 0;
         virtual std::string getKey() = 0;
     };

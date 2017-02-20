@@ -71,6 +71,7 @@ namespace BlueBear {
         public:
           Display& instance;
           State( Display& instance );
+          virtual ~State() = default;
           virtual void execute() = 0;
           virtual void handleEvent( sf::Event& event ) = 0;
       };
