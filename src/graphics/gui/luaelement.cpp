@@ -49,9 +49,29 @@ namespace BlueBear {
                 // Unref this if the pointer is ever removed!
                 LuaReference masterReference = luaL_ref( L, LUA_REGISTRYINDEX ); // "event" self
                 unsigned int handle = element.widget->GetSignal( sfg::Widget::OnLeftClick ).Connect( [ L, self, masterReference ]() {
-                  // Create new "disposable" reference that will get ferried through
-                  lua_rawgeti( L, LUA_REGISTRYINDEX, masterReference ); // object
-                  self->instance.eventManager.UI_ACTION_EVENT.trigger( luaL_ref( L, LUA_REGISTRYINDEX ) ); // EMPTY
+                  // Create new "disposable" reference that will get ferried through and double-bag it with an event meta object
+
+                  // Double-bag this function by slapping an event object onto the argument list
+                  lua_getglobal( L, "bluebear" ); // bluebear
+                  Tools::Utility::getTableValue( L, "util" ); // bluebear.util bluebear
+                  Tools::Utility::getTableValue( L, "bind" ); // <bind> bluebear.util bluebear
+                  lua_rawgeti( L, LUA_REGISTRYINDEX, masterReference ); // <function> <bind> bluebear.util bluebear
+
+                  lua_newtable( L ); // newtable <function> <bind> bluebear.util bluebear
+                  lua_pushstring( L, "mouse_left" ); // "mouse_left" newtable <function> <bind> bluebear.util bluebear
+                  lua_pushboolean( L, 1 ); // true "mouse_left" newtable <function> <bind> bluebear.util bluebear
+                  lua_settable( L, -3 ); // newtable <function> <bind> bluebear.util bluebear
+
+                  if( lua_pcall( L, 2, 1, 0 ) ) { // error bluebear.util bluebear
+                    Log::getInstance().error( "LuaElement::lua_onEvent/click", "Couldn't create required closure to fire event." );
+                    lua_pop( L, 3 ); // EMPTY
+                    return;
+                  } // <temp_function> bluebear.util bluebear
+
+                  int edibleReference = luaL_ref( L, LUA_REGISTRYINDEX ); // bluebear.util bluebear
+                  lua_pop( L, 2 ); // EMPTY
+
+                  self->instance.eventManager.UI_ACTION_EVENT.trigger( edibleReference );
                 } );
 
                 signalMap[ sfg::Widget::OnLeftClick ] = LuaElement::SignalBinding{ masterReference, handle };

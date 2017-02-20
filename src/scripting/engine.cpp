@@ -343,12 +343,19 @@ namespace BlueBear {
 				// Burn out every function scheduled for this tick
 				while( !waitingTable.queuedCallbacks.empty() ) {
 					LuaReference function = waitingTable.queuedCallbacks.front();
-					lua_rawgeti( L, LUA_REGISTRYINDEX, function ); // <function>
 
-					if( int stat = lua_pcall( L, 0, 0, 0 ) ) { // error
+					lua_getglobal( L, "bluebear" ); // bluebear
+					Tools::Utility::getTableValue( L, "util" ); // bluebear.util bluebear
+					Tools::Utility::getTableValue( L, "traceback" ); // <err_handler> bluebear.util bluebear
+
+					lua_rawgeti( L, LUA_REGISTRYINDEX, function ); // <function> <err_handler> bluebear.util bluebear
+
+					if( int stat = lua_pcall( L, 0, 0, -2 ) ) { // error <err_handler> bluebear.util bluebear
 						Log::getInstance().error( "Engine::objectLoop", "Exception thrown on tick " + std::to_string( currentTick ) + ": " + ( stat == -1 ? "<C++ exception>" : lua_tostring( L, -1 ) ) );
-						lua_pop( L, 1 ); // EMPTY
-					} // EMPTY
+						lua_pop( L, 1 ); // <err_handler> bluebear.util bluebear
+					}
+
+					lua_pop( L, 3 ); // EMPTY
 
 					// Only YOU can prevent memory leaks!
 					// The "function" reference should have not been used anywhere else in the pipeline (enqueued to now)

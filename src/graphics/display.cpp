@@ -452,8 +452,14 @@ namespace BlueBear {
       instance.mainWindow.display();
     }
     void Display::MainGameState::handleEvent( sf::Event& event ) {
+      // Useful for some metadata in event handling
+      currentEvent = &event;
+
       gui.desktop.HandleEvent( event );
       inputManager.handleEvent( event );
+
+      // Never leave a pointer dangling
+      currentEvent = nullptr;
     }
     void Display::MainGameState::processOsd() {
       glDisable( GL_DEPTH_TEST );
@@ -493,32 +499,38 @@ namespace BlueBear {
       Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
 
       self->camera.zoomIn();
+      return 0;
     }
     int Display::MainGameState::lua_zoomOut( lua_State* L ) {
       Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
 
       self->camera.zoomOut();
+      return 0;
     }
     int Display::MainGameState::lua_rotateWorldLeft( lua_State* L ) {
       Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
 
       self->currentRotation = self->camera.rotateLeft();
       self->createWallInstances();
+      return 0;
     }
     int Display::MainGameState::lua_rotateWorldRight( lua_State* L ) {
       Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
 
       self->currentRotation = self->camera.rotateRight();
       self->createWallInstances();
+      return 0;
     }
     // XXX: Remove after demo branch
     int Display::MainGameState::lua_playanim1( lua_State* L ) {
       Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
 
       self->dynamicInstances[ 0 ].instances[ 0 ].setAnimation( "Armature|ArmatureAction.002" );
+      return 0;
     }
     int Display::MainGameState::lua_playanim2( lua_State* L ) {
       Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+      return 0;
     }
   }
 }

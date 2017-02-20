@@ -42,8 +42,4 @@ function GUIProvider:on_click_rot_r()
   bluebear.gui.rotate_right()
 end
 
-function GUIProvider:handle_error( error )
-  print( "system.provider.gui", error )
-end
-
 bluebear.register_class( GUIProvider )

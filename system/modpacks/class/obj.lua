@@ -157,6 +157,12 @@ bluebear.util.bind = function( f, ... )
 		-- These will just be nil if they don't exist
 		__derived_class = bluebear.util.get_upvalue_by_name( func, "__derived_class" )
 		__derived_func = bluebear.util.get_upvalue_by_name( func, "__derived_func" )
+
+		-- Possible TODO: If we double-wrap a function, do we lose crucial upvalues in the serialisation process?
+		-- Should probably do the following here (in separate task/future milestone):
+		-- 1. check __derived_class and __derived_func to see if they are both present and strings
+		-- 2. pull args out of func and concatenate them with the current args
+		-- 3. replace func with the "completion" above. now we're achieving the notion of double-bagging a function by slapping new args on top of the old args.
 	end
 
   return function( ... )

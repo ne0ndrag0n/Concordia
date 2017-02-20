@@ -130,6 +130,7 @@ namespace BlueBear {
             std::shared_ptr< sfg::Container > rootContainer;
             sf::Clock clock;
           } gui;
+          sf::Event* currentEvent = nullptr;
 
           void execute();
           void handleEvent( sf::Event& event );

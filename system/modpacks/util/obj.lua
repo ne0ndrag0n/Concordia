@@ -117,3 +117,21 @@ end
 bluebear.util.set_upvalue_by_index = function( func, index, upvalue )
   debug.upvaluejoin( func, index, ( function() return upvalue end ), 1 )
 end
+
+bluebear.util.traceback = function( errmsg )
+  local msg = errmsg.."\n"
+  local additional = bluebear.util.split( debug.traceback(), "\n" )
+
+  -- first line is "stack traceback:"
+  -- second line is just where we did debug.traceback(), which is useless
+  -- There should be more than these
+  if #additional > 2 then
+    for i = 3, #additional do
+      msg = msg..additional[ i ].."\n"
+    end
+  else
+    msg = msg.."\t(no traceback available)"
+  end
+
+  return msg
+end
