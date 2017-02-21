@@ -22,7 +22,9 @@ function GUIProvider:open_debug_ui()
   bluebear.gui.get_widget_by_id( "animate1" ):on( "click", bluebear.gui.__internal__playanim1 )
 end
 
-function GUIProvider:do_something()
+function GUIProvider:do_something( event )
+  local button = event.mouse
+  local target = bluebear.gui.get_widget_by_id( 'inputs' )
 
 end
 

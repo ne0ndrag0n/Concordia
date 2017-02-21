@@ -10,9 +10,16 @@
 #include <map>
 
 namespace BlueBear {
+  class EventManager;
+
   namespace Graphics {
     namespace GUI {
       // Reserve space for additional elements we may need for a LuaElement type.
+
+      /**
+       * This is a Luasphere object that wraps an SFGUI object. It is only a wrapper, and does
+       * not signify an actual equality to a widget (unless the __eq metamethod is overridden)
+       */
       class LuaElement {
       public:
         std::shared_ptr< sfg::Widget > widget;
@@ -34,8 +41,17 @@ namespace BlueBear {
         static int lua_gc( lua_State* L );
         static int lua_getText( lua_State* L );
         static int lua_setText( lua_State* L );
+        static int lua_getProperty( lua_State* L );
+        static int lua_setProperty( lua_State* L );
 
         static void getUserdataFromWidget( lua_State* L, std::shared_ptr< sfg::Widget > widget );
+        static void clickHandler(
+          lua_State* L,
+          EventManager& eventManager,
+          std::weak_ptr< sfg::Widget > selfElement,
+          LuaReference masterReference,
+          const std::string& buttonTag
+        );
       };
     }
   }

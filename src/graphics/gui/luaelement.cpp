@@ -48,33 +48,14 @@ namespace BlueBear {
                 // Track the master reference
                 // Unref this if the pointer is ever removed!
                 LuaReference masterReference = luaL_ref( L, LUA_REGISTRYINDEX ); // "event" self
-                unsigned int handle = element.widget->GetSignal( sfg::Widget::OnLeftClick ).Connect( [ L, self, masterReference ]() {
-                  // Create new "disposable" reference that will get ferried through and double-bag it with an event meta object
-
-                  // Double-bag this function by slapping an event object onto the argument list
-                  lua_getglobal( L, "bluebear" ); // bluebear
-                  Tools::Utility::getTableValue( L, "util" ); // bluebear.util bluebear
-                  Tools::Utility::getTableValue( L, "bind" ); // <bind> bluebear.util bluebear
-                  lua_rawgeti( L, LUA_REGISTRYINDEX, masterReference ); // <function> <bind> bluebear.util bluebear
-
-                  lua_newtable( L ); // newtable <function> <bind> bluebear.util bluebear
-                  lua_pushstring( L, "mouse_left" ); // "mouse_left" newtable <function> <bind> bluebear.util bluebear
-                  lua_pushboolean( L, 1 ); // true "mouse_left" newtable <function> <bind> bluebear.util bluebear
-                  lua_settable( L, -3 ); // newtable <function> <bind> bluebear.util bluebear
-
-                  if( lua_pcall( L, 2, 1, 0 ) ) { // error bluebear.util bluebear
-                    Log::getInstance().error( "LuaElement::lua_onEvent/click", "Couldn't create required closure to fire event." );
-                    lua_pop( L, 3 ); // EMPTY
-                    return;
-                  } // <temp_function> bluebear.util bluebear
-
-                  int edibleReference = luaL_ref( L, LUA_REGISTRYINDEX ); // bluebear.util bluebear
-                  lua_pop( L, 2 ); // EMPTY
-
-                  self->instance.eventManager.UI_ACTION_EVENT.trigger( edibleReference );
-                } );
-
-                signalMap[ sfg::Widget::OnLeftClick ] = LuaElement::SignalBinding{ masterReference, handle };
+                signalMap[ sfg::Widget::OnLeftClick ] = LuaElement::SignalBinding{
+                  masterReference,
+                  element.widget->GetSignal( sfg::Widget::OnLeftClick ).Connect( std::bind( LuaElement::clickHandler, L, self->instance.eventManager, element.widget, masterReference, "left" ) )
+                };
+                signalMap[ sfg::Widget::OnRightClick ] = LuaElement::SignalBinding{
+                  masterReference,
+                  element.widget->GetSignal( sfg::Widget::OnRightClick ).Connect( std::bind( LuaElement::clickHandler, L, self->instance.eventManager, element.widget, masterReference, "right" ) )
+                };
 
                 lua_pushboolean( L, true ); // true "event" self
                 return 1; // true
@@ -115,6 +96,11 @@ namespace BlueBear {
                     luaL_unref( L, LUA_REGISTRYINDEX, pair->second.reference );
 
                     signalMap.erase( sfg::Widget::OnLeftClick );
+
+                    // This is a package deal
+                    auto& right = signalMap.at( sfg::Widget::OnRightClick );
+                    element.widget->GetSignal( sfg::Widget::OnRightClick ).Disconnect( right.slotHandle );
+                    signalMap.erase( sfg::Widget::OnRightClick );
                   }
                 }
               }
@@ -296,6 +282,130 @@ namespace BlueBear {
       /**
        * @static
        */
+      int LuaElement::lua_getProperty( lua_State* L ) {
+        LuaElement* widgetPtr = *( ( LuaElement** ) luaL_checkudata( L, 1, "bluebear_widget" ) );
+
+        // "property" self
+
+        if( !lua_isstring( L, -1 ) ) {
+          Log::getInstance().warn( "LuaElement::lua_getProperty", "Argument 1 of get_property must be a string." );
+          return 0;
+        }
+
+        const char* property = lua_tostring( L, -1 );
+        switch( Tools::Utility::hash( property ) ) {
+          case Tools::Utility::hash( "visible" ):
+           {
+             lua_pushboolean( L, widgetPtr->widget->IsLocallyVisible() ? 1 : 0 ); // true/false
+             return 1;
+           }
+          case Tools::Utility::hash( "id" ):
+            {
+              lua_pushstring( L, widgetPtr->widget->GetId().c_str() ); // "id"
+              return 1;
+            }
+          case Tools::Utility::hash( "class" ):
+            {
+              lua_pushstring( L, widgetPtr->widget->GetClass().c_str() ); // "class"
+              return 1;
+            }
+          case Tools::Utility::hash( "min-width" ):
+            {
+              sf::Vector2f requisition = widgetPtr->widget->GetRequisition();
+              lua_pushnumber( L, requisition.x ); // 42.0
+              return 1;
+            }
+          case Tools::Utility::hash( "min-height" ):
+            {
+              sf::Vector2f requisition = widgetPtr->widget->GetRequisition();
+              lua_pushnumber( L, requisition.y ); // 42.0
+              return 1;
+            }
+          default:
+            Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" is not a recognized ConcordiaME property." );
+            return 0;
+        }
+
+        return 0;
+      }
+
+      /**
+       * @static
+       */
+      int LuaElement::lua_setProperty( lua_State* L ) {
+        LuaElement* widgetPtr = *( ( LuaElement** ) luaL_checkudata( L, 1, "bluebear_widget" ) );
+
+        // value "property" self
+
+        if( !lua_isstring( L, -2 ) ) {
+          Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 1 of set_property must be a string." );
+          return 0;
+        }
+
+        const char* property = lua_tostring( L, -2 );
+        switch( Tools::Utility::hash( property ) ) {
+          case Tools::Utility::hash( "visible" ):
+            {
+              bool visibility = lua_toboolean( L, -1 ) ? true : false;
+              widgetPtr->widget->Show( visibility );
+              return 0;
+            }
+          case Tools::Utility::hash( "id" ):
+            {
+              if( !lua_isstring( L, -1 ) ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"id\" must be a string." );
+              } else {
+                widgetPtr->widget->SetId( lua_tostring( L, -1 ) );
+              }
+              return 0;
+            }
+          case Tools::Utility::hash( "class" ):
+            {
+              if( !lua_isstring( L, -1 ) ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"class\" must be a string." );
+              } else {
+                widgetPtr->widget->SetClass( lua_tostring( L, -1 ) );
+              }
+              return 0;
+            }
+          case Tools::Utility::hash( "min-width" ):
+            {
+              // FIXME: Why isn't SFGUI updating window size?
+
+              if( !lua_isstring( L, -1 ) ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"min-width\" must be a number." );
+                return 0;
+              }
+
+              sf::Vector2f requisition = widgetPtr->widget->GetRequisition();
+              requisition.x = lua_tonumber( L, -1 );
+              widgetPtr->widget->SetRequisition( requisition );
+              return 0;
+            }
+          case Tools::Utility::hash( "min-height" ):
+            {
+              // FIXME: Why isn't SFGUI updating window size?
+
+              if( !lua_isstring( L, -1 ) ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"min-height\" must be a number." );
+                return 0;
+              }
+
+              sf::Vector2f requisition = widgetPtr->widget->GetRequisition();
+              requisition.y = lua_tonumber( L, -1 );
+              widgetPtr->widget->SetRequisition( requisition );
+              return 0;
+            }
+          default:
+            Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" is not a recognized ConcordiaME property." );
+        }
+
+        return 0;
+      }
+
+      /**
+       * @static
+       */
       int LuaElement::lua_gc( lua_State* L ) {
         LuaElement* widgetPtr = *( ( LuaElement** ) luaL_checkudata( L, 1, "bluebear_widget" ) );
 
@@ -319,6 +429,45 @@ namespace BlueBear {
 
         luaL_getmetatable( L, "bluebear_widget" ); // metatable userdata
         lua_setmetatable( L, -2 ); // userdata
+      }
+
+      /**
+       *
+       * STACK ARGS: (none)
+       * Stack is unmodified after call
+       */
+      void LuaElement::clickHandler( lua_State* L, EventManager& eventManager, std::weak_ptr< sfg::Widget > selfElement, LuaReference masterReference, const std::string& buttonTag ) {
+        // Create new "disposable" reference that will get ferried through and double-bag it with an event meta object
+
+        // Double-bag this function by slapping an event object onto the argument list
+        lua_getglobal( L, "bluebear" ); // bluebear
+        Tools::Utility::getTableValue( L, "util" ); // bluebear.util bluebear
+        Tools::Utility::getTableValue( L, "bind" ); // <bind> bluebear.util bluebear
+        lua_rawgeti( L, LUA_REGISTRYINDEX, masterReference ); // <function> <bind> bluebear.util bluebear
+
+        lua_newtable( L ); // newtable <function> <bind> bluebear.util bluebear
+        lua_pushstring( L, "mouse" ); // "mouse" newtable <function> <bind> bluebear.util bluebear
+        lua_pushstring( L, buttonTag.c_str() ); // "left" "mouse" newtable <function> <bind> bluebear.util bluebear
+        lua_settable( L, -3 ); // newtable <function> <bind> bluebear.util bluebear
+
+        if( auto elementPtr = selfElement.lock() ) {
+          lua_pushstring( L, "widget" ); // "widget" newtable <function> <bind> bluebear.util bluebear
+          getUserdataFromWidget( L, elementPtr ); // element "widget" newtable <function> <bind> bluebear.util bluebear
+          lua_settable( L, -3 ); // newtable <function> <bind> bluebear.util bluebear
+        } else {
+          Log::getInstance().error( "LuaElement::clickHandler", "Could not lock element pointer to build field event.widget" );
+        }
+
+        if( lua_pcall( L, 2, 1, 0 ) ) { // error bluebear.util bluebear
+          Log::getInstance().error( "LuaElement::clickHandler", "Couldn't create required closure to fire event." );
+          lua_pop( L, 3 ); // EMPTY
+          return;
+        } // <temp_function> bluebear.util bluebear
+
+        int edibleReference = luaL_ref( L, LUA_REGISTRYINDEX ); // bluebear.util bluebear
+        lua_pop( L, 2 ); // EMPTY
+
+        eventManager.UI_ACTION_EVENT.trigger( edibleReference );
       }
 
     }

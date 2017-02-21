@@ -1,16 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Window id="debug" min-width="250" min-height="125" left="-260" top="10" title="Debug" resize="false">
   <Box orientation="vertical" spacing="5.0">
-    <!--
-    <Box orientation="horizontal">
-      <Label alignment_x="0">Camera:</Label>
-      <Label id="camera_val" alignment_x="0" expand="false">(0.0, 0.0, 0.0)</Label>
-    </Box>
-    <Box orientation="horizontal">
-      <Label alignment_x="0">Rotation:</Label>
-      <Label id="rot_val" alignment_x="1.0" expand="false">0</Label>
-    </Box>
-    -->
     <Label>0.0.3 "Picasso"</Label>
     <Box id="control" orientation="horizontal" spacing="5.0">
       <Button id="rot_l">&lt;</Button>

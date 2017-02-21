@@ -118,9 +118,13 @@ namespace BlueBear {
       }
     }
 
-    void WidgetBuilder::setIdAndClass( std::shared_ptr< sfg::Widget > widget, tinyxml2::XMLElement* element ) {
+    /**
+     * Set basic properties on all widgets
+     */
+    void WidgetBuilder::setBasicProperties( std::shared_ptr< sfg::Widget > widget, tinyxml2::XMLElement* element ) {
       const char* id = element->Attribute( "id" );
       const char* clss = element->Attribute( "class" );
+      const char* visible = element->Attribute( "visible" );
 
       if ( id ) {
         widget->SetId( id );
@@ -128,6 +132,18 @@ namespace BlueBear {
 
       if ( clss ) {
         widget->SetClass( clss );
+      }
+
+      if ( visible ) {
+        std::string value( visible );
+
+        if( value == "true" ) {
+          widget->Show( true );
+        } else if ( value == "false" ) {
+          widget->Show( false );
+        } else {
+          Log::getInstance().warn( "WidgetBuilder::setBasicProperties",  "Invalid value for \"visible\" attribute: " + std::string( value ) + ", defaulting to \"true\"" );
+        }
       }
     }
 
@@ -192,7 +208,7 @@ namespace BlueBear {
     std::shared_ptr< sfg::Window > WidgetBuilder::newWindowWidget( tinyxml2::XMLElement* element ) {
       std::shared_ptr< sfg::Window > window = sfg::Window::Create();
 
-      setIdAndClass( window, element );
+      setBasicProperties( window, element );
       setAllocationAndRequisition( window, element );
       setDefaultEvents( window, element );
 
@@ -236,7 +252,7 @@ namespace BlueBear {
 
       if( labelValue ) {
         label = sfg::Label::Create( labelValue );
-        setIdAndClass( label, element );
+        setBasicProperties( label, element );
         setAllocationAndRequisition( label, element );
         setAlignment( label, element );
       } else {
@@ -273,7 +289,7 @@ namespace BlueBear {
       element->QueryFloatAttribute( "spacing", &spacing );
 
       box = sfg::Box::Create( orientationFlag, spacing );
-      setIdAndClass( box, element );
+      setBasicProperties( box, element );
       setDefaultEvents( box, element );
 
       return box;
@@ -282,7 +298,7 @@ namespace BlueBear {
     std::shared_ptr< sfg::Alignment > WidgetBuilder::newAlignmentWidget( tinyxml2::XMLElement* element ) {
       std::shared_ptr< sfg::Alignment > alignment = sfg::Alignment::Create();
 
-      setIdAndClass( alignment, element );
+      setBasicProperties( alignment, element );
       setAllocationAndRequisition( alignment, element );
       setAlignment( alignment, element );
       setDefaultEvents( alignment, element );
@@ -296,7 +312,7 @@ namespace BlueBear {
     std::shared_ptr< sfg::Button > WidgetBuilder::newButtonWidget( tinyxml2::XMLElement* element ) {
       std::shared_ptr< sfg::Button > button = sfg::Button::Create( element->GetText() );
 
-      setIdAndClass( button, element );
+      setBasicProperties( button, element );
       setAllocationAndRequisition( button, element );
       setDefaultEvents( button, element );
 
@@ -306,7 +322,7 @@ namespace BlueBear {
     std::shared_ptr< sfg::Entry > WidgetBuilder::newEntryWidget( tinyxml2::XMLElement* element ) {
       std::shared_ptr< sfg::Entry > entry = sfg::Entry::Create( element->GetText() );
 
-      setIdAndClass( entry, element );
+      setBasicProperties( entry, element );
       setAllocationAndRequisition( entry, element );
       setDefaultEvents( entry, element );
 

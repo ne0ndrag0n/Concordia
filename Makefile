@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -pthread -std=c++14 -g -rdynamic -pipe
+CFLAGS = -pthread -std=c++14 -g -rdynamic -pipe #-fsanitize=address
 INCLUDES = -Iinclude
 LIBS = -lpthread -ltbb -lassimp -lGLEW -lGL -lsfml-graphics -lsfml-window -lsfml-system -lsfgui -ltinyxml2 -ljsoncpp -llua -ldl
 

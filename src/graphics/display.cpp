@@ -299,6 +299,8 @@ namespace BlueBear {
         { "off", GUI::LuaElement::lua_offEvent },
         { "get_text", GUI::LuaElement::lua_getText },
         { "set_text", GUI::LuaElement::lua_setText },
+        { "get_property", GUI::LuaElement::lua_getProperty },
+        { "set_property", GUI::LuaElement::lua_setProperty },
         { "__gc", GUI::LuaElement::lua_gc },
         { NULL, NULL }
       };
