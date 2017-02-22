@@ -12,7 +12,6 @@
     <Button id="misc">do interesting thing</Button>
     <Box id="inputs" spacing="5.0">
       <Entry id="inp1"></Entry>
-      <Button id="apply">Apply</Button>
     </Box>
   </Box>
 </Window>

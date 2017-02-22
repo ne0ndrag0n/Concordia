@@ -1,6 +1,7 @@
 #include "graphics/gui/luaelement.hpp"
 #include "graphics/display.hpp"
 #include "tools/utility.hpp"
+#include "configmanager.hpp"
 #include "eventmanager.hpp"
 #include "log.hpp"
 #include <SFML/Graphics.hpp>
@@ -292,6 +293,8 @@ namespace BlueBear {
           return 0;
         }
 
+        std::string widgetType = widgetPtr->widget->GetName();
+
         const char* property = lua_tostring( L, -1 );
         switch( Tools::Utility::hash( property ) ) {
           case Tools::Utility::hash( "visible" ):
@@ -321,6 +324,108 @@ namespace BlueBear {
               lua_pushnumber( L, requisition.y ); // 42.0
               return 1;
             }
+          case Tools::Utility::hash( "width" ):
+            {
+              sf::FloatRect allocation = widgetPtr->widget->GetAllocation();
+              lua_pushnumber( L, allocation.width ); // 42.0
+              return 1;
+            }
+          case Tools::Utility::hash( "height" ):
+            {
+              sf::FloatRect allocation = widgetPtr->widget->GetAllocation();
+              lua_pushnumber( L, allocation.height ); // 42.0
+              return 1;
+            }
+          case Tools::Utility::hash( "left" ):
+            {
+              sf::FloatRect allocation = widgetPtr->widget->GetAllocation();
+              lua_pushnumber( L, allocation.left ); // 42.0
+              return 1;
+            }
+          case Tools::Utility::hash( "top" ):
+            {
+              sf::FloatRect allocation = widgetPtr->widget->GetAllocation();
+              lua_pushnumber( L, allocation.top ); // 42.0
+              return 1;
+            }
+          case Tools::Utility::hash( "title" ):
+            {
+              // Verify this is applicable for the given widget
+              if( widgetType != "Window" ) {
+                Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+                return 0;
+              }
+
+              std::shared_ptr< sfg::Window > window = std::static_pointer_cast< sfg::Window >( widgetPtr->widget );
+              lua_pushstring( L, std::string( window->GetTitle() ).c_str() ); // "title"
+              return 1;
+            }
+          case Tools::Utility::hash( "titlebar" ):
+            {
+              if( widgetType != "Window" ) {
+                Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+                return 0;
+              }
+
+              std::shared_ptr< sfg::Window > window = std::static_pointer_cast< sfg::Window >( widgetPtr->widget );
+              lua_pushboolean( L, window->HasStyle( sfg::Window::Style::TITLEBAR ) ? 1 : 0 ); // true/false
+              return 1;
+            }
+          case Tools::Utility::hash( "background" ):
+            {
+              if( widgetType != "Window" ) {
+                Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+                return 0;
+              }
+
+              std::shared_ptr< sfg::Window > window = std::static_pointer_cast< sfg::Window >( widgetPtr->widget );
+              lua_pushboolean( L, window->HasStyle( sfg::Window::Style::BACKGROUND ) ? 1 : 0 ); // true/false
+              return 1;
+            }
+          case Tools::Utility::hash( "resize" ):
+            {
+              if( widgetType != "Window" ) {
+                Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+                return 0;
+              }
+
+              std::shared_ptr< sfg::Window > window = std::static_pointer_cast< sfg::Window >( widgetPtr->widget );
+              lua_pushboolean( L, window->HasStyle( sfg::Window::Style::RESIZE ) ? 1 : 0 ); // true/false
+              return 1;
+            }
+          case Tools::Utility::hash( "shadow" ):
+            {
+              if( widgetType != "Window" ) {
+                Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+                return 0;
+              }
+
+              std::shared_ptr< sfg::Window > window = std::static_pointer_cast< sfg::Window >( widgetPtr->widget );
+              lua_pushboolean( L, window->HasStyle( sfg::Window::Style::SHADOW ) ? 1 : 0 ); // true/false
+              return 1;
+            }
+          case Tools::Utility::hash( "close" ):
+            {
+              if( widgetType != "Window" ) {
+                Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+                return 0;
+              }
+
+              std::shared_ptr< sfg::Window > window = std::static_pointer_cast< sfg::Window >( widgetPtr->widget );
+              lua_pushboolean( L, window->HasStyle( sfg::Window::Style::CLOSE ) ? 1 : 0 ); // true/false
+              return 1;
+            }
+          case Tools::Utility::hash( "spacing" ):
+            {
+              if( widgetType != "Box" ) {
+                Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+                return 0;
+              }
+
+              std::shared_ptr< sfg::Box > box = std::static_pointer_cast< sfg::Box >( widgetPtr->widget );
+              lua_pushnumber( L, box->GetSpacing() ); // 42.0
+              return 1;
+            }
           default:
             Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" is not a recognized ConcordiaME property." );
             return 0;
@@ -341,6 +446,8 @@ namespace BlueBear {
           Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 1 of set_property must be a string." );
           return 0;
         }
+
+        std::string widgetType = widgetPtr->widget->GetName();
 
         const char* property = lua_tostring( L, -2 );
         switch( Tools::Utility::hash( property ) ) {
@@ -372,7 +479,7 @@ namespace BlueBear {
             {
               // FIXME: Why isn't SFGUI updating window size?
 
-              if( !lua_isstring( L, -1 ) ) {
+              if( !lua_isnumber( L, -1 ) ) {
                 Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"min-width\" must be a number." );
                 return 0;
               }
@@ -386,7 +493,7 @@ namespace BlueBear {
             {
               // FIXME: Why isn't SFGUI updating window size?
 
-              if( !lua_isstring( L, -1 ) ) {
+              if( !lua_isnumber( L, -1 ) ) {
                 Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"min-height\" must be a number." );
                 return 0;
               }
@@ -394,6 +501,202 @@ namespace BlueBear {
               sf::Vector2f requisition = widgetPtr->widget->GetRequisition();
               requisition.y = lua_tonumber( L, -1 );
               widgetPtr->widget->SetRequisition( requisition );
+              return 0;
+            }
+          case Tools::Utility::hash( "width" ):
+            {
+              if( !lua_isnumber( L, -1 ) ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"width\" must be a number." );
+                return 0;
+              }
+
+              sf::FloatRect allocation = widgetPtr->widget->GetAllocation();
+              allocation.width = lua_tonumber( L, -1 );
+              widgetPtr->widget->SetAllocation( allocation );
+              return 0;
+            }
+          case Tools::Utility::hash( "height" ):
+            {
+              if( !lua_isnumber( L, -1 ) ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"height\" must be a number." );
+                return 0;
+              }
+
+              sf::FloatRect allocation = widgetPtr->widget->GetAllocation();
+              allocation.height = lua_tonumber( L, -1 );
+              widgetPtr->widget->SetAllocation( allocation );
+              return 0;
+            }
+          case Tools::Utility::hash( "left" ):
+            {
+              if( !lua_isnumber( L, -1 ) ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"left\" must be a number." );
+                return 0;
+              }
+
+              sf::FloatRect allocation = widgetPtr->widget->GetAllocation();
+              double input = lua_tonumber( L, -1 );
+              if( input < 0.0 ) {
+                input = ConfigManager::getInstance().getIntValue( "viewport_x" ) + input;
+              }
+
+              allocation.left = input;
+              widgetPtr->widget->SetAllocation( allocation );
+              return 0;
+            }
+          case Tools::Utility::hash( "top" ):
+            {
+              if( !lua_isnumber( L, -1 ) ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"top\" must be a number." );
+                return 0;
+              }
+
+              sf::FloatRect allocation = widgetPtr->widget->GetAllocation();
+              double input = lua_tonumber( L, -1 );
+              if( input < 0.0 ) {
+                input = ConfigManager::getInstance().getIntValue( "viewport_y" ) + input;
+              }
+
+              allocation.top = input;
+              widgetPtr->widget->SetAllocation( allocation );
+              return 0;
+            }
+          case Tools::Utility::hash( "title" ):
+            {
+              // Verify this is applicable for the given widget
+              if( widgetType != "Window" ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+                return 0;
+              }
+
+              if( !lua_isstring( L, -1 ) ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"title\" must be a string." );
+                return 0;
+              }
+
+              std::shared_ptr< sfg::Window > window = std::static_pointer_cast< sfg::Window >( widgetPtr->widget );
+              window->SetTitle( lua_tostring( L, -1 ) );
+              return 0;
+            }
+          case Tools::Utility::hash( "titlebar" ):
+            {
+              if( widgetType != "Window" ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+                return 0;
+              }
+
+              if( !lua_isboolean( L, -1 ) ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"titlebar\" must be a boolean." );
+                return 0;
+              }
+
+              bool titlebar, background, resize, shadow, close;
+              std::shared_ptr< sfg::Window > window = std::static_pointer_cast< sfg::Window >( widgetPtr->widget );
+              getWindowProps( window, titlebar, background, resize, shadow, close );
+
+              titlebar = lua_toboolean( L, -1 ) ? true : false;
+
+              setWindowProps( window, titlebar, background, resize, shadow, close );
+              return 0;
+            }
+          case Tools::Utility::hash( "background" ):
+            {
+              if( widgetType != "Window" ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+                return 0;
+              }
+
+              if( !lua_isboolean( L, -1 ) ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"background\" must be a boolean." );
+                return 0;
+              }
+
+              bool titlebar, background, resize, shadow, close;
+              std::shared_ptr< sfg::Window > window = std::static_pointer_cast< sfg::Window >( widgetPtr->widget );
+              getWindowProps( window, titlebar, background, resize, shadow, close );
+
+              background = lua_toboolean( L, -1 ) ? true : false;
+
+              setWindowProps( window, titlebar, background, resize, shadow, close );
+              return 0;
+            }
+          case Tools::Utility::hash( "resize" ):
+            {
+              if( widgetType != "Window" ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+                return 0;
+              }
+
+              if( !lua_isboolean( L, -1 ) ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"resize\" must be a boolean." );
+                return 0;
+              }
+
+              bool titlebar, background, resize, shadow, close;
+              std::shared_ptr< sfg::Window > window = std::static_pointer_cast< sfg::Window >( widgetPtr->widget );
+              getWindowProps( window, titlebar, background, resize, shadow, close );
+
+              resize = lua_toboolean( L, -1 ) ? true : false;
+
+              setWindowProps( window, titlebar, background, resize, shadow, close );
+              return 0;
+            }
+          case Tools::Utility::hash( "shadow" ):
+            {
+              if( widgetType != "Window" ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+                return 0;
+              }
+
+              if( !lua_isboolean( L, -1 ) ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"shadow\" must be a boolean." );
+                return 0;
+              }
+
+              bool titlebar, background, resize, shadow, close;
+              std::shared_ptr< sfg::Window > window = std::static_pointer_cast< sfg::Window >( widgetPtr->widget );
+              getWindowProps( window, titlebar, background, resize, shadow, close );
+
+              shadow = lua_toboolean( L, -1 ) ? true : false;
+
+              setWindowProps( window, titlebar, background, resize, shadow, close );
+              return 0;
+            }
+          case Tools::Utility::hash( "close" ):
+            {
+              if( widgetType != "Window" ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+                return 0;
+              }
+
+              if( !lua_isboolean( L, -1 ) ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"close\" must be a boolean." );
+                return 0;
+              }
+
+              bool titlebar, background, resize, shadow, close;
+              std::shared_ptr< sfg::Window > window = std::static_pointer_cast< sfg::Window >( widgetPtr->widget );
+              getWindowProps( window, titlebar, background, resize, shadow, close );
+
+              close = lua_toboolean( L, -1 ) ? true : false;
+
+              setWindowProps( window, titlebar, background, resize, shadow, close );
+              return 0;
+            }
+          case Tools::Utility::hash( "spacing" ):
+            {
+              if( widgetType != "Box" ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+                return 0;
+              }
+
+              if( !lua_isnumber( L, -1 ) ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"spacing\" must be a number." );
+                return 0;
+              }
+
+              std::shared_ptr< sfg::Box > box = std::static_pointer_cast< sfg::Box >( widgetPtr->widget );
+              box->SetSpacing( lua_tonumber( L, -1 ) );
               return 0;
             }
           default:
@@ -414,6 +717,30 @@ namespace BlueBear {
         delete widgetPtr;
 
         return 0;
+      }
+
+      /**
+       * @static
+       */
+      void LuaElement::getWindowProps( std::shared_ptr< sfg::Window > window, bool& titlebar, bool& background, bool& resize, bool& shadow, bool& close ) {
+        titlebar = window->HasStyle( sfg::Window::Style::TITLEBAR );
+        background = window->HasStyle( sfg::Window::Style::BACKGROUND );
+        resize = window->HasStyle( sfg::Window::Style::RESIZE );
+        shadow = window->HasStyle( sfg::Window::Style::SHADOW );
+        close = window->HasStyle( sfg::Window::Style::CLOSE );
+      }
+
+      /**
+       * @static
+       */
+      void LuaElement::setWindowProps( std::shared_ptr< sfg::Window > window, bool titlebar, bool background, bool resize, bool shadow, bool close ) {
+        window->SetStyle(
+          ( titlebar ? 1 : 0 ) |
+          ( ( background ? 1 : 0 ) << 1 ) |
+          ( ( resize ? 1 : 0 ) << 2 ) |
+          ( ( shadow ? 1 : 0 ) << 3 ) |
+          ( ( close ? 1 : 0 ) << 4 )
+        );
       }
 
       /**

@@ -108,12 +108,12 @@ namespace BlueBear {
         child->QueryBoolAttribute( "fill", &fill );
 
         switch( packMethod ) {
-          case PackMethod::FROM_LEFT:
+          case PackMethod::FROM_START:
             widget->PackStart( nodeToWidget( child ), expand, fill );
             break;
-          case PackMethod::FROM_RIGHT:
+          case PackMethod::FROM_END:
           default:
-            widget->Pack( nodeToWidget( child ), expand, fill );
+            widget->PackEnd( nodeToWidget( child ), expand, fill );
         }
       }
     }

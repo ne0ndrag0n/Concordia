@@ -52,6 +52,22 @@ namespace BlueBear {
           LuaReference masterReference,
           const std::string& buttonTag
         );
+        static void getWindowProps(
+          std::shared_ptr< sfg::Window > window,
+          bool& titlebar,
+          bool& background,
+          bool& resize,
+          bool& shadow,
+          bool& close
+        );
+        static void setWindowProps(
+          std::shared_ptr< sfg::Window > window,
+          bool titlebar,
+          bool background,
+          bool resize,
+          bool shadow,
+          bool close
+        );
       };
     }
   }
