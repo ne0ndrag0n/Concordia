@@ -26,10 +26,8 @@ namespace BlueBear {
       tinyxml2::XMLDocument document;
       static constexpr unsigned int hash(const char* str, int h = 0);
 
-      enum class PackMethod { FROM_START, FROM_END };
-
       void addChildren( std::shared_ptr< sfg::Container > widget, tinyxml2::XMLElement* element );
-      void packChildren( std::shared_ptr< sfg::Box > widget, tinyxml2::XMLElement* element, PackMethod packMethod = PackMethod::FROM_END );
+      void packChildren( std::shared_ptr< sfg::Box > widget, tinyxml2::XMLElement* element );
 
       std::shared_ptr< sfg::Window > newWindowWidget( tinyxml2::XMLElement* element );
       std::shared_ptr< sfg::Label > newLabelWidget( tinyxml2::XMLElement* element );

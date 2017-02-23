@@ -13,5 +13,10 @@
     <Box id="inputs" spacing="5.0">
       <Entry id="inp1"></Entry>
     </Box>
+    <Box orientation="horizontal">
+      <Alignment id="align" scale_x="0" scale_y="1" alignment_x="0.5">
+        <Button>Aligned Button</Button>
+      </Alignment>
+    </Box>
   </Box>
 </Window>

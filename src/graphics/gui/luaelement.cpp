@@ -426,6 +426,14 @@ namespace BlueBear {
               lua_pushnumber( L, box->GetSpacing() ); // 42.0
               return 1;
             }
+          // These properties are not settable/retrievable using the SFGUI API
+          case Tools::Utility::hash( "expand" ):
+          case Tools::Utility::hash( "fill" ):
+          case Tools::Utility::hash( "orientation" ):
+            {
+              Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" cannot be queried from a widget." );
+              return 0;
+            }
           default:
             Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" is not a recognized ConcordiaME property." );
             return 0;
@@ -697,6 +705,14 @@ namespace BlueBear {
 
               std::shared_ptr< sfg::Box > box = std::static_pointer_cast< sfg::Box >( widgetPtr->widget );
               box->SetSpacing( lua_tonumber( L, -1 ) );
+              return 0;
+            }
+          // These properties are not settable/retrievable using the SFGUI API
+          case Tools::Utility::hash( "expand" ):
+          case Tools::Utility::hash( "fill" ):
+          case Tools::Utility::hash( "orientation" ):
+            {
+              Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" cannot be set on a widget." );
               return 0;
             }
           default:

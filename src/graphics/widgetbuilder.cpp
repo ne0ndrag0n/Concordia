@@ -99,7 +99,22 @@ namespace BlueBear {
       }
     }
 
-    void WidgetBuilder::packChildren( std::shared_ptr< sfg::Box > widget, tinyxml2::XMLElement* element, PackMethod packMethod ) {
+    void WidgetBuilder::packChildren( std::shared_ptr< sfg::Box > widget, tinyxml2::XMLElement* element ) {
+      bool packFromStart = false;
+      const char* _pack = element->Attribute( "pack" );
+      if( !_pack ) {
+        _pack = "end";
+      }
+      std::string pack( _pack );
+
+      if( pack == "start" ) {
+        packFromStart = true;
+      } else if ( pack == "end" ) {
+        packFromStart = false;
+      } else {
+        Log::getInstance().warn( "WidgetBuilder::packChildren", "Invalid value for \"pack\" attribute: " + pack + ", defaulting to \"end\"" );
+      }
+
       for ( tinyxml2::XMLElement* child = element->FirstChildElement(); child != NULL; child = child->NextSiblingElement() ) {
         bool expand = true;
         bool fill = true;
@@ -107,13 +122,10 @@ namespace BlueBear {
         child->QueryBoolAttribute( "expand", &expand );
         child->QueryBoolAttribute( "fill", &fill );
 
-        switch( packMethod ) {
-          case PackMethod::FROM_START:
-            widget->PackStart( nodeToWidget( child ), expand, fill );
-            break;
-          case PackMethod::FROM_END:
-          default:
-            widget->PackEnd( nodeToWidget( child ), expand, fill );
+        if( packFromStart ) {
+          widget->PackStart( nodeToWidget( child ), expand, fill );
+        } else {
+          widget->PackEnd( nodeToWidget( child ), expand, fill );
         }
       }
     }
@@ -302,6 +314,12 @@ namespace BlueBear {
       setAllocationAndRequisition( alignment, element );
       setAlignment( alignment, element );
       setDefaultEvents( alignment, element );
+
+      sf::Vector2f scale = alignment->GetScale();
+      element->QueryFloatAttribute( "scale_x", &scale.x );
+      element->QueryFloatAttribute( "scale_y", &scale.y );
+
+      alignment->SetScale( scale );
 
       return alignment;
     }
