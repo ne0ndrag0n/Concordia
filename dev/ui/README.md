@@ -16,24 +16,36 @@ Everything is case-sensitive.
 | `<Label>`      | `sfg::Label`        |
 | `<Box>`        | `sfg::Box`          |
 | `<Alignment>`  | `sfg::Alignment`    |
+| `<Button>`     | `sfg::Button`       |
+| `<Entry>`      | `sfg::Entry`        |
 
 **TODO:** More to come
 
 # Details by Widget Type
+
+## Common Attributes
+
+These attributes are shared by all widget types:
+
+| Attribute         | Type      | Description                                                              |
+|-------------------|-----------|--------------------------------------------------------------------------|
+| id                | string    | Widget ID                                                                |
+| class             | string    | Widget class                                                             |
+| visible           | bool      | Widget visibility                                                        |
+
 ## Window
-`<Window><child></child>...</Window>`
+
+Defines a window on-screen to contain other widget types.
 
 ### Features
 | Feature                           | Applies |
 |-----------------------------------|---------|
 | Accepts child elements            | YES     |
-| Accepts ID and class              | YES     |
+| Accepts text                      | NO      |
 
 ### Attributes
 | Attribute         | Type      | Description                                                              |
 |-------------------|-----------|--------------------------------------------------------------------------|
-| id                | string    | Window Style ID                                                          |
-| class             | string    | Window Style class                                                       |
 | left              | float     | Upper left corner X position (negative values start at opposite end)     |
 | top               | float     | Upper left corner Y position (negative values start at opposite end)     |
 | width             | float     | Window width                                                             |
@@ -48,19 +60,18 @@ Everything is case-sensitive.
 | close             | bool      | Display close button in titlebar. It's up to you to write an onClose.    |
 
 ## Label
-`<Label>Example Label Text</Label>`
+
+Simple textual label widget.
 
 ### Features
 | Feature                           | Applies |
 |-----------------------------------|---------|
 | Accepts child elements            | NO      |
-| Accepts ID and class              | YES     |
+| Accepts text                      | YES     |
 
 ### Attributes
 | Attribute         | Type      | Description                                                              |
 |-------------------|-----------|--------------------------------------------------------------------------|
-| id                | string    | Label Style ID                                                           |
-| class             | string    | Label Style class                                                        |
 | left              | float     | Upper left corner X position (negative values start at opposite end)     |
 | top               | float     | Upper left corner Y position (negative values start at opposite end)     |
 | width             | float     | Label width                                                              |
@@ -71,36 +82,34 @@ Everything is case-sensitive.
 | alignment_y       | float     | Set alignment of widget in the Y direction (topmost is 0.0)              |
 
 ## Box
-`<Box><child></child>...</Box>`
+
+Groups one or more widgets together, and can be aligned vertically or horizontally.
 
 ### Features
 | Feature                           | Applies |
 |-----------------------------------|---------|
 | Accepts child elements            | YES     |
-| Accepts ID and class              | YES     |
+| Accepts text                      | NO      |
 
 ### Attributes
 | Attribute         | Type      | Description                                                                        |
 |-------------------|-----------|------------------------------------------------------------------------------------|
-| id                | string    | Label Style ID                                                                     |
-| class             | string    | Label Style class                                                                  |
 | orientation       | string    | Orientation of contained elements. Can be "horizontal" (default) or "vertical".    |
 | spacing           | float     | Spacing between contained elements. Default 0.                                     |
 
 ## Alignment
-`<Alignment><child></child>...</Alignment>`
+
+Allows the specification of additional attributes that control the position of a single child element. This widget only accepts one single child element.
 
 ### Features
 | Feature                           | Applies |
 |-----------------------------------|---------|
 | Accepts child elements            | YES     |
-| Accepts ID and class              | YES     |
+| Accepts text                      | NO      |
 
 ### Attributes
 | Attribute         | Type      | Description                                                              |
 |-------------------|-----------|--------------------------------------------------------------------------|
-| id                | string    | Style ID                                                                 |
-| class             | string    | Style class                                                              |
 | left              | float     | Upper left corner X position (negative values start at opposite end)     |
 | top               | float     | Upper left corner Y position (negative values start at opposite end)     |
 | width             | float     | Width                                                                    |
@@ -109,22 +118,66 @@ Everything is case-sensitive.
 | min-height        | float     | Minimum height                                                           |
 | alignment_x       | float     | Set alignment of widget in the X direction (leftmost is 0.0)             |
 | alignment_y       | float     | Set alignment of widget in the Y direction (topmost is 0.0)              |
+| scale_x           | float     | Proportion of X-space child is allowed to expand to (0.0 to 1.0)         |
+| scale_y           | float     | Proportion of Y-space child is allowed to expand to (0.0 to 1.0)         |
+
+## Button
+
+Plain old, simple push-button widget.
+
+### Features
+| Feature                           | Applies |
+|-----------------------------------|---------|
+| Accepts child elements            | NO      |
+| Accepts text                      | YES     |
+
+### Attributes
+| Attribute         | Type      | Description                                                              |
+|-------------------|-----------|--------------------------------------------------------------------------|
+| left              | float     | Upper left corner X position (negative values start at opposite end)     |
+| top               | float     | Upper left corner Y position (negative values start at opposite end)     |
+| width             | float     | Width                                                                    |
+| min-width         | float     | Minimum width                                                            |
+| height            | float     | Height                                                                   |
+| min-height        | float     | Minimum height                                                           |
+
+## Entry
+
+Widget that accepts textual input.
+
+### Features
+| Feature                           | Applies |
+|-----------------------------------|---------|
+| Accepts child elements            | NO      |
+| Accepts text                      | YES     |
+
+### Attributes
+| Attribute         | Type      | Description                                                              |
+|-------------------|-----------|--------------------------------------------------------------------------|
+| left              | float     | Upper left corner X position (negative values start at opposite end)     |
+| top               | float     | Upper left corner Y position (negative values start at opposite end)     |
+| width             | float     | Width                                                                    |
+| min-width         | float     | Minimum width                                                            |
+| height            | float     | Height                                                                   |
+| min-height        | float     | Minimum height                                                           |
 
 
 ConcordiaME GUI API
 ===================
 
-**TODO:** Much work in progress
+# bluebear.gui
 
-Example of setting a callback to a GUI element:
+The GUI API is accessible on the global object `bluebear.gui` as well as more methods available on `LuaElement` objects. `bluebear.gui` exposes two methods allowing you to enter a widget tree: `get_element_by_id` and `get_element_by_class`. The "id" and "class" properties work similar to an HTML page within a web browser.
 
-`bluebear.gui.get_element_by_id( '#id' )` - Returns a wrapper to sfg::Widget
-`bluebear.gui.get_element_by_class( '.class' )` - Returns a wrapper to sfg::Widget
+* `get_element_by_id` will return the **first** item encountered with the matching "id" attribute. The "id" attribute is meant to be unique across the entire application; therefore, it is suggested you use "id" as sparingly as possible to maintain compatibility with other mods. **Multiple IDs with the same name produces undefined behaviour.**
+* `get_elements_by_class` will return all items matching the given class.
 
+It is recommended you prefix your IDs and classes with a vendor prefix. For example, if your organisation is named "Toys Incorporated", you should prefix your widget ID or class with the "toys_" prefix. Because all widgets share a global namespace, this will help you avoid collisions with other mods. The `system` namespace is reserved for Concordia's built-in mods.
 
-Element API:
+# LuaElement instances
 
-`get_element_by_id` and `get_element_by_class`  
-`on( event, callback )` - Register an event. Initial tests will only reveal the "click" event.
+The above functions will return `LuaElement` instances. `LuaElement` instances are just functions wrapping the shared_ptr for the sfg::Widget inside the game engine. That is, you can let Lua GC these objects, and the only thing that should happen is that the reference count is decremented.
 
-Element objects are just functions wrapping the shared_ptr for the sfg::Widget inside the game engine. That is, you can let Lua GC these objects, and the only thing that should happen is that the reference count is decremented. When you call up the same object using a subsequent get_element_by_id/get_element_by_class. 
+## Methods
+
+TODO

@@ -426,6 +426,54 @@ namespace BlueBear {
               lua_pushnumber( L, box->GetSpacing() ); // 42.0
               return 1;
             }
+          case Tools::Utility::hash( "alignment_x" ):
+            {
+              if( widgetType != "Alignment" ) {
+                Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+                return 0;
+              }
+
+              std::shared_ptr< sfg::Alignment > alignmentWidget = std::static_pointer_cast< sfg::Alignment >( widgetPtr->widget );
+              sf::Vector2f alignment = alignmentWidget->GetAlignment();
+              lua_pushnumber( L, alignment.x ); // 42.0
+              return 1;
+            }
+          case Tools::Utility::hash( "alignment_y" ):
+            {
+              if( widgetType != "Alignment" ) {
+                Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+                return 0;
+              }
+
+              std::shared_ptr< sfg::Alignment > alignmentWidget = std::static_pointer_cast< sfg::Alignment >( widgetPtr->widget );
+              sf::Vector2f alignment = alignmentWidget->GetAlignment();
+              lua_pushnumber( L, alignment.y ); // 42.0
+              return 1;
+            }
+          case Tools::Utility::hash( "scale_x" ):
+            {
+              if( widgetType != "Alignment" ) {
+                Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+                return 0;
+              }
+
+              std::shared_ptr< sfg::Alignment > alignmentWidget = std::static_pointer_cast< sfg::Alignment >( widgetPtr->widget );
+              sf::Vector2f scale = alignmentWidget->GetScale();
+              lua_pushnumber( L, scale.x ); // 42.0
+              return 1;
+            }
+          case Tools::Utility::hash( "scale_y" ):
+            {
+              if( widgetType != "Alignment" ) {
+                Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+                return 0;
+              }
+
+              std::shared_ptr< sfg::Alignment > alignmentWidget = std::static_pointer_cast< sfg::Alignment >( widgetPtr->widget );
+              sf::Vector2f scale = alignmentWidget->GetScale();
+              lua_pushnumber( L, scale.y ); // 42.0
+              return 1;
+            }
           // These properties are not settable/retrievable using the SFGUI API
           case Tools::Utility::hash( "expand" ):
           case Tools::Utility::hash( "fill" ):
@@ -705,6 +753,78 @@ namespace BlueBear {
 
               std::shared_ptr< sfg::Box > box = std::static_pointer_cast< sfg::Box >( widgetPtr->widget );
               box->SetSpacing( lua_tonumber( L, -1 ) );
+              return 0;
+            }
+          case Tools::Utility::hash( "alignment_x" ):
+            {
+              if( widgetType != "Alignment" ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+                return 0;
+              }
+
+              if( !lua_isnumber( L, -1 ) ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"alignment_x\" must be a number." );
+                return 0;
+              }
+
+              std::shared_ptr< sfg::Alignment > alignmentWidget = std::static_pointer_cast< sfg::Alignment >( widgetPtr->widget );
+              sf::Vector2f alignment = alignmentWidget->GetAlignment();
+              alignment.x = lua_tonumber( L, -1 );
+              alignmentWidget->SetAlignment( alignment );
+              return 0;
+            }
+          case Tools::Utility::hash( "alignment_y" ):
+            {
+              if( widgetType != "Alignment" ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+                return 0;
+              }
+
+              if( !lua_isnumber( L, -1 ) ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"alignment_y\" must be a number." );
+                return 0;
+              }
+
+              std::shared_ptr< sfg::Alignment > alignmentWidget = std::static_pointer_cast< sfg::Alignment >( widgetPtr->widget );
+              sf::Vector2f alignment = alignmentWidget->GetAlignment();
+              alignment.y = lua_tonumber( L, -1 );
+              alignmentWidget->SetAlignment( alignment );
+              return 0;
+            }
+          case Tools::Utility::hash( "scale_x" ):
+            {
+              if( widgetType != "Alignment" ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+                return 0;
+              }
+
+              if( !lua_isnumber( L, -1 ) ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"scale_x\" must be a number." );
+                return 0;
+              }
+
+              std::shared_ptr< sfg::Alignment > alignmentWidget = std::static_pointer_cast< sfg::Alignment >( widgetPtr->widget );
+              sf::Vector2f scale = alignmentWidget->GetScale();
+              scale.x = lua_tonumber( L, -1 );
+              alignmentWidget->SetScale( scale );
+              return 0;
+            }
+          case Tools::Utility::hash( "scale_y" ):
+            {
+              if( widgetType != "Alignment" ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+                return 0;
+              }
+
+              if( !lua_isnumber( L, -1 ) ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"scale_y\" must be a number." );
+                return 0;
+              }
+
+              std::shared_ptr< sfg::Alignment > alignmentWidget = std::static_pointer_cast< sfg::Alignment >( widgetPtr->widget );
+              sf::Vector2f scale = alignmentWidget->GetScale();
+              scale.y = lua_tonumber( L, -1 );
+              alignmentWidget->SetScale( scale );
               return 0;
             }
           // These properties are not settable/retrievable using the SFGUI API
