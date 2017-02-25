@@ -21,6 +21,9 @@ namespace BlueBear {
       int LuaElement::lua_onEvent( lua_State* L ) {
         LuaElement** userData = ( LuaElement** ) luaL_checkudata( L, 1, "bluebear_widget" );
         Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+        LuaElement& element = **userData;
+
+        // FIXME: argument -1 needs verification for function type
 
         // function "event" self
 
@@ -30,21 +33,10 @@ namespace BlueBear {
           switch( Tools::Utility::hash( eventType ) ) {
             case Tools::Utility::hash( "click" ):
               {
-                LuaElement& element = **userData;
-
                 // Create the bucket for this widget if it doesn't exist, otherwise, return a new bucket
                 auto& signalMap = masterSignalMap[ element.widget.get() ];
 
-                // If there's a previous sfg::Widget::OnLeftClick registered for this widget instance, unref and kill it
-                auto pair = signalMap.find( sfg::Widget::OnLeftClick );
-                if( pair != signalMap.end() ) {
-                  // One click listener at a time
-                  // Disconnect the handler
-                  element.widget->GetSignal( sfg::Widget::OnLeftClick ).Disconnect( pair->second.slotHandle );
-
-                  // Un-ref this function we're about to erase
-                  luaL_unref( L, LUA_REGISTRYINDEX, pair->second.reference );
-                }
+                unregisterClickHandler( L, signalMap, element.widget );
 
                 // Track the master reference
                 // Unref this if the pointer is ever removed!
@@ -61,7 +53,21 @@ namespace BlueBear {
                 lua_pushboolean( L, true ); // true "event" self
                 return 1; // true
               }
-              break;
+            case Tools::Utility::hash( "mouse_enter" ):
+              {
+                auto& signalMap = masterSignalMap[ element.widget.get() ];
+                unregisterHandler( L, signalMap, element.widget, sfg::Widget::OnMouseEnter );
+
+                LuaReference masterReference = luaL_ref( L, LUA_REGISTRYINDEX ); // "event" self
+
+                signalMap[ sfg::Widget::OnMouseEnter ] = LuaElement::SignalBinding{
+                  masterReference,
+                  element.widget->GetSignal( sfg::Widget::OnMouseEnter ).Connect( std::bind( LuaElement::genericHandler, L, self->instance.eventManager, element.widget, masterReference ) )
+                };
+
+                lua_pushboolean( L, true ); // true "event" self
+                return 1; // true
+              }
             default:
               Log::getInstance().warn( "LuaElement::lua_onEvent", "Invalid event type specified: " + std::string( eventType ) );
           }
@@ -77,37 +83,26 @@ namespace BlueBear {
        */
       int LuaElement::lua_offEvent( lua_State* L ) {
         LuaElement** userData = ( LuaElement** ) luaL_checkudata( L, 1, "bluebear_widget" );
+        LuaElement& element = **userData;
 
         // "event type" self
         if( lua_isstring( L, -1 ) ) {
 
           const char* eventType = lua_tostring( L, -1 );
-          switch( Tools::Utility::hash( eventType ) ) {
-            case Tools::Utility::hash( "click" ):
-              {
-                LuaElement& element = **userData;
+          auto signalMap = masterSignalMap.find( element.widget.get() );
+          if( signalMap != masterSignalMap.end() ) {
 
-                auto signalMapIt = masterSignalMap.find( element.widget.get() );
-                if( signalMapIt != masterSignalMap.end() ) {
-                  auto& signalMap = signalMapIt->second;
+            switch( Tools::Utility::hash( eventType ) ) {
+              case Tools::Utility::hash( "click" ):
+                unregisterClickHandler( L, signalMap->second, element.widget );
+                break;
+              case Tools::Utility::hash( "mouse_enter" ):
+                unregisterHandler( L, signalMap->second, element.widget, sfg::Widget::OnMouseEnter );
+                break;
+              default:
+                Log::getInstance().warn( "LuaElement::lua_offEvent", "Invalid event type specified: " + std::string( eventType ) );
+            }
 
-                  auto pair = signalMap.find( sfg::Widget::OnLeftClick );
-                  if( pair != signalMap.end() ) {
-                    element.widget->GetSignal( sfg::Widget::OnLeftClick ).Disconnect( pair->second.slotHandle );
-                    luaL_unref( L, LUA_REGISTRYINDEX, pair->second.reference );
-
-                    signalMap.erase( sfg::Widget::OnLeftClick );
-
-                    // This is a package deal
-                    auto& right = signalMap.at( sfg::Widget::OnRightClick );
-                    element.widget->GetSignal( sfg::Widget::OnRightClick ).Disconnect( right.slotHandle );
-                    signalMap.erase( sfg::Widget::OnRightClick );
-                  }
-                }
-              }
-              break;
-            default:
-              Log::getInstance().warn( "LuaElement::lua_offEvent", "Invalid event type specified: " + std::string( eventType ) );
           }
 
         } else {
@@ -931,6 +926,77 @@ namespace BlueBear {
         lua_pop( L, 2 ); // EMPTY
 
         eventManager.UI_ACTION_EVENT.trigger( edibleReference );
+      }
+
+      /**
+       * @static
+       * Generic event handler for most events that passes a baseline event object, double-bags the function, and calls it
+       *
+       * STACK ARGS: (none)
+       * Stack is unmodified after call
+       */
+      void LuaElement::genericHandler( lua_State* L, EventManager& eventManager, std::weak_ptr< sfg::Widget > widgetPtr, LuaReference masterReference ) {
+
+        lua_getglobal( L, "bluebear" ); // bluebear
+        Tools::Utility::getTableValue( L, "util" ); // bluebear.util bluebear
+        Tools::Utility::getTableValue( L, "bind" ); // <bind> bluebear.util bluebear
+        lua_rawgeti( L, LUA_REGISTRYINDEX, masterReference ); // <function> <bind> bluebear.util bluebear
+
+        lua_newtable( L ); // newtable <function> <bind> bluebear.util bluebear
+        // TODO: There's something else that can go here but so far I'm not really sure what it should be
+        // Just pass an empty event table for now to maintain consistency (users can ignore the table if it does not have anything they need to use)
+
+        if( auto widget = widgetPtr.lock() ) {
+          lua_pushstring( L, "widget" ); // "widget" newtable <function> <bind> bluebear.util bluebear
+          getUserdataFromWidget( L, widget ); // element "widget" newtable <function> <bind> bluebear.util bluebear
+          lua_settable( L, -3 ); // newtable <function> <bind> bluebear.util bluebear
+        } else {
+          Log::getInstance().error( "LuaElement::genericHandler", "Could not lock element pointer to build field event.widget" );
+        }
+
+        if( lua_pcall( L, 2, 1, 0 ) ) { // error bluebear.util bluebear
+          Log::getInstance().error( "LuaElement::genericHandler", "Couldn't create required closure to fire event." );
+          lua_pop( L, 3 ); // EMPTY
+          return;
+        } // <temp_function> bluebear.util bluebear
+
+        int edibleReference = luaL_ref( L, LUA_REGISTRYINDEX ); // bluebear.util bluebear
+        lua_pop( L, 2 ); // EMPTY
+
+        eventManager.UI_ACTION_EVENT.trigger( edibleReference );
+      }
+
+      /**
+       * @static
+       * Unregister a click handler registered by a LuaElement
+       */
+      void LuaElement::unregisterClickHandler( lua_State* L, std::map< sfg::Signal::SignalID, LuaElement::SignalBinding >& signalMap, std::shared_ptr< sfg::Widget > widget ) {
+        // If there's a previous pair of click events registered for this widget instance, unref and kill it
+        auto pair = signalMap.find( sfg::Widget::OnLeftClick );
+        if( pair != signalMap.end() ) {
+          // One click listener at a time
+          // Disconnect the handler for left click
+          widget->GetSignal( sfg::Widget::OnLeftClick ).Disconnect( pair->second.slotHandle );
+          // This is a package deal, do it for the right click handler as well
+          widget->GetSignal( sfg::Widget::OnRightClick ).Disconnect( signalMap.at( sfg::Widget::OnRightClick ).slotHandle );
+
+          // Un-ref this function we're about to erase (left and right should use the same reference)
+          luaL_unref( L, LUA_REGISTRYINDEX, pair->second.reference );
+
+          signalMap.erase( sfg::Widget::OnLeftClick );
+          signalMap.erase( sfg::Widget::OnRightClick );
+        }
+      }
+
+      /**
+       * @static
+       */
+      void LuaElement::unregisterHandler( lua_State* L, std::map< sfg::Signal::SignalID, LuaElement::SignalBinding >& signalMap, std::shared_ptr< sfg::Widget > widget, sfg::Signal::SignalID signalID ) {
+        auto pair = signalMap.find( signalID );
+        if( pair != signalMap.end() ) {
+          widget->GetSignal( signalID ).Disconnect( pair->second.slotHandle );
+          luaL_unref( L, LUA_REGISTRYINDEX, pair->second.reference );
+        }
       }
 
     }

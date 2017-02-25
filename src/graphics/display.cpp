@@ -333,6 +333,32 @@ namespace BlueBear {
       if( !gui.desktop.LoadThemeFromFile( ConfigManager::getInstance().getValue( "ui_theme" ) ) ) {
         Log::getInstance().warn( "Display::MainGameState::MainGameState", "ui_theme unable to load." );
       }
+
+      // SFGUI will not set a constant on a signal until it is used
+      // Sidestep this irritating behaviour here
+      sfg::Widget::OnStateChange = sfg::Signal::GetGUID();
+  		sfg::Widget::OnGainFocus = sfg::Signal::GetGUID();
+  		sfg::Widget::OnLostFocus = sfg::Signal::GetGUID();
+
+  		sfg::Widget::OnExpose = sfg::Signal::GetGUID();
+
+  		sfg::Widget::OnSizeAllocate = sfg::Signal::GetGUID();
+  		sfg::Widget::OnSizeRequest = sfg::Signal::GetGUID();
+
+  		sfg::Widget::OnMouseEnter = sfg::Signal::GetGUID();
+  		sfg::Widget::OnMouseLeave = sfg::Signal::GetGUID();
+  		sfg::Widget::OnMouseMove = sfg::Signal::GetGUID();
+  		sfg::Widget::OnMouseLeftPress = sfg::Signal::GetGUID();
+  		sfg::Widget::OnMouseRightPress = sfg::Signal::GetGUID();
+  		sfg::Widget::OnMouseLeftRelease = sfg::Signal::GetGUID();
+  		sfg::Widget::OnMouseRightRelease = sfg::Signal::GetGUID();
+
+  		sfg::Widget::OnLeftClick = sfg::Signal::GetGUID();
+  		sfg::Widget::OnRightClick = sfg::Signal::GetGUID();
+
+  		sfg::Widget::OnKeyPress = sfg::Signal::GetGUID();
+  		sfg::Widget::OnKeyRelease = sfg::Signal::GetGUID();
+  		sfg::Widget::OnText = sfg::Signal::GetGUID();
     }
     void Display::MainGameState::createFloorInstances() {
       floorInstanceCollection->clear();

@@ -52,6 +52,23 @@ namespace BlueBear {
           LuaReference masterReference,
           const std::string& buttonTag
         );
+        static void genericHandler(
+          lua_State* L,
+          EventManager& eventManager,
+          std::weak_ptr< sfg::Widget > widgetPtr,
+          LuaReference masterReference
+        );
+        static void unregisterClickHandler(
+          lua_State* L,
+          std::map< sfg::Signal::SignalID, LuaElement::SignalBinding >& signalMap,
+          std::shared_ptr< sfg::Widget > widget
+        );
+        static void unregisterHandler(
+          lua_State* L,
+          std::map< sfg::Signal::SignalID, LuaElement::SignalBinding >& signalMap,
+          std::shared_ptr< sfg::Widget > widget,
+          sfg::Signal::SignalID signalID
+        );
         static void getWindowProps(
           std::shared_ptr< sfg::Window > window,
           bool& titlebar,
