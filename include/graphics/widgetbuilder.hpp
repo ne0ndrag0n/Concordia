@@ -11,6 +11,7 @@
 #include <SFGUI/Misc.hpp>
 #include <SFGUI/Button.hpp>
 #include <SFGUI/Entry.hpp>
+#include <SFGUI/Image.hpp>
 #include <string>
 #include <memory>
 #include <exception>
@@ -20,9 +21,11 @@ namespace BlueBear {
   class EventManager;
 
   namespace Graphics {
+    class ImageCache;
 
     class WidgetBuilder {
       EventManager& eventManager;
+      ImageCache& imageCache;
       tinyxml2::XMLDocument document;
       static constexpr unsigned int hash(const char* str, int h = 0);
 
@@ -35,6 +38,7 @@ namespace BlueBear {
       std::shared_ptr< sfg::Alignment > newAlignmentWidget( tinyxml2::XMLElement* element );
       std::shared_ptr< sfg::Button > newButtonWidget( tinyxml2::XMLElement* element );
       std::shared_ptr< sfg::Entry > newEntryWidget( tinyxml2::XMLElement* element );
+      std::shared_ptr< sfg::Image > newImageWidget( tinyxml2::XMLElement* element );
 
       void setDefaultEvents( std::shared_ptr< sfg::Widget > widget, tinyxml2::XMLElement* element );
       void setAlignment( std::shared_ptr< sfg::Misc > widget, tinyxml2::XMLElement* element );
@@ -47,7 +51,7 @@ namespace BlueBear {
       void correctYBoundary( float* input );
 
     public:
-      WidgetBuilder( EventManager& eventManager, const std::string& path );
+      WidgetBuilder( EventManager& eventManager, ImageCache& imageCache, const std::string& path );
       std::vector< std::shared_ptr< sfg::Widget > > getWidgets();
     };
 

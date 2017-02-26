@@ -134,6 +134,7 @@ namespace BlueBear {
 
           void execute();
           void handleEvent( sf::Event& event );
+          ImageCache& getImageCache();
           MainGameState( Display& instance, unsigned int currentRotation, Containers::Collection3D< std::shared_ptr< Scripting::Tile > >& floorMap, Containers::Collection3D< std::shared_ptr< Scripting::WallCell > >& wallMap );
           ~MainGameState();
       };

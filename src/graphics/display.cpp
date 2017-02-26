@@ -301,6 +301,7 @@ namespace BlueBear {
         { "set_text", GUI::LuaElement::lua_setText },
         { "get_property", GUI::LuaElement::lua_getProperty },
         { "set_property", GUI::LuaElement::lua_setProperty },
+        { "set_image", GUI::LuaElement::lua_setImage },
         { "__gc", GUI::LuaElement::lua_gc },
         { NULL, NULL }
       };
@@ -359,6 +360,7 @@ namespace BlueBear {
   		sfg::Widget::OnKeyPress = sfg::Signal::GetGUID();
   		sfg::Widget::OnKeyRelease = sfg::Signal::GetGUID();
   		sfg::Widget::OnText = sfg::Signal::GetGUID();
+      sfg::Entry::OnTextChanged = sfg::Signal::GetGUID();
     }
     void Display::MainGameState::createFloorInstances() {
       floorInstanceCollection->clear();
@@ -495,6 +497,9 @@ namespace BlueBear {
       instance.sfgui.Display( instance.mainWindow );
       glEnable( GL_DEPTH_TEST );
     }
+    ImageCache& Display::MainGameState::getImageCache() {
+      return imageCache;
+    }
     int Display::MainGameState::lua_loadXMLWidgets( lua_State* L ) {
 
       Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
@@ -507,7 +512,7 @@ namespace BlueBear {
         try {
           // Create a WidgetBuilder and dump its widgets into the root container
           // This should run in the engine objectLoop stage, and it will be caught on subsequent render
-          WidgetBuilder builder( self->instance.eventManager, path );
+          WidgetBuilder builder( self->instance.eventManager, self->imageCache, path );
           std::vector< std::shared_ptr< sfg::Widget > > widgets = builder.getWidgets();
           for( auto& widget : widgets ) {
             self->gui.rootContainer->Add( widget );

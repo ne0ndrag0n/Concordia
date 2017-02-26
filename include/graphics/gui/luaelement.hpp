@@ -41,10 +41,17 @@ namespace BlueBear {
         static int lua_gc( lua_State* L );
         static int lua_getText( lua_State* L );
         static int lua_setText( lua_State* L );
+        static int lua_setImage( lua_State* L );
         static int lua_getProperty( lua_State* L );
         static int lua_setProperty( lua_State* L );
 
         static void getUserdataFromWidget( lua_State* L, std::shared_ptr< sfg::Widget > widget );
+        static void registerGenericHandler(
+          lua_State* L,
+          EventManager& eventManager,
+          std::shared_ptr< sfg::Widget > widget,
+          sfg::Signal::SignalID signalID
+        );
         static void clickHandler(
           lua_State* L,
           EventManager& eventManager,

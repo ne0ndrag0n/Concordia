@@ -18,18 +18,12 @@ function GUIProvider:open_debug_ui()
 
   bluebear.gui.get_widget_by_id( "misc" ):on( "click", bluebear.util.bind( "system.provider.gui:do_something", self ) )
 
-  bluebear.gui.get_widget_by_id( "enter_leave" ):on( "mouse_enter", function( event )
-    print( 'system.provider.gui', 'mouse entered' )
-    bluebear.gui.get_widget_by_id( "enter_leave" ):off( "mouse_enter" )
-  end )
-
   -- XXX: Remove after demo
   bluebear.gui.get_widget_by_id( "animate1" ):on( "click", bluebear.gui.__internal__playanim1 )
 end
 
 function GUIProvider:do_something( event )
-  local button = event.mouse
-  local target = bluebear.gui.get_widget_by_id( 'misc' )
+
 end
 
 function GUIProvider:on_click_zoom_in()

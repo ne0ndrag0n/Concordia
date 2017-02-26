@@ -1,4 +1,6 @@
 #include "graphics/widgetbuilder.hpp"
+#include "graphics/imagecache.hpp"
+#include "graphics/imagebuilder/pathimagesource.hpp"
 #include "configmanager.hpp"
 #include "log.hpp"
 #include "tools/utility.hpp"
@@ -20,7 +22,7 @@
 namespace BlueBear {
   namespace Graphics {
 
-    WidgetBuilder::WidgetBuilder( EventManager& eventManager, const std::string& path ) : eventManager( eventManager ) {
+    WidgetBuilder::WidgetBuilder( EventManager& eventManager, ImageCache& imageCache, const std::string& path ) : eventManager( eventManager ), imageCache( imageCache ) {
       document.LoadFile( path.c_str() );
 
       // Object is unusable if the file failed to load
@@ -83,6 +85,10 @@ namespace BlueBear {
 
         case hash( "Entry" ):
           widget = newEntryWidget( element );
+          break;
+
+        case hash( "Image" ):
+          widget = newImageWidget( element );
           break;
 
         default:
@@ -351,6 +357,27 @@ namespace BlueBear {
       } );
 
       return entry;
+    }
+
+    std::shared_ptr< sfg::Image > WidgetBuilder::newImageWidget( tinyxml2::XMLElement* element ) {
+      std::shared_ptr< sfg::Image > image = sfg::Image::Create();
+
+      setBasicProperties( image, element );
+      setAllocationAndRequisition( image, element );
+      setAlignment( image, element );
+      setDefaultEvents( image, element );
+
+      // This should be somewhat fault-tolerant since images go missing all the damn time
+      std::string path = element->GetText();
+
+      try {
+        PathImageSource piss = PathImageSource( path );
+        image->SetImage( *imageCache.getImage( piss ) );
+      } catch( std::exception& e ) {
+        Log::getInstance().warn( "WidgetBuilder::newImageWidget", "Could not load image for image widget: " + std::string( e.what() ) );
+      }
+
+      return image;
     }
 
   }

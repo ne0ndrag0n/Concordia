@@ -1,4 +1,5 @@
 #include "graphics/gui/luaelement.hpp"
+#include "graphics/imagebuilder/pathimagesource.hpp"
 #include "graphics/display.hpp"
 #include "tools/utility.hpp"
 #include "configmanager.hpp"
@@ -55,17 +56,22 @@ namespace BlueBear {
               }
             case Tools::Utility::hash( "mouse_enter" ):
               {
-                auto& signalMap = masterSignalMap[ element.widget.get() ];
-                unregisterHandler( L, signalMap, element.widget, sfg::Widget::OnMouseEnter );
-
-                LuaReference masterReference = luaL_ref( L, LUA_REGISTRYINDEX ); // "event" self
-
-                signalMap[ sfg::Widget::OnMouseEnter ] = LuaElement::SignalBinding{
-                  masterReference,
-                  element.widget->GetSignal( sfg::Widget::OnMouseEnter ).Connect( std::bind( LuaElement::genericHandler, L, self->instance.eventManager, element.widget, masterReference ) )
-                };
-
-                lua_pushboolean( L, true ); // true "event" self
+                registerGenericHandler( L, self->instance.eventManager, element.widget, sfg::Widget::OnMouseEnter ); // true "event" self
+                return 1; // true
+              }
+            case Tools::Utility::hash( "mouse_leave" ):
+              {
+                registerGenericHandler( L, self->instance.eventManager, element.widget, sfg::Widget::OnMouseLeave ); // true "event" self
+                return 1; // true
+              }
+            case Tools::Utility::hash( "focus" ):
+              {
+                registerGenericHandler( L, self->instance.eventManager, element.widget, sfg::Widget::OnGainFocus ); // true "event" self
+                return 1; // true
+              }
+            case Tools::Utility::hash( "blur" ):
+              {
+                registerGenericHandler( L, self->instance.eventManager, element.widget, sfg::Widget::OnLostFocus ); // true "event" self
                 return 1; // true
               }
             default:
@@ -98,6 +104,15 @@ namespace BlueBear {
                 break;
               case Tools::Utility::hash( "mouse_enter" ):
                 unregisterHandler( L, signalMap->second, element.widget, sfg::Widget::OnMouseEnter );
+                break;
+              case Tools::Utility::hash( "mouse_leave" ):
+                unregisterHandler( L, signalMap->second, element.widget, sfg::Widget::OnMouseLeave );
+                break;
+              case Tools::Utility::hash( "focus" ):
+                unregisterHandler( L, signalMap->second, element.widget, sfg::Widget::OnGainFocus );
+                break;
+              case Tools::Utility::hash( "blur" ):
+                unregisterHandler( L, signalMap->second, element.widget, sfg::Widget::OnLostFocus );
                 break;
               default:
                 Log::getInstance().warn( "LuaElement::lua_offEvent", "Invalid event type specified: " + std::string( eventType ) );
@@ -270,6 +285,46 @@ namespace BlueBear {
             {
               Log::getInstance().warn( "LuaElement::lua_setText", "Object of type " + widgetType + " has no convertible \"text\" field." );
             }
+        }
+
+        return 0;
+      }
+
+      /**
+       * @static
+       */
+      int LuaElement::lua_setImage( lua_State* L ) {
+        // "image" self
+        if( !lua_isstring( L, -1 ) ) {
+          Log::getInstance().warn( "LuaElement::lua_setImage", "Argument 1 of set_image must be a string." );
+          return 0;
+        }
+
+        LuaElement** userData = ( LuaElement** ) luaL_checkudata( L, 1, "bluebear_widget" );
+        Display::MainGameState* state = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+        LuaElement& element = **userData;
+
+        std::string widgetType = element.widget->GetName();
+        std::string path = lua_tostring( L, -1 );
+
+        switch( Tools::Utility::hash( widgetType.c_str() ) ) {
+          case Tools::Utility::hash( "Image" ):
+            {
+              std::shared_ptr< sfg::Image > image = std::static_pointer_cast< sfg::Image >( element.widget );
+
+              try {
+                PathImageSource piss = PathImageSource( path );
+                image->SetImage( *state->getImageCache().getImage( piss ) );
+              } catch( std::exception& e ) {
+                std::string error = "Could not load image for image widget: " + std::string( e.what() );
+                Log::getInstance().warn( "LuaElement::lua_setImage", error );
+                return luaL_error( L, error.c_str() );
+              }
+
+            }
+            return 0;
+          default:
+            Log::getInstance().warn( "LuaElement::lua_setImage", "Object of type " + widgetType + " has no convertible image type." );
         }
 
         return 0;
@@ -997,6 +1052,26 @@ namespace BlueBear {
           widget->GetSignal( signalID ).Disconnect( pair->second.slotHandle );
           luaL_unref( L, LUA_REGISTRYINDEX, pair->second.reference );
         }
+      }
+
+      /**
+       * @static
+       *
+       * STACK ARGS: function
+       * RETURNS: true
+       */
+      void LuaElement::registerGenericHandler( lua_State* L, EventManager& eventManager, std::shared_ptr< sfg::Widget > widget, sfg::Signal::SignalID signalID ) {
+        auto& signalMap = masterSignalMap[ widget.get() ];
+        unregisterHandler( L, signalMap, widget, signalID );
+
+        LuaReference masterReference = luaL_ref( L, LUA_REGISTRYINDEX ); // EMPTY
+
+        signalMap[ signalID ] = LuaElement::SignalBinding{
+          masterReference,
+          widget->GetSignal( signalID ).Connect( std::bind( LuaElement::genericHandler, L, eventManager, widget, masterReference ) )
+        };
+
+        lua_pushboolean( L, true ); // true
       }
 
     }

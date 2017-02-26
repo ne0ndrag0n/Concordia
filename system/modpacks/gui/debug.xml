@@ -13,6 +13,5 @@
     <Box id="inputs" spacing="5.0">
       <Entry id="inp1"></Entry>
     </Box>
-    <Label id="enter_leave">Mouse Not Over This Text</Label>
   </Box>
 </Window>
