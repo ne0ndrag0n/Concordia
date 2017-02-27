@@ -327,7 +327,6 @@ namespace BlueBear {
       GUI::LuaElement::masterSignalMap.clear();
 
       gui.rootContainer = GUI::RootContainer::Create();
-      gui.desktop.Add( gui.rootContainer );
 
       inputManager.setRootContainer( gui.rootContainer );
 
@@ -515,7 +514,11 @@ namespace BlueBear {
           WidgetBuilder builder( self->instance.eventManager, self->imageCache, path );
           std::vector< std::shared_ptr< sfg::Widget > > widgets = builder.getWidgets();
           for( auto& widget : widgets ) {
+            // Add to root container for proper bookkeeping
             self->gui.rootContainer->Add( widget );
+
+            // Add directly to desktop for proper Z-ordering
+            self->gui.desktop.Add( widget );
           }
         } catch( const std::exception& e ) {
           Log::getInstance().error( "Display::MainGameState::lua_loadXMLWidgets", "Failed to create a WidgetBuilder for path " + path + ": " + e.what() );

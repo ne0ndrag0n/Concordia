@@ -7,6 +7,7 @@
 #include "log.hpp"
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
+#include <SFML/Window/Keyboard.hpp>
 #include <SFGUI/SFGUI.hpp>
 #include <string>
 
@@ -401,14 +402,18 @@ namespace BlueBear {
           case Tools::Utility::hash( "title" ):
             {
               // Verify this is applicable for the given widget
-              if( widgetType != "Window" ) {
+              if( widgetType == "Window" ) {
+                std::shared_ptr< sfg::Window > window = std::static_pointer_cast< sfg::Window >( widgetPtr->widget );
+                lua_pushstring( L, std::string( window->GetTitle() ).c_str() ); // "title"
+                return 1;
+              } else if ( widgetType == "Frame" ) {
+                std::shared_ptr< sfg::Frame > frame = std::static_pointer_cast< sfg::Frame >( widgetPtr->widget );
+                lua_pushstring( L, std::string( frame->GetLabel() ).c_str() ); // "title"
+                return 1;
+              } else {
                 Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
                 return 0;
               }
-
-              std::shared_ptr< sfg::Window > window = std::static_pointer_cast< sfg::Window >( widgetPtr->widget );
-              lua_pushstring( L, std::string( window->GetTitle() ).c_str() ); // "title"
-              return 1;
             }
           case Tools::Utility::hash( "titlebar" ):
             {
@@ -524,12 +529,23 @@ namespace BlueBear {
               lua_pushnumber( L, scale.y ); // 42.0
               return 1;
             }
+          case Tools::Utility::hash( "value" ):
+            {
+              if( widgetType == "ProgressBar" ) {
+                std::shared_ptr< sfg::ProgressBar > progressBar = std::static_pointer_cast< sfg::ProgressBar >( widgetPtr->widget );
+                lua_pushnumber( L, progressBar->GetFraction() ); // 0.5
+                return 1;
+              } else {
+                Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+                return 0;
+              }
+            }
           // These properties are not settable/retrievable using the SFGUI API
           case Tools::Utility::hash( "expand" ):
           case Tools::Utility::hash( "fill" ):
           case Tools::Utility::hash( "orientation" ):
             {
-              Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" cannot be queried from a widget." );
+              Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" cannot be queried from this widget." );
               return 0;
             }
           default:
@@ -669,20 +685,24 @@ namespace BlueBear {
             }
           case Tools::Utility::hash( "title" ):
             {
-              // Verify this is applicable for the given widget
-              if( widgetType != "Window" ) {
-                Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
-                return 0;
-              }
-
               if( !lua_isstring( L, -1 ) ) {
                 Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"title\" must be a string." );
                 return 0;
               }
 
-              std::shared_ptr< sfg::Window > window = std::static_pointer_cast< sfg::Window >( widgetPtr->widget );
-              window->SetTitle( lua_tostring( L, -1 ) );
-              return 0;
+              // Verify this is applicable for the given widget
+              if( widgetType == "Window" ) {
+                std::shared_ptr< sfg::Window > window = std::static_pointer_cast< sfg::Window >( widgetPtr->widget );
+                window->SetTitle( lua_tostring( L, -1 ) );
+                return 0;
+              } else if( widgetType == "Frame" ) {
+                std::shared_ptr< sfg::Frame > frame = std::static_pointer_cast< sfg::Frame >( widgetPtr->widget );
+                frame->SetLabel( lua_tostring( L, -1 ) );
+                return 0;
+              } else {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+                return 0;
+              }
             }
           case Tools::Utility::hash( "titlebar" ):
             {
@@ -877,12 +897,28 @@ namespace BlueBear {
               alignmentWidget->SetScale( scale );
               return 0;
             }
+            case Tools::Utility::hash( "value" ):
+              {
+                if( widgetType == "ProgressBar" ) {
+                  if( !lua_isnumber( L, -1 ) ) {
+                    Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"value\" must be a number." );
+                    return 0;
+                  }
+
+                  std::shared_ptr< sfg::ProgressBar > progressBar = std::static_pointer_cast< sfg::ProgressBar >( widgetPtr->widget );
+                  progressBar->SetFraction( lua_tonumber( L, -1 ) );
+                  return 0;
+                } else {
+                  Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+                  return 0;
+                }
+              }
           // These properties are not settable/retrievable using the SFGUI API
           case Tools::Utility::hash( "expand" ):
           case Tools::Utility::hash( "fill" ):
           case Tools::Utility::hash( "orientation" ):
             {
-              Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" cannot be set on a widget." );
+              Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" cannot be set on this widget." );
               return 0;
             }
           default:
@@ -963,6 +999,8 @@ namespace BlueBear {
         lua_pushstring( L, buttonTag.c_str() ); // "left" "mouse" newtable <function> <bind> bluebear.util bluebear
         lua_settable( L, -3 ); // newtable <function> <bind> bluebear.util bluebear
 
+        setKeyboardStatus( L );
+
         if( auto elementPtr = selfElement.lock() ) {
           lua_pushstring( L, "widget" ); // "widget" newtable <function> <bind> bluebear.util bluebear
           getUserdataFromWidget( L, elementPtr ); // element "widget" newtable <function> <bind> bluebear.util bluebear
@@ -991,15 +1029,14 @@ namespace BlueBear {
        * Stack is unmodified after call
        */
       void LuaElement::genericHandler( lua_State* L, EventManager& eventManager, std::weak_ptr< sfg::Widget > widgetPtr, LuaReference masterReference ) {
-
         lua_getglobal( L, "bluebear" ); // bluebear
         Tools::Utility::getTableValue( L, "util" ); // bluebear.util bluebear
         Tools::Utility::getTableValue( L, "bind" ); // <bind> bluebear.util bluebear
         lua_rawgeti( L, LUA_REGISTRYINDEX, masterReference ); // <function> <bind> bluebear.util bluebear
 
         lua_newtable( L ); // newtable <function> <bind> bluebear.util bluebear
-        // TODO: There's something else that can go here but so far I'm not really sure what it should be
-        // Just pass an empty event table for now to maintain consistency (users can ignore the table if it does not have anything they need to use)
+
+        setKeyboardStatus( L );
 
         if( auto widget = widgetPtr.lock() ) {
           lua_pushstring( L, "widget" ); // "widget" newtable <function> <bind> bluebear.util bluebear
@@ -1019,6 +1056,30 @@ namespace BlueBear {
         lua_pop( L, 2 ); // EMPTY
 
         eventManager.UI_ACTION_EVENT.trigger( edibleReference );
+      }
+
+      /**
+       *
+       * STACK ARGS: newtable
+       * (Stack is unmodified after call)
+       */
+      void LuaElement::setKeyboardStatus( lua_State* L ) {
+        lua_pushstring( L, "keyboard" ); // "keyboard" newtable
+        lua_newtable( L ); // keyboard "keyboard" newtable
+
+        lua_pushstring( L, "ctrl" ); // "ctrl" keyboard "keyboard" newtable
+        lua_pushboolean( L, ( sf::Keyboard::isKeyPressed( sf::Keyboard::LControl ) || sf::Keyboard::isKeyPressed( sf::Keyboard::RControl ) ) ? 1 : 0 );  // true "ctrl" keyboard "keyboard" newtable
+        lua_settable( L, -3 ); // keyboard "keyboard" newtable
+
+        lua_pushstring( L, "alt" ); // "alt" keyboard "keyboard" newtable
+        lua_pushboolean( L, ( sf::Keyboard::isKeyPressed( sf::Keyboard::LAlt ) || sf::Keyboard::isKeyPressed( sf::Keyboard::RAlt ) ) ? 1 : 0 );  // true "alt" keyboard "keyboard" newtable
+        lua_settable( L, -3 ); // keyboard "keyboard" newtable
+
+        lua_pushstring( L, "meta" ); // "meta" keyboard "keyboard" newtable
+        lua_pushboolean( L, ( sf::Keyboard::isKeyPressed( sf::Keyboard::LSystem ) || sf::Keyboard::isKeyPressed( sf::Keyboard::RSystem ) ) ? 1 : 0 );  // true "meta" keyboard "keyboard" newtable
+        lua_settable( L, -3 ); // keyboard "keyboard" newtable
+
+        lua_settable( L, -3 ); // newtable
       }
 
       /**

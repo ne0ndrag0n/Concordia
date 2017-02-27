@@ -91,6 +91,15 @@ namespace BlueBear {
           widget = newImageWidget( element );
           break;
 
+        case hash( "Frame" ):
+          widget = newFrameWidget( element );
+          addChildren( std::static_pointer_cast< sfg::Container >( widget ), element );
+          break;
+
+        case hash( "ProgressBar" ):
+          widget = newProgressBarWidget( element );
+          break;
+
         default:
           Log::getInstance().error( "WidgetBuilder::nodeToWidget", "Invalid CME tag specified: " + std::string( tagType ) );
           throw InvalidCMEWidgetException();
@@ -378,6 +387,50 @@ namespace BlueBear {
       }
 
       return image;
+    }
+
+    std::shared_ptr< sfg::Frame > WidgetBuilder::newFrameWidget( tinyxml2::XMLElement* element ) {
+      std::shared_ptr< sfg::Frame > frame = sfg::Frame::Create( element->Attribute( "title" ) );
+
+      setBasicProperties( frame, element );
+      setAllocationAndRequisition( frame, element );
+      setAlignment( frame, element );
+      setDefaultEvents( frame, element );
+
+      return frame;
+    }
+
+    std::shared_ptr< sfg::ProgressBar > WidgetBuilder::newProgressBarWidget( tinyxml2::XMLElement* element ) {
+      const char* orientation = element->Attribute( "orientation" );
+      if( !orientation ) {
+        orientation = "horizontal";
+      }
+
+      sfg::ProgressBar::Orientation orientationFlag;
+
+      switch( hash( orientation ) ) {
+        case hash( "vertical" ):
+          orientationFlag = sfg::ProgressBar::Orientation::VERTICAL;
+          break;
+        default:
+          Log::getInstance().warn( "WidgetBuilder::newProgressBarWidget", "Invalid value for \"orientation\" attribute: " + std::string( orientation ) + ", defaulting to \"horizontal\"" );
+        case hash( "horizontal" ):
+          orientationFlag = sfg::ProgressBar::Orientation::HORIZONTAL;
+          break;
+      }
+
+      std::shared_ptr< sfg::ProgressBar > progressBar = sfg::ProgressBar::Create( orientationFlag );
+
+      setBasicProperties( progressBar, element );
+      setAllocationAndRequisition( progressBar, element );
+      setDefaultEvents( progressBar, element );
+
+      float fraction = 0.0f;
+      element->QueryFloatAttribute( "value", &fraction );
+
+      progressBar->SetFraction( fraction );
+
+      return progressBar;
     }
 
   }

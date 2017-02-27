@@ -12,6 +12,8 @@
 #include <SFGUI/Button.hpp>
 #include <SFGUI/Entry.hpp>
 #include <SFGUI/Image.hpp>
+#include <SFGUI/Frame.hpp>
+#include <SFGUI/ProgressBar.hpp>
 #include <string>
 #include <memory>
 #include <exception>
@@ -39,6 +41,8 @@ namespace BlueBear {
       std::shared_ptr< sfg::Button > newButtonWidget( tinyxml2::XMLElement* element );
       std::shared_ptr< sfg::Entry > newEntryWidget( tinyxml2::XMLElement* element );
       std::shared_ptr< sfg::Image > newImageWidget( tinyxml2::XMLElement* element );
+      std::shared_ptr< sfg::Frame > newFrameWidget( tinyxml2::XMLElement* element );
+      std::shared_ptr< sfg::ProgressBar > newProgressBarWidget( tinyxml2::XMLElement* element );
 
       void setDefaultEvents( std::shared_ptr< sfg::Widget > widget, tinyxml2::XMLElement* element );
       void setAlignment( std::shared_ptr< sfg::Misc > widget, tinyxml2::XMLElement* element );
