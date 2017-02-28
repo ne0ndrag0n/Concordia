@@ -14,10 +14,13 @@
 #include <SFGUI/Image.hpp>
 #include <SFGUI/Frame.hpp>
 #include <SFGUI/ProgressBar.hpp>
+#include <SFGUI/Separator.hpp>
+#include <SFGUI/Notebook.hpp>
 #include <string>
 #include <memory>
 #include <exception>
 #include <vector>
+#include "log.hpp"
 
 namespace BlueBear {
   class EventManager;
@@ -33,6 +36,7 @@ namespace BlueBear {
 
       void addChildren( std::shared_ptr< sfg::Container > widget, tinyxml2::XMLElement* element );
       void packChildren( std::shared_ptr< sfg::Box > widget, tinyxml2::XMLElement* element );
+      void addNotebookTabs( std::shared_ptr< sfg::Notebook > notebook, tinyxml2::XMLElement* element );
 
       std::shared_ptr< sfg::Window > newWindowWidget( tinyxml2::XMLElement* element );
       std::shared_ptr< sfg::Label > newLabelWidget( tinyxml2::XMLElement* element );
@@ -43,6 +47,8 @@ namespace BlueBear {
       std::shared_ptr< sfg::Image > newImageWidget( tinyxml2::XMLElement* element );
       std::shared_ptr< sfg::Frame > newFrameWidget( tinyxml2::XMLElement* element );
       std::shared_ptr< sfg::ProgressBar > newProgressBarWidget( tinyxml2::XMLElement* element );
+      std::shared_ptr< sfg::Separator > newSeparatorWidget( tinyxml2::XMLElement* element );
+      std::shared_ptr< sfg::Notebook > newNotebookWidget( tinyxml2::XMLElement* element );
 
       void setDefaultEvents( std::shared_ptr< sfg::Widget > widget, tinyxml2::XMLElement* element );
       void setAlignment( std::shared_ptr< sfg::Misc > widget, tinyxml2::XMLElement* element );
@@ -53,6 +59,27 @@ namespace BlueBear {
 
       void correctXBoundary( float* input );
       void correctYBoundary( float* input );
+
+      template< typename T > T getOrientation( const char* orientation ) {
+        if( !orientation ) {
+          orientation = "horizontal";
+        }
+
+        T orientationFlag;
+
+        switch( hash( orientation ) ) {
+          case hash( "vertical" ):
+            orientationFlag = T::VERTICAL;
+            break;
+          default:
+            Log::getInstance().warn( "WidgetBuilder::getOrientation", "Invalid value for \"orientation\" attribute: " + std::string( orientation ) + ", defaulting to \"horizontal\"" );
+          case hash( "horizontal" ):
+            orientationFlag = T::HORIZONTAL;
+            break;
+        }
+
+        return orientationFlag;
+      };
 
     public:
       WidgetBuilder( EventManager& eventManager, ImageCache& imageCache, const std::string& path );

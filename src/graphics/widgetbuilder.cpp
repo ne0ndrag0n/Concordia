@@ -100,6 +100,14 @@ namespace BlueBear {
           widget = newProgressBarWidget( element );
           break;
 
+        case hash( "Separator" ):
+          widget = newSeparatorWidget( element );
+          break;
+
+        case hash( "Notebook" ):
+          widget = newNotebookWidget( element );
+          break;
+
         default:
           Log::getInstance().error( "WidgetBuilder::nodeToWidget", "Invalid CME tag specified: " + std::string( tagType ) );
           throw InvalidCMEWidgetException();
@@ -401,25 +409,7 @@ namespace BlueBear {
     }
 
     std::shared_ptr< sfg::ProgressBar > WidgetBuilder::newProgressBarWidget( tinyxml2::XMLElement* element ) {
-      const char* orientation = element->Attribute( "orientation" );
-      if( !orientation ) {
-        orientation = "horizontal";
-      }
-
-      sfg::ProgressBar::Orientation orientationFlag;
-
-      switch( hash( orientation ) ) {
-        case hash( "vertical" ):
-          orientationFlag = sfg::ProgressBar::Orientation::VERTICAL;
-          break;
-        default:
-          Log::getInstance().warn( "WidgetBuilder::newProgressBarWidget", "Invalid value for \"orientation\" attribute: " + std::string( orientation ) + ", defaulting to \"horizontal\"" );
-        case hash( "horizontal" ):
-          orientationFlag = sfg::ProgressBar::Orientation::HORIZONTAL;
-          break;
-      }
-
-      std::shared_ptr< sfg::ProgressBar > progressBar = sfg::ProgressBar::Create( orientationFlag );
+      std::shared_ptr< sfg::ProgressBar > progressBar = sfg::ProgressBar::Create( getOrientation< sfg::ProgressBar::Orientation >( element->Attribute( "orientation" ) ) );
 
       setBasicProperties( progressBar, element );
       setAllocationAndRequisition( progressBar, element );
@@ -431,6 +421,103 @@ namespace BlueBear {
       progressBar->SetFraction( fraction );
 
       return progressBar;
+    }
+
+    std::shared_ptr< sfg::Separator > WidgetBuilder::newSeparatorWidget( tinyxml2::XMLElement* element ) {
+      std::shared_ptr< sfg::Separator > separator = sfg::Separator::Create( getOrientation< sfg::Separator::Orientation >( element->Attribute( "orientation" ) ) );
+
+      setBasicProperties( separator, element );
+      setAllocationAndRequisition( separator, element );
+      setDefaultEvents( separator, element );
+
+      return separator;
+    }
+
+    std::shared_ptr< sfg::Notebook > WidgetBuilder::newNotebookWidget( tinyxml2::XMLElement* element ) {
+      std::shared_ptr< sfg::Notebook > notebook = sfg::Notebook::Create();
+
+      setBasicProperties( notebook, element );
+      setAllocationAndRequisition( notebook, element );
+      setDefaultEvents( notebook, element );
+
+      const char* tabs = element->Attribute( "tab_position" );
+      if( !tabs ) {
+        tabs = "top";
+      }
+
+      sfg::Notebook::TabPosition tabPosition;
+      switch( hash( tabs ) ) {
+        default:
+          Log::getInstance().warn( "WidgetBuilder::newNotebookWidget", "Invalid value for \"tab_position\" attribute: " + std::string( tabs ) + ", defaulting to \"top\"" );
+        case hash( "top" ):
+          tabPosition = sfg::Notebook::TabPosition::TOP;
+          break;
+        case hash( "bottom" ):
+          tabPosition = sfg::Notebook::TabPosition::BOTTOM;
+          break;
+        case hash( "left" ):
+          tabPosition = sfg::Notebook::TabPosition::LEFT;
+          break;
+        case hash( "right" ):
+          tabPosition = sfg::Notebook::TabPosition::RIGHT;
+      }
+
+      notebook->SetTabPosition( tabPosition );
+
+      bool scrollable = notebook->GetScrollable();
+      element->QueryBoolAttribute( "scrollable", &scrollable );
+      notebook->SetScrollable( scrollable );
+
+      addNotebookTabs( notebook, element );
+
+      return notebook;
+    }
+
+    void WidgetBuilder::addNotebookTabs( std::shared_ptr< sfg::Notebook > notebook, tinyxml2::XMLElement* element ) {
+      for ( tinyxml2::XMLElement* child = element->FirstChildElement(); child != NULL; child = child->NextSiblingElement() ) {
+        // should be "page" pseudo-element
+        std::string name( child->Name() );
+
+        if( name == "page" ) {
+          std::shared_ptr< sfg::Widget > tab = nullptr;
+          std::shared_ptr< sfg::Widget > content = nullptr;
+
+          // generate BOTH tab and content
+          for( tinyxml2::XMLElement* pageChild = child->FirstChildElement(); pageChild != NULL; pageChild = pageChild->NextSiblingElement() ) {
+            const char* name = pageChild->Name();
+
+            switch( hash( name ) ) {
+              case hash( "tab" ):
+                // <tab> pseudo-element
+                if( tab ) {
+                  Log::getInstance().warn( "WidgetBuilder::addNotebookTabs", "Disregarding duplicate <tab> pseudo-element within <page>" );
+                } else {
+                  tab = nodeToWidget( pageChild->FirstChildElement() );
+                }
+                break;
+              case hash( "content" ):
+                // <content> pseudo-element
+                if( content ) {
+                  Log::getInstance().warn( "WidgetBuilder::addNotebookTabs", "Disregarding duplicate <content> pseudo-element within <page>" );
+                } else {
+                  content = nodeToWidget( pageChild->FirstChildElement() );
+                }
+                break;
+              default:
+                Log::getInstance().warn( "WidgetBuilder::addNotebookTabs", "Invalid pseudo-element within page pseudo-element: " + std::string( name ) );
+            }
+          }
+
+          // If neither tab nor content were generated, this page is unusable
+          if( !tab || !content ) {
+            Log::getInstance().warn( "WidgetBuilder::addNotebookTabs", "Incomplete <page> pseudo-element requires both a <tab> and <content> pseudo-element." );
+          } else {
+            notebook->AppendPage( content, tab );
+          }
+        } else {
+          Log::getInstance().warn( "WidgetBuilder::addNotebookTabs", "Invalid pseudo-element within Notebook element: " + name );
+        }
+      }
     }
 
   }

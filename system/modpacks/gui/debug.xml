@@ -1,22 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Window id="debug" min-width="250" min-height="125" left="-260" top="10" title="Debug" resize="false">
-  <Box orientation="vertical" spacing="5.0">
-    <Label>0.0.3 "Picasso"</Label>
-    <Frame title="View">
-      <Box id="control" orientation="horizontal" spacing="5.0">
-        <Button id="rot_l">&lt;</Button>
-        <Button id="rot_r">&gt;</Button>
-        <Button id="zoom_in">+</Button>
-        <Button id="zoom_out">-</Button>
-      </Box>
-    </Frame>
-    <Button id="animate1">play anim</Button>
-    <Button id="misc">do interesting thing</Button>
-    <Frame id="inpframe" title="Input">
-      <Box id="inputs" spacing="5.0">
-        <Entry id="inp1"></Entry>
-        <Button id="apply" min-width="75" expand="false">Apply</Button>
-      </Box>
-    </Frame>
-  </Box>
+  <Notebook>
+    <page>
+      <tab>
+        <Label>Version</Label>
+      </tab>
+      <content>
+        <Box orientation="vertical">
+          <Alignment scale_y="0">
+            <Box>
+              <Alignment scale_x="0.25">
+                <Image>dev/concicon.png</Image>
+              </Alignment>
+              <Alignment scale_x="0.75">
+                <Box orientation="vertical">
+                  <Alignment scale_x="0">
+                    <Label>Concordia</Label>
+                  </Alignment>
+                  <Alignment scale_x="0">
+                    <Label>0.0.3 "Picasso"</Label>
+                  </Alignment>
+                </Box>
+              </Alignment>
+            </Box>
+          </Alignment>
+          <Box orientation="vertical">
+            <Label>(c) 2017 ne0ndrag0n</Label>
+          </Box>
+        </Box>
+      </content>
+    </page>
+    <page>
+      <tab>
+        <Label>View</Label>
+      </tab>
+      <content>
+        <Frame title="View">
+          <Box id="control" orientation="horizontal" spacing="5.0">
+            <Button id="rot_l">&lt;</Button>
+            <Button id="rot_r">&gt;</Button>
+            <Button id="zoom_in">+</Button>
+            <Button id="zoom_out">-</Button>
+          </Box>
+        </Frame>
+      </content>
+    </page>
+    <page>
+      <tab>
+        <Label>Options</Label>
+      </tab>
+      <content>
+        <Box orientation="vertical" spacing="5.0">
+          <Button id="animate1">play anim</Button>
+          <Button id="misc">do interesting thing</Button>
+          <Frame id="inpframe" title="Input">
+            <Box id="inputs" spacing="5.0">
+              <Entry id="inp1"></Entry>
+              <Button id="apply" min-width="75" expand="false">Apply</Button>
+            </Box>
+          </Frame>
+        </Box>
+      </content>
+    </page>
+  </Notebook>
 </Window>
