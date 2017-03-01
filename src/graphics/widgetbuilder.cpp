@@ -440,35 +440,21 @@ namespace BlueBear {
       setAllocationAndRequisition( notebook, element );
       setDefaultEvents( notebook, element );
 
-      const char* tabs = element->Attribute( "tab_position" );
-      if( !tabs ) {
-        tabs = "top";
-      }
-
-      sfg::Notebook::TabPosition tabPosition;
-      switch( hash( tabs ) ) {
-        default:
-          Log::getInstance().warn( "WidgetBuilder::newNotebookWidget", "Invalid value for \"tab_position\" attribute: " + std::string( tabs ) + ", defaulting to \"top\"" );
-        case hash( "top" ):
-          tabPosition = sfg::Notebook::TabPosition::TOP;
-          break;
-        case hash( "bottom" ):
-          tabPosition = sfg::Notebook::TabPosition::BOTTOM;
-          break;
-        case hash( "left" ):
-          tabPosition = sfg::Notebook::TabPosition::LEFT;
-          break;
-        case hash( "right" ):
-          tabPosition = sfg::Notebook::TabPosition::RIGHT;
-      }
-
-      notebook->SetTabPosition( tabPosition );
+      notebook->SetTabPosition( getPosition< sfg::Notebook::TabPosition >( element->Attribute( "tab_position" ) ) );
 
       bool scrollable = notebook->GetScrollable();
       element->QueryBoolAttribute( "scrollable", &scrollable );
       notebook->SetScrollable( scrollable );
 
       addNotebookTabs( notebook, element );
+
+      unsigned int currentPage = 0;
+      element->QueryUnsignedAttribute( "selected", &currentPage );
+      if( currentPage < notebook->GetPageCount() ) {
+        notebook->SetCurrentPage( currentPage );
+      } else {
+        Log::getInstance().warn( "WidgetBuilder::newNotebookWidget", "Invalid page index for notebook specified." );
+      }
 
       return notebook;
     }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Window id="debug" min-width="250" min-height="125" left="-260" top="10" title="Debug" resize="false">
-  <Notebook>
+  <Notebook id="notebook">
     <page>
       <tab>
         <Label>Version</Label>

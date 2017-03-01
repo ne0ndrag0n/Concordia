@@ -21,6 +21,7 @@
 #include <exception>
 #include <vector>
 #include "log.hpp"
+#include "tools/utility.hpp"
 
 namespace BlueBear {
   class EventManager;
@@ -60,20 +61,24 @@ namespace BlueBear {
       void correctXBoundary( float* input );
       void correctYBoundary( float* input );
 
-      template< typename T > T getOrientation( const char* orientation ) {
+    public:
+      WidgetBuilder( EventManager& eventManager, ImageCache& imageCache, const std::string& path );
+      std::vector< std::shared_ptr< sfg::Widget > > getWidgets();
+
+      template< typename T > static T getOrientation( const char* orientation ) {
         if( !orientation ) {
           orientation = "horizontal";
         }
 
         T orientationFlag;
 
-        switch( hash( orientation ) ) {
-          case hash( "vertical" ):
+        switch( Tools::Utility::hash( orientation ) ) {
+          case Tools::Utility::hash( "vertical" ):
             orientationFlag = T::VERTICAL;
             break;
           default:
             Log::getInstance().warn( "WidgetBuilder::getOrientation", "Invalid value for \"orientation\" attribute: " + std::string( orientation ) + ", defaulting to \"horizontal\"" );
-          case hash( "horizontal" ):
+          case Tools::Utility::hash( "horizontal" ):
             orientationFlag = T::HORIZONTAL;
             break;
         }
@@ -81,9 +86,44 @@ namespace BlueBear {
         return orientationFlag;
       };
 
-    public:
-      WidgetBuilder( EventManager& eventManager, ImageCache& imageCache, const std::string& path );
-      std::vector< std::shared_ptr< sfg::Widget > > getWidgets();
+      template< typename T > static T getPosition( const char* tabs ) {
+        if( !tabs ) {
+          tabs = "top";
+        }
+
+        T tabPosition;
+        switch( Tools::Utility::hash( tabs ) ) {
+          default:
+            Log::getInstance().warn( "WidgetBuilder::getPosition", "Invalid value for \"tab_position\" attribute: " + std::string( tabs ) + ", defaulting to \"top\"" );
+          case Tools::Utility::hash( "top" ):
+            tabPosition = T::TOP;
+            break;
+          case Tools::Utility::hash( "bottom" ):
+            tabPosition = T::BOTTOM;
+            break;
+          case Tools::Utility::hash( "left" ):
+            tabPosition = T::LEFT;
+            break;
+          case Tools::Utility::hash( "right" ):
+            tabPosition = T::RIGHT;
+        }
+
+        return tabPosition;
+      };
+
+      template< typename T > static std::string getPosition( T position ) {
+        switch( position ) {
+          default:
+          case T::TOP:
+            return "top";
+          case T::BOTTOM:
+            return "bottom";
+          case T::LEFT:
+            return "left";
+          case T::RIGHT:
+            return "right";
+        }
+      };
     };
 
     struct InvalidCMEWidgetException : public std::exception {

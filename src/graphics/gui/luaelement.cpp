@@ -1,4 +1,5 @@
 #include "graphics/gui/luaelement.hpp"
+#include "graphics/widgetbuilder.hpp"
 #include "graphics/imagebuilder/pathimagesource.hpp"
 #include "graphics/display.hpp"
 #include "tools/utility.hpp"
@@ -540,7 +541,26 @@ namespace BlueBear {
                 return 0;
               }
             }
+          case Tools::Utility::hash( "scrollable" ):
+            if( widgetType == "Notebook" ) {
+              std::shared_ptr< sfg::Notebook > notebook = std::static_pointer_cast< sfg::Notebook >( widgetPtr->widget );
+              lua_pushboolean( L, notebook->GetScrollable() ); // true
+              return 1;
+            } else {
+              Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+              return 0;
+            }
+          case Tools::Utility::hash( "selected" ):
+            if( widgetType == "Notebook" ) {
+              std::shared_ptr< sfg::Notebook > notebook = std::static_pointer_cast< sfg::Notebook >( widgetPtr->widget );
+              lua_pushnumber( L, notebook->GetCurrentPage() ); // 42
+              return 1;
+            } else {
+              Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+              return 0;
+            }
           // These properties are not settable/retrievable using the SFGUI API
+          case Tools::Utility::hash( "tab_position" ):
           case Tools::Utility::hash( "expand" ):
           case Tools::Utility::hash( "fill" ):
           case Tools::Utility::hash( "orientation" ):
@@ -897,23 +917,54 @@ namespace BlueBear {
               alignmentWidget->SetScale( scale );
               return 0;
             }
-            case Tools::Utility::hash( "value" ):
-              {
-                if( widgetType == "ProgressBar" ) {
-                  if( !lua_isnumber( L, -1 ) ) {
-                    Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"value\" must be a number." );
-                    return 0;
-                  }
-
-                  std::shared_ptr< sfg::ProgressBar > progressBar = std::static_pointer_cast< sfg::ProgressBar >( widgetPtr->widget );
-                  progressBar->SetFraction( lua_tonumber( L, -1 ) );
-                  return 0;
-                } else {
-                  Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+          case Tools::Utility::hash( "value" ):
+            {
+              if( widgetType == "ProgressBar" ) {
+                if( !lua_isnumber( L, -1 ) ) {
+                  Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"value\" must be a number." );
                   return 0;
                 }
+
+                std::shared_ptr< sfg::ProgressBar > progressBar = std::static_pointer_cast< sfg::ProgressBar >( widgetPtr->widget );
+                progressBar->SetFraction( lua_tonumber( L, -1 ) );
+                return 0;
+              } else {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+                return 0;
               }
+            }
+          case Tools::Utility::hash( "scrollable" ):
+            if( widgetType == "Notebook" ) {
+              if( !lua_isboolean( L, -1 ) ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"" + std::string( property ) + "\" must be a boolean." );
+                return 0;
+              }
+
+              std::shared_ptr< sfg::Notebook > notebook = std::static_pointer_cast< sfg::Notebook >( widgetPtr->widget );
+              notebook->SetScrollable( lua_toboolean( L, -1 ) ? true : false );
+              return 0;
+            } else {
+              Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+              return 0;
+            }
+          case Tools::Utility::hash( "selected" ):
+            if( widgetType == "Notebook" ) {
+              if( !lua_isnumber( L, -1 ) ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"" + std::string( property ) + "\" must be a number." );
+                return 0;
+              }
+
+              std::shared_ptr< sfg::Notebook > notebook = std::static_pointer_cast< sfg::Notebook >( widgetPtr->widget );
+              notebook->SetCurrentPage( lua_tonumber( L, -1 ) );
+              return 0;
+            } else {
+              Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+              return 0;
+            }
           // These properties are not settable/retrievable using the SFGUI API
+          case Tools::Utility::hash( "tab_position" ):
+            // Tried to make tab_position settable.
+            // There appears to be an SFGUI bug here where if we set the tab_position on an existing Notebook, it just all goes to hell and will not render properly.
           case Tools::Utility::hash( "expand" ):
           case Tools::Utility::hash( "fill" ):
           case Tools::Utility::hash( "orientation" ):
