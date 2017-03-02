@@ -15,6 +15,7 @@
 #include <SFGUI/Alignment.hpp>
 #include <SFGUI/Misc.hpp>
 #include <SFGUI/Button.hpp>
+#include <SFGUI/Adjustment.hpp>
 #include <tinyxml2.h>
 #include <vector>
 #include <functional>
@@ -106,6 +107,11 @@ namespace BlueBear {
 
         case hash( "Notebook" ):
           widget = newNotebookWidget( element );
+          break;
+
+        case hash( "ScrolledWindow" ):
+          widget = newScrolledWindowWidget( element );
+          // TODO: ScrolledWindow-specific add children method
           break;
 
         default:
@@ -457,6 +463,37 @@ namespace BlueBear {
       }
 
       return notebook;
+    }
+
+    std::shared_ptr< sfg::ScrolledWindow > WidgetBuilder::newScrolledWindowWidget( tinyxml2::XMLElement* element ) {
+      // Assert that element has a min-width and min-height, as this widget requires a requisition.
+      if( !element->Attribute( "min-width" ) || !element->Attribute( "min-height" ) ) {
+        Log::getInstance().error( "WidgetBuilder::newScrolledWindowWidget", "ScrolledWindow widget requires min-width and min-height" );
+        throw FailedToLoadXMLException();
+      }
+
+      std::shared_ptr< sfg::ScrolledWindow > scrolledWindow = sfg::ScrolledWindow::Create();
+      setBasicProperties( scrolledWindow, element );
+      setAllocationAndRequisition( scrolledWindow, element );
+      setDefaultEvents( scrolledWindow, element );
+
+      // Set a default scrollbar policy to "auto"
+      scrolledWindow->SetScrollbarPolicy( ScrollbarPolicy( element->Attribute( "scrollbar_x" ), element->Attribute( "scrollbar_y" ) ).get() );
+      scrolledWindow->SetPlacement( Placement( element->Attribute( "placement" ) ).get() );
+
+      // Set the adjustment positions based on viewport_x and viewport_y attributes
+      std::shared_ptr< sfg::Adjustment > adjustmentX = scrolledWindow->GetHorizontalAdjustment();
+      std::shared_ptr< sfg::Adjustment > adjustmentY = scrolledWindow->GetVerticalAdjustment();
+
+      float viewportX = adjustmentX->GetValue();
+      element->QueryFloatAttribute( "viewport_x", &viewportX );
+      float viewportY = adjustmentY->GetValue();
+      element->QueryFloatAttribute( "viewport_y", &viewportY );
+
+      adjustmentX->SetValue( viewportX );
+      adjustmentY->SetValue( viewportY );
+
+      return scrolledWindow;
     }
 
     void WidgetBuilder::addNotebookTabs( std::shared_ptr< sfg::Notebook > notebook, tinyxml2::XMLElement* element ) {

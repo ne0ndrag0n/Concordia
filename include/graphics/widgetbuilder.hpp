@@ -16,6 +16,7 @@
 #include <SFGUI/ProgressBar.hpp>
 #include <SFGUI/Separator.hpp>
 #include <SFGUI/Notebook.hpp>
+#include <SFGUI/ScrolledWindow.hpp>
 #include <string>
 #include <memory>
 #include <exception>
@@ -50,6 +51,7 @@ namespace BlueBear {
       std::shared_ptr< sfg::ProgressBar > newProgressBarWidget( tinyxml2::XMLElement* element );
       std::shared_ptr< sfg::Separator > newSeparatorWidget( tinyxml2::XMLElement* element );
       std::shared_ptr< sfg::Notebook > newNotebookWidget( tinyxml2::XMLElement* element );
+      std::shared_ptr< sfg::ScrolledWindow > newScrolledWindowWidget( tinyxml2::XMLElement* element );
 
       void setDefaultEvents( std::shared_ptr< sfg::Widget > widget, tinyxml2::XMLElement* element );
       void setAlignment( std::shared_ptr< sfg::Misc > widget, tinyxml2::XMLElement* element );
@@ -124,6 +126,82 @@ namespace BlueBear {
             return "right";
         }
       };
+
+      class ScrollbarPolicy {
+        sfg::ScrolledWindow::ScrollbarPolicy x;
+        sfg::ScrolledWindow::ScrollbarPolicy y;
+
+      public:
+        ScrollbarPolicy( const char* x, const char* y ) {
+          switch( Tools::Utility::hash( x ) ) {
+            case Tools::Utility::hash( "off" ):
+              this->x = sfg::ScrolledWindow::ScrollbarPolicy::HORIZONTAL_NEVER;
+              break;
+            case Tools::Utility::hash( "on" ):
+              this->x = sfg::ScrolledWindow::ScrollbarPolicy::HORIZONTAL_ALWAYS;
+              break;
+            default:
+            case Tools::Utility::hash( "auto" ):
+              this->x = sfg::ScrolledWindow::ScrollbarPolicy::HORIZONTAL_AUTOMATIC;
+          }
+
+          switch( Tools::Utility::hash( y ) ) {
+            case Tools::Utility::hash( "off" ):
+              this->y = sfg::ScrolledWindow::ScrollbarPolicy::VERTICAL_NEVER;
+              break;
+            case Tools::Utility::hash( "on" ):
+              this->y = sfg::ScrolledWindow::ScrollbarPolicy::VERTICAL_ALWAYS;
+              break;
+            default:
+            case Tools::Utility::hash( "auto" ):
+              this->y = sfg::ScrolledWindow::ScrollbarPolicy::VERTICAL_AUTOMATIC;
+          }
+        }
+
+        char get() {
+          return x | y;
+        }
+      };
+
+      class Placement {
+        sfg::ScrolledWindow::Placement placement;
+
+      public:
+        Placement( sfg::ScrolledWindow::Placement placement ) : placement( placement ) {}
+        Placement( const char* mode ) {
+          switch( Tools::Utility::hash( mode ) ) {
+            default:
+            case Tools::Utility::hash( "top_left" ):
+              placement = sfg::ScrolledWindow::Placement::TOP_LEFT;
+              break;
+            case Tools::Utility::hash( "top_right" ):
+              placement = sfg::ScrolledWindow::Placement::TOP_RIGHT;
+              break;
+            case Tools::Utility::hash( "bottom_left" ):
+              placement = sfg::ScrolledWindow::Placement::BOTTOM_LEFT;
+              break;
+            case Tools::Utility::hash( "bottom_right" ):
+              placement = sfg::ScrolledWindow::Placement::BOTTOM_RIGHT;
+          }
+        }
+        sfg::ScrolledWindow::Placement get() {
+          return placement;
+        }
+        std::string getAsString() {
+          switch( placement ) {
+            default:
+            case sfg::ScrolledWindow::Placement::TOP_LEFT:
+              return "top_left";
+            case sfg::ScrolledWindow::Placement::TOP_RIGHT:
+              return "top_right";
+            case sfg::ScrolledWindow::Placement::BOTTOM_LEFT:
+              return "bottom_left";
+            case sfg::ScrolledWindow::Placement::BOTTOM_RIGHT:
+              return "bottom_right";
+          }
+        }
+      };
+
     };
 
     struct InvalidCMEWidgetException : public std::exception {

@@ -59,6 +59,9 @@
               <Button id="apply" min-width="75" expand="false">Apply</Button>
             </Box>
           </Frame>
+          <ScrolledWindow min-width="10" min-height="100">
+
+          </ScrolledWindow>
         </Box>
       </content>
     </page>

@@ -67,6 +67,10 @@ namespace BlueBear {
 				static void* stringToPointer( const std::string& str );
 
 				static constexpr unsigned int hash( const char* str, int h = 0 ) {
+					if( !str ) {
+						str = "";
+					}
+
 					return !str[ h ] ? 5381 : ( hash( str, h+1 ) * 33 ) ^ str[ h ];
 				};
 
