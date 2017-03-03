@@ -17,6 +17,8 @@
 #include <SFGUI/Separator.hpp>
 #include <SFGUI/Notebook.hpp>
 #include <SFGUI/ScrolledWindow.hpp>
+#include <SFGUI/Viewport.hpp>
+#include <SFGUI/Adjustment.hpp>
 #include <string>
 #include <memory>
 #include <exception>
@@ -36,6 +38,7 @@ namespace BlueBear {
       tinyxml2::XMLDocument document;
       static constexpr unsigned int hash(const char* str, int h = 0);
 
+      void addChildren( std::shared_ptr< sfg::ScrolledWindow > scrolledWindow, tinyxml2::XMLElement* element );
       void addChildren( std::shared_ptr< sfg::Container > widget, tinyxml2::XMLElement* element );
       void packChildren( std::shared_ptr< sfg::Box > widget, tinyxml2::XMLElement* element );
       void addNotebookTabs( std::shared_ptr< sfg::Notebook > notebook, tinyxml2::XMLElement* element );
@@ -52,6 +55,7 @@ namespace BlueBear {
       std::shared_ptr< sfg::Separator > newSeparatorWidget( tinyxml2::XMLElement* element );
       std::shared_ptr< sfg::Notebook > newNotebookWidget( tinyxml2::XMLElement* element );
       std::shared_ptr< sfg::ScrolledWindow > newScrolledWindowWidget( tinyxml2::XMLElement* element );
+      std::shared_ptr< sfg::Viewport > newViewportWidget( tinyxml2::XMLElement* element );
 
       void setDefaultEvents( std::shared_ptr< sfg::Widget > widget, tinyxml2::XMLElement* element );
       void setAlignment( std::shared_ptr< sfg::Misc > widget, tinyxml2::XMLElement* element );
@@ -62,6 +66,26 @@ namespace BlueBear {
 
       void correctXBoundary( float* input );
       void correctYBoundary( float* input );
+
+      template< typename T > void setAdjustments( std::shared_ptr< T > widget, tinyxml2::XMLElement* element ) {
+        // Set the adjustment positions based on viewport_x and viewport_y attributes
+        std::shared_ptr< sfg::Adjustment > adjustmentX = widget->GetHorizontalAdjustment();
+        std::shared_ptr< sfg::Adjustment > adjustmentY = widget->GetVerticalAdjustment();
+
+        // Set default upper and lower bounds
+        adjustmentX->SetLower( 0.0f );
+        adjustmentX->SetUpper( 100000000.0f );
+        adjustmentY->SetLower( 0.0f );
+        adjustmentY->SetUpper( 100000000.0f );
+
+        float viewportX = adjustmentX->GetValue();
+        element->QueryFloatAttribute( "viewport_x", &viewportX );
+        float viewportY = adjustmentY->GetValue();
+        element->QueryFloatAttribute( "viewport_y", &viewportY );
+
+        adjustmentX->SetValue( viewportX );
+        adjustmentY->SetValue( viewportY );
+      };
 
     public:
       WidgetBuilder( EventManager& eventManager, ImageCache& imageCache, const std::string& path );
