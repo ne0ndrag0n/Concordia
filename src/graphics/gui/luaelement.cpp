@@ -559,6 +559,18 @@ namespace BlueBear {
               Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
               return 0;
             }
+          case Tools::Utility::hash( "scrollbar_x" ):
+          case Tools::Utility::hash( "scrollbar_y" ):
+            if( widgetType == "ScrolledWindow" ) {
+              std::shared_ptr< sfg::ScrolledWindow > scrolledWindow = std::static_pointer_cast< sfg::ScrolledWindow >( widgetPtr->widget );
+              WidgetBuilder::ScrollbarPolicy policy( scrolledWindow );
+
+              lua_pushstring( L, ( std::string( property ) == "scrollbar_x" ) ? policy.getXAsString().c_str() : policy.getYAsString().c_str() ); // "auto"
+              return 1;
+            } else {
+              Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+              return 0;
+            }
           // These properties are not settable/retrievable using the SFGUI API
           case Tools::Utility::hash( "tab_position" ):
           case Tools::Utility::hash( "expand" ):
@@ -959,6 +971,31 @@ namespace BlueBear {
               return 0;
             } else {
               Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+              return 0;
+            }
+          case Tools::Utility::hash( "scrollbar_x" ):
+          case Tools::Utility::hash( "scrollbar_y" ):
+            if( widgetType == "ScrolledWindow" ) {
+              if( !lua_isstring( L, -1 ) ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"" + std::string( property ) + "\" must be a string." );
+                return 0;
+              }
+
+              std::shared_ptr< sfg::ScrolledWindow > scrolledWindow = std::static_pointer_cast< sfg::ScrolledWindow >( widgetPtr->widget );
+              WidgetBuilder::ScrollbarPolicy policy( scrolledWindow );
+              if( std::string( property ) == "scrollbar_x" ) {
+                // scrollbar_x
+                policy.setX( lua_tostring( L, -1 ) );
+              } else {
+                // scrollbar_y
+                policy.setY( lua_tostring( L, -1 ) );
+              }
+
+              scrolledWindow->SetScrollbarPolicy( policy.get() );
+
+              return 0;
+            } else {
+              Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
               return 0;
             }
           // These properties are not settable/retrievable using the SFGUI API

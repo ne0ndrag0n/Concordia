@@ -151,12 +151,30 @@ namespace BlueBear {
         }
       };
 
+      // Let's move onto helper classes instead of public static functions on WidgetBuilder
+      // for better encapsulation and potential testability
+
+      /**
+       * Helper class to convert between various forms of ScrollbarPolicy
+       */
       class ScrollbarPolicy {
+      public:
         sfg::ScrolledWindow::ScrollbarPolicy x;
         sfg::ScrolledWindow::ScrollbarPolicy y;
 
-      public:
         ScrollbarPolicy( const char* x, const char* y ) {
+          setX( x );
+          setY( y );
+        }
+
+        ScrollbarPolicy( std::shared_ptr< sfg::ScrolledWindow > window ) {
+          char stat = window->GetScrollbarPolicy();
+
+          x = ( sfg::ScrolledWindow::ScrollbarPolicy )( stat & 0x7 );
+          y = ( sfg::ScrolledWindow::ScrollbarPolicy )( stat & 0x38 );
+        }
+
+        void setX( const char* x ) {
           switch( Tools::Utility::hash( x ) ) {
             case Tools::Utility::hash( "off" ):
               this->x = sfg::ScrolledWindow::ScrollbarPolicy::HORIZONTAL_NEVER;
@@ -165,10 +183,15 @@ namespace BlueBear {
               this->x = sfg::ScrolledWindow::ScrollbarPolicy::HORIZONTAL_ALWAYS;
               break;
             default:
+              if( x ) {
+                Log::getInstance().warn( "ScrollbarPolicy::setX", "Invalid value for \"scrollbar_x\" attribute: " + std::string( x ) + ", defaulting to \"auto\"" );
+              }
             case Tools::Utility::hash( "auto" ):
               this->x = sfg::ScrolledWindow::ScrollbarPolicy::HORIZONTAL_AUTOMATIC;
           }
+        }
 
+        void setY( const char* y ) {
           switch( Tools::Utility::hash( y ) ) {
             case Tools::Utility::hash( "off" ):
               this->y = sfg::ScrolledWindow::ScrollbarPolicy::VERTICAL_NEVER;
@@ -177,8 +200,31 @@ namespace BlueBear {
               this->y = sfg::ScrolledWindow::ScrollbarPolicy::VERTICAL_ALWAYS;
               break;
             default:
+              if( y ) {
+                Log::getInstance().warn( "ScrollbarPolicy::setY", "Invalid value for \"scrollbar_y\" attribute: " + std::string( y ) + ", defaulting to \"auto\"" );
+              }
             case Tools::Utility::hash( "auto" ):
               this->y = sfg::ScrolledWindow::ScrollbarPolicy::VERTICAL_AUTOMATIC;
+          }
+        }
+
+        std::string getXAsString() {
+          if( x & sfg::ScrolledWindow::ScrollbarPolicy::HORIZONTAL_NEVER ) {
+            return "off";
+          } else if( x & sfg::ScrolledWindow::ScrollbarPolicy::HORIZONTAL_ALWAYS ) {
+            return "on";
+          } else {
+            return "auto";
+          }
+        }
+
+        std::string getYAsString() {
+          if( y & sfg::ScrolledWindow::ScrollbarPolicy::VERTICAL_NEVER ) {
+            return "off";
+          } else if( y & sfg::ScrolledWindow::ScrollbarPolicy::VERTICAL_ALWAYS ) {
+            return "on";
+          } else {
+            return "auto";
           }
         }
 
