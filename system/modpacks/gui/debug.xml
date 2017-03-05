@@ -64,3 +64,28 @@
     </page>
   </Notebook>
 </Window>
+
+<!--
+<Window id="tablewindow">
+  <Table id="table">
+    <row>
+      <cell>
+        <Label>Label 1</Label>
+      </cell>
+      <cell>
+        <Label>Label 2</Label>
+      </cell>
+    </row>
+    <row>
+      <cell>
+        <Label>Label 3</Label>
+      </cell>
+    </row>
+    <row>
+      <cell>
+        <Label>Label 4</Label>
+      </cell>
+    </row>
+  </Table>
+</Window>
+-->

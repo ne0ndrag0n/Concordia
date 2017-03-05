@@ -523,6 +523,12 @@ namespace BlueBear {
       return viewport;
     }
 
+    std::shared_ptr< sfg::Table > WidgetBuilder::newTableWidget( tinyxml2::XMLElement* element ) {
+      std::shared_ptr< sfg::Table > table = sfg::Table::Create();
+
+      return table;
+    }
+
     void WidgetBuilder::addNotebookTabs( std::shared_ptr< sfg::Notebook > notebook, tinyxml2::XMLElement* element ) {
       for ( tinyxml2::XMLElement* child = element->FirstChildElement(); child != NULL; child = child->NextSiblingElement() ) {
         // should be "page" pseudo-element

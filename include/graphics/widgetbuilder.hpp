@@ -19,6 +19,7 @@
 #include <SFGUI/ScrolledWindow.hpp>
 #include <SFGUI/Viewport.hpp>
 #include <SFGUI/Adjustment.hpp>
+#include <SFGUI/Table.hpp>
 #include <string>
 #include <memory>
 #include <exception>
@@ -56,6 +57,7 @@ namespace BlueBear {
       std::shared_ptr< sfg::Notebook > newNotebookWidget( tinyxml2::XMLElement* element );
       std::shared_ptr< sfg::ScrolledWindow > newScrolledWindowWidget( tinyxml2::XMLElement* element );
       std::shared_ptr< sfg::Viewport > newViewportWidget( tinyxml2::XMLElement* element );
+      std::shared_ptr< sfg::Table > newTableWidget( tinyxml2::XMLElement* element );
 
       void setDefaultEvents( std::shared_ptr< sfg::Widget > widget, tinyxml2::XMLElement* element );
       void setAlignment( std::shared_ptr< sfg::Misc > widget, tinyxml2::XMLElement* element );
