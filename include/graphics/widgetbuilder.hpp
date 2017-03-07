@@ -59,6 +59,8 @@ namespace BlueBear {
       std::shared_ptr< sfg::Viewport > newViewportWidget( tinyxml2::XMLElement* element );
       std::shared_ptr< sfg::Table > newTableWidget( tinyxml2::XMLElement* element );
 
+      void addTableRows( std::shared_ptr< sfg::Table > table, tinyxml2::XMLElement* element );
+
       void setDefaultEvents( std::shared_ptr< sfg::Widget > widget, tinyxml2::XMLElement* element );
       void setAlignment( std::shared_ptr< sfg::Misc > widget, tinyxml2::XMLElement* element );
       void setBasicProperties( std::shared_ptr< sfg::Widget > widget, tinyxml2::XMLElement* element );

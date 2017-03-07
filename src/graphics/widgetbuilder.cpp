@@ -526,7 +526,46 @@ namespace BlueBear {
     std::shared_ptr< sfg::Table > WidgetBuilder::newTableWidget( tinyxml2::XMLElement* element ) {
       std::shared_ptr< sfg::Table > table = sfg::Table::Create();
 
+      setBasicProperties( table, element );
+      setAllocationAndRequisition( table, element );
+      setDefaultEvents( table, element );
+
+      // Add table rows
+      addTableRows( table, element );
+
       return table;
+    }
+
+    void WidgetBuilder::addTableRows( std::shared_ptr< sfg::Table > table, tinyxml2::XMLElement* element ) {
+      unsigned int currentRow = 0;
+
+      for( tinyxml2::XMLElement* row = element->FirstChildElement(); row != NULL; row = row->NextSiblingElement() ) {
+        std::string nodeName( row->Name() );
+
+        if( nodeName == "row" ) {
+          unsigned int currentColumn = 0;
+
+          for( tinyxml2::XMLElement* cell = row->FirstChildElement(); cell != NULL; cell = cell->NextSiblingElement() ) {
+            unsigned int colspan = 1;
+            cell->QueryUnsignedAttribute( "colspan", &colspan );
+            unsigned int rowspan = 1;
+            cell->QueryUnsignedAttribute( "rowspan", &rowspan );
+
+            float paddingX = 10.0f;
+            cell->QueryFloatAttribute( "padding_x", &paddingX );
+            float paddingY = 10.0f;
+            cell->QueryFloatAttribute( "padding_y", &paddingY );
+
+            table->Attach( nodeToWidget( cell ), sf::Rect< sf::Uint32 >( currentColumn, currentRow, colspan, rowspan ), sfg::Table::FILL | sfg::Table::EXPAND, sfg::Table::FILL, sf::Vector2f( paddingX, paddingY ) );
+
+            currentColumn++;
+          }
+
+          currentRow++;
+        } else {
+          Log::getInstance().warn( "WidgetBuilder::addTableRows", "Invalid <Table> child element; only <row> pseudo-elements are valid direct children of a <Table>." );
+        }
+      }
     }
 
     void WidgetBuilder::addNotebookTabs( std::shared_ptr< sfg::Notebook > notebook, tinyxml2::XMLElement* element ) {
