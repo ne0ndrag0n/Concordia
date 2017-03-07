@@ -69,22 +69,17 @@
 <Window id="tablewindow">
   <Table id="table">
     <row>
-      <cell>
-        <Label>Label 1</Label>
-      </cell>
-      <cell>
-        <Label>Label 2</Label>
-      </cell>
+      <Button>Foo</Button>
+      <Button colspan="2" rowspan="3">row_span</Button>
     </row>
     <row>
-      <cell>
-        <Label>Label 3</Label>
-      </cell>
+    	<Button>Bar</Button>
     </row>
     <row>
-      <cell>
-        <Label>Label 4</Label>
-      </cell>
+    	<Button>Baz</Button>
+    </row>
+    <row>
+      <Button colspan="2">column_span</Button>
     </row>
   </Table>
 </Window>
