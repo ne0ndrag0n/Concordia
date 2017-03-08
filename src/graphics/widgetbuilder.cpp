@@ -118,6 +118,10 @@ namespace BlueBear {
           addChildren( std::static_pointer_cast< sfg::Container >( widget ), element );
           break;
 
+        case hash( "Table" ):
+          widget = newTableWidget( element );
+          break;
+
         default:
           Log::getInstance().error( "WidgetBuilder::nodeToWidget", "Invalid CME tag specified: " + std::string( tagType ) );
           throw InvalidCMEWidgetException();
