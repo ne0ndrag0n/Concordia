@@ -541,6 +541,9 @@ namespace BlueBear {
     }
 
     void WidgetBuilder::addTableRows( std::shared_ptr< sfg::Table > table, tinyxml2::XMLElement* element ) {
+      std::map< unsigned int, float > requestedRowSpacings;
+      std::map< unsigned int, float > requestedColumnSpacings;
+
       unsigned int currentRow = 0;
 
       for( tinyxml2::XMLElement* row = element->FirstChildElement(); row != NULL; row = row->NextSiblingElement() ) {
@@ -555,20 +558,61 @@ namespace BlueBear {
             unsigned int rowspan = 1;
             cell->QueryUnsignedAttribute( "rowspan", &rowspan );
 
-            float paddingX = 10.0f;
+            float paddingX = 0.0f;
             cell->QueryFloatAttribute( "padding_x", &paddingX );
-            float paddingY = 10.0f;
+            float paddingY = 0.0f;
             cell->QueryFloatAttribute( "padding_y", &paddingY );
 
-            table->Attach( nodeToWidget( cell ), sf::Rect< sf::Uint32 >( currentColumn, currentRow, colspan, rowspan ), sfg::Table::FILL | sfg::Table::EXPAND, sfg::Table::FILL, sf::Vector2f( paddingX, paddingY ) );
+            bool expandX = true, expandY = true;
+            bool fillX = true, fillY = true;
+
+            cell->QueryBoolAttribute( "expand_x", &expandX );
+            cell->QueryBoolAttribute( "expand_y", &expandY );
+            cell->QueryBoolAttribute( "fill_x", &fillX );
+            cell->QueryBoolAttribute( "fill_y", &fillY );
+
+            int packX = 0, packY = 0;
+
+            if( expandX ) { packX |= sfg::Table::EXPAND; }
+            if( fillX ) { packX |= sfg::Table::FILL; }
+
+            if( expandY ) { packY |= sfg::Table::EXPAND; }
+            if( fillY ) { packY |= sfg::Table::FILL; }
+
+            table->Attach( nodeToWidget( cell ), sf::Rect< sf::Uint32 >( currentColumn, currentRow, colspan, rowspan ), packX, packY, sf::Vector2f( paddingX, paddingY ) );
+
+            float spacing = 0.0f;
+            if( cell->QueryFloatAttribute( "spacing", &spacing ) == tinyxml2::XML_SUCCESS ) {
+              requestedColumnSpacings[ currentColumn ] = spacing;
+            }
 
             currentColumn++;
+          }
+
+          float spacing = 0.0f;
+          if( row->QueryFloatAttribute( "spacing", &spacing ) == tinyxml2::XML_SUCCESS ) {
+            requestedRowSpacings[ currentRow ] = spacing;
           }
 
           currentRow++;
         } else {
           Log::getInstance().warn( "WidgetBuilder::addTableRows", "Invalid <Table> child element; only <row> pseudo-elements are valid direct children of a <Table>." );
         }
+      }
+
+      float rowSpacing = 0.0f;
+      float columnSpacing = 0.0f;
+      element->QueryFloatAttribute( "row_spacing", &rowSpacing );
+      element->QueryFloatAttribute( "column_spacing", &columnSpacing );
+
+      table->SetRowSpacings( rowSpacing );
+      table->SetColumnSpacings( columnSpacing );
+
+      for( auto& it : requestedRowSpacings ) {
+        table->SetRowSpacing( it.first, it.second );
+      }
+      for( auto& it : requestedColumnSpacings ) {
+        table->SetColumnSpacing( it.first, it.second );
       }
     }
 
