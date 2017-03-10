@@ -576,6 +576,16 @@ namespace BlueBear {
           case Tools::Utility::hash( "expand" ):
           case Tools::Utility::hash( "fill" ):
           case Tools::Utility::hash( "orientation" ):
+          case Tools::Utility::hash( "colspan" ):
+          case Tools::Utility::hash( "rowspan" ):
+          case Tools::Utility::hash( "padding_x" ):
+          case Tools::Utility::hash( "padding_y" ):
+          case Tools::Utility::hash( "expand_x" ):
+          case Tools::Utility::hash( "expand_y" ):
+          case Tools::Utility::hash( "fill_x" ):
+          case Tools::Utility::hash( "fill_y" ):
+          case Tools::Utility::hash( "row_spacing" ):
+          case Tools::Utility::hash( "column_spacing" ):
             {
               Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" cannot be queried from this widget." );
               return 0;
@@ -594,16 +604,18 @@ namespace BlueBear {
       int LuaElement::lua_setProperty( lua_State* L ) {
         LuaElement* widgetPtr = *( ( LuaElement** ) luaL_checkudata( L, 1, "bluebear_widget" ) );
 
-        // value "property" self
+        // ...value "property" self
 
-        if( !lua_isstring( L, -2 ) ) {
+        char idIndex = 1 - lua_gettop( L );
+
+        if( !lua_isstring( L, idIndex ) ) {
           Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 1 of set_property must be a string." );
           return 0;
         }
 
         std::string widgetType = widgetPtr->widget->GetName();
 
-        const char* property = lua_tostring( L, -2 );
+        const char* property = lua_tostring( L, idIndex );
         switch( Tools::Utility::hash( property ) ) {
           case Tools::Utility::hash( "visible" ):
             {
@@ -996,6 +1008,49 @@ namespace BlueBear {
               return 0;
             } else {
               Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+              return 0;
+            }
+          case Tools::Utility::hash( "row_spacing" ):
+          case Tools::Utility::hash( "column_spacing" ):
+            {
+              // This should be one of very few set_property properties that take one or two values
+              char args = lua_gettop( L );
+
+              if( args == 4 ) {
+                // value cell "spacing" self
+                if( !lua_isnumber( L, -1 ) || !lua_isnumber( L, -2 ) ) {
+                  Log::getInstance().warn( "LuaElement::lua_setProperty", "Arguments 2 and 3 of set_property for property \"" + std::string( property ) + "\" must be numbers." );
+                  return 0;
+                }
+
+                float spacing = lua_tonumber( L, -1 );
+                int item = lua_tonumber( L, -2 );
+
+                std::shared_ptr< sfg::Table > table = std::static_pointer_cast< sfg::Table >( widgetPtr->widget );
+                if( std::string( property ) == "row_spacing" ) {
+                  // row spacing
+                  table->SetRowSpacing( item, spacing );
+                } else {
+                  // column spacing
+                  table->SetColumnSpacing( item, spacing );
+                }
+              } else {
+                // value "spacing" self
+                if( !lua_isnumber( L, -1 ) ) {
+                  Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"" + std::string( property ) + "\" must be a number." );
+                  return 0;
+                }
+
+                float spacing = lua_tonumber( L, -1 );
+                std::shared_ptr< sfg::Table > table = std::static_pointer_cast< sfg::Table >( widgetPtr->widget );
+                if( std::string( property ) == "row_spacing" ) {
+                  // row spacing
+                  table->SetRowSpacings( spacing );
+                } else {
+                  // column spacing
+                  table->SetColumnSpacings( spacing );
+                }
+              }
               return 0;
             }
           // These properties are not settable/retrievable using the SFGUI API
