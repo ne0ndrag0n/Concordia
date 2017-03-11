@@ -239,6 +239,12 @@ namespace BlueBear {
               lua_pushstring( L, std::string( button->GetLabel() ).c_str() ); // "entry"
             }
             break;
+          case Tools::Utility::hash( "Scrollbar" ):
+            {
+              std::shared_ptr< sfg::Range > range = std::static_pointer_cast< sfg::Range >( widgetPtr->widget );
+              lua_pushnumber( L, range->GetValue() ); // 42.0
+            }
+            break;
           default:
             {
               Log::getInstance().warn( "LuaElement::lua_getText", "Object of type " + widgetType + " has no convertible \"text\" field." );
@@ -255,32 +261,33 @@ namespace BlueBear {
        */
       int LuaElement::lua_setText( lua_State* L ) {
         // "text" self
-        if( !lua_isstring( L, -1 ) ) {
-          Log::getInstance().warn( "LuaElement::lua_setText", "Argument 1 of set_text must be a string." );
-          return 0;
-        }
 
         LuaElement* widgetPtr = *( ( LuaElement** ) luaL_checkudata( L, 1, "bluebear_widget" ) );
         std::string widgetType = widgetPtr->widget->GetName();
-        std::string text = lua_tostring( L, -1 );
 
         switch( Tools::Utility::hash( widgetType.c_str() ) ) {
           case Tools::Utility::hash( "Entry" ):
             {
               std::shared_ptr< sfg::Entry > entry = std::static_pointer_cast< sfg::Entry >( widgetPtr->widget );
-              entry->SetText( text );
+              entry->SetText( lua_tostring( L, -1 ) );
             }
             break;
           case Tools::Utility::hash( "Label" ):
             {
               std::shared_ptr< sfg::Label > label = std::static_pointer_cast< sfg::Label >( widgetPtr->widget );
-              label->SetText( text );
+              label->SetText( lua_tostring( L, -1 ) );
             }
             break;
           case Tools::Utility::hash( "Button" ):
             {
               std::shared_ptr< sfg::Button > button = std::static_pointer_cast< sfg::Button >( widgetPtr->widget );
-              button->SetLabel( text );
+              button->SetLabel( lua_tostring( L, -1 ) );
+            }
+            break;
+          case Tools::Utility::hash( "Scrollbar" ):
+            {
+              std::shared_ptr< sfg::Range > range = std::static_pointer_cast< sfg::Range >( widgetPtr->widget );
+              range->SetValue( lua_tonumber( L, -1 ) );
             }
             break;
           default:
@@ -570,6 +577,38 @@ namespace BlueBear {
             } else {
               Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
               return 0;
+            }
+          case Tools::Utility::hash( "min" ):
+          case Tools::Utility::hash( "max" ):
+            if( widgetType == "Scrollbar" ) {
+              std::shared_ptr< sfg::Range > range = std::static_pointer_cast< sfg::Range >( widgetPtr->widget );
+              std::shared_ptr< sfg::Adjustment > adjustment = range->GetAdjustment();
+
+              lua_pushnumber( L, ( std::string( property ) == "min" ? adjustment->GetLower() : adjustment->GetUpper() ) ); // 42
+              return 1;
+            } else {
+              Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+            }
+          case Tools::Utility::hash( "minor_step" ):
+          case Tools::Utility::hash( "major_step" ):
+            if( widgetType == "Scrollbar" ) {
+              std::shared_ptr< sfg::Range > range = std::static_pointer_cast< sfg::Range >( widgetPtr->widget );
+              std::shared_ptr< sfg::Adjustment > adjustment = range->GetAdjustment();
+
+              lua_pushnumber( L, ( std::string( property ) == "minor_step" ? adjustment->GetMinorStep() : adjustment->GetMajorStep() ) ); // 42
+              return 1;
+            } else {
+              Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+            }
+          case Tools::Utility::hash( "page_size" ):
+            if( widgetType == "Scrollbar" ) {
+              std::shared_ptr< sfg::Range > range = std::static_pointer_cast< sfg::Range >( widgetPtr->widget );
+              std::shared_ptr< sfg::Adjustment > adjustment = range->GetAdjustment();
+
+              lua_pushnumber( L, adjustment->GetPageSize() ); // 42
+              return 1;
+            } else {
+              Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
             }
           // These properties are not settable/retrievable using the SFGUI API
           case Tools::Utility::hash( "tab_position" ):
@@ -1052,6 +1091,64 @@ namespace BlueBear {
                 }
               }
               return 0;
+            }
+          case Tools::Utility::hash( "min" ):
+          case Tools::Utility::hash( "max" ):
+            if( widgetType == "Scrollbar" ) {
+              if( !lua_isnumber( L, -1 ) ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"" + std::string( property ) + "\" must be a number." );
+                return 0;
+              }
+
+              std::shared_ptr< sfg::Range > range = std::static_pointer_cast< sfg::Range >( widgetPtr->widget );
+              std::shared_ptr< sfg::Adjustment > adjustment = range->GetAdjustment();
+
+              if( std::string( property ) == "min" ) {
+                adjustment->SetLower( lua_tonumber( L, -1 ) );
+              } else {
+                adjustment->SetUpper( lua_tonumber( L, -1 ) );
+              }
+
+              return 0;
+            } else {
+              Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+            }
+          case Tools::Utility::hash( "minor_step" ):
+          case Tools::Utility::hash( "major_step" ):
+            if( widgetType == "Scrollbar" ) {
+              if( !lua_isnumber( L, -1 ) ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"" + std::string( property ) + "\" must be a number." );
+                return 0;
+              }
+
+              std::shared_ptr< sfg::Range > range = std::static_pointer_cast< sfg::Range >( widgetPtr->widget );
+              std::shared_ptr< sfg::Adjustment > adjustment = range->GetAdjustment();
+
+              if( std::string( property ) == "minor_step" ) {
+                adjustment->SetMinorStep( lua_tonumber( L, -1 ) );
+              } else {
+                adjustment->SetMajorStep( lua_tonumber( L, -1 ) );
+              }
+
+              return 0;
+            } else {
+              Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+            }
+          case Tools::Utility::hash( "page_size" ):
+            if( widgetType == "Scrollbar" ) {
+              if( !lua_isnumber( L, -1 ) ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"" + std::string( property ) + "\" must be a number." );
+                return 0;
+              }
+
+              std::shared_ptr< sfg::Range > range = std::static_pointer_cast< sfg::Range >( widgetPtr->widget );
+              std::shared_ptr< sfg::Adjustment > adjustment = range->GetAdjustment();
+
+              adjustment->SetPageSize( lua_tonumber( L, -1 ) );
+
+              return 0;
+            } else {
+              Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
             }
           // These properties are not settable/retrievable using the SFGUI API
           case Tools::Utility::hash( "tab_position" ):

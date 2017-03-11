@@ -286,7 +286,7 @@ namespace BlueBear {
       public:
         Orientation( const char* orientationString ) {
           if( !orientationString ) {
-            orientationString = "";
+            orientationString = "horizontal";
           }
 
           switch( Tools::Utility::hash( orientationString ) ) {
