@@ -15,6 +15,7 @@
 #include <SFGUI/Alignment.hpp>
 #include <SFGUI/Misc.hpp>
 #include <SFGUI/Button.hpp>
+#include <SFGUI/Range.hpp>
 #include <tinyxml2.h>
 #include <vector>
 #include <functional>
@@ -122,6 +123,10 @@ namespace BlueBear {
           widget = newTableWidget( element );
           break;
 
+        case hash( "Scrollbar" ):
+          widget = newScrollbarWidget( element );
+          break;
+
         default:
           Log::getInstance().error( "WidgetBuilder::nodeToWidget", "Invalid CME tag specified: " + std::string( tagType ) );
           throw InvalidCMEWidgetException();
@@ -209,6 +214,31 @@ namespace BlueBear {
           Log::getInstance().warn( "WidgetBuilder::setBasicProperties",  "Invalid value for \"visible\" attribute: " + std::string( value ) + ", defaulting to \"true\"" );
         }
       }
+    }
+
+    void WidgetBuilder::setRangeAdjustment( std::shared_ptr< sfg::Range > range, tinyxml2::XMLElement* element ) {
+      std::shared_ptr< sfg::Adjustment > adjustment = range->GetAdjustment();
+
+      float min = adjustment->GetLower();
+      float max = adjustment->GetUpper();
+      float minorStep = adjustment->GetMinorStep();
+      float majorStep = adjustment->GetMajorStep();
+      float value = adjustment->GetValue();
+      float pageSize = adjustment->GetPageSize();
+
+      element->QueryFloatAttribute( "min", &min );
+      element->QueryFloatAttribute( "max", &max );
+      element->QueryFloatAttribute( "minor_step", &minorStep );
+      element->QueryFloatAttribute( "major_step", &majorStep );
+      element->QueryFloatAttribute( "page_size", &pageSize );
+      element->QueryFloatText( &value );
+
+      adjustment->SetLower( min );
+      adjustment->SetUpper( max );
+      adjustment->SetMinorStep( minorStep );
+      adjustment->SetMajorStep( majorStep );
+      adjustment->SetPageSize( pageSize );
+      adjustment->SetValue( value );
     }
 
     void WidgetBuilder::correctXBoundary( float* input ) {
@@ -538,6 +568,18 @@ namespace BlueBear {
       addTableRows( table, element );
 
       return table;
+    }
+
+    std::shared_ptr< sfg::Scrollbar > WidgetBuilder::newScrollbarWidget( tinyxml2::XMLElement* element ) {
+      std::shared_ptr< sfg::Scrollbar > scrollbar = sfg::Scrollbar::Create( Orientation< sfg::Range >( element->Attribute( "orientation" ) ).get() );
+
+      setBasicProperties( scrollbar, element );
+      setAllocationAndRequisition( scrollbar, element );
+      setDefaultEvents( scrollbar, element );
+
+      setRangeAdjustment( scrollbar, element );
+
+      return scrollbar;
     }
 
     void WidgetBuilder::addTableRows( std::shared_ptr< sfg::Table > table, tinyxml2::XMLElement* element ) {

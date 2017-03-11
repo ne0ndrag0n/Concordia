@@ -20,6 +20,7 @@
 #include <SFGUI/Viewport.hpp>
 #include <SFGUI/Adjustment.hpp>
 #include <SFGUI/Table.hpp>
+#include <SFGUI/Scrollbar.hpp>
 #include <string>
 #include <memory>
 #include <exception>
@@ -58,6 +59,7 @@ namespace BlueBear {
       std::shared_ptr< sfg::ScrolledWindow > newScrolledWindowWidget( tinyxml2::XMLElement* element );
       std::shared_ptr< sfg::Viewport > newViewportWidget( tinyxml2::XMLElement* element );
       std::shared_ptr< sfg::Table > newTableWidget( tinyxml2::XMLElement* element );
+      std::shared_ptr< sfg::Scrollbar > newScrollbarWidget( tinyxml2::XMLElement* element );
 
       void addTableRows( std::shared_ptr< sfg::Table > table, tinyxml2::XMLElement* element );
 
@@ -65,6 +67,7 @@ namespace BlueBear {
       void setAlignment( std::shared_ptr< sfg::Misc > widget, tinyxml2::XMLElement* element );
       void setBasicProperties( std::shared_ptr< sfg::Widget > widget, tinyxml2::XMLElement* element );
       void setAllocationAndRequisition( std::shared_ptr< sfg::Widget > widget, tinyxml2::XMLElement* element );
+      void setRangeAdjustment( std::shared_ptr< sfg::Range > range, tinyxml2::XMLElement* element );
 
       std::shared_ptr< sfg::Widget > nodeToWidget( tinyxml2::XMLElement* element );
 
@@ -272,6 +275,45 @@ namespace BlueBear {
               return "bottom_left";
             case sfg::ScrolledWindow::Placement::BOTTOM_RIGHT:
               return "bottom_right";
+          }
+        }
+      };
+
+      template < typename T > class Orientation {
+        // If it's not horizontal, it's vertical
+        typename T::Orientation orientation;
+
+      public:
+        Orientation( const char* orientationString ) {
+          if( !orientationString ) {
+            orientationString = "";
+          }
+
+          switch( Tools::Utility::hash( orientationString ) ) {
+            case Tools::Utility::hash( "vertical" ):
+              orientation = T::Orientation::VERTICAL;
+              break;
+            default:
+              Log::getInstance().warn( "Orientation::Orientation", "Invalid value for \"orientation\" attribute: " + std::string( orientationString ) + ", defaulting to \"horizontal\"" );
+            case Tools::Utility::hash( "horizontal" ):
+              orientation = T::Orientation::HORIZONTAL;
+              break;
+          }
+        }
+
+        Orientation( typename T::Orientation orientation ) : orientation( orientation ) {}
+
+        typename T::Orientation get() {
+          return orientation;
+        }
+
+        std::string getAsString() {
+          switch( orientation ) {
+            case T::VERTICAL:
+              return "vertical";
+            case T::HORIZONTAL:
+            default:
+              return "horizontal";
           }
         }
       };

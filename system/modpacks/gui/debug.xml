@@ -59,26 +59,9 @@
               <Button id="apply" min-width="75" expand="false">Apply</Button>
             </Box>
           </Frame>
+          <Scrollbar id="scroller" min="20" max="100" minor_step="3" major_step="12" page_size="1">5</Scrollbar>
         </Box>
       </content>
     </page>
   </Notebook>
-</Window>
-
-<Window id="tablewindow">
-  <Table id="table">
-    <row>
-      <Button>Foo</Button>
-      <Button colspan="2" rowspan="3">row_span</Button>
-    </row>
-    <row>
-    	<Button>Bar</Button>
-    </row>
-    <row>
-    	<Button>Baz</Button>
-    </row>
-    <row>
-      <Button colspan="3">column_span</Button>
-    </row>
-  </Table>
 </Window>
