@@ -59,6 +59,7 @@
               <Button id="apply" min-width="75" expand="false">Apply</Button>
             </Box>
           </Frame>
+          <ToggleButton id="toggle">Toggle Me</ToggleButton>
         </Box>
       </content>
     </page>

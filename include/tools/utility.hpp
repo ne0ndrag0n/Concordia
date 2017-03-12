@@ -75,6 +75,14 @@ namespace BlueBear {
 				};
 
 				static std::string decodeUTF8( const std::string& encoded );
+
+				/**
+				 * C++ std::string is too fucking stupid to know what a null string is
+				 */
+				static inline const char* sanitizeCString( const char* string ) {
+					return !string ? "" : string;
+				};
+
 		};
 	}
 }

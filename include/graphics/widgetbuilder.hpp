@@ -21,6 +21,7 @@
 #include <SFGUI/Adjustment.hpp>
 #include <SFGUI/Table.hpp>
 #include <SFGUI/Range.hpp>
+#include <SFGUI/ToggleButton.hpp>
 #include <string>
 #include <memory>
 #include <exception>
@@ -69,7 +70,22 @@ namespace BlueBear {
         setRangeAdjustment( range, element );
 
         return range;
-      }
+      };
+      template < typename T > std::shared_ptr< T > newToggleButtonDerivativeWidget( tinyxml2::XMLElement* element ) {
+        std::shared_ptr< T > toggleButton = T::Create( Tools::Utility::sanitizeCString( element->GetText() ) );
+
+        setBasicProperties( toggleButton, element );
+        setAllocationAndRequisition( toggleButton, element );
+        setDefaultEvents( toggleButton, element );
+
+        bool enabled = false;
+        element->QueryBoolAttribute( "enabled", &enabled );
+
+        toggleButton->SetActive( enabled );
+
+        return toggleButton;
+      };
+      std::shared_ptr< sfg::ToggleButton > newToggleButtonWidget( tinyxml2::XMLElement* element );
 
       void addTableRows( std::shared_ptr< sfg::Table > table, tinyxml2::XMLElement* element );
 

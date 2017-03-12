@@ -234,6 +234,7 @@ namespace BlueBear {
             }
             break;
           case Tools::Utility::hash( "Button" ):
+          case Tools::Utility::hash( "ToggleButton" ):
             {
               std::shared_ptr< sfg::Button > button = std::static_pointer_cast< sfg::Button >( widgetPtr->widget );
               lua_pushstring( L, std::string( button->GetLabel() ).c_str() ); // "entry"
@@ -280,6 +281,7 @@ namespace BlueBear {
             }
             break;
           case Tools::Utility::hash( "Button" ):
+          case Tools::Utility::hash( "ToggleButton" ):
             {
               std::shared_ptr< sfg::Button > button = std::static_pointer_cast< sfg::Button >( widgetPtr->widget );
               button->SetLabel( lua_tostring( L, -1 ) );
@@ -608,6 +610,15 @@ namespace BlueBear {
               std::shared_ptr< sfg::Adjustment > adjustment = range->GetAdjustment();
 
               lua_pushnumber( L, adjustment->GetPageSize() ); // 42
+              return 1;
+            } else {
+              Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+            }
+          case Tools::Utility::hash( "enabled" ):
+            if( widgetType == "ToggleButton" ) {
+              std::shared_ptr< sfg::ToggleButton > toggleButton = std::static_pointer_cast< sfg::ToggleButton >( widgetPtr->widget );
+
+              lua_pushboolean( L, toggleButton->IsActive() ? 1 : 0 ); // true
               return 1;
             } else {
               Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
@@ -1148,6 +1159,19 @@ namespace BlueBear {
 
               adjustment->SetPageSize( lua_tonumber( L, -1 ) );
 
+              return 0;
+            } else {
+              Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+            }
+          case Tools::Utility::hash( "enabled" ):
+            if( widgetType == "ToggleButton" ) {
+              if( !lua_isboolean( L, -1 ) ) {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"" + std::string( property ) + "\" must be a boolean." );
+                return 0;
+              }
+
+              std::shared_ptr< sfg::ToggleButton > toggleButton = std::static_pointer_cast< sfg::ToggleButton >( widgetPtr->widget );
+              toggleButton->SetActive( lua_toboolean( L, -1 ) ? true : false );
               return 0;
             } else {
               Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );

@@ -132,6 +132,10 @@ namespace BlueBear {
           widget = newRangeWidget< sfg::Scale >( element );
           break;
 
+        case hash( "ToggleButton" ):
+          widget = newToggleButtonWidget( element );
+          break;
+
         default:
           Log::getInstance().error( "WidgetBuilder::nodeToWidget", "Invalid CME tag specified: " + std::string( tagType ) );
           throw InvalidCMEWidgetException();
@@ -415,7 +419,7 @@ namespace BlueBear {
      * TODO: Support for sfg::Image, and the ability to add one to a Button
      */
     std::shared_ptr< sfg::Button > WidgetBuilder::newButtonWidget( tinyxml2::XMLElement* element ) {
-      std::shared_ptr< sfg::Button > button = sfg::Button::Create( element->GetText() );
+      std::shared_ptr< sfg::Button > button = sfg::Button::Create( Tools::Utility::sanitizeCString( element->GetText() ) );
 
       setBasicProperties( button, element );
       setAllocationAndRequisition( button, element );
@@ -425,7 +429,7 @@ namespace BlueBear {
     }
 
     std::shared_ptr< sfg::Entry > WidgetBuilder::newEntryWidget( tinyxml2::XMLElement* element ) {
-      std::shared_ptr< sfg::Entry > entry = sfg::Entry::Create( element->GetText() );
+      std::shared_ptr< sfg::Entry > entry = sfg::Entry::Create( Tools::Utility::sanitizeCString( element->GetText() ) );
 
       setBasicProperties( entry, element );
       setAllocationAndRequisition( entry, element );
@@ -573,6 +577,10 @@ namespace BlueBear {
       addTableRows( table, element );
 
       return table;
+    }
+
+    std::shared_ptr< sfg::ToggleButton > WidgetBuilder::newToggleButtonWidget( tinyxml2::XMLElement* element ) {
+      return newToggleButtonDerivativeWidget< sfg::ToggleButton >( element );
     }
 
     void WidgetBuilder::addTableRows( std::shared_ptr< sfg::Table > table, tinyxml2::XMLElement* element ) {
