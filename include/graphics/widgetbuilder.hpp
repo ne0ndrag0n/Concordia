@@ -20,7 +20,7 @@
 #include <SFGUI/Viewport.hpp>
 #include <SFGUI/Adjustment.hpp>
 #include <SFGUI/Table.hpp>
-#include <SFGUI/Scrollbar.hpp>
+#include <SFGUI/Range.hpp>
 #include <string>
 #include <memory>
 #include <exception>
@@ -59,7 +59,17 @@ namespace BlueBear {
       std::shared_ptr< sfg::ScrolledWindow > newScrolledWindowWidget( tinyxml2::XMLElement* element );
       std::shared_ptr< sfg::Viewport > newViewportWidget( tinyxml2::XMLElement* element );
       std::shared_ptr< sfg::Table > newTableWidget( tinyxml2::XMLElement* element );
-      std::shared_ptr< sfg::Scrollbar > newScrollbarWidget( tinyxml2::XMLElement* element );
+      template< typename T > std::shared_ptr< T > newRangeWidget( tinyxml2::XMLElement* element ) {
+        std::shared_ptr< T > range = T::Create( Orientation< sfg::Range >( element->Attribute( "orientation" ) ).get() );
+
+        setBasicProperties( range, element );
+        setAllocationAndRequisition( range, element );
+        setDefaultEvents( range, element );
+
+        setRangeAdjustment( range, element );
+
+        return range;
+      }
 
       void addTableRows( std::shared_ptr< sfg::Table > table, tinyxml2::XMLElement* element );
 

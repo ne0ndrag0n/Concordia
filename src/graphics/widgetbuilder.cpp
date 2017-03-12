@@ -15,7 +15,8 @@
 #include <SFGUI/Alignment.hpp>
 #include <SFGUI/Misc.hpp>
 #include <SFGUI/Button.hpp>
-#include <SFGUI/Range.hpp>
+#include <SFGUI/Scrollbar.hpp>
+#include <SFGUI/Scale.hpp>
 #include <tinyxml2.h>
 #include <vector>
 #include <functional>
@@ -124,7 +125,11 @@ namespace BlueBear {
           break;
 
         case hash( "Scrollbar" ):
-          widget = newScrollbarWidget( element );
+          widget = newRangeWidget< sfg::Scrollbar >( element );
+          break;
+
+        case hash( "Scale" ):
+          widget = newRangeWidget< sfg::Scale >( element );
           break;
 
         default:
@@ -568,18 +573,6 @@ namespace BlueBear {
       addTableRows( table, element );
 
       return table;
-    }
-
-    std::shared_ptr< sfg::Scrollbar > WidgetBuilder::newScrollbarWidget( tinyxml2::XMLElement* element ) {
-      std::shared_ptr< sfg::Scrollbar > scrollbar = sfg::Scrollbar::Create( Orientation< sfg::Range >( element->Attribute( "orientation" ) ).get() );
-
-      setBasicProperties( scrollbar, element );
-      setAllocationAndRequisition( scrollbar, element );
-      setDefaultEvents( scrollbar, element );
-
-      setRangeAdjustment( scrollbar, element );
-
-      return scrollbar;
     }
 
     void WidgetBuilder::addTableRows( std::shared_ptr< sfg::Table > table, tinyxml2::XMLElement* element ) {

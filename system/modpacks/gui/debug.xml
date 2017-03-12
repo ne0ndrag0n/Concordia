@@ -59,7 +59,6 @@
               <Button id="apply" min-width="75" expand="false">Apply</Button>
             </Box>
           </Frame>
-          <Scrollbar id="scroller" min="20" max="100" minor_step="3" major_step="12" page_size="1">25</Scrollbar>
         </Box>
       </content>
     </page>
