@@ -45,9 +45,20 @@ namespace BlueBear {
      */
     std::vector< std::shared_ptr< sfg::Widget > > WidgetBuilder::getWidgets() {
       std::vector< std::shared_ptr< sfg::Widget > > widgets;
+      groups.clear();
 
       for ( tinyxml2::XMLElement* node = document.RootElement(); node != NULL; node = node->NextSiblingElement() ) {
         widgets.push_back( nodeToWidget( node ) );
+      }
+
+      // Second pass to associate groups in this widget set
+      for( auto& group : groups ) {
+        for( std::shared_ptr< sfg::Widget > widget : widgets ) {
+          std::shared_ptr< sfg::Widget > associatedWidget = widget->GetWidgetById( group.second );
+          if( associatedWidget && associatedWidget->GetName() == "RadioButton" ) {
+            group.first->SetGroup( std::static_pointer_cast< sfg::RadioButton >( associatedWidget )->GetGroup() );
+          }
+        }
       }
 
       return widgets;
@@ -133,7 +144,15 @@ namespace BlueBear {
           break;
 
         case hash( "ToggleButton" ):
-          widget = newToggleButtonWidget( element );
+          widget = newToggleButtonDerivativeWidget< sfg::ToggleButton >( element );
+          break;
+
+        case hash( "CheckButton" ):
+          widget = newToggleButtonDerivativeWidget< sfg::CheckButton >( element );
+          break;
+
+        case hash( "RadioButton" ):
+          widget = newRadioButtonWidget( element );
           break;
 
         default:
@@ -579,8 +598,16 @@ namespace BlueBear {
       return table;
     }
 
-    std::shared_ptr< sfg::ToggleButton > WidgetBuilder::newToggleButtonWidget( tinyxml2::XMLElement* element ) {
-      return newToggleButtonDerivativeWidget< sfg::ToggleButton >( element );
+    std::shared_ptr< sfg::RadioButton > WidgetBuilder::newRadioButtonWidget( tinyxml2::XMLElement* element ) {
+      std::shared_ptr< sfg::RadioButton > radioButton = newToggleButtonDerivativeWidget< sfg::RadioButton >( element );
+
+      // If there is the presence of a "group" attribute, associate this radio button widget to the same group of the ID specified.
+      // This will be picked up after the host operation's first nodeToWidget call is complete.
+      if( const char* group = element->Attribute( "group" ) ) {
+        groups.emplace_back( radioButton, group );
+      }
+
+      return radioButton;
     }
 
     void WidgetBuilder::addTableRows( std::shared_ptr< sfg::Table > table, tinyxml2::XMLElement* element ) {

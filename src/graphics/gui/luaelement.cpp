@@ -235,6 +235,8 @@ namespace BlueBear {
             break;
           case Tools::Utility::hash( "Button" ):
           case Tools::Utility::hash( "ToggleButton" ):
+          case Tools::Utility::hash( "CheckButton" ):
+          case Tools::Utility::hash( "RadioButton" ):
             {
               std::shared_ptr< sfg::Button > button = std::static_pointer_cast< sfg::Button >( widgetPtr->widget );
               lua_pushstring( L, std::string( button->GetLabel() ).c_str() ); // "entry"
@@ -282,6 +284,8 @@ namespace BlueBear {
             break;
           case Tools::Utility::hash( "Button" ):
           case Tools::Utility::hash( "ToggleButton" ):
+          case Tools::Utility::hash( "CheckButton" ):
+          case Tools::Utility::hash( "RadioButton" ):
             {
               std::shared_ptr< sfg::Button > button = std::static_pointer_cast< sfg::Button >( widgetPtr->widget );
               button->SetLabel( lua_tostring( L, -1 ) );
@@ -615,7 +619,7 @@ namespace BlueBear {
               Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
             }
           case Tools::Utility::hash( "enabled" ):
-            if( widgetType == "ToggleButton" ) {
+            if( widgetType == "ToggleButton" || widgetType == "CheckButton" || widgetType == "RadioButton" ) {
               std::shared_ptr< sfg::ToggleButton > toggleButton = std::static_pointer_cast< sfg::ToggleButton >( widgetPtr->widget );
 
               lua_pushboolean( L, toggleButton->IsActive() ? 1 : 0 ); // true
@@ -1164,7 +1168,7 @@ namespace BlueBear {
               Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
             }
           case Tools::Utility::hash( "enabled" ):
-            if( widgetType == "ToggleButton" ) {
+            if( widgetType == "ToggleButton" || widgetType == "CheckButton" || widgetType == "RadioButton" ) {
               if( !lua_isboolean( L, -1 ) ) {
                 Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"" + std::string( property ) + "\" must be a boolean." );
                 return 0;

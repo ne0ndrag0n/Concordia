@@ -22,10 +22,13 @@
 #include <SFGUI/Table.hpp>
 #include <SFGUI/Range.hpp>
 #include <SFGUI/ToggleButton.hpp>
+#include <SFGUI/CheckButton.hpp>
+#include <SFGUI/RadioButton.hpp>
 #include <string>
 #include <memory>
 #include <exception>
 #include <vector>
+#include <utility>
 #include "log.hpp"
 #include "tools/utility.hpp"
 
@@ -39,6 +42,8 @@ namespace BlueBear {
       EventManager& eventManager;
       ImageCache& imageCache;
       tinyxml2::XMLDocument document;
+      // "This RadioButton needs to be associated with the group belonging to this item"
+      std::vector< std::pair< std::shared_ptr< sfg::RadioButton >, std::string > > groups;
       static constexpr unsigned int hash(const char* str, int h = 0);
 
       void addChildren( std::shared_ptr< sfg::ScrolledWindow > scrolledWindow, tinyxml2::XMLElement* element );
@@ -85,7 +90,7 @@ namespace BlueBear {
 
         return toggleButton;
       };
-      std::shared_ptr< sfg::ToggleButton > newToggleButtonWidget( tinyxml2::XMLElement* element );
+      std::shared_ptr< sfg::RadioButton > newRadioButtonWidget( tinyxml2::XMLElement* element );
 
       void addTableRows( std::shared_ptr< sfg::Table > table, tinyxml2::XMLElement* element );
 
