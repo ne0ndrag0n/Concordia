@@ -24,6 +24,7 @@
 #include <SFGUI/ToggleButton.hpp>
 #include <SFGUI/CheckButton.hpp>
 #include <SFGUI/RadioButton.hpp>
+#include <SFGUI/SpinButton.hpp>
 #include <string>
 #include <memory>
 #include <exception>
@@ -91,6 +92,7 @@ namespace BlueBear {
         return toggleButton;
       };
       std::shared_ptr< sfg::RadioButton > newRadioButtonWidget( tinyxml2::XMLElement* element );
+      std::shared_ptr< sfg::SpinButton > newSpinButtonWidget( tinyxml2::XMLElement* element );
 
       void addTableRows( std::shared_ptr< sfg::Table > table, tinyxml2::XMLElement* element );
 
@@ -99,6 +101,7 @@ namespace BlueBear {
       void setBasicProperties( std::shared_ptr< sfg::Widget > widget, tinyxml2::XMLElement* element );
       void setAllocationAndRequisition( std::shared_ptr< sfg::Widget > widget, tinyxml2::XMLElement* element );
       void setRangeAdjustment( std::shared_ptr< sfg::Range > range, tinyxml2::XMLElement* element );
+      void setEatEntryEvent( std::shared_ptr< sfg::Entry > entry );
 
       std::shared_ptr< sfg::Widget > nodeToWidget( tinyxml2::XMLElement* element );
 

@@ -327,6 +327,14 @@ namespace BlueBear {
       widget->SetRequisition( requisition );
     }
 
+    void WidgetBuilder::setEatEntryEvent( std::shared_ptr< sfg::Entry > entry ) {
+      // Use eventManager to trigger a disable key events on eventManager.SFGUI_SIGNAL_EVENT when focusing in,
+      // and an enable key events when focusing out.
+      entry->GetSignal( sfg::Widget::OnKeyPress ).Connect( [ &eventManager = eventManager ]() {
+        eventManager.SFGUI_EAT_EVENT.trigger( SFGUIEatEvent::Event::EAT_KEYBOARD_EVENT );
+      } );
+    }
+
     std::shared_ptr< sfg::Window > WidgetBuilder::newWindowWidget( tinyxml2::XMLElement* element ) {
       std::shared_ptr< sfg::Window > window = sfg::Window::Create();
 
@@ -454,11 +462,7 @@ namespace BlueBear {
       setAllocationAndRequisition( entry, element );
       setDefaultEvents( entry, element );
 
-      // Use eventManager to trigger a disable key events on eventManager.SFGUI_SIGNAL_EVENT when focusing in,
-      // and an enable key events when focusing out.
-      entry->GetSignal( sfg::Widget::OnKeyPress ).Connect( [ &eventManager = eventManager ]() {
-        eventManager.SFGUI_EAT_EVENT.trigger( SFGUIEatEvent::Event::EAT_KEYBOARD_EVENT );
-      } );
+      setEatEntryEvent( entry );
 
       return entry;
     }
@@ -608,6 +612,16 @@ namespace BlueBear {
       }
 
       return radioButton;
+    }
+
+    std::shared_ptr< sfg::SpinButton > WidgetBuilder::newSpinButtonWidget( tinyxml2::XMLElement* element ) {
+      float minimum = 0.0f;
+      float maximum = 100.0f;
+      float step = 1.0f;
+
+      element->QueryFloatAttribute( "min", &minimum );
+      element->QueryFloatAttribute( "max", &maximum );
+      element->QueryFloatAttribute( "step", &step );
     }
 
     void WidgetBuilder::addTableRows( std::shared_ptr< sfg::Table > table, tinyxml2::XMLElement* element ) {
