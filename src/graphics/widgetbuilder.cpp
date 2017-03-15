@@ -155,6 +155,10 @@ namespace BlueBear {
           widget = newRadioButtonWidget( element );
           break;
 
+        case hash( "SpinButton" ):
+          widget = newSpinButtonWidget( element );
+          break;
+
         default:
           Log::getInstance().error( "WidgetBuilder::nodeToWidget", "Invalid CME tag specified: " + std::string( tagType ) );
           throw InvalidCMEWidgetException();
@@ -622,6 +626,24 @@ namespace BlueBear {
       element->QueryFloatAttribute( "min", &minimum );
       element->QueryFloatAttribute( "max", &maximum );
       element->QueryFloatAttribute( "step", &step );
+
+      std::shared_ptr< sfg::SpinButton > spinButton = sfg::SpinButton::Create( minimum, maximum, step );
+
+      setBasicProperties( spinButton, element );
+      setAllocationAndRequisition( spinButton, element );
+      setDefaultEvents( spinButton, element );
+
+      unsigned int precision = 0;
+      element->QueryUnsignedAttribute( "precision", &precision );
+      spinButton->SetDigits( precision );
+
+      float value = spinButton->GetValue();
+      element->QueryFloatText( &value );
+      spinButton->SetValue( value );
+
+      setEatEntryEvent( spinButton );
+
+      return spinButton;
     }
 
     void WidgetBuilder::addTableRows( std::shared_ptr< sfg::Table > table, tinyxml2::XMLElement* element ) {

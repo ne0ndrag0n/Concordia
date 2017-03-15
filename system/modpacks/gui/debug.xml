@@ -59,6 +59,7 @@
               <Button id="apply" min-width="75" expand="false">Apply</Button>
             </Box>
           </Frame>
+          <SpinButton id="spin">7</SpinButton>
         </Box>
       </content>
     </page>

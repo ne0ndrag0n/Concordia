@@ -93,6 +93,11 @@ namespace BlueBear {
           bool shadow,
           bool close
         );
+
+        template < typename T > static std::shared_ptr< sfg::Adjustment > getAdjustment( std::shared_ptr< sfg::Widget > widget ) {
+          std::shared_ptr< T > adjustmentType = std::static_pointer_cast< T >( widget );
+          return adjustmentType->GetAdjustment();
+        };
       };
     }
   }
