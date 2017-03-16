@@ -159,6 +159,10 @@ namespace BlueBear {
           widget = newSpinButtonWidget( element );
           break;
 
+        case hash( "ComboBox" ):
+          widget = newComboBoxWidget( element );
+          break;
+
         default:
           Log::getInstance().error( "WidgetBuilder::nodeToWidget", "Invalid CME tag specified: " + std::string( tagType ) );
           throw InvalidCMEWidgetException();
@@ -644,6 +648,36 @@ namespace BlueBear {
       setEatEntryEvent( spinButton );
 
       return spinButton;
+    }
+
+    std::shared_ptr< sfg::ComboBox > WidgetBuilder::newComboBoxWidget( tinyxml2::XMLElement* element ) {
+      std::shared_ptr< sfg::ComboBox > comboBox = sfg::ComboBox::Create();
+
+      setBasicProperties( comboBox, element );
+      setAllocationAndRequisition( comboBox, element );
+      setDefaultEvents( comboBox, element );
+
+      for( tinyxml2::XMLElement* item = element->FirstChildElement(); item != NULL; item = item->NextSiblingElement() ) {
+        std::string nodeName( item->Name() );
+
+        if( nodeName == "item" ) {
+          if( const char* text = item->GetText() ) {
+            comboBox->AppendItem( text );
+          } else {
+            Log::getInstance().warn( "WidgetBuilder::newComboBoxWidget", "Invalid <ComboBox> child element; <item> has no valid text." );
+          }
+        } else {
+          Log::getInstance().warn( "WidgetBuilder::newComboBoxWidget", "Invalid <ComboBox> child element; only <item> pseudo-elements are valid direct children of a <ComboBox>." );
+        }
+      }
+
+      int currentPage = -1;
+      element->QueryIntAttribute( "selected", &currentPage );
+      if( currentPage >= 0 ) {
+        comboBox->SelectItem( currentPage );
+      }
+
+      return comboBox;
     }
 
     void WidgetBuilder::addTableRows( std::shared_ptr< sfg::Table > table, tinyxml2::XMLElement* element ) {
