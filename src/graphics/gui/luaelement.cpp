@@ -255,6 +255,12 @@ namespace BlueBear {
               lua_pushnumber( L, range->GetValue() ); // 42.0
             }
             break;
+          case Tools::Utility::hash( "ComboBox" ):
+            {
+              std::shared_ptr< sfg::ComboBox > comboBox = std::static_pointer_cast< sfg::ComboBox >( widgetPtr->widget );
+              lua_pushstring( L, std::string( comboBox->GetSelectedText() ).c_str() ); // "entry"
+            }
+            break;
           default:
             {
               Log::getInstance().warn( "LuaElement::lua_getText", "Object of type " + widgetType + " has no convertible \"text\" field." );
@@ -312,7 +318,7 @@ namespace BlueBear {
             break;
           default:
             {
-              Log::getInstance().warn( "LuaElement::lua_setText", "Object of type " + widgetType + " has no convertible \"text\" field." );
+              Log::getInstance().warn( "LuaElement::lua_setText", "Object of type " + widgetType + " has no settable \"text\" field." );
             }
         }
 
@@ -581,6 +587,10 @@ namespace BlueBear {
             if( widgetType == "Notebook" ) {
               std::shared_ptr< sfg::Notebook > notebook = std::static_pointer_cast< sfg::Notebook >( widgetPtr->widget );
               lua_pushnumber( L, notebook->GetCurrentPage() ); // 42
+              return 1;
+            } else if( widgetType == "ComboBox" ) {
+              std::shared_ptr< sfg::ComboBox > comboBox = std::static_pointer_cast< sfg::ComboBox >( widgetPtr->widget );
+              lua_pushnumber( L, comboBox->GetSelectedItem() ); // 42
               return 1;
             } else {
               Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
@@ -1065,14 +1075,18 @@ namespace BlueBear {
               return 0;
             }
           case Tools::Utility::hash( "selected" ):
-            if( widgetType == "Notebook" ) {
-              if( !lua_isnumber( L, -1 ) ) {
-                Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"" + std::string( property ) + "\" must be a number." );
-                return 0;
-              }
+            if( !lua_isnumber( L, -1 ) ) {
+              Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"" + std::string( property ) + "\" must be a number." );
+              return 0;
+            }
 
+            if( widgetType == "Notebook" ) {
               std::shared_ptr< sfg::Notebook > notebook = std::static_pointer_cast< sfg::Notebook >( widgetPtr->widget );
               notebook->SetCurrentPage( lua_tonumber( L, -1 ) );
+              return 0;
+            } else if( widgetType == "ComboBox" ) {
+              std::shared_ptr< sfg::ComboBox > comboBox = std::static_pointer_cast< sfg::ComboBox >( widgetPtr->widget );
+              comboBox->SelectItem( lua_tonumber( L, -1 ) );
               return 0;
             } else {
               Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
