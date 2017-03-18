@@ -1,6 +1,9 @@
 #ifndef LUA_GUI_CONTEXT
 #define LUA_GUI_CONTEXT
 
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
 #include <SFGUI/Widgets.hpp>
 #include <SFGUI/Desktop.hpp>
 #include <memory>
@@ -9,6 +12,8 @@
 
 namespace BlueBear {
   namespace Graphics {
+    class WidgetBuilder;
+
     namespace GUI {
 
       class LuaGUIContext {
@@ -21,10 +26,18 @@ namespace BlueBear {
 
       public:
         LuaGUIContext( sfg::Desktop& desktop );
+        LuaGUIContext( sfg::Desktop& desktop, WidgetBuilder& widgetBuilder );
 
         void add( std::shared_ptr< sfg::Widget > widget, bool toDesktop = false );
+        void remove( std::shared_ptr< sfg::Widget > widget );
+        void removeAll();
         std::shared_ptr< sfg::Widget > findById( const std::string& id );
         std::vector< std::shared_ptr< sfg::Widget > > findByClass( const std::string& clss );
+
+        // TODO: Lua interfaces (these should be a lot less shitty than the way I did it in LuaElement)
+        static int lua_findById( lua_State* L );
+        static int lua_findByClass( lua_State* L );
+        static int lua_gc( lua_State* L );
       };
 
     }

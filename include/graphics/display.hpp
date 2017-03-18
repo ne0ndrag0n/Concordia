@@ -120,6 +120,7 @@ namespace BlueBear {
           static int lua_zoomIn( lua_State* L );
           static int lua_zoomOut( lua_State* L );
           static int lua_loadXMLWidgets( lua_State* L );
+          static int lua_createGUIContext( lua_State* L );
 
           // XXX: remove after demo branch
           static int lua_playanim1( lua_State* L );
