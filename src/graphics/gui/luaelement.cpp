@@ -135,7 +135,6 @@ namespace BlueBear {
       int LuaElement::lua_getWidgetByID( lua_State* L ) {
         std::string selector;
 
-        // called from bluebear.gui.get_widget_by_id
         if( lua_isstring( L, -1 ) ) {
           selector = std::string( lua_tostring( L, -1 ) );
         } else {
@@ -143,14 +142,8 @@ namespace BlueBear {
           return 0;
         }
 
-        Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
-        std::shared_ptr< sfg::Widget > parentWidget;
-        if( lua_gettop( L ) == 1 ) {
-          parentWidget = self->gui.rootContainer;
-        } else {
-          std::shared_ptr< sfg::Widget >* widgetPtr = *( ( std::shared_ptr< sfg::Widget >** ) luaL_checkudata( L, 1, "bluebear_widget" ) );
-          parentWidget = *widgetPtr;
-        }
+        LuaElement** userData = ( LuaElement** ) luaL_checkudata( L, 1, "bluebear_widget" );
+        std::shared_ptr< sfg::Widget > parentWidget = ( *userData )->widget;
 
         // Holy moly is this going to get confusing quick
         // I also have the least amount of confidence in this code you could possibly imagine
@@ -169,7 +162,6 @@ namespace BlueBear {
        */
       int LuaElement::lua_getWidgetsByClass( lua_State* L ) {
         std::string selector;
-        std::shared_ptr< sfg::Widget > parentWidget;
 
         // Check for presence of string selector
         if( lua_isstring( L, -1 ) ) {
@@ -179,16 +171,8 @@ namespace BlueBear {
           return 0;
         }
 
-        // Determine parent widget depending on where method was called
-        if( lua_gettop( L ) == 1 ) {
-          // Method was called from stateless bluebear.gui object
-          Display::MainGameState* state = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
-          parentWidget = state->gui.rootContainer;
-        } else {
-          // Method was called from a LuaElement instance
-          std::shared_ptr< sfg::Widget >* widgetPtr = *( ( std::shared_ptr< sfg::Widget >** ) luaL_checkudata( L, 1, "bluebear_widget" ) );
-          parentWidget = *widgetPtr;
-        }
+        LuaElement** userData = ( LuaElement** ) luaL_checkudata( L, 1, "bluebear_widget" );
+        std::shared_ptr< sfg::Widget > parentWidget = ( *userData )->widget;
 
         // Perform the actual SFGUI call
         sfg::Widget::WidgetsList widgets = parentWidget->GetWidgetsByClass( selector );

@@ -119,7 +119,6 @@ namespace BlueBear {
           static int lua_rotateWorldRight( lua_State* L );
           static int lua_zoomIn( lua_State* L );
           static int lua_zoomOut( lua_State* L );
-          static int lua_loadXMLWidgets( lua_State* L );
           static int lua_createGUIContext( lua_State* L );
 
           // XXX: remove after demo branch
@@ -128,7 +127,6 @@ namespace BlueBear {
         public:
           struct {
             sfg::Desktop desktop;
-            std::shared_ptr< sfg::Container > rootContainer;
             sf::Clock clock;
           } gui;
           sf::Event* currentEvent = nullptr;

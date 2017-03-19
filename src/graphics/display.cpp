@@ -242,12 +242,6 @@ namespace BlueBear {
       lua_pushstring( L, "gui" ); // "gui" bluebear
       lua_newtable( L ); // {} "gui" bluebear
 
-      // TODO: Deprecate this in favor of create_gui_context( 'path/to/layout.xml' )
-      lua_pushstring( L, "load_widgets" ); // string {} "gui" bluebear
-      lua_pushlightuserdata( L, this ); // this string {} "gui" bluebear
-      lua_pushcclosure( L, &Display::MainGameState::lua_loadXMLWidgets, 1 ); // closure string {} "gui" bluebear
-      lua_settable( L, -3 ); // {} "gui" bluebear
-
       lua_pushstring( L, "create_gui_context" );
       lua_pushlightuserdata( L, this );
       lua_pushcclosure( L, &Display::MainGameState::lua_createGUIContext, 1 );
@@ -348,10 +342,6 @@ namespace BlueBear {
     }
     void Display::MainGameState::setupGUI() {
       GUI::LuaElement::masterSignalMap.clear();
-
-      gui.rootContainer = GUI::RootContainer::Create();
-
-      inputManager.setRootContainer( gui.rootContainer );
 
       if( !gui.desktop.LoadThemeFromFile( ConfigManager::getInstance().getValue( "ui_theme" ) ) ) {
         Log::getInstance().warn( "Display::MainGameState::MainGameState", "ui_theme unable to load." );
@@ -521,39 +511,6 @@ namespace BlueBear {
     }
     ImageCache& Display::MainGameState::getImageCache() {
       return imageCache;
-    }
-    /**
-     * XXX: Deprecated
-     */
-    int Display::MainGameState::lua_loadXMLWidgets( lua_State* L ) {
-
-      Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
-
-      // Stack contains string to path of XML file
-
-      if( lua_isstring( L, -1 ) ) {
-        std::string path( lua_tostring( L, -1 ) );
-
-        try {
-          // Create a WidgetBuilder and dump its widgets into the root container
-          // This should run in the engine objectLoop stage, and it will be caught on subsequent render
-          WidgetBuilder builder( self->instance.eventManager, self->imageCache, path );
-          std::vector< std::shared_ptr< sfg::Widget > > widgets = builder.getWidgets();
-          for( auto& widget : widgets ) {
-            // Add to root container for proper bookkeeping
-            self->gui.rootContainer->Add( widget );
-
-            // Add directly to desktop for proper Z-ordering
-            self->gui.desktop.Add( widget );
-          }
-        } catch( const std::exception& e ) {
-          Log::getInstance().error( "Display::MainGameState::lua_loadXMLWidgets", "Failed to create a WidgetBuilder for path " + path + ": " + e.what() );
-        }
-      } else {
-        Log::getInstance().warn( "Display::MainGameState::lua_loadXMLWidgets", "Argument 1 provided to bluebear.gui.load_widgets is not a string." );
-      }
-
-      return 0;
     }
     int Display::MainGameState::lua_createGUIContext( lua_State* L ) {
       Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );

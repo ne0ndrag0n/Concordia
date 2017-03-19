@@ -1,4 +1,5 @@
 #include "graphics/input/inputmanager.hpp"
+#include "graphics/gui/sfgroot.hpp"
 #include "eventmanager.hpp"
 #include "log.hpp"
 
@@ -20,8 +21,11 @@ namespace BlueBear {
         eventManager.SFGUI_EAT_EVENT.stopListening( SFGUIEatEvent::Event::EAT_KEYBOARD_EVENT );
       }
 
+      /**
+       * Whatta hack
+       */
       void InputManager::removeSFGUIFocus() {
-        this->rootContainer->GrabFocus();
+        GUI::RootContainer::Create()->GrabFocus();
       }
 
       void InputManager::listen( sf::Keyboard::Key key, std::function< void() > callback ) {
@@ -55,10 +59,6 @@ namespace BlueBear {
           default:
             break;
         }
-      }
-
-      void InputManager::setRootContainer( std::shared_ptr< sfg::Container > rootContainer ) {
-        this->rootContainer = rootContainer;
       }
 
     }
