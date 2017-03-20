@@ -29,11 +29,11 @@ namespace BlueBear {
           unsigned int slotHandle;
         };
 
-        /**
-         * Much of this has to be static as a LuaElement is a functional wrapper around an sfg::Widget
-         * as it relates to the Concordia GUI.
-         */
         static std::map< void*, std::map< sfg::Signal::SignalID, SignalBinding > > masterSignalMap;
+
+        /**
+         * Over time, make more of this shit a goddamn instance function!!
+         */
         static int lua_onEvent( lua_State* L );
         static int lua_offEvent( lua_State* L );
         static int lua_getWidgetByID( lua_State* L );
