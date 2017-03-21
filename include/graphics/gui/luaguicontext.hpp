@@ -11,24 +11,32 @@
 #include <set>
 
 namespace BlueBear {
+  class EventManager;
+
   namespace Graphics {
     class WidgetBuilder;
+    class ImageCache;
 
     namespace GUI {
 
       class LuaGUIContext {
         std::shared_ptr< sfg::Container > rootContainer;
         sfg::Desktop& desktop;
+
+        EventManager& eventManager;
+        ImageCache& imageCache;
         /**
          * Bookkeeping for items we remove later on
          */
         std::set< std::shared_ptr< sfg::Widget > > addedToDesktop;
 
       public:
-        LuaGUIContext( sfg::Desktop& desktop );
-        LuaGUIContext( sfg::Desktop& desktop, WidgetBuilder& widgetBuilder );
+        LuaGUIContext( sfg::Desktop& desktop, EventManager& eventManager, ImageCache& imageCache );
+
+        void addFromPath( const std::string& path );
 
         void add( std::shared_ptr< sfg::Widget > widget, bool toDesktop = false );
+        void add( const std::string& xmlString );
         void remove( std::shared_ptr< sfg::Widget > widget );
         void removeAll();
         std::shared_ptr< sfg::Widget > findById( const std::string& id );

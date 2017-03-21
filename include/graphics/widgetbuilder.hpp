@@ -43,7 +43,6 @@ namespace BlueBear {
     class WidgetBuilder {
       EventManager& eventManager;
       ImageCache& imageCache;
-      tinyxml2::XMLDocument document;
       // "This RadioButton needs to be associated with the group belonging to this item"
       std::vector< std::pair< std::shared_ptr< sfg::RadioButton >, std::string > > groups;
       static constexpr unsigned int hash(const char* str, int h = 0);
@@ -131,8 +130,10 @@ namespace BlueBear {
       };
 
     public:
-      WidgetBuilder( EventManager& eventManager, ImageCache& imageCache, const std::string& path );
-      std::vector< std::shared_ptr< sfg::Widget > > getWidgets();
+      WidgetBuilder( EventManager& eventManager, ImageCache& imageCache );
+      std::vector< std::shared_ptr< sfg::Widget > > getWidgets( const std::string& path );
+
+      std::shared_ptr< sfg::Widget > getWidgetFromXML( const std::string& xmlString );
 
       template< typename T > static T getOrientation( const char* orientation ) {
         if( !orientation ) {

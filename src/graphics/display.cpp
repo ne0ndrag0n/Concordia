@@ -522,8 +522,8 @@ namespace BlueBear {
           // Create a WidgetBuilder and dump its widgets into the root container
           // This should run in the engine objectLoop stage, and it will be caught on subsequent render
           GUI::LuaGUIContext** userData = ( GUI::LuaGUIContext** )lua_newuserdata( L, sizeof( GUI::LuaGUIContext* ) ); // userdata "arg"
-          WidgetBuilder builder( self->instance.eventManager, self->imageCache, path );
-          *userData = new GUI::LuaGUIContext( self->gui.desktop, builder );
+          *userData = new GUI::LuaGUIContext( self->gui.desktop, self->instance.eventManager, self->imageCache );
+          ( *userData )->addFromPath( path );
 
           luaL_getmetatable( L, "bluebear_gui_context" ); // metatable userdata "arg"
           lua_setmetatable( L, -2 ); // userdata "arg"

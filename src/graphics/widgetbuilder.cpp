@@ -24,17 +24,7 @@
 namespace BlueBear {
   namespace Graphics {
 
-    WidgetBuilder::WidgetBuilder( EventManager& eventManager, ImageCache& imageCache, const std::string& path ) : eventManager( eventManager ), imageCache( imageCache ) {
-      document.LoadFile( path.c_str() );
-
-      // Object is unusable if the file failed to load
-      if( document.ErrorID() ) {
-        Log::getInstance().error( "WidgetBuilder::WidgetBuilder",
-          "WidgetBuilder construction failed; could not parse XML file " + path
-        );
-        throw FailedToLoadXMLException();
-      }
-    }
+    WidgetBuilder::WidgetBuilder( EventManager& eventManager, ImageCache& imageCache ) : eventManager( eventManager ), imageCache( imageCache ) {}
 
     constexpr unsigned int WidgetBuilder::hash(const char* str, int h) {
       return !str[h] ? 5381 : (hash(str, h+1) * 33) ^ str[h];
@@ -43,7 +33,19 @@ namespace BlueBear {
     /**
      * This is where it all happens. Call this method to turn your XML file into a collection of widgets.
      */
-    std::vector< std::shared_ptr< sfg::Widget > > WidgetBuilder::getWidgets() {
+    std::vector< std::shared_ptr< sfg::Widget > > WidgetBuilder::getWidgets( const std::string& path ) {
+      tinyxml2::XMLDocument document;
+      document.LoadFile( path.c_str() );
+
+      // Object is unusable if the file failed to load
+      if( document.ErrorID() ) {
+        Log::getInstance().error( "WidgetBuilder::getWidgets",
+          "WidgetBuilder construction failed; could not parse XML file " + path
+        );
+        throw FailedToLoadXMLException();
+      }
+
+
       std::vector< std::shared_ptr< sfg::Widget > > widgets;
       groups.clear();
 
@@ -62,6 +64,20 @@ namespace BlueBear {
       }
 
       return widgets;
+    }
+
+    std::shared_ptr< sfg::Widget > WidgetBuilder::getWidgetFromXML( const std::string& xmlString ) {
+      tinyxml2::XMLDocument document;
+      document.Parse( xmlString.c_str() );
+
+      if( document.ErrorID() ) {
+        Log::getInstance().error( "WidgetBuilder::getWidgetFromXML",
+          "WidgetBuilder construction failed; could not parse XML string " + xmlString
+        );
+        throw FailedToLoadXMLException();
+      }
+
+      return nodeToWidget( document.RootElement() );
     }
 
     std::shared_ptr< sfg::Widget > WidgetBuilder::nodeToWidget( tinyxml2::XMLElement* element ) {

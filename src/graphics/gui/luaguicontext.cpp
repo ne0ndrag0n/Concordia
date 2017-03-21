@@ -1,7 +1,9 @@
 #include "graphics/gui/luaguicontext.hpp"
 #include "graphics/gui/luaelement.hpp"
 #include "graphics/gui/sfgroot.hpp"
+#include "graphics/imagecache.hpp"
 #include "graphics/widgetbuilder.hpp"
+#include "eventmanager.hpp"
 
 #define LuaGUIContext_VERIFYSTRING( tag, func ) \
             if( !lua_isstring( L, -1 ) ) { \
@@ -14,10 +16,12 @@ namespace BlueBear {
   namespace Graphics {
     namespace GUI {
 
-      LuaGUIContext::LuaGUIContext( sfg::Desktop& desktop ) : rootContainer( RootContainer::Create() ), desktop( desktop ) {}
+      LuaGUIContext::LuaGUIContext( sfg::Desktop& desktop, EventManager& eventManager, ImageCache& imageCache )
+        : rootContainer( RootContainer::Create() ), desktop( desktop ), eventManager( eventManager ), imageCache( imageCache ) {}
 
-      LuaGUIContext::LuaGUIContext( sfg::Desktop& desktop, WidgetBuilder& widgetBuilder ) : LuaGUIContext::LuaGUIContext( desktop ) {
-        std::vector< std::shared_ptr< sfg::Widget > > widgets = widgetBuilder.getWidgets();
+      void LuaGUIContext::addFromPath( const std::string& path ) {
+        WidgetBuilder widgetBuilder( eventManager, imageCache );
+        std::vector< std::shared_ptr< sfg::Widget > > widgets = widgetBuilder.getWidgets( path );
 
         for( auto& widget : widgets ) {
           add( widget, true );
