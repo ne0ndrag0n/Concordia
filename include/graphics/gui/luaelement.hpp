@@ -13,6 +13,8 @@ namespace BlueBear {
   class EventManager;
 
   namespace Graphics {
+    class ImageCache;
+
     namespace GUI {
       // Reserve space for additional elements we may need for a LuaElement type.
 
@@ -34,6 +36,9 @@ namespace BlueBear {
         /**
          * Over time, make more of this shit a goddamn instance function!!
          */
+
+        void add( const std::string& xmlString, EventManager& eventManager, ImageCache& imageCache );
+
         static int lua_onEvent( lua_State* L );
         static int lua_offEvent( lua_State* L );
         static int lua_getWidgetByID( lua_State* L );
@@ -44,6 +49,7 @@ namespace BlueBear {
         static int lua_setImage( lua_State* L );
         static int lua_getProperty( lua_State* L );
         static int lua_setProperty( lua_State* L );
+        static int lua_add( lua_State* L );
 
         static void setKeyboardStatus( lua_State* L );
         static void getUserdataFromWidget( lua_State* L, std::shared_ptr< sfg::Widget > widget );

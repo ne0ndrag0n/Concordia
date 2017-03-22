@@ -99,7 +99,6 @@ namespace BlueBear {
           std::unique_ptr< Model > floorModel;
           std::unique_ptr< Model > __debugModel;
           TextureCache texCache;
-          ImageCache imageCache;
           std::vector< ShaderInstanceBundle > dynamicInstances;
           // These are from the lot!
           Containers::Collection3D< std::shared_ptr< Scripting::Tile > >& floorMap;
@@ -130,6 +129,7 @@ namespace BlueBear {
             sf::Clock clock;
           } gui;
           sf::Event* currentEvent = nullptr;
+          ImageCache imageCache;
 
           void execute();
           void handleEvent( sf::Event& event );

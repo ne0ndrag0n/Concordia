@@ -18,6 +18,20 @@ namespace BlueBear {
 
       std::map< void*, std::map< sfg::Signal::SignalID, LuaElement::SignalBinding > > LuaElement::masterSignalMap;
 
+      void LuaElement::add( const std::string& xmlString, EventManager& eventManager, ImageCache& imageCache ) {
+        WidgetBuilder widgetBuilder( eventManager, imageCache );
+        std::shared_ptr< sfg::Widget > child = nullptr;
+
+        try {
+          child = widgetBuilder.getWidgetFromXML( xmlString );
+        } catch( std::exception& e ) {
+          Log::getInstance().error( "LuaElement::add", "Failed to add widget XML: " + std::string( e.what() ) );
+          return;
+        }
+
+        // TODO: Verify widget is container and add to widget typecast as container
+      }
+
       /**
        * @static
        */
@@ -1271,6 +1285,23 @@ namespace BlueBear {
         // Destroy the std::shared_ptr< sfg::Widget >. This should decrease the reference count by one.
         //Log::getInstance().debug( "LuaElement::lua_gc", "Deleting " + Tools::Utility::pointerToString( widgetPtr ) );
         delete widgetPtr;
+
+        return 0;
+      }
+
+      /**
+       * @static
+       */
+      int LuaElement::lua_add( lua_State* L ) {
+        if( !lua_isstring( L, -1 ) ) {
+          Log::getInstance().warn( "LuaElement::lua_add", "Argument 1 provided to add must be a string." );
+          return 0;
+        }
+
+        LuaElement* widgetPtr = *( ( LuaElement** ) luaL_checkudata( L, 1, "bluebear_widget" ) );
+        Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+
+        widgetPtr->add( lua_tostring( L, -1 ), self->instance.eventManager, self->imageCache );
 
         return 0;
       }

@@ -38,6 +38,16 @@ namespace BlueBear {
         }
       }
 
+      void LuaGUIContext::add( const std::string& xmlString ) {
+        WidgetBuilder widgetBuilder( eventManager, imageCache );
+
+        try {
+          add( widgetBuilder.getWidgetFromXML( xmlString ), true );
+        } catch( std::exception& e ) {
+          Log::getInstance().error( "LuaGUIContext::add", "Failed to add widget XML: " + std::string( e.what() ) );
+        }
+      }
+
       void LuaGUIContext::remove( std::shared_ptr< sfg::Widget > widget ) {
         rootContainer->Remove( widget );
 
@@ -68,6 +78,14 @@ namespace BlueBear {
 
       std::vector< std::shared_ptr< sfg::Widget > > LuaGUIContext::findByClass( const std::string& clss ) {
         return rootContainer->GetWidgetsByClass( clss );
+      }
+
+      int LuaGUIContext::lua_add( lua_State* L ) {
+        LuaGUIContext_VERIFYSTRING( "LuaGUIContext::lua_add", "add" );
+        LuaGUIContext* self = *( ( LuaGUIContext** ) luaL_checkudata( L, 1, "bluebear_gui_context" ) );
+
+        self->add( lua_tostring( L, -1 ) );
+        return 0;
       }
 
       int LuaGUIContext::lua_findById( lua_State* L ) {
