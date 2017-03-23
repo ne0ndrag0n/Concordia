@@ -50,7 +50,7 @@
         <Label>Options</Label>
       </tab>
       <content>
-        <Box orientation="vertical" spacing="5.0">
+        <Box id="options" orientation="vertical" spacing="5.0">
           <Button id="animate1">play anim</Button>
           <Button id="misc">do interesting thing</Button>
           <Frame id="inpframe" title="Input">

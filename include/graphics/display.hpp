@@ -98,6 +98,7 @@ namespace BlueBear {
           Camera camera;
           std::unique_ptr< Model > floorModel;
           std::unique_ptr< Model > __debugModel;
+          ImageCache imageCache;
           TextureCache texCache;
           std::vector< ShaderInstanceBundle > dynamicInstances;
           // These are from the lot!
@@ -129,7 +130,6 @@ namespace BlueBear {
             sf::Clock clock;
           } gui;
           sf::Event* currentEvent = nullptr;
-          ImageCache imageCache;
 
           void execute();
           void handleEvent( sf::Event& event );

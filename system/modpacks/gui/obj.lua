@@ -23,7 +23,17 @@ function GUIProvider:open_debug_ui()
 end
 
 function GUIProvider:do_something( event )
-
+  local box = self.gui:add(
+    [[
+    <Window titlebar="false" resize="false" left="500" top="300" min-height="0">
+      <Box orientation="vertical" spacing="5.0">
+        <Button>Walk Here</Button>
+        <Button>Run Here</Button>
+        <Button>Skip Here</Button>
+      </Box>
+    </Window>
+    ]]
+  )
 end
 
 function GUIProvider:on_click_zoom_in()
