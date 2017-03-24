@@ -3,14 +3,8 @@
 #include "graphics/gui/sfgroot.hpp"
 #include "graphics/imagecache.hpp"
 #include "graphics/widgetbuilder.hpp"
+#include "tools/ctvalidators.hpp"
 #include "eventmanager.hpp"
-
-#define LuaGUIContext_VERIFYSTRING( tag, func ) \
-            if( !lua_isstring( L, -1 ) ) { \
-              Log::getInstance().warn( tag, "Argument 1 provided to " func " must be a string." ); \
-              return 0; \
-            }
-
 
 namespace BlueBear {
   namespace Graphics {
@@ -49,6 +43,8 @@ namespace BlueBear {
       }
 
       void LuaGUIContext::remove( std::shared_ptr< sfg::Widget > widget ) {
+        widget->Show( false );
+
         rootContainer->Remove( widget );
 
         if( addedToDesktop.find( widget ) != addedToDesktop.end() ) {
@@ -63,6 +59,8 @@ namespace BlueBear {
       void LuaGUIContext::removeAll() {
         // Remove desktopped items (this is where items will be removed from the screen)
         for( auto& item : addedToDesktop ) {
+          item->Show( false );
+
           desktop.Remove( item );
         }
 
@@ -81,15 +79,26 @@ namespace BlueBear {
       }
 
       int LuaGUIContext::lua_add( lua_State* L ) {
-        LuaGUIContext_VERIFYSTRING( "LuaGUIContext::lua_add", "add" );
+        VERIFY_STRING( "LuaGUIContext::lua_add", "add" );
         LuaGUIContext* self = *( ( LuaGUIContext** ) luaL_checkudata( L, 1, "bluebear_gui_context" ) );
 
         self->add( lua_tostring( L, -1 ) );
         return 0;
       }
 
+      int LuaGUIContext::lua_removeWidget( lua_State* L ) {
+        VERIFY_USER_DATA( "LuaGUIContext::lua_removeWidget", "remove" );
+
+        LuaGUIContext* self = *( ( LuaGUIContext** ) luaL_checkudata( L, 1, "bluebear_gui_context" ) );
+        LuaElement* argument = *( ( LuaElement** ) luaL_checkudata( L, 2, "bluebear_widget" ) );
+
+        self->remove( argument->widget );
+
+        return 0;
+      }
+
       int LuaGUIContext::lua_findById( lua_State* L ) {
-        LuaGUIContext_VERIFYSTRING( "LuaGUIContext::lua_findById", "find_by_id" );
+        VERIFY_STRING( "LuaGUIContext::lua_findById", "find_by_id" );
         LuaGUIContext* self = *( ( LuaGUIContext** ) luaL_checkudata( L, 1, "bluebear_gui_context" ) );
 
         std::string selector( lua_tostring( L, -1 ) );
@@ -103,7 +112,7 @@ namespace BlueBear {
       }
 
       int LuaGUIContext::lua_findByClass( lua_State* L ) {
-        LuaGUIContext_VERIFYSTRING( "LuaGUIContext::lua_findByClass", "find_by_class" );
+        VERIFY_STRING( "LuaGUIContext::lua_findByClass", "find_by_class" );
         LuaGUIContext* self = *( ( LuaGUIContext** ) luaL_checkudata( L, 1, "bluebear_gui_context" ) );
 
         std::string selector( lua_tostring( L, -1 ) );

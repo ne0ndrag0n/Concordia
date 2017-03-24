@@ -44,6 +44,7 @@ namespace BlueBear {
 
         // TODO: Lua interfaces (these should be a lot less shitty than the way I did it in LuaElement)
         static int lua_add( lua_State* L );
+        static int lua_removeWidget( lua_State* L );
         static int lua_findById( lua_State* L );
         static int lua_findByClass( lua_State* L );
         static int lua_gc( lua_State* L );

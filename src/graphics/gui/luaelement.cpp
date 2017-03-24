@@ -2,6 +2,7 @@
 #include "graphics/widgetbuilder.hpp"
 #include "graphics/imagebuilder/pathimagesource.hpp"
 #include "graphics/display.hpp"
+#include "tools/ctvalidators.hpp"
 #include "tools/utility.hpp"
 #include "configmanager.hpp"
 #include "eventmanager.hpp"
@@ -19,9 +20,43 @@ namespace BlueBear {
       std::map< void*, std::map< sfg::Signal::SignalID, LuaElement::SignalBinding > > LuaElement::masterSignalMap;
 
       void LuaElement::add( const std::string& xmlString, EventManager& eventManager, ImageCache& imageCache ) {
-        // Verify widget is container
-        std::string nodeID = widget->GetName();
-        switch( Tools::Utility::hash( nodeID.c_str() ) ) {
+        if( isContainer() ) {
+          WidgetBuilder widgetBuilder( eventManager, imageCache );
+          std::shared_ptr< sfg::Widget > child = nullptr;
+
+          try {
+            child = widgetBuilder.getWidgetFromXML( xmlString );
+          } catch( std::exception& e ) {
+            Log::getInstance().error( "LuaElement::add", "Failed to add widget XML: " + std::string( e.what() ) );
+            return;
+          }
+
+          // Add to widget typecast as container
+          if( std::string( widget->GetName() ) == "Box" ) {
+            std::shared_ptr< sfg::Box > widgetAsBox = std::static_pointer_cast< sfg::Box >( widget );
+            widgetAsBox->PackEnd( child, true, true );
+          } else {
+            std::shared_ptr< sfg::Container > widgetAsContainer = std::static_pointer_cast< sfg::Container >( widget );
+            widgetAsContainer->Add( child );
+          }
+        } else {
+          Log::getInstance().warn( "LuaElement::add", "This LuaElement is not a Container and cannot be added to." );
+        }
+      }
+
+      void LuaElement::removeWidget( std::shared_ptr< sfg::Widget > target ) {
+        if( isContainer() ) {
+          std::shared_ptr< sfg::Container > widget = std::static_pointer_cast< sfg::Container >( widget );
+
+          target->Show( false );
+          widget->Remove( target );
+        } else {
+          Log::getInstance().warn( "LuaElement::removeWidget", "This LuaElement is not a Container and cannot remove any child elements." );
+        }
+      }
+
+      bool LuaElement::isContainer() {
+        switch( Tools::Utility::hash( widget->GetName().c_str() ) ) {
           case Tools::Utility::hash( "Box" ):
           case Tools::Utility::hash( "Fixed" ):
           case Tools::Utility::hash( "Notebook" ):
@@ -36,29 +71,9 @@ namespace BlueBear {
           case Tools::Utility::hash( "Frame" ):
           case Tools::Utility::hash( "Viewport" ):
           case Tools::Utility::hash( "Window" ):
-            {
-              WidgetBuilder widgetBuilder( eventManager, imageCache );
-              std::shared_ptr< sfg::Widget > child = nullptr;
-
-              try {
-                child = widgetBuilder.getWidgetFromXML( xmlString );
-              } catch( std::exception& e ) {
-                Log::getInstance().error( "LuaElement::add", "Failed to add widget XML: " + std::string( e.what() ) );
-                return;
-              }
-
-              // Add to widget typecast as container
-              if( nodeID == "Box" ) {
-                std::shared_ptr< sfg::Box > widgetAsBox = std::static_pointer_cast< sfg::Box >( widget );
-                widgetAsBox->PackEnd( child, true, true );
-              } else {
-                std::shared_ptr< sfg::Container > widgetAsContainer = std::static_pointer_cast< sfg::Container >( widget );
-                widgetAsContainer->Add( child );
-              }
-            }
-            break;
+            return true;
           default:
-            Log::getInstance().warn( "LuaElement::add", "This LuaElement is not a Container and cannot be added to." );
+            return false;
         }
       }
 
@@ -1332,6 +1347,19 @@ namespace BlueBear {
         Display::MainGameState* state = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
 
         widgetPtr->add( lua_tostring( L, -1 ), state->instance.eventManager, state->getImageCache() );
+
+        return 0;
+      }
+
+      int LuaElement::lua_widgetRemove( lua_State* L ) {
+        VERIFY_USER_DATA( "LuaElement::lua_widgetRemove", "remove" );
+
+        LuaElement* self = *( ( LuaElement** ) luaL_checkudata( L, 1, "bluebear_widget" ) );
+        LuaElement* argument = *( ( LuaElement** ) luaL_checkudata( L, 2, "bluebear_widget" ) );
+        Display::MainGameState* state = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+
+        // "argument" should be removed from "self" if and only if "self" is a container
+        self->removeWidget( argument->widget );
 
         return 0;
       }
