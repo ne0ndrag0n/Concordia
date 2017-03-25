@@ -294,8 +294,8 @@ namespace BlueBear {
 
       // Register internal sfg::Widget wrappers
       luaL_Reg elementFuncs[] = {
-        { "get_widget_by_id", GUI::LuaElement::lua_getWidgetByID },
-        { "get_widgets_by_class", GUI::LuaElement::lua_getWidgetsByClass },
+        { "find_by_id", GUI::LuaElement::lua_getWidgetByID },
+        { "find_by_class", GUI::LuaElement::lua_getWidgetsByClass },
         { "add", GUI::LuaElement::lua_add },
         { "remove", GUI::LuaElement::lua_widgetRemove },
         { "on", GUI::LuaElement::lua_onEvent },
