@@ -296,6 +296,7 @@ namespace BlueBear {
       luaL_Reg elementFuncs[] = {
         { "find_by_id", GUI::LuaElement::lua_getWidgetByID },
         { "find_by_class", GUI::LuaElement::lua_getWidgetsByClass },
+        { "find_pseudo", GUI::LuaElement::lua_getPseudoElements },
         { "add", GUI::LuaElement::lua_add },
         { "remove", GUI::LuaElement::lua_widgetRemove },
         { "on", GUI::LuaElement::lua_onEvent },
@@ -331,6 +332,7 @@ namespace BlueBear {
         { "find_by_class", GUI::LuaGUIContext::lua_findByClass },
         { "add", GUI::LuaGUIContext::lua_add },
         { "remove", GUI::LuaGUIContext::lua_removeWidget },
+        { "create", GUI::LuaGUIContext::lua_createWidget },
         { "__gc", GUI::LuaGUIContext::lua_gc },
         { NULL, NULL }
       };

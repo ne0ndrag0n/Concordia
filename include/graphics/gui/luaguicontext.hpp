@@ -39,11 +39,13 @@ namespace BlueBear {
         void add( const std::string& xmlString );
         void remove( std::shared_ptr< sfg::Widget > widget );
         void removeAll();
+        bool create( lua_State* L, const std::string& xmlString );
         std::shared_ptr< sfg::Widget > findById( const std::string& id );
         std::vector< std::shared_ptr< sfg::Widget > > findByClass( const std::string& clss );
 
         // TODO: Lua interfaces (these should be a lot less shitty than the way I did it in LuaElement)
         static int lua_add( lua_State* L );
+        static int lua_createWidget( lua_State* L );
         static int lua_removeWidget( lua_State* L );
         static int lua_findById( lua_State* L );
         static int lua_findByClass( lua_State* L );

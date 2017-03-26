@@ -36,8 +36,9 @@ namespace BlueBear {
         /**
          * Over time, make more of this shit a goddamn instance function!!
          */
-
         void add( const std::string& xmlString, EventManager& eventManager, ImageCache& imageCache );
+        void add( LuaElement* element );
+        void addToCheckedContainer( std::shared_ptr< sfg::Widget > target );
         void removeWidget( std::shared_ptr< sfg::Widget > target );
         bool isContainer();
 
@@ -45,6 +46,7 @@ namespace BlueBear {
         static int lua_offEvent( lua_State* L );
         static int lua_getWidgetByID( lua_State* L );
         static int lua_getWidgetsByClass( lua_State* L );
+        static int lua_getPseudoElements( lua_State* L );
         static int lua_gc( lua_State* L );
         static int lua_getText( lua_State* L );
         static int lua_setText( lua_State* L );

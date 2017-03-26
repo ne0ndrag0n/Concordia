@@ -10,9 +10,21 @@
     return 0; \
   }
 
+#define VERIFY_STRING_N( tag, func, n ) \
+  if( !lua_isstring( L, -n ) ) { \
+    Log::getInstance().warn( tag, "Argument " #n " provided to " func " must be a string." ); \
+    return 0; \
+  }
+
 #define VERIFY_USER_DATA( tag, func ) \
   if( !lua_isuserdata( L, -1 ) ) { \
     Log::getInstance().warn( tag, "Argument 1 provided to " func " must be a userdata." ); \
+    return 0; \
+  }
+
+#define VERIFY_NUMBER_N( tag, func, n ) \
+  if( !lua_isnumber( L, -n ) ) { \
+    Log::getInstance().warn( tag, "Argument " #n " provided to " func " must be a number." ); \
     return 0; \
   }
 

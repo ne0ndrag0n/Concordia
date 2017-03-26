@@ -32,15 +32,27 @@ namespace BlueBear {
           }
 
           // Add to widget typecast as container
-          if( std::string( widget->GetName() ) == "Box" ) {
-            std::shared_ptr< sfg::Box > widgetAsBox = std::static_pointer_cast< sfg::Box >( widget );
-            widgetAsBox->PackEnd( child, true, true );
-          } else {
-            std::shared_ptr< sfg::Container > widgetAsContainer = std::static_pointer_cast< sfg::Container >( widget );
-            widgetAsContainer->Add( child );
-          }
+          addToCheckedContainer( child );
         } else {
           Log::getInstance().warn( "LuaElement::add", "This LuaElement is not a Container and cannot be added to." );
+        }
+      }
+
+      void LuaElement::add( LuaElement* element ) {
+        if( isContainer() ) {
+          addToCheckedContainer( element->widget );
+        } else {
+          Log::getInstance().warn( "LuaElement::add", "This LuaElement is not a Container and cannot be added to." );
+        }
+      }
+
+      void LuaElement::addToCheckedContainer( std::shared_ptr< sfg::Widget > target ) {
+        if( std::string( widget->GetName() ) == "Box" ) {
+          std::shared_ptr< sfg::Box > widgetAsBox = std::static_pointer_cast< sfg::Box >( widget );
+          widgetAsBox->PackEnd( target, true, true );
+        } else {
+          std::shared_ptr< sfg::Container > widgetAsContainer = std::static_pointer_cast< sfg::Container >( widget );
+          widgetAsContainer->Add( target );
         }
       }
 
@@ -253,6 +265,11 @@ namespace BlueBear {
           std::string error = std::string( "Could not find any widgets with class " + selector );
           return luaL_error( L, error.c_str() );
         }
+      }
+
+      int LuaElement::lua_getPseudoElements( lua_State* L ) {
+        // TODO
+        return 0;
       }
 
       /**
@@ -1338,15 +1355,15 @@ namespace BlueBear {
        * @static
        */
       int LuaElement::lua_add( lua_State* L ) {
-        if( !lua_isstring( L, -1 ) ) {
-          Log::getInstance().warn( "LuaElement::lua_add", "Argument 1 provided to add must be a string." );
-          return 0;
-        }
-
         LuaElement* widgetPtr = *( ( LuaElement** ) luaL_checkudata( L, 1, "bluebear_widget" ) );
-        Display::MainGameState* state = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
 
-        widgetPtr->add( lua_tostring( L, -1 ), state->instance.eventManager, state->getImageCache() );
+        if( lua_isstring( L, -1 ) ) {
+          Display::MainGameState* state = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+          widgetPtr->add( lua_tostring( L, -1 ), state->instance.eventManager, state->getImageCache() );
+        } else {
+          LuaElement* argument = *( ( LuaElement** ) luaL_checkudata( L, 2, "bluebear_widget" ) );
+          widgetPtr->add( argument );
+        }
 
         return 0;
       }

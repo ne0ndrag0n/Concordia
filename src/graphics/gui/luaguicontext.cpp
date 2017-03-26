@@ -78,12 +78,41 @@ namespace BlueBear {
         return rootContainer->GetWidgetsByClass( clss );
       }
 
+      bool LuaGUIContext::create( lua_State* L, const std::string& xmlString ) {
+        WidgetBuilder widgetBuilder( eventManager, imageCache );
+
+        try {
+          LuaElement::getUserdataFromWidget( L, widgetBuilder.getWidgetFromXML( xmlString ) ); // userdata
+          return true;
+        } catch( std::exception& e ) {
+          Log::getInstance().error( "LuaGUIContext::add", "Failed to add widget XML: " + std::string( e.what() ) );
+          return false;
+        }
+      }
+
       int LuaGUIContext::lua_add( lua_State* L ) {
-        VERIFY_STRING( "LuaGUIContext::lua_add", "add" );
         LuaGUIContext* self = *( ( LuaGUIContext** ) luaL_checkudata( L, 1, "bluebear_gui_context" ) );
 
-        self->add( lua_tostring( L, -1 ) );
+        if( lua_isstring( L, -1 ) ) {
+          self->add( lua_tostring( L, -1 ) );
+        } else {
+          // Will throw exception if this does not match
+          LuaElement* argument = *( ( LuaElement** ) luaL_checkudata( L, 2, "bluebear_widget" ) );
+          self->add( argument->widget, true );
+        }
+
         return 0;
+      }
+
+      int LuaGUIContext::lua_createWidget( lua_State* L ) {
+        VERIFY_STRING( "LuaGUIContext::lua_createWidget", "create" );
+        LuaGUIContext* self = *( ( LuaGUIContext** ) luaL_checkudata( L, 1, "bluebear_gui_context" ) );
+
+        if( self->create( L, lua_tostring( L, -1 ) ) ) { // userdata
+          return 1;
+        } else {
+          return 0;
+        }
       }
 
       int LuaGUIContext::lua_removeWidget( lua_State* L ) {

@@ -18,28 +18,12 @@ function GUIProvider:open_debug_ui()
 
   self.gui:find_by_id( "misc" ):on( "click", bluebear.util.bind( "system.provider.gui:do_something", self ) )
 
-  self.gui:add(
-    [[
-    <Window id="context_menu" titlebar="false" resize="false" left="500" top="300" min-height="0">
-      <Box orientation="vertical" spacing="5.0">
-        <Label>Options</Label>
-        <Separator />
-        <Button>Walk Here</Button>
-        <Button>Run Here</Button>
-        <Button>Skip Here</Button>
-      </Box>
-    </Window>
-    ]]
-  )
-
   -- XXX: Remove after demo
   self.gui:find_by_id( "animate1" ):on( "click", bluebear.gui.__internal__playanim1 )
 end
 
 function GUIProvider:do_something( event )
-  local cm = self.gui:find_by_id( 'context_menu' )
 
-  self.gui:remove( cm )
 end
 
 function GUIProvider:on_click_zoom_in()
