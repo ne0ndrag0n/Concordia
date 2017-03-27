@@ -2,6 +2,7 @@
 #define LUAELEMENT
 
 #include "bbtypes.hpp"
+#include "graphics/display.hpp"
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -41,7 +42,9 @@ namespace BlueBear {
         void addToCheckedContainer( std::shared_ptr< sfg::Widget > target );
         void removeWidget( std::shared_ptr< sfg::Widget > target );
         bool isContainer();
+        bool getPseudoElements( lua_State* L, const std::string& pseudo, Display::MainGameState& state, int index = -1 );
 
+        static int lua_getName( lua_State* L );
         static int lua_onEvent( lua_State* L );
         static int lua_offEvent( lua_State* L );
         static int lua_getWidgetByID( lua_State* L );

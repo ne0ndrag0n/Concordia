@@ -301,6 +301,7 @@ namespace BlueBear {
         { "remove", GUI::LuaElement::lua_widgetRemove },
         { "on", GUI::LuaElement::lua_onEvent },
         { "off", GUI::LuaElement::lua_offEvent },
+        { "get_name", GUI::LuaElement::lua_getName },
         { "get_content", GUI::LuaElement::lua_getText },
         { "set_content", GUI::LuaElement::lua_setText },
         { "get_property", GUI::LuaElement::lua_getProperty },

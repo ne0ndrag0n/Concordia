@@ -1,4 +1,5 @@
 #include "graphics/gui/luaelement.hpp"
+#include "graphics/gui/luapseudoelement/pagepseudoelement.hpp"
 #include "graphics/widgetbuilder.hpp"
 #include "graphics/imagebuilder/pathimagesource.hpp"
 #include "graphics/display.hpp"
@@ -267,9 +268,79 @@ namespace BlueBear {
         }
       }
 
+      /**
+       *
+       * STACK ARGS: none
+       * RETURNS: userdata, array, or none
+       */
+      bool LuaElement::getPseudoElements( lua_State* L, const std::string& pseudo, Display::MainGameState& state, int index ) {
+        // more shitty patching on top of the lack of polymorphism in LuaElement
+
+        switch( Tools::Utility::hash( pseudo.c_str() ) ) {
+          case Tools::Utility::hash( "page" ):
+            if( widget->GetName() == "Notebook" ) {
+              std::shared_ptr< sfg::Notebook > notebook = std::static_pointer_cast< sfg::Notebook >( widget );
+              int pageCount = notebook->GetPageCount();
+
+              if( index < 0 ) {
+                // Array of PagePseudoElement
+
+                lua_createtable( L, pageCount, 0 ); // table
+
+                for( int i = 0; i != notebook->GetPageCount(); i++ ) {
+
+                  PagePseudoElement** ppe = ( PagePseudoElement** )lua_newuserdata( L, sizeof( PagePseudoElement* ) ); // userdata table
+                  *ppe = new PagePseudoElement( notebook, i, state );
+                  ( *ppe )->setMetatable( L );
+
+                  lua_rawseti( L, -2, i + 1 ); // table
+                }
+
+              } else if( index <= pageCount ) {
+
+                PagePseudoElement** ppe = ( PagePseudoElement** )lua_newuserdata( L, sizeof( PagePseudoElement* ) ); // userdata
+                *ppe = new PagePseudoElement( notebook, index, state );
+                ( *ppe )->setMetatable( L );
+              } else {
+
+                Log::getInstance().warn( "LuaElement::getPseudoElements", "Page does not exist in this Notebook." );
+                return false;
+              }
+
+              return true;
+            }
+          default:
+            Log::getInstance().warn( "LuaElement::getPseudoElements", widget->GetName() + " has no pseudo-element of type " + pseudo );
+            return false;
+        }
+      }
+
       int LuaElement::lua_getPseudoElements( lua_State* L ) {
-        // TODO
-        return 0;
+        // index "selector" self
+        // or
+        // "selector" self
+        LuaElement* self = *( ( LuaElement** ) luaL_checkudata( L, 1, "bluebear_widget" ) );
+
+        if( !lua_isstring( L, 2 ) ) {
+          Log::getInstance().warn( "LuaElement::lua_getPseudoElements", "Argument 2 provided to find_pseudo must be a string." );
+          return 0;
+        }
+
+        Display::MainGameState* state = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+
+        bool success = lua_isnumber( L, 3 ) ?
+          self->getPseudoElements( L, lua_tostring( L, 2 ), *state, lua_tonumber( L, 3 ) ) :
+          self->getPseudoElements( L, lua_tostring( L, 2 ), *state ); // element or nothing
+
+        return success ? 1 : 0;
+      }
+
+      int LuaElement::lua_getName( lua_State* L ) {
+        LuaElement* self = *( ( LuaElement** ) luaL_checkudata( L, 1, "bluebear_widget" ) );
+
+        lua_pushstring( L, self->widget->GetName().c_str() );
+
+        return 1;
       }
 
       /**
