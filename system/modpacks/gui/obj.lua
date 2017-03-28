@@ -25,9 +25,6 @@ end
 function GUIProvider:do_something( event )
   local ps_page = self.gui:find_by_id( 'notebook' ):find_pseudo( 'page', 0 )
   local ps_tab = ps_page:find_pseudo( 'tab' )
-  local tab_label = ps_tab:get_content()
-
-  print( tab_label:get_content() )
 end
 
 function GUIProvider:on_click_zoom_in()

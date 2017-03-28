@@ -19,6 +19,9 @@ namespace BlueBear {
       void TabPseudoElement::setMetatable( lua_State* L ) {
         if( luaL_newmetatable( L, "bluebear_tab_pseudo_element" ) ) { // metatable userdata
           luaL_Reg tableFuncs[] = {
+            { "add", TabPseudoElement::lua_add },
+            { "remove", TabPseudoElement::lua_removeWidget },
+            { "get_name", TabPseudoElement::lua_getName },
             { "find_pseudo", TabPseudoElement::lua_findElement },
             { "get_property", TabPseudoElement::lua_getProperty },
             { "set_property", TabPseudoElement::lua_setProperty },
@@ -38,6 +41,22 @@ namespace BlueBear {
         lua_setmetatable( L, -2 ); // userdata
       }
 
+      int TabPseudoElement::lua_add( lua_State* L ) {
+        Log::getInstance().warn( "TabPseudoElement::lua_add", "Cannot add elements or pseudo-elements to <tab> pseudo-element; use set_content to set single child." );
+        return 0;
+      }
+
+      int TabPseudoElement::lua_removeWidget( lua_State* L ) {
+        Log::getInstance().warn( "TabPseudoElement::lua_removeWidget", "Cannot remove elements or pseudo-elements from <tab> pseudo-element." );
+        return 0;
+      }
+
+      int TabPseudoElement::lua_getName( lua_State* L ) {
+        lua_pushstring( L, "tab" );
+
+        return 1;
+      }
+
       /**
        *
        * STACK ARGS: none
@@ -54,22 +73,22 @@ namespace BlueBear {
       }
 
       void TabPseudoElement::setChild( lua_State* L, LuaElement* element ) {
-        if( std::shared_ptr< sfg::Widget > existingTabLabel = subject->GetNthTabLabel( pageNumber ) ) {
-          subject->SetTabLabel( existingTabLabel, element->widget );
+        if( std::shared_ptr< sfg::Widget > existingPage = subject->GetNthPage( pageNumber ) ) {
+          subject->SetTabLabel( existingPage, element->widget );
         } else {
           Log::getInstance().warn( "TabPseudoElement::setChild", "Tab has no label widget." );
         }
       }
 
       void TabPseudoElement::setChild( lua_State* L, const std::string& xmlString ) {
-        if( std::shared_ptr< sfg::Widget > existingTabLabel = subject->GetNthTabLabel( pageNumber ) ) {
+        if( std::shared_ptr< sfg::Widget > existingPage = subject->GetNthPage( pageNumber ) ) {
           WidgetBuilder widgetBuilder( displayState.instance.eventManager, displayState.getImageCache() );
           std::shared_ptr< sfg::Widget > child = nullptr;
 
           try {
             child = widgetBuilder.getWidgetFromXML( xmlString );
 
-            subject->SetTabLabel( existingTabLabel, child );
+            subject->SetTabLabel( existingPage, child );
           } catch( std::exception& e ) {
             Log::getInstance().error( "LuaElement::add", "Failed to add widget XML: " + std::string( e.what() ) );
             return;
@@ -101,6 +120,10 @@ namespace BlueBear {
       }
 
       int TabPseudoElement::lua_setContent( lua_State* L ) {
+        // FIXME: SFGUI bug. When you set the label on a tab widget, the tab becomes distorted.
+        Log::getInstance().error( "TabPseudoElement::lua_setContent", "Cannot set <page> element after it is created due to a library/platform issue." );
+
+        /*
         TabPseudoElement* self = *( ( TabPseudoElement** ) luaL_checkudata( L, 1, "bluebear_tab_pseudo_element" ) );
 
         if( lua_isstring( L, -1 ) ) {
@@ -109,6 +132,7 @@ namespace BlueBear {
           LuaElement* element = *( ( LuaElement** ) luaL_checkudata( L, 2, "bluebear_widget" ) );
           self->setChild( L, element );
         }
+        */
 
         return 0;
       }

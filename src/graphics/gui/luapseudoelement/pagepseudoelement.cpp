@@ -19,6 +19,9 @@ namespace BlueBear {
       void PagePseudoElement::setMetatable( lua_State* L ) {
         if( luaL_newmetatable( L, "bluebear_page_pseudo_element" ) ) { // metatable userdata
           luaL_Reg tableFuncs[] = {
+            { "add", PagePseudoElement::lua_add },
+            { "remove", PagePseudoElement::lua_removeWidget },
+            { "get_name", PagePseudoElement::lua_getName },
             { "find_pseudo", PagePseudoElement::lua_findElement },
             { "get_property", PagePseudoElement::lua_getProperty },
             { "set_property", PagePseudoElement::lua_setProperty },
@@ -36,6 +39,22 @@ namespace BlueBear {
         }
 
         lua_setmetatable( L, -2 ); // userdata
+      }
+
+      int PagePseudoElement::lua_add( lua_State* L ) {
+        Log::getInstance().warn( "PagePseudoElement::lua_add", "Cannot add elements or pseudo-elements to <page> pseudo-element." );
+        return 0;
+      }
+
+      int PagePseudoElement::lua_removeWidget( lua_State* L ) {
+        Log::getInstance().warn( "PagePseudoElement::lua_removeWidget", "Cannot remove elements or pseudo-elements from <page> pseudo-element." );
+        return 0;
+      }
+
+      int PagePseudoElement::lua_getName( lua_State* L ) {
+        lua_pushstring( L, "page" );
+
+        return 1;
       }
 
       /**
