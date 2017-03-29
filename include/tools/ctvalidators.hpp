@@ -28,4 +28,10 @@
     return 0; \
   }
 
+#define VERIFY_POINTER( ptr, tag ) \
+  if( !( ptr ) ) { \
+    Log::getInstance().warn( tag, "This pseudo-element must first be associated with an element object." ); \
+    return 0; \
+  }
+
 #endif
