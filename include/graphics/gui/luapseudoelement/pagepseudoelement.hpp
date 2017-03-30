@@ -12,11 +12,14 @@
 namespace BlueBear {
   namespace Graphics {
     namespace GUI {
+      class TabPseudoElement;
 
       class PagePseudoElement : public LuaPseudoElement {
         std::shared_ptr< sfg::Notebook > subject;
         unsigned int pageNumber;
         Display::MainGameState& displayState;
+
+        TabPseudoElement* stagedTabElement;
 
         bool findElement( lua_State* L, const std::string& tag );
 

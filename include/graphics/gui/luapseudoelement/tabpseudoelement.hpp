@@ -24,6 +24,8 @@ namespace BlueBear {
         void setChild( lua_State* L, const std::string& xmlString );
 
       public:
+        std::shared_ptr< sfg::Widget > stagedWidget;
+
         TabPseudoElement(
           std::shared_ptr< sfg::Notebook > subject,
           unsigned int pageNumber,
@@ -31,6 +33,8 @@ namespace BlueBear {
         );
 
         void setMetatable( lua_State* L );
+
+        static int lua_create( lua_State* L, Display::MainGameState& displayState, const std::string& xml );
 
         static int lua_add( lua_State* L );
         static int lua_removeWidget( lua_State* L );

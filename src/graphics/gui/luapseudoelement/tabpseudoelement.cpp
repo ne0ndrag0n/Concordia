@@ -3,13 +3,14 @@
 #include "graphics/widgetbuilder.hpp"
 #include "tools/ctvalidators.hpp"
 #include "log.hpp"
+#include <tinyxml2.h>
 
 namespace BlueBear {
   namespace Graphics {
     namespace GUI {
 
       TabPseudoElement::TabPseudoElement( std::shared_ptr< sfg::Notebook > subject, unsigned int pageNumber, Display::MainGameState& displayState )
-        : subject( subject ), pageNumber( pageNumber ), displayState( displayState ) {}
+        : subject( subject ), pageNumber( pageNumber ), displayState( displayState ), stagedWidget( nullptr ) {}
 
       /**
        *
@@ -39,6 +40,50 @@ namespace BlueBear {
         }
 
         lua_setmetatable( L, -2 ); // userdata
+      }
+
+      /**
+       * @static
+       * Create and push a new unstaged userdata for a <tab> pseudoelement. This can be disconnected/connected to pages before they are staged.
+       *
+       * STACK ARGS: (none)
+       * Returns: userdata, or none
+       */
+      int TabPseudoElement::lua_create( lua_State* L, Display::MainGameState& displayState, const std::string& xml ) {
+        tinyxml2::XMLDocument document;
+        document.Parse( xml.c_str() );
+
+        if( document.ErrorID() ) {
+          Log::getInstance().error( "TabPseudoElement::lua_create", "Could not parse XML string!" );
+          return 0;
+        }
+
+        tinyxml2::XMLElement* element = document.RootElement();
+        if( std::string( element->Name() ) == "tab" ) {
+          tinyxml2::XMLElement* child = element->FirstChildElement();
+          if( child != NULL ) {
+            WidgetBuilder widgetBuilder( displayState.instance.eventManager, displayState.getImageCache() );
+            std::shared_ptr< sfg::Widget > widget;
+
+            try {
+              widget = widgetBuilder.nodeToWidget( child );
+            } catch( std::exception& e ) {
+              Log::getInstance().error( "TabPseudoElement::lua_create", "Failed to add widget XML: " + std::string( e.what() ) );
+              return 0;
+            }
+
+            TabPseudoElement** userData = ( TabPseudoElement** ) lua_newuserdata( L, sizeof( TabPseudoElement* ) ); // userdata
+            *userData = new TabPseudoElement( nullptr, 0, displayState );
+            ( *userData )->stagedWidget = widget;
+            return 1;
+          } else {
+            Log::getInstance().warn( "TabPseudoElement::lua_create", "<tab> pseudo-element does not contain a child widget." );
+          }
+        } else {
+          Log::getInstance().warn( "TabPseudoElement::lua_create", "This is not a <tab> pseudo-element." );
+        }
+
+        return 0;
       }
 
       int TabPseudoElement::lua_add( lua_State* L ) {

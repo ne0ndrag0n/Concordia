@@ -104,8 +104,6 @@ namespace BlueBear {
       void setRangeAdjustment( std::shared_ptr< sfg::Range > range, tinyxml2::XMLElement* element );
       void setEatEntryEvent( std::shared_ptr< sfg::Entry > entry );
 
-      std::shared_ptr< sfg::Widget > nodeToWidget( tinyxml2::XMLElement* element );
-
       void correctXBoundary( float* input );
       void correctYBoundary( float* input );
 
@@ -134,6 +132,8 @@ namespace BlueBear {
       std::vector< std::shared_ptr< sfg::Widget > > getWidgets( const std::string& path );
 
       std::shared_ptr< sfg::Widget > getWidgetFromXML( const std::string& xmlString );
+
+      std::shared_ptr< sfg::Widget > nodeToWidget( tinyxml2::XMLElement* element );
 
       template< typename T > static T getOrientation( const char* orientation ) {
         if( !orientation ) {

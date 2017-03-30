@@ -9,7 +9,7 @@ namespace BlueBear {
     namespace GUI {
 
       PagePseudoElement::PagePseudoElement( std::shared_ptr< sfg::Notebook > subject, unsigned int pageNumber, Display::MainGameState& displayState )
-        : subject( subject ), pageNumber( pageNumber ), displayState( displayState ) {}
+        : subject( subject ), pageNumber( pageNumber ), displayState( displayState ), stagedTabElement( nullptr ) {}
 
       /**
        *
