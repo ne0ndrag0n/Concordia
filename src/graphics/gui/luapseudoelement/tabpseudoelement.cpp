@@ -49,41 +49,26 @@ namespace BlueBear {
        * STACK ARGS: (none)
        * Returns: userdata, or none
        */
-      int TabPseudoElement::lua_create( lua_State* L, Display::MainGameState& displayState, const std::string& xml ) {
-        tinyxml2::XMLDocument document;
-        document.Parse( xml.c_str() );
+      int TabPseudoElement::create( lua_State* L, Display::MainGameState& displayState, tinyxml2::XMLElement* element ) {
+        std::shared_ptr< sfg::Widget > widget = nullptr;
+        tinyxml2::XMLElement* child = element->FirstChildElement();
 
-        if( document.ErrorID() ) {
-          Log::getInstance().error( "TabPseudoElement::lua_create", "Could not parse XML string!" );
-          return 0;
-        }
-
-        tinyxml2::XMLElement* element = document.RootElement();
-        if( std::string( element->Name() ) == "tab" ) {
-          tinyxml2::XMLElement* child = element->FirstChildElement();
-          if( child != NULL ) {
+        if( child != NULL ) {
+          try {
             WidgetBuilder widgetBuilder( displayState.instance.eventManager, displayState.getImageCache() );
-            std::shared_ptr< sfg::Widget > widget;
-
-            try {
-              widget = widgetBuilder.nodeToWidget( child );
-            } catch( std::exception& e ) {
-              Log::getInstance().error( "TabPseudoElement::lua_create", "Failed to add widget XML: " + std::string( e.what() ) );
-              return 0;
-            }
-
-            TabPseudoElement** userData = ( TabPseudoElement** ) lua_newuserdata( L, sizeof( TabPseudoElement* ) ); // userdata
-            *userData = new TabPseudoElement( nullptr, 0, displayState );
-            ( *userData )->stagedWidget = widget;
-            return 1;
-          } else {
-            Log::getInstance().warn( "TabPseudoElement::lua_create", "<tab> pseudo-element does not contain a child widget." );
+            widget = widgetBuilder.getWidgetFromElementDirect( child );
+          } catch( std::exception& e ) {
+            Log::getInstance().error( "TabPseudoElement::lua_create", "Failed to add widget XML: " + std::string( e.what() ) );
+            return 0;
           }
-        } else {
-          Log::getInstance().warn( "TabPseudoElement::lua_create", "This is not a <tab> pseudo-element." );
         }
 
-        return 0;
+        TabPseudoElement** userData = ( TabPseudoElement** ) lua_newuserdata( L, sizeof( TabPseudoElement* ) ); // userdata
+        *userData = new TabPseudoElement( nullptr, 0, displayState );
+        ( *userData )->setMetatable( L );
+        ( *userData )->stagedWidget = widget;
+
+        return 1;
       }
 
       int TabPseudoElement::lua_add( lua_State* L ) {
@@ -117,6 +102,24 @@ namespace BlueBear {
         }
       }
 
+      /**
+       *
+       * STACK ARGS: none
+       * Returns: userdata, or nothing if a userdata cannot be created.
+       */
+      int TabPseudoElement::getStagedChild( lua_State* L ) {
+        if( stagedWidget ) {
+          LuaElement::getUserdataFromWidget( L, stagedWidget ); // userdata
+          return 1;
+        } else {
+          Log::getInstance().warn( "TabPseudoElement::getStagedChild", "Tab has no label widget." );
+          return 0;
+        }
+      }
+
+      /**
+       * Inactive
+       */
       void TabPseudoElement::setChild( lua_State* L, LuaElement* element ) {
         if( std::shared_ptr< sfg::Widget > existingPage = subject->GetNthPage( pageNumber ) ) {
           subject->SetTabLabel( existingPage, element->widget );
@@ -125,6 +128,9 @@ namespace BlueBear {
         }
       }
 
+      /**
+       * Inactive
+       */
       void TabPseudoElement::setChild( lua_State* L, const std::string& xmlString ) {
         if( std::shared_ptr< sfg::Widget > existingPage = subject->GetNthPage( pageNumber ) ) {
           WidgetBuilder widgetBuilder( displayState.instance.eventManager, displayState.getImageCache() );
@@ -141,6 +147,26 @@ namespace BlueBear {
         } else {
           Log::getInstance().warn( "TabPseudoElement::setChild", "Tab has no label widget." );
         }
+      }
+
+      void TabPseudoElement::setStagedChild( lua_State* L, LuaElement* element ) {
+        stagedWidget = element->widget;
+      }
+
+      void TabPseudoElement::setStagedChild( lua_State* L, const std::string& xmlString ) {
+        WidgetBuilder widgetBuilder( displayState.instance.eventManager, displayState.getImageCache() );
+
+        try {
+          stagedWidget = widgetBuilder.getWidgetFromXML( xmlString );
+        } catch( std::exception& e ) {
+          Log::getInstance().error( "LuaElement::add", "Failed to add widget XML: " + std::string( e.what() ) );
+        }
+      }
+
+      void TabPseudoElement::setSubject( std::shared_ptr< sfg::Notebook > subject ) {
+        this->subject = subject;
+
+        stagedWidget = nullptr;
       }
 
       int TabPseudoElement::lua_findElement( lua_State* L ) {
@@ -161,23 +187,29 @@ namespace BlueBear {
       int TabPseudoElement::lua_getContent( lua_State* L ) {
         TabPseudoElement* self = *( ( TabPseudoElement** ) luaL_checkudata( L, 1, "bluebear_tab_pseudo_element" ) );
 
-        return self->getChild( L ) ? 1 : 0;
+        if( self->subject ) {
+          return self->getChild( L ) ? 1 : 0;
+        } else {
+          return self->getStagedChild( L );
+        }
       }
 
       int TabPseudoElement::lua_setContent( lua_State* L ) {
-        // FIXME: SFGUI bug. When you set the label on a tab widget, the tab becomes distorted.
-        Log::getInstance().error( "TabPseudoElement::lua_setContent", "Cannot set <page> element after it is created due to a library/platform issue." );
-
-        /*
         TabPseudoElement* self = *( ( TabPseudoElement** ) luaL_checkudata( L, 1, "bluebear_tab_pseudo_element" ) );
 
-        if( lua_isstring( L, -1 ) ) {
-          self->setChild( L, lua_tostring( L, -1 ) );
+        if( self->subject ) {
+          // FIXME: SFGUI bug. When you set the label on a tab widget, the tab becomes distorted. Rather not give users the option to shoot their own foot off.
+          // If you want to programatically do this, you'll have to add the widget to the tab before adding its page to the Notebook.
+          Log::getInstance().error( "TabPseudoElement::lua_setContent", "Cannot set <tab> element after its <page> has been added to a Notebook due to a current library issue." );
         } else {
-          LuaElement* element = *( ( LuaElement** ) luaL_checkudata( L, 2, "bluebear_widget" ) );
-          self->setChild( L, element );
+          // With a tab unattached to a particular notebook, we can set the staged widget!
+          if( lua_isstring( L, -1 ) ) {
+            self->setStagedChild( L, lua_tostring( L, -1 ) );
+          } else {
+            LuaElement* element = *( ( LuaElement** ) luaL_checkudata( L, 2, "bluebear_widget" ) );
+            self->setStagedChild( L, element );
+          }
         }
-        */
 
         return 0;
       }

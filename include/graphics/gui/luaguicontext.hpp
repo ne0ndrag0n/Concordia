@@ -1,6 +1,7 @@
 #ifndef LUA_GUI_CONTEXT
 #define LUA_GUI_CONTEXT
 
+#include "graphics/display.hpp"
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -9,6 +10,7 @@
 #include <memory>
 #include <vector>
 #include <set>
+#include <tinyxml2.h>
 
 namespace BlueBear {
   class EventManager;
@@ -21,17 +23,15 @@ namespace BlueBear {
 
       class LuaGUIContext {
         std::shared_ptr< sfg::Container > rootContainer;
-        sfg::Desktop& desktop;
+        Display::MainGameState& displayState;
 
-        EventManager& eventManager;
-        ImageCache& imageCache;
         /**
          * Bookkeeping for items we remove later on
          */
         std::set< std::shared_ptr< sfg::Widget > > addedToDesktop;
 
       public:
-        LuaGUIContext( sfg::Desktop& desktop, EventManager& eventManager, ImageCache& imageCache );
+        LuaGUIContext( Display::MainGameState& displayState );
 
         void addFromPath( const std::string& path );
 

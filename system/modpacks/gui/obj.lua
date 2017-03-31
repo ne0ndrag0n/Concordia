@@ -23,8 +23,13 @@ function GUIProvider:open_debug_ui()
 end
 
 function GUIProvider:do_something( event )
-  --local ps_page = self.gui:find_by_id( 'notebook' ):find_pseudo( 'page', 0 )
-  --local ps_tab = ps_page:find_pseudo( 'tab' )
+  local tab = self.gui:create(
+    [[
+      <tab>
+        <Label id="tablabel">New Tab</Label>
+      </tab>
+    ]]
+  )
 end
 
 function GUIProvider:on_click_zoom_in()

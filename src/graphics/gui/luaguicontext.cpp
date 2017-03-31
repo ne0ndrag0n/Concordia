@@ -1,6 +1,7 @@
 #include "graphics/gui/luaguicontext.hpp"
 #include "graphics/gui/luaelement.hpp"
 #include "graphics/gui/sfgroot.hpp"
+#include "graphics/gui/luapseudoelement/tabpseudoelement.hpp"
 #include "graphics/imagecache.hpp"
 #include "graphics/widgetbuilder.hpp"
 #include "tools/ctvalidators.hpp"
@@ -10,11 +11,11 @@ namespace BlueBear {
   namespace Graphics {
     namespace GUI {
 
-      LuaGUIContext::LuaGUIContext( sfg::Desktop& desktop, EventManager& eventManager, ImageCache& imageCache )
-        : rootContainer( RootContainer::Create() ), desktop( desktop ), eventManager( eventManager ), imageCache( imageCache ) {}
+      LuaGUIContext::LuaGUIContext( Display::MainGameState& displayState )
+        : rootContainer( RootContainer::Create() ), displayState( displayState ) {}
 
       void LuaGUIContext::addFromPath( const std::string& path ) {
-        WidgetBuilder widgetBuilder( eventManager, imageCache );
+        WidgetBuilder widgetBuilder( displayState.instance.eventManager, displayState.getImageCache() );
         std::vector< std::shared_ptr< sfg::Widget > > widgets = widgetBuilder.getWidgets( path );
 
         for( auto& widget : widgets ) {
@@ -26,14 +27,14 @@ namespace BlueBear {
         rootContainer->Add( widget );
 
         if( toDesktop ) {
-          desktop.Add( widget );
+          displayState.gui.desktop.Add( widget );
 
           addedToDesktop.insert( widget );
         }
       }
 
       void LuaGUIContext::add( const std::string& xmlString ) {
-        WidgetBuilder widgetBuilder( eventManager, imageCache );
+        WidgetBuilder widgetBuilder( displayState.instance.eventManager, displayState.getImageCache() );
 
         try {
           add( widgetBuilder.getWidgetFromXML( xmlString ), true );
@@ -48,7 +49,7 @@ namespace BlueBear {
         rootContainer->Remove( widget );
 
         if( addedToDesktop.find( widget ) != addedToDesktop.end() ) {
-          desktop.Remove( widget );
+          displayState.gui.desktop.Remove( widget );
           addedToDesktop.erase( widget );
         }
       }
@@ -61,7 +62,7 @@ namespace BlueBear {
         for( auto& item : addedToDesktop ) {
           item->Show( false );
 
-          desktop.Remove( item );
+          displayState.gui.desktop.Remove( item );
         }
 
         // Free all elements within container
@@ -79,14 +80,29 @@ namespace BlueBear {
       }
 
       bool LuaGUIContext::create( lua_State* L, const std::string& xmlString ) {
-        WidgetBuilder widgetBuilder( eventManager, imageCache );
+        tinyxml2::XMLDocument document;
+        document.Parse( xmlString.c_str() );
 
-        try {
-          LuaElement::getUserdataFromWidget( L, widgetBuilder.getWidgetFromXML( xmlString ) ); // userdata
-          return true;
-        } catch( std::exception& e ) {
-          Log::getInstance().error( "LuaGUIContext::add", "Failed to add widget XML: " + std::string( e.what() ) );
+        if( document.ErrorID() ) {
+          Log::getInstance().error( "LuaGUIContext::create", "Could not parse XML string!" );
           return false;
+        }
+
+        tinyxml2::XMLElement* element = document.RootElement();
+
+        switch( Tools::Utility::hash( element->Name() ) ) {
+          case Tools::Utility::hash( "tab" ):
+            return TabPseudoElement::create( L, displayState, element ) == 1 ? true : false; // userdata
+          default:
+            try {
+              WidgetBuilder widgetBuilder( displayState.instance.eventManager, displayState.getImageCache() );
+
+              LuaElement::getUserdataFromWidget( L, widgetBuilder.getWidgetFromElementDirect( element ) ); // userdata
+              return true;
+            } catch( std::exception& e ) {
+              Log::getInstance().error( "LuaGUIContext::create", "Failed to add widget XML: " + std::string( e.what() ) );
+              return false;
+            }
         }
       }
 

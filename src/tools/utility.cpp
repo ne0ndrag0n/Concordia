@@ -399,5 +399,14 @@ namespace BlueBear {
 
 			return stringBuilder.str();
 		}
+
+		/**
+		 * THE AGONY
+		 */
+		std::string Utility::xmlToString( tinyxml2::XMLElement* element ) {
+			tinyxml2::XMLPrinter printer;
+			element->Accept( &printer );
+			return printer.CStr();
+		}
 	}
 }

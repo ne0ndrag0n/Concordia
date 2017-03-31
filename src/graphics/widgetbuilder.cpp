@@ -77,7 +77,33 @@ namespace BlueBear {
         throw FailedToLoadXMLException();
       }
 
-      return nodeToWidget( document.RootElement() );
+      groups.clear();
+
+      std::shared_ptr< sfg::Widget > widget = nodeToWidget( document.RootElement() );
+
+      for( auto& group : groups ) {
+        std::shared_ptr< sfg::Widget > associatedWidget = widget->GetWidgetById( group.second );
+        if( associatedWidget && associatedWidget->GetName() == "RadioButton" ) {
+          group.first->SetGroup( std::static_pointer_cast< sfg::RadioButton >( associatedWidget )->GetGroup() );
+        }
+      }
+
+      return widget;
+    }
+
+    std::shared_ptr< sfg::Widget > WidgetBuilder::getWidgetFromElementDirect( tinyxml2::XMLElement* element ) {
+      groups.clear();
+
+      std::shared_ptr< sfg::Widget > widget = nodeToWidget( element );
+
+      for( auto& group : groups ) {
+        std::shared_ptr< sfg::Widget > associatedWidget = widget->GetWidgetById( group.second );
+        if( associatedWidget && associatedWidget->GetName() == "RadioButton" ) {
+          group.first->SetGroup( std::static_pointer_cast< sfg::RadioButton >( associatedWidget )->GetGroup() );
+        }
+      }
+
+      return widget;
     }
 
     std::shared_ptr< sfg::Widget > WidgetBuilder::nodeToWidget( tinyxml2::XMLElement* element ) {

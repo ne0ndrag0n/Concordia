@@ -8,6 +8,7 @@
 #include <lauxlib.h>
 #include <SFGUI/Widgets.hpp>
 #include <memory>
+#include <tinyxml2.h>
 
 namespace BlueBear {
   namespace Graphics {
@@ -20,8 +21,13 @@ namespace BlueBear {
         Display::MainGameState& displayState;
 
         bool getChild( lua_State* L );
+        int getStagedChild( lua_State* L );
+
         void setChild( lua_State* L, LuaElement* element );
+        void setStagedChild( lua_State* L, LuaElement* element );
+
         void setChild( lua_State* L, const std::string& xmlString );
+        void setStagedChild( lua_State* L, const std::string& xmlString );
 
       public:
         std::shared_ptr< sfg::Widget > stagedWidget;
@@ -33,8 +39,9 @@ namespace BlueBear {
         );
 
         void setMetatable( lua_State* L );
+        void setSubject( std::shared_ptr< sfg::Notebook > subject );
 
-        static int lua_create( lua_State* L, Display::MainGameState& displayState, const std::string& xml );
+        static int create( lua_State* L, Display::MainGameState& displayState, tinyxml2::XMLElement* element );
 
         static int lua_add( lua_State* L );
         static int lua_removeWidget( lua_State* L );

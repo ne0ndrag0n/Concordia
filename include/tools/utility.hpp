@@ -6,6 +6,7 @@
 #include <lauxlib.h>
 #include <cstdint>
 #include <jsoncpp/json/json.h>
+#include <tinyxml2.h>
 #include <cstddef>
 #include <fstream>
 #include <vector>
@@ -82,6 +83,8 @@ namespace BlueBear {
 				static inline const char* sanitizeCString( const char* string ) {
 					return !string ? "" : string;
 				};
+
+				static std::string xmlToString( tinyxml2::XMLElement* element );
 
 		};
 	}
