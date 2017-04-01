@@ -72,12 +72,36 @@ namespace BlueBear {
       }
 
       int TabPseudoElement::lua_add( lua_State* L ) {
-        Log::getInstance().warn( "TabPseudoElement::lua_add", "Cannot add elements or pseudo-elements to <tab> pseudo-element; use set_content to set single child." );
+        TabPseudoElement* self = *( ( TabPseudoElement** ) luaL_checkudata( L, 1, "bluebear_tab_pseudo_element" ) );
+
+        if( self->subject ) {
+          Log::getInstance().warn( "TabPseudoElement::lua_add", "Cannot add to <tab> pseudo-element when attached to an existing Notebook." );
+        } else if( self->stagedWidget ) {
+          Log::getInstance().warn( "TabPseudoElement::lua_add", "Cannot add more than one child widget to <tab> pseudo-element." );
+        } else {
+          // Empty <tab> pseudo element: just punt it out to lua_setContent
+          return TabPseudoElement::lua_setContent( L );
+        }
+
         return 0;
       }
 
       int TabPseudoElement::lua_removeWidget( lua_State* L ) {
-        Log::getInstance().warn( "TabPseudoElement::lua_removeWidget", "Cannot remove elements or pseudo-elements from <tab> pseudo-element." );
+        TabPseudoElement* self = *( ( TabPseudoElement** ) luaL_checkudata( L, 1, "bluebear_tab_pseudo_element" ) );
+
+        if( self->subject ) {
+          Log::getInstance().warn( "TabPseudoElement::lua_removeWidget", "Cannot remove from <tab> pseudo-element when attached to an existing Notebook." );
+        } else if( self->stagedWidget ) {
+          LuaElement* argument = *( ( LuaElement** ) luaL_checkudata( L, 2, "bluebear_widget" ) );
+
+          if( argument->widget == self->stagedWidget ) {
+            self->stagedWidget = nullptr;
+          }
+        } else {
+          // Empty <tab> pseudo-element, nothing to remove.
+          Log::getInstance().debug( "TabPseudoElement::lua_removeWidget", "There is nothing to remove from this <tab> pseudo-element." );
+        }
+
         return 0;
       }
 
