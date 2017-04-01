@@ -1,5 +1,6 @@
 #include "graphics/gui/luapseudoelement/pagepseudoelement.hpp"
 #include "graphics/gui/luapseudoelement/tabpseudoelement.hpp"
+#include "scripting/luakit/gchelper.hpp"
 #include "tools/ctvalidators.hpp"
 #include "tools/utility.hpp"
 #include "log.hpp"
@@ -115,6 +116,10 @@ namespace BlueBear {
 
       int PagePseudoElement::lua_gc( lua_State* L ) {
         PagePseudoElement* widgetPtr = *( ( PagePseudoElement** ) luaL_checkudata( L, 1, "bluebear_page_pseudo_element" ) );
+
+        if( widgetPtr->stagedTabElement ) {
+          // TODO: Unregister potential stagedTabElement from LuaKit::GcHelper
+        }
 
         delete widgetPtr;
 
