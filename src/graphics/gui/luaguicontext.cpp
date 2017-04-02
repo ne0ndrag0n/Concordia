@@ -1,6 +1,7 @@
 #include "graphics/gui/luaguicontext.hpp"
 #include "graphics/gui/luaelement.hpp"
 #include "graphics/gui/sfgroot.hpp"
+#include "graphics/gui/luapseudoelement/pagepseudoelement.hpp"
 #include "graphics/gui/luapseudoelement/tabpseudoelement.hpp"
 #include "graphics/imagecache.hpp"
 #include "graphics/widgetbuilder.hpp"
@@ -93,6 +94,8 @@ namespace BlueBear {
         switch( Tools::Utility::hash( element->Name() ) ) {
           case Tools::Utility::hash( "tab" ):
             return TabPseudoElement::create( L, displayState, element ) == 1 ? true : false; // userdata
+          case Tools::Utility::hash( "page" ):
+            return PagePseudoElement::create( L, displayState, element ) == 1 ? true : false; // userdata
           default:
             try {
               WidgetBuilder widgetBuilder( displayState.instance.eventManager, displayState.getImageCache() );

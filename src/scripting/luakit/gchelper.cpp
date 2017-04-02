@@ -51,6 +51,22 @@ namespace BlueBear {
         lua_newtable( L ); // table "bluebear_gc_helper"
         lua_settable( L, LUA_REGISTRYINDEX ); // EMPTY
       }
+
+      /**
+       * Get an item tracked by the GcHelper.
+       *
+       * STACK ARGS: none
+       * Returns: item referred to by tag
+       */
+      void GcHelper::getTracked( lua_State* L, const std::string& tag ) {
+        lua_pushstring( L, "bluebear_gc_helper" ); // "bluebear_gc_helper"
+        lua_gettable( L, LUA_REGISTRYINDEX ); // table
+
+        lua_pushstring( L, tag.c_str() ); // "string" table
+        lua_gettable( L, -2 ); // item table
+
+        lua_remove( L, -2 ); // item
+      }
     }
   }
 }

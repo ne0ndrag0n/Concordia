@@ -429,15 +429,11 @@ namespace BlueBear {
       std::shared_ptr< sfg::Label > label;
 
       const char* labelValue = element->GetText();
+      label = sfg::Label::Create( labelValue ? labelValue : "" );
 
-      if( labelValue ) {
-        label = sfg::Label::Create( labelValue );
-        setBasicProperties( label, element );
-        setAllocationAndRequisition( label, element );
-        setAlignment( label, element );
-      } else {
-        label = sfg::Label::Create( "" );
-      }
+      setBasicProperties( label, element );
+      setAllocationAndRequisition( label, element );
+      setAlignment( label, element );
 
       setDefaultEvents( label, element );
 

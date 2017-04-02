@@ -29,6 +29,10 @@ namespace BlueBear {
         void setChild( lua_State* L, const std::string& xmlString );
         void setStagedChild( lua_State* L, const std::string& xmlString );
 
+        int getElementsByClass( lua_State* L, const std::string& classID );
+        int getElementById( lua_State* L, const std::string& id );
+        std::shared_ptr< sfg::Widget > getChildWidget();
+
       public:
         std::shared_ptr< sfg::Widget > stagedWidget;
 
@@ -46,6 +50,8 @@ namespace BlueBear {
         static int lua_add( lua_State* L );
         static int lua_removeWidget( lua_State* L );
         static int lua_getName( lua_State* L );
+        static int lua_findById( lua_State* L );
+        static int lua_findByClass( lua_State* L );
         static int lua_findElement( lua_State* L );
         static int lua_getProperty( lua_State* L );
         static int lua_setProperty( lua_State* L );

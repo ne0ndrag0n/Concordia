@@ -8,6 +8,7 @@
 #include <lauxlib.h>
 #include <SFGUI/Widgets.hpp>
 #include <memory>
+#include <tinyxml2.h>
 
 namespace BlueBear {
   namespace Graphics {
@@ -19,9 +20,12 @@ namespace BlueBear {
         unsigned int pageNumber;
         Display::MainGameState& displayState;
 
-        TabPseudoElement* stagedTabElement;
+        TabPseudoElement* stagedTabElement = nullptr;
 
+        void processXMLPseudoElement( lua_State* L, tinyxml2::XMLElement* child );
+        void setStagedTabElement( lua_State* L, TabPseudoElement* stagedTabElement );
         bool findElement( lua_State* L, const std::string& tag );
+        int findElementStaged( lua_State* L, const std::string& tag );
 
       public:
         PagePseudoElement(
@@ -31,6 +35,8 @@ namespace BlueBear {
         );
 
         void setMetatable( lua_State* L );
+
+        static int create( lua_State* L, Display::MainGameState& displayState, tinyxml2::XMLElement* element );
 
         static int lua_add( lua_State* L );
         static int lua_removeWidget( lua_State* L );

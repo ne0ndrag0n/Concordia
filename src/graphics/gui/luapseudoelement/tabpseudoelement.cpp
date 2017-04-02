@@ -24,6 +24,8 @@ namespace BlueBear {
             { "remove", TabPseudoElement::lua_removeWidget },
             { "get_name", TabPseudoElement::lua_getName },
             { "find_pseudo", TabPseudoElement::lua_findElement },
+            { "find_by_id", TabPseudoElement::lua_findById },
+            { "find_by_class", TabPseudoElement::lua_findByClass },
             { "get_property", TabPseudoElement::lua_getProperty },
             { "set_property", TabPseudoElement::lua_setProperty },
             { "get_content", TabPseudoElement::lua_getContent },
@@ -79,8 +81,13 @@ namespace BlueBear {
         } else if( self->stagedWidget ) {
           Log::getInstance().warn( "TabPseudoElement::lua_add", "Cannot add more than one child widget to <tab> pseudo-element." );
         } else {
-          // Empty <tab> pseudo element: just punt it out to lua_setContent
-          return TabPseudoElement::lua_setContent( L );
+          // Empty <tab> pseudo element
+          if( lua_isstring( L, -1 ) ) {
+            self->setStagedChild( L, lua_tostring( L, -1 ) );
+          } else {
+            LuaElement* element = *( ( LuaElement** ) luaL_checkudata( L, 2, "bluebear_widget" ) );
+            self->setStagedChild( L, element );
+          }
         }
 
         return 0;
@@ -193,6 +200,90 @@ namespace BlueBear {
         stagedWidget = nullptr;
       }
 
+      /**
+       *
+       * STACK ARGS: none
+       * Returns: userdata, or none
+       */
+      int TabPseudoElement::getElementsByClass( lua_State* L, const std::string& classID ) {
+        std::vector< std::shared_ptr< sfg::Widget > > widgets;
+
+        if( std::shared_ptr< sfg::Widget > child = this->getChildWidget() ) {
+          std::vector< std::shared_ptr< sfg::Widget > > widgets = child->GetWidgetsByClass( classID );
+
+          // Add the item itself if it matches the classID
+          if( child->GetClass() == classID ) {
+            widgets.push_back( child );
+          }
+
+          auto size = widgets.size();
+          if( size ) {
+            lua_createtable( L, size, 0 ); // table
+
+            for( int i = 0; i != size; i++ ) {
+              LuaElement::getUserdataFromWidget( L, widgets[ i ] ); // userdata table
+              lua_rawseti( L, -2, i + 1 ); // table
+            }
+
+            return 1;
+          }
+        }
+
+        Log::getInstance().warn( "TabPseudoElement::getElementsByClass", "No elements of class " + classID + " found in this pseudo-element." );
+        return 0;
+      }
+
+      /**
+       *
+       * STACK ARGS: none
+       * Returns: userdata, or none
+       */
+      int TabPseudoElement::getElementById( lua_State* L, const std::string& id ) {
+
+        if( std::shared_ptr< sfg::Widget > child = this->getChildWidget() ) {
+
+          if( child->GetId() == id ) {
+            LuaElement::getUserdataFromWidget( L, child ); // userdata
+            return 1;
+          }
+
+          if( std::shared_ptr< sfg::Widget > potentialChild = child->GetWidgetById( id ) ) {
+            LuaElement::getUserdataFromWidget( L, potentialChild ); // userdata
+            return 1;
+          }
+
+        }
+
+        Log::getInstance().warn( "TabPseudoElement::getElementById", "No elements of ID " + id + " found in this pseudo-element." );
+        return 0;
+      }
+
+      std::shared_ptr< sfg::Widget > TabPseudoElement::getChildWidget() {
+        if( subject ) {
+          return subject->GetNthTabLabel( pageNumber );
+        } else if ( stagedWidget ) {
+          return stagedWidget;
+        } else {
+          return nullptr;
+        }
+      }
+
+      int TabPseudoElement::lua_findById( lua_State* L ) {
+        VERIFY_STRING( "TabPseudoElement::lua_findById", "find_by_id" );
+
+        TabPseudoElement* self = *( ( TabPseudoElement** ) luaL_checkudata( L, 1, "bluebear_tab_pseudo_element" ) );
+
+        return self->getElementById( L, lua_tostring( L, -1 ) );
+      }
+
+      int TabPseudoElement::lua_findByClass( lua_State* L ) {
+        VERIFY_STRING( "TabPseudoElement::lua_findById", "find_by_class" );
+
+        TabPseudoElement* self = *( ( TabPseudoElement** ) luaL_checkudata( L, 1, "bluebear_tab_pseudo_element" ) );
+
+        return self->getElementsByClass( L, lua_tostring( L, -1 ) );
+      }
+
       int TabPseudoElement::lua_findElement( lua_State* L ) {
         Log::getInstance().warn( "TabPseudoElement::lua_findElement", "<tab> pseudo-element has no pseudo-element children." );
         return 0;
@@ -209,32 +300,12 @@ namespace BlueBear {
       }
 
       int TabPseudoElement::lua_getContent( lua_State* L ) {
-        TabPseudoElement* self = *( ( TabPseudoElement** ) luaL_checkudata( L, 1, "bluebear_tab_pseudo_element" ) );
-
-        if( self->subject ) {
-          return self->getChild( L ) ? 1 : 0;
-        } else {
-          return self->getStagedChild( L );
-        }
+        Log::getInstance().warn( "TabPseudoElement::lua_getContent", "<tab> pseudo-element has no direct content." );
+        return 0;
       }
 
       int TabPseudoElement::lua_setContent( lua_State* L ) {
-        TabPseudoElement* self = *( ( TabPseudoElement** ) luaL_checkudata( L, 1, "bluebear_tab_pseudo_element" ) );
-
-        if( self->subject ) {
-          // FIXME: SFGUI bug. When you set the label on a tab widget, the tab becomes distorted. Rather not give users the option to shoot their own foot off.
-          // If you want to programatically do this, you'll have to add the widget to the tab before adding its page to the Notebook.
-          Log::getInstance().error( "TabPseudoElement::lua_setContent", "Cannot set <tab> element after its <page> has been added to a Notebook due to a current library issue." );
-        } else {
-          // With a tab unattached to a particular notebook, we can set the staged widget!
-          if( lua_isstring( L, -1 ) ) {
-            self->setStagedChild( L, lua_tostring( L, -1 ) );
-          } else {
-            LuaElement* element = *( ( LuaElement** ) luaL_checkudata( L, 2, "bluebear_widget" ) );
-            self->setStagedChild( L, element );
-          }
-        }
-
+        Log::getInstance().warn( "TabPseudoElement::lua_setContent", "<tab> pseudo-element has no direct content." );
         return 0;
       }
 

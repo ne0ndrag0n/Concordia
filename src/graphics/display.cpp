@@ -15,6 +15,7 @@
 #include "graphics/wallcellbundler.hpp"
 #include "graphics/widgetbuilder.hpp"
 #include "graphics/shaderinstancebundle.hpp"
+#include "scripting/luakit/gchelper.hpp"
 #include "scripting/lot.hpp"
 #include "scripting/tile.hpp"
 #include "scripting/engine.hpp"
@@ -346,6 +347,8 @@ namespace BlueBear {
       }
 
       lua_pop( L, 1 ); // EMPTY
+
+      Scripting::LuaKit::GcHelper::initialize( L );
     }
     void Display::MainGameState::setupGUI() {
       GUI::LuaElement::masterSignalMap.clear();
