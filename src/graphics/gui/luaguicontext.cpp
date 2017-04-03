@@ -90,6 +90,10 @@ namespace BlueBear {
         }
 
         tinyxml2::XMLElement* element = document.RootElement();
+        if( !element ) {
+          Log::getInstance().error( "LuaGUIContext::create", "No root element!" );
+          return false;
+        }
 
         switch( Tools::Utility::hash( element->Name() ) ) {
           case Tools::Utility::hash( "tab" ):

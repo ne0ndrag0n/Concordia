@@ -23,7 +23,13 @@ function GUIProvider:open_debug_ui()
 end
 
 function GUIProvider:do_something( event )
-
+  local page = self.gui:create( [[
+    <page>
+      <tab>
+        <Label id="labelid"></Label>
+      </tab>
+    </page>
+  ]] )
 end
 
 function GUIProvider:on_click_zoom_in()

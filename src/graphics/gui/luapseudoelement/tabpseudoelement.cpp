@@ -118,68 +118,6 @@ namespace BlueBear {
         return 1;
       }
 
-      /**
-       *
-       * STACK ARGS: none
-       * Returns: userdata, or nothing if a userdata cannot be created.
-       */
-      bool TabPseudoElement::getChild( lua_State* L ) {
-        if( std::shared_ptr< sfg::Widget > tabLabel = subject->GetNthTabLabel( pageNumber ) ) {
-          LuaElement::getUserdataFromWidget( L, tabLabel ); // userdata
-          return true;
-        } else {
-          Log::getInstance().warn( "TabPseudoElement::getChild", "Tab has no label widget." );
-          return false;
-        }
-      }
-
-      /**
-       *
-       * STACK ARGS: none
-       * Returns: userdata, or nothing if a userdata cannot be created.
-       */
-      int TabPseudoElement::getStagedChild( lua_State* L ) {
-        if( stagedWidget ) {
-          LuaElement::getUserdataFromWidget( L, stagedWidget ); // userdata
-          return 1;
-        } else {
-          Log::getInstance().warn( "TabPseudoElement::getStagedChild", "Tab has no label widget." );
-          return 0;
-        }
-      }
-
-      /**
-       * Inactive
-       */
-      void TabPseudoElement::setChild( lua_State* L, LuaElement* element ) {
-        if( std::shared_ptr< sfg::Widget > existingPage = subject->GetNthPage( pageNumber ) ) {
-          subject->SetTabLabel( existingPage, element->widget );
-        } else {
-          Log::getInstance().warn( "TabPseudoElement::setChild", "Tab has no label widget." );
-        }
-      }
-
-      /**
-       * Inactive
-       */
-      void TabPseudoElement::setChild( lua_State* L, const std::string& xmlString ) {
-        if( std::shared_ptr< sfg::Widget > existingPage = subject->GetNthPage( pageNumber ) ) {
-          WidgetBuilder widgetBuilder( displayState.instance.eventManager, displayState.getImageCache() );
-          std::shared_ptr< sfg::Widget > child = nullptr;
-
-          try {
-            child = widgetBuilder.getWidgetFromXML( xmlString );
-
-            subject->SetTabLabel( existingPage, child );
-          } catch( std::exception& e ) {
-            Log::getInstance().error( "LuaElement::add", "Failed to add widget XML: " + std::string( e.what() ) );
-            return;
-          }
-        } else {
-          Log::getInstance().warn( "TabPseudoElement::setChild", "Tab has no label widget." );
-        }
-      }
-
       void TabPseudoElement::setStagedChild( lua_State* L, LuaElement* element ) {
         stagedWidget = element->widget;
       }
@@ -203,7 +141,7 @@ namespace BlueBear {
       /**
        *
        * STACK ARGS: none
-       * Returns: userdata, or none
+       * Returns: table, or none
        */
       int TabPseudoElement::getElementsByClass( lua_State* L, const std::string& classID ) {
         std::vector< std::shared_ptr< sfg::Widget > > widgets;

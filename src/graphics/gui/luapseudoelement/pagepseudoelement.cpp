@@ -1,5 +1,6 @@
 #include "graphics/gui/luapseudoelement/pagepseudoelement.hpp"
 #include "graphics/gui/luapseudoelement/tabpseudoelement.hpp"
+#include "graphics/gui/luaelement.hpp"
 #include "scripting/luakit/gchelper.hpp"
 #include "tools/ctvalidators.hpp"
 #include "tools/utility.hpp"
@@ -24,6 +25,8 @@ namespace BlueBear {
             { "remove", PagePseudoElement::lua_removeWidget },
             { "get_name", PagePseudoElement::lua_getName },
             { "find_pseudo", PagePseudoElement::lua_findElement },
+            { "find_by_id", PagePseudoElement::lua_findById },
+            { "find_by_class", PagePseudoElement::lua_findByClass },
             { "get_property", PagePseudoElement::lua_getProperty },
             { "set_property", PagePseudoElement::lua_setProperty },
             { "get_content", PagePseudoElement::lua_getContent },
@@ -111,8 +114,36 @@ namespace BlueBear {
         }
       }
 
+      /**
+       * Use given XML to determine what should be added. One XML item at a time.
+       */
+      void PagePseudoElement::setStagedChild( lua_State* L, const std::string& xml ) {
+        // TODO
+      }
+
       int PagePseudoElement::lua_add( lua_State* L ) {
-        Log::getInstance().warn( "PagePseudoElement::lua_add", "Cannot add elements or pseudo-elements to <page> pseudo-element." );
+        PagePseudoElement* self = *( ( PagePseudoElement** ) luaL_checkudata( L, 1, "bluebear_page_pseudo_element" ) );
+
+        if( self->subject ) {
+          Log::getInstance().warn( "PagePseudoElement::lua_add", "Cannot add to <page> pseudo-element when attached to an existing Notebook." );
+        }
+
+        // Determine if type is a string, bluebear_tab_pseudo_element, or bluebear_content_pseudo_element (possibly may combine the last two)
+        if( lua_isstring( L, -1 ) ) {
+          self->setStagedChild( L, lua_tostring( L, -1 ) );
+          return 0;
+        }
+
+        if( TabPseudoElement** udata = ( TabPseudoElement** ) luaL_testudata( L, 2, "bluebear_tab_pseudo_element" ) ) {
+          if( !self->stagedTabElement ) {
+            self->setStagedTabElement( L, *udata );
+          } else {
+            Log::getInstance().warn( "PagePseudoElement::lua_add", "Cannot add more than one <tab> pseudo-element to <page> pseudo-element." );
+          }
+          return 0;
+        }
+
+        Log::getInstance().warn( "PagePseudoElement::lua_add", "Invalid argument passed to add()" );
         return 0;
       }
 
@@ -186,6 +217,59 @@ namespace BlueBear {
         return 0;
       }
 
+      /**
+       *
+       * STACK ARGS: none
+       * Returns: table, or none
+       */
+      int PagePseudoElement::getElementsByClass( lua_State* L, const std::string& classID ) {
+        TabPseudoElement* tab = nullptr;
+        std::unique_ptr< TabPseudoElement > tabTemp = nullptr;
+        int stack = 0;
+
+        if( this->subject ) {
+          tabTemp = std::make_unique< TabPseudoElement >( subject, pageNumber, displayState );
+          tab = tabTemp.get();
+        } else if ( this->stagedTabElement ) {
+          tab = this->stagedTabElement;
+        }
+
+        if( tab ) {
+          stack = tab->getElementsByClass( L, classID ); // table/none
+        }
+
+        // TODO: Content
+
+        return stack;
+      }
+
+      /**
+       *
+       * STACK ARGS: none
+       * Returns: userdata, or none
+       */
+      int PagePseudoElement::getElementById( lua_State* L, const std::string& id ) {
+        TabPseudoElement* tab = nullptr;
+        std::unique_ptr< TabPseudoElement > tabTemp = nullptr;
+
+        if( this->subject ) {
+          tabTemp = std::make_unique< TabPseudoElement >( subject, pageNumber, displayState );
+          tab = tabTemp.get();
+        } else if ( this->stagedTabElement ) {
+          tab = this->stagedTabElement;
+        }
+
+        if( tab ) {
+          if( int stack = tab->getElementById( L, id ) ) { // userdata/none
+            return stack;
+          }
+        }
+
+        // TODO: Content
+
+        return 0;
+      }
+
       int PagePseudoElement::lua_findElement( lua_State* L ) {
         VERIFY_STRING( "PagePseudoElement::lua_findElement", "find_pseudo" );
 
@@ -197,6 +281,21 @@ namespace BlueBear {
         } else {
           return self->findElementStaged( L, lua_tostring( L, -1 ) ); // userdata or none
         }
+      }
+
+      int PagePseudoElement::lua_findById( lua_State* L ) {
+        VERIFY_STRING( "PagePseudoElement::lua_findById", "find_by_id" );
+
+        PagePseudoElement* self = *( ( PagePseudoElement** ) luaL_checkudata( L, 1, "bluebear_page_pseudo_element" ) );
+
+        return self->getElementById( L, lua_tostring( L, -1 ) );
+      }
+      int PagePseudoElement::lua_findByClass( lua_State* L ) {
+        VERIFY_STRING( "PagePseudoElement::lua_findByClass", "find_by_class" );
+
+        PagePseudoElement* self = *( ( PagePseudoElement** ) luaL_checkudata( L, 1, "bluebear_page_pseudo_element" ) );
+
+        return self->getElementsByClass( L, lua_tostring( L, -1 ) );
       }
 
       int PagePseudoElement::lua_getProperty( lua_State* L ) {

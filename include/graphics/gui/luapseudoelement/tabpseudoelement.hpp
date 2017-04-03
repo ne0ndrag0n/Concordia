@@ -20,18 +20,8 @@ namespace BlueBear {
         unsigned int pageNumber;
         Display::MainGameState& displayState;
 
-        bool getChild( lua_State* L );
-        int getStagedChild( lua_State* L );
-
-        void setChild( lua_State* L, LuaElement* element );
         void setStagedChild( lua_State* L, LuaElement* element );
-
-        void setChild( lua_State* L, const std::string& xmlString );
         void setStagedChild( lua_State* L, const std::string& xmlString );
-
-        int getElementsByClass( lua_State* L, const std::string& classID );
-        int getElementById( lua_State* L, const std::string& id );
-        std::shared_ptr< sfg::Widget > getChildWidget();
 
       public:
         std::shared_ptr< sfg::Widget > stagedWidget;
@@ -44,6 +34,10 @@ namespace BlueBear {
 
         void setMetatable( lua_State* L );
         void setSubject( std::shared_ptr< sfg::Notebook > subject );
+
+        int getElementsByClass( lua_State* L, const std::string& classID );
+        int getElementById( lua_State* L, const std::string& id );
+        std::shared_ptr< sfg::Widget > getChildWidget();
 
         static int create( lua_State* L, Display::MainGameState& displayState, tinyxml2::XMLElement* element );
 

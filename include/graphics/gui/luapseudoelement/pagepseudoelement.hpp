@@ -24,8 +24,12 @@ namespace BlueBear {
 
         void processXMLPseudoElement( lua_State* L, tinyxml2::XMLElement* child );
         void setStagedTabElement( lua_State* L, TabPseudoElement* stagedTabElement );
+        void setStagedChild( lua_State* L, const std::string& xml );
         bool findElement( lua_State* L, const std::string& tag );
         int findElementStaged( lua_State* L, const std::string& tag );
+
+        int getElementsByClass( lua_State* L, const std::string& classID );
+        int getElementById( lua_State* L, const std::string& id );
 
       public:
         PagePseudoElement(
@@ -41,6 +45,8 @@ namespace BlueBear {
         static int lua_add( lua_State* L );
         static int lua_removeWidget( lua_State* L );
         static int lua_getName( lua_State* L );
+        static int lua_findById( lua_State* L );
+        static int lua_findByClass( lua_State* L );
         static int lua_findElement( lua_State* L );
         static int lua_getProperty( lua_State* L );
         static int lua_setProperty( lua_State* L );
