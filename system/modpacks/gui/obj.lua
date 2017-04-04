@@ -25,11 +25,13 @@ end
 function GUIProvider:do_something( event )
   local page = self.gui:create( [[
     <page>
-      <tab>
-        <Label id="labelid"></Label>
-      </tab>
+
     </page>
   ]] )
+
+  page:add( '<tab><Label id="labelid"></Label></tab>' )
+
+  print( page:find_by_id( 'labelid' ):get_name() )
 end
 
 function GUIProvider:on_click_zoom_in()

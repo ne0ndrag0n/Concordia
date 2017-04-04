@@ -58,11 +58,15 @@ namespace BlueBear {
 
         switch( Tools::Utility::hash( tag.c_str() ) ) {
           case Tools::Utility::hash( "tab" ): {
-            if( !this->stagedTabElement && TabPseudoElement::create( L, displayState, child ) ) { // tabuserdata
-              this->setStagedTabElement( L, *( ( TabPseudoElement** ) lua_topointer( L, -1 ) ) );
+            if( !this->stagedTabElement ) {
+              if( TabPseudoElement::create( L, displayState, child ) ) { // tabuserdata
+                this->setStagedTabElement( L, *( ( TabPseudoElement** ) lua_topointer( L, -1 ) ) );
 
-              lua_pop( L, 1 ); // EMPTY
-            } // EMPTY
+                lua_pop( L, 1 ); // EMPTY
+              } // EMPTY
+            } else {
+              Log::getInstance().warn( "PagePseudoElement::processXMLPseudoElement", "Cannot add more than one <tab> child pseudo-element to <page> pseudo-element." );
+            }
             break;
           }
           case Tools::Utility::hash( "content" ): {
@@ -118,7 +122,17 @@ namespace BlueBear {
        * Use given XML to determine what should be added. One XML item at a time.
        */
       void PagePseudoElement::setStagedChild( lua_State* L, const std::string& xml ) {
-        // TODO
+        tinyxml2::XMLDocument document;
+        document.Parse( xml.c_str() );
+
+        if( document.ErrorID() ) {
+          Log::getInstance().error( "PagePseudoElement::setStagedChild", "Could not parse XML string!" );
+          return;
+        }
+
+        for( tinyxml2::XMLElement* child = document.RootElement(); child != NULL; child = child->NextSiblingElement() ) {
+          this->processXMLPseudoElement( L, child );
+        }
       }
 
       int PagePseudoElement::lua_add( lua_State* L ) {
@@ -126,6 +140,7 @@ namespace BlueBear {
 
         if( self->subject ) {
           Log::getInstance().warn( "PagePseudoElement::lua_add", "Cannot add to <page> pseudo-element when attached to an existing Notebook." );
+          return 0;
         }
 
         // Determine if type is a string, bluebear_tab_pseudo_element, or bluebear_content_pseudo_element (possibly may combine the last two)
@@ -143,12 +158,33 @@ namespace BlueBear {
           return 0;
         }
 
+        // TODO: content
+
         Log::getInstance().warn( "PagePseudoElement::lua_add", "Invalid argument passed to add()" );
         return 0;
       }
 
       int PagePseudoElement::lua_removeWidget( lua_State* L ) {
-        Log::getInstance().warn( "PagePseudoElement::lua_removeWidget", "Cannot remove elements or pseudo-elements from <page> pseudo-element." );
+        PagePseudoElement* self = *( ( PagePseudoElement** ) luaL_checkudata( L, 1, "bluebear_page_pseudo_element" ) );
+
+        if( self->subject ) {
+          Log::getInstance().warn( "PagePseudoElement::lua_removeWidget", "Cannot remove elements or pseudo-elements from <page> pseudo-element when attached to an existing Notebook." );
+          return 0;
+        }
+
+        // Unstaged <page>
+        // Accept only <tab> or <content> pseudo-elements directly
+        if( TabPseudoElement** udata = ( TabPseudoElement** ) luaL_testudata( L, 2, "bluebear_tab_pseudo_element" ) ) {
+
+          if( self->stagedTabElement == *udata ) {
+            self->setStagedTabElement( L, nullptr );
+          }
+
+          return 0;
+        }
+
+        // TODO: content
+
         return 0;
       }
 
