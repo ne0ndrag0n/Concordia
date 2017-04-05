@@ -2,6 +2,7 @@
 #include "graphics/gui/luaelement.hpp"
 #include "graphics/gui/sfgroot.hpp"
 #include "graphics/gui/luapseudoelement/pagepseudoelement.hpp"
+#include "graphics/gui/luapseudoelement/nbbinpseudoelement.hpp"
 #include "graphics/gui/luapseudoelement/tabpseudoelement.hpp"
 #include "graphics/imagecache.hpp"
 #include "graphics/widgetbuilder.hpp"

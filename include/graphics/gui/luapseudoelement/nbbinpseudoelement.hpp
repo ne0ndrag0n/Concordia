@@ -1,5 +1,5 @@
-#ifndef PAGEPSEUDOELEMENT
-#define PAGEPSEUDOELEMENT
+#ifndef NBBINPSEUDOELEMENT
+#define NBBINPSEUDOELEMENT
 
 #include "graphics/gui/luapseudoelement/luapseudoelement.hpp"
 #include "graphics/display.hpp"
@@ -13,35 +13,36 @@
 namespace BlueBear {
   namespace Graphics {
     namespace GUI {
-      class NBBinPseudoElement;
+      class LuaElement;
 
-      class PagePseudoElement : public LuaPseudoElement {
+      class NBBinPseudoElement : public LuaPseudoElement {
+      protected:
         std::shared_ptr< sfg::Notebook > subject;
         unsigned int pageNumber;
         Display::MainGameState& displayState;
 
-        NBBinPseudoElement* stagedTabElement = nullptr;
-
-        void processXMLPseudoElement( lua_State* L, tinyxml2::XMLElement* child );
-        void setStagedTabElement( lua_State* L, NBBinPseudoElement* stagedTabElement );
-        void setStagedChild( lua_State* L, const std::string& xml );
-        bool findElement( lua_State* L, const std::string& tag );
-        int findElementStaged( lua_State* L, const std::string& tag );
-
-        int getElementsByClass( lua_State* L, const std::string& classID );
-        int getElementById( lua_State* L, const std::string& id );
+        void setStagedChild( lua_State* L, LuaElement* element );
+        void setStagedChild( lua_State* L, const std::string& xmlString );
 
       public:
-        PagePseudoElement(
+        std::shared_ptr< sfg::Widget > stagedWidget;
+
+        NBBinPseudoElement(
           std::shared_ptr< sfg::Notebook > subject,
           unsigned int pageNumber,
           Display::MainGameState& displayState
         );
 
-        void setMetatable( lua_State* L );
         std::string getName();
 
-        static int create( lua_State* L, Display::MainGameState& displayState, tinyxml2::XMLElement* element );
+        void setMetatable( lua_State* L );
+        void setSubject( std::shared_ptr< sfg::Notebook > subject );
+
+        int getElementsByClass( lua_State* L, const std::string& classID );
+        int getElementById( lua_State* L, const std::string& id );
+
+        std::shared_ptr< sfg::Widget > getChildWidget();
+        virtual std::shared_ptr< sfg::Widget > getSubjectChildWidget() = 0;
 
         static int lua_add( lua_State* L );
         static int lua_removeWidget( lua_State* L );
@@ -59,6 +60,5 @@ namespace BlueBear {
     }
   }
 }
-
 
 #endif

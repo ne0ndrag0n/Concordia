@@ -32,6 +32,7 @@ function GUIProvider:do_something( event )
   page:add( '<tab><Label id="labelid"></Label></tab>' )
 
   print( page:find_by_id( 'labelid' ):get_name() )
+  print( page:find_pseudo( 'tab' ):get_name() )
 end
 
 function GUIProvider:on_click_zoom_in()

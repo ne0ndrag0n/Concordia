@@ -1,4 +1,5 @@
 #include "graphics/gui/luapseudoelement/pagepseudoelement.hpp"
+#include "graphics/gui/luapseudoelement/nbbinpseudoelement.hpp"
 #include "graphics/gui/luapseudoelement/tabpseudoelement.hpp"
 #include "graphics/gui/luaelement.hpp"
 #include "scripting/luakit/gchelper.hpp"
@@ -45,6 +46,10 @@ namespace BlueBear {
         lua_setmetatable( L, -2 ); // userdata
       }
 
+      std::string PagePseudoElement::getName() {
+        return "page";
+      }
+
       /**
        *
        * STACK ARGS: none
@@ -60,7 +65,7 @@ namespace BlueBear {
           case Tools::Utility::hash( "tab" ): {
             if( !this->stagedTabElement ) {
               if( TabPseudoElement::create( L, displayState, child ) ) { // tabuserdata
-                this->setStagedTabElement( L, *( ( TabPseudoElement** ) lua_topointer( L, -1 ) ) );
+                this->setStagedTabElement( L, *( ( NBBinPseudoElement** ) lua_topointer( L, -1 ) ) );
 
                 lua_pop( L, 1 ); // EMPTY
               } // EMPTY
@@ -102,7 +107,7 @@ namespace BlueBear {
        * STACK ARGS: userdata if stagedTabElement is not null
        * Stack is unmodified after call
        */
-      void PagePseudoElement::setStagedTabElement( lua_State* L, TabPseudoElement* stagedTabElement ) {
+      void PagePseudoElement::setStagedTabElement( lua_State* L, NBBinPseudoElement* stagedTabElement ) {
         if( this->stagedTabElement ) {
           Scripting::LuaKit::GcHelper::untrack(
             L,
@@ -143,13 +148,13 @@ namespace BlueBear {
           return 0;
         }
 
-        // Determine if type is a string, bluebear_tab_pseudo_element, or bluebear_content_pseudo_element (possibly may combine the last two)
+        // Determine if type is a string, bluebear_nbb_pseudo_element, or bluebear_content_pseudo_element (possibly may combine the last two)
         if( lua_isstring( L, -1 ) ) {
           self->setStagedChild( L, lua_tostring( L, -1 ) );
           return 0;
         }
 
-        if( TabPseudoElement** udata = ( TabPseudoElement** ) luaL_testudata( L, 2, "bluebear_tab_pseudo_element" ) ) {
+        if( NBBinPseudoElement** udata = ( NBBinPseudoElement** ) luaL_testudata( L, 2, "bluebear_nbb_pseudo_element" ) ) {
           if( !self->stagedTabElement ) {
             self->setStagedTabElement( L, *udata );
           } else {
@@ -174,7 +179,7 @@ namespace BlueBear {
 
         // Unstaged <page>
         // Accept only <tab> or <content> pseudo-elements directly
-        if( TabPseudoElement** udata = ( TabPseudoElement** ) luaL_testudata( L, 2, "bluebear_tab_pseudo_element" ) ) {
+        if( NBBinPseudoElement** udata = ( NBBinPseudoElement** ) luaL_testudata( L, 2, "bluebear_nbb_pseudo_element" ) ) {
 
           if( self->stagedTabElement == *udata ) {
             self->setStagedTabElement( L, nullptr );
@@ -189,7 +194,9 @@ namespace BlueBear {
       }
 
       int PagePseudoElement::lua_getName( lua_State* L ) {
-        lua_pushstring( L, "page" );
+        PagePseudoElement* self = *( ( PagePseudoElement** ) luaL_checkudata( L, 1, "bluebear_page_pseudo_element" ) );
+
+        lua_pushstring( L, self->getName().c_str() );
 
         return 1;
       }
@@ -203,7 +210,7 @@ namespace BlueBear {
         switch( Tools::Utility::hash( tag.c_str() ) ) {
           case Tools::Utility::hash( "tab" ):
             {
-              TabPseudoElement** userData = ( TabPseudoElement** ) lua_newuserdata( L, sizeof( TabPseudoElement* ) ); // userdata
+              NBBinPseudoElement** userData = ( NBBinPseudoElement** ) lua_newuserdata( L, sizeof( NBBinPseudoElement* ) ); // userdata
               *userData = new TabPseudoElement( subject, pageNumber, displayState );
               ( *userData )->setMetatable( L );
             }
@@ -259,8 +266,8 @@ namespace BlueBear {
        * Returns: table, or none
        */
       int PagePseudoElement::getElementsByClass( lua_State* L, const std::string& classID ) {
-        TabPseudoElement* tab = nullptr;
-        std::unique_ptr< TabPseudoElement > tabTemp = nullptr;
+        NBBinPseudoElement* tab = nullptr;
+        std::unique_ptr< NBBinPseudoElement > tabTemp = nullptr;
         int stack = 0;
 
         if( this->subject ) {
@@ -285,8 +292,8 @@ namespace BlueBear {
        * Returns: userdata, or none
        */
       int PagePseudoElement::getElementById( lua_State* L, const std::string& id ) {
-        TabPseudoElement* tab = nullptr;
-        std::unique_ptr< TabPseudoElement > tabTemp = nullptr;
+        NBBinPseudoElement* tab = nullptr;
+        std::unique_ptr< NBBinPseudoElement > tabTemp = nullptr;
 
         if( this->subject ) {
           tabTemp = std::make_unique< TabPseudoElement >( subject, pageNumber, displayState );
