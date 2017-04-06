@@ -51,6 +51,21 @@ namespace BlueBear {
         return "<invalid>";
       }
 
+      std::shared_ptr< sfg::Widget > NBBinPseudoElement::createStagedWidget( Display::MainGameState& displayState, tinyxml2::XMLElement* element ) {
+        tinyxml2::XMLElement* child = element->FirstChildElement();
+
+        if( child != NULL ) {
+          try {
+            WidgetBuilder widgetBuilder( displayState.instance.eventManager, displayState.getImageCache() );
+            return widgetBuilder.getWidgetFromElementDirect( child );
+          } catch( std::exception& e ) {
+            Log::getInstance().error( "NBBinPseudoElement::create", "Failed to add widget XML: " + std::string( e.what() ) );
+          }
+        }
+
+        return nullptr;
+      }
+
       int NBBinPseudoElement::lua_add( lua_State* L ) {
         NBBinPseudoElement* self = *( ( NBBinPseudoElement** ) luaL_checkudata( L, 1, "bluebear_nbb_pseudo_element" ) );
 

@@ -1,6 +1,7 @@
 #include "graphics/gui/luapseudoelement/pagepseudoelement.hpp"
 #include "graphics/gui/luapseudoelement/nbbinpseudoelement.hpp"
 #include "graphics/gui/luapseudoelement/tabpseudoelement.hpp"
+#include "graphics/gui/luapseudoelement/contentpseudoelement.hpp"
 #include "graphics/gui/luaelement.hpp"
 #include "scripting/luakit/gchelper.hpp"
 #include "tools/ctvalidators.hpp"
@@ -75,7 +76,15 @@ namespace BlueBear {
             break;
           }
           case Tools::Utility::hash( "content" ): {
-            Log::getInstance().error( "PagePseudoElement::processXMLPseudoElement", "Unimplemented" );
+            if( !this->stagedContentElement ) {
+              if( ContentPseudoElement::create( L, displayState, child ) ) { // tabuserdata
+                this->setStagedContentElement( L, *( ( NBBinPseudoElement** ) lua_topointer( L, -1 ) ) );
+
+                lua_pop( L, 1 ); // EMPTY
+              } // EMPTY
+            } else {
+              Log::getInstance().warn( "PagePseudoElement::processXMLPseudoElement", "Cannot add more than one <content> child pseudo-element to <page> pseudo-element." );
+            }
             break;
           }
           default:
@@ -124,6 +133,27 @@ namespace BlueBear {
       }
 
       /**
+       *
+       * STACK ARGS: userdata if stagedContentElement is not null
+       * Stack is unmodified after call
+       */
+      void PagePseudoElement::setStagedContentElement( lua_State* L, NBBinPseudoElement* stagedContentElement ) {
+        if( this->stagedContentElement ) {
+          Scripting::LuaKit::GcHelper::untrack(
+            L,
+            Tools::Utility::pointerToString( this ) + ":" + Tools::Utility::pointerToString( this->stagedContentElement )
+          );
+        }
+
+        if( this->stagedContentElement = stagedContentElement ) {
+          Scripting::LuaKit::GcHelper::track(
+            L,
+            Tools::Utility::pointerToString( this ) + ":" + Tools::Utility::pointerToString( this->stagedContentElement )
+          );
+        }
+      }
+
+      /**
        * Use given XML to determine what should be added. One XML item at a time.
        */
       void PagePseudoElement::setStagedChild( lua_State* L, const std::string& xml ) {
@@ -155,15 +185,25 @@ namespace BlueBear {
         }
 
         if( NBBinPseudoElement** udata = ( NBBinPseudoElement** ) luaL_testudata( L, 2, "bluebear_nbb_pseudo_element" ) ) {
-          if( !self->stagedTabElement ) {
-            self->setStagedTabElement( L, *udata );
-          } else {
-            Log::getInstance().warn( "PagePseudoElement::lua_add", "Cannot add more than one <tab> pseudo-element to <page> pseudo-element." );
+
+          if( ( *udata )->getName() == "tab" ) {
+            if( !self->stagedTabElement ) {
+              self->setStagedTabElement( L, *udata );
+            } else {
+              Log::getInstance().warn( "PagePseudoElement::lua_add", "Cannot add more than one <tab> pseudo-element to <page> pseudo-element." );
+            }
           }
+
+          if( ( *udata )->getName() == "content" ) {
+            if( !self->stagedContentElement ) {
+              self->setStagedContentElement( L, *udata );
+            } else {
+              Log::getInstance().warn( "PagePseudoElement::lua_add", "Cannot add more than one <content> pseudo-element to <page> pseudo-element." );
+            }
+          }
+
           return 0;
         }
-
-        // TODO: content
 
         Log::getInstance().warn( "PagePseudoElement::lua_add", "Invalid argument passed to add()" );
         return 0;
@@ -181,14 +221,20 @@ namespace BlueBear {
         // Accept only <tab> or <content> pseudo-elements directly
         if( NBBinPseudoElement** udata = ( NBBinPseudoElement** ) luaL_testudata( L, 2, "bluebear_nbb_pseudo_element" ) ) {
 
-          if( self->stagedTabElement == *udata ) {
-            self->setStagedTabElement( L, nullptr );
+          if( ( *udata )->getName() == "tab" ) {
+            if( self->stagedTabElement == *udata ) {
+              self->setStagedTabElement( L, nullptr );
+            }
+          }
+
+          if( ( *udata )->getName() == "content" ) {
+            if( self->stagedContentElement == *udata ) {
+              self->setStagedContentElement( L, nullptr );
+            }
           }
 
           return 0;
         }
-
-        // TODO: content
 
         return 0;
       }
@@ -208,19 +254,20 @@ namespace BlueBear {
        */
       bool PagePseudoElement::findElement( lua_State* L, const std::string& tag ) {
         switch( Tools::Utility::hash( tag.c_str() ) ) {
-          case Tools::Utility::hash( "tab" ):
-            {
-              NBBinPseudoElement** userData = ( NBBinPseudoElement** ) lua_newuserdata( L, sizeof( NBBinPseudoElement* ) ); // userdata
-              *userData = new TabPseudoElement( subject, pageNumber, displayState );
-              ( *userData )->setMetatable( L );
-            }
+          case Tools::Utility::hash( "tab" ): {
+            NBBinPseudoElement** userData = ( NBBinPseudoElement** ) lua_newuserdata( L, sizeof( NBBinPseudoElement* ) ); // userdata
+            *userData = new TabPseudoElement( subject, pageNumber, displayState );
+            ( *userData )->setMetatable( L );
+
             return true;
-          case Tools::Utility::hash( "content" ):
-            {
-              Log::getInstance().error( "PagePseudoElement::findElement", "Unimplemented" );
-              return false;
-            }
+          }
+          case Tools::Utility::hash( "content" ): {
+            NBBinPseudoElement** userData = ( NBBinPseudoElement** ) lua_newuserdata( L, sizeof( NBBinPseudoElement* ) ); // userdata
+            *userData = new ContentPseudoElement( subject, pageNumber, displayState );
+            ( *userData )->setMetatable( L );
+
             return true;
+          }
           default:
             Log::getInstance().warn( "PagePseudoElement::findElement", "<page> pseduo-element only contains pseudo-elements of type <tab> or <content>." );
         }
@@ -250,7 +297,17 @@ namespace BlueBear {
             break;
           }
           case Tools::Utility::hash( "content" ): {
-            Log::getInstance().error( "PagePseudoElement::findElementStaged", "Unimplemented" );
+            if( this->stagedContentElement ) {
+              Scripting::LuaKit::GcHelper::getTracked(
+                L,
+                Tools::Utility::pointerToString( this ) + ":" + Tools::Utility::pointerToString( this->stagedContentElement )
+              ); // userdata/nil
+
+              return lua_isnil( L, -1 ) ? 0 : 1;
+            } else {
+              Log::getInstance().debug( "PagePseudoElement::findElementStaged", "No <content> element present in this <page>." );
+            }
+
             break;
           }
           default:
@@ -266,22 +323,32 @@ namespace BlueBear {
        * Returns: table, or none
        */
       int PagePseudoElement::getElementsByClass( lua_State* L, const std::string& classID ) {
-        NBBinPseudoElement* tab = nullptr;
-        std::unique_ptr< NBBinPseudoElement > tabTemp = nullptr;
+        std::unique_ptr< NBBinPseudoElement > holdingPtr = nullptr;
         int stack = 0;
 
-        if( this->subject ) {
-          tabTemp = std::make_unique< TabPseudoElement >( subject, pageNumber, displayState );
-          tab = tabTemp.get();
-        } else if ( this->stagedTabElement ) {
-          tab = this->stagedTabElement;
+        if( NBBinPseudoElement* content = getPseudoElement< ContentPseudoElement >( holdingPtr, stagedContentElement ) ) {
+          stack = content->getElementsByClass( L, classID ); // table/none
         }
 
-        if( tab ) {
-          stack = tab->getElementsByClass( L, classID ); // table/none
-        }
+        if( NBBinPseudoElement* tab = getPseudoElement< TabPseudoElement >( holdingPtr, stagedTabElement ) ) {
+          if( stack ) {
+            // Coalesce tables
+            if( tab->getElementsByClass( L, classID ) ) { // table table
+              int firstTableIndex = lua_rawlen( L, -2 ) + 1;
+              int secondTableMax = lua_rawlen( L, -1 ) + 1;
 
-        // TODO: Content
+              for( int i = 0; i != secondTableMax; i++ ) {
+                lua_rawgeti( L, -1, i ); // item table table
+                lua_rawseti( L, -3, firstTableIndex++ ); // table table
+              }
+
+              lua_pop( L, 1 ); // table
+            }
+          } else {
+            // No table created previously, so just go with the stack
+            stack = tab->getElementsByClass( L, classID ); // table/none
+          }
+        }
 
         return stack;
       }
@@ -292,23 +359,20 @@ namespace BlueBear {
        * Returns: userdata, or none
        */
       int PagePseudoElement::getElementById( lua_State* L, const std::string& id ) {
-        NBBinPseudoElement* tab = nullptr;
-        std::unique_ptr< NBBinPseudoElement > tabTemp = nullptr;
 
-        if( this->subject ) {
-          tabTemp = std::make_unique< TabPseudoElement >( subject, pageNumber, displayState );
-          tab = tabTemp.get();
-        } else if ( this->stagedTabElement ) {
-          tab = this->stagedTabElement;
-        }
+        std::unique_ptr< NBBinPseudoElement > holdingPtr = nullptr;
 
-        if( tab ) {
-          if( int stack = tab->getElementById( L, id ) ) { // userdata/none
+        if( NBBinPseudoElement* content = getPseudoElement< ContentPseudoElement >( holdingPtr, stagedContentElement ) ) {
+          if( int stack = content->getElementById( L, id ) ) { // userdata/none
             return stack;
           }
         }
 
-        // TODO: Content
+        if( NBBinPseudoElement* tab = getPseudoElement< TabPseudoElement >( holdingPtr, stagedTabElement ) ) {
+          if( int stack = tab->getElementById( L, id ) ) { // userdata/none
+            return stack;
+          }
+        }
 
         return 0;
       }
@@ -365,6 +429,7 @@ namespace BlueBear {
         PagePseudoElement* widgetPtr = *( ( PagePseudoElement** ) luaL_checkudata( L, 1, "bluebear_page_pseudo_element" ) );
 
         widgetPtr->setStagedTabElement( L, nullptr );
+        widgetPtr->setStagedContentElement( L, nullptr );
 
         delete widgetPtr;
 

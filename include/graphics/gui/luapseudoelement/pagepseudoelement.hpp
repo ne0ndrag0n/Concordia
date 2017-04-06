@@ -21,15 +21,29 @@ namespace BlueBear {
         Display::MainGameState& displayState;
 
         NBBinPseudoElement* stagedTabElement = nullptr;
+        NBBinPseudoElement* stagedContentElement = nullptr;
 
         void processXMLPseudoElement( lua_State* L, tinyxml2::XMLElement* child );
+
         void setStagedTabElement( lua_State* L, NBBinPseudoElement* stagedTabElement );
+        void setStagedContentElement( lua_State* L, NBBinPseudoElement* stagedContentElement );
+
         void setStagedChild( lua_State* L, const std::string& xml );
         bool findElement( lua_State* L, const std::string& tag );
         int findElementStaged( lua_State* L, const std::string& tag );
 
         int getElementsByClass( lua_State* L, const std::string& classID );
         int getElementById( lua_State* L, const std::string& id );
+
+        template < typename T > NBBinPseudoElement* getPseudoElement( std::unique_ptr< NBBinPseudoElement >& holdingPtr, NBBinPseudoElement* staged ) {
+          if( subject ) {
+            holdingPtr = std::make_unique< T >( subject, pageNumber, displayState );
+            return holdingPtr.get();
+          }
+
+          // Will just return nullptr if either stagedTabElement or stagedContentElement are nullptr
+          return staged;
+        }
 
       public:
         PagePseudoElement(

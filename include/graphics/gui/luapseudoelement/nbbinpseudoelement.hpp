@@ -44,6 +44,8 @@ namespace BlueBear {
         std::shared_ptr< sfg::Widget > getChildWidget();
         virtual std::shared_ptr< sfg::Widget > getSubjectChildWidget() = 0;
 
+        static std::shared_ptr< sfg::Widget > createStagedWidget( Display::MainGameState& displayState, tinyxml2::XMLElement* element );
+
         static int lua_add( lua_State* L );
         static int lua_removeWidget( lua_State* L );
         static int lua_getName( lua_State* L );

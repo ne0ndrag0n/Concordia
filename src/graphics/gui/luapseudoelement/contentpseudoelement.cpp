@@ -1,4 +1,4 @@
-#include "graphics/gui/luapseudoelement/tabpseudoelement.hpp"
+#include "graphics/gui/luapseudoelement/contentpseudoelement.hpp"
 #include "graphics/widgetbuilder.hpp"
 #include "log.hpp"
 
@@ -6,7 +6,7 @@ namespace BlueBear {
   namespace Graphics {
     namespace GUI {
 
-      TabPseudoElement::TabPseudoElement( std::shared_ptr< sfg::Notebook > subject, unsigned int pageNumber, Display::MainGameState& displayState ) :
+      ContentPseudoElement::ContentPseudoElement( std::shared_ptr< sfg::Notebook > subject, unsigned int pageNumber, Display::MainGameState& displayState ) :
         NBBinPseudoElement::NBBinPseudoElement( subject, pageNumber, displayState ) {}
 
       /**
@@ -16,9 +16,9 @@ namespace BlueBear {
        * STACK ARGS: (none)
        * Returns: userdata, or none
        */
-      int TabPseudoElement::create( lua_State* L, Display::MainGameState& displayState, tinyxml2::XMLElement* element ) {
+      int ContentPseudoElement::create( lua_State* L, Display::MainGameState& displayState, tinyxml2::XMLElement* element ) {
         NBBinPseudoElement** userData = ( NBBinPseudoElement** ) lua_newuserdata( L, sizeof( NBBinPseudoElement* ) ); // userdata
-        *userData = new TabPseudoElement( nullptr, 0, displayState );
+        *userData = new ContentPseudoElement( nullptr, 0, displayState );
         ( *userData )->setMetatable( L );
         ( *userData )->stagedWidget = NBBinPseudoElement::createStagedWidget( displayState, element );
 
@@ -28,16 +28,16 @@ namespace BlueBear {
       /**
        * FUCKING linker won't recognize that this is already defined in NBBinPseudoElement
        */
-      void TabPseudoElement::setMetatable( lua_State* L ) {
+      void ContentPseudoElement::setMetatable( lua_State* L ) {
         NBBinPseudoElement::setMetatable( L );
       }
 
-      std::string TabPseudoElement::getName() {
-        return "tab";
+      std::string ContentPseudoElement::getName() {
+        return "content";
       }
 
-      std::shared_ptr< sfg::Widget > TabPseudoElement::getSubjectChildWidget() {
-        return subject->GetNthTabLabel( pageNumber );
+      std::shared_ptr< sfg::Widget > ContentPseudoElement::getSubjectChildWidget() {
+        return subject->GetNthPage( pageNumber );
       }
 
     }
