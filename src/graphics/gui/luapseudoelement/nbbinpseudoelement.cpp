@@ -127,7 +127,8 @@ namespace BlueBear {
         }
       }
 
-      void NBBinPseudoElement::setSubject( std::shared_ptr< sfg::Notebook > subject ) {
+      void NBBinPseudoElement::setSubject( std::shared_ptr< sfg::Notebook > subject, unsigned int pageNumber ) {
+        this->pageNumber = pageNumber;
         this->subject = subject;
 
         stagedWidget = nullptr;

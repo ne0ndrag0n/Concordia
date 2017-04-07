@@ -153,6 +153,38 @@ namespace BlueBear {
         }
       }
 
+      bool PagePseudoElement::setSubject( lua_State* L, std::shared_ptr< sfg::Notebook > notebook ) {
+
+        // Basic validation
+
+        if( !notebook ) {
+          Log::getInstance().error( "PagePseudoElement::setSubject", "std::shared_ptr< sfg::Notebook > was nullptr" );
+          return false;
+        }
+
+        if( subject ) {
+          Log::getInstance().warn( "PagePseudoElement::setSubject", "This <page> already belongs to a Notebook and cannot be added to another one." );
+          return false;
+        }
+
+        if( ( !stagedTabElement || !stagedContentElement ) || ( !stagedTabElement->stagedWidget || !stagedContentElement->stagedWidget ) ) {
+          Log::getInstance().warn( "PagePseudoElement::setSubject", "<page> pseudo-element cannot be added to a Notebook without both a <tab> and a <content> pseudo-element each containing one widget." );
+          return false;
+        }
+
+        // Page is fully staged
+        subject = notebook;
+        pageNumber = subject->AppendPage( stagedContentElement->stagedWidget, stagedTabElement->stagedWidget );
+
+        stagedTabElement->setSubject( subject, pageNumber );
+        stagedContentElement->setSubject( subject, pageNumber );
+
+        this->setStagedTabElement( L, nullptr );
+        this->setStagedContentElement( L, nullptr );
+
+        return true;
+      }
+
       /**
        * Use given XML to determine what should be added. One XML item at a time.
        */

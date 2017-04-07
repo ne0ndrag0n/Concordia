@@ -30,13 +30,12 @@ function GUIProvider:do_something( event )
   ]] )
 
   page:add( [[
-    <tab>
-      <Label id="tablabel">Tab</Label>
-    </tab>
+    <content>
+      <Box id="boxid">
+        <Label id="contentlabel">Content</Label>
+      </Box>
+    </content>
   ]] )
-
-  print( page:find_by_id( 'tablabel' ):get_name() )
-  print( page:find_pseudo( 'content' ):get_name() )
 end
 
 function GUIProvider:on_click_zoom_in()

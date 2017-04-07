@@ -36,7 +36,7 @@ namespace BlueBear {
         std::string getName();
 
         void setMetatable( lua_State* L );
-        void setSubject( std::shared_ptr< sfg::Notebook > subject );
+        virtual void setSubject( std::shared_ptr< sfg::Notebook > subject, unsigned int pageNumber );
 
         int getElementsByClass( lua_State* L, const std::string& classID );
         int getElementById( lua_State* L, const std::string& id );
