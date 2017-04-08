@@ -47,6 +47,17 @@ namespace BlueBear {
         }
       }
 
+      void LuaElement::add( lua_State* L, PagePseudoElement* page ) {
+        switch( Tools::Utility::hash( widget->GetName().c_str() ) ) {
+          case Tools::Utility::hash( "Notebook" ): {
+            page->setSubject( L, std::static_pointer_cast< sfg::Notebook >( widget ) );
+            break;
+          }
+          default:
+            Log::getInstance().debug( "LuaElement::add", "Cannot add a <" + page->getName() + "> pseudo-element to a " + widget->GetName() + " widget." );
+        }
+      }
+
       void LuaElement::addToCheckedContainer( std::shared_ptr< sfg::Widget > target ) {
         if( std::string( widget->GetName() ) == "Box" ) {
           std::shared_ptr< sfg::Box > widgetAsBox = std::static_pointer_cast< sfg::Box >( widget );
@@ -1426,14 +1437,16 @@ namespace BlueBear {
        * @static
        */
       int LuaElement::lua_add( lua_State* L ) {
-        LuaElement* widgetPtr = *( ( LuaElement** ) luaL_checkudata( L, 1, "bluebear_widget" ) );
+        LuaElement* self = *( ( LuaElement** ) luaL_checkudata( L, 1, "bluebear_widget" ) );
 
         if( lua_isstring( L, -1 ) ) {
           Display::MainGameState* state = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
-          widgetPtr->add( lua_tostring( L, -1 ), state->instance.eventManager, state->getImageCache() );
+          self->add( lua_tostring( L, -1 ), state->instance.eventManager, state->getImageCache() );
+        } else if ( PagePseudoElement** udata = ( PagePseudoElement** ) luaL_testudata( L, 2, "bluebear_page_pseudo_element" ) ) {
+          self->add( L, *udata );
         } else {
           LuaElement* argument = *( ( LuaElement** ) luaL_checkudata( L, 2, "bluebear_widget" ) );
-          widgetPtr->add( argument );
+          self->add( argument );
         }
 
         return 0;

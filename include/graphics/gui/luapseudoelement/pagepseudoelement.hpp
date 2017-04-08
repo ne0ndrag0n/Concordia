@@ -35,8 +35,6 @@ namespace BlueBear {
         int getElementsByClass( lua_State* L, const std::string& classID );
         int getElementById( lua_State* L, const std::string& id );
 
-        bool setSubject( lua_State* L, std::shared_ptr< sfg::Notebook > notebook );
-
         template < typename T > NBBinPseudoElement* getPseudoElement( std::unique_ptr< NBBinPseudoElement >& holdingPtr, NBBinPseudoElement* staged ) {
           if( subject ) {
             holdingPtr = std::make_unique< T >( subject, pageNumber, displayState );
@@ -56,6 +54,8 @@ namespace BlueBear {
 
         void setMetatable( lua_State* L );
         std::string getName();
+
+        bool setSubject( lua_State* L, std::shared_ptr< sfg::Notebook > notebook );
 
         static int create( lua_State* L, Display::MainGameState& displayState, tinyxml2::XMLElement* element );
 
