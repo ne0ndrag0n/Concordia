@@ -86,6 +86,8 @@ namespace BlueBear {
 
 				static std::string xmlToString( tinyxml2::XMLElement* element );
 
+				static tinyxml2::XMLElement* getRootNode( tinyxml2::XMLDocument& document, const std::string& xmlString );
+
 		};
 	}
 }

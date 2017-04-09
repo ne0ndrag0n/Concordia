@@ -1,4 +1,5 @@
 #include "tools/utility.hpp"
+#include "log.hpp"
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -407,6 +408,23 @@ namespace BlueBear {
 			tinyxml2::XMLPrinter printer;
 			element->Accept( &printer );
 			return printer.CStr();
+		}
+
+		tinyxml2::XMLElement* Utility::getRootNode( tinyxml2::XMLDocument& document, const std::string& xmlString ) {
+			document.Parse( xmlString.c_str() );
+
+			if( document.ErrorID() ) {
+				Log::getInstance().error( "Utility::getRootNode", "Could not parse XML string!" );
+				return nullptr;
+			}
+
+			tinyxml2::XMLElement* element = document.RootElement();
+			if( !element ) {
+				Log::getInstance().error( "Utility::getRootNode", "No root element!" );
+				return nullptr;
+			}
+
+			return element;
 		}
 	}
 }

@@ -20,20 +20,35 @@ namespace BlueBear {
 
       std::map< void*, std::map< sfg::Signal::SignalID, LuaElement::SignalBinding > > LuaElement::masterSignalMap;
 
-      void LuaElement::add( const std::string& xmlString, EventManager& eventManager, ImageCache& imageCache ) {
+      void LuaElement::add( lua_State* L, const std::string& xmlString, Display::MainGameState& state ) {
         if( isContainer() ) {
-          WidgetBuilder widgetBuilder( eventManager, imageCache );
-          std::shared_ptr< sfg::Widget > child = nullptr;
+          tinyxml2::XMLDocument document;
+          if( tinyxml2::XMLElement* element = Tools::Utility::getRootNode( document, xmlString ) ) {
+            // Check for pseudo-elements
+            switch( Tools::Utility::hash( element->Name() ) ) {
+              case Tools::Utility::hash( "page" ): {
+                if( PagePseudoElement::create( L, state, element ) ) { // userdata
+                  add( L, *( ( PagePseudoElement** ) lua_topointer( L, -1 ) ) );
+                  lua_pop( L, 1 ); // EMPTY
+                }
+                break;
+              }
+              default: {
+                WidgetBuilder widgetBuilder( state.instance.eventManager, state.getImageCache() );
+                std::shared_ptr< sfg::Widget > child = nullptr;
 
-          try {
-            child = widgetBuilder.getWidgetFromXML( xmlString );
-          } catch( std::exception& e ) {
-            Log::getInstance().error( "LuaElement::add", "Failed to add widget XML: " + std::string( e.what() ) );
-            return;
+                try {
+                  child = widgetBuilder.getWidgetFromElementDirect( element );
+                } catch( std::exception& e ) {
+                  Log::getInstance().error( "LuaElement::add", "Failed to add widget XML: " + std::string( e.what() ) );
+                  return;
+                }
+
+                // Add to widget typecast as container
+                addToCheckedContainer( child );
+              }
+            }
           }
-
-          // Add to widget typecast as container
-          addToCheckedContainer( child );
         } else {
           Log::getInstance().warn( "LuaElement::add", "This LuaElement is not a Container and cannot be added to." );
         }
@@ -1441,7 +1456,7 @@ namespace BlueBear {
 
         if( lua_isstring( L, -1 ) ) {
           Display::MainGameState* state = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
-          self->add( lua_tostring( L, -1 ), state->instance.eventManager, state->getImageCache() );
+          self->add( L, lua_tostring( L, -1 ), *state );
         } else if ( PagePseudoElement** udata = ( PagePseudoElement** ) luaL_testudata( L, 2, "bluebear_page_pseudo_element" ) ) {
           self->add( L, *udata );
         } else {
