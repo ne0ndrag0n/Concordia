@@ -94,6 +94,10 @@ namespace BlueBear {
         }
       }
 
+      void LuaElement::removePseudoElement( PagePseudoElement* page ) {
+        page->removeFromNotebook( widget );
+      }
+
       bool LuaElement::isContainer() {
         switch( Tools::Utility::hash( widget->GetName().c_str() ) ) {
           case Tools::Utility::hash( "Box" ):
@@ -1471,11 +1475,15 @@ namespace BlueBear {
         VERIFY_USER_DATA( "LuaElement::lua_widgetRemove", "remove" );
 
         LuaElement* self = *( ( LuaElement** ) luaL_checkudata( L, 1, "bluebear_widget" ) );
-        LuaElement* argument = *( ( LuaElement** ) luaL_checkudata( L, 2, "bluebear_widget" ) );
-        Display::MainGameState* state = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
 
-        // "argument" should be removed from "self" if and only if "self" is a container
-        self->removeWidget( argument->widget );
+        if( LuaElement** udata = ( LuaElement** ) luaL_testudata( L, 2, "bluebear_widget" ) ) {
+          // "argument" should be removed from "self" if and only if "self" is a container
+          self->removeWidget( ( *udata )->widget );
+        } else if( PagePseudoElement** udata = ( PagePseudoElement** ) luaL_testudata( L, 2, "bluebear_page_pseudo_element" ) ) {
+          self->removePseudoElement( *udata );
+        } else {
+          Log::getInstance().warn( "LuaElement::lua_widgetRemove", "Invalid argument passed to remove()" );
+        }
 
         return 0;
       }

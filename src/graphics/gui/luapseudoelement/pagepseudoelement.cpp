@@ -51,6 +51,18 @@ namespace BlueBear {
         return "page";
       }
 
+      void PagePseudoElement::removeFromNotebook( std::shared_ptr< sfg::Widget > comparison ) {
+        if( !subject || ( comparison != subject ) ) {
+          Log::getInstance().warn( "PagePseudoElement::removeFromNotebook", "This <page> is not attached to this Notebook widget!" );
+          return;
+        }
+
+        subject->RemovePage( pageNumber );
+
+        pageNumber = 0;
+        subject = nullptr;
+      }
+
       /**
        *
        * STACK ARGS: none

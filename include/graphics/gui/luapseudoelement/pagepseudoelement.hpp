@@ -54,6 +54,7 @@ namespace BlueBear {
 
         void setMetatable( lua_State* L );
         std::string getName();
+        void removeFromNotebook( std::shared_ptr< sfg::Widget > comparison );
 
         bool setSubject( lua_State* L, std::shared_ptr< sfg::Notebook > notebook );
 

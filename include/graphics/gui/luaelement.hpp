@@ -44,6 +44,7 @@ namespace BlueBear {
         void add( lua_State* L, PagePseudoElement* page );
         void addToCheckedContainer( std::shared_ptr< sfg::Widget > target );
         void removeWidget( std::shared_ptr< sfg::Widget > target );
+        void removePseudoElement( PagePseudoElement* page );
         bool isContainer();
         bool getPseudoElements( lua_State* L, const std::string& pseudo, Display::MainGameState& state, int index = -1 );
 
