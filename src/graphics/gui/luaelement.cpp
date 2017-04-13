@@ -1,5 +1,6 @@
 #include "graphics/gui/luaelement.hpp"
 #include "graphics/gui/luapseudoelement/pagepseudoelement.hpp"
+#include "graphics/gui/luapseudoelement/itempseudoelement.hpp"
 #include "graphics/widgetbuilder.hpp"
 #include "graphics/imagebuilder/pathimagesource.hpp"
 #include "graphics/display.hpp"
@@ -339,6 +340,35 @@ namespace BlueBear {
 
               return true;
             }
+          case Tools::Utility::hash( "item" ): {
+            if( widget->GetName() == "ComboBox" ) {
+              std::shared_ptr< sfg::ComboBox > comboBox = std::static_pointer_cast< sfg::ComboBox >( widget );
+              int itemCount = comboBox->GetItemCount();
+
+              if( index < 0 ) {
+                // Array of ItemPseudoElement
+
+                lua_createtable( L, itemCount, 0 ); // table
+
+                for( int i = 0; i != itemCount; i++ ) {
+                  ItemPseudoElement** item = ( ItemPseudoElement** ) lua_newuserdata( L, sizeof( ItemPseudoElement* ) ); // userdata table
+                  *item = new ItemPseudoElement( comboBox, i, state );
+                  ( *item )->setMetatable( L );
+
+                  lua_rawseti( L, -2, i + 1 ); // table
+                }
+              } else if( index <= itemCount ) {
+                ItemPseudoElement** item = ( ItemPseudoElement** ) lua_newuserdata( L, sizeof( ItemPseudoElement* ) ); // userdata
+                *item = new ItemPseudoElement( comboBox, index, state );
+                ( *item )->setMetatable( L );
+              } else {
+                Log::getInstance().warn( "LuaElement::getPseudoElements", "Item does not exist in this ComboBox." );
+                return false;
+              }
+
+              return true;
+            }
+          }
           default:
             Log::getInstance().warn( "LuaElement::getPseudoElements", widget->GetName() + " has no pseudo-element of type " + pseudo );
             return false;

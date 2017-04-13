@@ -6,7 +6,7 @@ namespace BlueBear {
   namespace Graphics {
     namespace GUI {
 
-      ItemPseudoElement::ItemPseudoElement( std::shared_ptr< sfg::ComboBox > subject, int elementNumber ) : subject( subject ), elementNumber( elementNumber ) {}
+      ItemPseudoElement::ItemPseudoElement( std::shared_ptr< sfg::ComboBox > subject, int elementNumber, Display::MainGameState& displayState ) : subject( subject ), elementNumber( elementNumber ), displayState( displayState ) {}
 
       /**
        *
@@ -38,6 +38,19 @@ namespace BlueBear {
         }
 
         lua_setmetatable( L, -2 ); // userdata
+      }
+
+      int ItemPseudoElement::create( lua_State* L, Display::MainGameState& displayState, tinyxml2::XMLElement* element ) {
+        ItemPseudoElement** item = ( ItemPseudoElement** ) lua_newuserdata( L, sizeof( ItemPseudoElement* ) ); // userdata
+        *item = new ItemPseudoElement( nullptr, -1, displayState );
+        ( *item )->setMetatable( L );
+
+        // Stage content
+        if( const char* text = element->GetText() ) {
+          ( *item )->stagedItem = text;
+        }
+
+        return 1;
       }
 
       std::string ItemPseudoElement::getName() {

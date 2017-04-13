@@ -23,22 +23,8 @@ function GUIProvider:open_debug_ui()
 end
 
 function GUIProvider:do_something( event )
-  local notebook = self.gui:find_by_id( 'notebook' )
+  local combobox = self.gui:find_by_id( 'combo' )
 
-  local page_string = [[
-    <page>
-      <tab>
-        <Label id="label_new">New Tab!</Label>
-      </tab>
-      <content>
-        <Box id="boxid">
-          <Label id="contentlabel">Content</Label>
-        </Box>
-      </content>
-    </page>
-  ]]
-
-  notebook:add( page_string )
 end
 
 function GUIProvider:on_click_zoom_in()
