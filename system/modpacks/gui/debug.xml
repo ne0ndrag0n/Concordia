@@ -59,12 +59,26 @@
               <Button id="apply" min-width="75" expand="false">Apply</Button>
             </Box>
           </Frame>
-          <ComboBox id="combo">
-            <item>one</item>
-            <item>two</item>
-          </ComboBox>
         </Box>
       </content>
     </page>
   </Notebook>
+</Window>
+
+<Window id="tablewindow" title="Table Test">
+  <Table id="table">
+    <row>
+      <Button>Foo</Button>
+      <Button colspan="2" rowspan="3">row_span</Button>
+    </row>
+    <row>
+    	<Button>Bar</Button>
+    </row>
+    <row>
+    	<Button>Baz</Button>
+    </row>
+    <row>
+      <Button colspan="3">column_span</Button>
+    </row>
+  </Table>
 </Window>

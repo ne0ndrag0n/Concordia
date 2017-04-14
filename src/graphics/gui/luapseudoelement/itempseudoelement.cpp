@@ -69,6 +69,28 @@ namespace BlueBear {
         return subject ? ( std::string ) subject->GetItem( elementNumber ) : stagedItem;
       }
 
+      /**
+       * Note: turns out we didn't really need the bool in PagePseudoElement's setSubject
+       */
+      void ItemPseudoElement::setSubject( std::shared_ptr< sfg::ComboBox > comboBox ) {
+
+        if( !comboBox ) {
+          Log::getInstance().error( "ItemPseudoElement::setSubject", "std::shared_ptr< sfg::ComboBox > was nullptr" );
+          return;
+        }
+
+        if( subject ) {
+          Log::getInstance().warn( "ItemPseudoElement::setSubject", "This <item> already belongs to a ComboBox and cannot be added to another one." );
+          return;
+        }
+
+        subject = comboBox;
+        subject->AppendItem( stagedItem );
+        elementNumber = subject->GetItemCount() - 1;
+
+        stagedItem = "";
+      }
+
       int ItemPseudoElement::lua_add( lua_State* L ) {
         Log::getInstance().warn( "ItemPseudoElement::lua_add", "Cannot add to <item> pseudo-element." );
         return 0;

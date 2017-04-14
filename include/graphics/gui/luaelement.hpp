@@ -17,6 +17,7 @@ namespace BlueBear {
     class ImageCache;
 
     namespace GUI {
+      class ItemPseudoElement;
       class PagePseudoElement;
 
       // Reserve space for additional elements we may need for a LuaElement type.
@@ -42,6 +43,7 @@ namespace BlueBear {
         void add( lua_State* L, const std::string& xmlString, Display::MainGameState& state );
         void add( LuaElement* element );
         void add( lua_State* L, PagePseudoElement* page );
+        void add( lua_State* L, ItemPseudoElement* item );
         void addToCheckedContainer( std::shared_ptr< sfg::Widget > target );
         void removeWidget( std::shared_ptr< sfg::Widget > target );
         void removePseudoElement( PagePseudoElement* page );

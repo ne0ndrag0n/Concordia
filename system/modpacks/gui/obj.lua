@@ -23,7 +23,7 @@ function GUIProvider:open_debug_ui()
 end
 
 function GUIProvider:do_something( event )
-  local combobox = self.gui:find_by_id( 'combo' )
+  local table = self.gui:find_by_id( 'table' )
 
 end
 

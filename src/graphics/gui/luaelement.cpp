@@ -34,6 +34,13 @@ namespace BlueBear {
                 }
                 break;
               }
+              case Tools::Utility::hash( "item" ): {
+                if( ItemPseudoElement::create( L, state, element ) ) { // userdata
+                  add( L, *( ( ItemPseudoElement** ) lua_topointer( L, -1 ) ) );
+                  lua_pop( L, 1 ); // EMPTY
+                }
+                break;
+              }
               default: {
                 WidgetBuilder widgetBuilder( state.instance.eventManager, state.getImageCache() );
                 std::shared_ptr< sfg::Widget > child = nullptr;
@@ -74,6 +81,17 @@ namespace BlueBear {
         }
       }
 
+      void LuaElement::add( lua_State* L, ItemPseudoElement* item ) {
+        switch( Tools::Utility::hash( widget->GetName().c_str() ) ) {
+          case Tools::Utility::hash( "ComboBox" ): {
+            item->setSubject( std::static_pointer_cast< sfg::ComboBox >( widget ) );
+            break;
+          }
+          default:
+            Log::getInstance().debug( "LuaElement::add", "Cannot add a <" + item->getName() + "> pseudo-element to a " + widget->GetName() + " widget." );
+        }
+      }
+
       void LuaElement::addToCheckedContainer( std::shared_ptr< sfg::Widget > target ) {
         if( std::string( widget->GetName() ) == "Box" ) {
           std::shared_ptr< sfg::Box > widgetAsBox = std::static_pointer_cast< sfg::Box >( widget );
@@ -107,11 +125,11 @@ namespace BlueBear {
           case Tools::Utility::hash( "ScrolledWindow" ):
           case Tools::Utility::hash( "Table" ):
           case Tools::Utility::hash( "Alignment" ):
-          case Tools::Utility::hash( "Button" ):
-          case Tools::Utility::hash( "ToggleButton" ):
-          case Tools::Utility::hash( "CheckButton" ):
-          case Tools::Utility::hash( "RadioButton" ):
-          case Tools::Utility::hash( "ComboBox" ):
+          //case Tools::Utility::hash( "Button" ):
+          //case Tools::Utility::hash( "ToggleButton" ):
+          //case Tools::Utility::hash( "CheckButton" ):
+          //case Tools::Utility::hash( "RadioButton" ):
+          //case Tools::Utility::hash( "ComboBox" ):
           case Tools::Utility::hash( "Frame" ):
           case Tools::Utility::hash( "Viewport" ):
           case Tools::Utility::hash( "Window" ):
@@ -1492,6 +1510,8 @@ namespace BlueBear {
           Display::MainGameState* state = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
           self->add( L, lua_tostring( L, -1 ), *state );
         } else if ( PagePseudoElement** udata = ( PagePseudoElement** ) luaL_testudata( L, 2, "bluebear_page_pseudo_element" ) ) {
+          self->add( L, *udata );
+        } else if ( ItemPseudoElement** udata = ( ItemPseudoElement** ) luaL_testudata( L, 2, "bluebear_item_pseudo_element" ) ) {
           self->add( L, *udata );
         } else {
           LuaElement* argument = *( ( LuaElement** ) luaL_checkudata( L, 2, "bluebear_widget" ) );
