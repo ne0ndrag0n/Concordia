@@ -68,11 +68,11 @@
 <Window id="tablewindow" title="Table Test">
   <Table id="table">
     <row>
-      <Button>Foo</Button>
+      <Button id="foo">Foo</Button>
       <Button colspan="2" rowspan="3">row_span</Button>
     </row>
     <row>
-    	<Button>Bar</Button>
+    	<Button id="bar">Bar</Button>
     </row>
     <row>
     	<Button>Baz</Button>

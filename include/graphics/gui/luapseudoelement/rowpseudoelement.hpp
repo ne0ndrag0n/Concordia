@@ -23,7 +23,8 @@ namespace BlueBear {
         std::vector< std::shared_ptr< sfg::Widget > > stagedWidgets;
 
         std::vector< std::shared_ptr< sfg::Widget > > getWidgetsForRow();
-        int getItemById( const std::string& id );
+        int getItemById( lua_State* L, const std::string& id );
+        int getItemsByClass( lua_State* L, const std::string clss );
 
       public:
         RowPseudoElement(
@@ -35,9 +36,12 @@ namespace BlueBear {
         void setMetatable( lua_State* L );
         std::string getName();
 
+        static int getRowCount( std::shared_ptr< sfg::Table > table );
         static int lua_gc( lua_State* L );
         static int lua_getName( lua_State* L );
         static int lua_findElement( lua_State* L );
+        static int lua_findById( lua_State* L );
+        static int lua_findByClass( lua_State* L );
       };
 
     }

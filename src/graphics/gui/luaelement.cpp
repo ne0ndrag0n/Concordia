@@ -1,6 +1,7 @@
 #include "graphics/gui/luaelement.hpp"
 #include "graphics/gui/luapseudoelement/pagepseudoelement.hpp"
 #include "graphics/gui/luapseudoelement/itempseudoelement.hpp"
+#include "graphics/gui/luapseudoelement/rowpseudoelement.hpp"
 #include "graphics/widgetbuilder.hpp"
 #include "graphics/imagebuilder/pathimagesource.hpp"
 #include "graphics/display.hpp"
@@ -117,6 +118,9 @@ namespace BlueBear {
         page->removeFromNotebook( widget );
       }
 
+      /**
+       * TODO: This is now identical to Tools::Utility::widgetIsContainer, consider replacing this method with that one if any changes required.
+       */
       bool LuaElement::isContainer() {
         switch( Tools::Utility::hash( widget->GetName().c_str() ) ) {
           case Tools::Utility::hash( "Box" ):
@@ -345,7 +349,7 @@ namespace BlueBear {
                   lua_rawseti( L, -2, i + 1 ); // table
                 }
 
-              } else if( index <= pageCount ) {
+              } else if( index < pageCount ) {
 
                 PagePseudoElement** ppe = ( PagePseudoElement** )lua_newuserdata( L, sizeof( PagePseudoElement* ) ); // userdata
                 *ppe = new PagePseudoElement( notebook, index, state );
@@ -375,12 +379,39 @@ namespace BlueBear {
 
                   lua_rawseti( L, -2, i + 1 ); // table
                 }
-              } else if( index <= itemCount ) {
+              } else if( index < itemCount ) {
                 ItemPseudoElement** item = ( ItemPseudoElement** ) lua_newuserdata( L, sizeof( ItemPseudoElement* ) ); // userdata
                 *item = new ItemPseudoElement( comboBox, index, state );
                 ( *item )->setMetatable( L );
               } else {
                 Log::getInstance().warn( "LuaElement::getPseudoElements", "Item does not exist in this ComboBox." );
+                return false;
+              }
+
+              return true;
+            }
+          }
+          case Tools::Utility::hash( "row" ) : {
+            if( widget->GetName() == "Table" ) {
+              std::shared_ptr< sfg::Table > table = std::static_pointer_cast< sfg::Table >( widget );
+              int rowCount = RowPseudoElement::getRowCount( table );
+
+              if( index < 0 ) {
+                lua_createtable( L, rowCount, 0 ); // table
+
+                for( int i = 0; i != rowCount; i++ ) {
+                  RowPseudoElement** row = ( RowPseudoElement** ) lua_newuserdata( L, sizeof( RowPseudoElement* ) ); // userdata table
+                  *row = new RowPseudoElement( table, i, state );
+                  ( *row )->setMetatable( L );
+
+                  lua_rawseti( L, -2, i + 1 ); // table
+                }
+              } else if( index < rowCount ) {
+                RowPseudoElement** row = ( RowPseudoElement** ) lua_newuserdata( L, sizeof( RowPseudoElement* ) ); // userdata
+                *row = new RowPseudoElement( table, index, state );
+                ( *row )->setMetatable( L );
+              } else {
+                Log::getInstance().warn( "LuaElement::getPseudoElements", "Row does not exist in this Table." );
                 return false;
               }
 

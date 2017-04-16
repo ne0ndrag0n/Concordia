@@ -426,5 +426,51 @@ namespace BlueBear {
 
 			return element;
 		}
+
+		/**
+		 * This is to work around an SFGUI bug where i'll ask a parent for a child widget and get a widget that doesn't actually belong to the parent.
+		 */
+		bool Utility::isActualParent( std::shared_ptr< sfg::Widget > widget, std::shared_ptr< sfg::Container > expectedParent ) {
+			if( widget && expectedParent ) {
+
+				std::shared_ptr< sfg::Container > current = widget->GetParent();
+
+				while( current != nullptr ) {
+					if( current == expectedParent ) {
+						return true;
+					}
+
+					current = current->GetParent();
+				}
+
+			}
+
+			return false;
+		}
+
+		/**
+		 * Consider replacing the method in LuaElement with this shit
+		 */
+		bool Utility::widgetIsContainer( std::shared_ptr< sfg::Widget > widget ) {
+			switch( Utility::hash( widget->GetName().c_str() ) ) {
+				case Tools::Utility::hash( "Box" ):
+				case Tools::Utility::hash( "Fixed" ):
+				case Tools::Utility::hash( "Notebook" ):
+				case Tools::Utility::hash( "ScrolledWindow" ):
+				case Tools::Utility::hash( "Table" ):
+				case Tools::Utility::hash( "Alignment" ):
+				//case Tools::Utility::hash( "Button" ):
+				//case Tools::Utility::hash( "ToggleButton" ):
+				//case Tools::Utility::hash( "CheckButton" ):
+				//case Tools::Utility::hash( "RadioButton" ):
+				//case Tools::Utility::hash( "ComboBox" ):
+				case Tools::Utility::hash( "Frame" ):
+				case Tools::Utility::hash( "Viewport" ):
+				case Tools::Utility::hash( "Window" ):
+					return true;
+				default:
+					return false;
+			}
+		}
 	}
 }

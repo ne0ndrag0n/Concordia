@@ -11,6 +11,9 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <SFGUI/Widget.hpp>
+#include <SFGUI/Container.hpp>
+#include <memory>
 
 namespace BlueBear {
 	namespace Tools {
@@ -88,6 +91,9 @@ namespace BlueBear {
 
 				static tinyxml2::XMLElement* getRootNode( tinyxml2::XMLDocument& document, const std::string& xmlString );
 
+				static bool isActualParent( std::shared_ptr< sfg::Widget > widget, std::shared_ptr< sfg::Container > expectedParent );
+
+				static bool widgetIsContainer( std::shared_ptr< sfg::Widget > widget );
 		};
 	}
 }
