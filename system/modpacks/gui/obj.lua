@@ -25,7 +25,7 @@ end
 function GUIProvider:do_something( event )
   local table = self.gui:find_by_id( 'table' )
 
-  local foo = table:find_pseudo( 'row' ):find_by_id( 'foo' )
+  local foo = table:find_pseudo( 'row', 0 ):find_by_id( 'foo' )
 
 end
 

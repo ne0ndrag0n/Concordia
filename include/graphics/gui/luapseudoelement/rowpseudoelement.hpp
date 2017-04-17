@@ -14,17 +14,33 @@
 namespace BlueBear {
   namespace Graphics {
     namespace GUI {
+      class LuaElement;
 
       class RowPseudoElement : public LuaPseudoElement {
+        struct WidgetStaging {
+          unsigned int colspan;
+          unsigned int rowspan;
+          float paddingX;
+          float paddingY;
+          int packX;
+          int packY;
+          std::shared_ptr< sfg::Widget > widget;
+        };
+
         std::shared_ptr< sfg::Table > subject;
         int rowNumber;
         Display::MainGameState& displayState;
 
-        std::vector< std::shared_ptr< sfg::Widget > > stagedWidgets;
+        std::vector< WidgetStaging > stagedWidgets;
 
         std::vector< std::shared_ptr< sfg::Widget > > getWidgetsForRow();
         int getItemById( lua_State* L, const std::string& id );
         int getItemsByClass( lua_State* L, const std::string clss );
+        int getLatestColumn();
+
+        void add( lua_State* L, LuaElement* element );
+        void add( lua_State* L, const std::string& xmlString );
+        void add( WidgetStaging staging );
 
       public:
         RowPseudoElement(
@@ -40,6 +56,7 @@ namespace BlueBear {
         static int lua_gc( lua_State* L );
         static int lua_getName( lua_State* L );
         static int lua_findElement( lua_State* L );
+        static int lua_findPseudo( lua_State* L );
         static int lua_findById( lua_State* L );
         static int lua_findByClass( lua_State* L );
       };
