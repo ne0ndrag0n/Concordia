@@ -53,6 +53,7 @@ namespace BlueBear {
         std::string getName();
 
         static int getRowCount( std::shared_ptr< sfg::Table > table );
+        static int lua_add( lua_State* L );
         static int lua_gc( lua_State* L );
         static int lua_getName( lua_State* L );
         static int lua_findElement( lua_State* L );

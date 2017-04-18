@@ -24,8 +24,8 @@ namespace BlueBear {
       void RowPseudoElement::setMetatable( lua_State* L ) {
         if( luaL_newmetatable( L, "bluebear_row_pseudo_element" ) ) { // metatable userdata
           luaL_Reg tableFuncs[] = {
-            /*
             { "add", RowPseudoElement::lua_add },
+            /*
             { "remove", RowPseudoElement::lua_removeWidget },
             */
             { "get_name", RowPseudoElement::lua_getName },
@@ -246,7 +246,7 @@ namespace BlueBear {
         if( subject ) {
           subject->Attach(
             staging.widget,
-            sf::Rect< sf::Uint32 >( getLatestColumn(), rowNumber, staging.colspan, staging.rowspan ),
+            sf::Rect< sf::Uint32 >( getLatestColumn() + 1, rowNumber, staging.colspan, staging.rowspan ),
             staging.packX,
             staging.packY,
             sf::Vector2f( staging.paddingX, staging.paddingY )
@@ -258,12 +258,11 @@ namespace BlueBear {
 
       int RowPseudoElement::getLatestColumn() {
         if( subject ) {
-          int largestColumn = 0;
+          int largestColumn = -1;
 
           std::list< sfg::priv::TableCell > tableCellList = subject->m_cells;
           std::for_each( tableCellList.begin(), tableCellList.end(), [ & ]( sfg::priv::TableCell& cell ) {
-            // Top should contain row number
-            if( cell.rect.top == rowNumber && cell.rect.left > largestColumn ) {
+            if( cell.rect.top == rowNumber && (int) cell.rect.left > largestColumn ) {
               largestColumn = cell.rect.left;
             }
           } );
@@ -271,6 +270,17 @@ namespace BlueBear {
           return largestColumn;
         } else {
           return stagedWidgets.size();
+        }
+      }
+
+      int RowPseudoElement::lua_add( lua_State* L ) {
+        RowPseudoElement* self = *( ( RowPseudoElement** ) luaL_checkudata( L, 1, "bluebear_row_pseudo_element" ) );
+
+        if( lua_isstring( L, -1 ) ) {
+          self->add( L, lua_tostring( L, -1 ) );
+        } else {
+          LuaElement* element = *( ( LuaElement** ) luaL_checkudata( L, 2, "bluebear_widget" ) );
+          self->add( L, element );
         }
       }
 
