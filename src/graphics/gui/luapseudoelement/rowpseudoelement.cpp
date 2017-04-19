@@ -188,7 +188,12 @@ namespace BlueBear {
       }
 
       void RowPseudoElement::add( lua_State* L, LuaElement* element ) {
-
+        // Add using the default attributes (these attributes cannot be set on the original pointer)
+        add(
+          RowPseudoElement::WidgetStaging{
+            1, 1, 0.0f, 0.0f, sfg::Table::EXPAND | sfg::Table::FILL, sfg::Table::EXPAND | sfg::Table::FILL, element->widget
+          }
+        );
       }
 
       void RowPseudoElement::add( lua_State* L, const std::string& xmlString ) {
