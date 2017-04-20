@@ -4,7 +4,6 @@
 #include <tinyxml2.h>
 #include <SFGUI/Widget.hpp>
 #include <SFGUI/Window.hpp>
-#include <SFGUI/Label.hpp>
 #include <SFGUI/Container.hpp>
 #include <SFGUI/Box.hpp>
 #include <SFGUI/Alignment.hpp>
@@ -40,6 +39,10 @@ namespace BlueBear {
   namespace Graphics {
     class ImageCache;
 
+    namespace GUI {
+      class CMELabel;
+    }
+
     class WidgetBuilder {
       EventManager& eventManager;
       ImageCache& imageCache;
@@ -53,7 +56,7 @@ namespace BlueBear {
       void addNotebookTabs( std::shared_ptr< sfg::Notebook > notebook, tinyxml2::XMLElement* element );
 
       std::shared_ptr< sfg::Window > newWindowWidget( tinyxml2::XMLElement* element );
-      std::shared_ptr< sfg::Label > newLabelWidget( tinyxml2::XMLElement* element );
+      std::shared_ptr< GUI::CMELabel > newLabelWidget( tinyxml2::XMLElement* element );
       std::shared_ptr< sfg::Box > newBoxWidget( tinyxml2::XMLElement* element );
       std::shared_ptr< sfg::Alignment > newAlignmentWidget( tinyxml2::XMLElement* element );
       std::shared_ptr< sfg::Button > newButtonWidget( tinyxml2::XMLElement* element );

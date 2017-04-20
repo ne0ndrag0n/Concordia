@@ -5,6 +5,7 @@
 #include "graphics/widgetbuilder.hpp"
 #include "graphics/imagebuilder/pathimagesource.hpp"
 #include "graphics/display.hpp"
+#include "graphics/gui/cmelabel.hpp"
 #include "tools/ctvalidators.hpp"
 #include "tools/utility.hpp"
 #include "configmanager.hpp"
@@ -475,7 +476,7 @@ namespace BlueBear {
             break;
           case Tools::Utility::hash( "Label" ):
             {
-              std::shared_ptr< sfg::Label > label = std::static_pointer_cast< sfg::Label >( widgetPtr->widget );
+              std::shared_ptr< CMELabel > label = std::static_pointer_cast< CMELabel >( widgetPtr->widget );
               lua_pushstring( L, std::string( label->GetText() ).c_str() ); // "entry"
             }
             break;
@@ -536,7 +537,7 @@ namespace BlueBear {
             break;
           case Tools::Utility::hash( "Label" ):
             {
-              std::shared_ptr< sfg::Label > label = std::static_pointer_cast< sfg::Label >( widgetPtr->widget );
+              std::shared_ptr< CMELabel > label = std::static_pointer_cast< CMELabel >( widgetPtr->widget );
               label->SetText( lua_tostring( L, -1 ) );
             }
             break;
