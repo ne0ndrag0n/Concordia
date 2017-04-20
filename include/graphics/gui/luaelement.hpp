@@ -19,6 +19,7 @@ namespace BlueBear {
     namespace GUI {
       class ItemPseudoElement;
       class PagePseudoElement;
+      class CMEWindow;
 
       // Reserve space for additional elements we may need for a LuaElement type.
 
@@ -98,7 +99,7 @@ namespace BlueBear {
           sfg::Signal::SignalID signalID
         );
         static void getWindowProps(
-          std::shared_ptr< sfg::Window > window,
+          std::shared_ptr< CMEWindow > window,
           bool& titlebar,
           bool& background,
           bool& resize,
@@ -106,7 +107,7 @@ namespace BlueBear {
           bool& close
         );
         static void setWindowProps(
-          std::shared_ptr< sfg::Window > window,
+          std::shared_ptr< CMEWindow > window,
           bool titlebar,
           bool background,
           bool resize,

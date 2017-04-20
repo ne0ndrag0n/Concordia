@@ -6,6 +6,9 @@
 #include "graphics/imagebuilder/pathimagesource.hpp"
 #include "graphics/display.hpp"
 #include "graphics/gui/cmelabel.hpp"
+#include "graphics/gui/cmewindow.hpp"
+#include "graphics/gui/cmebox.hpp"
+#include "graphics/gui/cmealignment.hpp"
 #include "tools/ctvalidators.hpp"
 #include "tools/utility.hpp"
 #include "configmanager.hpp"
@@ -96,7 +99,7 @@ namespace BlueBear {
 
       void LuaElement::addToCheckedContainer( std::shared_ptr< sfg::Widget > target ) {
         if( std::string( widget->GetName() ) == "Box" ) {
-          std::shared_ptr< sfg::Box > widgetAsBox = std::static_pointer_cast< sfg::Box >( widget );
+          std::shared_ptr< CMEBox > widgetAsBox = std::static_pointer_cast< CMEBox >( widget );
           widgetAsBox->PackEnd( target, true, true );
         } else {
           std::shared_ptr< sfg::Container > widgetAsContainer = std::static_pointer_cast< sfg::Container >( widget );
@@ -678,7 +681,7 @@ namespace BlueBear {
             {
               // Verify this is applicable for the given widget
               if( widgetType == "Window" ) {
-                std::shared_ptr< sfg::Window > window = std::static_pointer_cast< sfg::Window >( widgetPtr->widget );
+                std::shared_ptr< CMEWindow > window = std::static_pointer_cast< CMEWindow >( widgetPtr->widget );
                 lua_pushstring( L, std::string( window->GetTitle() ).c_str() ); // "title"
                 return 1;
               } else if ( widgetType == "Frame" ) {
@@ -697,7 +700,7 @@ namespace BlueBear {
                 return 0;
               }
 
-              std::shared_ptr< sfg::Window > window = std::static_pointer_cast< sfg::Window >( widgetPtr->widget );
+              std::shared_ptr< CMEWindow > window = std::static_pointer_cast< CMEWindow >( widgetPtr->widget );
               lua_pushboolean( L, window->HasStyle( sfg::Window::Style::TITLEBAR ) ? 1 : 0 ); // true/false
               return 1;
             }
@@ -708,7 +711,7 @@ namespace BlueBear {
                 return 0;
               }
 
-              std::shared_ptr< sfg::Window > window = std::static_pointer_cast< sfg::Window >( widgetPtr->widget );
+              std::shared_ptr< CMEWindow > window = std::static_pointer_cast< CMEWindow >( widgetPtr->widget );
               lua_pushboolean( L, window->HasStyle( sfg::Window::Style::BACKGROUND ) ? 1 : 0 ); // true/false
               return 1;
             }
@@ -719,7 +722,7 @@ namespace BlueBear {
                 return 0;
               }
 
-              std::shared_ptr< sfg::Window > window = std::static_pointer_cast< sfg::Window >( widgetPtr->widget );
+              std::shared_ptr< CMEWindow > window = std::static_pointer_cast< CMEWindow >( widgetPtr->widget );
               lua_pushboolean( L, window->HasStyle( sfg::Window::Style::RESIZE ) ? 1 : 0 ); // true/false
               return 1;
             }
@@ -730,7 +733,7 @@ namespace BlueBear {
                 return 0;
               }
 
-              std::shared_ptr< sfg::Window > window = std::static_pointer_cast< sfg::Window >( widgetPtr->widget );
+              std::shared_ptr< CMEWindow > window = std::static_pointer_cast< CMEWindow >( widgetPtr->widget );
               lua_pushboolean( L, window->HasStyle( sfg::Window::Style::SHADOW ) ? 1 : 0 ); // true/false
               return 1;
             }
@@ -741,7 +744,7 @@ namespace BlueBear {
                 return 0;
               }
 
-              std::shared_ptr< sfg::Window > window = std::static_pointer_cast< sfg::Window >( widgetPtr->widget );
+              std::shared_ptr< CMEWindow > window = std::static_pointer_cast< CMEWindow >( widgetPtr->widget );
               lua_pushboolean( L, window->HasStyle( sfg::Window::Style::CLOSE ) ? 1 : 0 ); // true/false
               return 1;
             }
@@ -752,7 +755,7 @@ namespace BlueBear {
                 return 0;
               }
 
-              std::shared_ptr< sfg::Box > box = std::static_pointer_cast< sfg::Box >( widgetPtr->widget );
+              std::shared_ptr< CMEBox > box = std::static_pointer_cast< CMEBox >( widgetPtr->widget );
               lua_pushnumber( L, box->GetSpacing() ); // 42.0
               return 1;
             }
@@ -763,7 +766,7 @@ namespace BlueBear {
                 return 0;
               }
 
-              std::shared_ptr< sfg::Alignment > alignmentWidget = std::static_pointer_cast< sfg::Alignment >( widgetPtr->widget );
+              std::shared_ptr< CMEAlignment > alignmentWidget = std::static_pointer_cast< CMEAlignment >( widgetPtr->widget );
               sf::Vector2f alignment = alignmentWidget->GetAlignment();
               lua_pushnumber( L, alignment.x ); // 42.0
               return 1;
@@ -775,7 +778,7 @@ namespace BlueBear {
                 return 0;
               }
 
-              std::shared_ptr< sfg::Alignment > alignmentWidget = std::static_pointer_cast< sfg::Alignment >( widgetPtr->widget );
+              std::shared_ptr< CMEAlignment > alignmentWidget = std::static_pointer_cast< CMEAlignment >( widgetPtr->widget );
               sf::Vector2f alignment = alignmentWidget->GetAlignment();
               lua_pushnumber( L, alignment.y ); // 42.0
               return 1;
@@ -787,7 +790,7 @@ namespace BlueBear {
                 return 0;
               }
 
-              std::shared_ptr< sfg::Alignment > alignmentWidget = std::static_pointer_cast< sfg::Alignment >( widgetPtr->widget );
+              std::shared_ptr< CMEAlignment > alignmentWidget = std::static_pointer_cast< CMEAlignment >( widgetPtr->widget );
               sf::Vector2f scale = alignmentWidget->GetScale();
               lua_pushnumber( L, scale.x ); // 42.0
               return 1;
@@ -799,7 +802,7 @@ namespace BlueBear {
                 return 0;
               }
 
-              std::shared_ptr< sfg::Alignment > alignmentWidget = std::static_pointer_cast< sfg::Alignment >( widgetPtr->widget );
+              std::shared_ptr< CMEAlignment > alignmentWidget = std::static_pointer_cast< CMEAlignment >( widgetPtr->widget );
               sf::Vector2f scale = alignmentWidget->GetScale();
               lua_pushnumber( L, scale.y ); // 42.0
               return 1;
@@ -1080,7 +1083,7 @@ namespace BlueBear {
 
               // Verify this is applicable for the given widget
               if( widgetType == "Window" ) {
-                std::shared_ptr< sfg::Window > window = std::static_pointer_cast< sfg::Window >( widgetPtr->widget );
+                std::shared_ptr< CMEWindow > window = std::static_pointer_cast< CMEWindow >( widgetPtr->widget );
                 window->SetTitle( lua_tostring( L, -1 ) );
                 return 0;
               } else if( widgetType == "Frame" ) {
@@ -1105,7 +1108,7 @@ namespace BlueBear {
               }
 
               bool titlebar, background, resize, shadow, close;
-              std::shared_ptr< sfg::Window > window = std::static_pointer_cast< sfg::Window >( widgetPtr->widget );
+              std::shared_ptr< CMEWindow > window = std::static_pointer_cast< CMEWindow >( widgetPtr->widget );
               getWindowProps( window, titlebar, background, resize, shadow, close );
 
               titlebar = lua_toboolean( L, -1 ) ? true : false;
@@ -1126,7 +1129,7 @@ namespace BlueBear {
               }
 
               bool titlebar, background, resize, shadow, close;
-              std::shared_ptr< sfg::Window > window = std::static_pointer_cast< sfg::Window >( widgetPtr->widget );
+              std::shared_ptr< CMEWindow > window = std::static_pointer_cast< CMEWindow >( widgetPtr->widget );
               getWindowProps( window, titlebar, background, resize, shadow, close );
 
               background = lua_toboolean( L, -1 ) ? true : false;
@@ -1147,7 +1150,7 @@ namespace BlueBear {
               }
 
               bool titlebar, background, resize, shadow, close;
-              std::shared_ptr< sfg::Window > window = std::static_pointer_cast< sfg::Window >( widgetPtr->widget );
+              std::shared_ptr< CMEWindow > window = std::static_pointer_cast< CMEWindow >( widgetPtr->widget );
               getWindowProps( window, titlebar, background, resize, shadow, close );
 
               resize = lua_toboolean( L, -1 ) ? true : false;
@@ -1168,7 +1171,7 @@ namespace BlueBear {
               }
 
               bool titlebar, background, resize, shadow, close;
-              std::shared_ptr< sfg::Window > window = std::static_pointer_cast< sfg::Window >( widgetPtr->widget );
+              std::shared_ptr< CMEWindow > window = std::static_pointer_cast< CMEWindow >( widgetPtr->widget );
               getWindowProps( window, titlebar, background, resize, shadow, close );
 
               shadow = lua_toboolean( L, -1 ) ? true : false;
@@ -1189,7 +1192,7 @@ namespace BlueBear {
               }
 
               bool titlebar, background, resize, shadow, close;
-              std::shared_ptr< sfg::Window > window = std::static_pointer_cast< sfg::Window >( widgetPtr->widget );
+              std::shared_ptr< CMEWindow > window = std::static_pointer_cast< CMEWindow >( widgetPtr->widget );
               getWindowProps( window, titlebar, background, resize, shadow, close );
 
               close = lua_toboolean( L, -1 ) ? true : false;
@@ -1209,7 +1212,7 @@ namespace BlueBear {
                 return 0;
               }
 
-              std::shared_ptr< sfg::Box > box = std::static_pointer_cast< sfg::Box >( widgetPtr->widget );
+              std::shared_ptr< CMEBox > box = std::static_pointer_cast< CMEBox >( widgetPtr->widget );
               box->SetSpacing( lua_tonumber( L, -1 ) );
               return 0;
             }
@@ -1225,7 +1228,7 @@ namespace BlueBear {
                 return 0;
               }
 
-              std::shared_ptr< sfg::Alignment > alignmentWidget = std::static_pointer_cast< sfg::Alignment >( widgetPtr->widget );
+              std::shared_ptr< CMEAlignment > alignmentWidget = std::static_pointer_cast< CMEAlignment >( widgetPtr->widget );
               sf::Vector2f alignment = alignmentWidget->GetAlignment();
               alignment.x = lua_tonumber( L, -1 );
               alignmentWidget->SetAlignment( alignment );
@@ -1243,7 +1246,7 @@ namespace BlueBear {
                 return 0;
               }
 
-              std::shared_ptr< sfg::Alignment > alignmentWidget = std::static_pointer_cast< sfg::Alignment >( widgetPtr->widget );
+              std::shared_ptr< CMEAlignment > alignmentWidget = std::static_pointer_cast< CMEAlignment >( widgetPtr->widget );
               sf::Vector2f alignment = alignmentWidget->GetAlignment();
               alignment.y = lua_tonumber( L, -1 );
               alignmentWidget->SetAlignment( alignment );
@@ -1261,7 +1264,7 @@ namespace BlueBear {
                 return 0;
               }
 
-              std::shared_ptr< sfg::Alignment > alignmentWidget = std::static_pointer_cast< sfg::Alignment >( widgetPtr->widget );
+              std::shared_ptr< CMEAlignment > alignmentWidget = std::static_pointer_cast< CMEAlignment >( widgetPtr->widget );
               sf::Vector2f scale = alignmentWidget->GetScale();
               scale.x = lua_tonumber( L, -1 );
               alignmentWidget->SetScale( scale );
@@ -1279,7 +1282,7 @@ namespace BlueBear {
                 return 0;
               }
 
-              std::shared_ptr< sfg::Alignment > alignmentWidget = std::static_pointer_cast< sfg::Alignment >( widgetPtr->widget );
+              std::shared_ptr< CMEAlignment > alignmentWidget = std::static_pointer_cast< CMEAlignment >( widgetPtr->widget );
               sf::Vector2f scale = alignmentWidget->GetScale();
               scale.y = lua_tonumber( L, -1 );
               alignmentWidget->SetScale( scale );
@@ -1573,7 +1576,7 @@ namespace BlueBear {
       /**
        * @static
        */
-      void LuaElement::getWindowProps( std::shared_ptr< sfg::Window > window, bool& titlebar, bool& background, bool& resize, bool& shadow, bool& close ) {
+      void LuaElement::getWindowProps( std::shared_ptr< CMEWindow > window, bool& titlebar, bool& background, bool& resize, bool& shadow, bool& close ) {
         titlebar = window->HasStyle( sfg::Window::Style::TITLEBAR );
         background = window->HasStyle( sfg::Window::Style::BACKGROUND );
         resize = window->HasStyle( sfg::Window::Style::RESIZE );
@@ -1584,7 +1587,7 @@ namespace BlueBear {
       /**
        * @static
        */
-      void LuaElement::setWindowProps( std::shared_ptr< sfg::Window > window, bool titlebar, bool background, bool resize, bool shadow, bool close ) {
+      void LuaElement::setWindowProps( std::shared_ptr< CMEWindow > window, bool titlebar, bool background, bool resize, bool shadow, bool close ) {
         window->SetStyle(
           ( titlebar ? 1 : 0 ) |
           ( ( background ? 1 : 0 ) << 1 ) |

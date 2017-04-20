@@ -3,10 +3,7 @@
 
 #include <tinyxml2.h>
 #include <SFGUI/Widget.hpp>
-#include <SFGUI/Window.hpp>
 #include <SFGUI/Container.hpp>
-#include <SFGUI/Box.hpp>
-#include <SFGUI/Alignment.hpp>
 #include <SFGUI/Misc.hpp>
 #include <SFGUI/Button.hpp>
 #include <SFGUI/Entry.hpp>
@@ -41,6 +38,9 @@ namespace BlueBear {
 
     namespace GUI {
       class CMELabel;
+      class CMEWindow;
+      class CMEBox;
+      class CMEAlignment;
     }
 
     class WidgetBuilder {
@@ -52,13 +52,13 @@ namespace BlueBear {
 
       void addChildren( std::shared_ptr< sfg::ScrolledWindow > scrolledWindow, tinyxml2::XMLElement* element );
       void addChildren( std::shared_ptr< sfg::Container > widget, tinyxml2::XMLElement* element );
-      void packChildren( std::shared_ptr< sfg::Box > widget, tinyxml2::XMLElement* element );
+      void packChildren( std::shared_ptr< GUI::CMEBox > widget, tinyxml2::XMLElement* element );
       void addNotebookTabs( std::shared_ptr< sfg::Notebook > notebook, tinyxml2::XMLElement* element );
 
-      std::shared_ptr< sfg::Window > newWindowWidget( tinyxml2::XMLElement* element );
+      std::shared_ptr< GUI::CMEWindow > newWindowWidget( tinyxml2::XMLElement* element );
       std::shared_ptr< GUI::CMELabel > newLabelWidget( tinyxml2::XMLElement* element );
-      std::shared_ptr< sfg::Box > newBoxWidget( tinyxml2::XMLElement* element );
-      std::shared_ptr< sfg::Alignment > newAlignmentWidget( tinyxml2::XMLElement* element );
+      std::shared_ptr< GUI::CMEBox > newBoxWidget( tinyxml2::XMLElement* element );
+      std::shared_ptr< GUI::CMEAlignment > newAlignmentWidget( tinyxml2::XMLElement* element );
       std::shared_ptr< sfg::Button > newButtonWidget( tinyxml2::XMLElement* element );
       std::shared_ptr< sfg::Entry > newEntryWidget( tinyxml2::XMLElement* element );
       std::shared_ptr< sfg::Image > newImageWidget( tinyxml2::XMLElement* element );
