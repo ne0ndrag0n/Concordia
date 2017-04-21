@@ -2,9 +2,6 @@
 #include "graphics/imagecache.hpp"
 #include "graphics/imagebuilder/pathimagesource.hpp"
 #include "graphics/gui/cmelabel.hpp"
-#include "graphics/gui/cmewindow.hpp"
-#include "graphics/gui/cmebox.hpp"
-#include "graphics/gui/cmealignment.hpp"
 #include "configmanager.hpp"
 #include "log.hpp"
 #include "tools/utility.hpp"
@@ -119,7 +116,7 @@ namespace BlueBear {
 
         case hash( "Window" ):
           widget = newWindowWidget( element );
-          addChildren( std::static_pointer_cast< GUI::CMEWindow >( widget ), element );
+          addChildren( std::static_pointer_cast< sfg::Window >( widget ), element );
           break;
 
         case hash( "Label" ):
@@ -128,12 +125,12 @@ namespace BlueBear {
 
         case hash( "Box" ):
           widget = newBoxWidget( element );
-          packChildren( std::static_pointer_cast< GUI::CMEBox >( widget ), element );
+          packChildren( std::static_pointer_cast< sfg::Box >( widget ), element );
           break;
 
         case hash( "Alignment" ):
           widget = newAlignmentWidget( element );
-          addChildren( std::static_pointer_cast< GUI::CMEAlignment >( widget ), element );
+          addChildren( std::static_pointer_cast< sfg::Alignment >( widget ), element );
           break;
 
         case hash( "Button" ):
@@ -238,7 +235,7 @@ namespace BlueBear {
       }
     }
 
-    void WidgetBuilder::packChildren( std::shared_ptr< GUI::CMEBox > widget, tinyxml2::XMLElement* element ) {
+    void WidgetBuilder::packChildren( std::shared_ptr< sfg::Box > widget, tinyxml2::XMLElement* element ) {
       bool packFromStart = false;
       const char* _pack = element->Attribute( "pack" );
       if( !_pack ) {
@@ -389,8 +386,8 @@ namespace BlueBear {
       } );
     }
 
-    std::shared_ptr< GUI::CMEWindow > WidgetBuilder::newWindowWidget( tinyxml2::XMLElement* element ) {
-      std::shared_ptr< GUI::CMEWindow > window = GUI::CMEWindow::create();
+    std::shared_ptr< sfg::Window > WidgetBuilder::newWindowWidget( tinyxml2::XMLElement* element ) {
+      std::shared_ptr< sfg::Window > window = sfg::Window::Create();
 
       setBasicProperties( window, element );
       setAllocationAndRequisition( window, element );
@@ -444,8 +441,8 @@ namespace BlueBear {
       return label;
     }
 
-    std::shared_ptr< GUI::CMEBox > WidgetBuilder::newBoxWidget( tinyxml2::XMLElement* element ) {
-      std::shared_ptr< GUI::CMEBox > box;
+    std::shared_ptr< sfg::Box > WidgetBuilder::newBoxWidget( tinyxml2::XMLElement* element ) {
+      std::shared_ptr< sfg::Box > box;
 
       const char* orientation = element->Attribute( "orientation" );
       if( !orientation ) {
@@ -468,15 +465,15 @@ namespace BlueBear {
       float spacing = 0.0f;
       element->QueryFloatAttribute( "spacing", &spacing );
 
-      box = GUI::CMEBox::create( orientationFlag, spacing );
+      box = sfg::Box::Create( orientationFlag, spacing );
       setBasicProperties( box, element );
       setDefaultEvents( box, element );
 
       return box;
     }
 
-    std::shared_ptr< GUI::CMEAlignment > WidgetBuilder::newAlignmentWidget( tinyxml2::XMLElement* element ) {
-      std::shared_ptr< GUI::CMEAlignment > alignment = GUI::CMEAlignment::create();
+    std::shared_ptr< sfg::Alignment > WidgetBuilder::newAlignmentWidget( tinyxml2::XMLElement* element ) {
+      std::shared_ptr< sfg::Alignment > alignment = sfg::Alignment::Create();
 
       setBasicProperties( alignment, element );
       setAllocationAndRequisition( alignment, element );
