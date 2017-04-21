@@ -18,7 +18,7 @@
                     <Label>Concordia</Label>
                   </Alignment>
                   <Alignment scale_x="0">
-                    <Label id="ver">0.0.3 "Picasso"</Label>
+                    <Label>0.0.3 "Picasso"</Label>
                   </Alignment>
                 </Box>
               </Alignment>

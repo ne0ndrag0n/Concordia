@@ -1,7 +1,6 @@
 #include "graphics/widgetbuilder.hpp"
 #include "graphics/imagecache.hpp"
 #include "graphics/imagebuilder/pathimagesource.hpp"
-#include "graphics/gui/cmelabel.hpp"
 #include "configmanager.hpp"
 #include "log.hpp"
 #include "tools/utility.hpp"
@@ -116,7 +115,7 @@ namespace BlueBear {
 
         case hash( "Window" ):
           widget = newWindowWidget( element );
-          addChildren( std::static_pointer_cast< sfg::Window >( widget ), element );
+          addChildren( std::static_pointer_cast< sfg::Container >( widget ), element );
           break;
 
         case hash( "Label" ):
@@ -130,7 +129,7 @@ namespace BlueBear {
 
         case hash( "Alignment" ):
           widget = newAlignmentWidget( element );
-          addChildren( std::static_pointer_cast< sfg::Alignment >( widget ), element );
+          addChildren( std::static_pointer_cast< sfg::Container >( widget ), element );
           break;
 
         case hash( "Button" ):
@@ -149,7 +148,7 @@ namespace BlueBear {
 
         case hash( "Frame" ):
           widget = newFrameWidget( element );
-          addChildren( std::static_pointer_cast< sfg::Frame >( widget ), element );
+          addChildren( std::static_pointer_cast< sfg::Container >( widget ), element );
           break;
 
         case hash( "ProgressBar" ):
@@ -171,7 +170,7 @@ namespace BlueBear {
 
         case hash( "Viewport" ):
           widget = newViewportWidget( element );
-          addChildren( std::static_pointer_cast< sfg::Viewport >( widget ), element );
+          addChildren( std::static_pointer_cast< sfg::Container >( widget ), element );
           break;
 
         case hash( "Table" ):
@@ -426,11 +425,11 @@ namespace BlueBear {
       return window;
     }
 
-    std::shared_ptr< GUI::CMELabel > WidgetBuilder::newLabelWidget( tinyxml2::XMLElement* element ) {
-      std::shared_ptr< GUI::CMELabel > label;
+    std::shared_ptr< sfg::Label > WidgetBuilder::newLabelWidget( tinyxml2::XMLElement* element ) {
+      std::shared_ptr< sfg::Label > label;
 
       const char* labelValue = element->GetText();
-      label = GUI::CMELabel::create( labelValue ? labelValue : "" );
+      label = sfg::Label::Create( labelValue ? labelValue : "" );
 
       setBasicProperties( label, element );
       setAllocationAndRequisition( label, element );
