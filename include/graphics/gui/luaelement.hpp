@@ -36,6 +36,7 @@ namespace BlueBear {
         };
 
         static std::map< void*, std::map< sfg::Signal::SignalID, SignalBinding > > masterSignalMap;
+        static std::map< void*, std::map< std::string, std::string > > masterAttrMap;
 
         /**
          * Over time, make more of this shit a goddamn instance function!!

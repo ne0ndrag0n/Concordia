@@ -21,6 +21,7 @@ namespace BlueBear {
     namespace GUI {
 
       std::map< void*, std::map< sfg::Signal::SignalID, LuaElement::SignalBinding > > LuaElement::masterSignalMap;
+      std::map< void*, std::map< std::string, std::string > > LuaElement::masterAttrMap;
 
       void LuaElement::add( lua_State* L, const std::string& xmlString, Display::MainGameState& state ) {
         if( isContainer() ) {

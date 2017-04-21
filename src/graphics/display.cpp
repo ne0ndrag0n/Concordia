@@ -352,6 +352,7 @@ namespace BlueBear {
     }
     void Display::MainGameState::setupGUI() {
       GUI::LuaElement::masterSignalMap.clear();
+      GUI::LuaElement::masterAttrMap.clear();
 
       if( !gui.desktop.LoadThemeFromFile( ConfigManager::getInstance().getValue( "ui_theme" ) ) ) {
         Log::getInstance().warn( "Display::MainGameState::MainGameState", "ui_theme unable to load." );
