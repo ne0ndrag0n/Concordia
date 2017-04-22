@@ -20,8 +20,8 @@ namespace BlueBear {
   namespace Graphics {
     namespace GUI {
 
-      std::map< void*, std::map< sfg::Signal::SignalID, LuaElement::SignalBinding > > LuaElement::masterSignalMap;
-      std::map< void*, std::map< std::string, std::string > > LuaElement::masterAttrMap;
+      std::map< std::shared_ptr< sfg::Widget >, std::map< sfg::Signal::SignalID, LuaElement::SignalBinding > > LuaElement::masterSignalMap;
+      std::map< std::shared_ptr< sfg::Widget >, std::map< std::string, std::string > > LuaElement::masterAttrMap;
 
       void LuaElement::add( lua_State* L, const std::string& xmlString, Display::MainGameState& state ) {
         if( isContainer() ) {
@@ -163,7 +163,7 @@ namespace BlueBear {
             case Tools::Utility::hash( "click" ):
               {
                 // Create the bucket for this widget if it doesn't exist, otherwise, return a new bucket
-                auto& signalMap = masterSignalMap[ element.widget.get() ];
+                auto& signalMap = masterSignalMap[ element.widget ];
 
                 unregisterClickHandler( L, signalMap, element.widget );
 
@@ -223,7 +223,7 @@ namespace BlueBear {
         if( lua_isstring( L, -1 ) ) {
 
           const char* eventType = lua_tostring( L, -1 );
-          auto signalMap = masterSignalMap.find( element.widget.get() );
+          auto signalMap = masterSignalMap.find( element.widget );
           if( signalMap != masterSignalMap.end() ) {
 
             switch( Tools::Utility::hash( eventType ) ) {
@@ -1751,7 +1751,7 @@ namespace BlueBear {
        * RETURNS: true
        */
       void LuaElement::registerGenericHandler( lua_State* L, EventManager& eventManager, std::shared_ptr< sfg::Widget > widget, sfg::Signal::SignalID signalID ) {
-        auto& signalMap = masterSignalMap[ widget.get() ];
+        auto& signalMap = masterSignalMap[ widget ];
         unregisterHandler( L, signalMap, widget, signalID );
 
         LuaReference masterReference = luaL_ref( L, LUA_REGISTRYINDEX ); // EMPTY
