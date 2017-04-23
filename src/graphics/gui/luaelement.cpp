@@ -1764,6 +1764,42 @@ namespace BlueBear {
         lua_pushboolean( L, true ); // true
       }
 
+      void LuaElement::setCustomAttribute( std::shared_ptr< sfg::Widget > widget, const std::string& key, const std::string& value ) {
+        // If we're unsetting a particular attribute and there's no map for this widget, just ignore it
+        if( value == "" && masterAttrMap.find( widget ) == masterAttrMap.end() ) {
+          return;
+        }
+
+        std::map< std::string, std::string > attrMap = masterAttrMap[ widget ];
+        if( value == "" ) {
+          // Unsetting an existing map value
+          attrMap.erase( key );
+
+          // If this was the last value, clean up the map
+          if( !attrMap.size() ) {
+            masterAttrMap.erase( widget );
+          }
+        } else {
+          // Setting a new map value
+          attrMap[ key ] = value;
+        }
+      }
+
+      std::string LuaElement::getCustomAttribute( std::shared_ptr< sfg::Widget > widget, const std::string& key ) {
+        auto it = masterAttrMap.find( widget );
+
+        if( it != masterAttrMap.end() ) {
+          std::map< std::string, std::string > attrMap = it->second;
+          auto it = attrMap.find( key );
+          if( it != attrMap.end() ) {
+            return it->second;
+          }
+        }
+
+        return "";
+      }
+
+
     }
   }
 }

@@ -188,10 +188,26 @@ namespace BlueBear {
       }
 
       void RowPseudoElement::add( lua_State* L, LuaElement* element ) {
-        // Add using the default attributes (these attributes cannot be set on the original pointer)
+
+        // This is just a disgrace
+        unsigned int colspan = 1;
+        unsigned int rowspan = 1;
+        float paddingX = 0.0f;
+        float paddingY = 0.0f;
+        bool expandX = true, expandY = true;
+        bool fillX = true, fillY = true;
+
+        int packX = 0, packY = 0;
+        if( expandX ) { packX |= sfg::Table::EXPAND; }
+        if( fillX ) { packX |= sfg::Table::FILL; }
+        if( expandY ) { packY |= sfg::Table::EXPAND; }
+        if( fillY ) { packY |= sfg::Table::FILL; }
+
+        // TODO: loading from attributes into properties above
+
         add(
           RowPseudoElement::WidgetStaging{
-            1, 1, 0.0f, 0.0f, sfg::Table::EXPAND | sfg::Table::FILL, sfg::Table::EXPAND | sfg::Table::FILL, element->widget
+            colspan, rowspan, paddingX, paddingY, packX, packY, element->widget
           }
         );
       }
@@ -229,6 +245,18 @@ namespace BlueBear {
             if( expandY ) { packY |= sfg::Table::EXPAND; }
             if( fillY ) { packY |= sfg::Table::FILL; }
 
+            std::shared_ptr< sfg::Widget > widget = widgetBuilder.getWidgetFromElementDirect( child );
+            if( !subject ) {
+              LuaElement::setCustomAttribute( widget, "colspan", std::to_string( colspan ) );
+              LuaElement::setCustomAttribute( widget, "rowspan", std::to_string( rowspan ) );
+              LuaElement::setCustomAttribute( widget, "padding_x", std::to_string( paddingX ) );
+              LuaElement::setCustomAttribute( widget, "padding_y", std::to_string( paddingY ) );
+              LuaElement::setCustomAttribute( widget, "expand_x", std::to_string( expandX ) );
+              LuaElement::setCustomAttribute( widget, "expand_y", std::to_string( expandY ) );
+              LuaElement::setCustomAttribute( widget, "fill_x", std::to_string( fillX ) );
+              LuaElement::setCustomAttribute( widget, "fill_y", std::to_string( fillY ) );
+            }
+
             add(
               RowPseudoElement::WidgetStaging{
                 colspan,
@@ -237,7 +265,7 @@ namespace BlueBear {
                 paddingY,
                 packX,
                 packY,
-                widgetBuilder.getWidgetFromElementDirect( child )
+                widget
               }
             );
 
@@ -322,6 +350,8 @@ namespace BlueBear {
       }
 
       int RowPseudoElement::lua_gc( lua_State* L ) {
+        // TODO cleanup of masterAttrMap
+
         RowPseudoElement* self = *( ( RowPseudoElement** ) luaL_checkudata( L, 1, "bluebear_row_pseudo_element" ) );
 
         delete self;
