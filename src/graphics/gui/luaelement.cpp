@@ -1529,6 +1529,9 @@ namespace BlueBear {
         //Log::getInstance().debug( "LuaElement::lua_gc", "Deleting " + Tools::Utility::pointerToString( widgetPtr ) );
         delete widgetPtr;
 
+        // Cycle GC for master maps
+        masterMapGC();
+
         return 0;
       }
 
@@ -1799,6 +1802,61 @@ namespace BlueBear {
         return "";
       }
 
+      void LuaElement::queryUnsignedAttribute( std::shared_ptr< sfg::Widget > widget, const std::string& key, unsigned int* value ) {
+        std::string stringValue = getCustomAttribute( widget, key );
+
+        if( stringValue != "" ) {
+          *value = std::stoul( stringValue );
+        }
+      }
+
+      void LuaElement::queryFloatAttribute( std::shared_ptr< sfg::Widget > widget, const std::string& key, float* value ) {
+        std::string stringValue = getCustomAttribute( widget, key );
+
+        if( stringValue != "" ) {
+          *value = std::stof( stringValue );
+        }
+      }
+
+      void LuaElement::queryBoolAttribute( std::shared_ptr< sfg::Widget > widget, const std::string& key, bool* value ) {
+        std::string stringValue = getCustomAttribute( widget, key );
+
+        if( stringValue != "" ) {
+          // non-false, non-blank values are truthy
+          *value = !( stringValue == "false" );
+        }
+      }
+
+      /**
+       * Garbage-collect potentially abandoned items that masterSignalMap/masterAttrMap are keeping alive
+       */
+      void LuaElement::masterMapGC() {
+        {
+          auto it = masterSignalMap.begin();
+          while( it != masterSignalMap.end() ) {
+
+            if( it->first.use_count() == 1 ) {
+              it = masterSignalMap.erase( it );
+            } else {
+              ++it;
+            }
+
+          }
+        }
+
+        {
+          auto it = masterAttrMap.begin();
+          while( it != masterAttrMap.end() ) {
+
+            if( it->first.use_count() == 1 ) {
+              it = masterAttrMap.erase( it );
+            } else {
+              ++it;
+            }
+
+          }
+        }
+      }
 
     }
   }

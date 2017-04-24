@@ -118,6 +118,11 @@ namespace BlueBear {
         static void setCustomAttribute( std::shared_ptr< sfg::Widget > widget, const std::string& key, const std::string& value );
         static std::string getCustomAttribute( std::shared_ptr< sfg::Widget > widget, const std::string& key );
 
+        static void queryUnsignedAttribute( std::shared_ptr< sfg::Widget > widget, const std::string& key, unsigned int* value );
+        static void queryFloatAttribute( std::shared_ptr< sfg::Widget > widget, const std::string& key, float* value );
+        static void queryBoolAttribute( std::shared_ptr< sfg::Widget > widget, const std::string& key, bool* value );
+        static void masterMapGC();
+
         template < typename T > static std::shared_ptr< sfg::Adjustment > getAdjustment( std::shared_ptr< sfg::Widget > widget ) {
           std::shared_ptr< T > adjustmentType = std::static_pointer_cast< T >( widget );
           return adjustmentType->GetAdjustment();

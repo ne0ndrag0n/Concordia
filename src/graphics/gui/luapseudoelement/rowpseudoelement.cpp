@@ -191,19 +191,26 @@ namespace BlueBear {
 
         // This is just a disgrace
         unsigned int colspan = 1;
+        LuaElement::queryUnsignedAttribute( element->widget, "colspan", &colspan );
         unsigned int rowspan = 1;
+        LuaElement::queryUnsignedAttribute( element->widget, "rowspan", &rowspan );
         float paddingX = 0.0f;
+        LuaElement::queryFloatAttribute( element->widget, "padding_x", &paddingX );
         float paddingY = 0.0f;
+        LuaElement::queryFloatAttribute( element->widget, "padding_y", &paddingY );
         bool expandX = true, expandY = true;
         bool fillX = true, fillY = true;
+
+        LuaElement::queryBoolAttribute( element->widget, "expand_x", &expandX );
+        LuaElement::queryBoolAttribute( element->widget, "expand_y", &expandX );
+        LuaElement::queryBoolAttribute( element->widget, "fill_x", &fillX );
+        LuaElement::queryBoolAttribute( element->widget, "fill_y", &fillY );
 
         int packX = 0, packY = 0;
         if( expandX ) { packX |= sfg::Table::EXPAND; }
         if( fillX ) { packX |= sfg::Table::FILL; }
         if( expandY ) { packY |= sfg::Table::EXPAND; }
         if( fillY ) { packY |= sfg::Table::FILL; }
-
-        // TODO: loading from attributes into properties above
 
         add(
           RowPseudoElement::WidgetStaging{

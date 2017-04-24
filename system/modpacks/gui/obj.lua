@@ -25,8 +25,8 @@ end
 function GUIProvider:do_something( event )
   local table = self.gui:find_by_id( 'table' )
 
-  local row = table:find_pseudo( 'row', 2 )
-  row:add( '<Button>New</Button>' )
+  --local row = table:find_pseudo( 'row', 2 )
+  --row:add( '<Button>New</Button>' )
 end
 
 function GUIProvider:on_click_zoom_in()
