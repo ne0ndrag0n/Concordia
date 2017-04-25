@@ -1,6 +1,7 @@
 #include "graphics/widgetbuilder.hpp"
 #include "graphics/imagecache.hpp"
 #include "graphics/imagebuilder/pathimagesource.hpp"
+#include "graphics/gui/luaelement.hpp"
 #include "configmanager.hpp"
 #include "log.hpp"
 #include "tools/utility.hpp"
@@ -290,6 +291,24 @@ namespace BlueBear {
           widget->Show( false );
         } else {
           Log::getInstance().warn( "WidgetBuilder::setBasicProperties",  "Invalid value for \"visible\" attribute: " + std::string( value ) + ", defaulting to \"true\"" );
+        }
+      }
+
+      if( includeCustom ) {
+        setCustomAttributes( widget, element );
+      }
+    }
+
+    void WidgetBuilder::setCustomAttributes( std::shared_ptr< sfg::Widget > widget, tinyxml2::XMLElement* element ) {
+      // Handle whitelisted custom attributes
+      static std::array< std::string, 8 > usableAttrs{ { "colspan", "rowspan", "padding_x", "padding_y", "expand_x", "expand_y", "fill_x", "fill_y" } };
+      for ( const tinyxml2::XMLAttribute* attribute = element->FirstAttribute(); attribute != nullptr; attribute = attribute->Next() ) {
+        std::string attrName = attribute->Name();
+
+        auto it = std::find( usableAttrs.begin(), usableAttrs.end(), attrName );
+        if( it != usableAttrs.end() ) {
+          // Whitelisted attribute
+          GUI::LuaElement::setCustomAttribute( widget, attrName, attribute->Value() );
         }
       }
     }
@@ -722,6 +741,8 @@ namespace BlueBear {
       std::map< unsigned int, float > requestedRowSpacings;
       std::map< unsigned int, float > requestedColumnSpacings;
 
+      includeCustom = false;
+
       unsigned int currentRow = 0;
 
       for( tinyxml2::XMLElement* row = element->FirstChildElement(); row != NULL; row = row->NextSiblingElement() ) {
@@ -792,6 +813,8 @@ namespace BlueBear {
       for( auto& it : requestedColumnSpacings ) {
         table->SetColumnSpacing( it.first, it.second );
       }
+
+      includeCustom = true;
     }
 
     void WidgetBuilder::addNotebookTabs( std::shared_ptr< sfg::Notebook > notebook, tinyxml2::XMLElement* element ) {

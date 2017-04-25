@@ -31,6 +31,7 @@
 #include <exception>
 #include <vector>
 #include <utility>
+#include <array>
 #include "log.hpp"
 #include "tools/utility.hpp"
 
@@ -46,6 +47,7 @@ namespace BlueBear {
       // "This RadioButton needs to be associated with the group belonging to this item"
       std::vector< std::pair< std::shared_ptr< sfg::RadioButton >, std::string > > groups;
       static constexpr unsigned int hash(const char* str, int h = 0);
+      bool includeCustom = true;
 
       void addChildren( std::shared_ptr< sfg::ScrolledWindow > scrolledWindow, tinyxml2::XMLElement* element );
       void addChildren( std::shared_ptr< sfg::Container > widget, tinyxml2::XMLElement* element );
@@ -98,6 +100,7 @@ namespace BlueBear {
       void addTableRows( std::shared_ptr< sfg::Table > table, tinyxml2::XMLElement* element );
 
       void setDefaultEvents( std::shared_ptr< sfg::Widget > widget, tinyxml2::XMLElement* element );
+      void setCustomAttributes( std::shared_ptr< sfg::Widget > widget, tinyxml2::XMLElement* element );
       void setAlignment( std::shared_ptr< sfg::Misc > widget, tinyxml2::XMLElement* element );
       void setBasicProperties( std::shared_ptr< sfg::Widget > widget, tinyxml2::XMLElement* element );
       void setAllocationAndRequisition( std::shared_ptr< sfg::Widget > widget, tinyxml2::XMLElement* element );
