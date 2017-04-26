@@ -56,6 +56,14 @@ namespace BlueBear {
         return "row";
       }
 
+      int RowPseudoElement::create( lua_State* L, Display::MainGameState& displayState, tinyxml2::XMLElement* element ) {
+        RowPseudoElement** item = ( RowPseudoElement** ) lua_newuserdata( L, sizeof( RowPseudoElement* ) ); // userdata
+        *item = new RowPseudoElement( nullptr, -1, displayState );
+        ( *item )->setMetatable( L );
+
+        return 1;
+      }
+
       /**
        * @static
        */
@@ -187,24 +195,23 @@ namespace BlueBear {
         return 0;
       }
 
-      void RowPseudoElement::add( lua_State* L, LuaElement* element ) {
-
+      void RowPseudoElement::add( std::shared_ptr< sfg::Widget > widget ) {
         // This is just a disgrace
         unsigned int colspan = 1;
-        LuaElement::queryUnsignedAttribute( element->widget, "colspan", &colspan );
+        LuaElement::queryUnsignedAttribute( widget, "colspan", &colspan );
         unsigned int rowspan = 1;
-        LuaElement::queryUnsignedAttribute( element->widget, "rowspan", &rowspan );
+        LuaElement::queryUnsignedAttribute( widget, "rowspan", &rowspan );
         float paddingX = 0.0f;
-        LuaElement::queryFloatAttribute( element->widget, "padding_x", &paddingX );
+        LuaElement::queryFloatAttribute( widget, "padding_x", &paddingX );
         float paddingY = 0.0f;
-        LuaElement::queryFloatAttribute( element->widget, "padding_y", &paddingY );
+        LuaElement::queryFloatAttribute( widget, "padding_y", &paddingY );
         bool expandX = true, expandY = true;
         bool fillX = true, fillY = true;
 
-        LuaElement::queryBoolAttribute( element->widget, "expand_x", &expandX );
-        LuaElement::queryBoolAttribute( element->widget, "expand_y", &expandX );
-        LuaElement::queryBoolAttribute( element->widget, "fill_x", &fillX );
-        LuaElement::queryBoolAttribute( element->widget, "fill_y", &fillY );
+        LuaElement::queryBoolAttribute( widget, "expand_x", &expandX );
+        LuaElement::queryBoolAttribute( widget, "expand_y", &expandX );
+        LuaElement::queryBoolAttribute( widget, "fill_x", &fillX );
+        LuaElement::queryBoolAttribute( widget, "fill_y", &fillY );
 
         int packX = 0, packY = 0;
         if( expandX ) { packX |= sfg::Table::EXPAND; }
@@ -212,77 +219,10 @@ namespace BlueBear {
         if( expandY ) { packY |= sfg::Table::EXPAND; }
         if( fillY ) { packY |= sfg::Table::FILL; }
 
-        add(
-          RowPseudoElement::WidgetStaging{
-            colspan, rowspan, paddingX, paddingY, packX, packY, element->widget
-          }
-        );
-      }
+        RowPseudoElement::WidgetStaging staging{
+          colspan, rowspan, paddingX, paddingY, packX, packY, widget
+        };
 
-      void RowPseudoElement::add( lua_State* L, const std::string& xmlString ) {
-        // Manually parse this out - We'll be adding a widget but it has additional properties that need to be passed to the shared_ptr overload
-        tinyxml2::XMLDocument document;
-
-        for( tinyxml2::XMLElement* child = Tools::Utility::getRootNode( document, xmlString ); child != NULL; child = child->NextSiblingElement() ) {
-          try {
-            WidgetBuilder widgetBuilder( displayState.instance.eventManager, displayState.getImageCache() );
-            unsigned int colspan = 1;
-            child->QueryUnsignedAttribute( "colspan", &colspan );
-
-            unsigned int rowspan = 1;
-            child->QueryUnsignedAttribute( "rowspan", &rowspan );
-
-            float paddingX = 0.0f;
-            child->QueryFloatAttribute( "padding_x", &paddingX );
-
-            float paddingY = 0.0f;
-            child->QueryFloatAttribute( "padding_y", &paddingY );
-
-            bool expandX = true, expandY = true;
-            bool fillX = true, fillY = true;
-
-            child->QueryBoolAttribute( "expand_x", &expandX );
-            child->QueryBoolAttribute( "expand_y", &expandY );
-            child->QueryBoolAttribute( "fill_x", &fillX );
-            child->QueryBoolAttribute( "fill_y", &fillY );
-
-            int packX = 0, packY = 0;
-            if( expandX ) { packX |= sfg::Table::EXPAND; }
-            if( fillX ) { packX |= sfg::Table::FILL; }
-            if( expandY ) { packY |= sfg::Table::EXPAND; }
-            if( fillY ) { packY |= sfg::Table::FILL; }
-
-            std::shared_ptr< sfg::Widget > widget = widgetBuilder.getWidgetFromElementDirect( child );
-            if( !subject ) {
-              LuaElement::setCustomAttribute( widget, "colspan", std::to_string( colspan ) );
-              LuaElement::setCustomAttribute( widget, "rowspan", std::to_string( rowspan ) );
-              LuaElement::setCustomAttribute( widget, "padding_x", std::to_string( paddingX ) );
-              LuaElement::setCustomAttribute( widget, "padding_y", std::to_string( paddingY ) );
-              LuaElement::setCustomAttribute( widget, "expand_x", std::to_string( expandX ) );
-              LuaElement::setCustomAttribute( widget, "expand_y", std::to_string( expandY ) );
-              LuaElement::setCustomAttribute( widget, "fill_x", std::to_string( fillX ) );
-              LuaElement::setCustomAttribute( widget, "fill_y", std::to_string( fillY ) );
-            }
-
-            add(
-              RowPseudoElement::WidgetStaging{
-                colspan,
-                rowspan,
-                paddingX,
-                paddingY,
-                packX,
-                packY,
-                widget
-              }
-            );
-
-          } catch( std::exception& e ) {
-            Log::getInstance().error( "RowPseudoElement::add", "Failed to add widget XML: " + std::string( e.what() ) );
-          }
-        }
-      }
-
-      void RowPseudoElement::add( RowPseudoElement::WidgetStaging staging ) {
         if( subject ) {
           subject->Attach(
             staging.widget,
@@ -293,6 +233,24 @@ namespace BlueBear {
           );
         } else {
           stagedWidgets.push_back( staging );
+        }
+      }
+
+      void RowPseudoElement::add( lua_State* L, LuaElement* element ) {
+        add( element->widget );
+      }
+
+      void RowPseudoElement::add( lua_State* L, const std::string& xmlString ) {
+        // Manually parse this out - We'll be adding a widget but it has additional properties that need to be passed to the shared_ptr overload
+        tinyxml2::XMLDocument document;
+
+        for( tinyxml2::XMLElement* child = Tools::Utility::getRootNode( document, xmlString ); child != NULL; child = child->NextSiblingElement() ) {
+          try {
+            WidgetBuilder widgetBuilder( displayState.instance.eventManager, displayState.getImageCache() );
+            add( widgetBuilder.getWidgetFromElementDirect( child ) );
+          } catch( std::exception& e ) {
+            Log::getInstance().error( "RowPseudoElement::add", "Failed to add widget XML: " + std::string( e.what() ) );
+          }
         }
       }
 

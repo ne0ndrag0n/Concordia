@@ -6,6 +6,7 @@
 #include "graphics/gui/luapseudoelement/tabpseudoelement.hpp"
 #include "graphics/gui/luapseudoelement/contentpseudoelement.hpp"
 #include "graphics/gui/luapseudoelement/itempseudoelement.hpp"
+#include "graphics/gui/luapseudoelement/rowpseudoelement.hpp"
 #include "graphics/imagecache.hpp"
 #include "graphics/widgetbuilder.hpp"
 #include "tools/ctvalidators.hpp"
@@ -107,6 +108,8 @@ namespace BlueBear {
             return PagePseudoElement::create( L, displayState, element ) == 1 ? true : false; // userdata
           case Tools::Utility::hash( "item" ):
             return ItemPseudoElement::create( L, displayState, element ) == 1 ? true : false; // userdata
+          case Tools::Utility::hash( "row" ):
+            return RowPseudoElement::create( L, displayState, element ) == 1 ? true : false; // userdata
           default:
             try {
               WidgetBuilder widgetBuilder( displayState.instance.eventManager, displayState.getImageCache() );

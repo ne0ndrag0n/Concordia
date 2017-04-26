@@ -38,9 +38,9 @@ namespace BlueBear {
         int getItemsByClass( lua_State* L, const std::string clss );
         int getLatestColumn();
 
+        void add( std::shared_ptr< sfg::Widget > widget );
         void add( lua_State* L, LuaElement* element );
         void add( lua_State* L, const std::string& xmlString );
-        void add( WidgetStaging staging );
 
       public:
         RowPseudoElement(
@@ -52,6 +52,7 @@ namespace BlueBear {
         void setMetatable( lua_State* L );
         std::string getName();
 
+        static int create( lua_State* L, Display::MainGameState& displayState, tinyxml2::XMLElement* element );
         static int getRowCount( std::shared_ptr< sfg::Table > table );
         static int lua_add( lua_State* L );
         static int lua_gc( lua_State* L );

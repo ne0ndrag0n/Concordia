@@ -67,9 +67,9 @@
 
 <Window id="tablewindow" title="Table Test">
   <Table id="table">
+    <!--
     <row>
       <Button id="foo">Foo</Button>
-      <!-- <Button colspan="2" rowspan="3">row_span</Button> -->
     </row>
     <row>
     	<Button id="bar">Bar</Button>
@@ -80,5 +80,6 @@
     <row>
       <Button colspan="3">column_span</Button>
     </row>
+    -->
   </Table>
 </Window>

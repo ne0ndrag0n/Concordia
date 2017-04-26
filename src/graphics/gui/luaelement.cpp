@@ -94,6 +94,18 @@ namespace BlueBear {
         }
       }
 
+      void LuaElement::add( lua_State* L, RowPseudoElement* row ) {
+        switch( Tools::Utility::hash( widget->GetName().c_str() ) ) {
+          case Tools::Utility::hash( "Table" ): {
+            // TODO
+            Log::getInstance().error( "LuaElement::add", "Unimplemented" );
+            break;
+          }
+          default:
+            Log::getInstance().debug( "LuaElement::add", "Cannot add a <" + row->getName() + "> pseudo-element to a " + widget->GetName() + " widget." );
+        }
+      }
+
       void LuaElement::addToCheckedContainer( std::shared_ptr< sfg::Widget > target ) {
         if( std::string( widget->GetName() ) == "Box" ) {
           std::shared_ptr< sfg::Box > widgetAsBox = std::static_pointer_cast< sfg::Box >( widget );
@@ -1547,6 +1559,8 @@ namespace BlueBear {
         } else if ( PagePseudoElement** udata = ( PagePseudoElement** ) luaL_testudata( L, 2, "bluebear_page_pseudo_element" ) ) {
           self->add( L, *udata );
         } else if ( ItemPseudoElement** udata = ( ItemPseudoElement** ) luaL_testudata( L, 2, "bluebear_item_pseudo_element" ) ) {
+          self->add( L, *udata );
+        } else if ( RowPseudoElement** udata = ( RowPseudoElement** ) luaL_testudata( L, 2, "bluebear_row_pseudo_element" ) ) {
           self->add( L, *udata );
         } else {
           LuaElement* argument = *( ( LuaElement** ) luaL_checkudata( L, 2, "bluebear_widget" ) );

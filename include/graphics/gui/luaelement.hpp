@@ -19,6 +19,7 @@ namespace BlueBear {
     namespace GUI {
       class ItemPseudoElement;
       class PagePseudoElement;
+      class RowPseudoElement;
 
       // Reserve space for additional elements we may need for a LuaElement type.
 
@@ -45,6 +46,7 @@ namespace BlueBear {
         void add( LuaElement* element );
         void add( lua_State* L, PagePseudoElement* page );
         void add( lua_State* L, ItemPseudoElement* item );
+        void add( lua_State* L, RowPseudoElement* row );
         void addToCheckedContainer( std::shared_ptr< sfg::Widget > target );
         void removeWidget( std::shared_ptr< sfg::Widget > target );
         void removePseudoElement( PagePseudoElement* page );
