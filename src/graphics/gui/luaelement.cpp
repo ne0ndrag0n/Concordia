@@ -1787,7 +1787,7 @@ namespace BlueBear {
           return;
         }
 
-        std::map< std::string, std::string > attrMap = masterAttrMap[ widget ];
+        std::map< std::string, std::string >& attrMap = masterAttrMap[ widget ];
         if( value == "" ) {
           // Unsetting an existing map value
           attrMap.erase( key );

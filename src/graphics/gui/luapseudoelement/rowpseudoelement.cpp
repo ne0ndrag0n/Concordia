@@ -61,6 +61,9 @@ namespace BlueBear {
         *item = new RowPseudoElement( nullptr, -1, displayState );
         ( *item )->setMetatable( L );
 
+        // Process out everything
+        ( *item )->processElements( element->FirstChildElement() );
+
         return 1;
       }
 
@@ -195,6 +198,28 @@ namespace BlueBear {
         return 0;
       }
 
+      void RowPseudoElement::setSubject( std::shared_ptr< sfg::Table > table ) {
+        if( !table ) {
+          Log::getInstance().error( "RowPseudoElement::setSubject", "std::shared_ptr< sfg::Table > was nullptr" );
+          return;
+        }
+
+        if( subject ) {
+          Log::getInstance().warn( "RowPseudoElement::setSubject", "This <row> already belongs to a Table and cannot be added to another one." );
+          return;
+        }
+
+        subject = table;
+
+        rowNumber = RowPseudoElement::getRowCount( subject );
+
+        for( RowPseudoElement::WidgetStaging staging : stagedWidgets ) {
+          addFromStaging( staging );
+        }
+
+        stagedWidgets.clear();
+      }
+
       void RowPseudoElement::add( std::shared_ptr< sfg::Widget > widget ) {
         // This is just a disgrace
         unsigned int colspan = 1;
@@ -224,6 +249,14 @@ namespace BlueBear {
         };
 
         if( subject ) {
+          addFromStaging( staging );
+        } else {
+          stagedWidgets.push_back( staging );
+        }
+      }
+
+      void RowPseudoElement::addFromStaging( WidgetStaging staging ) {
+        if( subject ) {
           subject->Attach(
             staging.widget,
             sf::Rect< sf::Uint32 >( getLatestColumn() + 1, rowNumber, staging.colspan, staging.rowspan ),
@@ -232,7 +265,7 @@ namespace BlueBear {
             sf::Vector2f( staging.paddingX, staging.paddingY )
           );
         } else {
-          stagedWidgets.push_back( staging );
+          Log::getInstance().error( "RowPseudoElement::addFromStaging", "Tried to add <row> element staging to null subject; this is likely a bug." );
         }
       }
 
@@ -244,7 +277,11 @@ namespace BlueBear {
         // Manually parse this out - We'll be adding a widget but it has additional properties that need to be passed to the shared_ptr overload
         tinyxml2::XMLDocument document;
 
-        for( tinyxml2::XMLElement* child = Tools::Utility::getRootNode( document, xmlString ); child != NULL; child = child->NextSiblingElement() ) {
+        processElements( Tools::Utility::getRootNode( document, xmlString ) );
+      }
+
+      void RowPseudoElement::processElements( tinyxml2::XMLElement* element ) {
+        for( tinyxml2::XMLElement* child = element; child != NULL; child = child->NextSiblingElement() ) {
           try {
             WidgetBuilder widgetBuilder( displayState.instance.eventManager, displayState.getImageCache() );
             add( widgetBuilder.getWidgetFromElementDirect( child ) );

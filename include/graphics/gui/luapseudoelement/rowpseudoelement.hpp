@@ -41,6 +41,8 @@ namespace BlueBear {
         void add( std::shared_ptr< sfg::Widget > widget );
         void add( lua_State* L, LuaElement* element );
         void add( lua_State* L, const std::string& xmlString );
+        void addFromStaging( WidgetStaging staging );
+        void processElements( tinyxml2::XMLElement* element );
 
       public:
         RowPseudoElement(
@@ -49,6 +51,7 @@ namespace BlueBear {
           Display::MainGameState& displayState
         );
 
+        void setSubject( std::shared_ptr< sfg::Table > table );
         void setMetatable( lua_State* L );
         std::string getName();
 
