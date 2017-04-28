@@ -97,8 +97,7 @@ namespace BlueBear {
       void LuaElement::add( lua_State* L, RowPseudoElement* row ) {
         switch( Tools::Utility::hash( widget->GetName().c_str() ) ) {
           case Tools::Utility::hash( "Table" ): {
-            // TODO
-            Log::getInstance().error( "LuaElement::add", "Unimplemented" );
+            row->setSubject( std::static_pointer_cast< sfg::Table >( widget ) );
             break;
           }
           default:
@@ -927,19 +926,67 @@ namespace BlueBear {
               Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
               return 0;
             }
+          // Table extras
+          case Tools::Utility::hash( "colspan" ): {
+            // If the widget has a parent and it's a table widget, extract the info from the table widget
+            std::shared_ptr< sfg::Widget > parent = widgetPtr->widget->GetParent();
+
+            if( parent && parent->GetName() == "Table" ) {
+              // Extract the info from the table widget
+              std::shared_ptr< sfg::Table > table = std::static_pointer_cast< sfg::Table >( parent );
+              std::list< sfg::priv::TableCell > tableCellList = table->m_cells;
+              auto it = std::find_if( tableCellList.begin(), tableCellList.end(), [ & ]( sfg::priv::TableCell& cell ) {
+                return cell.child == widgetPtr->widget;
+              } );
+
+              if( it != tableCellList.end() ) {
+                sfg::priv::TableCell& cell = *it;
+                lua_pushnumber( L, cell.rect.width ); // 42
+                return 1;
+              }
+            } else {
+              // Query this info from XML. Default = 1
+              unsigned int colspan = 1;
+              queryUnsignedAttribute( widgetPtr->widget, "colspan", &colspan );
+              lua_pushnumber( L, colspan ); // 42
+              return 1;
+            }
+
+            return 0;
+          }
+          case Tools::Utility::hash( "rowspan" ): {
+            // TODO
+            return 0;
+          }
+          case Tools::Utility::hash( "expand_x" ): {
+            // TODO
+            return 0;
+          }
+          case Tools::Utility::hash( "expand_y" ): {
+            // TODO
+            return 0;
+          }
+          case Tools::Utility::hash( "fill_x" ): {
+            // TODO
+            return 0;
+          }
+          case Tools::Utility::hash( "fill_y" ): {
+            // TODO
+            return 0;
+          }
+          case Tools::Utility::hash( "padding_x" ): {
+            // TODO
+            return 0;
+          }
+          case Tools::Utility::hash( "padding_y" ): {
+            // TODO
+            return 0;
+          }
           // These properties are not settable/retrievable using the SFGUI API
           case Tools::Utility::hash( "tab_position" ):
           case Tools::Utility::hash( "expand" ):
           case Tools::Utility::hash( "fill" ):
           case Tools::Utility::hash( "orientation" ):
-          case Tools::Utility::hash( "colspan" ):
-          case Tools::Utility::hash( "rowspan" ):
-          case Tools::Utility::hash( "padding_x" ):
-          case Tools::Utility::hash( "padding_y" ):
-          case Tools::Utility::hash( "expand_x" ):
-          case Tools::Utility::hash( "expand_y" ):
-          case Tools::Utility::hash( "fill_x" ):
-          case Tools::Utility::hash( "fill_y" ):
           case Tools::Utility::hash( "row_spacing" ):
           case Tools::Utility::hash( "column_spacing" ):
             {

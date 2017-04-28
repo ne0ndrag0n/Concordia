@@ -24,16 +24,6 @@ end
 
 function GUIProvider:do_something( event )
   local table = self.gui:find_by_id( 'table' )
-
-  local row1 = self.gui:create( [[ <row><Button id="foo2">Foo</Button></row> ]] )
-  local row2 = self.gui:create( [[ <row><Button id="bar2">Bar</Button></row> ]] )
-  local row3 = self.gui:create( [[ <row><Button>Baz</Button></row> ]] )
-  local row4 = self.gui:create( [[ <row><Button colspan="3">column_span</Button></row> ]] )
-
-  --table:add( row1 )
-  --table:add( row2 )
-  --table:add( row3 )
-  --table:add( row4 )
 end
 
 function GUIProvider:on_click_zoom_in()

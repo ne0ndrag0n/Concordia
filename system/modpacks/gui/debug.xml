@@ -77,7 +77,7 @@
     	<Button>Baz</Button>
     </row>
     <row>
-      <Button colspan="3">column_span</Button>
+      <Button id="col3" colspan="3">column_span</Button>
     </row>
   </Table>
 </Window>
