@@ -955,7 +955,28 @@ namespace BlueBear {
             return 0;
           }
           case Tools::Utility::hash( "rowspan" ): {
-            // TODO
+            // Look, past a certain point it's just easier to copy/paste the damn thing
+            std::shared_ptr< sfg::Widget > parent = widgetPtr->widget->GetParent();
+
+            if( parent && parent->GetName() == "Table" ) {
+              std::shared_ptr< sfg::Table > table = std::static_pointer_cast< sfg::Table >( parent );
+              std::list< sfg::priv::TableCell > tableCellList = table->m_cells;
+              auto it = std::find_if( tableCellList.begin(), tableCellList.end(), [ & ]( sfg::priv::TableCell& cell ) {
+                return cell.child == widgetPtr->widget;
+              } );
+
+              if( it != tableCellList.end() ) {
+                sfg::priv::TableCell& cell = *it;
+                lua_pushnumber( L, cell.rect.height ); // 42
+                return 1;
+              }
+            } else {
+              unsigned int rowspan = 1;
+              queryUnsignedAttribute( widgetPtr->widget, "rowspan", &rowspan );
+              lua_pushnumber( L, rowspan ); // 42
+              return 1;
+            }
+
             return 0;
           }
           case Tools::Utility::hash( "expand_x" ): {
