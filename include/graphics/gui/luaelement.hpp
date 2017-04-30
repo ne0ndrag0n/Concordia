@@ -117,6 +117,8 @@ namespace BlueBear {
           bool close
         );
 
+        static std::list< sfg::priv::TableCell >::iterator getCell( std::list< sfg::priv::TableCell >& tableCellList, std::shared_ptr< sfg::Widget > widget );
+
         static void setCustomAttribute( std::shared_ptr< sfg::Widget > widget, const std::string& key, const std::string& value );
         static std::string getCustomAttribute( std::shared_ptr< sfg::Widget > widget, const std::string& key );
 

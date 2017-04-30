@@ -934,12 +934,9 @@ namespace BlueBear {
             if( parent && parent->GetName() == "Table" ) {
               // Extract the info from the table widget
               std::shared_ptr< sfg::Table > table = std::static_pointer_cast< sfg::Table >( parent );
-              std::list< sfg::priv::TableCell > tableCellList = table->m_cells;
-              auto it = std::find_if( tableCellList.begin(), tableCellList.end(), [ & ]( sfg::priv::TableCell& cell ) {
-                return cell.child == widgetPtr->widget;
-              } );
+              auto it = getCell( table->m_cells, widgetPtr->widget );
 
-              if( it != tableCellList.end() ) {
+              if( it != table->m_cells.end() ) {
                 sfg::priv::TableCell& cell = *it;
                 lua_pushnumber( L, cell.rect.width ); // 42
                 return 1;
@@ -960,12 +957,9 @@ namespace BlueBear {
 
             if( parent && parent->GetName() == "Table" ) {
               std::shared_ptr< sfg::Table > table = std::static_pointer_cast< sfg::Table >( parent );
-              std::list< sfg::priv::TableCell > tableCellList = table->m_cells;
-              auto it = std::find_if( tableCellList.begin(), tableCellList.end(), [ & ]( sfg::priv::TableCell& cell ) {
-                return cell.child == widgetPtr->widget;
-              } );
+              auto it = getCell( table->m_cells, widgetPtr->widget );
 
-              if( it != tableCellList.end() ) {
+              if( it != table->m_cells.end() ) {
                 sfg::priv::TableCell& cell = *it;
                 lua_pushnumber( L, cell.rect.height ); // 42
                 return 1;
@@ -980,7 +974,25 @@ namespace BlueBear {
             return 0;
           }
           case Tools::Utility::hash( "expand_x" ): {
-            // TODO
+            // ( total & specific ) == specific
+            std::shared_ptr< sfg::Widget > parent = widgetPtr->widget->GetParent();
+
+            if( parent && parent->GetName() == "Table" ) {
+              std::shared_ptr< sfg::Table > table = std::static_pointer_cast< sfg::Table >( parent );
+              auto it = getCell( table->m_cells, widgetPtr->widget );
+
+              if( it != table->m_cells.end() ) {
+                sfg::priv::TableCell& cell = *it;
+                lua_pushboolean( L, ( cell.x_options & sfg::Table::EXPAND ) == sfg::Table::EXPAND ? 1 : 0 ); // true
+                return 1;
+              }
+            } else {
+              bool expandX = true;
+              queryBoolAttribute( widgetPtr->widget, "expand_x", &expandX );
+              lua_pushboolean( L, expandX == true ? 1 : 0 ); // true
+              return 1;
+            }
+
             return 0;
           }
           case Tools::Utility::hash( "expand_y" ): {
@@ -1938,6 +1950,12 @@ namespace BlueBear {
 
           }
         }
+      }
+
+      std::list< sfg::priv::TableCell >::iterator LuaElement::getCell( std::list< sfg::priv::TableCell >& tableCellList, std::shared_ptr< sfg::Widget > widget ) {
+        return std::find_if( tableCellList.begin(), tableCellList.end(), [ & ]( sfg::priv::TableCell& cell ) {
+          return cell.child == widget;
+        } );
       }
 
     }
