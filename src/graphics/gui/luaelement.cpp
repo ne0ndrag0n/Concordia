@@ -996,15 +996,69 @@ namespace BlueBear {
             return 0;
           }
           case Tools::Utility::hash( "expand_y" ): {
-            // TODO
+            // ( total & specific ) == specific
+            std::shared_ptr< sfg::Widget > parent = widgetPtr->widget->GetParent();
+
+            if( parent && parent->GetName() == "Table" ) {
+              std::shared_ptr< sfg::Table > table = std::static_pointer_cast< sfg::Table >( parent );
+              auto it = getCell( table->m_cells, widgetPtr->widget );
+
+              if( it != table->m_cells.end() ) {
+                sfg::priv::TableCell& cell = *it;
+                lua_pushboolean( L, ( cell.y_options & sfg::Table::EXPAND ) == sfg::Table::EXPAND ? 1 : 0 ); // true
+                return 1;
+              }
+            } else {
+              bool expandY = true;
+              queryBoolAttribute( widgetPtr->widget, "expand_y", &expandY );
+              lua_pushboolean( L, expandY == true ? 1 : 0 ); // true
+              return 1;
+            }
+
             return 0;
           }
           case Tools::Utility::hash( "fill_x" ): {
-            // TODO
+            // ( total & specific ) == specific
+            std::shared_ptr< sfg::Widget > parent = widgetPtr->widget->GetParent();
+
+            if( parent && parent->GetName() == "Table" ) {
+              std::shared_ptr< sfg::Table > table = std::static_pointer_cast< sfg::Table >( parent );
+              auto it = getCell( table->m_cells, widgetPtr->widget );
+
+              if( it != table->m_cells.end() ) {
+                sfg::priv::TableCell& cell = *it;
+                lua_pushboolean( L, ( cell.x_options & sfg::Table::FILL ) == sfg::Table::FILL ? 1 : 0 ); // true
+                return 1;
+              }
+            } else {
+              bool fillX = true;
+              queryBoolAttribute( widgetPtr->widget, "fill_x", &fillX );
+              lua_pushboolean( L, fillX == true ? 1 : 0 ); // true
+              return 1;
+            }
+
             return 0;
           }
           case Tools::Utility::hash( "fill_y" ): {
-            // TODO
+            // ( total & specific ) == specific
+            std::shared_ptr< sfg::Widget > parent = widgetPtr->widget->GetParent();
+
+            if( parent && parent->GetName() == "Table" ) {
+              std::shared_ptr< sfg::Table > table = std::static_pointer_cast< sfg::Table >( parent );
+              auto it = getCell( table->m_cells, widgetPtr->widget );
+
+              if( it != table->m_cells.end() ) {
+                sfg::priv::TableCell& cell = *it;
+                lua_pushboolean( L, ( cell.y_options & sfg::Table::FILL ) == sfg::Table::FILL ? 1 : 0 ); // true
+                return 1;
+              }
+            } else {
+              bool fillY = true;
+              queryBoolAttribute( widgetPtr->widget, "fill_y", &fillY );
+              lua_pushboolean( L, fillY == true ? 1 : 0 ); // true
+              return 1;
+            }
+
             return 0;
           }
           case Tools::Utility::hash( "padding_x" ): {
