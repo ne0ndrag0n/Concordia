@@ -1647,6 +1647,25 @@ namespace BlueBear {
               Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
               return 0;
             }
+          case Tools::Utility::hash( "colspan" ): {
+            // Attempting to see if setting colspan is something that will work effectively...
+            std::shared_ptr< sfg::Widget > parent = widgetPtr->widget->GetParent();
+
+            if( parent && parent->GetName() == "Table" ) {
+              // Already attached to table
+              std::shared_ptr< sfg::Table > table = std::static_pointer_cast< sfg::Table >( parent );
+              // TODO
+            } else {
+              // Unattached to table
+              if( lua_isstring( L, -1 ) ) {
+                setCustomAttribute( widgetPtr->widget, "colspan", lua_tostring( L, -1 ) );
+              } else {
+                Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument is not convertible to string." );
+              }
+            }
+
+            return 0;
+          }
           // These properties are not settable/retrievable using the SFGUI API
           case Tools::Utility::hash( "tab_position" ):
             // Tried to make tab_position settable.
