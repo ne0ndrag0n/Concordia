@@ -64,20 +64,3 @@
     </page>
   </Notebook>
 </Window>
-
-<Window id="tablewindow" title="Table Test">
-  <Table id="table">
-    <row>
-      <Button id="foo">Foo</Button>
-    </row>
-    <row>
-    	<Button id="bar">Bar</Button>
-    </row>
-    <row>
-    	<Button>Baz</Button>
-    </row>
-    <row>
-      <Button id="col3" colspan="3">column_span</Button>
-    </row>
-  </Table>
-</Window>
