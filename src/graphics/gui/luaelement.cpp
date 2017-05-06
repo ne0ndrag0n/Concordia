@@ -1052,12 +1052,40 @@ namespace BlueBear {
             return args;
           }
           case Tools::Utility::hash( "padding_x" ): {
-            // TODO
-            return 0;
+            int args = 0;
+
+            widgetPtr->operateTableAttribute(
+              [ & ]( sfg::priv::TableCell& cell ) {
+                lua_pushnumber( L, cell.padding.x ); // 42
+                args = 1;
+              },
+              [ & ]() {
+                float paddingX = 0.0f;
+                queryFloatAttribute( widgetPtr->widget, "padding_x", &paddingX );
+                lua_pushnumber( L, paddingX ); // 42
+                args = 1;
+              }
+            );
+
+            return args;
           }
           case Tools::Utility::hash( "padding_y" ): {
-            // TODO
-            return 0;
+            int args = 0;
+
+            widgetPtr->operateTableAttribute(
+              [ & ]( sfg::priv::TableCell& cell ) {
+                lua_pushnumber( L, cell.padding.y ); // 42
+                args = 1;
+              },
+              [ & ]() {
+                float paddingY = 0.0f;
+                queryFloatAttribute( widgetPtr->widget, "padding_y", &paddingY );
+                lua_pushnumber( L, paddingY ); // 42
+                args = 1;
+              }
+            );
+
+            return args;
           }
           // These properties are not settable/retrievable using the SFGUI API
           case Tools::Utility::hash( "tab_position" ):

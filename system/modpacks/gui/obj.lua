@@ -24,6 +24,8 @@ end
 
 function GUIProvider:do_something( event )
   local table = self.gui:find_by_id( 'table' )
+
+  print( tostring( table:find_by_id( 'col3' ):get_property( 'padding_x' ) ) )
 end
 
 function GUIProvider:on_click_zoom_in()
