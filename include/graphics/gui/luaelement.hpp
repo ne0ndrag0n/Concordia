@@ -52,6 +52,10 @@ namespace BlueBear {
         void removePseudoElement( PagePseudoElement* page );
         bool isContainer();
         bool getPseudoElements( lua_State* L, const std::string& pseudo, Display::MainGameState& state, int index = -1 );
+        void operateTableAttribute(
+          std::function< void( sfg::priv::TableCell& ) > tableOp,
+          std::function< void() > nonTableOp
+        );
 
         static int lua_getName( lua_State* L );
         static int lua_onEvent( lua_State* L );
