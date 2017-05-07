@@ -25,7 +25,6 @@ end
 function GUIProvider:do_something( event )
   local table = self.gui:find_by_id( 'table' )
 
-  --table:find_by_id( 'bar' ):set_property( 'table_spacing', 5.0 )
 end
 
 function GUIProvider:on_click_zoom_in()

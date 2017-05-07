@@ -29,7 +29,7 @@ namespace BlueBear {
 
         std::shared_ptr< sfg::Table > subject;
         int rowNumber;
-        float stagedRowSpacing = 0.0f;
+        float stagedRowSpacing = -1.0f;
         Display::MainGameState& displayState;
 
         std::vector< WidgetStaging > stagedWidgets;

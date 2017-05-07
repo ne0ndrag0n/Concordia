@@ -139,7 +139,7 @@ namespace BlueBear {
           case Tools::Utility::hash( "Fixed" ):
           case Tools::Utility::hash( "Notebook" ):
           case Tools::Utility::hash( "ScrolledWindow" ):
-          case Tools::Utility::hash( "Table" ):
+          //case Tools::Utility::hash( "Table" ):
           case Tools::Utility::hash( "Alignment" ):
           //case Tools::Utility::hash( "Button" ):
           //case Tools::Utility::hash( "ToggleButton" ):
@@ -1105,13 +1105,35 @@ namespace BlueBear {
 
             return args;
           }
+          case Tools::Utility::hash( "row_spacing" ): {
+            int args = 0;
+
+            if( widgetType == "Table" ) {
+              lua_pushnumber( L, std::static_pointer_cast< sfg::Table >( widgetPtr->widget )->m_general_spacings.y );
+              args = 1;
+            } else {
+              Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+            }
+
+            return args;
+          }
+          case Tools::Utility::hash( "column_spacing" ): {
+            int args = 0;
+
+            if( widgetType == "Table" ) {
+              lua_pushnumber( L, std::static_pointer_cast< sfg::Table >( widgetPtr->widget )->m_general_spacings.x );
+              args = 1;
+            } else {
+              Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+            }
+
+            return args;
+          }
           // These properties are not settable/retrievable using the SFGUI API
           case Tools::Utility::hash( "tab_position" ):
           case Tools::Utility::hash( "expand" ):
           case Tools::Utility::hash( "fill" ):
           case Tools::Utility::hash( "orientation" ):
-          case Tools::Utility::hash( "row_spacing" ):
-          case Tools::Utility::hash( "column_spacing" ):
             {
               Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" cannot be queried from this widget." );
               return 0;
@@ -1541,8 +1563,8 @@ namespace BlueBear {
               return 0;
             }
           case Tools::Utility::hash( "row_spacing" ):
-          case Tools::Utility::hash( "column_spacing" ):
-            {
+          case Tools::Utility::hash( "column_spacing" ): {
+            if( widgetType == "Table" ) {
               // This should be one of very few set_property properties that take one or two values
               char args = lua_gettop( L );
 
@@ -1582,7 +1604,11 @@ namespace BlueBear {
                 }
               }
               return 0;
+            } else {
+              Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+              return 0;
             }
+          }
           case Tools::Utility::hash( "min" ):
           case Tools::Utility::hash( "max" ):
             {
@@ -1988,11 +2014,25 @@ namespace BlueBear {
         }
       }
 
+      bool LuaElement::propertyIsSet( std::shared_ptr< sfg::Widget > widget, const std::string& key ) {
+        auto it = masterAttrMap.find( widget );
+
+        if( it != masterAttrMap.end() ) {
+          std::map< std::string, std::string >& attrMap = it->second;
+          auto it = attrMap.find( key );
+          if( it != attrMap.end() ) {
+            return it->second != "";
+          }
+        }
+
+        return false;
+      }
+
       std::string LuaElement::getCustomAttribute( std::shared_ptr< sfg::Widget > widget, const std::string& key ) {
         auto it = masterAttrMap.find( widget );
 
         if( it != masterAttrMap.end() ) {
-          std::map< std::string, std::string > attrMap = it->second;
+          std::map< std::string, std::string >& attrMap = it->second;
           auto it = attrMap.find( key );
           if( it != attrMap.end() ) {
             return it->second;

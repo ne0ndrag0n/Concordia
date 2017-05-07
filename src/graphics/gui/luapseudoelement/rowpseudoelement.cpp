@@ -62,6 +62,11 @@ namespace BlueBear {
         ( *item )->setMetatable( L );
 
         // Process out everything
+        float spacing = 0.0f;
+        if( element->QueryFloatAttribute( "table_spacing", &spacing ) == tinyxml2::XML_SUCCESS ) {
+          ( *item )->stagedRowSpacing = spacing;
+        }
+
         ( *item )->processElements( element->FirstChildElement() );
 
         return 1;
@@ -213,8 +218,29 @@ namespace BlueBear {
 
         rowNumber = RowPseudoElement::getRowCount( subject );
 
-        for( RowPseudoElement::WidgetStaging staging : stagedWidgets ) {
+        std::map< unsigned int, float > requestedColumnSpacings;
+        unsigned int size = stagedWidgets.size();
+        for( int i = 0; i != size; i++ ) {
+          // Add the WidgetStaging
+          WidgetStaging staging = stagedWidgets.at( i );
           addFromStaging( staging );
+
+          // If this widget has the table_spacing property set on it (WidgetBuilder should slap it on),
+          // set it up so that we set the column spacing
+          if( LuaElement::propertyIsSet( staging.widget, "table_spacing" ) ) {
+            float spacing = 0.0f;
+            LuaElement::queryFloatAttribute( staging.widget, "table_spacing", &spacing );
+            requestedColumnSpacings[ i ] = spacing;
+          }
+        }
+
+        for( auto& it : requestedColumnSpacings ) {
+          subject->SetColumnSpacing( it.first, it.second );
+        }
+
+        if( stagedRowSpacing != -1.0f ) {
+          subject->SetRowSpacing( rowNumber, stagedRowSpacing );
+          stagedRowSpacing = -1.0f;
         }
 
         stagedWidgets.clear();
