@@ -617,7 +617,7 @@ namespace BlueBear {
         return 0;
       }
 
-      void LuaElement::operateTableAttribute( std::function< void( sfg::priv::TableCell& ) > tableOp, std::function< void() > nonTableOp ) {
+      void LuaElement::operateTableAttribute( std::function< void( sfg::priv::TableCell&, std::shared_ptr< sfg::Table > ) > tableOp, std::function< void() > nonTableOp ) {
         std::shared_ptr< sfg::Widget > parent = widget->GetParent();
 
         if( parent && parent->GetName() == "Table" ) {
@@ -625,7 +625,7 @@ namespace BlueBear {
           auto it = getCell( table->m_cells, widget );
 
           if( it != table->m_cells.end() ) {
-            tableOp( *it );
+            tableOp( *it, table );
           }
         } else {
           nonTableOp();
@@ -946,7 +946,7 @@ namespace BlueBear {
             int args = 0;
 
             widgetPtr->operateTableAttribute(
-              [ & ]( sfg::priv::TableCell& cell ){
+              [ & ]( sfg::priv::TableCell& cell, std::shared_ptr< sfg::Table > table ){
                 lua_pushnumber( L, cell.rect.width ); // 42
                 args = 1;
               },
@@ -964,7 +964,7 @@ namespace BlueBear {
             int args = 0;
 
             widgetPtr->operateTableAttribute(
-              [ & ]( sfg::priv::TableCell& cell ){
+              [ & ]( sfg::priv::TableCell& cell, std::shared_ptr< sfg::Table > table ){
                 lua_pushnumber( L, cell.rect.height ); // 42
                 args = 1;
               },
@@ -983,7 +983,7 @@ namespace BlueBear {
             int args = 0;
 
             widgetPtr->operateTableAttribute(
-              [ & ]( sfg::priv::TableCell& cell ){
+              [ & ]( sfg::priv::TableCell& cell, std::shared_ptr< sfg::Table > table ){
                 lua_pushboolean( L, ( cell.x_options & sfg::Table::EXPAND ) == sfg::Table::EXPAND ? 1 : 0 ); // true
                 args = 1;
               },
@@ -1001,7 +1001,7 @@ namespace BlueBear {
             int args = 0;
 
             widgetPtr->operateTableAttribute(
-              [ & ]( sfg::priv::TableCell& cell ){
+              [ & ]( sfg::priv::TableCell& cell, std::shared_ptr< sfg::Table > table ){
                 lua_pushboolean( L, ( cell.y_options & sfg::Table::EXPAND ) == sfg::Table::EXPAND ? 1 : 0 ); // true
                 args = 1;
               },
@@ -1019,7 +1019,7 @@ namespace BlueBear {
             int args = 0;
 
             widgetPtr->operateTableAttribute(
-              [ & ]( sfg::priv::TableCell& cell ){
+              [ & ]( sfg::priv::TableCell& cell, std::shared_ptr< sfg::Table > table ){
                 lua_pushboolean( L, ( cell.x_options & sfg::Table::FILL ) == sfg::Table::FILL ? 1 : 0 ); // true
                 args = 1;
               },
@@ -1037,7 +1037,7 @@ namespace BlueBear {
             int args = 0;
 
             widgetPtr->operateTableAttribute(
-              [ & ]( sfg::priv::TableCell& cell ){
+              [ & ]( sfg::priv::TableCell& cell, std::shared_ptr< sfg::Table > table ){
                 lua_pushboolean( L, ( cell.y_options & sfg::Table::FILL ) == sfg::Table::FILL ? 1 : 0 ); // true
                 args = 1;
               },
@@ -1055,7 +1055,7 @@ namespace BlueBear {
             int args = 0;
 
             widgetPtr->operateTableAttribute(
-              [ & ]( sfg::priv::TableCell& cell ) {
+              [ & ]( sfg::priv::TableCell& cell, std::shared_ptr< sfg::Table > table ) {
                 lua_pushnumber( L, cell.padding.x ); // 42
                 args = 1;
               },
@@ -1073,7 +1073,7 @@ namespace BlueBear {
             int args = 0;
 
             widgetPtr->operateTableAttribute(
-              [ & ]( sfg::priv::TableCell& cell ) {
+              [ & ]( sfg::priv::TableCell& cell, std::shared_ptr< sfg::Table > table ) {
                 lua_pushnumber( L, cell.padding.y ); // 42
                 args = 1;
               },
@@ -1081,6 +1081,24 @@ namespace BlueBear {
                 float paddingY = 0.0f;
                 queryFloatAttribute( widgetPtr->widget, "padding_y", &paddingY );
                 lua_pushnumber( L, paddingY ); // 42
+                args = 1;
+              }
+            );
+
+            return args;
+          }
+          case Tools::Utility::hash( "table_spacing" ): {
+            int args = 0;
+
+            widgetPtr->operateTableAttribute(
+              [ & ]( sfg::priv::TableCell& cell, std::shared_ptr< sfg::Table > table ) {
+                lua_pushnumber( L, table->m_columns.at( cell.rect.left ).spacing ); // 42
+                args = 1;
+              },
+              [ & ]() {
+                float spacing = 0.0f;
+                queryFloatAttribute( widgetPtr->widget, "table_spacing", &spacing );
+                lua_pushnumber( L, spacing ); // 42
                 args = 1;
               }
             );
@@ -1665,6 +1683,22 @@ namespace BlueBear {
               Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
               return 0;
             }
+          case Tools::Utility::hash( "table_spacing" ): {
+            VERIFY_NUMBER_N( "LuaElement::lua_setProperty", "set_property", 1 );
+
+            widgetPtr->operateTableAttribute(
+              [ & ]( sfg::priv::TableCell& cell, std::shared_ptr< sfg::Table > table ) {
+                // Determine column of element in cell, and then set the spacing for that column
+                // cell.rect.left contains column index
+                table->SetColumnSpacing( cell.rect.left, lua_tonumber( L, -1 ) );
+              },
+              [ & ]() {
+                setCustomAttribute( widgetPtr->widget, "table_spacing", std::to_string( lua_tonumber( L, -1 ) ) );
+              }
+            );
+
+            return 0;
+          }
           // These properties are not settable/retrievable using the SFGUI API
           case Tools::Utility::hash( "tab_position" ):
             // Tried to make tab_position settable.

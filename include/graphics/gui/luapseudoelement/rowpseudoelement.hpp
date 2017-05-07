@@ -29,6 +29,7 @@ namespace BlueBear {
 
         std::shared_ptr< sfg::Table > subject;
         int rowNumber;
+        float stagedRowSpacing = 0.0f;
         Display::MainGameState& displayState;
 
         std::vector< WidgetStaging > stagedWidgets;
@@ -43,6 +44,10 @@ namespace BlueBear {
         void add( lua_State* L, const std::string& xmlString );
         void addFromStaging( WidgetStaging staging );
         void processElements( tinyxml2::XMLElement* element );
+        float getSpacing();
+        void setSpacing( float spacing );
+        int getProperty( lua_State* L, const std::string& property );
+        void setProperty( lua_State* L, const std::string& property );
 
       public:
         RowPseudoElement(
@@ -61,6 +66,8 @@ namespace BlueBear {
         static int lua_gc( lua_State* L );
         static int lua_getName( lua_State* L );
         static int lua_findElement( lua_State* L );
+        static int lua_getProperty( lua_State* L );
+        static int lua_setProperty( lua_State* L );
         static int lua_findPseudo( lua_State* L );
         static int lua_findById( lua_State* L );
         static int lua_findByClass( lua_State* L );

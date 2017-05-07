@@ -32,9 +32,9 @@ namespace BlueBear {
             { "find_pseudo", RowPseudoElement::lua_findElement },
             { "find_by_id", RowPseudoElement::lua_findById },
             { "find_by_class", RowPseudoElement::lua_findByClass },
+            { "get_property", RowPseudoElement::lua_getProperty },
+            { "set_property", RowPseudoElement::lua_setProperty },
             /*
-            { "get_property", RowPseudoElement::lua_property },
-            { "set_property", RowPseudoElement::lua_property },
             { "get_content", RowPseudoElement::lua_getContent },
             { "set_content", RowPseudoElement::lua_setContent },
             */
@@ -339,6 +339,78 @@ namespace BlueBear {
         lua_pushstring( L, self->getName().c_str() );
 
         return 1;
+      }
+
+      float RowPseudoElement::getSpacing() {
+        if( subject ) {
+          return subject->m_rows.at( rowNumber ).spacing;
+        } else {
+          return stagedRowSpacing;
+        }
+      }
+
+      void RowPseudoElement::setSpacing( float spacing ) {
+        if( subject ) {
+          subject->SetRowSpacing( rowNumber, spacing );
+        } else {
+          stagedRowSpacing = spacing;
+        }
+      }
+
+      /**
+       *
+       * STACK ARGS: none
+       * Returns: number or none
+       */
+      int RowPseudoElement::getProperty( lua_State* L, const std::string& property ) {
+        switch( Tools::Utility::hash( property.c_str() ) ) {
+          case Tools::Utility::hash( "table_spacing" ): {
+            lua_pushnumber( L, getSpacing() ); // 42.0
+            return 1;
+          }
+          default:
+            Log::getInstance().warn( "RowPseudoElement::getProperty", "Property \"" + std::string( property ) + "\" cannot be queried from this pseudo-element." );
+        }
+
+        return 0;
+      }
+
+      int RowPseudoElement::lua_getProperty( lua_State* L ) {
+        VERIFY_STRING_N( "RowPseudoElement::lua_getProperty", "get_property", 1 );
+
+        RowPseudoElement* self = *( ( RowPseudoElement** ) luaL_checkudata( L, 1, "bluebear_row_pseudo_element" ) );
+
+        return self->getProperty( L, lua_tostring( L, -1 ) );
+      }
+
+      /**
+       *
+       * STACK ARGS: various
+       * (Stack is unmodified after call)
+       */
+      void RowPseudoElement::setProperty( lua_State* L, const std::string& property ) {
+        switch( Tools::Utility::hash( property.c_str() ) ) {
+          case Tools::Utility::hash( "table_spacing" ): {
+            if( lua_isnumber( L, -1 ) ) {
+              setSpacing( lua_tonumber( L, -1 ) );
+            } else {
+              Log::getInstance().warn( "RowPseudoElement::setProperty", "Argument #2 must be a number." );
+            }
+
+            return;
+          }
+          default:
+            Log::getInstance().warn( "RowPseudoElement::setProperty", "Property \"" + std::string( property ) + "\" cannot be set on this pseudo-element." );
+        }
+      }
+
+      int RowPseudoElement::lua_setProperty( lua_State* L ) {
+        VERIFY_STRING_N( "RowPseudoElement::lua_getProperty", "get_property", 2 );
+
+        RowPseudoElement* self = *( ( RowPseudoElement** ) luaL_checkudata( L, 1, "bluebear_row_pseudo_element" ) );
+
+        self->setProperty( L, lua_tostring( L, -2 ) );
+        return 0;
       }
 
       int RowPseudoElement::lua_findElement( lua_State* L ) {

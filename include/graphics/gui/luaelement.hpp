@@ -53,7 +53,7 @@ namespace BlueBear {
         bool isContainer();
         bool getPseudoElements( lua_State* L, const std::string& pseudo, Display::MainGameState& state, int index = -1 );
         void operateTableAttribute(
-          std::function< void( sfg::priv::TableCell& ) > tableOp,
+          std::function< void( sfg::priv::TableCell&, std::shared_ptr< sfg::Table > ) > tableOp,
           std::function< void() > nonTableOp
         );
 

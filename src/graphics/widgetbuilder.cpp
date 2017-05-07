@@ -301,7 +301,7 @@ namespace BlueBear {
 
     void WidgetBuilder::setCustomAttributes( std::shared_ptr< sfg::Widget > widget, tinyxml2::XMLElement* element ) {
       // Handle whitelisted custom attributes
-      static std::array< std::string, 8 > usableAttrs{ { "colspan", "rowspan", "padding_x", "padding_y", "expand_x", "expand_y", "fill_x", "fill_y" } };
+      static std::array< std::string, 9 > usableAttrs{ { "colspan", "rowspan", "padding_x", "padding_y", "expand_x", "expand_y", "fill_x", "fill_y", "table_spacing" } };
       for ( const tinyxml2::XMLAttribute* attribute = element->FirstAttribute(); attribute != nullptr; attribute = attribute->Next() ) {
         std::string attrName = attribute->Name();
 
@@ -781,7 +781,7 @@ namespace BlueBear {
             table->Attach( nodeToWidget( cell ), sf::Rect< sf::Uint32 >( currentColumn, currentRow, colspan, rowspan ), packX, packY, sf::Vector2f( paddingX, paddingY ) );
 
             float spacing = 0.0f;
-            if( cell->QueryFloatAttribute( "spacing", &spacing ) == tinyxml2::XML_SUCCESS ) {
+            if( cell->QueryFloatAttribute( "table_spacing", &spacing ) == tinyxml2::XML_SUCCESS ) {
               requestedColumnSpacings[ currentColumn ] = spacing;
             }
 
@@ -789,7 +789,7 @@ namespace BlueBear {
           }
 
           float spacing = 0.0f;
-          if( row->QueryFloatAttribute( "spacing", &spacing ) == tinyxml2::XML_SUCCESS ) {
+          if( row->QueryFloatAttribute( "table_spacing", &spacing ) == tinyxml2::XML_SUCCESS ) {
             requestedRowSpacings[ currentRow ] = spacing;
           }
 
