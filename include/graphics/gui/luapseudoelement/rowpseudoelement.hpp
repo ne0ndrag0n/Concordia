@@ -67,6 +67,7 @@ namespace BlueBear {
         static int lua_gc( lua_State* L );
         static int lua_getName( lua_State* L );
         static int lua_findElement( lua_State* L );
+        static int lua_content( lua_State* L );
         static int lua_getProperty( lua_State* L );
         static int lua_setProperty( lua_State* L );
         static int lua_removeWidget( lua_State* L );

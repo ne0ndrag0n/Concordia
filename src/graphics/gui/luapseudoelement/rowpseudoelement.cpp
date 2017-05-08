@@ -32,10 +32,8 @@ namespace BlueBear {
             { "find_by_class", RowPseudoElement::lua_findByClass },
             { "get_property", RowPseudoElement::lua_getProperty },
             { "set_property", RowPseudoElement::lua_setProperty },
-            /*
-            { "get_content", RowPseudoElement::lua_getContent },
-            { "set_content", RowPseudoElement::lua_setContent },
-            */
+            { "get_content", RowPseudoElement::lua_content },
+            { "set_content", RowPseudoElement::lua_content },
             { "__gc", RowPseudoElement::lua_gc },
             { NULL, NULL }
           };
@@ -471,6 +469,11 @@ namespace BlueBear {
 
       int RowPseudoElement::lua_findPseudo( lua_State* L ) {
         Log::getInstance().warn( "RowPseudoElement::lua_findPseudo", "<row> pseudo-element has no pseudo-element children." );
+        return 0;
+      }
+
+      int RowPseudoElement::lua_content( lua_State* L ) {
+        Log::getInstance().warn( "RowPseudoElement::lua_content", "<row> pseudo-element has no direct content." );
         return 0;
       }
 
