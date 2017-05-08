@@ -42,6 +42,7 @@ namespace BlueBear {
         void add( std::shared_ptr< sfg::Widget > widget );
         void add( lua_State* L, LuaElement* element );
         void add( lua_State* L, const std::string& xmlString );
+        void remove( lua_State* L, LuaElement* element );
         void addFromStaging( WidgetStaging staging );
         void processElements( tinyxml2::XMLElement* element );
         float getSpacing();
@@ -68,6 +69,7 @@ namespace BlueBear {
         static int lua_findElement( lua_State* L );
         static int lua_getProperty( lua_State* L );
         static int lua_setProperty( lua_State* L );
+        static int lua_removeWidget( lua_State* L );
         static int lua_findPseudo( lua_State* L );
         static int lua_findById( lua_State* L );
         static int lua_findByClass( lua_State* L );

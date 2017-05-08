@@ -25,9 +25,7 @@ namespace BlueBear {
         if( luaL_newmetatable( L, "bluebear_row_pseudo_element" ) ) { // metatable userdata
           luaL_Reg tableFuncs[] = {
             { "add", RowPseudoElement::lua_add },
-            /*
             { "remove", RowPseudoElement::lua_removeWidget },
-            */
             { "get_name", RowPseudoElement::lua_getName },
             { "find_pseudo", RowPseudoElement::lua_findElement },
             { "find_by_id", RowPseudoElement::lua_findById },
@@ -436,6 +434,33 @@ namespace BlueBear {
         RowPseudoElement* self = *( ( RowPseudoElement** ) luaL_checkudata( L, 1, "bluebear_row_pseudo_element" ) );
 
         self->setProperty( L, lua_tostring( L, -2 ) );
+        return 0;
+      }
+
+      void RowPseudoElement::remove( lua_State* L, LuaElement* element ) {
+        if( subject ) {
+          subject->Remove( element->widget );
+        } else {
+
+          auto it = std::find_if( stagedWidgets.begin(), stagedWidgets.end(), [ & ]( WidgetStaging staging ) {
+            return staging.widget == element->widget;
+          } );
+
+          if( it != stagedWidgets.end() ) {
+            stagedWidgets.erase( it );
+          }
+
+        }
+      }
+
+      int RowPseudoElement::lua_removeWidget( lua_State* L ) {
+        VERIFY_USER_DATA( "RowPseudoElement::lua_removeWidget", "remove" );
+
+        RowPseudoElement* self = *( ( RowPseudoElement** ) luaL_checkudata( L, 1, "bluebear_row_pseudo_element" ) );
+
+        LuaElement* element = *( ( LuaElement** ) luaL_checkudata( L, 2, "bluebear_widget" ) );
+        self->remove( L, element );
+
         return 0;
       }
 
