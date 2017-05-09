@@ -61,6 +61,8 @@ namespace BlueBear {
         void setMetatable( lua_State* L );
         std::string getName();
 
+        void removeFromTable( std::shared_ptr< sfg::Widget > comparison );
+
         static int create( lua_State* L, Display::MainGameState& displayState, tinyxml2::XMLElement* element );
         static int getRowCount( std::shared_ptr< sfg::Table > table );
         static int lua_add( lua_State* L );

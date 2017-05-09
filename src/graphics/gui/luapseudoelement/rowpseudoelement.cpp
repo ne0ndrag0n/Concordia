@@ -52,6 +52,23 @@ namespace BlueBear {
         return "row";
       }
 
+      void RowPseudoElement::removeFromTable( std::shared_ptr< sfg::Widget > comparison ) {
+        if( !subject || ( comparison != subject ) ) {
+          Log::getInstance().warn( "RowPseudoElement::removeFromTable", "This <row> is not attached to this Table widget!" );
+          return;
+        }
+
+        // Get elements belonging to this row
+        std::vector< std::shared_ptr< sfg::Widget > > insertedWidgets = getWidgetsForRow();
+        for( std::shared_ptr< sfg::Widget > widget : insertedWidgets ) {
+          widget->Show( false );
+          subject->Remove( widget );
+        }
+
+        rowNumber = -1;
+        subject = nullptr;
+      }
+
       int RowPseudoElement::create( lua_State* L, Display::MainGameState& displayState, tinyxml2::XMLElement* element ) {
         RowPseudoElement** item = ( RowPseudoElement** ) lua_newuserdata( L, sizeof( RowPseudoElement* ) ); // userdata
         *item = new RowPseudoElement( nullptr, -1, displayState );

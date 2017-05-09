@@ -51,6 +51,7 @@ namespace BlueBear {
         void removeWidget( std::shared_ptr< sfg::Widget > target );
         void removePseudoElement( PagePseudoElement* page );
         void removePseudoElement( ItemPseudoElement* item );
+        void removePseudoElement( RowPseudoElement* row );
         bool isContainer();
         bool getPseudoElements( lua_State* L, const std::string& pseudo, Display::MainGameState& state, int index = -1 );
         void operateTableAttribute(
