@@ -53,6 +53,19 @@ namespace BlueBear {
         return 1;
       }
 
+      void ItemPseudoElement::removeFromComboBox( std::shared_ptr< sfg::Widget > comparison ) {
+        if( !subject || ( comparison != subject ) ) {
+          Log::getInstance().warn( "ItemPseudoElement::removeFromComboBox", "This <item> is not attached to this ComboBox widget!" );
+          return;
+        }
+
+        subject->RemoveItem( elementNumber );
+        elementNumber = 0;
+
+        subject = nullptr;
+      }
+
+
       std::string ItemPseudoElement::getName() {
         return "item";
       }

@@ -24,7 +24,9 @@ end
 
 function GUIProvider:do_something( event )
   local table = self.gui:find_by_id( 'table' )
+  local combo = self.gui:find_by_id( 'combo' )
 
+  combo:remove( combo:find_pseudo( 'item', 2 ) )
 end
 
 function GUIProvider:on_click_zoom_in()

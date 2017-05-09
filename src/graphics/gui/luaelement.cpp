@@ -130,6 +130,10 @@ namespace BlueBear {
         page->removeFromNotebook( widget );
       }
 
+      void LuaElement::removePseudoElement( ItemPseudoElement* item ) {
+        item->removeFromComboBox( widget );
+      }
+
       /**
        * TODO: This is now identical to Tools::Utility::widgetIsContainer, consider replacing this method with that one if any changes required.
        */
@@ -1791,6 +1795,8 @@ namespace BlueBear {
           // "argument" should be removed from "self" if and only if "self" is a container
           self->removeWidget( ( *udata )->widget );
         } else if( PagePseudoElement** udata = ( PagePseudoElement** ) luaL_testudata( L, 2, "bluebear_page_pseudo_element" ) ) {
+          self->removePseudoElement( *udata );
+        } else if( ItemPseudoElement** udata = ( ItemPseudoElement** ) luaL_testudata( L, 2, "bluebear_item_pseudo_element" ) ) {
           self->removePseudoElement( *udata );
         } else {
           Log::getInstance().warn( "LuaElement::lua_widgetRemove", "Invalid argument passed to remove()" );

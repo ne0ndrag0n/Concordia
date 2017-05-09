@@ -36,6 +36,7 @@ namespace BlueBear {
         std::string getItem();
 
         void setSubject( std::shared_ptr< sfg::ComboBox > comboBox );
+        void removeFromComboBox( std::shared_ptr< sfg::Widget > comparison );
 
         static int create( lua_State* L, Display::MainGameState& displayState, tinyxml2::XMLElement* element );
 
