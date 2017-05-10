@@ -80,7 +80,13 @@ namespace BlueBear {
 
       groups.clear();
 
-      std::shared_ptr< sfg::Widget > widget = nodeToWidget( document.RootElement() );
+      tinyxml2::XMLElement* root = document.RootElement();
+      if( !root ) {
+        Log::getInstance().error( "WidgetBuilder::getWidgetFromXML", "WidgetBuilder construction failed; could not find root element!" );
+        throw FailedToLoadXMLException();
+      }
+
+      std::shared_ptr< sfg::Widget > widget = nodeToWidget( root );
 
       for( auto& group : groups ) {
         std::shared_ptr< sfg::Widget > associatedWidget = widget->GetWidgetById( group.second );
