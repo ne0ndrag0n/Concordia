@@ -8,26 +8,24 @@
 namespace BlueBear {
 
   /**
-   * This really is not what I wanted and I hope it doesn't bite me in the ass down the line.
+   * This is a standard, flexible base event type that can be used for anything that takes a listen on an instance,
+   * and fires off a callback with varying types.
    */
-  class UIActionEvent {
-    std::map< void*, std::function< void( LuaReference ) > > listeners;
+  template < typename Key, typename... Signature > class BasicEvent {
+    std::map< Key, std::function< void( Signature... ) > > listeners;
 
-  public:
-    /**
-     * Listen for a specific signal
-     */
-    void listen( void* key, std::function< void( LuaReference ) > callback );
-
-    /**
-     * Stop listening for a specific signal
-     */
-    void stopListening( void* key );
-
-    /**
-     * Trigger all listeners for a specific signal
-     */
-    void trigger( LuaReference param );
+    public:
+      void listen( Key key, std::function< void( Signature... ) > callback ) {
+        listeners[ key ] = callback;
+      }
+      void stopListening( Key key ) {
+        listeners.erase( key );
+      }
+      void trigger( Signature... params ) {
+        for( auto& nestedPair : listeners ) {
+          nestedPair.second( params... );
+        }
+      }
   };
 
   /**
@@ -51,8 +49,10 @@ namespace BlueBear {
   };
 
   struct EventManager {
-    UIActionEvent UI_ACTION_EVENT;
+    BasicEvent< void*, LuaReference > UI_ACTION_EVENT;
     SFGUIEatEvent SFGUI_EAT_EVENT;
+    BasicEvent< void*, unsigned int > ITEM_ADDED;
+    BasicEvent< void*, unsigned int > ITEM_REMOVED;
   };
 
   // eventManager.UI_ACTION_EVENT.listen( this, [ & ]( LuaReference luaref ) { engine queues up passed-in lua reference } )
