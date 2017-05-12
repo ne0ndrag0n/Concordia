@@ -25,7 +25,7 @@
 namespace BlueBear {
   namespace Graphics {
 
-    WidgetBuilder::WidgetBuilder( EventManager& eventManager, ImageCache& imageCache ) : eventManager( eventManager ), imageCache( imageCache ) {}
+    WidgetBuilder::WidgetBuilder( std::shared_ptr< EventManager > eventManager, ImageCache& imageCache ) : eventManager( eventManager ), imageCache( imageCache ) {}
 
     constexpr unsigned int WidgetBuilder::hash(const char* str, int h) {
       return !str[h] ? 5381 : (hash(str, h+1) * 33) ^ str[h];
@@ -364,12 +364,12 @@ namespace BlueBear {
      * Attach events that should be on every widget
      */
     void WidgetBuilder::setDefaultEvents( std::shared_ptr< sfg::Widget > widget, tinyxml2::XMLElement* element ) {
-      widget->GetSignal( sfg::Widget::OnMouseLeftRelease ).Connect( [ &eventManager = eventManager ]() {
-        eventManager.SFGUI_EAT_EVENT.trigger( SFGUIEatEvent::Event::EAT_MOUSE_EVENT );
+      widget->GetSignal( sfg::Widget::OnMouseLeftRelease ).Connect( [ eventManager = eventManager ]() {
+        eventManager->SFGUI_EAT_EVENT.trigger( SFGUIEatEvent::Event::EAT_MOUSE_EVENT );
       } );
 
-      widget->GetSignal( sfg::Widget::OnMouseRightRelease ).Connect( [ &eventManager = eventManager ]() {
-        eventManager.SFGUI_EAT_EVENT.trigger( SFGUIEatEvent::Event::EAT_MOUSE_EVENT );
+      widget->GetSignal( sfg::Widget::OnMouseRightRelease ).Connect( [ eventManager = eventManager ]() {
+        eventManager->SFGUI_EAT_EVENT.trigger( SFGUIEatEvent::Event::EAT_MOUSE_EVENT );
       } );
     }
 
@@ -406,7 +406,7 @@ namespace BlueBear {
       // Use eventManager to trigger a disable key events on eventManager.SFGUI_SIGNAL_EVENT when focusing in,
       // and an enable key events when focusing out.
       entry->GetSignal( sfg::Widget::OnKeyPress ).Connect( [ &eventManager = eventManager ]() {
-        eventManager.SFGUI_EAT_EVENT.trigger( SFGUIEatEvent::Event::EAT_KEYBOARD_EVENT );
+        eventManager->SFGUI_EAT_EVENT.trigger( SFGUIEatEvent::Event::EAT_KEYBOARD_EVENT );
       } );
     }
 

@@ -78,20 +78,20 @@ namespace BlueBear {
         static void getUserdataFromWidget( lua_State* L, std::shared_ptr< sfg::Widget > widget );
         static void registerGenericHandler(
           lua_State* L,
-          EventManager& eventManager,
+          std::shared_ptr< EventManager > eventManager,
           std::shared_ptr< sfg::Widget > widget,
           sfg::Signal::SignalID signalID
         );
         static void clickHandler(
           lua_State* L,
-          EventManager& eventManager,
+          std::shared_ptr< EventManager > eventManager,
           std::weak_ptr< sfg::Widget > selfElement,
           LuaReference masterReference,
           const std::string& buttonTag
         );
         static void genericHandler(
           lua_State* L,
-          EventManager& eventManager,
+          std::shared_ptr< EventManager > eventManager,
           std::weak_ptr< sfg::Widget > widgetPtr,
           LuaReference masterReference
         );

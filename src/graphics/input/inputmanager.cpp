@@ -7,18 +7,18 @@ namespace BlueBear {
   namespace Graphics {
     namespace Input {
 
-      InputManager::InputManager( EventManager& eventManager ) : eventManager( eventManager ) {
-        eventManager.SFGUI_EAT_EVENT.listen( SFGUIEatEvent::Event::EAT_KEYBOARD_EVENT, [ & ]() {
+      InputManager::InputManager( std::shared_ptr< EventManager > eventManager ) : eventManager( eventManager ) {
+        eventManager->SFGUI_EAT_EVENT.listen( SFGUIEatEvent::Event::EAT_KEYBOARD_EVENT, [ & ]() {
           eatKeyEvents = true;
         } );
 
-        eventManager.SFGUI_EAT_EVENT.listen( SFGUIEatEvent::Event::EAT_MOUSE_EVENT, [ & ]() {
+        eventManager->SFGUI_EAT_EVENT.listen( SFGUIEatEvent::Event::EAT_MOUSE_EVENT, [ & ]() {
           eatMouseEvents = true;
         } );
       }
 
       InputManager::~InputManager() {
-        eventManager.SFGUI_EAT_EVENT.stopListening( SFGUIEatEvent::Event::EAT_KEYBOARD_EVENT );
+        eventManager->SFGUI_EAT_EVENT.stopListening( SFGUIEatEvent::Event::EAT_KEYBOARD_EVENT );
       }
 
       /**

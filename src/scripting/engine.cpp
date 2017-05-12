@@ -26,7 +26,7 @@
 namespace BlueBear {
 	namespace Scripting {
 
-		Engine::Engine( EventManager& eventManager ) :
+		Engine::Engine( std::shared_ptr< EventManager > eventManager ) :
 		 eventManager( eventManager ),
 		 lastExecuted( std::chrono::steady_clock::now() ),
 		 L( luaL_newstate() ),
@@ -47,7 +47,7 @@ namespace BlueBear {
 		 * Hook into eventmanager for everything we need
 		 */
 		void Engine::setupEvents() {
-			eventManager.UI_ACTION_EVENT.listen( this, [ & ]( LuaReference function ) {
+			eventManager->UI_ACTION_EVENT.listen( this, [ & ]( LuaReference function ) {
 				waitingTable.waitForTick( currentTick + 1, function );
 			} );
 		}

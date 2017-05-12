@@ -46,7 +46,7 @@ namespace BlueBear {
     const std::string Display::WALLPANEL_MODEL_DR_PATH = "system/models/wall/diagwall.dae";
     const std::string Display::FLOOR_MODEL_PATH = "system/models/floor/floor.dae";
 
-    Display::Display( lua_State* L, EventManager& eventManager ) : L( L ), eventManager( eventManager ) {
+    Display::Display( lua_State* L, std::shared_ptr< EventManager > eventManager ) : L( L ), eventManager( eventManager ) {
       // Get our settings out of the config manager
       x = ConfigManager::getInstance().getIntValue( "viewport_x" );
       y = ConfigManager::getInstance().getIntValue( "viewport_y" );

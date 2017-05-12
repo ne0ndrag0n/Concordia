@@ -15,7 +15,7 @@ namespace BlueBear {
     namespace Input {
 
       class InputManager {
-        EventManager& eventManager;
+        std::shared_ptr< EventManager > eventManager;
         std::map< sf::Keyboard::Key, std::function< void() > > keyEvents;
         bool eatKeyEvents = false;
         bool eatMouseEvents = false;
@@ -23,7 +23,7 @@ namespace BlueBear {
         void removeSFGUIFocus();
 
       public:
-        InputManager( EventManager& eventManager );
+        InputManager( std::shared_ptr< EventManager > eventManager );
         ~InputManager();
         void listen( sf::Keyboard::Key key, std::function< void() > callback );
         void handleEvent( sf::Event& event );

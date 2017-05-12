@@ -34,7 +34,7 @@ namespace BlueBear {
 				static constexpr const char* MODPACK_MAIN_SCRIPT = "obj.lua";
 				static constexpr const Tick WORLD_TICKS_MAX = 300;
 
-				EventManager& eventManager;
+				std::shared_ptr< EventManager > eventManager;
 
 				std::chrono::time_point< std::chrono::steady_clock > lastExecuted;
 
@@ -62,7 +62,7 @@ namespace BlueBear {
 				std::vector< LuaReference > objects;
 				std::shared_ptr< Lot > currentLot;
 
-				Engine( EventManager& eventManager );
+				Engine( std::shared_ptr< EventManager > eventManager );
 				~Engine();
 				void setupEvents();
 				void objectLoop();

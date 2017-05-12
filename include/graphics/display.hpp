@@ -59,7 +59,7 @@ namespace BlueBear {
       static const std::string FLOOR_MODEL_PATH;
 
       // RAII style
-      Display( lua_State* L, EventManager& eventManager );
+      Display( lua_State* L, std::shared_ptr< EventManager > eventManager );
       ~Display();
 
       void openDisplay();
@@ -139,7 +139,7 @@ namespace BlueBear {
       };
       // ----------------------------
 
-        EventManager& eventManager;
+        std::shared_ptr< EventManager > eventManager;
       private:
         lua_State* L;
         using ViewportDimension = int;

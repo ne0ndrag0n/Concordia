@@ -1855,7 +1855,7 @@ namespace BlueBear {
        * STACK ARGS: (none)
        * Stack is unmodified after call
        */
-      void LuaElement::clickHandler( lua_State* L, EventManager& eventManager, std::weak_ptr< sfg::Widget > selfElement, LuaReference masterReference, const std::string& buttonTag ) {
+      void LuaElement::clickHandler( lua_State* L, std::shared_ptr< EventManager > eventManager, std::weak_ptr< sfg::Widget > selfElement, LuaReference masterReference, const std::string& buttonTag ) {
         // Create new "disposable" reference that will get ferried through and double-bag it with an event meta object
 
         // Double-bag this function by slapping an event object onto the argument list
@@ -1888,7 +1888,7 @@ namespace BlueBear {
         int edibleReference = luaL_ref( L, LUA_REGISTRYINDEX ); // bluebear.util bluebear
         lua_pop( L, 2 ); // EMPTY
 
-        eventManager.UI_ACTION_EVENT.trigger( edibleReference );
+        eventManager->UI_ACTION_EVENT.trigger( edibleReference );
       }
 
       /**
@@ -1898,7 +1898,7 @@ namespace BlueBear {
        * STACK ARGS: (none)
        * Stack is unmodified after call
        */
-      void LuaElement::genericHandler( lua_State* L, EventManager& eventManager, std::weak_ptr< sfg::Widget > widgetPtr, LuaReference masterReference ) {
+      void LuaElement::genericHandler( lua_State* L, std::shared_ptr< EventManager > eventManager, std::weak_ptr< sfg::Widget > widgetPtr, LuaReference masterReference ) {
         lua_getglobal( L, "bluebear" ); // bluebear
         Tools::Utility::getTableValue( L, "util" ); // bluebear.util bluebear
         Tools::Utility::getTableValue( L, "bind" ); // <bind> bluebear.util bluebear
@@ -1925,7 +1925,7 @@ namespace BlueBear {
         int edibleReference = luaL_ref( L, LUA_REGISTRYINDEX ); // bluebear.util bluebear
         lua_pop( L, 2 ); // EMPTY
 
-        eventManager.UI_ACTION_EVENT.trigger( edibleReference );
+        eventManager->UI_ACTION_EVENT.trigger( edibleReference );
       }
 
       /**
@@ -1991,7 +1991,7 @@ namespace BlueBear {
        * STACK ARGS: function
        * RETURNS: true
        */
-      void LuaElement::registerGenericHandler( lua_State* L, EventManager& eventManager, std::shared_ptr< sfg::Widget > widget, sfg::Signal::SignalID signalID ) {
+      void LuaElement::registerGenericHandler( lua_State* L, std::shared_ptr< EventManager > eventManager, std::shared_ptr< sfg::Widget > widget, sfg::Signal::SignalID signalID ) {
         auto& signalMap = masterSignalMap[ widget ];
         unregisterHandler( L, signalMap, widget, signalID );
 

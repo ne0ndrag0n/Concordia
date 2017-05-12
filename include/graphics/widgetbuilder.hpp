@@ -42,7 +42,7 @@ namespace BlueBear {
     class ImageCache;
 
     class WidgetBuilder {
-      EventManager& eventManager;
+      std::shared_ptr< EventManager > eventManager;
       ImageCache& imageCache;
       // "This RadioButton needs to be associated with the group belonging to this item"
       std::vector< std::pair< std::shared_ptr< sfg::RadioButton >, std::string > > groups;
@@ -133,7 +133,7 @@ namespace BlueBear {
       };
 
     public:
-      WidgetBuilder( EventManager& eventManager, ImageCache& imageCache );
+      WidgetBuilder( std::shared_ptr< EventManager > eventManager, ImageCache& imageCache );
       std::vector< std::shared_ptr< sfg::Widget > > getWidgets( const std::string& path );
       std::shared_ptr< sfg::Widget > getWidgetFromXML( const std::string& xmlString );
       std::shared_ptr< sfg::Widget > getWidgetFromElementDirect( tinyxml2::XMLElement* element );

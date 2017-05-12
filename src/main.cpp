@@ -33,7 +33,7 @@ int main() {
 	Log::getInstance().info( "Main", LocaleManager::getInstance().getString( "BLUEBEAR_WELCOME_MESSAGE" ) );
 	sf::err().rdbuf( NULL );
 
-	EventManager eventManager;
+	std::shared_ptr< EventManager > eventManager = std::make_shared< EventManager >();
 
 	Scripting::Engine engine( eventManager );
 	if ( !engine.submitLuaContributions() ) {
