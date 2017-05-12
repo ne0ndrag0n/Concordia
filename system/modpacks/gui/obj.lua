@@ -23,7 +23,7 @@ function GUIProvider:open_debug_ui()
 end
 
 function GUIProvider:do_something( event )
-  local table = self.gui:find_by_id( 'table' )
+  local notebook = self.gui:find_by_id( 'notebook' )
 end
 
 function GUIProvider:on_click_zoom_in()

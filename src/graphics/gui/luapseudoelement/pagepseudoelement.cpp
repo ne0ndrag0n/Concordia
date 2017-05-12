@@ -6,6 +6,7 @@
 #include "scripting/luakit/gchelper.hpp"
 #include "tools/ctvalidators.hpp"
 #include "tools/utility.hpp"
+#include "eventmanager.hpp"
 #include "log.hpp"
 
 namespace BlueBear {
@@ -13,7 +14,14 @@ namespace BlueBear {
     namespace GUI {
 
       PagePseudoElement::PagePseudoElement( std::shared_ptr< sfg::Notebook > subject, unsigned int pageNumber, Display::MainGameState& displayState )
-        : subject( subject ), pageNumber( pageNumber ), displayState( displayState ), stagedTabElement( nullptr ) {}
+        : subject( subject ), pageNumber( pageNumber ), displayState( displayState ), stagedTabElement( nullptr ) {
+          listen();
+        }
+
+      PagePseudoElement::~PagePseudoElement() {
+        // FIXME: eventManager needs to be a shared_ptr so that the destructor is not called on a bum object when the game closes
+        //deafen();
+      }
 
       /**
        *
@@ -51,6 +59,30 @@ namespace BlueBear {
         return "page";
       }
 
+      void PagePseudoElement::onItemAdded( void* table, unsigned int changed ) {
+        // TODO
+        if( subject.get() == table ) {
+          Log::getInstance().debug( "PagePseudoElement::handleUpdate", "Item was added" );
+        }
+      }
+
+      void PagePseudoElement::onItemRemoved( void* table, unsigned int changed ) {
+        // TODO
+        if( subject.get() == table ) {
+          Log::getInstance().debug( "PagePseudoElement::handleUpdate", "Item was removed" );
+        }
+      }
+
+      void PagePseudoElement::listen() {
+        displayState.instance.eventManager.ITEM_ADDED.listen( this, std::bind( &PagePseudoElement::onItemAdded, this, std::placeholders::_1, std::placeholders::_2 ) );
+        displayState.instance.eventManager.ITEM_REMOVED.listen( this, std::bind( &PagePseudoElement::onItemRemoved, this, std::placeholders::_1, std::placeholders::_2 ) );
+      }
+
+      void PagePseudoElement::deafen() {
+        displayState.instance.eventManager.ITEM_ADDED.stopListening( this );
+        displayState.instance.eventManager.ITEM_REMOVED.stopListening( this );
+      }
+
       void PagePseudoElement::removeFromNotebook( std::shared_ptr< sfg::Widget > comparison ) {
         if( !subject || ( comparison != subject ) ) {
           Log::getInstance().warn( "PagePseudoElement::removeFromNotebook", "This <page> is not attached to this Notebook widget!" );
@@ -58,6 +90,7 @@ namespace BlueBear {
         }
 
         subject->RemovePage( pageNumber );
+        displayState.instance.eventManager.ITEM_REMOVED.trigger( subject.get(), pageNumber );
 
         pageNumber = 0;
         subject = nullptr;

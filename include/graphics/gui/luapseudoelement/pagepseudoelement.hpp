@@ -45,12 +45,19 @@ namespace BlueBear {
           return staged;
         }
 
+        void onItemAdded( void* table, unsigned int changed );
+        void onItemRemoved( void* table, unsigned int changed );
+
+        void listen();
+        void deafen();
+
       public:
         PagePseudoElement(
           std::shared_ptr< sfg::Notebook > subject,
           unsigned int pageNumber,
           Display::MainGameState& displayState
         );
+        ~PagePseudoElement();
 
         void setMetatable( lua_State* L );
         std::string getName();
