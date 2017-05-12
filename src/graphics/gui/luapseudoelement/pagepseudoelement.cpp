@@ -58,17 +58,13 @@ namespace BlueBear {
         return "page";
       }
 
-      void PagePseudoElement::onItemAdded( void* table, unsigned int changed ) {
+      void PagePseudoElement::onItemAdded( void* table, int changed ) {
         // TODO
-        if( subject.get() == table ) {
-          Log::getInstance().debug( "PagePseudoElement::handleUpdate", "Item was added" );
-        }
       }
 
-      void PagePseudoElement::onItemRemoved( void* table, unsigned int changed ) {
-        // TODO
-        if( subject.get() == table ) {
-          Log::getInstance().debug( "PagePseudoElement::handleUpdate", "Item was removed" );
+      void PagePseudoElement::onItemRemoved( void* table, int changed ) {
+        if( subject.get() == table && pageNumber > changed ) {
+          --pageNumber;
         }
       }
 
@@ -91,7 +87,7 @@ namespace BlueBear {
         subject->RemovePage( pageNumber );
         eventManager->ITEM_REMOVED.trigger( subject.get(), pageNumber );
 
-        pageNumber = 0;
+        pageNumber = -1;
         subject = nullptr;
       }
 

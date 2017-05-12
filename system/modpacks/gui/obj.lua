@@ -16,14 +16,19 @@ function GUIProvider:open_debug_ui()
   self.gui:find_by_id( "zoom_in" ):on( "click", bluebear.util.bind( "system.provider.gui:on_click_zoom_in", self ) )
   self.gui:find_by_id( "zoom_out" ):on( "click", bluebear.util.bind( "system.provider.gui:on_click_zoom_out", self ) )
 
-  self.gui:find_by_id( "misc" ):on( "click", bluebear.util.bind( "system.provider.gui:do_something", self ) )
+  self.gui:find_by_id( "ta1" ):on( "click", bluebear.util.bind( "system.provider.gui:test_action_1", self ) )
+  self.gui:find_by_id( "ta2" ):on( "click", bluebear.util.bind( "system.provider.gui:test_action_2", self ) )
 
   -- XXX: Remove after demo
   self.gui:find_by_id( "animate1" ):on( "click", bluebear.gui.__internal__playanim1 )
 end
 
-function GUIProvider:do_something( event )
+function GUIProvider:test_action_1( event )
   local notebook = self.gui:find_by_id( 'notebook' )
+end
+
+function GUIProvider:test_action_2( event )
+
 end
 
 function GUIProvider:on_click_zoom_in()

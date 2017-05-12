@@ -52,7 +52,12 @@
       <content>
         <Box id="options" orientation="vertical" spacing="5.0">
           <Button id="animate1">play anim</Button>
-          <Button id="misc">do interesting thing</Button>
+          <Frame title="Test Actions">
+            <Box spacing="5.0">
+              <Button id="ta1">#1</Button>
+              <Button id="ta2">#2</Button>
+            </Box>
+          </Frame>
           <Frame id="inpframe" title="Input">
             <Box id="inputs" spacing="5.0">
               <Entry id="inp1"></Entry>

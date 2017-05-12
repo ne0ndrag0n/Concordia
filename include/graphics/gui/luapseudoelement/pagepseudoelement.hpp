@@ -20,7 +20,7 @@ namespace BlueBear {
       class PagePseudoElement : public LuaPseudoElement {
         std::shared_ptr< sfg::Notebook > subject;
         std::shared_ptr< EventManager > eventManager;
-        unsigned int pageNumber;
+        int pageNumber = -1;
         Display::MainGameState& displayState;
 
         NBBinPseudoElement* stagedTabElement = nullptr;
@@ -48,8 +48,8 @@ namespace BlueBear {
           return staged;
         }
 
-        void onItemAdded( void* table, unsigned int changed );
-        void onItemRemoved( void* table, unsigned int changed );
+        void onItemAdded( void* table, int changed );
+        void onItemRemoved( void* table, int changed );
 
         void listen();
         void deafen();
