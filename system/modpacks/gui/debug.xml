@@ -35,14 +35,17 @@
         <Label>View</Label>
       </tab>
       <content>
-        <Frame title="View">
-          <Box id="control" orientation="horizontal" spacing="5.0">
-            <Button id="rot_l">&lt;</Button>
-            <Button id="rot_r">&gt;</Button>
-            <Button id="zoom_in">+</Button>
-            <Button id="zoom_out">-</Button>
-          </Box>
-        </Frame>
+        <Box orientation="vertical" spacing="5.0">
+          <Frame title="View">
+            <Box id="control" orientation="horizontal" spacing="5.0">
+              <Button id="rot_l">&lt;</Button>
+              <Button id="rot_r">&gt;</Button>
+              <Button id="zoom_in">+</Button>
+              <Button id="zoom_out">-</Button>
+            </Box>
+          </Frame>
+          <Button id="toggle_table">Toggle Table</Button>
+        </Box>
       </content>
     </page>
     <page>
@@ -70,7 +73,7 @@
   </Notebook>
 </Window>
 
-<Window id="tablewindow" title="Table Test">
+<Window id="tablewindow" title="Table Test" visible="false">
   <Table id="table">
     <row>
       <Button id="foo">Foo</Button>

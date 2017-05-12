@@ -19,16 +19,30 @@ function GUIProvider:open_debug_ui()
   self.gui:find_by_id( "ta1" ):on( "click", bluebear.util.bind( "system.provider.gui:test_action_1", self ) )
   self.gui:find_by_id( "ta2" ):on( "click", bluebear.util.bind( "system.provider.gui:test_action_2", self ) )
 
+  self.gui:find_by_id( "toggle_table" ):on( "click", bluebear.util.bind( "system.provider.gui:toggle_visibility", self ) )
+
   -- XXX: Remove after demo
   self.gui:find_by_id( "animate1" ):on( "click", bluebear.gui.__internal__playanim1 )
 end
 
+local row0 = nil
+local row1 = nil
+
 function GUIProvider:test_action_1( event )
-  local notebook = self.gui:find_by_id( 'notebook' )
+  local table = self.gui:find_by_id( 'table' )
+
+  row0 = table:find_pseudo( 'row', 0 )
+  row1 = table:find_pseudo( 'row', 1 )
 end
 
 function GUIProvider:test_action_2( event )
+  self.gui:find_by_id( 'table' ):remove( row0 )
+end
 
+function GUIProvider:toggle_visibility( event )
+  local tablewindow = self.gui:find_by_id( 'tablewindow' )
+
+  tablewindow:set_property( 'visible', not tablewindow:get_property( 'visible' ) )
 end
 
 function GUIProvider:on_click_zoom_in()

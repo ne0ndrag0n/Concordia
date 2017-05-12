@@ -58,12 +58,12 @@ namespace BlueBear {
         return "page";
       }
 
-      void PagePseudoElement::onItemAdded( void* table, int changed ) {
+      void PagePseudoElement::onItemAdded( void* notebook, int changed ) {
         // TODO
       }
 
-      void PagePseudoElement::onItemRemoved( void* table, int changed ) {
-        if( subject.get() == table && pageNumber > changed ) {
+      void PagePseudoElement::onItemRemoved( void* notebook, int changed ) {
+        if( subject.get() == notebook && pageNumber > changed ) {
           --pageNumber;
         }
       }

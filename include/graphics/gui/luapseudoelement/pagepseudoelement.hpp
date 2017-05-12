@@ -48,8 +48,8 @@ namespace BlueBear {
           return staged;
         }
 
-        void onItemAdded( void* table, int changed );
-        void onItemRemoved( void* table, int changed );
+        void onItemAdded( void* notebook, int changed );
+        void onItemRemoved( void* notebook, int changed );
 
         void listen();
         void deafen();
