@@ -11,12 +11,15 @@
 #include <tinyxml2.h>
 
 namespace BlueBear {
+  class EventManager;
+
   namespace Graphics {
     namespace GUI {
       class NBBinPseudoElement;
 
       class PagePseudoElement : public LuaPseudoElement {
         std::shared_ptr< sfg::Notebook > subject;
+        std::shared_ptr< EventManager > eventManager;
         unsigned int pageNumber;
         Display::MainGameState& displayState;
 

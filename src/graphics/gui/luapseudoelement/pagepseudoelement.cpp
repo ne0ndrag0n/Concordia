@@ -14,13 +14,12 @@ namespace BlueBear {
     namespace GUI {
 
       PagePseudoElement::PagePseudoElement( std::shared_ptr< sfg::Notebook > subject, unsigned int pageNumber, Display::MainGameState& displayState )
-        : subject( subject ), pageNumber( pageNumber ), displayState( displayState ), stagedTabElement( nullptr ) {
+        : subject( subject ), eventManager( displayState.instance.eventManager ), pageNumber( pageNumber ), displayState( displayState ) {
           listen();
         }
 
       PagePseudoElement::~PagePseudoElement() {
-        // FIXME: eventManager needs to be a shared_ptr so that the destructor is not called on a bum object when the game closes
-        //deafen();
+        deafen();
       }
 
       /**
@@ -74,13 +73,13 @@ namespace BlueBear {
       }
 
       void PagePseudoElement::listen() {
-        displayState.instance.eventManager->ITEM_ADDED.listen( this, std::bind( &PagePseudoElement::onItemAdded, this, std::placeholders::_1, std::placeholders::_2 ) );
-        displayState.instance.eventManager->ITEM_REMOVED.listen( this, std::bind( &PagePseudoElement::onItemRemoved, this, std::placeholders::_1, std::placeholders::_2 ) );
+        eventManager->ITEM_ADDED.listen( this, std::bind( &PagePseudoElement::onItemAdded, this, std::placeholders::_1, std::placeholders::_2 ) );
+        eventManager->ITEM_REMOVED.listen( this, std::bind( &PagePseudoElement::onItemRemoved, this, std::placeholders::_1, std::placeholders::_2 ) );
       }
 
       void PagePseudoElement::deafen() {
-        displayState.instance.eventManager->ITEM_ADDED.stopListening( this );
-        displayState.instance.eventManager->ITEM_REMOVED.stopListening( this );
+        eventManager->ITEM_ADDED.stopListening( this );
+        eventManager->ITEM_REMOVED.stopListening( this );
       }
 
       void PagePseudoElement::removeFromNotebook( std::shared_ptr< sfg::Widget > comparison ) {
@@ -90,7 +89,7 @@ namespace BlueBear {
         }
 
         subject->RemovePage( pageNumber );
-        displayState.instance.eventManager->ITEM_REMOVED.trigger( subject.get(), pageNumber );
+        eventManager->ITEM_REMOVED.trigger( subject.get(), pageNumber );
 
         pageNumber = 0;
         subject = nullptr;
