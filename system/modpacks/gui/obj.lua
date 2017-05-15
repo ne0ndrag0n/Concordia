@@ -25,18 +25,18 @@ function GUIProvider:open_debug_ui()
   self.gui:find_by_id( "animate1" ):on( "click", bluebear.gui.__internal__playanim1 )
 end
 
-local row0 = nil
-local row1 = nil
+local page0 = nil
+local tab1 = nil
 
 function GUIProvider:test_action_1( event )
-  local table = self.gui:find_by_id( 'table' )
+  local table = self.gui:find_by_id( 'notebook' )
 
-  row0 = table:find_pseudo( 'row', 0 )
-  row1 = table:find_pseudo( 'row', 1 )
+  page0 = table:find_pseudo( 'page', 0 )
+  tab1 = table:find_pseudo( 'page', 2 ):find_pseudo( 'tab' )
 end
 
 function GUIProvider:test_action_2( event )
-  self.gui:find_by_id( 'table' ):remove( row0 )
+  self.gui:find_by_id( 'notebook' ):remove( page0 )
 end
 
 function GUIProvider:toggle_visibility( event )

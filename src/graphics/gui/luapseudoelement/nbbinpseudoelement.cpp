@@ -2,6 +2,7 @@
 #include "graphics/gui/luaelement.hpp"
 #include "graphics/widgetbuilder.hpp"
 #include "tools/ctvalidators.hpp"
+#include "eventmanager.hpp"
 #include "log.hpp"
 #include <tinyxml2.h>
 
@@ -10,7 +11,13 @@ namespace BlueBear {
     namespace GUI {
 
       NBBinPseudoElement::NBBinPseudoElement( std::shared_ptr< sfg::Notebook > subject, unsigned int pageNumber, Display::MainGameState& displayState )
-        : subject( subject ), pageNumber( pageNumber ), displayState( displayState ), stagedWidget( nullptr ) {}
+        : subject( subject ), eventManager( displayState.instance.eventManager ), pageNumber( pageNumber ), displayState( displayState ), stagedWidget( nullptr ) {
+        listen();
+      }
+
+      NBBinPseudoElement::~NBBinPseudoElement() {
+        deafen();
+      }
 
       /**
        *
@@ -49,6 +56,27 @@ namespace BlueBear {
        */
       std::string NBBinPseudoElement::getName() {
         return "<invalid>";
+      }
+
+      void NBBinPseudoElement::listen() {
+        eventManager->ITEM_ADDED.listen( this, std::bind( &NBBinPseudoElement::onItemAdded, this, std::placeholders::_1, std::placeholders::_2 ) );
+        eventManager->ITEM_REMOVED.listen( this, std::bind( &NBBinPseudoElement::onItemRemoved, this, std::placeholders::_1, std::placeholders::_2 ) );
+      }
+
+      void NBBinPseudoElement::deafen() {
+        eventManager->ITEM_ADDED.stopListening( this );
+        eventManager->ITEM_REMOVED.stopListening( this );
+      }
+
+      void NBBinPseudoElement::onItemAdded( void* notebook, int changed ) {
+        // TODO
+      }
+
+      void NBBinPseudoElement::onItemRemoved( void* notebook, int changed ) {
+        if( subject.get() == notebook && pageNumber > changed ) {
+          Log::getInstance().debug( "NBBinPseudoElement of type " + getName(), "Picked up the remove event and turning item " + std::to_string( pageNumber ) + " to " + std::to_string( pageNumber - 1 ) );
+          --pageNumber;
+        }
       }
 
       std::shared_ptr< sfg::Widget > NBBinPseudoElement::createStagedWidget( Display::MainGameState& displayState, tinyxml2::XMLElement* element ) {

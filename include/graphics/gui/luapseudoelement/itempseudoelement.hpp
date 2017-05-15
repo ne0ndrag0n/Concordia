@@ -17,10 +17,18 @@ namespace BlueBear {
 
       class ItemPseudoElement : public LuaPseudoElement {
         std::shared_ptr< sfg::ComboBox > subject;
+        std::shared_ptr< EventManager > eventManager;
+
         int elementNumber;
         Display::MainGameState& displayState;
 
         std::string stagedItem;
+
+        void onItemAdded( void* item, int changed );
+        void onItemRemoved( void* item, int changed );
+
+        void listen();
+        void deafen();
 
       public:
         ItemPseudoElement(
@@ -28,6 +36,7 @@ namespace BlueBear {
           int elementNumber,
           Display::MainGameState& displayState
         );
+        ~ItemPseudoElement();
 
         void setMetatable( lua_State* L );
         std::string getName();

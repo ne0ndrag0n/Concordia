@@ -18,11 +18,17 @@ namespace BlueBear {
       class NBBinPseudoElement : public LuaPseudoElement {
       protected:
         std::shared_ptr< sfg::Notebook > subject;
+        std::shared_ptr< EventManager > eventManager;
         unsigned int pageNumber;
         Display::MainGameState& displayState;
 
         void setStagedChild( lua_State* L, LuaElement* element );
         void setStagedChild( lua_State* L, const std::string& xmlString );
+
+        void onItemAdded( void* notebook, int changed );
+        void onItemRemoved( void* notebook, int changed );
+        void listen();
+        void deafen();
 
       public:
         std::shared_ptr< sfg::Widget > stagedWidget;
@@ -32,6 +38,7 @@ namespace BlueBear {
           unsigned int pageNumber,
           Display::MainGameState& displayState
         );
+        virtual ~NBBinPseudoElement();
 
         std::string getName();
 

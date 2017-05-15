@@ -1,12 +1,20 @@
 #include "graphics/gui/luapseudoelement/itempseudoelement.hpp"
 #include "tools/ctvalidators.hpp"
+#include "eventmanager.hpp"
 #include "log.hpp"
 
 namespace BlueBear {
   namespace Graphics {
     namespace GUI {
 
-      ItemPseudoElement::ItemPseudoElement( std::shared_ptr< sfg::ComboBox > subject, int elementNumber, Display::MainGameState& displayState ) : subject( subject ), elementNumber( elementNumber ), displayState( displayState ) {}
+      ItemPseudoElement::ItemPseudoElement( std::shared_ptr< sfg::ComboBox > subject, int elementNumber, Display::MainGameState& displayState )
+        : subject( subject ), eventManager( displayState.instance.eventManager ), elementNumber( elementNumber ), displayState( displayState ) {
+        listen();
+      }
+
+      ItemPseudoElement::~ItemPseudoElement() {
+        deafen();
+      }
 
       /**
        *
@@ -60,7 +68,9 @@ namespace BlueBear {
         }
 
         subject->RemoveItem( elementNumber );
-        elementNumber = 0;
+        eventManager->ITEM_REMOVED.trigger( subject.get(), elementNumber );
+
+        elementNumber = -1;
 
         subject = nullptr;
       }
@@ -68,6 +78,26 @@ namespace BlueBear {
 
       std::string ItemPseudoElement::getName() {
         return "item";
+      }
+
+      void ItemPseudoElement::listen() {
+        eventManager->ITEM_ADDED.listen( this, std::bind( &ItemPseudoElement::onItemAdded, this, std::placeholders::_1, std::placeholders::_2 ) );
+        eventManager->ITEM_REMOVED.listen( this, std::bind( &ItemPseudoElement::onItemRemoved, this, std::placeholders::_1, std::placeholders::_2 ) );
+      }
+
+      void ItemPseudoElement::deafen() {
+        eventManager->ITEM_ADDED.stopListening( this );
+        eventManager->ITEM_REMOVED.stopListening( this );
+      }
+
+      void ItemPseudoElement::onItemAdded( void* item, int changed ) {
+        // TODO
+      }
+
+      void ItemPseudoElement::onItemRemoved( void* item, int changed ) {
+        if( subject.get() == item && elementNumber > changed ) {
+          --elementNumber;
+        }
       }
 
       void ItemPseudoElement::setItem( const std::string& content ) {
