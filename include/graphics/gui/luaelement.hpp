@@ -42,7 +42,7 @@ namespace BlueBear {
         /**
          * Over time, make more of this shit a goddamn instance function!!
          */
-        void add( lua_State* L, const std::string& xmlString, Display::MainGameState& state );
+        void add( lua_State* L, const std::string& xmlString, Display::MainGameState& state, int index = -1 );
         void add( LuaElement* element );
         void add( lua_State* L, PagePseudoElement* page );
         void add( lua_State* L, ItemPseudoElement* item );

@@ -23,7 +23,7 @@ namespace BlueBear {
       std::map< std::shared_ptr< sfg::Widget >, std::map< sfg::Signal::SignalID, LuaElement::SignalBinding > > LuaElement::masterSignalMap;
       std::map< std::shared_ptr< sfg::Widget >, std::map< std::string, std::string > > LuaElement::masterAttrMap;
 
-      void LuaElement::add( lua_State* L, const std::string& xmlString, Display::MainGameState& state ) {
+      void LuaElement::add( lua_State* L, const std::string& xmlString, Display::MainGameState& state, int index ) {
         if( isContainer() ) {
           tinyxml2::XMLDocument document;
           if( tinyxml2::XMLElement* element = Tools::Utility::getRootNode( document, xmlString ) ) {
