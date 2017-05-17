@@ -31,7 +31,7 @@ namespace BlueBear {
             switch( Tools::Utility::hash( element->Name() ) ) {
               case Tools::Utility::hash( "page" ): {
                 if( PagePseudoElement::create( L, state, element ) ) { // userdata
-                  add( L, *( ( PagePseudoElement** ) lua_topointer( L, -1 ) ) );
+                  add( L, *( ( PagePseudoElement** ) lua_topointer( L, -1 ) ), index );
                   lua_pop( L, 1 ); // EMPTY
                 }
                 break;
@@ -72,9 +72,10 @@ namespace BlueBear {
         }
       }
 
-      void LuaElement::add( lua_State* L, PagePseudoElement* page ) {
+      void LuaElement::add( lua_State* L, PagePseudoElement* page, int index ) {
         switch( Tools::Utility::hash( widget->GetName().c_str() ) ) {
           case Tools::Utility::hash( "Notebook" ): {
+            // TODO pass along index
             page->setSubject( L, std::static_pointer_cast< sfg::Notebook >( widget ) );
             break;
           }
@@ -1773,11 +1774,16 @@ namespace BlueBear {
       int LuaElement::lua_add( lua_State* L ) {
         LuaElement* self = *( ( LuaElement** ) luaL_checkudata( L, 1, "bluebear_widget" ) );
 
-        if( lua_isstring( L, -1 ) ) {
+        // Top argument is convertible to a number, and second-to-top argument is convertible to string
+        if( lua_isnumber( L, -1 ) && lua_isstring( L, -2 ) ) {
+          Display::MainGameState* state = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+          self->add( L, lua_tostring( L, -2 ), *state, lua_tonumber( L, -1 ) );
+        // Top argument is convertible to a string, but is NOT convertible to a number
+        } else if( lua_isstring( L, -1 ) && !lua_isnumber( L, -1 ) ) {
           Display::MainGameState* state = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
           self->add( L, lua_tostring( L, -1 ), *state );
         } else if ( PagePseudoElement** udata = ( PagePseudoElement** ) luaL_testudata( L, 2, "bluebear_page_pseudo_element" ) ) {
-          self->add( L, *udata );
+          self->add( L, *udata, lua_isnumber( L, -1 ) ? lua_tonumber( L, -1 ) : -1 );
         } else if ( ItemPseudoElement** udata = ( ItemPseudoElement** ) luaL_testudata( L, 2, "bluebear_item_pseudo_element" ) ) {
           self->add( L, *udata );
         } else if ( RowPseudoElement** udata = ( RowPseudoElement** ) luaL_testudata( L, 2, "bluebear_row_pseudo_element" ) ) {
