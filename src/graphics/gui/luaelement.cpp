@@ -75,8 +75,7 @@ namespace BlueBear {
       void LuaElement::add( lua_State* L, PagePseudoElement* page, int index ) {
         switch( Tools::Utility::hash( widget->GetName().c_str() ) ) {
           case Tools::Utility::hash( "Notebook" ): {
-            // TODO pass along index
-            page->setSubject( L, std::static_pointer_cast< sfg::Notebook >( widget ) );
+            page->setSubject( L, std::static_pointer_cast< sfg::Notebook >( widget ), index );
             break;
           }
           default:

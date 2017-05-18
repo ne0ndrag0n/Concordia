@@ -59,7 +59,9 @@ namespace BlueBear {
       }
 
       void PagePseudoElement::onItemAdded( void* notebook, int changed ) {
-        // TODO
+        if( subject.get() == notebook && pageNumber >= changed ) {
+          ++pageNumber;
+        }
       }
 
       void PagePseudoElement::onItemRemoved( void* notebook, int changed ) {
@@ -193,7 +195,7 @@ namespace BlueBear {
         }
       }
 
-      bool PagePseudoElement::setSubject( lua_State* L, std::shared_ptr< sfg::Notebook > notebook ) {
+      bool PagePseudoElement::setSubject( lua_State* L, std::shared_ptr< sfg::Notebook > notebook, int index ) {
 
         // Basic validation
 
@@ -212,9 +214,11 @@ namespace BlueBear {
           return false;
         }
 
-        // Page is fully staged
+        int newPageNumber = notebook->InsertPage( stagedContentElement->stagedWidget, stagedTabElement->stagedWidget, index );
+        eventManager->ITEM_ADDED.trigger( notebook.get(), newPageNumber );
+
         subject = notebook;
-        pageNumber = subject->AppendPage( stagedContentElement->stagedWidget, stagedTabElement->stagedWidget );
+        pageNumber = newPageNumber;
 
         stagedTabElement->setSubject( subject, pageNumber );
         stagedContentElement->setSubject( subject, pageNumber );

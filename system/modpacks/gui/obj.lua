@@ -39,8 +39,9 @@ function GUIProvider:test_action_1( event )
       </content>
     </page>
   ]]
+  local page2 = table:find_pseudo( 'page', 0 )
 
-  table:add( newtab )
+  table:add( newtab, 0 )
 end
 
 function GUIProvider:test_action_2( event )

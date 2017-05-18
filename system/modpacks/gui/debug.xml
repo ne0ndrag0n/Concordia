@@ -32,7 +32,7 @@
     </page>
     <page>
       <tab>
-        <Label>View</Label>
+        <Label id="view">View</Label>
       </tab>
       <content>
         <Box orientation="vertical" spacing="5.0">

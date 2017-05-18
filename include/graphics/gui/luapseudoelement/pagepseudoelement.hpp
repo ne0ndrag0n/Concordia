@@ -66,7 +66,7 @@ namespace BlueBear {
         std::string getName();
         void removeFromNotebook( std::shared_ptr< sfg::Widget > comparison );
 
-        bool setSubject( lua_State* L, std::shared_ptr< sfg::Notebook > notebook );
+        bool setSubject( lua_State* L, std::shared_ptr< sfg::Notebook > notebook, int index );
 
         static int create( lua_State* L, Display::MainGameState& displayState, tinyxml2::XMLElement* element );
 
