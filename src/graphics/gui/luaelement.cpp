@@ -86,7 +86,7 @@ namespace BlueBear {
       void LuaElement::add( lua_State* L, ItemPseudoElement* item, int index ) {
         switch( Tools::Utility::hash( widget->GetName().c_str() ) ) {
           case Tools::Utility::hash( "ComboBox" ): {
-            item->setSubject( std::static_pointer_cast< sfg::ComboBox >( widget ) );
+            item->setSubject( std::static_pointer_cast< sfg::ComboBox >( widget ), index );
             break;
           }
           default:

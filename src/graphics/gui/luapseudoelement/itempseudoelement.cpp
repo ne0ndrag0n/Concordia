@@ -91,7 +91,9 @@ namespace BlueBear {
       }
 
       void ItemPseudoElement::onItemAdded( void* item, int changed ) {
-        // TODO
+        if( subject.get() == item && elementNumber >= changed ) {
+          ++elementNumber;
+        }
       }
 
       void ItemPseudoElement::onItemRemoved( void* item, int changed ) {
@@ -115,7 +117,7 @@ namespace BlueBear {
       /**
        * Note: turns out we didn't really need the bool in PagePseudoElement's setSubject
        */
-      void ItemPseudoElement::setSubject( std::shared_ptr< sfg::ComboBox > comboBox ) {
+      void ItemPseudoElement::setSubject( std::shared_ptr< sfg::ComboBox > comboBox, int index ) {
 
         if( !comboBox ) {
           Log::getInstance().error( "ItemPseudoElement::setSubject", "std::shared_ptr< sfg::ComboBox > was nullptr" );
@@ -128,8 +130,19 @@ namespace BlueBear {
         }
 
         subject = comboBox;
-        subject->AppendItem( stagedItem );
-        elementNumber = subject->GetItemCount() - 1;
+
+        int newElementNumber;
+
+        if( index >= 0 && index <= subject->GetItemCount() - 1 ) {
+          subject->InsertItem( index, stagedItem );
+          newElementNumber = index;
+        } else {
+          subject->AppendItem( stagedItem );
+          newElementNumber = subject->GetItemCount() - 1;
+        }
+
+        eventManager->ITEM_ADDED.trigger( subject.get(), newElementNumber );
+        elementNumber = newElementNumber;
 
         stagedItem = "";
       }
