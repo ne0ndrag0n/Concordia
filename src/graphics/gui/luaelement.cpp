@@ -38,7 +38,7 @@ namespace BlueBear {
               }
               case Tools::Utility::hash( "item" ): {
                 if( ItemPseudoElement::create( L, state, element ) ) { // userdata
-                  add( L, *( ( ItemPseudoElement** ) lua_topointer( L, -1 ) ) );
+                  add( L, *( ( ItemPseudoElement** ) lua_topointer( L, -1 ) ), index );
                   lua_pop( L, 1 ); // EMPTY
                 }
                 break;
@@ -83,7 +83,7 @@ namespace BlueBear {
         }
       }
 
-      void LuaElement::add( lua_State* L, ItemPseudoElement* item ) {
+      void LuaElement::add( lua_State* L, ItemPseudoElement* item, int index ) {
         switch( Tools::Utility::hash( widget->GetName().c_str() ) ) {
           case Tools::Utility::hash( "ComboBox" ): {
             item->setSubject( std::static_pointer_cast< sfg::ComboBox >( widget ) );
@@ -153,7 +153,7 @@ namespace BlueBear {
           //case Tools::Utility::hash( "ToggleButton" ):
           //case Tools::Utility::hash( "CheckButton" ):
           //case Tools::Utility::hash( "RadioButton" ):
-          //case Tools::Utility::hash( "ComboBox" ):
+          case Tools::Utility::hash( "ComboBox" ):
           case Tools::Utility::hash( "Frame" ):
           case Tools::Utility::hash( "Viewport" ):
           case Tools::Utility::hash( "Window" ):
@@ -1784,7 +1784,7 @@ namespace BlueBear {
         } else if ( PagePseudoElement** udata = ( PagePseudoElement** ) luaL_testudata( L, 2, "bluebear_page_pseudo_element" ) ) {
           self->add( L, *udata, lua_isnumber( L, -1 ) ? lua_tonumber( L, -1 ) : -1 );
         } else if ( ItemPseudoElement** udata = ( ItemPseudoElement** ) luaL_testudata( L, 2, "bluebear_item_pseudo_element" ) ) {
-          self->add( L, *udata );
+          self->add( L, *udata, lua_isnumber( L, -1 ) ? lua_tonumber( L, -1 ) : -1 );
         } else if ( RowPseudoElement** udata = ( RowPseudoElement** ) luaL_testudata( L, 2, "bluebear_row_pseudo_element" ) ) {
           self->add( L, *udata );
         } else {

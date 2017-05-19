@@ -463,7 +463,7 @@ namespace BlueBear {
 				//case Tools::Utility::hash( "ToggleButton" ):
 				//case Tools::Utility::hash( "CheckButton" ):
 				//case Tools::Utility::hash( "RadioButton" ):
-				//case Tools::Utility::hash( "ComboBox" ):
+				case Tools::Utility::hash( "ComboBox" ):
 				case Tools::Utility::hash( "Frame" ):
 				case Tools::Utility::hash( "Viewport" ):
 				case Tools::Utility::hash( "Window" ):

@@ -26,22 +26,14 @@ function GUIProvider:open_debug_ui()
 end
 
 function GUIProvider:test_action_1( event )
-  local table = self.gui:find_by_id( 'notebook' )
-  local newtab = [[
-    <page>
-      <tab>
-        <Label>Label</Label>
-      </tab>
-      <content>
-        <Box>
-          <Label>Content</Label>
-        </Box>
-      </content>
-    </page>
+  local combo = self.gui:find_by_id( 'combo' )
+  local newitem = [[
+    <item>potato</item>
   ]]
-  local page2 = table:find_pseudo( 'page', 0 )
 
-  table:add( newtab, 0 )
+  local item2 = combo:find_pseudo( 'item', 2 )
+
+  combo:add( newitem, 0 )
 end
 
 function GUIProvider:test_action_2( event )

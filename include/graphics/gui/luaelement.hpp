@@ -45,7 +45,7 @@ namespace BlueBear {
         void add( lua_State* L, const std::string& xmlString, Display::MainGameState& state, int index = -1 );
         void add( LuaElement* element );
         void add( lua_State* L, PagePseudoElement* page, int index );
-        void add( lua_State* L, ItemPseudoElement* item );
+        void add( lua_State* L, ItemPseudoElement* item, int index );
         void add( lua_State* L, RowPseudoElement* row );
         void addToCheckedContainer( std::shared_ptr< sfg::Widget > target );
         void removeWidget( std::shared_ptr< sfg::Widget > target );
