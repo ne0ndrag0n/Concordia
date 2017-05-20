@@ -55,7 +55,7 @@ namespace BlueBear {
                 }
 
                 // Add to widget typecast as container
-                addToCheckedContainer( child );
+                addToCheckedContainer( child, index );
               }
             }
           }
@@ -64,9 +64,9 @@ namespace BlueBear {
         }
       }
 
-      void LuaElement::add( LuaElement* element ) {
+      void LuaElement::add( LuaElement* element, int index ) {
         if( isContainer() ) {
-          addToCheckedContainer( element->widget );
+          addToCheckedContainer( element->widget, index );
         } else {
           Log::getInstance().warn( "LuaElement::add", "This LuaElement is not a Container and cannot be added to." );
         }
@@ -105,10 +105,14 @@ namespace BlueBear {
         }
       }
 
-      void LuaElement::addToCheckedContainer( std::shared_ptr< sfg::Widget > target ) {
+      void LuaElement::addToCheckedContainer( std::shared_ptr< sfg::Widget > target, int position ) {
         if( std::string( widget->GetName() ) == "Box" ) {
           std::shared_ptr< sfg::Box > widgetAsBox = std::static_pointer_cast< sfg::Box >( widget );
           widgetAsBox->PackEnd( target, true, true );
+
+          if( position >= 0 ) {
+            widgetAsBox->ReorderChild( target, position );
+          }
         } else {
           std::shared_ptr< sfg::Container > widgetAsContainer = std::static_pointer_cast< sfg::Container >( widget );
           widgetAsContainer->Add( target );
@@ -1789,7 +1793,7 @@ namespace BlueBear {
           self->add( L, *udata );
         } else {
           LuaElement* argument = *( ( LuaElement** ) luaL_checkudata( L, 2, "bluebear_widget" ) );
-          self->add( argument );
+          self->add( argument, lua_isnumber( L, -1 ) ? lua_tonumber( L, -1 ) : -1 );
         }
 
         return 0;

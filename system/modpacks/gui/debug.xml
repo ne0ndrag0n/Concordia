@@ -74,7 +74,7 @@
 </Window>
 
 <Window id="tablewindow" title="Additional Tests" min-width="500" visible="false">
-  <Box orientation="vertical" spacing="5">
+  <Box id="tablebox" orientation="vertical" spacing="5">
     <ComboBox id="combo">
       <item>spam</item>
       <item>meat</item>

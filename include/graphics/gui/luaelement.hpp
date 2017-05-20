@@ -43,11 +43,11 @@ namespace BlueBear {
          * Over time, make more of this shit a goddamn instance function!!
          */
         void add( lua_State* L, const std::string& xmlString, Display::MainGameState& state, int index = -1 );
-        void add( LuaElement* element );
+        void add( LuaElement* element, int index );
         void add( lua_State* L, PagePseudoElement* page, int index );
         void add( lua_State* L, ItemPseudoElement* item, int index );
         void add( lua_State* L, RowPseudoElement* row );
-        void addToCheckedContainer( std::shared_ptr< sfg::Widget > target );
+        void addToCheckedContainer( std::shared_ptr< sfg::Widget > target, int position );
         void removeWidget( std::shared_ptr< sfg::Widget > target );
         void removePseudoElement( PagePseudoElement* page );
         void removePseudoElement( ItemPseudoElement* item );

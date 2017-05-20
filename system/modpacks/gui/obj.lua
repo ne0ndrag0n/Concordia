@@ -26,14 +26,7 @@ function GUIProvider:open_debug_ui()
 end
 
 function GUIProvider:test_action_1( event )
-  local combo = self.gui:find_by_id( 'combo' )
-  local newitem = [[
-    <item>potato</item>
-  ]]
 
-  local item2 = combo:find_pseudo( 'item', 2 )
-
-  combo:add( newitem, 0 )
 end
 
 function GUIProvider:test_action_2( event )
