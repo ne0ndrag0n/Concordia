@@ -80,7 +80,7 @@ namespace BlueBear {
           ( *item )->stagedRowSpacing = spacing;
         }
 
-        ( *item )->processElements( element->FirstChildElement() );
+        ( *item )->processElements( element->FirstChildElement(), -1 );
 
         return 1;
       }
@@ -259,7 +259,7 @@ namespace BlueBear {
         stagedWidgets.clear();
       }
 
-      void RowPseudoElement::add( std::shared_ptr< sfg::Widget > widget ) {
+      void RowPseudoElement::add( std::shared_ptr< sfg::Widget > widget, int index ) {
         // This is just a disgrace
         unsigned int colspan = 1;
         LuaElement::queryUnsignedAttribute( widget, "colspan", &colspan );
@@ -288,9 +288,17 @@ namespace BlueBear {
         };
 
         if( subject ) {
+          // TODO: index added to addFromStaging
           addFromStaging( staging );
         } else {
-          stagedWidgets.push_back( staging );
+          std::vector< RowPseudoElement::WidgetStaging >::iterator iterator = stagedWidgets.end();
+
+          if( index > -1 && index <= stagedWidgets.size() ) {
+            iterator = stagedWidgets.begin();
+            std::advance( iterator, index );
+          }
+
+          stagedWidgets.insert( iterator, staging );
         }
       }
 
@@ -308,22 +316,22 @@ namespace BlueBear {
         }
       }
 
-      void RowPseudoElement::add( lua_State* L, LuaElement* element ) {
-        add( element->widget );
-      }
-
-      void RowPseudoElement::add( lua_State* L, const std::string& xmlString ) {
+      void RowPseudoElement::add( lua_State* L, const std::string& xmlString, int index ) {
         // Manually parse this out - We'll be adding a widget but it has additional properties that need to be passed to the shared_ptr overload
         tinyxml2::XMLDocument document;
 
-        processElements( Tools::Utility::getRootNode( document, xmlString ) );
+        processElements( Tools::Utility::getRootNode( document, xmlString ), index );
       }
 
-      void RowPseudoElement::processElements( tinyxml2::XMLElement* element ) {
+      void RowPseudoElement::processElements( tinyxml2::XMLElement* element, int startingIndex ) {
+        int index = 0;
+
         for( tinyxml2::XMLElement* child = element; child != NULL; child = child->NextSiblingElement() ) {
           try {
             WidgetBuilder widgetBuilder( displayState.instance.eventManager, displayState.getImageCache() );
-            add( widgetBuilder.getWidgetFromElementDirect( child ) );
+            add( widgetBuilder.getWidgetFromElementDirect( child ), startingIndex == -1 ? -1 : index + startingIndex );
+
+            index++;
           } catch( std::exception& e ) {
             Log::getInstance().error( "RowPseudoElement::add", "Failed to add widget XML: " + std::string( e.what() ) );
           }
@@ -350,11 +358,15 @@ namespace BlueBear {
       int RowPseudoElement::lua_add( lua_State* L ) {
         RowPseudoElement* self = *( ( RowPseudoElement** ) luaL_checkudata( L, 1, "bluebear_row_pseudo_element" ) );
 
-        if( lua_isstring( L, -1 ) ) {
-          self->add( L, lua_tostring( L, -1 ) );
+        bool numericArgument = lua_gettop( L ) == 3 && lua_isnumber( L, -1 );
+        int position = numericArgument ? lua_tonumber( L, -1 ) : -1;
+        int target = numericArgument ? -2 : -1;
+
+        if( lua_isstring( L, target ) ) {
+          self->add( L, lua_tostring( L, target ), position );
         } else {
           LuaElement* element = *( ( LuaElement** ) luaL_checkudata( L, 2, "bluebear_widget" ) );
-          self->add( L, element );
+          self->add( element->widget, position );
         }
       }
 
