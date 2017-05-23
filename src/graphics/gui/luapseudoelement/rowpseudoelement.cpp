@@ -236,7 +236,7 @@ namespace BlueBear {
         for( int i = 0; i != size; i++ ) {
           // Add the WidgetStaging
           WidgetStaging staging = stagedWidgets.at( i );
-          addFromStaging( staging );
+          addFromStaging( staging, -1 );
 
           // If this widget has the table_spacing property set on it (WidgetBuilder should slap it on),
           // set it up so that we set the column spacing
@@ -288,8 +288,7 @@ namespace BlueBear {
         };
 
         if( subject ) {
-          // TODO: index added to addFromStaging
-          addFromStaging( staging );
+          addFromStaging( staging, index );
         } else {
           std::vector< RowPseudoElement::WidgetStaging >::iterator iterator = stagedWidgets.end();
 
@@ -302,11 +301,14 @@ namespace BlueBear {
         }
       }
 
-      void RowPseudoElement::addFromStaging( WidgetStaging staging ) {
+      void RowPseudoElement::addFromStaging( WidgetStaging staging, int columnIndex ) {
         if( subject ) {
+          int latestColumn = getLatestColumn();
+          int columnNumber = columnIndex > -1 ? columnIndex : latestColumn + 1;
+
           subject->Attach(
             staging.widget,
-            sf::Rect< sf::Uint32 >( getLatestColumn() + 1, rowNumber, staging.colspan, staging.rowspan ),
+            sf::Rect< sf::Uint32 >( columnNumber, rowNumber, staging.colspan, staging.rowspan ),
             staging.packX,
             staging.packY,
             sf::Vector2f( staging.paddingX, staging.paddingY )

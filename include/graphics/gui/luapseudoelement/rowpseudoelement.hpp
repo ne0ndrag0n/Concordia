@@ -42,7 +42,7 @@ namespace BlueBear {
         void add( std::shared_ptr< sfg::Widget > widget, int index );
         void add( lua_State* L, const std::string& xmlString, int index );
         void remove( lua_State* L, LuaElement* element );
-        void addFromStaging( WidgetStaging staging );
+        void addFromStaging( WidgetStaging staging, int columnIndex );
         void processElements( tinyxml2::XMLElement* element, int startingIndex );
         float getSpacing();
         void setSpacing( float spacing );

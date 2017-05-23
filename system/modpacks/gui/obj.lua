@@ -27,13 +27,9 @@ end
 
 function GUIProvider:test_action_1( event )
   local table = self.gui:find_by_id( 'table' )
-  local row = self.gui:create( [[ <row></row> ]] )
+  local row = table:find_pseudo( 'row', 1 )
 
-  row:add( self.gui:create( '<Label>1</Label>' ) )
-  row:add( self.gui:create( '<Label>3</Label>' ) )
-  row:add( self.gui:create( '<Label>2</Label>' ), 1 )
-
-  table:add( row )
+  row:add( '<Label>Hi</Label>' )
 end
 
 function GUIProvider:test_action_2( event )
