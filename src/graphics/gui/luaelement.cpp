@@ -1737,6 +1737,34 @@ namespace BlueBear {
 
             return 0;
           }
+          // Table extras
+          case Tools::Utility::hash( "colspan" ): {
+            VERIFY_NUMBER_N( "LuaElement::lua_setProperty", "set_property", 1 );
+
+            widgetPtr->operateTableAttribute(
+              [ & ]( sfg::priv::TableCell& cell, std::shared_ptr< sfg::Table > table ) {
+                // Copy cell
+                sfg::priv::TableCell copy = cell;
+
+                table->Remove( copy.child );
+
+                // ORIGINAL CELL IS NOW INVALID
+
+                table->Attach(
+                  copy.child,
+                  sf::Rect< sf::Uint32 >( copy.rect.left, copy.rect.top, lua_tonumber( L, -1 ), copy.rect.height ),
+                  copy.x_options,
+                  copy.y_options,
+                  copy.padding
+                );
+              },
+              [ & ]() {
+                setCustomAttribute( widgetPtr->widget, "colspan", std::to_string( lua_tonumber( L, -1 ) ) );
+              }
+            );
+
+            return 0;
+          }
           // These properties are not settable/retrievable using the SFGUI API
           case Tools::Utility::hash( "tab_position" ):
             // Tried to make tab_position settable.

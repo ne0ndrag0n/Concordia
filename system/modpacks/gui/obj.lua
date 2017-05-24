@@ -27,9 +27,10 @@ end
 
 function GUIProvider:test_action_1( event )
   local table = self.gui:find_by_id( 'table' )
-  local row = table:find_pseudo( 'row', 1 )
+  local row = table:find_pseudo( 'row', 3 )
+  local col3 = row:find_by_id( 'col3' )
 
-  row:add( '<Label>Hi</Label>' )
+  col3:set_property( 'colspan', 1 )
 end
 
 function GUIProvider:test_action_2( event )
