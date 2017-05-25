@@ -28,6 +28,12 @@
     return 0; \
   }
 
+#define VERIFY_BOOLEAN_N( tag, func, n ) \
+  if( !lua_isboolean( L, -n ) ) { \
+    Log::getInstance().warn( tag, "Argument " #n " provided to " func " must be a boolean." ); \
+    return 0; \
+  }
+
 #define VERIFY_POINTER( ptr, tag ) \
   if( !( ptr ) ) { \
     Log::getInstance().warn( tag, "This pseudo-element must first be associated with an element object." ); \

@@ -1765,6 +1765,173 @@ namespace BlueBear {
 
             return 0;
           }
+          case Tools::Utility::hash( "rowspan" ): {
+            VERIFY_NUMBER_N( "LuaElement::lua_setProperty", "set_property", 1 );
+
+            widgetPtr->operateTableAttribute(
+              [ & ]( sfg::priv::TableCell& cell, std::shared_ptr< sfg::Table > table ) {
+                // Copy cell
+                sfg::priv::TableCell copy = cell;
+
+                table->Remove( copy.child );
+
+                // ORIGINAL CELL IS NOW INVALID
+
+                table->Attach(
+                  copy.child,
+                  sf::Rect< sf::Uint32 >( copy.rect.left, copy.rect.top, copy.rect.width, lua_tonumber( L, -1 ) ),
+                  copy.x_options,
+                  copy.y_options,
+                  copy.padding
+                );
+              },
+              [ & ]() {
+                setCustomAttribute( widgetPtr->widget, "rowspan", std::to_string( lua_tonumber( L, -1 ) ) );
+              }
+            );
+
+            return 0;
+          }
+          case Tools::Utility::hash( "expand_x" ): {
+            VERIFY_BOOLEAN_N( "LuaElement::lua_setProperty", "set_property", 1 );
+
+            bool expand_x = lua_toboolean( L, -1 );
+
+            widgetPtr->operateTableAttribute(
+              [ & ]( sfg::priv::TableCell& cell, std::shared_ptr< sfg::Table > table ) {
+                // Copy cell
+                sfg::priv::TableCell copy = cell;
+
+                table->Remove( copy.child );
+
+                // ORIGINAL CELL IS NOW INVALID
+                int new_x_options = copy.x_options;
+                if( expand_x ) {
+                  new_x_options |= sfg::Table::EXPAND;
+                } else {
+                  new_x_options &= ~( sfg::Table::EXPAND );
+                }
+
+                table->Attach(
+                  copy.child,
+                  sf::Rect< sf::Uint32 >( copy.rect.left, copy.rect.top, copy.rect.width, copy.rect.height ),
+                  new_x_options,
+                  copy.y_options,
+                  copy.padding
+                );
+              },
+              [ & ]() {
+                setCustomAttribute( widgetPtr->widget, "expand_x", expand_x ? "true" : "false" );
+              }
+            );
+
+            return 0;
+          }
+          case Tools::Utility::hash( "expand_y" ): {
+            VERIFY_BOOLEAN_N( "LuaElement::lua_setProperty", "set_property", 1 );
+
+            bool expand_y = lua_toboolean( L, -1 );
+
+            widgetPtr->operateTableAttribute(
+              [ & ]( sfg::priv::TableCell& cell, std::shared_ptr< sfg::Table > table ) {
+                // Copy cell
+                sfg::priv::TableCell copy = cell;
+
+                table->Remove( copy.child );
+
+                // ORIGINAL CELL IS NOW INVALID
+                int new_y_options = copy.y_options;
+                if( expand_y ) {
+                  new_y_options |= sfg::Table::EXPAND;
+                } else {
+                  new_y_options &= ~( sfg::Table::EXPAND );
+                }
+
+                table->Attach(
+                  copy.child,
+                  sf::Rect< sf::Uint32 >( copy.rect.left, copy.rect.top, copy.rect.width, copy.rect.height ),
+                  copy.x_options,
+                  new_y_options,
+                  copy.padding
+                );
+              },
+              [ & ]() {
+                setCustomAttribute( widgetPtr->widget, "expand_y", expand_y ? "true" : "false" );
+              }
+            );
+
+            return 0;
+          }
+          case Tools::Utility::hash( "fill_x" ): {
+            VERIFY_BOOLEAN_N( "LuaElement::lua_setProperty", "set_property", 1 );
+
+            bool fill_x = lua_toboolean( L, -1 );
+
+            widgetPtr->operateTableAttribute(
+              [ & ]( sfg::priv::TableCell& cell, std::shared_ptr< sfg::Table > table ) {
+                // Copy cell
+                sfg::priv::TableCell copy = cell;
+
+                table->Remove( copy.child );
+
+                // ORIGINAL CELL IS NOW INVALID
+                int new_x_options = copy.x_options;
+                if( fill_x ) {
+                  new_x_options |= sfg::Table::FILL;
+                } else {
+                  new_x_options &= ~( sfg::Table::FILL );
+                }
+
+                table->Attach(
+                  copy.child,
+                  sf::Rect< sf::Uint32 >( copy.rect.left, copy.rect.top, copy.rect.width, copy.rect.height ),
+                  new_x_options,
+                  copy.y_options,
+                  copy.padding
+                );
+              },
+              [ & ]() {
+                setCustomAttribute( widgetPtr->widget, "fill_x", fill_x ? "true" : "false" );
+              }
+            );
+
+            return 0;
+          }
+          case Tools::Utility::hash( "fill_y" ): {
+            VERIFY_BOOLEAN_N( "LuaElement::lua_setProperty", "set_property", 1 );
+
+            bool fill_y = lua_toboolean( L, -1 );
+
+            widgetPtr->operateTableAttribute(
+              [ & ]( sfg::priv::TableCell& cell, std::shared_ptr< sfg::Table > table ) {
+                // Copy cell
+                sfg::priv::TableCell copy = cell;
+
+                table->Remove( copy.child );
+
+                // ORIGINAL CELL IS NOW INVALID
+                int new_y_options = copy.y_options;
+                if( fill_y ) {
+                  new_y_options |= sfg::Table::FILL;
+                } else {
+                  new_y_options &= ~( sfg::Table::FILL );
+                }
+
+                table->Attach(
+                  copy.child,
+                  sf::Rect< sf::Uint32 >( copy.rect.left, copy.rect.top, copy.rect.width, copy.rect.height ),
+                  copy.x_options,
+                  new_y_options,
+                  copy.padding
+                );
+              },
+              [ & ]() {
+                setCustomAttribute( widgetPtr->widget, "fill_y", fill_y ? "true" : "false" );
+              }
+            );
+
+            return 0;
+          }
           // These properties are not settable/retrievable using the SFGUI API
           case Tools::Utility::hash( "tab_position" ):
             // Tried to make tab_position settable.
