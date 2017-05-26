@@ -30,7 +30,8 @@ function GUIProvider:test_action_1( event )
   local row = table:find_pseudo( 'row', 3 )
   local col3 = row:find_by_id( 'col3' )
 
-  col3:set_property( 'expand_y', not col3:get_property( 'expand_y' ) )
+  col3:set_property( 'padding_x', col3:get_property( 'padding_x' ) + 1 )
+  print( col3:get_property( 'padding_x' ) )
 end
 
 function GUIProvider:test_action_2( event )

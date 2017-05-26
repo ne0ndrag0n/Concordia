@@ -1792,6 +1792,60 @@ namespace BlueBear {
 
             return 0;
           }
+          case Tools::Utility::hash( "padding_x" ): {
+            VERIFY_NUMBER_N( "LuaElement::lua_setProperty", "set_property", 1 );
+
+            widgetPtr->operateTableAttribute(
+              [ & ]( sfg::priv::TableCell& cell, std::shared_ptr< sfg::Table > table ) {
+                // Copy cell
+                sfg::priv::TableCell copy = cell;
+
+                table->Remove( copy.child );
+
+                // ORIGINAL CELL IS NOW INVALID
+
+                table->Attach(
+                  copy.child,
+                  sf::Rect< sf::Uint32 >( copy.rect.left, copy.rect.top, copy.rect.width, copy.rect.height ),
+                  copy.x_options,
+                  copy.y_options,
+                  sf::Vector2f( lua_tonumber( L, -1 ), copy.padding.y )
+                );
+              },
+              [ & ]() {
+                setCustomAttribute( widgetPtr->widget, "padding_x", std::to_string( lua_tonumber( L, -1 ) ) );
+              }
+            );
+
+            return 0;
+          }
+          case Tools::Utility::hash( "padding_y" ): {
+            VERIFY_NUMBER_N( "LuaElement::lua_setProperty", "set_property", 1 );
+
+            widgetPtr->operateTableAttribute(
+              [ & ]( sfg::priv::TableCell& cell, std::shared_ptr< sfg::Table > table ) {
+                // Copy cell
+                sfg::priv::TableCell copy = cell;
+
+                table->Remove( copy.child );
+
+                // ORIGINAL CELL IS NOW INVALID
+
+                table->Attach(
+                  copy.child,
+                  sf::Rect< sf::Uint32 >( copy.rect.left, copy.rect.top, copy.rect.width, copy.rect.height ),
+                  copy.x_options,
+                  copy.y_options,
+                  sf::Vector2f( copy.padding.x, lua_tonumber( L, -1 ) )
+                );
+              },
+              [ & ]() {
+                setCustomAttribute( widgetPtr->widget, "padding_y", std::to_string( lua_tonumber( L, -1 ) ) );
+              }
+            );
+
+            return 0;
+          }
           case Tools::Utility::hash( "expand_x" ): {
             VERIFY_BOOLEAN_N( "LuaElement::lua_setProperty", "set_property", 1 );
 
