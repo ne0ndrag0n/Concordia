@@ -20,8 +20,8 @@ namespace BlueBear {
   namespace Graphics {
     namespace GUI {
 
-      std::map< std::shared_ptr< sfg::Widget >, std::map< sfg::Signal::SignalID, LuaElement::SignalBinding > > LuaElement::masterSignalMap;
-      std::map< std::shared_ptr< sfg::Widget >, std::map< std::string, std::string > > LuaElement::masterAttrMap;
+      std::map< std::weak_ptr< sfg::Widget >, std::map< sfg::Signal::SignalID, LuaElement::SignalBinding >, std::owner_less< std::weak_ptr< sfg::Widget > > > LuaElement::masterSignalMap;
+      std::map< std::weak_ptr< sfg::Widget >, std::map< std::string, std::string >, std::owner_less< std::weak_ptr< sfg::Widget > > > LuaElement::masterAttrMap;
 
       void LuaElement::add( lua_State* L, const std::string& xmlString, Display::MainGameState& state, int index ) {
         if( isContainer() ) {
@@ -2345,7 +2345,15 @@ namespace BlueBear {
           auto it = masterSignalMap.begin();
           while( it != masterSignalMap.end() ) {
 
-            if( it->first.use_count() == 1 ) {
+            /** for use in debugging memory leak issues with LuaGUIContext
+            if( std::shared_ptr< sfg::Widget > wid = it->first.lock() ) {
+              if( wid->GetId() == "testa" ) {
+                Log::getInstance().debug( "use count", std::to_string( it->first.use_count() ) );
+              }
+            }
+            */
+
+            if( it->first.expired() ) {
               it = masterSignalMap.erase( it );
             } else {
               ++it;
@@ -2358,7 +2366,7 @@ namespace BlueBear {
           auto it = masterAttrMap.begin();
           while( it != masterAttrMap.end() ) {
 
-            if( it->first.use_count() == 1 ) {
+            if( it->first.expired() ) {
               it = masterAttrMap.erase( it );
             } else {
               ++it;

@@ -18,15 +18,20 @@
 using namespace BlueBear;
 
 void test() {
-	std::map< double, std::string > t;
+	std::map< std::weak_ptr< int >, std::string, std::owner_less< std::weak_ptr< int > > > test;
 
-	t[ 0 ] = "a";
-	t[ 1 ] = "b";
-	t[ 2 ] = "c";
+	std::shared_ptr< int > five = std::make_shared< int >( 5 );
+	std::shared_ptr< int > differentFive = std::make_shared< int >( 5 );
 
-	auto it = t.upper_bound( 1 );
+	test[ five ] = "five";
 
-	Log::getInstance().debug( "Assert", it->second );
+	Log::getInstance().debug( "", test[ five ] );
+	Log::getInstance().debug( "", test.find( differentFive ) == test.end() ? "true" : "false" );
+	Log::getInstance().debug( "", std::to_string( test.begin()->first.expired() ) );
+
+	five = nullptr;
+
+	Log::getInstance().debug( "", std::to_string( test.begin()->first.expired() ) );
 }
 
 int main() {

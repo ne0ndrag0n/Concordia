@@ -9,6 +9,7 @@
 #include <memory>
 #include <SFGUI/Widgets.hpp>
 #include <map>
+#include <unordered_map>
 
 namespace BlueBear {
   class EventManager;
@@ -36,8 +37,8 @@ namespace BlueBear {
           unsigned int slotHandle;
         };
 
-        static std::map< std::shared_ptr< sfg::Widget >, std::map< sfg::Signal::SignalID, SignalBinding > > masterSignalMap;
-        static std::map< std::shared_ptr< sfg::Widget >, std::map< std::string, std::string > > masterAttrMap;
+        static std::map< std::weak_ptr< sfg::Widget >, std::map< sfg::Signal::SignalID, SignalBinding >, std::owner_less< std::weak_ptr< sfg::Widget > > > masterSignalMap;
+        static std::map< std::weak_ptr< sfg::Widget >, std::map< std::string, std::string >, std::owner_less< std::weak_ptr< sfg::Widget > > > masterAttrMap;
 
         /**
          * Over time, make more of this shit a goddamn instance function!!

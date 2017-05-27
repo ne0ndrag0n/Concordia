@@ -96,3 +96,7 @@
     </Table>
   </Box>
 </Window>
+
+<Window title="test refcount">
+  <Button id="testa">Testa</Button>
+</Window>
