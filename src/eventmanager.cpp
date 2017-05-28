@@ -3,6 +3,8 @@
 
 namespace BlueBear {
 
+  EventManager eventManager;
+
   void SFGUIEatEvent::listen( SFGUIEatEvent::Event event, std::function< void() > callback ) {
     listeners[ event ] = callback;
   }

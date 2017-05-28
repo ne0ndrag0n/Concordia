@@ -17,7 +17,6 @@ namespace BlueBear {
 
       class ItemPseudoElement : public LuaPseudoElement {
         std::shared_ptr< sfg::ComboBox > subject;
-        std::shared_ptr< EventManager > eventManager;
 
         int elementNumber;
         Display::MainGameState& displayState;

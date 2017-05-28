@@ -6,7 +6,6 @@
 #include "graphics/display.hpp"
 #include "graphics/transform.hpp"
 #include "localemanager.hpp"
-#include "eventmanager.hpp"
 #include "scripting/lot.hpp"
 #include <thread>
 #include <SFML/Window.hpp>
@@ -38,9 +37,7 @@ int main() {
 	Log::getInstance().info( "Main", LocaleManager::getInstance().getString( "BLUEBEAR_WELCOME_MESSAGE" ) );
 	sf::err().rdbuf( NULL );
 
-	std::shared_ptr< EventManager > eventManager = std::make_shared< EventManager >();
-
-	Scripting::Engine engine( eventManager );
+	Scripting::Engine engine;
 	if ( !engine.submitLuaContributions() ) {
 		Log::getInstance().error( "main", "Failed to load BlueBear!" );
 		return 1;
@@ -50,7 +47,7 @@ int main() {
 		Log::getInstance().error( "main", "Failed to load demo lot!" );
 	}
 
-	Graphics::Display display( engine.L, eventManager );
+	Graphics::Display display( engine.L );
 	display.openDisplay();
 
 	// send engine lot data to display

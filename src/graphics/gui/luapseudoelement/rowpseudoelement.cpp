@@ -330,7 +330,7 @@ namespace BlueBear {
 
         for( tinyxml2::XMLElement* child = element; child != NULL; child = child->NextSiblingElement() ) {
           try {
-            WidgetBuilder widgetBuilder( displayState.instance.eventManager, displayState.getImageCache() );
+            WidgetBuilder widgetBuilder( displayState.getImageCache() );
             add( widgetBuilder.getWidgetFromElementDirect( child ), startingIndex == -1 ? -1 : index + startingIndex );
 
             index++;

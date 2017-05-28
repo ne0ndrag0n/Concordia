@@ -11,7 +11,7 @@ namespace BlueBear {
     namespace GUI {
 
       NBBinPseudoElement::NBBinPseudoElement( std::shared_ptr< sfg::Notebook > subject, unsigned int pageNumber, Display::MainGameState& displayState )
-        : subject( subject ), eventManager( displayState.instance.eventManager ), pageNumber( pageNumber ), displayState( displayState ), stagedWidget( nullptr ) {
+        : subject( subject ), pageNumber( pageNumber ), displayState( displayState ), stagedWidget( nullptr ) {
         listen();
       }
 
@@ -59,13 +59,13 @@ namespace BlueBear {
       }
 
       void NBBinPseudoElement::listen() {
-        eventManager->ITEM_ADDED.listen( this, std::bind( &NBBinPseudoElement::onItemAdded, this, std::placeholders::_1, std::placeholders::_2 ) );
-        eventManager->ITEM_REMOVED.listen( this, std::bind( &NBBinPseudoElement::onItemRemoved, this, std::placeholders::_1, std::placeholders::_2 ) );
+        eventManager.ITEM_ADDED.listen( this, std::bind( &NBBinPseudoElement::onItemAdded, this, std::placeholders::_1, std::placeholders::_2 ) );
+        eventManager.ITEM_REMOVED.listen( this, std::bind( &NBBinPseudoElement::onItemRemoved, this, std::placeholders::_1, std::placeholders::_2 ) );
       }
 
       void NBBinPseudoElement::deafen() {
-        eventManager->ITEM_ADDED.stopListening( this );
-        eventManager->ITEM_REMOVED.stopListening( this );
+        eventManager.ITEM_ADDED.stopListening( this );
+        eventManager.ITEM_REMOVED.stopListening( this );
       }
 
       void NBBinPseudoElement::onItemAdded( void* notebook, int changed ) {
@@ -84,7 +84,7 @@ namespace BlueBear {
 
         if( child != NULL ) {
           try {
-            WidgetBuilder widgetBuilder( displayState.instance.eventManager, displayState.getImageCache() );
+            WidgetBuilder widgetBuilder( displayState.getImageCache() );
             return widgetBuilder.getWidgetFromElementDirect( child );
           } catch( std::exception& e ) {
             Log::getInstance().error( "NBBinPseudoElement::create", "Failed to add widget XML: " + std::string( e.what() ) );
@@ -146,7 +146,7 @@ namespace BlueBear {
       }
 
       void NBBinPseudoElement::setStagedChild( lua_State* L, const std::string& xmlString ) {
-        WidgetBuilder widgetBuilder( displayState.instance.eventManager, displayState.getImageCache() );
+        WidgetBuilder widgetBuilder( displayState.getImageCache() );
 
         try {
           stagedWidget = widgetBuilder.getWidgetFromXML( xmlString );

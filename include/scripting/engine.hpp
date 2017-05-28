@@ -15,8 +15,6 @@
 #include <jsoncpp/json/json.h>
 
 namespace BlueBear {
-	class EventManager;
-
 	namespace Scripting {
 		namespace LuaKit {
 			class Serializer;
@@ -33,8 +31,6 @@ namespace BlueBear {
 				static constexpr const char* SYSTEM_MODPACK_DIRECTORY = "system/modpacks/";
 				static constexpr const char* MODPACK_MAIN_SCRIPT = "obj.lua";
 				static constexpr const Tick WORLD_TICKS_MAX = 300;
-
-				std::shared_ptr< EventManager > eventManager;
 
 				std::chrono::time_point< std::chrono::steady_clock > lastExecuted;
 
@@ -62,7 +58,7 @@ namespace BlueBear {
 				std::vector< LuaReference > objects;
 				std::shared_ptr< Lot > currentLot;
 
-				Engine( std::shared_ptr< EventManager > eventManager );
+				Engine();
 				~Engine();
 				void setupEvents();
 				void objectLoop();

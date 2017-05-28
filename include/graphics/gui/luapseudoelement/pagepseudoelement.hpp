@@ -19,7 +19,6 @@ namespace BlueBear {
 
       class PagePseudoElement : public LuaPseudoElement {
         std::shared_ptr< sfg::Notebook > subject;
-        std::shared_ptr< EventManager > eventManager;
         int pageNumber = -1;
         Display::MainGameState& displayState;
 

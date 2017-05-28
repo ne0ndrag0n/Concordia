@@ -29,6 +29,15 @@ namespace BlueBear {
   };
 
   /**
+   * This is an event type similar to BasicEvent, but allows you to perform an action for every object
+   * which is triggered. This essentially inverts BasicEvent to perform an action on the trigger side
+   * for every object that is triggered.
+   */
+   template< typename Key, typename... Signature > class SelectableActionEvent {
+
+   };
+
+  /**
    * This is mainly meant to be a many-to-one mapping for internal use
    */
   class SFGUIEatEvent {
@@ -54,6 +63,8 @@ namespace BlueBear {
     BasicEvent< void*, void*, int > ITEM_ADDED;
     BasicEvent< void*, void*, int > ITEM_REMOVED;
   };
+
+  extern EventManager eventManager;
 
   // eventManager.UI_ACTION_EVENT.listen( this, [ & ]( LuaReference luaref ) { engine queues up passed-in lua reference } )
   // eventManager.UI_ACTION_EVENT.trigger( 3 )

@@ -44,7 +44,7 @@ namespace BlueBear {
                 break;
               }
               default: {
-                WidgetBuilder widgetBuilder( state.instance.eventManager, state.getImageCache() );
+                WidgetBuilder widgetBuilder( state.getImageCache() );
                 std::shared_ptr< sfg::Widget > child = nullptr;
 
                 try {
@@ -195,11 +195,11 @@ namespace BlueBear {
                 LuaReference masterReference = luaL_ref( L, LUA_REGISTRYINDEX ); // "event" self
                 signalMap[ sfg::Widget::OnLeftClick ] = LuaElement::SignalBinding{
                   masterReference,
-                  element.widget->GetSignal( sfg::Widget::OnLeftClick ).Connect( std::bind( LuaElement::clickHandler, L, self->instance.eventManager, element.widget, masterReference, "left" ) )
+                  element.widget->GetSignal( sfg::Widget::OnLeftClick ).Connect( std::bind( LuaElement::clickHandler, L, element.widget, masterReference, "left" ) )
                 };
                 signalMap[ sfg::Widget::OnRightClick ] = LuaElement::SignalBinding{
                   masterReference,
-                  element.widget->GetSignal( sfg::Widget::OnRightClick ).Connect( std::bind( LuaElement::clickHandler, L, self->instance.eventManager, element.widget, masterReference, "right" ) )
+                  element.widget->GetSignal( sfg::Widget::OnRightClick ).Connect( std::bind( LuaElement::clickHandler, L, element.widget, masterReference, "right" ) )
                 };
 
                 lua_pushboolean( L, true ); // true "event" self
@@ -207,22 +207,22 @@ namespace BlueBear {
               }
             case Tools::Utility::hash( "mouse_enter" ):
               {
-                registerGenericHandler( L, self->instance.eventManager, element.widget, sfg::Widget::OnMouseEnter ); // true "event" self
+                registerGenericHandler( L, element.widget, sfg::Widget::OnMouseEnter ); // true "event" self
                 return 1; // true
               }
             case Tools::Utility::hash( "mouse_leave" ):
               {
-                registerGenericHandler( L, self->instance.eventManager, element.widget, sfg::Widget::OnMouseLeave ); // true "event" self
+                registerGenericHandler( L, element.widget, sfg::Widget::OnMouseLeave ); // true "event" self
                 return 1; // true
               }
             case Tools::Utility::hash( "focus" ):
               {
-                registerGenericHandler( L, self->instance.eventManager, element.widget, sfg::Widget::OnGainFocus ); // true "event" self
+                registerGenericHandler( L, element.widget, sfg::Widget::OnGainFocus ); // true "event" self
                 return 1; // true
               }
             case Tools::Utility::hash( "blur" ):
               {
-                registerGenericHandler( L, self->instance.eventManager, element.widget, sfg::Widget::OnLostFocus ); // true "event" self
+                registerGenericHandler( L, element.widget, sfg::Widget::OnLostFocus ); // true "event" self
                 return 1; // true
               }
             default:
@@ -2113,7 +2113,7 @@ namespace BlueBear {
        * STACK ARGS: (none)
        * Stack is unmodified after call
        */
-      void LuaElement::clickHandler( lua_State* L, std::shared_ptr< EventManager > eventManager, std::weak_ptr< sfg::Widget > selfElement, LuaReference masterReference, const std::string& buttonTag ) {
+      void LuaElement::clickHandler( lua_State* L, std::weak_ptr< sfg::Widget > selfElement, LuaReference masterReference, const std::string& buttonTag ) {
         // Create new "disposable" reference that will get ferried through and double-bag it with an event meta object
 
         // Double-bag this function by slapping an event object onto the argument list
@@ -2146,7 +2146,7 @@ namespace BlueBear {
         int edibleReference = luaL_ref( L, LUA_REGISTRYINDEX ); // bluebear.util bluebear
         lua_pop( L, 2 ); // EMPTY
 
-        eventManager->UI_ACTION_EVENT.trigger( edibleReference );
+        eventManager.UI_ACTION_EVENT.trigger( edibleReference );
       }
 
       /**
@@ -2156,7 +2156,7 @@ namespace BlueBear {
        * STACK ARGS: (none)
        * Stack is unmodified after call
        */
-      void LuaElement::genericHandler( lua_State* L, std::shared_ptr< EventManager > eventManager, std::weak_ptr< sfg::Widget > widgetPtr, LuaReference masterReference ) {
+      void LuaElement::genericHandler( lua_State* L, std::weak_ptr< sfg::Widget > widgetPtr, LuaReference masterReference ) {
         lua_getglobal( L, "bluebear" ); // bluebear
         Tools::Utility::getTableValue( L, "util" ); // bluebear.util bluebear
         Tools::Utility::getTableValue( L, "bind" ); // <bind> bluebear.util bluebear
@@ -2183,7 +2183,7 @@ namespace BlueBear {
         int edibleReference = luaL_ref( L, LUA_REGISTRYINDEX ); // bluebear.util bluebear
         lua_pop( L, 2 ); // EMPTY
 
-        eventManager->UI_ACTION_EVENT.trigger( edibleReference );
+        eventManager.UI_ACTION_EVENT.trigger( edibleReference );
       }
 
       /**
@@ -2249,7 +2249,7 @@ namespace BlueBear {
        * STACK ARGS: function
        * RETURNS: true
        */
-      void LuaElement::registerGenericHandler( lua_State* L, std::shared_ptr< EventManager > eventManager, std::shared_ptr< sfg::Widget > widget, sfg::Signal::SignalID signalID ) {
+      void LuaElement::registerGenericHandler( lua_State* L, std::shared_ptr< sfg::Widget > widget, sfg::Signal::SignalID signalID ) {
         auto& signalMap = masterSignalMap[ widget ];
         unregisterHandler( L, signalMap, widget, signalID );
 
@@ -2257,7 +2257,7 @@ namespace BlueBear {
 
         signalMap[ signalID ] = LuaElement::SignalBinding{
           masterReference,
-          widget->GetSignal( signalID ).Connect( std::bind( LuaElement::genericHandler, L, eventManager, widget, masterReference ) )
+          widget->GetSignal( signalID ).Connect( std::bind( LuaElement::genericHandler, L, widget, masterReference ) )
         };
 
         lua_pushboolean( L, true ); // true

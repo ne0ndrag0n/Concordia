@@ -20,7 +20,7 @@ namespace BlueBear {
         : displayState( displayState ) {}
 
       void LuaGUIContext::addFromPath( const std::string& path ) {
-        WidgetBuilder widgetBuilder( displayState.instance.eventManager, displayState.getImageCache() );
+        WidgetBuilder widgetBuilder( displayState.getImageCache() );
         std::vector< std::shared_ptr< sfg::Widget > > widgets = widgetBuilder.getWidgets( path );
 
         for( auto& widget : widgets ) {
@@ -37,7 +37,7 @@ namespace BlueBear {
       }
 
       void LuaGUIContext::add( const std::string& xmlString ) {
-        WidgetBuilder widgetBuilder( displayState.instance.eventManager, displayState.getImageCache() );
+        WidgetBuilder widgetBuilder( displayState.getImageCache() );
 
         try {
           add( widgetBuilder.getWidgetFromXML( xmlString ), true );
@@ -140,7 +140,7 @@ namespace BlueBear {
             return RowPseudoElement::create( L, displayState, element ) == 1 ? true : false; // userdata
           default:
             try {
-              WidgetBuilder widgetBuilder( displayState.instance.eventManager, displayState.getImageCache() );
+              WidgetBuilder widgetBuilder( displayState.getImageCache() );
 
               LuaElement::getUserdataFromWidget( L, widgetBuilder.getWidgetFromElementDirect( element ) ); // userdata
               return true;

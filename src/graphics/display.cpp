@@ -23,7 +23,6 @@
 #include "scripting/wallpaper.hpp"
 #include "localemanager.hpp"
 #include "configmanager.hpp"
-#include "eventmanager.hpp"
 #include "tools/utility.hpp"
 #include "log.hpp"
 #include <SFML/Graphics.hpp>
@@ -46,7 +45,7 @@ namespace BlueBear {
     const std::string Display::WALLPANEL_MODEL_DR_PATH = "system/models/wall/diagwall.dae";
     const std::string Display::FLOOR_MODEL_PATH = "system/models/floor/floor.dae";
 
-    Display::Display( lua_State* L, std::shared_ptr< EventManager > eventManager ) : L( L ), eventManager( eventManager ) {
+    Display::Display( lua_State* L ) : L( L ) {
       // Get our settings out of the config manager
       x = ConfigManager::getInstance().getIntValue( "viewport_x" );
       y = ConfigManager::getInstance().getIntValue( "viewport_y" );
@@ -150,7 +149,6 @@ namespace BlueBear {
     Display::MainGameState::MainGameState( Display& instance, unsigned int currentRotation, Containers::Collection3D< std::shared_ptr< Scripting::Tile > >& floorMap, Containers::Collection3D< std::shared_ptr< Scripting::WallCell > >& wallMap ) :
       Display::State::State( instance ),
       L( instance.L ),
-      inputManager( instance.eventManager ),
       defaultShader( Shader( "system/shaders/default_vertex.glsl", "system/shaders/default_fragment.glsl" ) ),
       camera( Camera( instance.x, instance.y ) ),
       floorMap( floorMap ),

@@ -8,7 +8,7 @@ namespace BlueBear {
     namespace GUI {
 
       ItemPseudoElement::ItemPseudoElement( std::shared_ptr< sfg::ComboBox > subject, int elementNumber, Display::MainGameState& displayState )
-        : subject( subject ), eventManager( displayState.instance.eventManager ), elementNumber( elementNumber ), displayState( displayState ) {
+        : subject( subject ), elementNumber( elementNumber ), displayState( displayState ) {
         listen();
       }
 
@@ -68,7 +68,7 @@ namespace BlueBear {
         }
 
         subject->RemoveItem( elementNumber );
-        eventManager->ITEM_REMOVED.trigger( subject.get(), elementNumber );
+        eventManager.ITEM_REMOVED.trigger( subject.get(), elementNumber );
 
         elementNumber = -1;
 
@@ -81,13 +81,13 @@ namespace BlueBear {
       }
 
       void ItemPseudoElement::listen() {
-        eventManager->ITEM_ADDED.listen( this, std::bind( &ItemPseudoElement::onItemAdded, this, std::placeholders::_1, std::placeholders::_2 ) );
-        eventManager->ITEM_REMOVED.listen( this, std::bind( &ItemPseudoElement::onItemRemoved, this, std::placeholders::_1, std::placeholders::_2 ) );
+        eventManager.ITEM_ADDED.listen( this, std::bind( &ItemPseudoElement::onItemAdded, this, std::placeholders::_1, std::placeholders::_2 ) );
+        eventManager.ITEM_REMOVED.listen( this, std::bind( &ItemPseudoElement::onItemRemoved, this, std::placeholders::_1, std::placeholders::_2 ) );
       }
 
       void ItemPseudoElement::deafen() {
-        eventManager->ITEM_ADDED.stopListening( this );
-        eventManager->ITEM_REMOVED.stopListening( this );
+        eventManager.ITEM_ADDED.stopListening( this );
+        eventManager.ITEM_REMOVED.stopListening( this );
       }
 
       void ItemPseudoElement::onItemAdded( void* item, int changed ) {
@@ -141,7 +141,7 @@ namespace BlueBear {
           newElementNumber = subject->GetItemCount() - 1;
         }
 
-        eventManager->ITEM_ADDED.trigger( subject.get(), newElementNumber );
+        eventManager.ITEM_ADDED.trigger( subject.get(), newElementNumber );
         elementNumber = newElementNumber;
 
         stagedItem = "";

@@ -14,7 +14,7 @@ namespace BlueBear {
     namespace GUI {
 
       PagePseudoElement::PagePseudoElement( std::shared_ptr< sfg::Notebook > subject, unsigned int pageNumber, Display::MainGameState& displayState )
-        : subject( subject ), eventManager( displayState.instance.eventManager ), pageNumber( pageNumber ), displayState( displayState ) {
+        : subject( subject ), pageNumber( pageNumber ), displayState( displayState ) {
           listen();
         }
 
@@ -71,13 +71,13 @@ namespace BlueBear {
       }
 
       void PagePseudoElement::listen() {
-        eventManager->ITEM_ADDED.listen( this, std::bind( &PagePseudoElement::onItemAdded, this, std::placeholders::_1, std::placeholders::_2 ) );
-        eventManager->ITEM_REMOVED.listen( this, std::bind( &PagePseudoElement::onItemRemoved, this, std::placeholders::_1, std::placeholders::_2 ) );
+        eventManager.ITEM_ADDED.listen( this, std::bind( &PagePseudoElement::onItemAdded, this, std::placeholders::_1, std::placeholders::_2 ) );
+        eventManager.ITEM_REMOVED.listen( this, std::bind( &PagePseudoElement::onItemRemoved, this, std::placeholders::_1, std::placeholders::_2 ) );
       }
 
       void PagePseudoElement::deafen() {
-        eventManager->ITEM_ADDED.stopListening( this );
-        eventManager->ITEM_REMOVED.stopListening( this );
+        eventManager.ITEM_ADDED.stopListening( this );
+        eventManager.ITEM_REMOVED.stopListening( this );
       }
 
       void PagePseudoElement::removeFromNotebook( std::shared_ptr< sfg::Widget > comparison ) {
@@ -87,7 +87,7 @@ namespace BlueBear {
         }
 
         subject->RemovePage( pageNumber );
-        eventManager->ITEM_REMOVED.trigger( subject.get(), pageNumber );
+        eventManager.ITEM_REMOVED.trigger( subject.get(), pageNumber );
 
         pageNumber = -1;
         subject = nullptr;
@@ -215,7 +215,7 @@ namespace BlueBear {
         }
 
         int newPageNumber = notebook->InsertPage( stagedContentElement->stagedWidget, stagedTabElement->stagedWidget, index );
-        eventManager->ITEM_ADDED.trigger( notebook.get(), newPageNumber );
+        eventManager.ITEM_ADDED.trigger( notebook.get(), newPageNumber );
 
         subject = notebook;
         pageNumber = newPageNumber;
