@@ -2345,14 +2345,6 @@ namespace BlueBear {
           auto it = masterSignalMap.begin();
           while( it != masterSignalMap.end() ) {
 
-            /** for use in debugging memory leak issues with LuaGUIContext
-            if( std::shared_ptr< sfg::Widget > wid = it->first.lock() ) {
-              if( wid->GetId() == "testa" ) {
-                Log::getInstance().debug( "use count", std::to_string( it->first.use_count() ) );
-              }
-            }
-            */
-
             if( it->first.expired() ) {
               it = masterSignalMap.erase( it );
             } else {

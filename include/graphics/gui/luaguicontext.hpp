@@ -22,13 +22,15 @@ namespace BlueBear {
     namespace GUI {
 
       class LuaGUIContext {
-        std::shared_ptr< sfg::Container > rootContainer;
         Display::MainGameState& displayState;
 
         /**
-         * Bookkeeping for items we remove later on
+         * Bookkeeping for items belonging exclusively to this LuaGUIContext
+         * This should NEVER have a nullptr added to it, EVER!!
          */
-        std::set< std::shared_ptr< sfg::Widget > > addedToDesktop;
+        std::set< std::weak_ptr< sfg::Widget >, std::owner_less< std::weak_ptr< sfg::Widget > > > myItems;
+
+        std::shared_ptr< sfg::Widget > getWidgetOrAncestor( std::shared_ptr< sfg::Widget > widget );
 
       public:
         LuaGUIContext( Display::MainGameState& displayState );

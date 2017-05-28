@@ -17,7 +17,7 @@ namespace BlueBear {
     namespace GUI {
 
       LuaGUIContext::LuaGUIContext( Display::MainGameState& displayState )
-        : rootContainer( RootContainer::Create() ), displayState( displayState ) {}
+        : displayState( displayState ) {}
 
       void LuaGUIContext::addFromPath( const std::string& path ) {
         WidgetBuilder widgetBuilder( displayState.instance.eventManager, displayState.getImageCache() );
@@ -29,12 +29,10 @@ namespace BlueBear {
       }
 
       void LuaGUIContext::add( std::shared_ptr< sfg::Widget > widget, bool toDesktop ) {
-        rootContainer->Add( widget );
-
         if( toDesktop ) {
           displayState.gui.desktop.Add( widget );
 
-          addedToDesktop.insert( widget );
+          myItems.insert( widget );
         }
       }
 
@@ -51,11 +49,9 @@ namespace BlueBear {
       void LuaGUIContext::remove( std::shared_ptr< sfg::Widget > widget ) {
         widget->Show( false );
 
-        rootContainer->Remove( widget );
-
-        if( addedToDesktop.find( widget ) != addedToDesktop.end() ) {
+        if( myItems.find( widget ) != myItems.end() ) {
           displayState.gui.desktop.Remove( widget );
-          addedToDesktop.erase( widget );
+          myItems.erase( widget );
         }
       }
 
@@ -64,24 +60,56 @@ namespace BlueBear {
        */
       void LuaGUIContext::removeAll() {
         // Remove desktopped items (this is where items will be removed from the screen)
-        for( auto& item : addedToDesktop ) {
-          item->Show( false );
-
-          displayState.gui.desktop.Remove( item );
+        for( std::weak_ptr< sfg::Widget > pointer : myItems ) {
+          if( std::shared_ptr< sfg::Widget > item = pointer.lock() ) {
+            item->Show( false );
+            displayState.gui.desktop.Remove( item );
+          }
         }
 
-        // Free all elements within container
-        rootContainer = RootContainer::Create();
+        myItems.clear();
+      }
 
-        addedToDesktop.clear();
+      std::shared_ptr< sfg::Widget > LuaGUIContext::getWidgetOrAncestor( std::shared_ptr< sfg::Widget > widget ) {
+
+        // Give back the widget if it was null, there's nothing we can do with it
+        if( widget == nullptr ) {
+          return widget;
+        }
+
+        std::shared_ptr< sfg::Widget > result = widget;
+
+        while( result->GetParent() != nullptr ) {
+          result = result->GetParent();
+        }
+
+        return result;
       }
 
       std::shared_ptr< sfg::Widget > LuaGUIContext::findById( const std::string& id ) {
-        return rootContainer->GetWidgetById( id );
+        std::shared_ptr< sfg::Widget > result = sfg::Widget::GetWidgetById( id );
+
+        if( myItems.find( getWidgetOrAncestor( result ) ) != myItems.end() ) {
+          return result;
+        } else {
+          return nullptr;
+        }
       }
 
       std::vector< std::shared_ptr< sfg::Widget > > LuaGUIContext::findByClass( const std::string& clss ) {
-        return rootContainer->GetWidgetsByClass( clss );
+        std::vector< std::shared_ptr< sfg::Widget > > results = sfg::Widget::GetWidgetsByClass( clss );
+
+        results.erase(
+          std::remove_if(
+            results.begin(),
+            results.end(),
+            [ & ]( std::shared_ptr< sfg::Widget > widget ) {
+              return myItems.find( getWidgetOrAncestor( widget ) ) == myItems.end();
+            }
+          )
+        );
+
+        return results;
       }
 
       bool LuaGUIContext::create( lua_State* L, const std::string& xmlString ) {

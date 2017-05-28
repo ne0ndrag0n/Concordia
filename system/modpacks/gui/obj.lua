@@ -17,7 +17,7 @@ function GUIProvider:open_debug_ui()
   self.gui:find_by_id( "zoom_out" ):on( "click", bluebear.util.bind( "system.provider.gui:on_click_zoom_out", self ) )
 
   self.gui:find_by_id( "ta1" ):on( "click", bluebear.util.bind( "system.provider.gui:test_action_1", self ) )
-  self.gui:find_by_id( "testa" ):on( "click", bluebear.util.bind( "system.provider.gui:test_action_2", self ) )
+  self.gui:find_by_id( "ta2" ):on( "click", bluebear.util.bind( "system.provider.gui:test_action_2", self ) )
 
   self.gui:find_by_id( "toggle_table" ):on( "click", bluebear.util.bind( "system.provider.gui:toggle_visibility", self ) )
 
@@ -26,17 +26,11 @@ function GUIProvider:open_debug_ui()
 end
 
 function GUIProvider:test_action_1( event )
-  local table = self.gui:find_by_id( 'table' )
-  local row = table:find_pseudo( 'row', 3 )
-  local col3 = row:find_by_id( 'col3' )
 
-  col3:set_property( 'padding_x', col3:get_property( 'padding_x' ) + 1 )
-  print( col3:get_property( 'padding_x' ) )
 end
 
 function GUIProvider:test_action_2( event )
-  print( "test A now deregistering" )
-  event.widget:off( "click" )
+
 end
 
 function GUIProvider:toggle_visibility( event )

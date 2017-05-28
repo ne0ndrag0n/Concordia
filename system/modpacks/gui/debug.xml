@@ -82,21 +82,17 @@
     </ComboBox>
     <Table id="table">
       <row>
-        <Button id="foo">Foo</Button>
+        <Button id="foo" class="intable">Foo</Button>
       </row>
       <row>
-      	<Button id="bar">Bar</Button>
+      	<Button id="bar" class="intable">Bar</Button>
       </row>
       <row>
-      	<Button>Baz</Button>
+      	<Button class="intable">Baz</Button>
       </row>
       <row>
-        <Button id="col3" colspan="3">column_span</Button>
+        <Button id="col3" colspan="3" class="intable">column_span</Button>
       </row>
     </Table>
   </Box>
-</Window>
-
-<Window title="test refcount">
-  <Button id="testa">Testa</Button>
 </Window>
