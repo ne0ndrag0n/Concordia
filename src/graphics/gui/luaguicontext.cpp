@@ -17,7 +17,16 @@ namespace BlueBear {
     namespace GUI {
 
       LuaGUIContext::LuaGUIContext( Display::MainGameState& displayState )
-        : displayState( displayState ) {}
+        : displayState( displayState ) {
+        eventManager.CONTEXT_REQUEST.listen( this, [ & ]( std::shared_ptr< sfg::Widget > widget ) {
+          // not end = the item (or the item's most distant parent) belongs to this context
+          return myItems.find( getWidgetOrAncestor( widget ) ) != myItems.end();
+        } );
+      }
+
+      LuaGUIContext::~LuaGUIContext() {
+        eventManager.CONTEXT_REQUEST.stopListening( this );
+      }
 
       void LuaGUIContext::addFromPath( const std::string& path ) {
         WidgetBuilder widgetBuilder( displayState.getImageCache() );

@@ -34,6 +34,7 @@ namespace BlueBear {
 
       public:
         LuaGUIContext( Display::MainGameState& displayState );
+        ~LuaGUIContext();
 
         void addFromPath( const std::string& path );
 

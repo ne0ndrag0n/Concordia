@@ -4,8 +4,16 @@
 #include "bbtypes.hpp"
 #include <map>
 #include <functional>
+#include <memory>
+#include <SFGUI/Widget.hpp>
 
 namespace BlueBear {
+
+  namespace Graphics {
+    namespace GUI {
+      class LuaGUIContext;
+    }
+  }
 
   /**
    * This is a standard, flexible base event type that can be used for anything that takes a listen on an instance,
@@ -34,7 +42,32 @@ namespace BlueBear {
    * for every object that is triggered.
    */
    template< typename Key, typename... Signature > class SelectableActionEvent {
+     std::map< Key, std::function< bool( Signature... ) > > predicates;
 
+   public:
+     void listen( Key key, std::function< bool( Signature... ) > predicate ) {
+       predicates[ key ] = predicate;
+     }
+
+     void stopListening( Key key ) {
+       predicates.erase( key );
+     }
+
+     void trigger( std::function< void( Key ) > action, Signature... params ) {
+       for( auto& nestedPair : predicates ) {
+         if( nestedPair.second( params... ) ) {
+           return action( nestedPair.first );
+         }
+       }
+     }
+
+     void triggerAll( std::function< void( Key ) > action, Signature... params ) {
+       for( auto& nestedPair : predicates ) {
+         if( nestedPair.second( params... ) ) {
+           action( nestedPair.first );
+         }
+       }
+     }
    };
 
   /**
@@ -62,6 +95,7 @@ namespace BlueBear {
     SFGUIEatEvent SFGUI_EAT_EVENT;
     BasicEvent< void*, void*, int > ITEM_ADDED;
     BasicEvent< void*, void*, int > ITEM_REMOVED;
+    SelectableActionEvent< Graphics::GUI::LuaGUIContext*, std::shared_ptr< sfg::Widget > > CONTEXT_REQUEST;
   };
 
   extern EventManager eventManager;
