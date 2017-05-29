@@ -209,7 +209,7 @@ namespace BlueBear {
             return 1;
           }
 
-          if( std::shared_ptr< sfg::Widget > potentialChild = child->GetWidgetById( id ) ) {
+          if( std::shared_ptr< sfg::Widget > potentialChild = Tools::Utility::isActualParent( sfg::Widget::GetWidgetById( id ), child ) ) {
             LuaElement::getUserdataFromWidget( L, potentialChild ); // userdata
             return 1;
           }

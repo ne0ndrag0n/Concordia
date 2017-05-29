@@ -294,10 +294,7 @@ namespace BlueBear {
         LuaElement** userData = ( LuaElement** ) luaL_checkudata( L, 1, "bluebear_widget" );
         std::shared_ptr< sfg::Widget > parentWidget = ( *userData )->widget;
 
-        // Holy moly is this going to get confusing quick
-        // I also have the least amount of confidence in this code you could possibly imagine
-        std::shared_ptr< sfg::Widget > widget = parentWidget->GetWidgetById( selector );
-        if( widget ) {
+        if( std::shared_ptr< sfg::Widget > widget = Tools::Utility::isActualParent( sfg::Widget::GetWidgetById( selector ), parentWidget ) ) {
           getUserdataFromWidget( L, widget ); // userdata
           return 1;
         } else {

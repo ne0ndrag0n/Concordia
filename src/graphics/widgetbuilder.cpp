@@ -57,7 +57,7 @@ namespace BlueBear {
       // Second pass to associate groups in this widget set
       for( auto& group : groups ) {
         for( std::shared_ptr< sfg::Widget > widget : widgets ) {
-          std::shared_ptr< sfg::Widget > associatedWidget = widget->GetWidgetById( group.second );
+          std::shared_ptr< sfg::Widget > associatedWidget = Tools::Utility::isActualParent( sfg::Widget::GetWidgetById( group.second ), widget );
           if( associatedWidget && associatedWidget->GetName() == "RadioButton" ) {
             group.first->SetGroup( std::static_pointer_cast< sfg::RadioButton >( associatedWidget )->GetGroup() );
           }
@@ -89,7 +89,7 @@ namespace BlueBear {
       std::shared_ptr< sfg::Widget > widget = nodeToWidget( root );
 
       for( auto& group : groups ) {
-        std::shared_ptr< sfg::Widget > associatedWidget = widget->GetWidgetById( group.second );
+        std::shared_ptr< sfg::Widget > associatedWidget = Tools::Utility::isActualParent( sfg::Widget::GetWidgetById( group.second ), widget );
         if( associatedWidget && associatedWidget->GetName() == "RadioButton" ) {
           group.first->SetGroup( std::static_pointer_cast< sfg::RadioButton >( associatedWidget )->GetGroup() );
         }
@@ -104,7 +104,7 @@ namespace BlueBear {
       std::shared_ptr< sfg::Widget > widget = nodeToWidget( element );
 
       for( auto& group : groups ) {
-        std::shared_ptr< sfg::Widget > associatedWidget = widget->GetWidgetById( group.second );
+        std::shared_ptr< sfg::Widget > associatedWidget = Tools::Utility::isActualParent( sfg::Widget::GetWidgetById( group.second ), widget );
         if( associatedWidget && associatedWidget->GetName() == "RadioButton" ) {
           group.first->SetGroup( std::static_pointer_cast< sfg::RadioButton >( associatedWidget )->GetGroup() );
         }
