@@ -321,7 +321,20 @@ namespace BlueBear {
         std::shared_ptr< sfg::Widget > parentWidget = ( *userData )->widget;
 
         // Perform the actual SFGUI call
-        sfg::Widget::WidgetsList widgets = parentWidget->GetWidgetsByClass( selector );
+        sfg::Widget::WidgetsList widgets = sfg::Widget::GetWidgetsByClass( selector );
+
+        // Erase items that don't belong in this list to keep up the MarkupEngine context/owner paradigm
+        widgets.erase(
+          std::remove_if(
+            widgets.begin(),
+            widgets.end(),
+            [ & ]( std::shared_ptr< sfg::Widget > widget ) {
+              // widget must be a child of parentWidget
+              return !Tools::Utility::isActualParent( widget, parentWidget );
+            }
+          ),
+          widgets.end()
+        );
 
         auto size = widgets.size();
         if( size ) {

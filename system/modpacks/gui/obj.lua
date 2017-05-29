@@ -26,6 +26,8 @@ function GUIProvider:open_debug_ui()
 end
 
 function GUIProvider:test_action_1( event )
+  local table = self.gui:find_by_id( 'table' )
+  local buttons1 = table:find_by_class( 'intable' )
 
 end
 

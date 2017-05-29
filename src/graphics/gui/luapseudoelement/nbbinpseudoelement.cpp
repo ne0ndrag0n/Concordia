@@ -171,7 +171,19 @@ namespace BlueBear {
         std::vector< std::shared_ptr< sfg::Widget > > widgets;
 
         if( std::shared_ptr< sfg::Widget > child = this->getChildWidget() ) {
-          std::vector< std::shared_ptr< sfg::Widget > > widgets = child->GetWidgetsByClass( classID );
+          std::vector< std::shared_ptr< sfg::Widget > > widgets = sfg::Widget::GetWidgetsByClass( classID );
+
+          // Erase items that don't belong in this list to keep up the MarkupEngine context/owner paradigm
+          widgets.erase(
+            std::remove_if(
+              widgets.begin(),
+              widgets.end(),
+              [ & ]( std::shared_ptr< sfg::Widget > descendant ) {
+                return !Tools::Utility::isActualParent( descendant, child );
+              }
+            ),
+            widgets.end()
+          );
 
           // Add the item itself if it matches the classID
           if( child->GetClass() == classID ) {
