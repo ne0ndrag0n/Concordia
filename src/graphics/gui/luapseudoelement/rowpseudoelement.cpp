@@ -150,14 +150,9 @@ namespace BlueBear {
           // Workaround is implemented below. TODO check this in other areas where container based items are used. Bug reports might come in.
 
           // Does this widget tree contain the widget we need?
-          if( Tools::Utility::widgetIsContainer( widget ) ) {
-
-            std::shared_ptr< sfg::Widget > found = widget->GetWidgetById( id );
-            if( found && Tools::Utility::isActualParent( found, std::static_pointer_cast< sfg::Container >( widget ) ) ) {
-              LuaElement::getUserdataFromWidget( L, found ); // userdata
-              return 1;
-            }
-
+          if( std::shared_ptr< sfg::Widget > found = Tools::Utility::isActualParent( sfg::Widget::GetWidgetById( id ), widget ) ) {
+            LuaElement::getUserdataFromWidget( L, found ); // userdata
+            return 1;
           }
 
         }
@@ -173,26 +168,33 @@ namespace BlueBear {
        */
       int RowPseudoElement::getItemsByClass( lua_State* L, const std::string clss ) {
         std::vector< std::shared_ptr< sfg::Widget > > widgets = getWidgetsForRow();
-        std::vector< std::shared_ptr< sfg::Widget > > results;
+        std::vector< std::shared_ptr< sfg::Widget > > results = sfg::Widget::GetWidgetsByClass( clss );
 
         // Pare this list down from widgets into results
-        for( std::shared_ptr< sfg::Widget > widget : widgets ) {
+        results.erase(
+          std::remove_if(
+            results.begin(),
+            results.end(),
+            [ & ]( std::shared_ptr< sfg::Widget > result ) {
+              // Check #1: Widget is a direct descendent of this <row> pseudoelement
+              auto it = std::find( widgets.begin(), widgets.end(), result );
+              if( it != widgets.end() ) {
+                return false;
+              }
 
-          if( widget->GetClass() == clss ) {
-            results.push_back( widget );
-          }
+              // Check #2: Widget is a child of any parent inside "widgets"
+              for( std::shared_ptr< sfg::Widget > parent : widgets ) {
+                if( Tools::Utility::isActualParent( result, parent ) ) {
+                  return false;
+                }
+              }
 
-          if( Tools::Utility::widgetIsContainer( widget ) ) {
-
-             std::vector< std::shared_ptr< sfg::Widget > > all = widget->GetWidgetsByClass( clss );
-             for( std::shared_ptr< sfg::Widget > nestedWidget : all ) {
-               if( Tools::Utility::isActualParent( nestedWidget, std::static_pointer_cast< sfg::Container >( widget ) ) ) {
-                 results.push_back( nestedWidget );
-               }
-             }
-          }
-
-        }
+              // Both checks failed, this result must be removed
+              return true;
+            }
+          ),
+          results.end()
+        );
 
         int resultSize = results.size();
         if( resultSize == 1 ) {

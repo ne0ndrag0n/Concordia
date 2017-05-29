@@ -91,7 +91,7 @@ namespace BlueBear {
 
 				static tinyxml2::XMLElement* getRootNode( tinyxml2::XMLDocument& document, const std::string& xmlString );
 
-				static bool isActualParent( std::shared_ptr< sfg::Widget > widget, std::shared_ptr< sfg::Container > expectedParent );
+				static std::shared_ptr< sfg::Widget > isActualParent( std::shared_ptr< sfg::Widget > widget, std::shared_ptr< sfg::Widget > parent );
 
 				static bool widgetIsContainer( std::shared_ptr< sfg::Widget > widget );
 		};

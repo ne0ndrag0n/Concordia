@@ -115,7 +115,8 @@ namespace BlueBear {
             [ & ]( std::shared_ptr< sfg::Widget > widget ) {
               return myItems.find( getWidgetOrAncestor( widget ) ) == myItems.end();
             }
-          )
+          ),
+          results.end()
         );
 
         return results;

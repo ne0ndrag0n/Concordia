@@ -429,15 +429,23 @@ namespace BlueBear {
 
 		/**
 		 * This is to work around an SFGUI bug where i'll ask a parent for a child widget and get a widget that doesn't actually belong to the parent.
+		 *
+		 * Returns same widget if the widget is an actual child of expectedParent
+		 * Returns nullptr if the widget does NOT belong to expectedParent
+		 *
+		 * This API is so you can just pull a widget right into the first argument and have this function "sanitize" it
 		 */
-		bool Utility::isActualParent( std::shared_ptr< sfg::Widget > widget, std::shared_ptr< sfg::Container > expectedParent ) {
+		std::shared_ptr< sfg::Widget > Utility::isActualParent( std::shared_ptr< sfg::Widget > widget, std::shared_ptr< sfg::Widget > parent ) {
+
+			std::shared_ptr< sfg::Container > expectedParent = widgetIsContainer( parent ) ? std::static_pointer_cast< sfg::Container >( parent ) : nullptr;
+
 			if( widget && expectedParent ) {
 
 				std::shared_ptr< sfg::Container > current = widget->GetParent();
 
 				while( current != nullptr ) {
 					if( current == expectedParent ) {
-						return true;
+						return widget;
 					}
 
 					current = current->GetParent();
@@ -445,7 +453,7 @@ namespace BlueBear {
 
 			}
 
-			return false;
+			return nullptr;
 		}
 
 		/**
