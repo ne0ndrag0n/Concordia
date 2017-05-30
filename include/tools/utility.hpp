@@ -94,6 +94,10 @@ namespace BlueBear {
 				static std::shared_ptr< sfg::Widget > isActualParent( std::shared_ptr< sfg::Widget > widget, std::shared_ptr< sfg::Widget > parent );
 
 				static bool widgetIsContainer( std::shared_ptr< sfg::Widget > widget );
+
+				static std::shared_ptr< sfg::Widget > getWidgetOrAncestor( std::shared_ptr< sfg::Widget > widget );
+
+				static void* getAncestralAddress( std::shared_ptr< sfg::Widget > widget );
 		};
 	}
 }

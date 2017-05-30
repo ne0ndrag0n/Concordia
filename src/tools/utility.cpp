@@ -1,4 +1,6 @@
 #include "tools/utility.hpp"
+#include "graphics/gui/luaguicontext.hpp"
+#include "eventmanager.hpp"
 #include "log.hpp"
 #include <lua.h>
 #include <lualib.h>
@@ -454,6 +456,41 @@ namespace BlueBear {
 			}
 
 			return nullptr;
+		}
+
+		std::shared_ptr< sfg::Widget > Utility::getWidgetOrAncestor( std::shared_ptr< sfg::Widget > widget ) {
+
+			// Give back the widget if it was null, there's nothing we can do with it
+			if( widget == nullptr ) {
+				return widget;
+			}
+
+			std::shared_ptr< sfg::Widget > result = widget;
+
+			while( result->GetParent() != nullptr ) {
+				result = result->GetParent();
+			}
+
+			return result;
+		}
+
+		void* Utility::getAncestralAddress( std::shared_ptr< sfg::Widget > widget ) {
+
+			void* address = nullptr;
+
+			eventManager.CONTEXT_REQUEST.trigger(
+				[ & ]( Graphics::GUI::LuaGUIContext* self ) {
+					address = self;
+				},
+				widget
+			);
+
+			if( address ) {
+				return address;
+			}
+
+			// Address is unbound to any context
+			return getWidgetOrAncestor( widget ).get();
 		}
 
 		/**

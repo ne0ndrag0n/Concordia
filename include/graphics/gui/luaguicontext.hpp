@@ -30,8 +30,6 @@ namespace BlueBear {
          */
         std::set< std::weak_ptr< sfg::Widget >, std::owner_less< std::weak_ptr< sfg::Widget > > > myItems;
 
-        std::shared_ptr< sfg::Widget > getWidgetOrAncestor( std::shared_ptr< sfg::Widget > widget );
-
       public:
         LuaGUIContext( Display::MainGameState& displayState );
         ~LuaGUIContext();

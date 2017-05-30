@@ -136,6 +136,15 @@ namespace BlueBear {
           std::shared_ptr< T > adjustmentType = std::static_pointer_cast< T >( widget );
           return adjustmentType->GetAdjustment();
         };
+
+        static std::string getIdentifierPrefix( std::shared_ptr< sfg::Widget > widget );
+
+        static void setId( std::shared_ptr< sfg::Widget > widget, const std::string& id );
+        static void setClass( std::shared_ptr< sfg::Widget > widget, const std::string& clss );
+        static std::string getId( std::shared_ptr< sfg::Widget > widget );
+        static std::string getClass( std::shared_ptr< sfg::Widget > widget );
+        static std::shared_ptr< sfg::Widget > getWidgetById( std::shared_ptr< sfg::Widget > parent, const std::string& id );
+        static std::vector< std::shared_ptr< sfg::Widget > > getWidgetsByClass( std::shared_ptr< sfg::Widget > parent, const std::string& clss );
       };
     }
   }

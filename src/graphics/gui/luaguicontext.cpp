@@ -9,6 +9,7 @@
 #include "graphics/gui/luapseudoelement/rowpseudoelement.hpp"
 #include "graphics/imagecache.hpp"
 #include "graphics/widgetbuilder.hpp"
+#include "tools/utility.hpp"
 #include "tools/ctvalidators.hpp"
 #include "eventmanager.hpp"
 
@@ -20,7 +21,7 @@ namespace BlueBear {
         : displayState( displayState ) {
         eventManager.CONTEXT_REQUEST.listen( this, [ & ]( std::shared_ptr< sfg::Widget > widget ) {
           // not end = the item (or the item's most distant parent) belongs to this context
-          return myItems.find( getWidgetOrAncestor( widget ) ) != myItems.end();
+          return myItems.find( Tools::Utility::getWidgetOrAncestor( widget ) ) != myItems.end();
         } );
       }
 
@@ -79,26 +80,10 @@ namespace BlueBear {
         myItems.clear();
       }
 
-      std::shared_ptr< sfg::Widget > LuaGUIContext::getWidgetOrAncestor( std::shared_ptr< sfg::Widget > widget ) {
-
-        // Give back the widget if it was null, there's nothing we can do with it
-        if( widget == nullptr ) {
-          return widget;
-        }
-
-        std::shared_ptr< sfg::Widget > result = widget;
-
-        while( result->GetParent() != nullptr ) {
-          result = result->GetParent();
-        }
-
-        return result;
-      }
-
       std::shared_ptr< sfg::Widget > LuaGUIContext::findById( const std::string& id ) {
         std::shared_ptr< sfg::Widget > result = sfg::Widget::GetWidgetById( id );
 
-        if( myItems.find( getWidgetOrAncestor( result ) ) != myItems.end() ) {
+        if( myItems.find( Tools::Utility::getWidgetOrAncestor( result ) ) != myItems.end() ) {
           return result;
         } else {
           return nullptr;
@@ -113,7 +98,7 @@ namespace BlueBear {
             results.begin(),
             results.end(),
             [ & ]( std::shared_ptr< sfg::Widget > widget ) {
-              return myItems.find( getWidgetOrAncestor( widget ) ) == myItems.end();
+              return myItems.find( Tools::Utility::getWidgetOrAncestor( widget ) ) == myItems.end();
             }
           ),
           results.end()

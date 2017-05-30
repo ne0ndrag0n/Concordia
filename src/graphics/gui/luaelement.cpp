@@ -2384,6 +2384,58 @@ namespace BlueBear {
         } );
       }
 
+      std::string LuaElement::getIdentifierPrefix( std::shared_ptr< sfg::Widget > widget ) {
+        // Can't do any of this shit on a nullptr
+        if( !widget ) {
+          Log::getInstance().error( "LuaElement::getIdentifierPrefix", "Unable to derive identifier prefix on a nullptr!" );
+          return "";
+        }
+
+        // Identifier prefix comes from one of three things in the following order: the context it is within, its most distant ancestor, or the item itself.
+        if( void* address = Tools::Utility::getAncestralAddress( widget ) ) {
+          return Tools::Utility::pointerToString( address ) + ":";
+        }
+
+        // For some reason, we ended up with a nullptr after all this mess. This is likely a bug of some kind.
+        Log::getInstance().error( "LuaElement::getIdentifierPrefix", "Unable to derive identifier prefix!" );
+        return "";
+      }
+
+      void LuaElement::setId( std::shared_ptr< sfg::Widget > widget, const std::string& id ) {
+        widget->SetId( getIdentifierPrefix( widget ) + id );
+      }
+
+      void LuaElement::setClass( std::shared_ptr< sfg::Widget > widget, const std::string& clss ) {
+        widget->SetClass( getIdentifierPrefix( widget ) + clss );
+      }
+
+      std::string LuaElement::getId( std::shared_ptr< sfg::Widget > widget ) {
+        std::string id = widget->GetId();
+        return Tools::Utility::split( id, ':' )[ 1 ];
+      }
+
+      std::string LuaElement::getClass( std::shared_ptr< sfg::Widget > widget ) {
+        std::string clss = widget->GetClass();
+        return Tools::Utility::split( clss, ':' )[ 1 ];
+      }
+
+      /**
+       * This function will return nullptr unless two conditions are satisfied:
+       * 1) Both parent and the found element share "commonAncestor" as an address
+       * 2) "widget" is an actual descendant of "parent"
+       */
+      std::shared_ptr< sfg::Widget > LuaElement::getWidgetById( std::shared_ptr< sfg::Widget > parent, const std::string& id ) {
+        std::shared_ptr< sfg::Widget > found = sfg::Widget::GetWidgetById( getIdentifierPrefix( parent ) + id );
+
+        if( found ) {
+          // "found" and "parent" both have the same ancestor if the item was retrievable using the above prefix
+          // now verify found was an actual descendant of "parent". if it is, the pointer will survive the next call
+          found = Tools::Utility::isActualParent( found, parent );
+        }
+
+        return found;
+      }
+
     }
   }
 }
