@@ -14,23 +14,16 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
+#include <regex>
+
 using namespace BlueBear;
 
 void test() {
-	std::map< std::weak_ptr< int >, std::string, std::owner_less< std::weak_ptr< int > > > test;
+	std::string matches( "asdsa:fsdgsd" );
+	std::string nomatches( "asdsafsdgsd" );
 
-	std::shared_ptr< int > five = std::make_shared< int >( 5 );
-	std::shared_ptr< int > differentFive = std::make_shared< int >( 5 );
-
-	test[ five ] = "five";
-
-	Log::getInstance().debug( "", test[ five ] );
-	Log::getInstance().debug( "", test.find( differentFive ) == test.end() ? "true" : "false" );
-	Log::getInstance().debug( "", std::to_string( test.begin()->first.expired() ) );
-
-	five = nullptr;
-
-	Log::getInstance().debug( "", std::to_string( test.begin()->first.expired() ) );
+	Log::getInstance().debug( "matches", matches.find( ":" ) == std::string::npos ? "true" : "false" );
+	Log::getInstance().debug( "nomatches", nomatches.find( ":" ) == std::string::npos ? "true" : "false" );
 }
 
 int main() {

@@ -2402,21 +2402,33 @@ namespace BlueBear {
       }
 
       void LuaElement::setId( std::shared_ptr< sfg::Widget > widget, const std::string& id ) {
+
+        if( id.find( ":" ) != std::string::npos ) {
+          Log::getInstance().warn( "LuaElement::setId", "Character \":\" is not permitted in id/class" );
+          return;
+        }
+
         widget->SetId( getIdentifierPrefix( widget ) + id );
       }
 
       void LuaElement::setClass( std::shared_ptr< sfg::Widget > widget, const std::string& clss ) {
+
+        if( clss.find( ":" ) != std::string::npos ) {
+          Log::getInstance().warn( "LuaElement::setClass", "Character \":\" is not permitted in id/class" );
+          return;
+        }
+
         widget->SetClass( getIdentifierPrefix( widget ) + clss );
       }
 
       std::string LuaElement::getId( std::shared_ptr< sfg::Widget > widget ) {
         std::string id = widget->GetId();
-        return Tools::Utility::split( id, ':' )[ 1 ];
+        return id.find( ":" ) == std::string::npos ? id : Tools::Utility::split( id, ':' )[ 1 ];
       }
 
       std::string LuaElement::getClass( std::shared_ptr< sfg::Widget > widget ) {
         std::string clss = widget->GetClass();
-        return Tools::Utility::split( clss, ':' )[ 1 ];
+        return clss.find( ":" ) == std::string::npos ? clss : Tools::Utility::split( clss, ':' )[ 1 ];
       }
 
       /**
@@ -2425,6 +2437,7 @@ namespace BlueBear {
        * 2) "widget" is an actual descendant of "parent"
        */
       std::shared_ptr< sfg::Widget > LuaElement::getWidgetById( std::shared_ptr< sfg::Widget > parent, const std::string& id ) {
+        // This will automatically search in the right scope
         std::shared_ptr< sfg::Widget > found = sfg::Widget::GetWidgetById( getIdentifierPrefix( parent ) + id );
 
         if( found ) {
@@ -2434,6 +2447,32 @@ namespace BlueBear {
         }
 
         return found;
+      }
+
+      std::vector< std::shared_ptr< sfg::Widget > > LuaElement::getWidgetsByClass( std::shared_ptr< sfg::Widget > parent, const std::string& clss ) {
+        std::vector< std::shared_ptr< sfg::Widget > > found = sfg::Widget::GetWidgetsByClass( getIdentifierPrefix( parent ) + clss );
+
+        found.erase(
+          std::remove_if(
+            found.begin(),
+            found.end(),
+            [ & ]( std::shared_ptr< sfg::Widget > widget ) {
+              // widget must be a child of parent
+              return !Tools::Utility::isActualParent( widget, parent );
+            }
+          ),
+          found.end()
+        );
+
+        return found;
+      }
+
+      /**
+       * Read and reset ID/class prefix.
+       */
+      void LuaElement::updateAncestorPrefixes( std::shared_ptr< sfg::Widget > widget ) {
+        // Modify the ancestor prefix for widget, then check if widget is castable to sfg::Container and use GetChildren() to do the dirty work
+        // TODO
       }
 
     }

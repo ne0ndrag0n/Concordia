@@ -10,6 +10,7 @@
 #include <SFGUI/Widgets.hpp>
 #include <map>
 #include <unordered_map>
+#include <set>
 
 namespace BlueBear {
   class EventManager;
@@ -145,6 +146,8 @@ namespace BlueBear {
         static std::string getClass( std::shared_ptr< sfg::Widget > widget );
         static std::shared_ptr< sfg::Widget > getWidgetById( std::shared_ptr< sfg::Widget > parent, const std::string& id );
         static std::vector< std::shared_ptr< sfg::Widget > > getWidgetsByClass( std::shared_ptr< sfg::Widget > parent, const std::string& clss );
+
+        static void updateAncestorPrefixes( std::shared_ptr< sfg::Widget > widget );
       };
     }
   }
