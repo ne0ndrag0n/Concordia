@@ -2472,7 +2472,25 @@ namespace BlueBear {
        */
       void LuaElement::updateAncestorPrefixes( std::shared_ptr< sfg::Widget > widget ) {
         // Modify the ancestor prefix for widget, then check if widget is castable to sfg::Container and use GetChildren() to do the dirty work
-        // TODO
+
+        std::string elementId = LuaElement::getId( widget );
+        std::string elementClass = LuaElement::getClass( widget );
+
+        if( elementId != "" ) {
+          LuaElement::setId( widget, elementId );
+        }
+
+        if( elementClass != "" ) {
+          LuaElement::setClass( widget, elementClass );
+        }
+
+        if( std::shared_ptr< sfg::Container > asContainer = std::dynamic_pointer_cast< sfg::Container >( widget ) ) {
+          std::vector< std::shared_ptr< sfg::Widget > > children = asContainer->GetChildren();
+
+          for( std::shared_ptr< sfg::Widget > widget : children ) {
+            LuaElement::updateAncestorPrefixes( widget );
+          }
+        }
       }
 
     }
