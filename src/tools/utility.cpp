@@ -497,6 +497,10 @@ namespace BlueBear {
 		 * Consider replacing the method in LuaElement with this shit
 		 */
 		bool Utility::widgetIsContainer( std::shared_ptr< sfg::Widget > widget ) {
+			if( !widget ) {
+				return false;
+			}
+
 			switch( Utility::hash( widget->GetName().c_str() ) ) {
 				case Tools::Utility::hash( "Box" ):
 				case Tools::Utility::hash( "Fixed" ):

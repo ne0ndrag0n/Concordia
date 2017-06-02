@@ -117,6 +117,8 @@ namespace BlueBear {
           std::shared_ptr< sfg::Container > widgetAsContainer = std::static_pointer_cast< sfg::Container >( widget );
           widgetAsContainer->Add( target );
         }
+
+        LuaElement::updateAncestorPrefixes( widget );
       }
 
       void LuaElement::removeWidget( std::shared_ptr< sfg::Widget > target ) {
@@ -294,7 +296,7 @@ namespace BlueBear {
         LuaElement** userData = ( LuaElement** ) luaL_checkudata( L, 1, "bluebear_widget" );
         std::shared_ptr< sfg::Widget > parentWidget = ( *userData )->widget;
 
-        if( std::shared_ptr< sfg::Widget > widget = Tools::Utility::isActualParent( sfg::Widget::GetWidgetById( selector ), parentWidget ) ) {
+        if( std::shared_ptr< sfg::Widget > widget = LuaElement::getWidgetById( parentWidget, selector ) ) {
           getUserdataFromWidget( L, widget ); // userdata
           return 1;
         } else {
@@ -321,7 +323,7 @@ namespace BlueBear {
         std::shared_ptr< sfg::Widget > parentWidget = ( *userData )->widget;
 
         // Perform the actual SFGUI call
-        sfg::Widget::WidgetsList widgets = sfg::Widget::GetWidgetsByClass( selector );
+        sfg::Widget::WidgetsList widgets = LuaElement::getWidgetsByClass( parentWidget, selector );
 
         // Erase items that don't belong in this list to keep up the MarkupEngine context/owner paradigm
         widgets.erase(
@@ -678,12 +680,12 @@ namespace BlueBear {
            }
           case Tools::Utility::hash( "id" ):
             {
-              lua_pushstring( L, widgetPtr->widget->GetId().c_str() ); // "id"
+              lua_pushstring( L, LuaElement::getId( widgetPtr->widget ).c_str() ); // "id"
               return 1;
             }
           case Tools::Utility::hash( "class" ):
             {
-              lua_pushstring( L, widgetPtr->widget->GetClass().c_str() ); // "class"
+              lua_pushstring( L, LuaElement::getClass( widgetPtr->widget ).c_str() ); // "class"
               return 1;
             }
           case Tools::Utility::hash( "min-width" ):
@@ -1198,7 +1200,7 @@ namespace BlueBear {
               if( !lua_isstring( L, -1 ) ) {
                 Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"id\" must be a string." );
               } else {
-                widgetPtr->widget->SetId( lua_tostring( L, -1 ) );
+                LuaElement::setId( widgetPtr->widget, lua_tostring( L, -1 ) );
               }
               return 0;
             }
@@ -1207,7 +1209,7 @@ namespace BlueBear {
               if( !lua_isstring( L, -1 ) ) {
                 Log::getInstance().warn( "LuaElement::lua_setProperty", "Argument 2 of set_property for property \"class\" must be a string." );
               } else {
-                widgetPtr->widget->SetClass( lua_tostring( L, -1 ) );
+                LuaElement::setClass( widgetPtr->widget, lua_tostring( L, -1 ) );
               }
               return 0;
             }
@@ -2472,6 +2474,11 @@ namespace BlueBear {
        */
       void LuaElement::updateAncestorPrefixes( std::shared_ptr< sfg::Widget > widget ) {
         // Modify the ancestor prefix for widget, then check if widget is castable to sfg::Container and use GetChildren() to do the dirty work
+
+        if( !widget ) {
+          Log::getInstance().error( "LuaElement::updateAncestorPrefixes", "Attempted to update ancestor prefix for null widget" );
+          return;
+        }
 
         std::string elementId = LuaElement::getId( widget );
         std::string elementClass = LuaElement::getClass( widget );

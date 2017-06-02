@@ -85,7 +85,9 @@ namespace BlueBear {
         if( child != NULL ) {
           try {
             WidgetBuilder widgetBuilder( displayState.getImageCache() );
-            return widgetBuilder.getWidgetFromElementDirect( child );
+            std::shared_ptr< sfg::Widget > widget = widgetBuilder.getWidgetFromElementDirect( child );
+            LuaElement::updateAncestorPrefixes( widget );
+            return widget;
           } catch( std::exception& e ) {
             Log::getInstance().error( "NBBinPseudoElement::create", "Failed to add widget XML: " + std::string( e.what() ) );
           }
@@ -153,6 +155,8 @@ namespace BlueBear {
         } catch( std::exception& e ) {
           Log::getInstance().error( "LuaElement::add", "Failed to add widget XML: " + std::string( e.what() ) );
         }
+
+        LuaElement::updateAncestorPrefixes( stagedWidget );
       }
 
       void NBBinPseudoElement::setSubject( std::shared_ptr< sfg::Notebook > subject, unsigned int pageNumber ) {
@@ -171,7 +175,7 @@ namespace BlueBear {
         std::vector< std::shared_ptr< sfg::Widget > > widgets;
 
         if( std::shared_ptr< sfg::Widget > child = this->getChildWidget() ) {
-          std::vector< std::shared_ptr< sfg::Widget > > widgets = sfg::Widget::GetWidgetsByClass( classID );
+          std::vector< std::shared_ptr< sfg::Widget > > widgets = LuaElement::getWidgetsByClass( child, classID );
 
           // Erase items that don't belong in this list to keep up the MarkupEngine context/owner paradigm
           widgets.erase(
@@ -186,7 +190,7 @@ namespace BlueBear {
           );
 
           // Add the item itself if it matches the classID
-          if( child->GetClass() == classID ) {
+          if( LuaElement::getClass( child ) == classID ) {
             widgets.push_back( child );
           }
 
@@ -216,12 +220,12 @@ namespace BlueBear {
 
         if( std::shared_ptr< sfg::Widget > child = this->getChildWidget() ) {
 
-          if( child->GetId() == id ) {
+          if( LuaElement::getId( child ) == id ) {
             LuaElement::getUserdataFromWidget( L, child ); // userdata
             return 1;
           }
 
-          if( std::shared_ptr< sfg::Widget > potentialChild = Tools::Utility::isActualParent( sfg::Widget::GetWidgetById( id ), child ) ) {
+          if( std::shared_ptr< sfg::Widget > potentialChild = LuaElement::getWidgetById( child, id ) ) {
             LuaElement::getUserdataFromWidget( L, potentialChild ); // userdata
             return 1;
           }

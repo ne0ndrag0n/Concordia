@@ -43,6 +43,8 @@ namespace BlueBear {
           displayState.gui.desktop.Add( widget );
 
           myItems.insert( widget );
+
+          LuaElement::updateAncestorPrefixes( widget );
         }
       }
 
@@ -81,7 +83,7 @@ namespace BlueBear {
       }
 
       std::shared_ptr< sfg::Widget > LuaGUIContext::findById( const std::string& id ) {
-        std::shared_ptr< sfg::Widget > result = sfg::Widget::GetWidgetById( id );
+        std::shared_ptr< sfg::Widget > result = sfg::Widget::GetWidgetById( Tools::Utility::pointerToString( this ) + ":" + id );
 
         if( myItems.find( Tools::Utility::getWidgetOrAncestor( result ) ) != myItems.end() ) {
           return result;
@@ -91,7 +93,7 @@ namespace BlueBear {
       }
 
       std::vector< std::shared_ptr< sfg::Widget > > LuaGUIContext::findByClass( const std::string& clss ) {
-        std::vector< std::shared_ptr< sfg::Widget > > results = sfg::Widget::GetWidgetsByClass( clss );
+        std::vector< std::shared_ptr< sfg::Widget > > results = sfg::Widget::GetWidgetsByClass( Tools::Utility::pointerToString( this ) + ":" + clss );
 
         results.erase(
           std::remove_if(
@@ -137,7 +139,9 @@ namespace BlueBear {
             try {
               WidgetBuilder widgetBuilder( displayState.getImageCache() );
 
-              LuaElement::getUserdataFromWidget( L, widgetBuilder.getWidgetFromElementDirect( element ) ); // userdata
+              std::shared_ptr< sfg::Widget > widget = widgetBuilder.getWidgetFromElementDirect( element );
+              LuaElement::updateAncestorPrefixes( widget );
+              LuaElement::getUserdataFromWidget( L, widget ); // userdata
               return true;
             } catch( std::exception& e ) {
               Log::getInstance().error( "LuaGUIContext::create", "Failed to add widget XML: " + std::string( e.what() ) );

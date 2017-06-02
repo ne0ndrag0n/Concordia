@@ -136,21 +136,13 @@ namespace BlueBear {
         for( std::shared_ptr< sfg::Widget > widget : widgets ) {
 
           // Is this the widget we need?
-          if( widget->GetId() == id ) {
+          if( LuaElement::getId( widget ) == id ) {
             LuaElement::getUserdataFromWidget( L, widget ); // userdata
             return 1;
           }
 
-          // FIXME: ANOTHER sfgui bug. The sibling widgets "foo" and "bar", existing in two different rows in the table, will be reported as
-          // "bar" being the parent of "foo". This breaks the specification of ConcordiaME but is not necessarily a deal-breaking bug.
-          //
-          // A potential workaround can be made by checking the parent chain of the discovered widget. If "widget" is not anywhere in the parent
-          // chain, then this result is not valid.
-          //
-          // Workaround is implemented below. TODO check this in other areas where container based items are used. Bug reports might come in.
-
           // Does this widget tree contain the widget we need?
-          if( std::shared_ptr< sfg::Widget > found = Tools::Utility::isActualParent( sfg::Widget::GetWidgetById( id ), widget ) ) {
+          if( std::shared_ptr< sfg::Widget > found = LuaElement::getWidgetById( widget, id ) ) {
             LuaElement::getUserdataFromWidget( L, found ); // userdata
             return 1;
           }
@@ -168,33 +160,18 @@ namespace BlueBear {
        */
       int RowPseudoElement::getItemsByClass( lua_State* L, const std::string clss ) {
         std::vector< std::shared_ptr< sfg::Widget > > widgets = getWidgetsForRow();
-        std::vector< std::shared_ptr< sfg::Widget > > results = sfg::Widget::GetWidgetsByClass( clss );
+        std::vector< std::shared_ptr< sfg::Widget > > results;
 
         // Pare this list down from widgets into results
-        results.erase(
-          std::remove_if(
-            results.begin(),
-            results.end(),
-            [ & ]( std::shared_ptr< sfg::Widget > result ) {
-              // Check #1: Widget is a direct descendent of this <row> pseudoelement
-              auto it = std::find( widgets.begin(), widgets.end(), result );
-              if( it != widgets.end() ) {
-                return false;
-              }
+        for( std::shared_ptr< sfg::Widget > widget : widgets ) {
 
-              // Check #2: Widget is a child of any parent inside "widgets"
-              for( std::shared_ptr< sfg::Widget > parent : widgets ) {
-                if( Tools::Utility::isActualParent( result, parent ) ) {
-                  return false;
-                }
-              }
+          if( LuaElement::getClass( widget ) == clss ) {
+            results.push_back( widget );
+          }
 
-              // Both checks failed, this result must be removed
-              return true;
-            }
-          ),
-          results.end()
-        );
+          std::vector< std::shared_ptr< sfg::Widget > > subwidgets = LuaElement::getWidgetsByClass( widget, clss );
+          results.insert( results.end(), subwidgets.begin(), subwidgets.end() );;
+        }
 
         int resultSize = results.size();
         if( resultSize == 1 ) {
@@ -301,6 +278,8 @@ namespace BlueBear {
 
           stagedWidgets.insert( iterator, staging );
         }
+
+        LuaElement::updateAncestorPrefixes( widget );
       }
 
       void RowPseudoElement::addFromStaging( WidgetStaging staging, int columnIndex ) {

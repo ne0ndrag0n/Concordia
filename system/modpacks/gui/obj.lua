@@ -27,8 +27,7 @@ end
 
 function GUIProvider:test_action_1( event )
   local table = self.gui:find_by_id( 'table' )
-  local buttons1 = table:find_by_class( 'intable' )
-
+  local row1 = table:find_pseudo( 'row', 0 )
 end
 
 function GUIProvider:test_action_2( event )
