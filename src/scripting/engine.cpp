@@ -379,15 +379,41 @@ namespace BlueBear {
 
 				 // print( "message" )
 				 if( numArgs == 1 ) {
-					 Log::getInstance().debug( "LuaScript", lua_tostring( L, -1 ) );
+					 lua_getglobal( L, "tostring" ); // <tostring> string
+					 lua_pushvalue( L, -2 ); // string <tostring> string
+
+					 if( lua_pcall( L, 1, 1, 0 ) == 0 ) { // string string
+						 Log::getInstance().debug( "Lua Script", lua_tostring( L, -1 ) );
+					 } else {
+						 Log::getInstance().error( "Engine::lua_print", "Argument not convertible to string type" );
+					 }
 				 }
 
 				 // print( "tag", "message" )
 				 else if( numArgs == 2 ) {
-					 Log::getInstance().debug( lua_tostring( L, -2 ), lua_tostring( L, -1 ) );
+					 // message tag
+					 lua_getglobal( L, "tostring" ); // <tostring> message tag
+					 lua_pushvalue( L, -2 ); // message <tostring> message tag
+
+					 if( lua_pcall( L, 1, 1, 0 ) != 0 ) {
+						 Log::getInstance().error( "Engine::lua_print", "Message not convertible to string type" );
+						 return 0;
+					 }
+
+					 // convertedmessage message tag
+					 lua_getglobal( L, "tostring" ); // <tostring> convertedmessage message tag
+					 lua_pushvalue( L, -4 ); // tag <tostring> convertedmessage message tag
+
+					 if( lua_pcall( L, 1, 1, 0 ) != 0 ) {
+						 Log::getInstance().error( "Engine::lua_print", "Tag not convertible to string type" );
+						 return 0;
+					 }
+
+					 // convertedtag convertedmessage message tag
+					 Log::getInstance().debug( lua_tostring( L, -1 ), lua_tostring( L, -2 ) );
 				 }
 			 } catch ( std::logic_error e ) {
-				 Log::getInstance().error( "lua_print", "Failed to print() log message (did you use tostring() on non-string objects?)" );
+				 Log::getInstance().error( "Engine::lua_print", "Failed to print() log message" );
 			 }
 
 			 return 0;

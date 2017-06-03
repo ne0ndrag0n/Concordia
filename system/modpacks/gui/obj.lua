@@ -26,14 +26,7 @@ function GUIProvider:open_debug_ui()
 end
 
 function GUIProvider:test_action_1( event )
-  local window = self.gui:find_by_id( 'tablewindow' )
-  local table = window:find_by_id( 'table' )
-
-  print( table:find_by_id( 'foo' ):get_content() )
-
-  self.gui:find_by_id( 'tablebox' ):remove( table )
-
-  print( table:find_by_id( 'foo' ):get_content() )
+  print( event.widget:get_property( 'min-width' ) )
 end
 
 function GUIProvider:test_action_2( event )
