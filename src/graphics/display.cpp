@@ -330,6 +330,7 @@ namespace BlueBear {
       luaL_Reg guiContextFuncs[] = {
         { "find_by_id", GUI::LuaGUIContext::lua_findById },
         { "find_by_class", GUI::LuaGUIContext::lua_findByClass },
+        { "add_from_path", GUI::LuaGUIContext::lua_addXMLFromPath },
         { "add", GUI::LuaGUIContext::lua_add },
         { "remove", GUI::LuaGUIContext::lua_removeWidget },
         { "create", GUI::LuaGUIContext::lua_createWidget },

@@ -154,6 +154,15 @@ namespace BlueBear {
         }
       }
 
+      int LuaGUIContext::lua_addXMLFromPath( lua_State* L ) {
+        VERIFY_STRING( "LuaGUIContext::lua_addXMLFromPath", "add_from_path" );
+        LuaGUIContext* self = *( ( LuaGUIContext** ) luaL_checkudata( L, 1, "bluebear_gui_context" ) );
+
+        self->addFromPath( lua_tostring( L, -1 ) );
+
+        return 0;
+      }
+
       int LuaGUIContext::lua_add( lua_State* L ) {
         LuaGUIContext* self = *( ( LuaGUIContext** ) luaL_checkudata( L, 1, "bluebear_gui_context" ) );
 

@@ -7,9 +7,12 @@ local GUIProvider = bluebear.extend( 'system.entity.base', 'system.provider.gui'
 
 function GUIProvider:open_debug_ui()
   local path = modpack_path.."/debug.xml"
+  local console_path = modpack_path.."/console.xml"
+
   print( "system.provider.gui", "Providing the debug UI from "..path )
 
   self.gui = bluebear.gui.create_gui_context( path )
+  --self.gui:add_from_path( console_path )
 
   self.gui:find_by_id( "rot_l" ):on( "click", bluebear.util.bind( "system.provider.gui:on_click_rot_l", self ) )
   self.gui:find_by_id( "rot_r" ):on( "click", bluebear.util.bind( "system.provider.gui:on_click_rot_r", self ) )

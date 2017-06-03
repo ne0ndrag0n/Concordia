@@ -45,6 +45,7 @@ namespace BlueBear {
         std::vector< std::shared_ptr< sfg::Widget > > findByClass( const std::string& clss );
 
         // TODO: Lua interfaces (these should be a lot less shitty than the way I did it in LuaElement)
+        static int lua_addXMLFromPath( lua_State* L );
         static int lua_add( lua_State* L );
         static int lua_createWidget( lua_State* L );
         static int lua_removeWidget( lua_State* L );
