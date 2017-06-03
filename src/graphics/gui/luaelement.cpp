@@ -123,10 +123,11 @@ namespace BlueBear {
 
       void LuaElement::removeWidget( std::shared_ptr< sfg::Widget > target ) {
         if( isContainer() ) {
-          std::shared_ptr< sfg::Container > widget = std::static_pointer_cast< sfg::Container >( widget );
+          // Dammit, GCC!
+          std::shared_ptr< sfg::Container > container = std::static_pointer_cast< sfg::Container >( widget );
 
           target->Show( false );
-          widget->Remove( target );
+          container->Remove( target );
 
           LuaElement::updateAncestorPrefixes( target );
         } else {
