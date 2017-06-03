@@ -1,6 +1,6 @@
 CC = g++
 CFLAGS = -pthread -std=c++14 -g -rdynamic -pipe #-fsanitize=address
-INCLUDES = -Iinclude
+INCLUDES = -Iinclude -Ilib
 LIBS = -lpthread -ltbb -lassimp -lGLEW -lGL -lsfml-graphics -lsfml-window -lsfml-system -lsfgui -ltinyxml2 -ljsoncpp -llua -ldl
 
 SRCS = $(wildcard src/*.cpp)
@@ -16,7 +16,10 @@ SRCS += $(wildcard src/scripting/event/*.cpp)
 SRCS += $(wildcard src/scripting/luakit/*.cpp)
 SRCS += $(wildcard src/threading/*.cpp)
 SRCS += $(wildcard src/tools/*.cpp)
+
 OBJS = $(SRCS:.cpp=.o)
+OBJS += lib/cparse/builtin-features.o
+OBJS += lib/cparse/core-shunting-yard.o
 
 MAIN = bbexec
 

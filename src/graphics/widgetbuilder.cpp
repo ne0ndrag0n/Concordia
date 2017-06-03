@@ -6,6 +6,7 @@
 #include "log.hpp"
 #include "tools/utility.hpp"
 #include "eventmanager.hpp"
+#include <cparse/shunting-yard.h>
 #include <string>
 #include <memory>
 #include <SFGUI/Widget.hpp>
