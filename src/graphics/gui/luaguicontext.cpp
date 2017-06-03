@@ -65,6 +65,8 @@ namespace BlueBear {
           displayState.gui.desktop.Remove( widget );
           myItems.erase( widget );
         }
+
+        LuaElement::updateAncestorPrefixes( widget );
       }
 
       /**
@@ -76,6 +78,8 @@ namespace BlueBear {
           if( std::shared_ptr< sfg::Widget > item = pointer.lock() ) {
             item->Show( false );
             displayState.gui.desktop.Remove( item );
+
+            LuaElement::updateAncestorPrefixes( item );
           }
         }
 

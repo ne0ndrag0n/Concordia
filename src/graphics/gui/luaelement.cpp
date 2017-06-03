@@ -127,6 +127,8 @@ namespace BlueBear {
 
           target->Show( false );
           widget->Remove( target );
+
+          LuaElement::updateAncestorPrefixes( target );
         } else {
           Log::getInstance().warn( "LuaElement::removeWidget", "This LuaElement is not a Container and cannot remove any child elements." );
         }

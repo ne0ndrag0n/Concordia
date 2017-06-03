@@ -63,6 +63,7 @@ namespace BlueBear {
         for( std::shared_ptr< sfg::Widget > widget : insertedWidgets ) {
           widget->Show( false );
           subject->Remove( widget );
+          LuaElement::updateAncestorPrefixes( widget );
         }
 
         rowNumber = -1;
