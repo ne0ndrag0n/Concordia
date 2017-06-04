@@ -26,6 +26,7 @@
 #include <SFGUI/RadioButton.hpp>
 #include <SFGUI/SpinButton.hpp>
 #include <SFGUI/ComboBox.hpp>
+#include <cparse/shunting-yard.h>
 #include <string>
 #include <memory>
 #include <exception>
@@ -41,10 +42,13 @@ namespace BlueBear {
 
     class WidgetBuilder {
       ImageCache& imageCache;
+      TokenMap settingsTokens;
       // "This RadioButton needs to be associated with the group belonging to this item"
       std::vector< std::pair< std::shared_ptr< sfg::RadioButton >, std::string > > groups;
       static constexpr unsigned int hash(const char* str, int h = 0);
       bool includeCustom = true;
+
+      void buildSettingsTokens();
 
       void addChildren( std::shared_ptr< sfg::ScrolledWindow > scrolledWindow, tinyxml2::XMLElement* element );
       void addChildren( std::shared_ptr< sfg::Container > widget, tinyxml2::XMLElement* element );

@@ -58,6 +58,12 @@ namespace BlueBear {
     }
   }
 
+  void ConfigManager::each( std::function< void( std::string, Json::Value& ) > func ) {
+    for( Json::Value::iterator jsonIterator = configRoot.begin(); jsonIterator != configRoot.end(); ++jsonIterator ) {
+      func( jsonIterator.key().asString(), *jsonIterator );
+    }
+  }
+
   std::string ConfigManager::getValue( const std::string& key ) {
     return configRoot[ key ].asString();
   }

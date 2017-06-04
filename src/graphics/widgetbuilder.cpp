@@ -6,7 +6,6 @@
 #include "log.hpp"
 #include "tools/utility.hpp"
 #include "eventmanager.hpp"
-#include <cparse/shunting-yard.h>
 #include <string>
 #include <memory>
 #include <SFGUI/Widget.hpp>
@@ -26,7 +25,19 @@
 namespace BlueBear {
   namespace Graphics {
 
-    WidgetBuilder::WidgetBuilder( ImageCache& imageCache ) : imageCache( imageCache ) {}
+    WidgetBuilder::WidgetBuilder( ImageCache& imageCache ) : imageCache( imageCache ) {
+      buildSettingsTokens();
+    }
+
+    void WidgetBuilder::buildSettingsTokens() {
+      settingsTokens = TokenMap();
+
+      ConfigManager::getInstance().each( [ & ]( std::string key, Json::Value& value ) {
+        if( value.isNumeric() ) {
+          settingsTokens[ key ] = value.asDouble();
+        }
+      } );
+    }
 
     constexpr unsigned int WidgetBuilder::hash(const char* str, int h) {
       return !str[h] ? 5381 : (hash(str, h+1) * 33) ^ str[h];
@@ -330,11 +341,11 @@ namespace BlueBear {
       float value = adjustment->GetValue();
       float pageSize = adjustment->GetPageSize();
 
-      element->QueryFloatAttribute( "min", &min );
-      element->QueryFloatAttribute( "max", &max );
-      element->QueryFloatAttribute( "minor_step", &minorStep );
-      element->QueryFloatAttribute( "major_step", &majorStep );
-      element->QueryFloatAttribute( "page_size", &pageSize );
+      Tools::Utility::queryFloatExpression( element, "min", settingsTokens, &min );
+      Tools::Utility::queryFloatExpression( element, "max", settingsTokens, &max );
+      Tools::Utility::queryFloatExpression( element, "minor_step", settingsTokens, &minorStep );
+      Tools::Utility::queryFloatExpression( element, "major_step", settingsTokens, &majorStep );
+      Tools::Utility::queryFloatExpression( element, "page_size", settingsTokens, &pageSize );
       element->QueryFloatText( &value );
 
       adjustment->SetLower( min );
@@ -377,8 +388,8 @@ namespace BlueBear {
     void WidgetBuilder::setAlignment( std::shared_ptr< sfg::Misc > widget, tinyxml2::XMLElement* element ) {
       sf::Vector2f alignment = widget->GetAlignment();
 
-      element->QueryFloatAttribute( "alignment_x", &alignment.x );
-      element->QueryFloatAttribute( "alignment_y", &alignment.y );
+      Tools::Utility::queryFloatExpression( element, "alignment_x", settingsTokens, &alignment.x );
+      Tools::Utility::queryFloatExpression( element, "alignment_y", settingsTokens, &alignment.y );
 
       widget->SetAlignment( alignment );
     }
@@ -386,19 +397,17 @@ namespace BlueBear {
     void WidgetBuilder::setAllocationAndRequisition( std::shared_ptr< sfg::Widget > widget, tinyxml2::XMLElement* element ) {
       sf::FloatRect allocation = widget->GetAllocation();
 
-      element->QueryFloatAttribute( "top", &allocation.top );
-      correctYBoundary( &allocation.top );
-      element->QueryFloatAttribute( "left", &allocation.left );
-      correctXBoundary( &allocation.left );
-      element->QueryFloatAttribute( "width", &allocation.width );
-      element->QueryFloatAttribute( "height", &allocation.height );
+      Tools::Utility::queryFloatExpression( element, "top", settingsTokens, &allocation.top );
+      Tools::Utility::queryFloatExpression( element, "left", settingsTokens, &allocation.left );
+      Tools::Utility::queryFloatExpression( element, "width", settingsTokens, &allocation.width );
+      Tools::Utility::queryFloatExpression( element, "height", settingsTokens, &allocation.height );
 
       widget->SetAllocation( allocation );
 
       sf::Vector2f requisition = widget->GetRequisition();
 
-      element->QueryFloatAttribute( "min-width", &requisition.x );
-      element->QueryFloatAttribute( "min-height", &requisition.y );
+      Tools::Utility::queryFloatExpression( element, "min-width", settingsTokens, &requisition.x );
+      Tools::Utility::queryFloatExpression( element, "min-height", settingsTokens, &requisition.y );
 
       widget->SetRequisition( requisition );
     }
@@ -488,7 +497,7 @@ namespace BlueBear {
       }
 
       float spacing = 0.0f;
-      element->QueryFloatAttribute( "spacing", &spacing );
+      Tools::Utility::queryFloatExpression( element, "spacing", settingsTokens, &spacing );
 
       box = sfg::Box::Create( orientationFlag, spacing );
       setBasicProperties( box, element );
@@ -506,8 +515,8 @@ namespace BlueBear {
       setDefaultEvents( alignment, element );
 
       sf::Vector2f scale = alignment->GetScale();
-      element->QueryFloatAttribute( "scale_x", &scale.x );
-      element->QueryFloatAttribute( "scale_y", &scale.y );
+      Tools::Utility::queryFloatExpression( element, "scale_x", settingsTokens, &scale.x );
+      Tools::Utility::queryFloatExpression( element, "scale_y", settingsTokens, &scale.y );
 
       alignment->SetScale( scale );
 
@@ -579,7 +588,7 @@ namespace BlueBear {
       setDefaultEvents( progressBar, element );
 
       float fraction = 0.0f;
-      element->QueryFloatAttribute( "value", &fraction );
+      Tools::Utility::queryFloatExpression( element, "value", settingsTokens, &fraction );
 
       progressBar->SetFraction( fraction );
 
@@ -691,9 +700,9 @@ namespace BlueBear {
       float maximum = 100.0f;
       float step = 1.0f;
 
-      element->QueryFloatAttribute( "min", &minimum );
-      element->QueryFloatAttribute( "max", &maximum );
-      element->QueryFloatAttribute( "step", &step );
+      Tools::Utility::queryFloatExpression( element, "min", settingsTokens, &minimum );
+      Tools::Utility::queryFloatExpression( element, "max", settingsTokens, &maximum );
+      Tools::Utility::queryFloatExpression( element, "step", settingsTokens, &step );
 
       std::shared_ptr< sfg::SpinButton > spinButton = sfg::SpinButton::Create( minimum, maximum, step );
 
@@ -765,9 +774,10 @@ namespace BlueBear {
             cell->QueryUnsignedAttribute( "rowspan", &rowspan );
 
             float paddingX = 0.0f;
-            cell->QueryFloatAttribute( "padding_x", &paddingX );
+            Tools::Utility::queryFloatExpression( cell, "padding_x", settingsTokens, &paddingX );
+
             float paddingY = 0.0f;
-            cell->QueryFloatAttribute( "padding_y", &paddingY );
+            Tools::Utility::queryFloatExpression( cell, "padding_y", settingsTokens, &paddingY );
 
             bool expandX = true, expandY = true;
             bool fillX = true, fillY = true;
@@ -808,8 +818,8 @@ namespace BlueBear {
 
       float rowSpacing = 0.0f;
       float columnSpacing = 0.0f;
-      element->QueryFloatAttribute( "row_spacing", &rowSpacing );
-      element->QueryFloatAttribute( "column_spacing", &columnSpacing );
+      Tools::Utility::queryFloatExpression( element, "row_spacing", settingsTokens, &rowSpacing );
+      Tools::Utility::queryFloatExpression( element, "column_spacing", settingsTokens, &columnSpacing );
 
       table->SetRowSpacings( rowSpacing );
       table->SetColumnSpacings( columnSpacing );

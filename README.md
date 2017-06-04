@@ -33,4 +33,5 @@ Concordia
 * GLM
 * GLEW
 * Assimp
+* cparser f465747
 * Intel Threading Building Blocks (TBB) 4.4

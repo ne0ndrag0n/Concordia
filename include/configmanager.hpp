@@ -7,6 +7,7 @@
 #include <jsoncpp/json/json.h>
 #include <string>
 #include <map>
+#include <functional>
 
 namespace BlueBear {
   class ConfigManager {
@@ -22,6 +23,8 @@ namespace BlueBear {
       int getIntValue( const std::string& key );
       bool getBoolValue( const std::string& key );
       static int lua_getValue( lua_State* L );
+
+      void each( std::function< void( std::string, Json::Value& ) > func );
 
     private:
       static constexpr const char* SETTINGS_PATH = "settings.json";
