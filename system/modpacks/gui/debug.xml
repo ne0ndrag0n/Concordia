@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Window id="debug" min-width="250" min-height="125" left="viewport_x - 260" top="10" title="Debug" resize="false">
+<Window id="debug" class="transparent" min-width="250" min-height="125" left="viewport_x - 260" top="10" title="Debug" resize="false">
   <Notebook id="notebook">
     <page>
       <tab>

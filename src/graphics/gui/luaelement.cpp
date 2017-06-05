@@ -1277,10 +1277,6 @@ namespace BlueBear {
 
               sf::FloatRect allocation = widgetPtr->widget->GetAllocation();
               double input = lua_tonumber( L, -1 );
-              if( input < 0.0 ) {
-                input = ConfigManager::getInstance().getIntValue( "viewport_x" ) + input;
-              }
-
               allocation.left = input;
               widgetPtr->widget->SetAllocation( allocation );
               return 0;
@@ -1294,10 +1290,6 @@ namespace BlueBear {
 
               sf::FloatRect allocation = widgetPtr->widget->GetAllocation();
               double input = lua_tonumber( L, -1 );
-              if( input < 0.0 ) {
-                input = ConfigManager::getInstance().getIntValue( "viewport_y" ) + input;
-              }
-
               allocation.top = input;
               widgetPtr->widget->SetAllocation( allocation );
               return 0;

@@ -12,7 +12,7 @@ function GUIProvider:open_debug_ui()
   print( "system.provider.gui", "Providing the debug UI from "..path )
 
   self.gui = bluebear.gui.create_gui_context( path )
-  --self.gui:add_from_path( console_path )
+  self.gui:add_from_path( console_path )
 
   self.gui:find_by_id( "rot_l" ):on( "click", bluebear.util.bind( "system.provider.gui:on_click_rot_l", self ) )
   self.gui:find_by_id( "rot_r" ):on( "click", bluebear.util.bind( "system.provider.gui:on_click_rot_r", self ) )
@@ -29,7 +29,25 @@ function GUIProvider:open_debug_ui()
 end
 
 function GUIProvider:test_action_1( event )
-  print( event.widget:get_property( 'min-width' ) )
+  local element = self.gui:find_by_id( 'bb_console' )
+
+  local interval = 0
+  local initial = element:get_property( 'top' )
+  local final
+  local step
+
+  if initial == -360 then
+    final = 0
+    step = 20
+  else
+    final = -360
+    step = -20
+  end
+
+  for i=initial,final,step do
+    interval = interval + 1
+    self:sleep( interval ):then_call( function() element:set_property( 'top', i ) end )
+  end
 end
 
 function GUIProvider:test_action_2( event )

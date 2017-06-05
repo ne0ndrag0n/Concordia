@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Window id="console" titlebar="false" resize="false" min-height="300">
+<Window id="bb_console" titlebar="false" resize="false" top="-360" min-width="viewport_x" min-height="300">
+  <Box orientation="vertical" spacing="10.0">
+    <ScrolledWindow min-width="1" min-height="300">
 
+    </ScrolledWindow>
+    <Box spacing="10.0">
+      <Entry></Entry>
+      <Button expand="false">&gt;</Button>
+    </Box>
+  </Box>
 </Window>
