@@ -63,7 +63,6 @@ namespace BlueBear {
         for( std::shared_ptr< sfg::Widget > widget : insertedWidgets ) {
           widget->Show( false );
           subject->Remove( widget );
-          LuaElement::updateAncestorPrefixes( widget );
         }
 
         rowNumber = -1;
@@ -279,8 +278,6 @@ namespace BlueBear {
 
           stagedWidgets.insert( iterator, staging );
         }
-
-        LuaElement::updateAncestorPrefixes( widget );
       }
 
       void RowPseudoElement::addFromStaging( WidgetStaging staging, int columnIndex ) {

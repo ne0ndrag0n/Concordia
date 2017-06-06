@@ -9,12 +9,6 @@
 
 namespace BlueBear {
 
-  namespace Graphics {
-    namespace GUI {
-      class LuaGUIContext;
-    }
-  }
-
   /**
    * This is a standard, flexible base event type that can be used for anything that takes a listen on an instance,
    * and fires off a callback with varying types.
@@ -95,7 +89,6 @@ namespace BlueBear {
     SFGUIEatEvent SFGUI_EAT_EVENT;
     BasicEvent< void*, void*, int > ITEM_ADDED;
     BasicEvent< void*, void*, int > ITEM_REMOVED;
-    SelectableActionEvent< Graphics::GUI::LuaGUIContext*, std::shared_ptr< sfg::Widget > > CONTEXT_REQUEST;
   };
 
   extern EventManager eventManager;

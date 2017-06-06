@@ -11,25 +11,30 @@ function GUIProvider:open_debug_ui()
 
   print( "system.provider.gui", "Providing the debug UI from "..path )
 
-  self.gui = bluebear.gui.create_gui_context( path )
-  self.gui:add_from_path( console_path )
+  bluebear.gui.add_from_path( path )
+  bluebear.gui.add_from_path( console_path )
 
-  self.gui:find_by_id( "rot_l" ):on( "click", bluebear.util.bind( "system.provider.gui:on_click_rot_l", self ) )
-  self.gui:find_by_id( "rot_r" ):on( "click", bluebear.util.bind( "system.provider.gui:on_click_rot_r", self ) )
-  self.gui:find_by_id( "zoom_in" ):on( "click", bluebear.util.bind( "system.provider.gui:on_click_zoom_in", self ) )
-  self.gui:find_by_id( "zoom_out" ):on( "click", bluebear.util.bind( "system.provider.gui:on_click_zoom_out", self ) )
+  bluebear.gui.find_by_id( "rot_l" ):on( "click", bluebear.util.bind( "system.provider.gui:on_click_rot_l", self ) )
+  bluebear.gui.find_by_id( "rot_r" ):on( "click", bluebear.util.bind( "system.provider.gui:on_click_rot_r", self ) )
+  bluebear.gui.find_by_id( "zoom_in" ):on( "click", bluebear.util.bind( "system.provider.gui:on_click_zoom_in", self ) )
+  bluebear.gui.find_by_id( "zoom_out" ):on( "click", bluebear.util.bind( "system.provider.gui:on_click_zoom_out", self ) )
 
-  self.gui:find_by_id( "ta1" ):on( "click", bluebear.util.bind( "system.provider.gui:test_action_1", self ) )
-  self.gui:find_by_id( "ta2" ):on( "click", bluebear.util.bind( "system.provider.gui:test_action_2", self ) )
+  bluebear.gui.find_by_id( "ta1" ):on( "click", bluebear.util.bind( "system.provider.gui:test_action_1", self ) )
+  bluebear.gui.find_by_id( "ta2" ):on( "click", bluebear.util.bind( "system.provider.gui:test_action_2", self ) )
 
-  self.gui:find_by_id( "toggle_table" ):on( "click", bluebear.util.bind( "system.provider.gui:toggle_visibility", self ) )
+  bluebear.gui.find_by_id( "toggle_table" ):on( "click", bluebear.util.bind( "system.provider.gui:toggle_visibility", self ) )
+
+  bluebear.gui.find_by_id( "bb_ritzy" ):set_property(
+    'left',
+    ( bluebear.gui.find_by_id( 'bb_chatarea' ):get_property( 'width' ) / 2 ) - 150
+  )
 
   -- XXX: Remove after demo
-  self.gui:find_by_id( "animate1" ):on( "click", bluebear.gui.__internal__playanim1 )
+  bluebear.gui.find_by_id( "animate1" ):on( "click", bluebear.gui.__internal__playanim1 )
 end
 
 function GUIProvider:test_action_1( event )
-  local element = self.gui:find_by_id( 'bb_console' )
+  local element = bluebear.gui.find_by_id( 'bb_console' )
 
   local interval = 0
   local initial = element:get_property( 'top' )
@@ -55,7 +60,7 @@ function GUIProvider:test_action_2( event )
 end
 
 function GUIProvider:toggle_visibility( event )
-  local tablewindow = self.gui:find_by_id( 'tablewindow' )
+  local tablewindow = bluebear.gui.find_by_id( 'tablewindow' )
 
   tablewindow:set_property( 'visible', not tablewindow:get_property( 'visible' ) )
 end

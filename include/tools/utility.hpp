@@ -98,8 +98,6 @@ namespace BlueBear {
 
 				static std::shared_ptr< sfg::Widget > getWidgetOrAncestor( std::shared_ptr< sfg::Widget > widget );
 
-				static void* getAncestralAddress( std::shared_ptr< sfg::Widget > widget );
-
 				static void queryFloatExpression( tinyxml2::XMLElement* element, const std::string& attribute, TokenMap& tokenMap, float* destination );
 		};
 	}

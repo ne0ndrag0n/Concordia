@@ -91,8 +91,6 @@ namespace BlueBear {
 
         subject->RemovePage( pageNumber );
 
-        updateAncestorPrefixes( tabWidget, contentWidget );
-
         eventManager.ITEM_REMOVED.trigger( subject.get(), pageNumber );
 
         pageNumber = -1;
@@ -229,17 +227,10 @@ namespace BlueBear {
         stagedTabElement->setSubject( subject, pageNumber );
         stagedContentElement->setSubject( subject, pageNumber );
 
-        updateAncestorPrefixes( stagedTabElement->stagedWidget, stagedContentElement->stagedWidget );
-
         this->setStagedTabElement( L, nullptr );
         this->setStagedContentElement( L, nullptr );
 
         return true;
-      }
-
-      void PagePseudoElement::updateAncestorPrefixes( std::shared_ptr< sfg::Widget > tab, std::shared_ptr< sfg::Widget > content ) {
-        LuaElement::updateAncestorPrefixes( tab );
-        LuaElement::updateAncestorPrefixes( content );
       }
 
       /**

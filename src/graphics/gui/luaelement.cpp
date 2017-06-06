@@ -117,8 +117,6 @@ namespace BlueBear {
           std::shared_ptr< sfg::Container > widgetAsContainer = std::static_pointer_cast< sfg::Container >( widget );
           widgetAsContainer->Add( target );
         }
-
-        LuaElement::updateAncestorPrefixes( widget );
       }
 
       void LuaElement::removeWidget( std::shared_ptr< sfg::Widget > target ) {
@@ -128,8 +126,6 @@ namespace BlueBear {
 
           target->Show( false );
           container->Remove( target );
-
-          LuaElement::updateAncestorPrefixes( target );
         } else {
           Log::getInstance().warn( "LuaElement::removeWidget", "This LuaElement is not a Container and cannot remove any child elements." );
         }
@@ -2381,51 +2377,20 @@ namespace BlueBear {
         } );
       }
 
-      std::string LuaElement::getIdentifierPrefix( std::shared_ptr< sfg::Widget > widget ) {
-        // Can't do any of this shit on a nullptr
-        if( !widget ) {
-          Log::getInstance().error( "LuaElement::getIdentifierPrefix", "Unable to derive identifier prefix on a nullptr!" );
-          return "";
-        }
-
-        // Identifier prefix comes from one of three things in the following order: the context it is within, its most distant ancestor, or the item itself.
-        if( void* address = Tools::Utility::getAncestralAddress( widget ) ) {
-          return Tools::Utility::pointerToString( address ) + ":";
-        }
-
-        // For some reason, we ended up with a nullptr after all this mess. This is likely a bug of some kind.
-        Log::getInstance().error( "LuaElement::getIdentifierPrefix", "Unable to derive identifier prefix!" );
-        return "";
-      }
-
       void LuaElement::setId( std::shared_ptr< sfg::Widget > widget, const std::string& id ) {
-
-        if( id.find( ":" ) != std::string::npos ) {
-          Log::getInstance().warn( "LuaElement::setId", "Character \":\" is not permitted in id/class" );
-          return;
-        }
-
-        widget->SetId( getIdentifierPrefix( widget ) + id );
+        widget->SetId( id );
       }
 
       void LuaElement::setClass( std::shared_ptr< sfg::Widget > widget, const std::string& clss ) {
-
-        if( clss.find( ":" ) != std::string::npos ) {
-          Log::getInstance().warn( "LuaElement::setClass", "Character \":\" is not permitted in id/class" );
-          return;
-        }
-
-        widget->SetClass( getIdentifierPrefix( widget ) + clss );
+        widget->SetClass( clss );
       }
 
       std::string LuaElement::getId( std::shared_ptr< sfg::Widget > widget ) {
-        std::string id = widget->GetId();
-        return id.find( ":" ) == std::string::npos ? id : Tools::Utility::split( id, ':' )[ 1 ];
+        return widget->GetId();
       }
 
       std::string LuaElement::getClass( std::shared_ptr< sfg::Widget > widget ) {
-        std::string clss = widget->GetClass();
-        return clss.find( ":" ) == std::string::npos ? clss : Tools::Utility::split( clss, ':' )[ 1 ];
+        return widget->GetClass();
       }
 
       /**
@@ -2435,9 +2400,9 @@ namespace BlueBear {
        */
       std::shared_ptr< sfg::Widget > LuaElement::getWidgetById( std::shared_ptr< sfg::Widget > parent, const std::string& id ) {
         // This will automatically search in the right scope
-        std::shared_ptr< sfg::Widget > found = sfg::Widget::GetWidgetById( getIdentifierPrefix( parent ) + id );
+        std::shared_ptr< sfg::Widget > found = sfg::Widget::GetWidgetById( id );
 
-        if( found ) {
+        if( parent && found ) {
           // "found" and "parent" both have the same ancestor if the item was retrievable using the above prefix
           // now verify found was an actual descendant of "parent". if it is, the pointer will survive the next call
           found = Tools::Utility::isActualParent( found, parent );
@@ -2447,7 +2412,7 @@ namespace BlueBear {
       }
 
       std::vector< std::shared_ptr< sfg::Widget > > LuaElement::getWidgetsByClass( std::shared_ptr< sfg::Widget > parent, const std::string& clss ) {
-        std::vector< std::shared_ptr< sfg::Widget > > found = sfg::Widget::GetWidgetsByClass( getIdentifierPrefix( parent ) + clss );
+        std::vector< std::shared_ptr< sfg::Widget > > found = sfg::Widget::GetWidgetsByClass( clss );
 
         found.erase(
           std::remove_if(
@@ -2455,44 +2420,13 @@ namespace BlueBear {
             found.end(),
             [ & ]( std::shared_ptr< sfg::Widget > widget ) {
               // widget must be a child of parent
-              return !Tools::Utility::isActualParent( widget, parent );
+              return parent && !Tools::Utility::isActualParent( widget, parent );
             }
           ),
           found.end()
         );
 
         return found;
-      }
-
-      /**
-       * Read and reset ID/class prefix.
-       */
-      void LuaElement::updateAncestorPrefixes( std::shared_ptr< sfg::Widget > widget ) {
-        // Modify the ancestor prefix for widget, then check if widget is castable to sfg::Container and use GetChildren() to do the dirty work
-
-        if( !widget ) {
-          Log::getInstance().error( "LuaElement::updateAncestorPrefixes", "Attempted to update ancestor prefix for null widget" );
-          return;
-        }
-
-        std::string elementId = LuaElement::getId( widget );
-        std::string elementClass = LuaElement::getClass( widget );
-
-        if( elementId != "" ) {
-          LuaElement::setId( widget, elementId );
-        }
-
-        if( elementClass != "" ) {
-          LuaElement::setClass( widget, elementClass );
-        }
-
-        if( std::shared_ptr< sfg::Container > asContainer = std::dynamic_pointer_cast< sfg::Container >( widget ) ) {
-          std::vector< std::shared_ptr< sfg::Widget > > children = asContainer->GetChildren();
-
-          for( std::shared_ptr< sfg::Widget > widget : children ) {
-            LuaElement::updateAncestorPrefixes( widget );
-          }
-        }
       }
 
     }

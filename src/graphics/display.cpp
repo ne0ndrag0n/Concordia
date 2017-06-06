@@ -2,7 +2,7 @@
 #include "containers/collection3d.hpp"
 #include "graphics/gui/sfgroot.hpp"
 #include "graphics/gui/luaelement.hpp"
-#include "graphics/gui/luaguicontext.hpp"
+#include "graphics/gui/luadesktopfunctions.hpp"
 #include "graphics/imagebuilder/imagesource.hpp"
 #include "graphics/imagebuilder/pathimagesource.hpp"
 #include "graphics/instance/instance.hpp"
@@ -241,11 +241,6 @@ namespace BlueBear {
       lua_pushstring( L, "gui" ); // "gui" bluebear
       lua_newtable( L ); // {} "gui" bluebear
 
-      lua_pushstring( L, "create_gui_context" );
-      lua_pushlightuserdata( L, this );
-      lua_pushcclosure( L, &Display::MainGameState::lua_createGUIContext, 1 );
-      lua_settable( L, -3 );
-
       lua_pushstring( L, "rotate_left" );
       lua_pushlightuserdata( L, this );
       lua_pushcclosure( L, &Display::MainGameState::lua_rotateWorldLeft, 1 );
@@ -287,6 +282,37 @@ namespace BlueBear {
       lua_pushcclosure( L, &Display::MainGameState::lua_playanim2, 1 );
       lua_settable( L, -3 );
 
+      // Replacement for most of the LuaGUIContext stuff
+      lua_pushstring( L, "find_by_id" );
+      lua_pushlightuserdata( L, this );
+      lua_pushcclosure( L, &GUI::LuaDesktopFunctions::lua_findById, 1 );
+      lua_settable( L, -3 );
+
+      lua_pushstring( L, "find_by_class" );
+      lua_pushlightuserdata( L, this );
+      lua_pushcclosure( L, &GUI::LuaDesktopFunctions::lua_findByClass, 1 );
+      lua_settable( L, -3 );
+
+      lua_pushstring( L, "add_from_path" );
+      lua_pushlightuserdata( L, this );
+      lua_pushcclosure( L, &GUI::LuaDesktopFunctions::lua_addXMLFromPath, 1 );
+      lua_settable( L, -3 );
+
+      lua_pushstring( L, "add" );
+      lua_pushlightuserdata( L, this );
+      lua_pushcclosure( L, &GUI::LuaDesktopFunctions::lua_add, 1 );
+      lua_settable( L, -3 );
+
+      lua_pushstring( L, "remove" );
+      lua_pushlightuserdata( L, this );
+      lua_pushcclosure( L, &GUI::LuaDesktopFunctions::lua_removeWidget, 1 );
+      lua_settable( L, -3 );
+
+      lua_pushstring( L, "create" );
+      lua_pushlightuserdata( L, this );
+      lua_pushcclosure( L, &GUI::LuaDesktopFunctions::lua_createWidget, 1 );
+      lua_settable( L, -3 );
+
       lua_settable( L, -3 ); // bluebear
 
       lua_pop( L, 1 ); // EMPTY
@@ -322,26 +348,6 @@ namespace BlueBear {
         lua_pushvalue( L, -1 ); // metatable metatable
 
         // HOLY SHIT THIS FUNCTION EXISTS?!
-        lua_setfield( L, -2, "__index" ); // metatable
-      }
-
-      lua_pop( L, 1 ); // EMPTY
-
-      luaL_Reg guiContextFuncs[] = {
-        { "find_by_id", GUI::LuaGUIContext::lua_findById },
-        { "find_by_class", GUI::LuaGUIContext::lua_findByClass },
-        { "add_from_path", GUI::LuaGUIContext::lua_addXMLFromPath },
-        { "add", GUI::LuaGUIContext::lua_add },
-        { "remove", GUI::LuaGUIContext::lua_removeWidget },
-        { "create", GUI::LuaGUIContext::lua_createWidget },
-        { "__gc", GUI::LuaGUIContext::lua_gc },
-        { NULL, NULL }
-      };
-
-      if( luaL_newmetatable( L, "bluebear_gui_context" ) ) { // metatable
-        lua_pushlightuserdata( L, this ); // upvalue metatable
-        luaL_setfuncs( L, guiContextFuncs, 1 ); // metatable
-        lua_pushvalue( L, -1 ); // metatable metatable
         lua_setfield( L, -2, "__index" ); // metatable
       }
 
@@ -521,37 +527,6 @@ namespace BlueBear {
     }
     ImageCache& Display::MainGameState::getImageCache() {
       return imageCache;
-    }
-    int Display::MainGameState::lua_createGUIContext( lua_State* L ) {
-      Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
-
-      if( lua_isstring( L, -1 ) ) {
-        std::string path( lua_tostring( L, -1 ) );
-
-        try {
-          // Create a WidgetBuilder and dump its widgets into the root container
-          // This should run in the engine objectLoop stage, and it will be caught on subsequent render
-          GUI::LuaGUIContext** userData = ( GUI::LuaGUIContext** )lua_newuserdata( L, sizeof( GUI::LuaGUIContext* ) ); // userdata "arg"
-          *userData = new GUI::LuaGUIContext( *self );
-          ( *userData )->addFromPath( path );
-
-          luaL_getmetatable( L, "bluebear_gui_context" ); // metatable userdata "arg"
-          lua_setmetatable( L, -2 ); // userdata "arg"
-          return 1;
-        } catch( const std::exception& e ) {
-          Log::getInstance().error(
-            "Display::MainGameState::lua_createGUIContext",
-            "Failed to create a WidgetBuilder for path " + path + ": " + e.what()
-          );
-        }
-      } else {
-        Log::getInstance().warn(
-          "Display::MainGameState::lua_createGUIContext",
-          "Argument 1 provided to bluebear.gui.create_gui_context is not a string."
-        );
-      }
-
-      return 0;
     }
     int Display::MainGameState::lua_zoomIn( lua_State* L ) {
       Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );

@@ -53,8 +53,6 @@ namespace BlueBear {
         void listen();
         void deafen();
 
-        void updateAncestorPrefixes( std::shared_ptr< sfg::Widget > tab, std::shared_ptr< sfg::Widget > content );
-
       public:
         PagePseudoElement(
           std::shared_ptr< sfg::Notebook > subject,

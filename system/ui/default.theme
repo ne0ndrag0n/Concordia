@@ -3,3 +3,11 @@
   FontName: system/ui/dosvga.ttf;
   CFontCompensation: -3.0;
 }
+
+#bb_console {
+  BackgroundColor: #464646CC;
+}
+
+#bb_entry {
+  BackgroundColor: #5e5e5eCC;
+}

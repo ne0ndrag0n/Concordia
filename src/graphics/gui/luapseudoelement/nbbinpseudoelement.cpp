@@ -86,7 +86,6 @@ namespace BlueBear {
           try {
             WidgetBuilder widgetBuilder( displayState.getImageCache() );
             std::shared_ptr< sfg::Widget > widget = widgetBuilder.getWidgetFromElementDirect( child );
-            LuaElement::updateAncestorPrefixes( widget );
             return widget;
           } catch( std::exception& e ) {
             Log::getInstance().error( "NBBinPseudoElement::create", "Failed to add widget XML: " + std::string( e.what() ) );
@@ -155,8 +154,6 @@ namespace BlueBear {
         } catch( std::exception& e ) {
           Log::getInstance().error( "LuaElement::add", "Failed to add widget XML: " + std::string( e.what() ) );
         }
-
-        LuaElement::updateAncestorPrefixes( stagedWidget );
       }
 
       void NBBinPseudoElement::setSubject( std::shared_ptr< sfg::Notebook > subject, unsigned int pageNumber ) {
