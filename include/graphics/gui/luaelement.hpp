@@ -75,6 +75,7 @@ namespace BlueBear {
         static int lua_setProperty( lua_State* L );
         static int lua_add( lua_State* L );
         static int lua_widgetRemove( lua_State* L );
+        static int lua_getStyleProperty( lua_State* L );
 
         static void setKeyboardStatus( lua_State* L );
         static void getUserdataFromWidget( lua_State* L, std::shared_ptr< sfg::Widget > widget );

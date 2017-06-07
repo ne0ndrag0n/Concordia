@@ -26,6 +26,7 @@
 #include <SFGUI/RadioButton.hpp>
 #include <SFGUI/SpinButton.hpp>
 #include <SFGUI/ComboBox.hpp>
+#include <SFGUI/Fixed.hpp>
 #include <cparse/shunting-yard.h>
 #include <string>
 #include <memory>
@@ -97,6 +98,7 @@ namespace BlueBear {
       std::shared_ptr< sfg::RadioButton > newRadioButtonWidget( tinyxml2::XMLElement* element );
       std::shared_ptr< sfg::SpinButton > newSpinButtonWidget( tinyxml2::XMLElement* element );
       std::shared_ptr< sfg::ComboBox > newComboBoxWidget( tinyxml2::XMLElement* element );
+      std::shared_ptr< sfg::Fixed > newFixedWidget( tinyxml2::XMLElement* element );
 
       void addTableRows( std::shared_ptr< sfg::Table > table, tinyxml2::XMLElement* element );
 

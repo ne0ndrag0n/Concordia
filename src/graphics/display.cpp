@@ -332,6 +332,7 @@ namespace BlueBear {
         { "get_property", GUI::LuaElement::lua_getProperty },
         { "set_property", GUI::LuaElement::lua_setProperty },
         { "set_image", GUI::LuaElement::lua_setImage },
+        { "get_style", GUI::LuaElement::lua_getStyleProperty },
         { "__gc", GUI::LuaElement::lua_gc },
         { NULL, NULL }
       };

@@ -224,6 +224,10 @@ namespace BlueBear {
           widget = newComboBoxWidget( element );
           break;
 
+        case hash( "Fixed" ):
+          widget = newFixedWidget( element );
+          break;
+
         default:
           Log::getInstance().error( "WidgetBuilder::nodeToWidget", "Invalid CME tag specified: " + std::string( tagType ) );
           throw InvalidCMEWidgetException();
@@ -319,7 +323,7 @@ namespace BlueBear {
 
     void WidgetBuilder::setCustomAttributes( std::shared_ptr< sfg::Widget > widget, tinyxml2::XMLElement* element ) {
       // Handle whitelisted custom attributes
-      static std::array< std::string, 9 > usableAttrs{ { "colspan", "rowspan", "padding_x", "padding_y", "expand_x", "expand_y", "fill_x", "fill_y", "table_spacing" } };
+      static std::array< std::string, 11 > usableAttrs{ { "colspan", "rowspan", "padding_x", "padding_y", "expand_x", "expand_y", "fill_x", "fill_y", "table_spacing", "fixed_x", "fixed_y" } };
       for ( const tinyxml2::XMLAttribute* attribute = element->FirstAttribute(); attribute != nullptr; attribute = attribute->Next() ) {
         std::string attrName = attribute->Name();
 
@@ -471,6 +475,10 @@ namespace BlueBear {
       setAlignment( label, element );
 
       setDefaultEvents( label, element );
+
+      if( const char* wrap = element->Attribute( "wrap" ) ) {
+        label->SetLineWrap( std::string( wrap ) == "true" );
+      }
 
       return label;
     }
@@ -751,6 +759,25 @@ namespace BlueBear {
       }
 
       return comboBox;
+    }
+
+    std::shared_ptr< sfg::Fixed > WidgetBuilder::newFixedWidget( tinyxml2::XMLElement* element ) {
+      std::shared_ptr< sfg::Fixed > fixed = sfg::Fixed::Create();
+
+      setBasicProperties( fixed, element );
+      setAllocationAndRequisition( fixed, element );
+      setDefaultEvents( fixed, element );
+
+      for( tinyxml2::XMLElement* child = element->FirstChildElement(); child != NULL; child = child->NextSiblingElement() ) {
+        sf::Vector2f position( 0.0f, 0.0f );
+
+        Tools::Utility::queryFloatExpression( child, "fixed_x", settingsTokens, &position.x );
+        Tools::Utility::queryFloatExpression( child, "fixed_y", settingsTokens, &position.y );
+
+        fixed->Put( nodeToWidget( child ), position );
+      }
+
+      return fixed;
     }
 
     void WidgetBuilder::addTableRows( std::shared_ptr< sfg::Table > table, tinyxml2::XMLElement* element ) {

@@ -24,10 +24,18 @@ function GUIProvider:open_debug_ui()
 
   bluebear.gui.find_by_id( "toggle_table" ):on( "click", bluebear.util.bind( "system.provider.gui:toggle_visibility", self ) )
 
+  local chat = bluebear.gui.find_by_id( 'bb_chatscroller' )
+  local chatwidth = chat:get_property( 'width' )
+
   bluebear.gui.find_by_id( "bb_ritzy" ):set_property(
-    'left',
-    ( bluebear.gui.find_by_id( 'bb_chatarea' ):get_property( 'width' ) / 2 ) - 150
+    'fixed_x',
+    ( chatwidth / 2 ) - 150
   )
+
+  print( chat:get_style( "FontSize" ) )
+  print( chatwidth )
+  self.cl_line_chars = bluebear.util.round( ( chatwidth - 100 ) / ( tonumber( chat:get_style( "FontSize" ) / 2 ) + 0.5 ) )
+  print( self.cl_line_chars )
 
   -- XXX: Remove after demo
   bluebear.gui.find_by_id( "animate1" ):on( "click", bluebear.gui.__internal__playanim1 )
@@ -56,7 +64,30 @@ function GUIProvider:test_action_1( event )
 end
 
 function GUIProvider:test_action_2( event )
+  local content = 'fart fart fart fart fart fart fart fart fart fart fart fart fart fart fart fart fart fart fart fart fart fart fart fart fart FART FART'
+  local line_template = [[
+    <Alignment scale_x="0" scale_y="0">
+      <Label>%s</Label>
+    </Alignment>
+  ]]
+  local textarea = bluebear.gui.find_by_id( 'bb_textarea' )
 
+  -- writing this drunk and tired
+  local finished = false
+  local lbound = 1
+
+  while finished == false do
+    local ubound = lbound + self.cl_line_chars
+
+    if ubound > content:len() then
+      -- last one
+      textarea:add( string.format( line_template, content:sub( lbound, content:len() ) ) )
+      finished = true
+    else
+      textarea:add( string.format( line_template, content:sub( lbound, ubound ) ) )
+      lbound = lbound + self.cl_line_chars
+    end
+  end
 end
 
 function GUIProvider:toggle_visibility( event )

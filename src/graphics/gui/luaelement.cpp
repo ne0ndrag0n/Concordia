@@ -106,13 +106,21 @@ namespace BlueBear {
       }
 
       void LuaElement::addToCheckedContainer( std::shared_ptr< sfg::Widget > target, int position ) {
-        if( std::string( widget->GetName() ) == "Box" ) {
+        if( widget->GetName() == "Box" ) {
           std::shared_ptr< sfg::Box > widgetAsBox = std::static_pointer_cast< sfg::Box >( widget );
           widgetAsBox->PackEnd( target, true, true );
 
           if( position >= 0 ) {
             widgetAsBox->ReorderChild( target, position );
           }
+        } else if( widget->GetName() == "Fixed" ) {
+          std::shared_ptr< sfg::Fixed > fixed = std::static_pointer_cast< sfg::Fixed >( widget );
+          sf::Vector2f position( 0.0f, 0.0f );
+
+          queryFloatAttribute( target, "fixed_x", &position.x );
+          queryFloatAttribute( target, "fixed_y", &position.y );
+
+          fixed->Put( target, position );
         } else {
           std::shared_ptr< sfg::Container > widgetAsContainer = std::static_pointer_cast< sfg::Container >( widget );
           widgetAsContainer->Add( target );
@@ -1152,6 +1160,27 @@ namespace BlueBear {
 
             return args;
           }
+          case Tools::Utility::hash( "fixed_x" ):
+          case Tools::Utility::hash( "fixed_y" ): {
+
+            // Determine if the widget has a parent and the parent is a Fixed
+            if( std::shared_ptr< sfg::Widget > parent = widgetPtr->widget->GetParent() ) {
+              if( parent->GetName() == "Fixed" ) {
+                std::shared_ptr< sfg::Fixed > fixed = std::static_pointer_cast< sfg::Fixed >( parent );
+
+                sf::Vector2f& position = fixed->m_children_position_map.at( widgetPtr->widget );
+                lua_pushnumber( L, std::string( property ) == "fixed_x" ? position.x : position.y ); // 42
+                return 1;
+              }
+            }
+
+            // Widget has no parent, or its parent is not a Fixed
+            // Bookmark the fixed property using the custom attribute functionality
+            float result = 0.0f;
+            queryFloatAttribute( widgetPtr->widget, property, &result );
+            lua_pushnumber( L, result ); // 42
+            return 1;
+          }
           // These properties are not settable/retrievable using the SFGUI API
           case Tools::Utility::hash( "tab_position" ):
           case Tools::Utility::hash( "expand" ):
@@ -1989,6 +2018,34 @@ namespace BlueBear {
 
             return 0;
           }
+          case Tools::Utility::hash( "fixed_x" ):
+          case Tools::Utility::hash( "fixed_y" ): {
+            VERIFY_NUMBER_N( "LuaElement::lua_setProperty", "set_property", 1 );
+
+            // Determine if the widget has a parent and the parent is a Fixed
+            if( std::shared_ptr< sfg::Widget > parent = widgetPtr->widget->GetParent() ) {
+              if( parent->GetName() == "Fixed" ) {
+                std::shared_ptr< sfg::Fixed > fixed = std::static_pointer_cast< sfg::Fixed >( parent );
+                sf::Vector2f position = fixed->m_children_position_map.at( widgetPtr->widget );
+
+                if( std::string( property ) == "fixed_x" ) {
+                  // fixed_x
+                  position.x = lua_tonumber( L, -1 );
+                } else {
+                  // fixed_y
+                  position.y = lua_tonumber( L, -1 );
+                }
+
+                fixed->Move( widgetPtr->widget, position );
+
+                return 0;
+              }
+            }
+
+            // Widget has no parent, or its parent is not a Fixed
+            setCustomAttribute( widgetPtr->widget, property, std::to_string( lua_tonumber( L, -1 ) ) );
+            return 0;
+          }
           // These properties are not settable/retrievable using the SFGUI API
           case Tools::Utility::hash( "tab_position" ):
             // Tried to make tab_position settable.
@@ -2067,6 +2124,23 @@ namespace BlueBear {
           self->removePseudoElement( *udata );
         } else {
           Log::getInstance().warn( "LuaElement::lua_widgetRemove", "Invalid argument passed to remove()" );
+        }
+
+        return 0;
+      }
+
+      int LuaElement::lua_getStyleProperty( lua_State* L ) {
+        VERIFY_STRING( "LuaElement::lua_getStyleProperty", "get_style" );
+
+        LuaElement* self = *( ( LuaElement** ) luaL_checkudata( L, 1, "bluebear_widget" ) );
+
+        try {
+          std::string result = sfg::Context::Get().GetEngine().GetProperty< std::string >( lua_tostring( L, -1 ), self->widget );
+          lua_pushstring( L, result.c_str() ); // "result"
+          return 1;
+        } catch( std::exception& e ) {
+          Log::getInstance().error( "LuaElement::lua_getStyleProperty", "Unable to retrieve style property: " + std::string( e.what() ) );
+          return 0;
         }
 
         return 0;

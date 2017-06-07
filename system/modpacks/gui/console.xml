@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Window id="bb_console" titlebar="false" resize="false" top="-360" min-width="viewport_x" min-height="300">
   <Box orientation="vertical" spacing="10.0">
-    <ScrolledWindow id="bb_chatarea" min-width="1" min-height="300">
-      <Box orientation="vertical">
+    <ScrolledWindow scrollbar_x="off" id="bb_chatscroller" min-width="1" min-height="300">
+      <Fixed>
         <Image id="bb_ritzy">dev/chatbox.png</Image>
-      </Box>
+        <Box id="bb_textarea" orientation="vertical">
+          <Alignment scale_x="0" scale_y="0">
+            <Label>Type help for a list of commands.</Label>
+          </Alignment>
+        </Box>
+      </Fixed>
     </ScrolledWindow>
     <Box spacing="10.0">
       <Entry id="bb_entry"></Entry>
