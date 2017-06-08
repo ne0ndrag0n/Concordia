@@ -77,6 +77,7 @@ namespace BlueBear {
         static int lua_widgetRemove( lua_State* L );
         static int lua_getStyleProperty( lua_State* L );
 
+        static void elementsToTable( lua_State* L, std::vector< std::shared_ptr< sfg::Widget > >& widgetList );
         static void setKeyboardStatus( lua_State* L );
         static void getUserdataFromWidget( lua_State* L, std::shared_ptr< sfg::Widget > widget );
         static void registerGenericHandler(
@@ -145,6 +146,7 @@ namespace BlueBear {
         static std::string getClass( std::shared_ptr< sfg::Widget > widget );
         static std::shared_ptr< sfg::Widget > getWidgetById( std::shared_ptr< sfg::Widget > parent, const std::string& id );
         static std::vector< std::shared_ptr< sfg::Widget > > getWidgetsByClass( std::shared_ptr< sfg::Widget > parent, const std::string& clss );
+        static std::vector< std::shared_ptr< sfg::Widget > > getWidgetsByName( std::shared_ptr< sfg::Widget > parent, const std::string& name );
       };
     }
   }

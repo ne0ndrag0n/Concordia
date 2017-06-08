@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Window id="bb_console" titlebar="false" resize="false" top="-360" min-width="viewport_x" min-height="300">
-  <Box orientation="vertical" spacing="10.0">
-    <ScrolledWindow scrollbar_x="off" id="bb_chatscroller" min-width="1" min-height="300">
-      <Fixed>
-        <Image id="bb_ritzy">dev/chatbox.png</Image>
+  <Box id="bb_containing_box" orientation="vertical" spacing="10.0">
+    <Fixed>
+      <Image id="bb_ritzy">dev/chatbox.png</Image>
+      <ScrolledWindow expand="true" scrollbar_x="off" id="bb_chatscroller" min-width="viewport_x - 22" min-height="300">
         <Box id="bb_textarea" orientation="vertical">
-          <Alignment scale_x="0" scale_y="0">
+          <Alignment class="bb_chatline" scale_x="0" scale_y="0">
             <Label>Type help for a list of commands.</Label>
           </Alignment>
         </Box>
-      </Fixed>
-    </ScrolledWindow>
+      </ScrolledWindow>
+    </Fixed>
     <Box spacing="10.0">
       <Entry id="bb_entry"></Entry>
-      <Button expand="false">&gt;</Button>
+      <Button expand="false" id="bb_clear">Clear</Button>
+      <Button expand="false" id="bb_exec">&gt;</Button>
     </Box>
   </Box>
 </Window>

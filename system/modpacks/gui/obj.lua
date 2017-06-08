@@ -22,8 +22,41 @@ function GUIProvider:open_debug_ui()
   bluebear.gui.find_by_id( "ta1" ):on( "click", bluebear.util.bind( "system.provider.gui:test_action_1", self ) )
   bluebear.gui.find_by_id( "ta2" ):on( "click", bluebear.util.bind( "system.provider.gui:test_action_2", self ) )
 
-  bluebear.gui.find_by_id( "toggle_table" ):on( "click", bluebear.util.bind( "system.provider.gui:toggle_visibility", self ) )
+  bluebear.gui.find_by_id( "bb_clear" ):on( "click", bluebear.util.bind( "system.provider.gui:clear_chat", self ) )
+  bluebear.gui.find_by_id( "bb_exec" ):on( "click", bluebear.util.bind( "system.provider.gui:handle_command", self ) )
 
+  -- XXX: Remove after demo
+  bluebear.gui.find_by_id( "animate1" ):on( "click", bluebear.gui.__internal__playanim1 )
+
+  self:determine_max_chat_chars()
+end
+
+function GUIProvider:test_action_1( event )
+  self:toggle_visibility()
+end
+
+function GUIProvider:test_action_2( event )
+  self:echo( '(w) 2017-06-07 21:31:34: [TextureCache::generateForAtlasBuilderEntry] Key (0xc system/models/wall/greywallpaper.png 0xl system/models/wall/greywallpaper.png 0xr system/models/wall/greywallpaper.png 0xs2 system/models/wall/greywallpaper.png ) not found; generating texture atlas.' )
+end
+
+function GUIProvider:clear_chat()
+  local alignments = bluebear.gui.find_by_class( 'bb_chatline' )
+  local textarea = bluebear.gui.find_by_id( 'bb_textarea' )
+
+  for i, alignment in ipairs( alignments ) do
+    textarea:remove( alignment )
+  end
+end
+
+function GUIProvider:handle_command()
+  self:echo(
+    bluebear.gui.find_by_id( 'bb_entry' ):get_content()
+  )
+
+  bluebear.gui.find_by_id( 'bb_entry' ):set_content( '' )
+end
+
+function GUIProvider:determine_max_chat_chars()
   local chat = bluebear.gui.find_by_id( 'bb_chatscroller' )
   local chatwidth = chat:get_property( 'width' )
 
@@ -32,16 +65,10 @@ function GUIProvider:open_debug_ui()
     ( chatwidth / 2 ) - 150
   )
 
-  print( chat:get_style( "FontSize" ) )
-  print( chatwidth )
   self.cl_line_chars = bluebear.util.round( ( chatwidth - 100 ) / ( tonumber( chat:get_style( "FontSize" ) / 2 ) + 0.5 ) )
-  print( self.cl_line_chars )
-
-  -- XXX: Remove after demo
-  bluebear.gui.find_by_id( "animate1" ):on( "click", bluebear.gui.__internal__playanim1 )
 end
 
-function GUIProvider:test_action_1( event )
+function GUIProvider:toggle_visibility()
   local element = bluebear.gui.find_by_id( 'bb_console' )
 
   local interval = 0
@@ -63,10 +90,9 @@ function GUIProvider:test_action_1( event )
   end
 end
 
-function GUIProvider:test_action_2( event )
-  local content = 'fart fart fart fart fart fart fart fart fart fart fart fart fart fart fart fart fart fart fart fart fart fart fart fart fart FART FART'
+function GUIProvider:echo( content )
   local line_template = [[
-    <Alignment scale_x="0" scale_y="0">
+    <Alignment class="bb_chatline" scale_x="0" scale_y="0">
       <Label>%s</Label>
     </Alignment>
   ]]
@@ -85,15 +111,9 @@ function GUIProvider:test_action_2( event )
       finished = true
     else
       textarea:add( string.format( line_template, content:sub( lbound, ubound ) ) )
-      lbound = lbound + self.cl_line_chars
+      lbound = lbound + self.cl_line_chars + 1
     end
   end
-end
-
-function GUIProvider:toggle_visibility( event )
-  local tablewindow = bluebear.gui.find_by_id( 'tablewindow' )
-
-  tablewindow:set_property( 'visible', not tablewindow:get_property( 'visible' ) )
 end
 
 function GUIProvider:on_click_zoom_in()

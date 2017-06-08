@@ -44,7 +44,6 @@
               <Button id="zoom_out">-</Button>
             </Box>
           </Frame>
-          <Button id="toggle_table">Toggle Table</Button>
         </Box>
       </content>
     </page>
@@ -71,28 +70,4 @@
       </content>
     </page>
   </Notebook>
-</Window>
-
-<Window id="tablewindow" title="Additional Tests" min-width="500" visible="false">
-  <Box id="tablebox" orientation="vertical" spacing="5">
-    <ComboBox id="combo">
-      <item>spam</item>
-      <item>meat</item>
-      <item>eggs</item>
-    </ComboBox>
-    <Table id="table">
-      <row>
-        <Button id="foo" class="intable">Foo</Button>
-      </row>
-      <row>
-      	<Button id="bar" class="intable">Bar</Button>
-      </row>
-      <row>
-      	<Button class="intable">Baz</Button>
-      </row>
-      <row>
-        <Button id="col3" colspan="3" class="intable">column_span</Button>
-      </row>
-    </Table>
-  </Box>
 </Window>

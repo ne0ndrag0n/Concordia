@@ -349,18 +349,29 @@ namespace BlueBear {
         if( size ) {
           // At least one widget is present - these items must be chained in a Lua table
           // Create a Lua table, then push a new LuaInstance wrapper for every widget found as part of this class
-          lua_createtable( L, size, 0 ); // table
-
-          for( int i = 0; i != size; i++ ) {
-            getUserdataFromWidget( L, widgets[ i ] ); // userdata table
-            lua_rawseti( L, -2, i + 1 ); // table
-          }
+          elementsToTable( L, widgets );
 
           return 1;
         } else {
           // No widgets are present
           std::string error = std::string( "Could not find any widgets with class " + selector );
           return luaL_error( L, error.c_str() );
+        }
+      }
+
+      /**
+       *
+       * STACK ARGS: none
+       * RETURNS: table
+       */
+      void LuaElement::elementsToTable( lua_State* L, std::vector< std::shared_ptr< sfg::Widget > >& widgets ) {
+        auto size = widgets.size();
+
+        lua_createtable( L, size, 0 ); // table
+
+        for( int i = 0; i != size; i++ ) {
+          getUserdataFromWidget( L, widgets[ i ] ); // userdata table
+          lua_rawseti( L, -2, i + 1 ); // table
         }
       }
 
@@ -2499,6 +2510,22 @@ namespace BlueBear {
           ),
           found.end()
         );
+
+        return found;
+      }
+
+      std::vector< std::shared_ptr< sfg::Widget > > LuaElement::getWidgetsByName( std::shared_ptr< sfg::Widget > parent, const std::string& name ) {
+        std::vector< std::shared_ptr< sfg::Widget > > found;
+
+        if( Tools::Utility::widgetIsContainer( parent ) ) {
+          std::shared_ptr< sfg::Container > container = std::static_pointer_cast< sfg::Container >( parent );
+
+          for( std::shared_ptr< sfg::Widget > widget : container->GetChildren() ) {
+            if( widget->GetName() == name ) {
+              found.push_back( widget );
+            }
+          }
+        }
 
         return found;
       }
