@@ -1,6 +1,10 @@
 #ifndef INPUT_MANAGER
 #define INPUT_MANAGER
 
+#include "bbtypes.hpp"
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
 #include <map>
 #include <functional>
 #include <memory>
@@ -16,16 +20,22 @@ namespace BlueBear {
 
       class InputManager {
         std::map< sf::Keyboard::Key, std::function< void() > > keyEvents;
+        std::map< sf::Keyboard::Key, std::vector< LuaReference > > luaKeyEvents;
+
         bool eatKeyEvents = false;
         bool eatMouseEvents = false;
 
         void removeSFGUIFocus();
+        sf::Keyboard::Key stringToKey( const std::string& key );
 
       public:
         InputManager();
         ~InputManager();
         void listen( sf::Keyboard::Key key, std::function< void() > callback );
         void handleEvent( sf::Event& event );
+        static int lua_registerScriptKey( lua_State* L );
+        static int lua_unregisterScriptKey( lua_State* L );
+
       };
 
     }
