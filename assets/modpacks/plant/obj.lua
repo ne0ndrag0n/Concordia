@@ -44,7 +44,7 @@ local Flowers = bluebear.extend( "system.entity.base", "game.flowers.base", {
 			-- and track the doll on the object instance to ensure the doll can be released from the INTERACTING state
 			interact = function( doll, object )
 				-- Play the doll animation that features it watering an object in front of it. This unrolls a series
-				-- of doll:change_graphic() callbacks across the next few ticks which will change the doll's appearance.
+				-- of callbacks across the next few ticks which will change the doll's appearance.
 				-- After those animations are played, call the replenish_water method which will increase the water_level
 				-- back to 100 and then change the object frame to healthy plants if necessary. After *that* completes,
 				-- call change_state on the doll to CONCLUDING to give the doll its reward
@@ -104,7 +104,6 @@ end
 function Flowers:replenish_water()
 	print( Flowers.name, "Replenishing water" )
 	self.water_level = 100
-	self:change_graphic( 0, 0, Flowers.GRAPHICS.ALIVE )
 end
 
 bluebear.register_class( Flowers )
