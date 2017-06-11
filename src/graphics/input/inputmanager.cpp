@@ -183,7 +183,7 @@ namespace BlueBear {
             return sf::Keyboard::F10;
           case Tools::Utility::hash( "f11" ):
             return sf::Keyboard::F11;
-          case Tools::Utility::hash( "F12" ):
+          case Tools::Utility::hash( "f12" ):
             return sf::Keyboard::F12;
 
 
