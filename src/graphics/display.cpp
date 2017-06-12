@@ -315,6 +315,21 @@ namespace BlueBear {
 
       lua_settable( L, -3 ); // bluebear
 
+      lua_pushstring( L, "event" ); // "event" bluebear
+      lua_newtable( L ); // {} "event" bluebear
+
+      lua_pushstring( L, "register_key" );
+      lua_pushlightuserdata( L, this );
+      lua_pushcclosure( L, &Input::InputManager::lua_registerScriptKey, 1 );
+      lua_settable( L, -3 );
+
+      lua_pushstring( L, "unregister_key" );
+      lua_pushlightuserdata( L, this );
+      lua_pushcclosure( L, &Input::InputManager::lua_unregisterScriptKey, 1 );
+      lua_settable( L, -3 );
+
+      lua_settable( L, -3 ); // bluebear
+
       lua_pop( L, 1 ); // EMPTY
 
       // Register internal sfg::Widget wrappers
@@ -528,6 +543,9 @@ namespace BlueBear {
     }
     ImageCache& Display::MainGameState::getImageCache() {
       return imageCache;
+    }
+    Input::InputManager& Display::MainGameState::getInputManager() {
+      return inputManager;
     }
     int Display::MainGameState::lua_zoomIn( lua_State* L ) {
       Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );

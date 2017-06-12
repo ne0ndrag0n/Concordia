@@ -1,5 +1,7 @@
 #include "graphics/input/inputmanager.hpp"
+#include "graphics/display.hpp"
 #include "graphics/gui/sfgroot.hpp"
+#include "tools/ctvalidators.hpp"
 #include "tools/utility.hpp"
 #include "eventmanager.hpp"
 #include "log.hpp"
@@ -255,6 +257,36 @@ namespace BlueBear {
           default:
             return sf::Keyboard::Unknown;
         }
+      }
+
+      int InputManager::lua_registerScriptKey( lua_State* L ) {
+        VERIFY_FUNCTION_N( "InputManager::lua_registerScriptKey", "register_key", 1 );
+        VERIFY_STRING_N( "InputManager::lua_registerScriptKey", "register_key", 2 );
+
+        Display::MainGameState* state = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+        InputManager& self = state->getInputManager();
+
+        sf::Keyboard::Key sfKey = stringToKey( lua_tostring( L, -1 ) );
+        auto it = self.keyEvents.find( sfKey );
+        if( it == self.keyEvents.end() ) {
+          std::vector< LuaReference >& refTable = self.luaKeyEvents[ sfKey ];
+          auto ref = luaL_ref( L, -1 );
+          refTable.push_back( ref );
+
+          lua_pushnumber( L, ref ); // 42
+          return 1;
+        } else {
+          Log::getInstance().warn( "InputManager::lua_registerScriptKey", "This key is reserved by the engine and cannot be registered for an event." );
+        }
+
+        return 0;
+      }
+
+      int InputManager::lua_unregisterScriptKey( lua_State* L ) {
+        Display::MainGameState* state = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+        InputManager& self = state->getInputManager();
+
+        return 0;
       }
 
     }

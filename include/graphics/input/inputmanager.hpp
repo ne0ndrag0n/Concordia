@@ -26,7 +26,7 @@ namespace BlueBear {
         bool eatMouseEvents = false;
 
         void removeSFGUIFocus();
-        sf::Keyboard::Key stringToKey( const std::string& key );
+        static sf::Keyboard::Key stringToKey( const std::string& key );
 
       public:
         InputManager();
