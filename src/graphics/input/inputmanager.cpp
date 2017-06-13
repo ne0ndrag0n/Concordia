@@ -12,7 +12,7 @@ namespace BlueBear {
   namespace Graphics {
     namespace Input {
 
-      InputManager::InputManager() {
+      InputManager::InputManager( lua_State* L ) : L( L ) {
         eventManager.SFGUI_EAT_EVENT.listen( SFGUIEatEvent::Event::EAT_KEYBOARD_EVENT, [ & ]() {
           eatKeyEvents = true;
         } );
@@ -45,6 +45,12 @@ namespace BlueBear {
                 auto it = keyEvents.find( event.key.code );
                 if( it != keyEvents.end() ) {
                   it->second();
+                } else {
+                  // Lua key events come second-fiddle to key events
+                  auto it2 = luaKeyEvents.find( event.key.code );
+                  if( it2 != luaKeyEvents.end() ) {
+                    fireOff( it2->second );
+                  }
                 }
               } else {
                 // Only eat the event for this tick
@@ -63,6 +69,31 @@ namespace BlueBear {
             }
           default:
             break;
+        }
+      }
+
+      void InputManager::fireOff( std::vector< LuaReference >& refs ) {
+        for( LuaReference reference : refs ) {
+
+          if( reference != -1 ) {
+            lua_getglobal( L, "bluebear" ); // bluebear
+            Tools::Utility::getTableValue( L, "util" ); // bluebear.util bluebear
+            Tools::Utility::getTableValue( L, "bind" ); // <bind> bluebear.util bluebear
+            lua_rawgeti( L, LUA_REGISTRYINDEX, reference ); // <function> <bind> bluebear.util bluebear
+
+            if( lua_pcall( L, 1, 1, 0 ) ) { // error bluebear.util bluebear
+              Log::getInstance().error( "InputManager::fireOff", "Couldn't create required closure to fire event: " + std::string( lua_tostring( L, -1 ) ) );
+              lua_pop( L, 3 ); // EMPTY
+              return;
+            } // <temp_function> bluebear.util bluebear
+
+            int edibleReference = luaL_ref( L, LUA_REGISTRYINDEX ); // bluebear.util bluebear
+            lua_pop( L, 2 ); // EMPTY
+
+            // Enqueue the edible reference
+            eventManager.UI_ACTION_EVENT.trigger( edibleReference );
+          }
+
         }
       }
 
@@ -259,6 +290,19 @@ namespace BlueBear {
         }
       }
 
+      unsigned int InputManager::insertNearest( std::vector< LuaReference >& vector, LuaReference value ) {
+        for( unsigned int i = 0; i != vector.size(); i++ ) {
+          if( vector[ i ] == -1 ) {
+            vector[ i ] = value;
+            return i;
+          }
+        }
+
+        // push_back and return size - 1
+        vector.push_back( value );
+        return vector.size() - 1;
+      }
+
       int InputManager::lua_registerScriptKey( lua_State* L ) {
         VERIFY_FUNCTION_N( "InputManager::lua_registerScriptKey", "register_key", 1 );
         VERIFY_STRING_N( "InputManager::lua_registerScriptKey", "register_key", 2 );
@@ -266,14 +310,12 @@ namespace BlueBear {
         Display::MainGameState* state = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
         InputManager& self = state->getInputManager();
 
-        sf::Keyboard::Key sfKey = stringToKey( lua_tostring( L, -1 ) );
+        sf::Keyboard::Key sfKey = stringToKey( lua_tostring( L, -2 ) );
         auto it = self.keyEvents.find( sfKey );
         if( it == self.keyEvents.end() ) {
-          std::vector< LuaReference >& refTable = self.luaKeyEvents[ sfKey ];
-          auto ref = luaL_ref( L, -1 );
-          refTable.push_back( ref );
+          std::vector< LuaReference >& vector = self.luaKeyEvents[ sfKey ];
+          lua_pushnumber( L, self.insertNearest( vector, luaL_ref( L, LUA_REGISTRYINDEX ) ) ); // 42 "str"
 
-          lua_pushnumber( L, ref ); // 42
           return 1;
         } else {
           Log::getInstance().warn( "InputManager::lua_registerScriptKey", "This key is reserved by the engine and cannot be registered for an event." );
@@ -283,8 +325,22 @@ namespace BlueBear {
       }
 
       int InputManager::lua_unregisterScriptKey( lua_State* L ) {
+        VERIFY_NUMBER_N( "InputManager::lua_unregisterScriptKey", "unregister_key", 1 );
+        VERIFY_STRING_N( "InputManager::lua_unregisterScriptKey", "unregister_key", 2 );
+
         Display::MainGameState* state = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
         InputManager& self = state->getInputManager();
+
+        sf::Keyboard::Key sfKey = stringToKey( lua_tostring( L, -2 ) );
+        if( self.luaKeyEvents.find( sfKey ) != self.luaKeyEvents.end() ) {
+          std::vector< LuaReference >& vector = self.luaKeyEvents[ sfKey ];
+          int index = lua_tonumber( L, -1 );
+          if( index < vector.size() ) {
+            vector[ index ] = -1;
+          } else {
+            Log::getInstance().warn( "InputManager::lua_unregisterScriptKey", "Invalid ID to deregister event." );
+          }
+        }
 
         return 0;
       }

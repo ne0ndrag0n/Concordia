@@ -19,6 +19,7 @@ namespace BlueBear {
     namespace Input {
 
       class InputManager {
+        lua_State* L;
         std::map< sf::Keyboard::Key, std::function< void() > > keyEvents;
         std::map< sf::Keyboard::Key, std::vector< LuaReference > > luaKeyEvents;
 
@@ -28,8 +29,11 @@ namespace BlueBear {
         void removeSFGUIFocus();
         static sf::Keyboard::Key stringToKey( const std::string& key );
 
+        unsigned int insertNearest( std::vector< LuaReference >& vector, LuaReference value );
+        void fireOff( std::vector< LuaReference >& refs );
+
       public:
-        InputManager();
+        InputManager( lua_State* L );
         ~InputManager();
         void listen( sf::Keyboard::Key key, std::function< void() > callback );
         void handleEvent( sf::Event& event );

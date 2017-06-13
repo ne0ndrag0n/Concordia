@@ -29,6 +29,8 @@ function GUIProvider:open_debug_ui()
   bluebear.gui.find_by_id( "animate1" ):on( "click", bluebear.gui.__internal__playanim1 )
 
   self:determine_max_chat_chars()
+
+  bluebear.event.register_key( '~', bluebear.util.bind( "system.provider.gui:toggle_visibility", self ) )
 end
 
 function GUIProvider:test_action_1( event )
