@@ -25,6 +25,10 @@ function GUIProvider:open_debug_ui()
   bluebear.gui.find_by_id( "bb_clear" ):on( "click", bluebear.util.bind( "system.provider.gui:clear_chat", self ) )
   bluebear.gui.find_by_id( "bb_exec" ):on( "click", bluebear.util.bind( "system.provider.gui:handle_command", self ) )
 
+  -- TODO: Start caching MarkupEngine DOM queries here
+  self.console_input = bluebear.gui.find_by_id( 'bb_entry' )
+  self.console_input:on( "key_down", function() end )
+
   -- XXX: Remove after demo
   bluebear.gui.find_by_id( "animate1" ):on( "click", bluebear.gui.__internal__playanim1 )
 
@@ -51,11 +55,11 @@ function GUIProvider:clear_chat()
 end
 
 function GUIProvider:handle_command()
-  self:echo(
-    bluebear.gui.find_by_id( 'bb_entry' ):get_content()
-  )
+  local text = self.console_input:get_content()
 
-  bluebear.gui.find_by_id( 'bb_entry' ):set_content( '' )
+  self:sleep( 1 ):then_call( load( text ) )
+
+  self.console_input:set_content( '' )
 end
 
 function GUIProvider:determine_max_chat_chars()

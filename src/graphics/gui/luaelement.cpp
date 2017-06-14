@@ -214,6 +214,24 @@ namespace BlueBear {
                 lua_pushboolean( L, true ); // true "event" self
                 return 1; // true
               }
+            case Tools::Utility::hash( "key_down" ):
+              {
+                // major TODO/FIXME
+                // proof of concept that the key can be derived in a key down event
+                // TODO make a clickHandler like standard callback which will append the key using an inverse inputManager map thing
+                element.widget->GetSignal( sfg::Widget::OnKeyPress ).Connect( [ mainState = self ]() {
+                  Log::getInstance().debug( "assert", Tools::Utility::pointerToString( mainState->currentEvent ) );
+                  if( mainState->currentEvent ) {
+                    switch( mainState->currentEvent->type ) {
+                      case sf::Event::KeyPressed:
+                        Log::getInstance().debug( "assert", std::to_string( mainState->currentEvent->key.code ) );
+                    }
+                  }
+                } );
+
+                lua_pushboolean( L, true );
+                return 1;
+              }
             case Tools::Utility::hash( "mouse_enter" ):
               {
                 registerGenericHandler( L, element.widget, sfg::Widget::OnMouseEnter ); // true "event" self
