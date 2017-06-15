@@ -27,7 +27,7 @@ function GUIProvider:open_debug_ui()
 
   -- TODO: Start caching MarkupEngine DOM queries here
   self.console_input = bluebear.gui.find_by_id( 'bb_entry' )
-  self.console_input:on( "key_down", function() end )
+  self.console_input:on( "key_down", bluebear.util.bind( "system.provider.gui:check_enter_press", self ) )
 
   -- XXX: Remove after demo
   bluebear.gui.find_by_id( "animate1" ):on( "click", bluebear.gui.__internal__playanim1 )
@@ -51,6 +51,12 @@ function GUIProvider:clear_chat()
 
   for i, alignment in ipairs( alignments ) do
     textarea:remove( alignment )
+  end
+end
+
+function GUIProvider:check_enter_press( event )
+  if event.keyboard.key == 'ret' then
+    self:handle_command()
   end
 end
 

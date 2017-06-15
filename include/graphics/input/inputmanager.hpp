@@ -27,12 +27,14 @@ namespace BlueBear {
         bool eatMouseEvents = false;
 
         void removeSFGUIFocus();
-        static sf::Keyboard::Key stringToKey( const std::string& key );
 
         unsigned int insertNearest( std::vector< LuaReference >& vector, LuaReference value );
         void fireOff( std::vector< LuaReference >& refs );
 
       public:
+        static sf::Keyboard::Key stringToKey( const std::string& key );
+        static std::string keyToString( sf::Keyboard::Key key );
+
         InputManager( lua_State* L );
         ~InputManager();
         void listen( sf::Keyboard::Key key, std::function< void() > callback );

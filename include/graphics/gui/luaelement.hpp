@@ -91,6 +91,12 @@ namespace BlueBear {
           LuaReference masterReference,
           const std::string& buttonTag
         );
+        static void keyHandler(
+          lua_State* L,
+          std::weak_ptr< sfg::Widget > selfElement,
+          Display::MainGameState* state,
+          LuaReference masterReference
+        );
         static void genericHandler(
           lua_State* L,
           std::weak_ptr< sfg::Widget > widgetPtr,

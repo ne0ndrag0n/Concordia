@@ -184,6 +184,8 @@ namespace BlueBear {
             return sf::Keyboard::Num8;
           case Tools::Utility::hash( "9" ):
             return sf::Keyboard::Num9;
+          case Tools::Utility::hash( "0" ):
+            return sf::Keyboard::Num0;
           case Tools::Utility::hash( "dash" ):
             return sf::Keyboard::Dash;
           case Tools::Utility::hash( "equal" ):
@@ -285,8 +287,193 @@ namespace BlueBear {
           case Tools::Utility::hash( "right" ):
             return sf::Keyboard::Right;
 
+          case Tools::Utility::hash( "ret" ):
+            return sf::Keyboard::Return;
+
           default:
             return sf::Keyboard::Unknown;
+        }
+      }
+
+      std::string InputManager::keyToString( sf::Keyboard::Key key ) {
+        switch( key ) {
+          case sf::Keyboard::Q:
+            return "q";
+          case sf::Keyboard::W:
+            return "w";
+          case sf::Keyboard::E:
+            return "e";
+          case sf::Keyboard::R:
+            return "r";
+          case sf::Keyboard::T:
+            return "t";
+          case sf::Keyboard::Y:
+            return "y";
+          case sf::Keyboard::U:
+            return "u";
+          case sf::Keyboard::I:
+            return "i";
+          case sf::Keyboard::O:
+            return "o";
+          case sf::Keyboard::P:
+            return "p";
+          case sf::Keyboard::A:
+            return "a";
+          case sf::Keyboard::S:
+            return "s";
+          case sf::Keyboard::D:
+            return "d";
+          case sf::Keyboard::F:
+            return "f";
+          case sf::Keyboard::G:
+            return "g";
+          case sf::Keyboard::H:
+            return "h";
+          case sf::Keyboard::J:
+            return "j";
+          case sf::Keyboard::K:
+            return "k";
+          case sf::Keyboard::L:
+            return "l";
+          case sf::Keyboard::Z:
+            return "z";
+          case sf::Keyboard::X:
+            return "x";
+          case sf::Keyboard::C:
+            return "c";
+          case sf::Keyboard::V:
+            return "v";
+          case sf::Keyboard::B:
+            return "b";
+          case sf::Keyboard::N:
+            return "n";
+          case sf::Keyboard::M:
+            return "m";
+
+          case sf::Keyboard::Tilde:
+            return "~";
+          case sf::Keyboard::Num1:
+            return "1";
+          case sf::Keyboard::Num2:
+            return "2";
+          case sf::Keyboard::Num3:
+            return "3";
+          case sf::Keyboard::Num4:
+            return "4";
+          case sf::Keyboard::Num5:
+            return "5";
+          case sf::Keyboard::Num6:
+            return "6";
+          case sf::Keyboard::Num7:
+            return "7";
+          case sf::Keyboard::Num8:
+            return "8";
+          case sf::Keyboard::Num9:
+            return "9";
+          case sf::Keyboard::Num0:
+            return "0";
+          case sf::Keyboard::Dash:
+            return "dash";
+          case sf::Keyboard::Equal:
+            return "equal";
+          case sf::Keyboard::BackSpace:
+            return "bksp";
+
+          case sf::Keyboard::Escape:
+            return "esc";
+          case sf::Keyboard::F1:
+            return "f1";
+          case sf::Keyboard::F2:
+            return "f2";
+          case sf::Keyboard::F3:
+            return "f3";
+          case sf::Keyboard::F4:
+            return "f4";
+          case sf::Keyboard::F5:
+            return "f5";
+          case sf::Keyboard::F6:
+            return "f6";
+          case sf::Keyboard::F7:
+            return "f7";
+          case sf::Keyboard::F8:
+            return "f8";
+          case sf::Keyboard::F9:
+            return "f9";
+          case sf::Keyboard::F10:
+            return "f10";
+          case sf::Keyboard::F11:
+            return "f11";
+          case sf::Keyboard::F12:
+            return "f12";
+
+
+          case sf::Keyboard::Tab:
+            return "tab";
+          case sf::Keyboard::LBracket:
+            return "[";
+          case sf::Keyboard::RBracket:
+            return "]";
+          case sf::Keyboard::BackSlash:
+            return "\\";
+          case sf::Keyboard::SemiColon:
+            return ";";
+          case sf::Keyboard::Quote:
+            return "'";
+          case sf::Keyboard::Comma:
+            return ",";
+          case sf::Keyboard::Period:
+            return ".";
+          case sf::Keyboard::Slash:
+            return "/";
+
+          case sf::Keyboard::LControl:
+            return "lctrl";
+          case sf::Keyboard::LSystem:
+            return "lsys";
+          case sf::Keyboard::LAlt:
+            return "lalt";
+
+          case sf::Keyboard::RControl:
+            return "rctrl";
+          case sf::Keyboard::Menu:
+            return "menu";
+          case sf::Keyboard::RSystem:
+            return "rsys";
+          case sf::Keyboard::RAlt:
+            return "ralt";
+
+          case sf::Keyboard::LShift:
+            return "lshift";
+          case sf::Keyboard::RShift:
+            return "rshift";
+
+          case sf::Keyboard::Insert:
+            return "ins";
+          case sf::Keyboard::Home:
+            return "home";
+          case sf::Keyboard::PageUp:
+            return "pgup";
+          case sf::Keyboard::Delete:
+            return "del";
+          case sf::Keyboard::End:
+            return "end";
+          case sf::Keyboard::PageDown:
+            return "pgdn";
+
+          case sf::Keyboard::Up:
+            return "up";
+          case sf::Keyboard::Down:
+            return "down";
+          case sf::Keyboard::Left:
+            return "left";
+          case sf::Keyboard::Right:
+            return "right";
+
+          case sf::Keyboard::Return:
+            return "ret";
+
+          default:
+            return "<unk>";
         }
       }
 

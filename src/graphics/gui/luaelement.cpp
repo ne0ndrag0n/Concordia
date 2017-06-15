@@ -2,6 +2,7 @@
 #include "graphics/gui/luapseudoelement/pagepseudoelement.hpp"
 #include "graphics/gui/luapseudoelement/itempseudoelement.hpp"
 #include "graphics/gui/luapseudoelement/rowpseudoelement.hpp"
+#include "graphics/input/inputmanager.hpp"
 #include "graphics/widgetbuilder.hpp"
 #include "graphics/imagebuilder/pathimagesource.hpp"
 #include "graphics/display.hpp"
@@ -216,20 +217,32 @@ namespace BlueBear {
               }
             case Tools::Utility::hash( "key_down" ):
               {
-                // major TODO/FIXME
-                // proof of concept that the key can be derived in a key down event
-                // TODO make a clickHandler like standard callback which will append the key using an inverse inputManager map thing
-                element.widget->GetSignal( sfg::Widget::OnKeyPress ).Connect( [ mainState = self ]() {
-                  Log::getInstance().debug( "assert", Tools::Utility::pointerToString( mainState->currentEvent ) );
-                  if( mainState->currentEvent ) {
-                    switch( mainState->currentEvent->type ) {
-                      case sf::Event::KeyPressed:
-                        Log::getInstance().debug( "assert", std::to_string( mainState->currentEvent->key.code ) );
-                    }
-                  }
-                } );
+                auto& signalMap = masterSignalMap[ element.widget ];
 
-                lua_pushboolean( L, true );
+                unregisterHandler( L, signalMap, element.widget, sfg::Widget::OnKeyPress );
+
+                LuaReference masterReference = luaL_ref( L, LUA_REGISTRYINDEX ); // "event" self
+                signalMap[ sfg::Widget::OnKeyPress ] = LuaElement::SignalBinding{
+                  masterReference,
+                  element.widget->GetSignal( sfg::Widget::OnKeyPress ).Connect( std::bind( LuaElement::keyHandler, L, element.widget, self, masterReference ) )
+                };
+
+                lua_pushboolean( L, true ); // true "event" self
+                return 1;
+              }
+            case Tools::Utility::hash( "key_up" ):
+              {
+                auto& signalMap = masterSignalMap[ element.widget ];
+
+                unregisterHandler( L, signalMap, element.widget, sfg::Widget::OnKeyRelease );
+
+                LuaReference masterReference = luaL_ref( L, LUA_REGISTRYINDEX ); // "event" self
+                signalMap[ sfg::Widget::OnKeyRelease ] = LuaElement::SignalBinding{
+                  masterReference,
+                  element.widget->GetSignal( sfg::Widget::OnKeyRelease ).Connect( std::bind( LuaElement::keyHandler, L, element.widget, self, masterReference ) )
+                };
+
+                lua_pushboolean( L, true ); // true "event" self
                 return 1;
               }
             case Tools::Utility::hash( "mouse_enter" ):
@@ -279,6 +292,12 @@ namespace BlueBear {
             switch( Tools::Utility::hash( eventType ) ) {
               case Tools::Utility::hash( "click" ):
                 unregisterClickHandler( L, signalMap->second, element.widget );
+                break;
+              case Tools::Utility::hash( "key_down" ):
+                unregisterHandler( L, signalMap->second, element.widget, sfg::Widget::OnKeyPress );
+                break;
+              case Tools::Utility::hash( "key_up" ):
+                unregisterHandler( L, signalMap->second, element.widget, sfg::Widget::OnKeyRelease );
                 break;
               case Tools::Utility::hash( "mouse_enter" ):
                 unregisterHandler( L, signalMap->second, element.widget, sfg::Widget::OnMouseEnter );
@@ -2214,6 +2233,55 @@ namespace BlueBear {
         lua_setmetatable( L, -2 ); // userdata
       }
 
+      void LuaElement::keyHandler( lua_State* L, std::weak_ptr< sfg::Widget > selfElement, Display::MainGameState* state, LuaReference masterReference ) {
+
+        if( !state->currentEvent ) {
+          Log::getInstance().error( "LuaElement::keyHandler", "no state to read the key event from!!" );
+          return;
+        }
+
+        lua_getglobal( L, "bluebear" ); // bluebear
+        Tools::Utility::getTableValue( L, "util" ); // bluebear.util bluebear
+        Tools::Utility::getTableValue( L, "bind" ); // <bind> bluebear.util bluebear
+        lua_rawgeti( L, LUA_REGISTRYINDEX, masterReference ); // <function> <bind> bluebear.util bluebear
+
+        lua_newtable( L ); // newtable <function> <bind> bluebear.util bluebear
+
+        setKeyboardStatus( L );
+
+        lua_getfield( L, -1, "keyboard" ); // keyboard newtable <function> <bind> bluebear.util bluebear
+
+        switch( state->currentEvent->type ) {
+          case sf::Event::KeyPressed:
+          case sf::Event::KeyReleased:
+            lua_pushstring( L, Input::InputManager::keyToString( state->currentEvent->key.code ).c_str() ); // "key" keyboard newtable <function> <bind> bluebear.util bluebear
+            lua_setfield( L, -2, "key" ); // keyboard newtable <function> <bind> bluebear.util bluebear
+            lua_pop( L, 1 ); // newtable <function> <bind> bluebear.util bluebear
+            break;
+          default:
+            Log::getInstance().error( "LuaElement::keyHandler", "incorrect event for key type!!" );
+            return;
+        }
+
+        if( auto elementPtr = selfElement.lock() ) {
+          getUserdataFromWidget( L, elementPtr ); // element newtable <function> <bind> bluebear.util bluebear
+          lua_setfield( L, -2, "widget" ); // newtable <function> <bind> bluebear.util bluebear
+        } else {
+          Log::getInstance().error( "LuaElement::keyHandler", "Could not lock element pointer to build field event.widget" );
+        }
+
+        if( lua_pcall( L, 2, 1, 0 ) ) { // error bluebear.util bluebear
+          Log::getInstance().error( "LuaElement::keyHandler", "Couldn't create required closure to fire event." );
+          lua_pop( L, 3 ); // EMPTY
+          return;
+        } // <temp_function> bluebear.util bluebear
+
+        int edibleReference = luaL_ref( L, LUA_REGISTRYINDEX ); // bluebear.util bluebear
+        lua_pop( L, 2 ); // EMPTY
+
+        eventManager.UI_ACTION_EVENT.trigger( edibleReference );
+      }
+
       /**
        *
        * STACK ARGS: (none)
@@ -2452,6 +2520,7 @@ namespace BlueBear {
           while( it != masterSignalMap.end() ) {
 
             if( it->first.expired() ) {
+              // FIXME: Those master references in each SignalBinding need to be unref'd!!!
               it = masterSignalMap.erase( it );
             } else {
               ++it;
