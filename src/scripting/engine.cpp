@@ -114,6 +114,19 @@ namespace BlueBear {
 			// Set the config table on "bluebear"
 			lua_settable( L, -3 );
 
+			// bluebear.event
+			lua_pushstring( L, "event" );
+			lua_newtable( L );
+
+			// bluebear.event.listen
+			// TODO
+
+			// bluebear.event.unlisten
+			// TODO
+
+			// Set the event table on "bluebear"
+			lua_settable( L, -3 );
+
 			// bluebear.util
 			lua_pushstring( L, "util" );
 			lua_newtable( L );

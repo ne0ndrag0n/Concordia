@@ -316,8 +316,7 @@ namespace BlueBear {
 
       lua_settable( L, -3 ); // bluebear
 
-      lua_pushstring( L, "event" ); // "event" bluebear
-      lua_newtable( L ); // {} "event" bluebear
+      lua_getfield( L, -1, "event" ); // event bluebear
 
       lua_pushstring( L, "register_key" );
       lua_pushlightuserdata( L, this );
@@ -329,9 +328,7 @@ namespace BlueBear {
       lua_pushcclosure( L, &Input::InputManager::lua_unregisterScriptKey, 1 );
       lua_settable( L, -3 );
 
-      lua_settable( L, -3 ); // bluebear
-
-      lua_pop( L, 1 ); // EMPTY
+      lua_pop( L, 2 ); // EMPTY
 
       // Register internal sfg::Widget wrappers
       luaL_Reg elementFuncs[] = {

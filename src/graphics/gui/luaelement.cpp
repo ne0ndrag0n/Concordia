@@ -2268,6 +2268,7 @@ namespace BlueBear {
           lua_setfield( L, -2, "widget" ); // newtable <function> <bind> bluebear.util bluebear
         } else {
           Log::getInstance().error( "LuaElement::keyHandler", "Could not lock element pointer to build field event.widget" );
+          return;
         }
 
         if( lua_pcall( L, 2, 1, 0 ) ) { // error bluebear.util bluebear
@@ -2309,6 +2310,7 @@ namespace BlueBear {
           lua_settable( L, -3 ); // newtable <function> <bind> bluebear.util bluebear
         } else {
           Log::getInstance().error( "LuaElement::clickHandler", "Could not lock element pointer to build field event.widget" );
+          return;
         }
 
         if( lua_pcall( L, 2, 1, 0 ) ) { // error bluebear.util bluebear
