@@ -6,6 +6,7 @@
 #include <lualib.h>
 #include <lauxlib.h>
 #include <vector>
+#include <string>
 
 namespace BlueBear {
   namespace Scripting {
@@ -18,7 +19,7 @@ namespace BlueBear {
 
         std::vector< LuaReference > messageLogged;
 
-        void fireEvents( std::vector< LuaReference >& reference );
+        void fireEvents( std::vector< LuaReference >& references, const std::string& logMessage );
 
       public:
         EventBridge( Scripting::Engine& engine );

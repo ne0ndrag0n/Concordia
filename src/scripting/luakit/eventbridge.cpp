@@ -1,6 +1,7 @@
 #include "scripting/luakit/eventbridge.hpp"
 #include "scripting/engine.hpp"
 #include "eventmanager.hpp"
+#include <functional>
 
 namespace BlueBear {
   namespace Scripting {
@@ -9,9 +10,10 @@ namespace BlueBear {
       EventBridge::EventBridge( Engine& engine ) : engine( engine ) {
         // TODO: Register one of each exposable EventManager type here
         // and in the callbacks, call the trigger method
+        eventManager.MESSAGE_LOGGED.listen( this, std::bind( &EventBridge::fireEvents, this, messageLogged, std::placeholders::_1 ) );
       }
 
-      void EventBridge::fireEvents( std::vector< LuaReference >& reference ) {
+      void EventBridge::fireEvents( std::vector< LuaReference >& references, const std::string& logMessage ) {
 
       }
 

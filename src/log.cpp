@@ -1,5 +1,6 @@
 #include "log.hpp"
 #include "configmanager.hpp"
+#include "eventmanager.hpp"
 #include <string>
 #include <map>
 #include <iomanip>
@@ -13,6 +14,7 @@ namespace BlueBear {
 
   Log::Log() {
     // The ConfigManager can now never ever log anything
+    // The EventManager also can now never log anything
     minimumReportableLevel = ( LogLevel )ConfigManager::getInstance().getIntValue( "min_log_level" );
     mode = ( LogMode )ConfigManager::getInstance().getIntValue( "logger_mode" );
     logFile.open( ConfigManager::getInstance().getValue( "logfile_path" ), std::ios_base::app );
@@ -41,7 +43,9 @@ namespace BlueBear {
     if( message.level >= minimumReportableLevel ) {
       // sucks
       if( mode == LogMode::CONSOLE || mode == LogMode::BOTH ) {
-        outToConsole( messageToString( message, true ) );
+        std::string strMessage = messageToString( message, true );
+        outToConsole( strMessage );
+        eventManager.MESSAGE_LOGGED.trigger( strMessage );
       }
       if( mode == LogMode::FILE || mode == LogMode::BOTH ) {
         outToFile( messageToString( message, false ) );

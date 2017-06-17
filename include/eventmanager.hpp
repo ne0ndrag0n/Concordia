@@ -89,6 +89,7 @@ namespace BlueBear {
     SFGUIEatEvent SFGUI_EAT_EVENT;
     BasicEvent< void*, void*, int > ITEM_ADDED;
     BasicEvent< void*, void*, int > ITEM_REMOVED;
+    BasicEvent< void*, std::string > MESSAGE_LOGGED;
   };
 
   extern EventManager eventManager;
