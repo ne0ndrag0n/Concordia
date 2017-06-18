@@ -22,6 +22,7 @@
 #include <memory>
 #include <list>
 #include <stdexcept>
+#include <functional>
 
 namespace BlueBear {
 	namespace Scripting {
@@ -36,6 +37,8 @@ namespace BlueBear {
 			setActiveState( false );
 
 			setupEvents();
+
+			eventBridge = std::make_unique< LuaKit::EventBridge >( L, *this );
 		}
 
 		Engine::~Engine() {
@@ -46,9 +49,11 @@ namespace BlueBear {
 		 * Hook into eventmanager for everything we need
 		 */
 		void Engine::setupEvents() {
-			eventManager.UI_ACTION_EVENT.listen( this, [ & ]( LuaReference function ) {
-				waitingTable.waitForTick( currentTick + 1, function );
-			} );
+			eventManager.UI_ACTION_EVENT.listen( this, std::bind( &Engine::enqueue, this, std::placeholders::_1 ) );
+		}
+
+		void Engine::enqueue( LuaReference edibleReference ) {
+			waitingTable.waitForTick( currentTick + 1, edibleReference );
 		}
 
 		/**
@@ -119,10 +124,16 @@ namespace BlueBear {
 			lua_newtable( L );
 
 			// bluebear.event.listen
-			// TODO
+			lua_pushstring( L, "listen" );
+			lua_pushlightuserdata( L, eventBridge.get() );
+			lua_pushcclosure( L, &LuaKit::EventBridge::lua_listen, 1 );
+			lua_settable( L, -3 );
 
 			// bluebear.event.unlisten
-			// TODO
+			lua_pushstring( L, "unlisten" );
+			lua_pushlightuserdata( L, eventBridge.get() );
+			lua_pushcclosure( L, &LuaKit::EventBridge::lua_unlisten, 1 );
+			lua_settable( L, -3 );
 
 			// Set the event table on "bluebear"
 			lua_settable( L, -3 );

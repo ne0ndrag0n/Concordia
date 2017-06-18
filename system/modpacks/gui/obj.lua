@@ -35,6 +35,7 @@ function GUIProvider:open_debug_ui()
   self:determine_max_chat_chars()
 
   bluebear.event.register_key( '~', bluebear.util.bind( "system.provider.gui:toggle_visibility", self ) )
+  bluebear.event.listen( 'MESSAGE_LOGGED', bluebear.util.bind( 'system.provider.gui:on_message_logged', self ) )
 end
 
 function GUIProvider:test_action_1( event )
@@ -43,6 +44,10 @@ end
 
 function GUIProvider:test_action_2( event )
   self:echo( '(w) 2017-06-07 21:31:34: [TextureCache::generateForAtlasBuilderEntry] Key (0xc system/models/wall/greywallpaper.png 0xl system/models/wall/greywallpaper.png 0xr system/models/wall/greywallpaper.png 0xs2 system/models/wall/greywallpaper.png ) not found; generating texture atlas.' )
+end
+
+function GUIProvider:on_message_logged( message )
+  self:echo( message )
 end
 
 function GUIProvider:clear_chat()

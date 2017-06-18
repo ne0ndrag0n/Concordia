@@ -2,6 +2,7 @@
 #define ENGINE
 
 #include "scripting/event/waitingtable.hpp"
+#include "scripting/luakit/eventbridge.hpp"
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -24,6 +25,8 @@ namespace BlueBear {
 		class InfrastructureFactory;
 
 		class Engine {
+			public:
+				lua_State* L;
 
 			private:
 				static constexpr const char* LUASPHERE_MAIN = "system/root.lua";
@@ -39,6 +42,7 @@ namespace BlueBear {
 
 				Event::WaitingTable waitingTable;
 
+				std::unique_ptr< LuaKit::EventBridge > eventBridge;
 				std::unique_ptr< InfrastructureFactory > infrastructureFactory;
 				const char* currentModpackDirectory;
 				std::map< std::string, BlueBear::ModpackStatus > loadedModpacks;
@@ -53,14 +57,13 @@ namespace BlueBear {
 				friend class LuaKit::Serializer;
 
 			public:
-				lua_State* L;
-
 				std::vector< LuaReference > objects;
 				std::shared_ptr< Lot > currentLot;
 
 				Engine();
 				~Engine();
 				void setupEvents();
+				void enqueue( LuaReference edibleReference );
 				void objectLoop();
 				bool loadLot( const char* lotPath );
 				bool submitLuaContributions();
