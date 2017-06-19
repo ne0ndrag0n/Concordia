@@ -27,23 +27,30 @@ function GUIProvider:open_debug_ui()
 
   -- TODO: Start caching MarkupEngine DOM queries here
   self.console_input = bluebear.gui.find_by_id( 'bb_entry' )
+  self.chat_scroller = bluebear.gui.find_by_id( 'bb_chatscroller' )
   self.console_input:on( "key_down", bluebear.util.bind( "system.provider.gui:check_enter_press", self ) )
 
   -- XXX: Remove after demo
   bluebear.gui.find_by_id( "animate1" ):on( "click", bluebear.gui.__internal__playanim1 )
 
   self:determine_max_chat_chars()
+  self.OUTPUT_COLORS = {
+    [ '(d)' ] = 'bb_green',
+    [ '(i)' ] = 'bb_blue',
+    [ '(w)' ] = 'bb_yellow',
+    [ '(e)' ] = 'bb_red'
+  }
 
   bluebear.event.register_key( '~', bluebear.util.bind( "system.provider.gui:toggle_visibility", self ) )
   bluebear.event.listen( 'MESSAGE_LOGGED', bluebear.util.bind( 'system.provider.gui:on_message_logged', self ) )
 end
 
 function GUIProvider:test_action_1( event )
-  self:toggle_visibility()
+
 end
 
 function GUIProvider:test_action_2( event )
-  self:echo( '(w) 2017-06-07 21:31:34: [TextureCache::generateForAtlasBuilderEntry] Key (0xc system/models/wall/greywallpaper.png 0xl system/models/wall/greywallpaper.png 0xr system/models/wall/greywallpaper.png 0xs2 system/models/wall/greywallpaper.png ) not found; generating texture atlas.' )
+
 end
 
 function GUIProvider:on_message_logged( message )
@@ -110,8 +117,14 @@ end
 function GUIProvider:echo( content )
   local line_template = [[
     <Alignment class="bb_chatline" scale_x="0" scale_y="0">
-      <Label>%s</Label>
+      <Box>
+        %s
+        <Label>%s</Label>
+      </Box>
     </Alignment>
+  ]]
+  local prefix_template = [[
+    <Label class="%s">%s</Label>
   ]]
   local textarea = bluebear.gui.find_by_id( 'bb_textarea' )
 
@@ -124,13 +137,26 @@ function GUIProvider:echo( content )
 
     if ubound > content:len() then
       -- last one
-      textarea:add( string.format( line_template, content:sub( lbound, content:len() ) ) )
+      textarea:add( string.format( line_template, '', content:sub( lbound, content:len() ) ) )
       finished = true
     else
-      textarea:add( string.format( line_template, content:sub( lbound, ubound ) ) )
+      local xml_string
+
+      if lbound == 1 then
+        xml_string = string.format(
+          line_template,
+          string.format( prefix_template, self.OUTPUT_COLORS[ content:sub( 1, 3 ) ], content:sub( lbound, 25 ) ),
+          content:sub( 26, ubound )
+        )
+      else
+        xml_string = string.format( line_template, '', content:sub( lbound, ubound ) )
+      end
+
+      textarea:add( xml_string )
       lbound = lbound + self.cl_line_chars + 1
     end
   end
+
 end
 
 function GUIProvider:on_click_zoom_in()

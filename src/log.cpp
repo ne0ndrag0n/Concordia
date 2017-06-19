@@ -43,13 +43,14 @@ namespace BlueBear {
     if( message.level >= minimumReportableLevel ) {
       // sucks
       if( mode == LogMode::CONSOLE || mode == LogMode::BOTH ) {
-        std::string strMessage = messageToString( message, true );
-        outToConsole( strMessage );
-        eventManager.MESSAGE_LOGGED.trigger( strMessage );
+        outToConsole( messageToString( message, true ) );
       }
       if( mode == LogMode::FILE || mode == LogMode::BOTH ) {
         outToFile( messageToString( message, false ) );
       }
+
+      // SUCKS
+      eventManager.MESSAGE_LOGGED.trigger( messageToString( message, false ) );
     }
   }
 
