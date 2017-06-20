@@ -30,6 +30,8 @@ function GUIProvider:open_debug_ui()
   self.chat_scroller = bluebear.gui.find_by_id( 'bb_chatscroller' )
   self.console_input:on( "key_down", bluebear.util.bind( "system.provider.gui:check_enter_press", self ) )
 
+  self.natural_height = self.chat_scroller:get_property( 'max_y' ) - self.chat_scroller:get_property( 'scroll_y' )
+
   -- XXX: Remove after demo
   bluebear.gui.find_by_id( "animate1" ):on( "click", bluebear.gui.__internal__playanim1 )
 
@@ -127,6 +129,11 @@ function GUIProvider:echo( content )
     <Label class="%s">%s</Label>
   ]]
   local textarea = bluebear.gui.find_by_id( 'bb_textarea' )
+  local scroll_down =
+    ( self.chat_scroller:get_property( 'max_y' ) - self.chat_scroller:get_property( 'scroll_y' ) == self.natural_height )
+      or
+    ( self.chat_scroller:get_property( 'max_y' ) > self.natural_height and self.chat_scroller:get_property( 'scroll_y' ) == 0 )
+
 
   -- writing this drunk and tired
   local finished = false
@@ -157,6 +164,9 @@ function GUIProvider:echo( content )
     end
   end
 
+  if scroll_down == true then
+    self.chat_scroller:set_property( 'scroll_y', self.chat_scroller:get_property( 'max_y' ) )
+  end
 end
 
 function GUIProvider:on_click_zoom_in()

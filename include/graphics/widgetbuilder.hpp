@@ -121,18 +121,56 @@ namespace BlueBear {
         std::shared_ptr< sfg::Adjustment > adjustmentY = widget->GetVerticalAdjustment();
 
         // Set default upper and lower bounds
-        adjustmentX->SetLower( 0.0f );
-        adjustmentX->SetUpper( 100000000.0f );
-        adjustmentY->SetLower( 0.0f );
-        adjustmentY->SetUpper( 100000000.0f );
+        float lowerX = adjustmentX->GetLower();
+        float upperX = adjustmentX->GetUpper();
+        float lowerY = adjustmentY->GetLower();
+        float upperY = adjustmentY->GetUpper();
 
+        Tools::Utility::queryFloatExpression( element, "min_x", settingsTokens, &lowerX );
+        Tools::Utility::queryFloatExpression( element, "max_x", settingsTokens, &upperX );
+        Tools::Utility::queryFloatExpression( element, "min_y", settingsTokens, &lowerY );
+        Tools::Utility::queryFloatExpression( element, "max_y", settingsTokens, &upperY );
+
+        adjustmentX->SetLower( lowerX );
+        adjustmentX->SetUpper( upperX );
+        adjustmentY->SetLower( lowerY );
+        adjustmentY->SetUpper( upperY );
+
+        // Set the viewport values
         float viewportX = adjustmentX->GetValue();
-        element->QueryFloatAttribute( "viewport_x", &viewportX );
+        Tools::Utility::queryFloatExpression( element, "scroll_x", settingsTokens, &viewportX );
         float viewportY = adjustmentY->GetValue();
-        element->QueryFloatAttribute( "viewport_y", &viewportY );
+        Tools::Utility::queryFloatExpression( element, "scroll_y", settingsTokens, &viewportY );
 
         adjustmentX->SetValue( viewportX );
         adjustmentY->SetValue( viewportY );
+
+        // Set the viewport minor and major step
+        float minorStepX = adjustmentX->GetMinorStep();
+        float minorStepY = adjustmentY->GetMinorStep();
+
+        float majorStepX = adjustmentX->GetMajorStep();
+        float majorStepY = adjustmentY->GetMajorStep();
+
+        Tools::Utility::queryFloatExpression( element, "minor_step_x", settingsTokens, &minorStepX );
+        Tools::Utility::queryFloatExpression( element, "minor_step_y", settingsTokens, &minorStepY );
+        Tools::Utility::queryFloatExpression( element, "major_step_x", settingsTokens, &majorStepX );
+        Tools::Utility::queryFloatExpression( element, "major_step_y", settingsTokens, &majorStepY );
+
+        adjustmentX->SetMinorStep( minorStepX );
+        adjustmentY->SetMinorStep( minorStepY );
+
+        adjustmentX->SetMajorStep( majorStepX );
+        adjustmentY->SetMajorStep( majorStepY );
+
+        // Set the viewport page size
+        float pageSizeX = adjustmentX->GetPageSize();
+        float pageSizeY = adjustmentY->GetPageSize();
+        Tools::Utility::queryFloatExpression( element, "page_size_x", settingsTokens, &pageSizeX );
+        Tools::Utility::queryFloatExpression( element, "page_size_y", settingsTokens, &pageSizeY );
+
+        adjustmentX->SetPageSize( pageSizeX );
+        adjustmentY->SetPageSize( pageSizeY );
       };
 
     public:

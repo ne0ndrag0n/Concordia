@@ -1229,6 +1229,52 @@ namespace BlueBear {
             lua_pushnumber( L, result ); // 42
             return 1;
           }
+          case Tools::Utility::hash( "min_x" ):
+          case Tools::Utility::hash( "min_y" ): {
+            if( widgetType == "ScrolledWindow" ) {
+              lua_pushnumber( L,
+                std::string( property ) == "min_x" ?
+                  std::static_pointer_cast< sfg::ScrolledWindow >( widgetPtr->widget )->GetHorizontalAdjustment()->GetLower() :
+                  std::static_pointer_cast< sfg::ScrolledWindow >( widgetPtr->widget )->GetVerticalAdjustment()->GetLower()
+              ); // 42
+              return 1;
+            } else {
+              Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+            }
+
+            return 0;
+          }
+          case Tools::Utility::hash( "max_x" ):
+          case Tools::Utility::hash( "max_y" ): {
+            if( widgetType == "ScrolledWindow" ) {
+              lua_pushnumber( L,
+                std::string( property ) == "max_x" ?
+                  std::static_pointer_cast< sfg::ScrolledWindow >( widgetPtr->widget )->GetHorizontalAdjustment()->GetUpper() :
+                  std::static_pointer_cast< sfg::ScrolledWindow >( widgetPtr->widget )->GetVerticalAdjustment()->GetUpper()
+              ); // 42
+              return 1;
+            } else {
+              Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+            }
+
+            return 0;
+          }
+          case Tools::Utility::hash( "scroll_x" ):
+          case Tools::Utility::hash( "scroll_y" ): {
+
+            if( widgetType == "ScrolledWindow" ) {
+              lua_pushnumber( L,
+                std::string( property ) == "scroll_x" ?
+                  std::static_pointer_cast< sfg::ScrolledWindow >( widgetPtr->widget )->GetHorizontalAdjustment()->GetValue() :
+                  std::static_pointer_cast< sfg::ScrolledWindow >( widgetPtr->widget )->GetVerticalAdjustment()->GetValue()
+              ); // 42
+              return 1;
+            } else {
+              Log::getInstance().warn( "LuaElement::lua_getProperty", "Property \"" + std::string( property ) + "\" does not exist for this widget type." );
+            }
+
+            return 0;
+          }
           // These properties are not settable/retrievable using the SFGUI API
           case Tools::Utility::hash( "tab_position" ):
           case Tools::Utility::hash( "expand" ):
@@ -2092,6 +2138,60 @@ namespace BlueBear {
 
             // Widget has no parent, or its parent is not a Fixed
             setCustomAttribute( widgetPtr->widget, property, std::to_string( lua_tonumber( L, -1 ) ) );
+            return 0;
+          }
+          case Tools::Utility::hash( "min_x" ):
+          case Tools::Utility::hash( "min_y" ): {
+            VERIFY_STRING_N( "LuaElement::lua_setProperty", "set_property", 1 );
+
+            if( widgetType == "ScrolledWindow" ) {
+
+              if( std::string( property ) == "min_x" ) {
+                std::static_pointer_cast< sfg::ScrolledWindow >( widgetPtr->widget )->GetHorizontalAdjustment()->SetLower( lua_tonumber( L, -1 ) );
+              } else {
+                std::static_pointer_cast< sfg::ScrolledWindow >( widgetPtr->widget )->GetVerticalAdjustment()->SetLower( lua_tonumber( L, -1 ) );
+              }
+
+            } else {
+              Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" cannot be set on this widget." );
+            }
+
+            return 0;
+          }
+          case Tools::Utility::hash( "max_x" ):
+          case Tools::Utility::hash( "max_y" ): {
+            VERIFY_STRING_N( "LuaElement::lua_setProperty", "set_property", 1 );
+
+            if( widgetType == "ScrolledWindow" ) {
+
+              if( std::string( property ) == "max_x" ) {
+                std::static_pointer_cast< sfg::ScrolledWindow >( widgetPtr->widget )->GetHorizontalAdjustment()->SetUpper( lua_tonumber( L, -1 ) );
+              } else {
+                std::static_pointer_cast< sfg::ScrolledWindow >( widgetPtr->widget )->GetVerticalAdjustment()->SetUpper( lua_tonumber( L, -1 ) );
+              }
+
+            } else {
+              Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" cannot be set on this widget." );
+            }
+
+            return 0;
+          }
+          case Tools::Utility::hash( "scroll_x" ):
+          case Tools::Utility::hash( "scroll_y" ): {
+            VERIFY_STRING_N( "LuaElement::lua_setProperty", "set_property", 1 );
+
+            if( widgetType == "ScrolledWindow" ) {
+
+              if( std::string( property ) == "scroll_x" ) {
+                std::static_pointer_cast< sfg::ScrolledWindow >( widgetPtr->widget )->GetHorizontalAdjustment()->SetValue( lua_tonumber( L, -1 ) );
+              } else {
+                std::static_pointer_cast< sfg::ScrolledWindow >( widgetPtr->widget )->GetVerticalAdjustment()->SetValue( lua_tonumber( L, -1 ) );
+              }
+
+            } else {
+              Log::getInstance().warn( "LuaElement::lua_setProperty", "Property \"" + std::string( property ) + "\" cannot be set on this widget." );
+            }
+
             return 0;
           }
           // These properties are not settable/retrievable using the SFGUI API
