@@ -42,6 +42,8 @@ function GUIProvider:open_debug_ui()
     [ '(w)' ] = 'bb_yellow',
     [ '(e)' ] = 'bb_red'
   }
+  self.LINE_TEMPLATE = io.open( modpack_path..'/line_fragment.xml' ):read( '*all' )
+  self.PREFIX_TEMPLATE = io.open( modpack_path..'/prefix_fragment.xml' ):read( '*all' )
 
   bluebear.event.register_key( '~', bluebear.util.bind( "system.provider.gui:toggle_visibility", self ) )
   bluebear.event.listen( 'MESSAGE_LOGGED', bluebear.util.bind( 'system.provider.gui:on_message_logged', self ) )
@@ -117,56 +119,66 @@ function GUIProvider:toggle_visibility()
 end
 
 function GUIProvider:echo( content )
-  local line_template = [[
-    <Alignment class="bb_chatline" scale_x="0" scale_y="0">
-      <Box>
-        %s
-        <Label>%s</Label>
-      </Box>
-    </Alignment>
-  ]]
-  local prefix_template = [[
-    <Label class="%s">%s</Label>
-  ]]
   local textarea = bluebear.gui.find_by_id( 'bb_textarea' )
   local scroll_down =
     ( self.chat_scroller:get_property( 'max_y' ) - self.chat_scroller:get_property( 'scroll_y' ) == self.natural_height )
       or
     ( self.chat_scroller:get_property( 'max_y' ) > self.natural_height and self.chat_scroller:get_property( 'scroll_y' ) == 0 )
 
+  local lines = bluebear.util.split( content, '\n' )
+  for i, line in ipairs( lines ) do
+    local splits = self:get_lines( line )
 
-  -- writing this drunk and tired
-  local finished = false
-  local lbound = 1
-
-  while finished == false do
-    local ubound = lbound + self.cl_line_chars
-
-    if ubound > content:len() then
-      -- last one
-      textarea:add( string.format( line_template, '', content:sub( lbound, content:len() ) ) )
-      finished = true
-    else
-      local xml_string
-
-      if lbound == 1 then
-        xml_string = string.format(
-          line_template,
-          string.format( prefix_template, self.OUTPUT_COLORS[ content:sub( 1, 3 ) ], content:sub( lbound, 25 ) ),
-          content:sub( 26, ubound )
-        )
-      else
-        xml_string = string.format( line_template, '', content:sub( lbound, ubound ) )
-      end
-
-      textarea:add( xml_string )
-      lbound = lbound + self.cl_line_chars + 1
+    for j, split in ipairs( splits ) do
+      textarea:add( split )
     end
   end
 
   if scroll_down == true then
     self.chat_scroller:set_property( 'scroll_y', self.chat_scroller:get_property( 'max_y' ) )
   end
+end
+
+function GUIProvider:get_lines( content )
+  local finished = false
+  local lbound = 1
+  local xml_string
+  local results = {}
+
+  while finished == false do
+    local ubound = lbound + self.cl_line_chars
+
+    if ubound > content:len() then
+      -- last one
+      if lbound == 1 and content:sub( 1, 1 ) == "(" then
+        xml_string = string.format(
+          self.LINE_TEMPLATE,
+          string.format( self.PREFIX_TEMPLATE, self.OUTPUT_COLORS[ content:sub( 1, 3 ) ], content:sub( lbound, 25 ) ),
+          content:sub( 26, ubound )
+        )
+      else
+        xml_string = string.format( self.LINE_TEMPLATE, '', content:sub( lbound, content:len() ) )
+      end
+
+      table.insert( results, xml_string )
+      finished = true
+    else
+      if lbound == 1 and content:sub( 1, 1 ) == "(" then
+        xml_string = string.format(
+          self.LINE_TEMPLATE,
+          string.format( self.PREFIX_TEMPLATE, self.OUTPUT_COLORS[ content:sub( 1, 3 ) ], content:sub( lbound, 25 ) ),
+          content:sub( 26, ubound )
+        )
+      else
+        xml_string = string.format( self.LINE_TEMPLATE, '', content:sub( lbound, ubound ) )
+      end
+
+      table.insert( results, xml_string )
+      lbound = lbound + self.cl_line_chars + 1
+    end
+  end
+
+  return results
 end
 
 function GUIProvider:on_click_zoom_in()
