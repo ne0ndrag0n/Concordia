@@ -140,23 +140,14 @@ namespace BlueBear {
 
         auto size = widgets.size();
 
-        if( size ) {
-          // At least one widget is present - these items must be chained in a Lua table
-          // Create a Lua table, then push a new LuaInstance wrapper for every widget found as part of this class
-          lua_createtable( L, size, 0 ); // table "selector"
+        lua_createtable( L, size, 0 ); // table "selector"
 
-          for( int i = 0; i != size; i++ ) {
-            LuaElement::getUserdataFromWidget( L, widgets[ i ] ); // userdata table "selector"
-            lua_rawseti( L, -2, i + 1 ); // table "selector"
-          }
-
-          return 1;
-        } else {
-          std::string error = std::string( "Could not find any widgets with class " ) + selector;
-          return luaL_error( L, error.c_str() );
+        for( int i = 0; i != size; i++ ) {
+          LuaElement::getUserdataFromWidget( L, widgets[ i ] ); // userdata table "selector"
+          lua_rawseti( L, -2, i + 1 ); // table "selector"
         }
 
-        return 0;
+        return 1;
       }
 
     }

@@ -1,40 +1,46 @@
-bluebear.engine.require_modpack( "class" )
-bluebear.engine.require_modpack( "util" )
-bluebear.engine.require_modpack( "entity" )
+bluebear.engine.require_modpack( 'class' )
+bluebear.engine.require_modpack( 'util' )
+bluebear.engine.require_modpack( 'entity' )
 
 local modpack_path = ...
 local GUIProvider = bluebear.extend( 'system.entity.base', 'system.provider.gui' )
 
 function GUIProvider:open_debug_ui()
-  local path = modpack_path.."/debug.xml"
-  local console_path = modpack_path.."/console.xml"
+  bluebear.gui.add_from_path( modpack_path..'/debug.xml' )
+  bluebear.gui.add_from_path( modpack_path..'/console.xml' )
 
-  print( "system.provider.gui", "Providing the debug UI from "..path )
+  self:cache_queries()
+  self:set_callbacks()
+  self:set_constants()
+  self:hook_events()
+end
 
-  bluebear.gui.add_from_path( path )
-  bluebear.gui.add_from_path( console_path )
-
-  bluebear.gui.find_by_id( "rot_l" ):on( "click", bluebear.util.bind( "system.provider.gui:on_click_rot_l", self ) )
-  bluebear.gui.find_by_id( "rot_r" ):on( "click", bluebear.util.bind( "system.provider.gui:on_click_rot_r", self ) )
-  bluebear.gui.find_by_id( "zoom_in" ):on( "click", bluebear.util.bind( "system.provider.gui:on_click_zoom_in", self ) )
-  bluebear.gui.find_by_id( "zoom_out" ):on( "click", bluebear.util.bind( "system.provider.gui:on_click_zoom_out", self ) )
-
-  bluebear.gui.find_by_id( "ta1" ):on( "click", bluebear.util.bind( "system.provider.gui:test_action_1", self ) )
-  bluebear.gui.find_by_id( "ta2" ):on( "click", bluebear.util.bind( "system.provider.gui:test_action_2", self ) )
-
-  bluebear.gui.find_by_id( "bb_clear" ):on( "click", bluebear.util.bind( "system.provider.gui:clear_chat", self ) )
-  bluebear.gui.find_by_id( "bb_exec" ):on( "click", bluebear.util.bind( "system.provider.gui:handle_command", self ) )
-
-  -- TODO: Start caching MarkupEngine DOM queries here
+function GUIProvider:cache_queries()
   self.console_input = bluebear.gui.find_by_id( 'bb_entry' )
   self.chat_scroller = bluebear.gui.find_by_id( 'bb_chatscroller' )
-  self.console_input:on( "key_down", bluebear.util.bind( "system.provider.gui:check_enter_press", self ) )
+  self.bg_image = bluebear.gui.find_by_id( 'bb_ritzy' )
+  self.textarea = bluebear.gui.find_by_id( 'bb_textarea' )
+  self.console_window = bluebear.gui.find_by_id( 'bb_console' )
+end
 
-  self.natural_height = self.chat_scroller:get_property( 'max_y' ) - self.chat_scroller:get_property( 'scroll_y' )
+function GUIProvider:set_callbacks()
+  bluebear.gui.find_by_id( 'rot_l' ):on( 'click', bluebear.gui.rotate_left )
+  bluebear.gui.find_by_id( 'rot_r' ):on( 'click', bluebear.gui.rotate_right )
+  bluebear.gui.find_by_id( 'zoom_in' ):on( 'click', bluebear.gui.zoom_in )
+  bluebear.gui.find_by_id( 'zoom_out' ):on( 'click', bluebear.gui.zoom_out )
+
+  bluebear.gui.find_by_id( 'ta1' ):on( 'click', bluebear.util.bind( 'system.provider.gui:test_action_1', self ) )
+  bluebear.gui.find_by_id( 'ta2' ):on( 'click', bluebear.util.bind( 'system.provider.gui:test_action_2', self ) )
+
+  bluebear.gui.find_by_id( 'bb_clear' ):on( 'click', bluebear.util.bind( 'system.provider.gui:clear_chat', self ) )
+  bluebear.gui.find_by_id( 'bb_exec' ):on( 'click', bluebear.util.bind( 'system.provider.gui:handle_command', self ) )
 
   -- XXX: Remove after demo
-  bluebear.gui.find_by_id( "animate1" ):on( "click", bluebear.gui.__internal__playanim1 )
+  bluebear.gui.find_by_id( 'animate1' ):on( 'click', bluebear.gui.__internal__playanim1 )
+end
 
+function GUIProvider:set_constants()
+  self.natural_height = self.chat_scroller:get_property( 'max_y' ) - self.chat_scroller:get_property( 'scroll_y' )
   self:determine_max_chat_chars()
   self.OUTPUT_COLORS = {
     [ '(d)' ] = 'bb_green',
@@ -45,8 +51,15 @@ function GUIProvider:open_debug_ui()
   self.LINE_TEMPLATE = io.open( modpack_path..'/line_fragment.xml' ):read( '*all' )
   self.PREFIX_TEMPLATE = io.open( modpack_path..'/prefix_fragment.xml' ):read( '*all' )
 
-  bluebear.event.register_key( '~', bluebear.util.bind( "system.provider.gui:toggle_visibility", self ) )
-  bluebear.event.listen( 'MESSAGE_LOGGED', bluebear.util.bind( 'system.provider.gui:on_message_logged', self ) )
+  self.command_history = {}
+  self.command_history_index = 0
+end
+
+function GUIProvider:hook_events()
+  bluebear.event.register_key( '~', bluebear.util.bind( 'system.provider.gui:toggle_visibility', self ) )
+  bluebear.event.listen( 'MESSAGE_LOGGED', bluebear.util.bind( 'system.provider.gui:echo', self ) )
+
+  self.console_input:on( 'key_down', bluebear.util.bind( 'system.provider.gui:check_enter_press', self ) )
 end
 
 function GUIProvider:test_action_1( event )
@@ -57,27 +70,49 @@ function GUIProvider:test_action_2( event )
 
 end
 
-function GUIProvider:on_message_logged( message )
-  self:echo( message )
-end
-
 function GUIProvider:clear_chat()
   local alignments = bluebear.gui.find_by_class( 'bb_chatline' )
-  local textarea = bluebear.gui.find_by_id( 'bb_textarea' )
 
   for i, alignment in ipairs( alignments ) do
-    textarea:remove( alignment )
+    self.textarea:remove( alignment )
   end
 end
 
 function GUIProvider:check_enter_press( event )
   if event.keyboard.key == 'ret' then
     self:handle_command()
+  elseif event.keyboard.key == 'up' then
+    self:show_previous_command()
+  elseif event.keyboard.key == 'down' then
+    self:show_next_command()
+  end
+end
+
+function GUIProvider:show_previous_command()
+  local prev = self.command_history_index - 1
+
+  if prev >= 1 then
+    self.console_input:set_content( self.command_history[ prev ] )
+    self.command_history_index = prev
+  end
+end
+
+function GUIProvider:show_next_command()
+  local next = self.command_history_index + 1
+
+  if next <= #self.command_history then
+    self.console_input:set_content( self.command_history[ next ] )
+    self.command_history_index = next
+  else
+    self.console_input:set_content( '' )
+    self.command_history_index = #self.command_history + 1
   end
 end
 
 function GUIProvider:handle_command()
   local text = self.console_input:get_content()
+  table.insert( self.command_history, text )
+  self.command_history_index = #self.command_history + 1
 
   self:sleep( 1 ):then_call( load( text ) )
 
@@ -85,22 +120,19 @@ function GUIProvider:handle_command()
 end
 
 function GUIProvider:determine_max_chat_chars()
-  local chat = bluebear.gui.find_by_id( 'bb_chatscroller' )
-  local chatwidth = chat:get_property( 'width' )
+  local chatwidth = self.chat_scroller:get_property( 'width' )
 
-  bluebear.gui.find_by_id( "bb_ritzy" ):set_property(
+  self.bg_image:set_property(
     'fixed_x',
     ( chatwidth / 2 ) - 150
   )
 
-  self.cl_line_chars = bluebear.util.round( ( chatwidth - 100 ) / ( tonumber( chat:get_style( "FontSize" ) / 2 ) + 0.5 ) )
+  self.cl_line_chars = bluebear.util.round( ( chatwidth - 100 ) / ( tonumber( self.chat_scroller:get_style( 'FontSize' ) / 2 ) + 0.5 ) )
 end
 
 function GUIProvider:toggle_visibility()
-  local element = bluebear.gui.find_by_id( 'bb_console' )
-
   local interval = 0
-  local initial = element:get_property( 'top' )
+  local initial = self.console_window:get_property( 'top' )
   local final
   local step
 
@@ -114,12 +146,11 @@ function GUIProvider:toggle_visibility()
 
   for i=initial,final,step do
     interval = interval + 1
-    self:sleep( interval ):then_call( function() element:set_property( 'top', i ) end )
+    self:sleep( interval ):then_call( function() self.console_window:set_property( 'top', i ) end )
   end
 end
 
 function GUIProvider:echo( content )
-  local textarea = bluebear.gui.find_by_id( 'bb_textarea' )
   local scroll_down =
     ( self.chat_scroller:get_property( 'max_y' ) - self.chat_scroller:get_property( 'scroll_y' ) == self.natural_height )
       or
@@ -130,7 +161,7 @@ function GUIProvider:echo( content )
     local splits = self:get_lines( line )
 
     for j, split in ipairs( splits ) do
-      textarea:add( split )
+      self.textarea:add( split )
     end
   end
 
@@ -139,6 +170,9 @@ function GUIProvider:echo( content )
   end
 end
 
+--[[
+  Look, it's a mess, but don't touch it.
+--]]
 function GUIProvider:get_lines( content )
   local finished = false
   local lbound = 1
@@ -150,7 +184,7 @@ function GUIProvider:get_lines( content )
 
     if ubound > content:len() then
       -- last one
-      if lbound == 1 and content:sub( 1, 1 ) == "(" then
+      if lbound == 1 and content:sub( 1, 1 ) == '(' then
         xml_string = string.format(
           self.LINE_TEMPLATE,
           string.format( self.PREFIX_TEMPLATE, self.OUTPUT_COLORS[ content:sub( 1, 3 ) ], content:sub( lbound, 25 ) ),
@@ -163,7 +197,7 @@ function GUIProvider:get_lines( content )
       table.insert( results, xml_string )
       finished = true
     else
-      if lbound == 1 and content:sub( 1, 1 ) == "(" then
+      if lbound == 1 and content:sub( 1, 1 ) == '(' then
         xml_string = string.format(
           self.LINE_TEMPLATE,
           string.format( self.PREFIX_TEMPLATE, self.OUTPUT_COLORS[ content:sub( 1, 3 ) ], content:sub( lbound, 25 ) ),
@@ -179,22 +213,6 @@ function GUIProvider:get_lines( content )
   end
 
   return results
-end
-
-function GUIProvider:on_click_zoom_in()
-  bluebear.gui.zoom_in()
-end
-
-function GUIProvider:on_click_zoom_out()
-  bluebear.gui.zoom_out()
-end
-
-function GUIProvider:on_click_rot_l()
-  bluebear.gui.rotate_left()
-end
-
-function GUIProvider:on_click_rot_r()
-  bluebear.gui.rotate_right()
 end
 
 bluebear.register_class( GUIProvider )

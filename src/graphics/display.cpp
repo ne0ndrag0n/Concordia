@@ -262,16 +262,6 @@ namespace BlueBear {
       lua_pushcclosure( L, &Display::MainGameState::lua_zoomOut, 1 );
       lua_settable( L, -3 );
 
-      lua_pushstring( L, "get_widget_by_id" );
-      lua_pushlightuserdata( L, this );
-      lua_pushcclosure( L, &GUI::LuaElement::lua_getWidgetByID, 1 );
-      lua_settable( L, -3 );
-
-      lua_pushstring( L, "get_widgets_by_class" );
-      lua_pushlightuserdata( L, this );
-      lua_pushcclosure( L, &GUI::LuaElement::lua_getWidgetsByClass, 1 );
-      lua_settable( L, -3 );
-
       // XXX: Remove when demo branch is over
       lua_pushstring( L, "__internal__playanim1" );
       lua_pushlightuserdata( L, this );
