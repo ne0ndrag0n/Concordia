@@ -40,6 +40,7 @@ namespace BlueBear {
             { "set_property", PagePseudoElement::lua_setProperty },
             { "get_content", PagePseudoElement::lua_getContent },
             { "set_content", PagePseudoElement::lua_setContent },
+            { "get_children", PagePseudoElement::lua_getChildElements },
             { "__gc", PagePseudoElement::lua_gc },
             { NULL, NULL }
           };
@@ -483,6 +484,11 @@ namespace BlueBear {
         PagePseudoElement* self = *( ( PagePseudoElement** ) luaL_checkudata( L, 1, "bluebear_page_pseudo_element" ) );
 
         return self->getElementsByClass( L, lua_tostring( L, -1 ) );
+      }
+
+      int PagePseudoElement::lua_getChildElements( lua_State* L ) {
+        Log::getInstance().warn( "PagePseudoElement::lua_getChildElements", "Use the find_pseudo method to get a <tab> or <content> pseudo-element." );
+        return 0;
       }
 
       int PagePseudoElement::lua_getProperty( lua_State* L ) {

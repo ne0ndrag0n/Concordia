@@ -34,6 +34,7 @@ namespace BlueBear {
             { "set_property", ItemPseudoElement::lua_property },
             { "get_content", ItemPseudoElement::lua_getContent },
             { "set_content", ItemPseudoElement::lua_setContent },
+            { "get_children", ItemPseudoElement::lua_findBy },
             { "__gc", ItemPseudoElement::lua_gc },
             { NULL, NULL }
           };

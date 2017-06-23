@@ -2,6 +2,7 @@
 #include "graphics/gui/luaelement.hpp"
 #include "graphics/widgetbuilder.hpp"
 #include "tools/ctvalidators.hpp"
+#include "tools/utility.hpp"
 #include "eventmanager.hpp"
 #include "log.hpp"
 #include <tinyxml2.h>
@@ -37,6 +38,7 @@ namespace BlueBear {
             { "set_property", NBBinPseudoElement::lua_setProperty },
             { "get_content", NBBinPseudoElement::lua_getContent },
             { "set_content", NBBinPseudoElement::lua_setContent },
+            { "get_children", NBBinPseudoElement::lua_getChildElements },
             { "__gc", NBBinPseudoElement::lua_gc },
             { NULL, NULL }
           };
@@ -257,6 +259,21 @@ namespace BlueBear {
         NBBinPseudoElement* self = *( ( NBBinPseudoElement** ) luaL_checkudata( L, 1, "bluebear_nbb_pseudo_element" ) );
 
         return self->getElementsByClass( L, lua_tostring( L, -1 ) );
+      }
+
+      int NBBinPseudoElement::lua_getChildElements( lua_State* L ) {
+        NBBinPseudoElement* self = *( ( NBBinPseudoElement** ) luaL_checkudata( L, 1, "bluebear_nbb_pseudo_element" ) );
+
+
+        if( std::shared_ptr< sfg::Widget > child = self->getChildWidget() ) {
+          if( Tools::Utility::widgetIsContainer( child ) ) {
+            LuaElement::elementsToTable( L, std::static_pointer_cast< sfg::Container >( child )->GetChildren() ); // table
+            return 1;
+          }
+        }
+
+        lua_newtable( L ); // table
+        return 1;
       }
 
       int NBBinPseudoElement::lua_findElement( lua_State* L ) {

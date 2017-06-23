@@ -1,0 +1,23 @@
+#bb_console {
+  BackgroundColor: #464646CC;
+}
+
+#bb_entry {
+  BackgroundColor: #5e5e5eCC;
+}
+
+.bb_red {
+  Color: #ff0000ff;
+}
+
+.bb_green {
+  Color: #00ff00ff;
+}
+
+.bb_blue {
+  Color: #0000ffff;
+}
+
+.bb_yellow {
+  Color: #ffff00ff;
+}

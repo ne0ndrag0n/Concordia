@@ -6,6 +6,7 @@ local modpack_path = ...
 local GUIProvider = bluebear.extend( 'system.entity.base', 'system.provider.gui' )
 
 function GUIProvider:open_debug_ui()
+  bluebear.gui.load_theme( modpack_path..'/chatarea.theme' )
   bluebear.gui.add_from_path( modpack_path..'/debug.xml' )
   bluebear.gui.add_from_path( modpack_path..'/console.xml' )
 
@@ -71,7 +72,7 @@ function GUIProvider:test_action_2( event )
 end
 
 function GUIProvider:clear_chat()
-  local alignments = bluebear.gui.find_by_class( 'bb_chatline' )
+  local alignments = self.textarea:get_children()
 
   for i, alignment in ipairs( alignments ) do
     self.textarea:remove( alignment )
@@ -155,12 +156,20 @@ function GUIProvider:echo( content )
     ( self.chat_scroller:get_property( 'max_y' ) - self.chat_scroller:get_property( 'scroll_y' ) == self.natural_height )
       or
     ( self.chat_scroller:get_property( 'max_y' ) > self.natural_height and self.chat_scroller:get_property( 'scroll_y' ) == 0 )
+  local max_lines = tonumber( bluebear.config.get_value( 'max_ingame_terminal_scrollback' ) ) or 100
 
   local lines = bluebear.util.split( content, '\n' )
   for i, line in ipairs( lines ) do
     local splits = self:get_lines( line )
 
     for j, split in ipairs( splits ) do
+      local textarea_children = self.textarea:get_children()
+
+      if #textarea_children > max_lines then
+        -- Start removing older scrollback
+        self.textarea:remove( textarea_children[ 1 ] )
+      end
+
       self.textarea:add( split )
     end
   end

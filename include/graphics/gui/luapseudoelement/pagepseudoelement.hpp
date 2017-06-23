@@ -74,6 +74,7 @@ namespace BlueBear {
         static int lua_getName( lua_State* L );
         static int lua_findById( lua_State* L );
         static int lua_findByClass( lua_State* L );
+        static int lua_getChildElements( lua_State* L );
         static int lua_findElement( lua_State* L );
         static int lua_getProperty( lua_State* L );
         static int lua_setProperty( lua_State* L );

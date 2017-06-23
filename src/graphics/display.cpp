@@ -304,6 +304,11 @@ namespace BlueBear {
       lua_pushcclosure( L, &GUI::LuaDesktopFunctions::lua_createWidget, 1 );
       lua_settable( L, -3 );
 
+      lua_pushstring( L, "load_theme" );
+      lua_pushlightuserdata( L, this );
+      lua_pushcclosure( L, &GUI::LuaDesktopFunctions::lua_loadThemeFromFile, 1 );
+      lua_settable( L, -3 );
+
       lua_settable( L, -3 ); // bluebear
 
       lua_getfield( L, -1, "event" ); // event bluebear
@@ -336,6 +341,7 @@ namespace BlueBear {
         { "set_property", GUI::LuaElement::lua_setProperty },
         { "set_image", GUI::LuaElement::lua_setImage },
         { "get_style", GUI::LuaElement::lua_getStyleProperty },
+        { "get_children", GUI::LuaElement::lua_getChildElements },
         { "__gc", GUI::LuaElement::lua_gc },
         { NULL, NULL }
       };

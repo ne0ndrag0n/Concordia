@@ -150,6 +150,20 @@ namespace BlueBear {
         return 1;
       }
 
+      int LuaDesktopFunctions::lua_loadThemeFromFile( lua_State* L ) {
+        VERIFY_STRING_N( "LuaDesktopFunctions::lua_loadThemeFromFile", "load_theme", 1 );
+
+        Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
+
+        std::string theme( lua_tostring( L, -1 ) );
+
+        if( !self->gui.desktop.LoadThemeFromFile( theme ) ) {
+          Log::getInstance().warn( "LuaDesktopFunctions::lua_loadThemeFromFile", theme + " unable to load." );
+        }
+
+        return 0;
+      }
+
     }
   }
 }

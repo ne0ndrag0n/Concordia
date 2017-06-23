@@ -397,11 +397,28 @@ namespace BlueBear {
       }
 
       /**
+       * @static
+       *
+       * Get all immediate child elements of this container item
+       */
+      int LuaElement::lua_getChildElements( lua_State* L ) {
+        LuaElement* self = *( ( LuaElement** ) luaL_checkudata( L, 1, "bluebear_widget" ) );
+
+        if( Tools::Utility::widgetIsContainer( self->widget ) ) {
+          elementsToTable( L, std::static_pointer_cast< sfg::Container >( self->widget )->GetChildren() ); // table
+        } else {
+          lua_newtable( L ); // table
+        }
+
+        return 1;
+      }
+
+      /**
        *
        * STACK ARGS: none
        * RETURNS: table
        */
-      void LuaElement::elementsToTable( lua_State* L, std::vector< std::shared_ptr< sfg::Widget > >& widgets ) {
+      void LuaElement::elementsToTable( lua_State* L, const std::vector< std::shared_ptr< sfg::Widget > >& widgets ) {
         auto size = widgets.size();
 
         lua_createtable( L, size, 0 ); // table

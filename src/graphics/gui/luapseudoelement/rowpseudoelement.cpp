@@ -34,6 +34,7 @@ namespace BlueBear {
             { "set_property", RowPseudoElement::lua_setProperty },
             { "get_content", RowPseudoElement::lua_content },
             { "set_content", RowPseudoElement::lua_content },
+            { "get_children", RowPseudoElement::lua_getChildElements },
             { "__gc", RowPseudoElement::lua_gc },
             { NULL, NULL }
           };
@@ -485,6 +486,14 @@ namespace BlueBear {
       int RowPseudoElement::lua_content( lua_State* L ) {
         Log::getInstance().warn( "RowPseudoElement::lua_content", "<row> pseudo-element has no direct content." );
         return 0;
+      }
+
+      int RowPseudoElement::lua_getChildElements( lua_State* L ) {
+        RowPseudoElement* self = *( ( RowPseudoElement** ) luaL_checkudata( L, 1, "bluebear_row_pseudo_element" ) );
+
+        LuaElement::elementsToTable( L, self->getWidgetsForRow() ); // table
+
+        return 1;
       }
 
       int RowPseudoElement::lua_gc( lua_State* L ) {
