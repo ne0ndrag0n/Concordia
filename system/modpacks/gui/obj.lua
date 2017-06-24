@@ -17,27 +17,32 @@ function GUIProvider:open_debug_ui()
 end
 
 function GUIProvider:cache_queries()
-  self.console_input = bluebear.gui.find_by_id( 'bb_entry' )
-  self.chat_scroller = bluebear.gui.find_by_id( 'bb_chatscroller' )
-  self.bg_image = bluebear.gui.find_by_id( 'bb_ritzy' )
-  self.textarea = bluebear.gui.find_by_id( 'bb_textarea' )
-  self.console_window = bluebear.gui.find_by_id( 'bb_console' )
+  self.console_input = bluebear.gui.find_by_id( 'bb_console_entry' )
+  self.chat_scroller = bluebear.gui.find_by_id( 'bb_console_chatscroller' )
+  self.bg_image = bluebear.gui.find_by_id( 'bb_console_ritzy' )
+  self.textarea = bluebear.gui.find_by_id( 'bb_console_textarea' )
+  self.console_window = bluebear.gui.find_by_id( 'bb_console_console' )
 end
 
 function GUIProvider:set_callbacks()
-  bluebear.gui.find_by_id( 'rot_l' ):on( 'click', bluebear.gui.rotate_left )
-  bluebear.gui.find_by_id( 'rot_r' ):on( 'click', bluebear.gui.rotate_right )
-  bluebear.gui.find_by_id( 'zoom_in' ):on( 'click', bluebear.gui.zoom_in )
-  bluebear.gui.find_by_id( 'zoom_out' ):on( 'click', bluebear.gui.zoom_out )
+  bluebear.gui.find_by_id( 'bb_console_clear' ):on( 'click', bluebear.util.bind( 'system.provider.gui:clear_chat', self ) )
+  bluebear.gui.find_by_id( 'bb_console_exec' ):on( 'click', bluebear.util.bind( 'system.provider.gui:handle_command', self ) )
 
-  bluebear.gui.find_by_id( 'ta1' ):on( 'click', bluebear.util.bind( 'system.provider.gui:test_action_1', self ) )
-  bluebear.gui.find_by_id( 'ta2' ):on( 'click', bluebear.util.bind( 'system.provider.gui:test_action_2', self ) )
+  bluebear.gui.find_by_id( 'bb_debug_gc' ):on( 'click', bluebear.util.bind( 'system.provider.gui:run_gc', self ) )
+  bluebear.gui.find_by_id( 'bb_debug_print_ram_usage' ):on( 'click', bluebear.util.bind( 'system.provider.gui:print_kbytes', self ) )
+  bluebear.gui.find_by_id( 'bb_debug_toggle_console' ):on( 'click', bluebear.util.bind( 'system.provider.gui:toggle_visibility', self ) )
+end
 
-  bluebear.gui.find_by_id( 'bb_clear' ):on( 'click', bluebear.util.bind( 'system.provider.gui:clear_chat', self ) )
-  bluebear.gui.find_by_id( 'bb_exec' ):on( 'click', bluebear.util.bind( 'system.provider.gui:handle_command', self ) )
+function GUIProvider:print_kbytes()
+  print( 'system.provider.gui', collectgarbage( 'count' )..' KB' )
+end
 
-  -- XXX: Remove after demo
-  bluebear.gui.find_by_id( 'animate1' ):on( 'click', bluebear.gui.__internal__playanim1 )
+function GUIProvider:run_gc()
+  print( 'system.provider.gui', 'Collecting garbage...' )
+  self:print_kbytes()
+  collectgarbage()
+  self:print_kbytes()
+  print( 'system.provider.gui', 'Done' )
 end
 
 function GUIProvider:set_constants()
@@ -61,14 +66,6 @@ function GUIProvider:hook_events()
   bluebear.event.listen( 'MESSAGE_LOGGED', bluebear.util.bind( 'system.provider.gui:echo', self ) )
 
   self.console_input:on( 'key_down', bluebear.util.bind( 'system.provider.gui:check_enter_press', self ) )
-end
-
-function GUIProvider:test_action_1( event )
-
-end
-
-function GUIProvider:test_action_2( event )
-
 end
 
 function GUIProvider:clear_chat()

@@ -32,40 +32,13 @@
     </page>
     <page>
       <tab>
-        <Label>View</Label>
-      </tab>
-      <content>
-        <Box orientation="vertical" spacing="5.0">
-          <Frame title="View">
-            <Box id="control" orientation="horizontal" spacing="5.0">
-              <Button id="rot_l">&lt;</Button>
-              <Button id="rot_r">&gt;</Button>
-              <Button id="zoom_in">+</Button>
-              <Button id="zoom_out">-</Button>
-            </Box>
-          </Frame>
-        </Box>
-      </content>
-    </page>
-    <page>
-      <tab>
         <Label>Options</Label>
       </tab>
       <content>
         <Box id="options" orientation="vertical" spacing="5.0">
-          <Button id="animate1">play anim</Button>
-          <Frame title="Test Actions">
-            <Box spacing="5.0">
-              <Button id="ta1">#1</Button>
-              <Button id="ta2">#2</Button>
-            </Box>
-          </Frame>
-          <Frame id="inpframe" title="Input">
-            <Box id="inputs" spacing="5.0">
-              <Entry id="inp1"></Entry>
-              <Button id="apply" min-width="75" expand="false">Apply</Button>
-            </Box>
-          </Frame>
+          <Button id="bb_debug_gc">Run Garbage Collector</Button>
+          <Button id="bb_debug_print_ram_usage">Print Lua RAM Usage</Button>
+          <Button id="bb_debug_toggle_console">Toggle Console</Button>
         </Box>
       </content>
     </page>
