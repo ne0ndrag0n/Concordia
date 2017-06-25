@@ -1,22 +1,23 @@
 #ifndef SHADERINSTANCEBUNDLE
 #define SHADERINSTANCEBUNDLE
 
-#include "graphics/shader.hpp"
-#include "graphics/instance/instance.hpp"
+#include <memory>
 #include <vector>
 
 namespace BlueBear {
   namespace Graphics {
     class Camera;
+    class Shader;
+    class Instance;
 
     class ShaderInstanceBundle {
     public:
-      Camera& camera;
-      Shader shader;
-      std::vector< Instance > instances;
+      std::shared_ptr< Shader > shader;
+      std::vector< std::shared_ptr< Instance > > instances;
 
-      ShaderInstanceBundle( Camera& camera, const std::string& vertexPath, const std::string& fragmentPath );
-      void drawInstances();
+      ShaderInstanceBundle( const std::string& vertexPath, const std::string& fragmentPath );
+      ShaderInstanceBundle( std::shared_ptr< Shader > shader );
+      void drawInstances( Camera& camera );
     };
 
   }

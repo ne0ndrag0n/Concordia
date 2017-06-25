@@ -150,7 +150,7 @@ namespace BlueBear {
       Display::State::State( instance ),
       L( instance.L ),
       inputManager( Input::InputManager( instance.L ) ),
-      defaultShader( Shader( "system/shaders/default_vertex.glsl", "system/shaders/default_fragment.glsl" ) ),
+      defaultShader( std::make_shared< Shader >( "system/shaders/default_vertex.glsl", "system/shaders/default_fragment.glsl" ) ),
       camera( Camera( instance.x, instance.y ) ),
       floorMap( floorMap ),
       wallMap( wallMap ),
@@ -164,11 +164,6 @@ namespace BlueBear {
 
       setupGUI();
       submitLuaContributions();
-
-      dynamicInstances.emplace_back( camera, "system/shaders/default_vertex.glsl", "system/shaders/default_fragment.glsl" );
-
-      dynamicInstances[ 0 ].instances.emplace_back( *__debugModel );
-      dynamicInstances[ 0 ].instances[ 0 ].setPosition( glm::vec3( 2.5f, 2.5f, 0.0f ) );
 
       // Moving much of Display::loadInfrastructure here
       loadInfrastructure();
@@ -231,7 +226,6 @@ namespace BlueBear {
       WallCellBundler::DPiece = std::make_unique< Model >( Display::WALLPANEL_MODEL_DR_PATH );
 
       floorModel = std::make_unique< Model >( Display::FLOOR_MODEL_PATH );
-      __debugModel = std::make_unique< Model >( ConfigManager::getInstance().getValue( "__debug_file" ) );
     }
     /**
      * bluebear.gui and associated commands to create and manage windows
@@ -260,17 +254,6 @@ namespace BlueBear {
       lua_pushstring( L, "zoom_out" );
       lua_pushlightuserdata( L, this );
       lua_pushcclosure( L, &Display::MainGameState::lua_zoomOut, 1 );
-      lua_settable( L, -3 );
-
-      // XXX: Remove when demo branch is over
-      lua_pushstring( L, "__internal__playanim1" );
-      lua_pushlightuserdata( L, this );
-      lua_pushcclosure( L, &Display::MainGameState::lua_playanim1, 1 );
-      lua_settable( L, -3 );
-
-      lua_pushstring( L, "__internal__playanim2" );
-      lua_pushlightuserdata( L, this );
-      lua_pushcclosure( L, &Display::MainGameState::lua_playanim2, 1 );
       lua_settable( L, -3 );
 
       // Replacement for most of the LuaGUIContext stuff
@@ -490,7 +473,7 @@ namespace BlueBear {
       // USES DEFAULT SHADER
       // Draw entities of each type
       // Floor & Walls with nudging
-      defaultShader.use();
+      defaultShader->use();
       camera.sendToShader();
       auto length = floorInstanceCollection->getLength();
       for( auto i = 0; i != length; i++ ) {
@@ -511,8 +494,10 @@ namespace BlueBear {
       }
 
       // USES VARYING SHADERS
+      std::vector< ShaderInstanceBundle > dynamicInstances;
+      // TODO: Generate them from the list of tracked entities
       for( ShaderInstanceBundle& bundle : dynamicInstances ) {
-        bundle.drawInstances();
+        bundle.drawInstances( camera );
       }
 
       processOsd();
@@ -565,17 +550,6 @@ namespace BlueBear {
 
       self->currentRotation = self->camera.rotateRight();
       self->createWallInstances();
-      return 0;
-    }
-    // XXX: Remove after demo branch
-    int Display::MainGameState::lua_playanim1( lua_State* L ) {
-      Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
-
-      self->dynamicInstances[ 0 ].instances[ 0 ].setAnimation( "Armature|ArmatureAction.002" );
-      return 0;
-    }
-    int Display::MainGameState::lua_playanim2( lua_State* L ) {
-      Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );
       return 0;
     }
   }

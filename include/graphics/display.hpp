@@ -94,13 +94,11 @@ namespace BlueBear {
           lua_State* L;
           Input::InputManager inputManager;
           unsigned int currentRotation;
-          Shader defaultShader;
+          std::shared_ptr< Shader > defaultShader;
           Camera camera;
           std::unique_ptr< Model > floorModel;
-          std::unique_ptr< Model > __debugModel;
           ImageCache imageCache;
           TextureCache texCache;
-          std::vector< ShaderInstanceBundle > dynamicInstances;
           // These are from the lot!
           Containers::Collection3D< std::shared_ptr< Scripting::Tile > >& floorMap;
           Containers::Collection3D< std::shared_ptr< Scripting::WallCell > >& wallMap;
@@ -119,10 +117,6 @@ namespace BlueBear {
           static int lua_rotateWorldRight( lua_State* L );
           static int lua_zoomIn( lua_State* L );
           static int lua_zoomOut( lua_State* L );
-
-          // XXX: remove after demo branch
-          static int lua_playanim1( lua_State* L );
-          static int lua_playanim2( lua_State* L );
         public:
           struct {
             sfg::Desktop desktop;
