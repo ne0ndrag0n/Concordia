@@ -15,6 +15,7 @@
 #include "graphics/wallcellbundler.hpp"
 #include "graphics/widgetbuilder.hpp"
 #include "graphics/shaderinstancebundle.hpp"
+#include "graphics/modelloader.hpp"
 #include "scripting/luakit/gchelper.hpp"
 #include "scripting/lot.hpp"
 #include "scripting/tile.hpp"
@@ -150,11 +151,13 @@ namespace BlueBear {
       Display::State::State( instance ),
       L( instance.L ),
       inputManager( Input::InputManager( instance.L ) ),
-      defaultShader( std::make_shared< Shader >( "system/shaders/default_vertex.glsl", "system/shaders/default_fragment.glsl" ) ),
       camera( Camera( instance.x, instance.y ) ),
       floorMap( floorMap ),
       wallMap( wallMap ),
       currentRotation( currentRotation ) {
+
+      // Lay out default shader
+      registeredShaders[ "default" ] = std::make_shared< Shader >( "system/shaders/default_vertex.glsl", "system/shaders/default_fragment.glsl" );
 
       // Setup all system-level models used by this state
       loadIntrinsicModels();
@@ -306,7 +309,55 @@ namespace BlueBear {
       lua_pushcclosure( L, &Input::InputManager::lua_unregisterScriptKey, 1 );
       lua_settable( L, -3 );
 
-      lua_pop( L, 2 ); // EMPTY
+      lua_pop( L, 1 ); // bluebear
+
+      lua_pushstring( L, "world" ); // "world" bluebear
+      lua_newtable( L ); // {} "world" bluebear
+
+      lua_pushstring( L, "get_model_loader" );
+      lua_pushlightuserdata( L, this );
+      lua_pushcclosure( L, &ModelLoaderHelper::lua_createModelLoader, 1 );
+      lua_settable( L, -3 );
+
+      lua_settable( L, -3 ); // bluebear
+
+      lua_pop( L, 1 ); // EMPTY
+
+      // Register lua crap for the ModelLoader
+      luaL_Reg modelLoaderFuncs[] = {
+        { "load_model", ModelLoaderHelper::lua_loadModel },
+        { "get_instance", ModelLoaderHelper::lua_getInstance },
+        { "__gc", ModelLoaderHelper::lua_gc },
+        { NULL, NULL }
+      };
+
+      if( luaL_newmetatable( L, "bluebear_model_loader" ) ) { // metatable
+
+        lua_pushlightuserdata( L, this ); // upvalue metatable
+        luaL_setfuncs( L, modelLoaderFuncs, 1 ); // metatable
+        lua_pushvalue( L, -1 ); // metatable metatable
+        lua_setfield( L, -2, "__index" ); // metatable
+
+      }
+
+      lua_pop( L, 1 ); // EMPTY
+
+      // Register lua crap for the LuaInstanceHelper
+      luaL_Reg luaInstanceHelperFuncs[] = {
+        { "__gc", LuaInstanceHelper::lua_gc },
+        { NULL, NULL }
+      };
+
+      if( luaL_newmetatable( L, "bluebear_graphics_instance" ) ) { // metatable
+
+        lua_pushlightuserdata( L, this ); // upvalue metatable
+        luaL_setfuncs( L, luaInstanceHelperFuncs, 1 ); // metatable
+        lua_pushvalue( L, -1 ); // metatable metatable
+        lua_setfield( L, -2, "__index" ); // metatable
+
+      }
+
+      lua_pop( L, 1 ); // EMPTY
 
       // Register internal sfg::Widget wrappers
       luaL_Reg elementFuncs[] = {
@@ -473,7 +524,7 @@ namespace BlueBear {
       // USES DEFAULT SHADER
       // Draw entities of each type
       // Floor & Walls with nudging
-      defaultShader->use();
+      registeredShaders[ "default" ]->use();
       camera.sendToShader();
       auto length = floorInstanceCollection->getLength();
       for( auto i = 0; i != length; i++ ) {
@@ -525,6 +576,9 @@ namespace BlueBear {
     }
     Input::InputManager& Display::MainGameState::getInputManager() {
       return inputManager;
+    }
+    std::map< std::string, std::shared_ptr< Shader > >& Display::MainGameState::getRegisteredShaders() {
+      return registeredShaders;
     }
     int Display::MainGameState::lua_zoomIn( lua_State* L ) {
       Display::MainGameState* self = ( Display::MainGameState* )lua_touserdata( L, lua_upvalueindex( 1 ) );

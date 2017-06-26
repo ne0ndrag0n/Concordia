@@ -94,7 +94,7 @@ namespace BlueBear {
           lua_State* L;
           Input::InputManager inputManager;
           unsigned int currentRotation;
-          std::shared_ptr< Shader > defaultShader;
+          std::map< std::string, std::shared_ptr< Shader > > registeredShaders;
           Camera camera;
           std::unique_ptr< Model > floorModel;
           ImageCache imageCache;
@@ -128,6 +128,7 @@ namespace BlueBear {
           void handleEvent( sf::Event& event );
           ImageCache& getImageCache();
           Input::InputManager& getInputManager();
+          std::map< std::string, std::shared_ptr< Shader > >& getRegisteredShaders();
           MainGameState( Display& instance, unsigned int currentRotation, Containers::Collection3D< std::shared_ptr< Scripting::Tile > >& floorMap, Containers::Collection3D< std::shared_ptr< Scripting::WallCell > >& wallMap );
           ~MainGameState();
       };

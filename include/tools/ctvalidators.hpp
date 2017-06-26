@@ -40,6 +40,12 @@
     return 0; \
   }
 
+#define VERIFY_TABLE_N( tag, func, n ) \
+  if( !lua_istable( L, -n ) ) { \
+    Log::getInstance().warn( tag, "Argument " #n " provided to " func " must be a table." ); \
+    return 0; \
+  }
+
 #define VERIFY_POINTER( ptr, tag ) \
   if( !( ptr ) ) { \
     Log::getInstance().warn( tag, "This pseudo-element must first be associated with an element object." ); \

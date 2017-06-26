@@ -92,6 +92,9 @@ local Flowers = bluebear.extend( "system.entity.base", "game.flowers.base", {
 } )
 
 function Flowers:main()
+	-- TODO: Until we add the ability to refer to instances from the console
+	flowers = self
+
 	if self.water_level > 0 then
 		self.water_level = self.water_level - 10
 	end
@@ -104,6 +107,17 @@ end
 function Flowers:replenish_water()
 	print( Flowers.name, "Replenishing water" )
 	self.water_level = 100
+end
+
+function Flowers:setup_world()
+	self.model_loader = bluebear.world.get_model_loader()
+	print( Flowers.name, 'Created model loader for object.' )
+
+	self.model_loader:load_model( 'bgb', 'dev/box/cylinder.fbx' )
+	print( Flowers.name, 'Loaded model.' )
+
+	self.pipe = self.model_loader:get_instance( 'bgb', { 0.0, 0.0, 0.0 } )
+	print( Flowers.name, 'Got an instance of that model.' )
 end
 
 bluebear.register_class( Flowers )
