@@ -35,6 +35,51 @@ function Entity:get_interactions( player )
 end
 
 --[[
+	This is if your entity has any visible objects on the lot. Sets up self.model_loader
+	and opens up a few models
+--]]
+function Entity:setup_models( models )
+	self.model_loader = bluebear.world.get_model_loader()
+	self.world_objects = {}
+
+	if type( models ) == 'table' then
+		for key, value in pairs( models ) do
+			self.model_loader:load_model( key, value )
+		end
+	end
+end
+
+--[[
+	Place a new object into the game world
+--]]
+function Entity:place_object( id, coord )
+	local instance = self.model_loader:get_instance( id, coord )
+
+	table.insert( self.world_objects, instance )
+
+	return instance
+end
+
+--[[
+	Remove an object from the game world
+--]]
+function Entity:remove_object( obj )
+	local index = nil
+
+	-- Get the index
+	for i, value in ipairs( self.world_objects ) do
+		if value == obj then
+			index = i
+			break
+		end
+	end
+
+	if not index == nil then
+		table.remove( self.world_objects, index )
+	end
+end
+
+--[[
   Provide interfaces for objects placed on a lot
 --]]
 function Entity:on_create() end

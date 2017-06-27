@@ -11,6 +11,7 @@
 #include <functional>
 #include <map>
 #include <regex>
+#include <unordered_set>
 
 namespace BlueBear {
   namespace Scripting {
@@ -41,7 +42,6 @@ namespace BlueBear {
         std::map< std::string, Callback > substitutions;
         // When loading a lot from disk, use these maps to track top-level objects
         std::map< std::string, LuaReference > globalEntities;
-        std::map< std::string, LuaReference > globalInstanceEntities;
 
         // --- saving ---
         void createTableOnMasterList();
@@ -74,6 +74,11 @@ namespace BlueBear {
         bool globalItemExists( const std::string& addressKey );
         void unpackUpvalues( Json::Value& upvalues );
         void setUpvalueByIndex( int upvalueIndex );
+        void unpackEntityManager(
+          const Json::Value& entityManager,
+          std::vector< LuaReference >& refs,
+          std::unordered_set< LuaReference >& waitingTableExclusions
+        );
 
       public:
         Serializer( lua_State* L );
@@ -82,7 +87,7 @@ namespace BlueBear {
          * Save the world to JSON value
          */
         Json::Value saveWorld( std::vector< LuaReference >& objects, Engine& engine );
-        std::vector< LuaReference > loadWorld( Json::Value& engineDefinition, Engine& engine );
+        void loadWorld( Json::Value& engineDefinition, Engine& engine );
       };
 
     }

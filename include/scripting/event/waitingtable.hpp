@@ -33,7 +33,11 @@ namespace BlueBear {
       public:
         std::queue< LuaReference > queuedCallbacks;
 
-        std::unordered_set< LuaReference > loadFromJSON( Json::Value& loadingTable, std::map< std::string, LuaReference >& entities );
+        void loadFromJSON(
+          Json::Value& loadingTable,
+          std::map< std::string, LuaReference >& entities,
+          std::unordered_set< LuaReference >& visitedItems
+        );
         Json::Value saveToJSON( lua_State* L );
 
         std::string waitForTick( Tick deadline, LuaReference function );

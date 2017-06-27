@@ -8,8 +8,7 @@ namespace BlueBear {
   namespace Scripting {
     namespace Event {
 
-      std::unordered_set< LuaReference > WaitingTable::loadFromJSON( Json::Value& loadingTable, std::map< std::string, LuaReference >& entities ) {
-        std::unordered_set< LuaReference > visitedItems;
+      void WaitingTable::loadFromJSON( Json::Value& loadingTable, std::map< std::string, LuaReference >& entities, std::unordered_set< LuaReference >& visitedItems ) {
 
         // do timerMap
         Json::Value& timerMap = loadingTable[ "timerMap" ];
@@ -30,7 +29,6 @@ namespace BlueBear {
           }
         }
 
-        return visitedItems;
       }
 
       /**

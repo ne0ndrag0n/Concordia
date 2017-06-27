@@ -316,7 +316,7 @@ namespace BlueBear {
 
 					// Deserialize the world
 					LuaKit::Serializer serializer( L );
-					objects = serializer.loadWorld( engineJSON, *this );
+					serializer.loadWorld( engineJSON, *this );
 				} else {
 					Log::getInstance().error( "Engine::loadLot", "Unable to parse " + std::string( lotPath ) );
 					return false;

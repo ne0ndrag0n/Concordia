@@ -110,14 +110,11 @@ function Flowers:replenish_water()
 end
 
 function Flowers:setup_world()
-	self.model_loader = bluebear.world.get_model_loader()
-	print( Flowers.name, 'Created model loader for object.' )
+	self:setup_models( {
+		[ 'bgb' ] = 'dev/box/cylinder.fbx'
+	} )
 
-	self.model_loader:load_model( 'bgb', 'dev/box/cylinder.fbx' )
-	print( Flowers.name, 'Loaded model.' )
-
-	self.pipe = self.model_loader:get_instance( 'bgb', { 0.0, 0.0, 0.0 } )
-	print( Flowers.name, 'Got an instance of that model.' )
+	self.pipe = self:place_object( 'bgb', { 0.0, 0.0, 0.0 } )
 end
 
 bluebear.register_class( Flowers )

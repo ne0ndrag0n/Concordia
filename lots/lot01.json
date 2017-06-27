@@ -40,6 +40,10 @@
 				"60": [ "0xfffffffffffc" ]
 			}
 		},
+		"entityManager": [
+			"0x5609738a47e0",
+			"0xfffffffffffd"
+		],
 		"world": {
 		   "0x5609738a47e0" : {
 		      "classID" : "game.flowers.base",

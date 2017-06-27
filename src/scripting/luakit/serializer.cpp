@@ -11,7 +11,6 @@
 #include <sstream>
 #include <iomanip>
 #include <regex>
-#include <unordered_set>
 
 namespace BlueBear {
   namespace Scripting {
@@ -99,11 +98,10 @@ namespace BlueBear {
       /**
        * Load (deserialise) the game world.
        */
-      std::vector< LuaReference > Serializer::loadWorld( Json::Value& engineDefinition, Engine& engine ) {
+      void Serializer::loadWorld( Json::Value& engineDefinition, Engine& engine ) {
         world = engineDefinition[ "world" ];
 
         globalEntities.clear();
-        globalInstanceEntities.clear();
 
         // STOP the garbage collector so pointer references remain intact as we operate
         lua_gc( L, LUA_GCSTOP, 0 );
@@ -119,7 +117,10 @@ namespace BlueBear {
 
         // Load waiting functions into waitingTableExclusions, returning a list of items that should NOT be unref'd
         // TODO: This is shit. Would it kill us to repurpose globalInstanceEntities into a general list where references are not released?
-        std::unordered_set< LuaReference > waitingTableExclusions = engine.waitingTable.loadFromJSON( engineDefinition[ "waitingTable" ], globalEntities );
+        std::unordered_set< LuaReference > waitingTableExclusions;
+
+        engine.waitingTable.loadFromJSON( engineDefinition[ "waitingTable" ], globalEntities, waitingTableExclusions );
+        unpackEntityManager( engineDefinition[ "entityManager" ], engine.objects, waitingTableExclusions );
 
         // Release references to items we no longer require. This allows the engine to start discarding items it no longer requires.
         for( auto& entityPair : globalEntities ) {
@@ -132,14 +133,16 @@ namespace BlueBear {
         // If, for some reason, there's any disconnected item in the original file...it will be discarded here
         lua_gc( L, LUA_GCRESTART, 0 );
         lua_gc( L, LUA_GCCOLLECT, 0 );
+      }
 
-        // Return the globalInstanceEntities map as a vector
-        std::vector< LuaReference > serializableInstances;
-        for( auto& instancePair : globalInstanceEntities ) {
-          serializableInstances.push_back( instancePair.second );
+      void Serializer::unpackEntityManager( const Json::Value& entityManager, std::vector< LuaReference >& refs, std::unordered_set< LuaReference >& waitingTableExclusions ) {
+        for( const Json::Value& arrayVal : entityManager ) {
+          std::string pointer = arrayVal.asString();
+
+          LuaReference entity = globalEntities.at( pointer );
+          refs.push_back( entity );
+          waitingTableExclusions.insert( entity );
         }
-
-        return serializableInstances;
       }
 
       /**
@@ -222,7 +225,7 @@ namespace BlueBear {
         // No metatable? itable-type objects should never set a metatable because middleclass already does that. Consequently, you should never fuck with the metatable in your game entities.
 
         // Set reference
-        int ref = globalInstanceEntities[ addressKey ] = luaL_ref( L, LUA_REGISTRYINDEX ); // Class bluebear
+        int ref = globalEntities[ addressKey ] = luaL_ref( L, LUA_REGISTRYINDEX ); // Class bluebear
 
         lua_pop( L, 2 ); // EMPTY
 
@@ -374,12 +377,6 @@ namespace BlueBear {
           return;
         }
 
-        auto gieEntry = globalInstanceEntities.find( addressKey );
-        if( gieEntry != globalInstanceEntities.end() ) {
-          lua_rawgeti( L, LUA_REGISTRYINDEX, gieEntry->second ); // item
-          return;
-        }
-
         // If we got here, then it looks like we need to create the item before pushing it onto the stack
         lua_rawgeti( L, LUA_REGISTRYINDEX, createGlobalItem( addressKey ) ); // item
       }
@@ -425,10 +422,10 @@ namespace BlueBear {
       }
 
       /**
-       * Returns true if the addressKey is defined in either globalEntities or globalInstanceEntities
+       * Returns true if the addressKey is defined in either globalEntities
        */
       bool Serializer::globalItemExists( const std::string& addressKey ) {
-        return ( globalEntities.find( addressKey ) != globalEntities.end() ) || ( globalInstanceEntities.find( addressKey ) != globalInstanceEntities.end() );
+        return globalEntities.find( addressKey ) != globalEntities.end();
       }
 
       /**
