@@ -40,7 +40,7 @@ int main() {
 		Log::getInstance().error( "main", "Failed to load demo lot!" );
 	}
 
-	Graphics::Display display( engine.L );
+	Graphics::Display display( &engine );
 	display.openDisplay();
 
 	// send engine lot data to display

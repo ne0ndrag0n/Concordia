@@ -35,6 +35,7 @@ namespace BlueBear {
   class EventManager;
 
   namespace Scripting {
+    class Engine;
     class Lot;
   }
 
@@ -59,7 +60,7 @@ namespace BlueBear {
       static const std::string FLOOR_MODEL_PATH;
 
       // RAII style
-      Display( lua_State* L );
+      Display( Scripting::Engine* e );
       ~Display();
 
       void openDisplay();
@@ -113,6 +114,7 @@ namespace BlueBear {
           void createWallInstances();
           void setupGUI();
           void submitLuaContributions();
+          void drawWorldInstances();
           static int lua_rotateWorldLeft( lua_State* L );
           static int lua_rotateWorldRight( lua_State* L );
           static int lua_zoomIn( lua_State* L );
@@ -135,6 +137,7 @@ namespace BlueBear {
       // ----------------------------
 
       private:
+        Scripting::Engine* engine;
         lua_State* L;
         using ViewportDimension = int;
         ViewportDimension x;

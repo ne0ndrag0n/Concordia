@@ -46,7 +46,7 @@ namespace BlueBear {
     const std::string Display::WALLPANEL_MODEL_DR_PATH = "system/models/wall/diagwall.dae";
     const std::string Display::FLOOR_MODEL_PATH = "system/models/floor/floor.dae";
 
-    Display::Display( lua_State* L ) : L( L ) {
+    Display::Display( Scripting::Engine* e ) : engine( e ), L( e->L ) {
       // Get our settings out of the config manager
       x = ConfigManager::getInstance().getIntValue( "viewport_x" );
       y = ConfigManager::getInstance().getIntValue( "viewport_y" );
@@ -544,16 +544,52 @@ namespace BlueBear {
         }
       }
 
-      // USES VARYING SHADERS
-      std::vector< ShaderInstanceBundle > dynamicInstances;
-      // TODO: Generate them from the list of tracked entities
-      for( ShaderInstanceBundle& bundle : dynamicInstances ) {
-        bundle.drawInstances( camera );
-      }
+      drawWorldInstances();
 
       processOsd();
 
       instance.mainWindow.display();
+    }
+    void Display::MainGameState::drawWorldInstances() {
+      std::unordered_map< std::shared_ptr< Shader >, std::vector< std::shared_ptr< Instance > > > bundles;
+
+      // For each entity, dig through its world_objects field (if present) and retrieve all the instances that need to be drawn
+      for( LuaReference entity : instance.engine->objects ) {
+        lua_rawgeti( L, LUA_REGISTRYINDEX, entity ); // table
+        lua_getfield( L, -1, "world_objects" ); // world_objects table
+
+        if( lua_istable( L, -1 ) ) {
+          unsigned int size = lua_rawlen( L, -1 );
+          for( int i = 1; i <= size; i++ ) {
+            // Screen for bluebear_graphics_instance
+            lua_rawgeti( L, -1, i ); // item world_objects table
+
+            LuaInstanceHelper** helperPtr = ( LuaInstanceHelper** ) luaL_testudata( L, 3, "bluebear_graphics_instance" );
+            if( helperPtr ) {
+              LuaInstanceHelper* helper = *helperPtr;
+
+              bundles[ helper->shader ].push_back( helper->instance );
+            }
+
+            lua_pop( L, 1 ); // world_objects table
+          }
+        }
+
+        lua_pop( L, 2 ); // EMPTY
+      }
+
+      // Now draw each
+      for( auto& pair : bundles ) {
+        // pair.first is the shader
+        pair.first->use();
+
+        // need to re-send the camera
+        camera.sendToShader();
+
+        for( std::shared_ptr< Instance > individualInstance : pair.second ) {
+          individualInstance->drawEntity();
+        }
+      }
     }
     void Display::MainGameState::handleEvent( sf::Event& event ) {
       // Useful for some metadata in event handling
