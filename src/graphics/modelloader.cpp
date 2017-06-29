@@ -2,6 +2,7 @@
 #include "graphics/model.hpp"
 #include "graphics/display.hpp"
 #include "tools/ctvalidators.hpp"
+#include "exceptions/nullpointerexception.hpp"
 #include "log.hpp"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -73,6 +74,35 @@ namespace BlueBear {
       instanceHelper->instance->setPosition( initialPosition );
 
       return 1;
+    }
+
+    int LuaInstanceHelper::lua_getAnimList( lua_State* L ) {
+      LuaInstanceHelper* self = *( ( LuaInstanceHelper** ) luaL_checkudata( L, 1, "bluebear_graphics_instance" ) );
+
+      lua_newtable( L ); // table
+
+      try {
+        std::map< std::string, Animation >& animation = self->instance->getAnimList();
+
+        unsigned int index = 0;
+        for( auto& pair : animation ) {
+          lua_pushstring( L, pair.first.c_str() ); // "string" table
+          lua_rawseti( L, -2, ++index ); // table
+        }
+      } catch( Exceptions::NullPointerException& e ) {
+        Log::getInstance().warn( "LuaInstanceHelper::lua_getAnimList", "This model has no animations!" );
+      }
+
+      return 1;
+    }
+
+    int LuaInstanceHelper::lua_setAnimation( lua_State* L ) {
+      VERIFY_STRING_N( "LuaInstanceHelper::lua_setAnimation", "set_anim", 1 );
+
+      LuaInstanceHelper* self = *( ( LuaInstanceHelper** ) luaL_checkudata( L, 1, "bluebear_graphics_instance" ) );
+      self->instance->setAnimation( lua_tostring( L, -1 ) );
+
+      return 0;
     }
 
     int ModelLoaderHelper::lua_gc( lua_State* L ) {

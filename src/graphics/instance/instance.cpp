@@ -1,5 +1,6 @@
 #include "graphics/instance/instance.hpp"
 #include "graphics/armature/armature.hpp"
+#include "exceptions/nullpointerexception.hpp"
 #include "graphics/model.hpp"
 #include "graphics/drawable.hpp"
 #include "graphics/animplayer.hpp"
@@ -150,6 +151,14 @@ namespace BlueBear {
     void Instance::setRotationAngle( GLfloat rotationAngle, const glm::vec3& rotationAxes ) {
       // Generate new quat
       transform->setRotationAngle( rotationAngle, rotationAxes );
+    }
+
+    std::map< std::string, Animation >& Instance::getAnimList() {
+      if( !animations ) {
+        throw Exceptions::NullPointerException();
+      }
+
+      return *animations;
     }
 
   }

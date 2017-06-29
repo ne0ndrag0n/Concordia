@@ -114,7 +114,7 @@ function Flowers:setup_world()
 		[ 'bgb' ] = 'dev/box/cylinder.fbx'
 	} )
 
-	self:place_object( 'bgb', { 2.5, 2.5, 0.0 } )
+	self.pipe = self:place_object( 'bgb', { 2.5, 2.5, 0.0 } )
 end
 
 bluebear.register_class( Flowers )

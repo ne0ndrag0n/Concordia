@@ -29,6 +29,8 @@ namespace BlueBear {
       std::shared_ptr< Shader > shader;
       std::shared_ptr< Instance > instance;
 
+      static int lua_getAnimList( lua_State* L );
+      static int lua_setAnimation( lua_State* L );
       static int lua_gc( lua_State* L );
     };
   }
