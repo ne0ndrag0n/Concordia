@@ -16,11 +16,16 @@ namespace BlueBear {
       Animation& animation;
       double interval;
       double step = 0.0;
+      bool paused = false;
 
     public:
       AnimPlayer( Animation& animation );
       void reset();
       std::shared_ptr< Armature > generateNextFrame( std::shared_ptr< Armature > bindPose );
+      std::shared_ptr< Armature > generateFrame( std::shared_ptr< Armature > bindPose, double step );
+
+      bool getPaused();
+      void pause();
     };
 
   }

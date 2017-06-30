@@ -22,11 +22,16 @@ namespace BlueBear {
      * AnimPlayer should "suicide" once this is completed (from instance)
      */
     std::shared_ptr< Armature > AnimPlayer::generateNextFrame( std::shared_ptr< Armature > bindPose ) {
-      step += interval;
+      if ( !paused ) {
+        return generateFrame( bindPose, step += interval );
+      }
+    }
+
+    std::shared_ptr< Armature > AnimPlayer::generateFrame( std::shared_ptr< Armature > bindPose, double newStep ) {
+      step = newStep;
 
       if( step <= animation.duration ) {
         // Generate next frame
-
         std::shared_ptr< Armature > newPose = std::make_shared< Armature >( *bindPose );
 
         // Spray the replacement keyframes onto the former bind pose
@@ -38,6 +43,14 @@ namespace BlueBear {
       } else {
         return bindPose;
       }
+    }
+
+    bool AnimPlayer::getPaused() {
+      return paused;
+    }
+
+    void AnimPlayer::pause() {
+      paused = !paused;
     }
   }
 }
