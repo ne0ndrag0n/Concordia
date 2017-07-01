@@ -1,6 +1,5 @@
 #include "graphics/instance/instance.hpp"
 #include "graphics/armature/armature.hpp"
-#include "exceptions/nullpointerexception.hpp"
 #include "graphics/model.hpp"
 #include "graphics/drawable.hpp"
 #include "graphics/animplayer.hpp"
@@ -153,12 +152,8 @@ namespace BlueBear {
       transform->setRotationAngle( rotationAngle, rotationAxes );
     }
 
-    std::map< std::string, Animation >& Instance::getAnimList() {
-      if( !animations ) {
-        throw Exceptions::NullPointerException();
-      }
-
-      return *animations;
+    std::shared_ptr< std::map< std::string, Animation > > Instance::getAnimList() {
+      return animations;
     }
 
   }

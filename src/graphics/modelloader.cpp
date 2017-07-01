@@ -81,15 +81,15 @@ namespace BlueBear {
 
       lua_newtable( L ); // table
 
-      try {
-        std::map< std::string, Animation >& animation = self->instance->getAnimList();
+      std::shared_ptr< std::map< std::string, Animation > > animation = self->instance->getAnimList();
 
+      if( animation ) {
         unsigned int index = 0;
-        for( auto& pair : animation ) {
+        for( auto& pair : *animation ) {
           lua_pushstring( L, pair.first.c_str() ); // "string" table
           lua_rawseti( L, -2, ++index ); // table
         }
-      } catch( Exceptions::NullPointerException& e ) {
+      } else {
         Log::getInstance().warn( "LuaInstanceHelper::lua_getAnimList", "This model has no animations!" );
       }
 
