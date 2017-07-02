@@ -25,6 +25,9 @@ namespace BlueBear {
       if ( !paused ) {
         return generateFrame( bindPose, step += interval );
       }
+
+      // Returns nullptr when there's no change to be made on this frame
+      return nullptr;
     }
 
     std::shared_ptr< Armature > AnimPlayer::generateFrame( std::shared_ptr< Armature > bindPose, double newStep ) {
@@ -51,6 +54,10 @@ namespace BlueBear {
 
     void AnimPlayer::pause() {
       paused = !paused;
+    }
+
+    std::string AnimPlayer::getAnimationID() {
+      return animation.animationID;
     }
   }
 }

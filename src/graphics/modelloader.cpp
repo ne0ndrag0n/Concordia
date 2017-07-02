@@ -97,12 +97,37 @@ namespace BlueBear {
     }
 
     int LuaInstanceHelper::lua_setAnimation( lua_State* L ) {
-      VERIFY_STRING_N( "LuaInstanceHelper::lua_setAnimation", "set_anim", 1 );
+      unsigned int argumentCount = lua_gettop( L );
+      bool playNow = true;
+      std::string animationID;
+
+      if( argumentCount == 2 ) {
+        VERIFY_STRING_N( "LuaInstanceHelper::lua_setAnimation", "set_anim", 1 );
+
+        animationID = lua_tostring( L, -1 );
+      } else if( argumentCount == 3 ) {
+        VERIFY_BOOLEAN_N( "LuaInstanceHelper::lua_setAnimation", "set_anim", 1 );
+        VERIFY_STRING_N( "LuaInstanceHelper::lua_setAnimation", "set_anim", 2 );
+
+        playNow = lua_toboolean( L, -1 ) ? true : false;
+        animationID = lua_tostring( L, -2 );
+      } else {
+        Log::getInstance().warn( "LuaInstanceHelper::lua_setAnimation", "Pass either (self, string, bool) or (self, string)." );
+        return 0;
+      }
 
       LuaInstanceHelper* self = *( ( LuaInstanceHelper** ) luaL_checkudata( L, 1, "bluebear_graphics_instance" ) );
-      self->instance->setAnimation( lua_tostring( L, -1 ) );
+      self->instance->setAnimation( animationID, playNow );
 
       return 0;
+    }
+
+    int LuaInstanceHelper::lua_getAnimation( lua_State* L ) {
+      LuaInstanceHelper* self = *( ( LuaInstanceHelper** ) luaL_checkudata( L, 1, "bluebear_graphics_instance" ) );
+
+      lua_pushstring( L, self->instance->getAnimation().c_str() );
+
+      return 1;
     }
 
     int ModelLoaderHelper::lua_gc( lua_State* L ) {

@@ -26,6 +26,8 @@ namespace BlueBear {
 
       bool getPaused();
       void pause();
+
+      std::string getAnimationID();
     };
 
   }

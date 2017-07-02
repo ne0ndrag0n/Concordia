@@ -29,6 +29,7 @@ namespace BlueBear {
       KeyframeBundleMap keyframes;
       double duration;
       double frameRate;
+      std::string animationID;
     };
   }
 }

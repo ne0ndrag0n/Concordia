@@ -304,6 +304,7 @@ namespace BlueBear {
         Animation& currentAnimation = ( *animations )[ anim->mName.C_Str() ];
         currentAnimation.duration = anim->mDuration;
         currentAnimation.frameRate = anim->mTicksPerSecond;
+        currentAnimation.animationID = anim->mName.C_Str();
 
         // Each channel controls the behaviour of one particular node
         for( int i = 0; i != anim->mNumChannels; i++ ) {

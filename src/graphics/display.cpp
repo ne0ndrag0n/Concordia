@@ -346,6 +346,7 @@ namespace BlueBear {
       luaL_Reg luaInstanceHelperFuncs[] = {
         { "get_anim_list", LuaInstanceHelper::lua_getAnimList },
         { "set_anim", LuaInstanceHelper::lua_setAnimation },
+        { "get_anim", LuaInstanceHelper::lua_getAnimation },
         { "__gc", LuaInstanceHelper::lua_gc },
         { NULL, NULL }
       };

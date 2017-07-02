@@ -64,7 +64,7 @@ namespace BlueBear {
     /**
      * setAnimation will act the same whether or not it's called on a child node or the root node. It will activate all animations as if called from the top of the scene graph.
      */
-    void Instance::setAnimation( const std::string& animKey ) {
+    void Instance::setAnimation( const std::string& animKey, bool playNow ) {
       if( !animations ) {
         Log::getInstance().warn( "Instance::setAnimation", "This instance has no animations." );
         return;
@@ -77,6 +77,19 @@ namespace BlueBear {
       }
 
       currentAnimation = std::make_shared< AnimPlayer >( it->second );
+
+      if( !playNow ) {
+        currentAnimation->pause();
+      }
+    }
+
+    std::string Instance::getAnimation() {
+      if( currentAnimation ) {
+        return currentAnimation->getAnimationID();
+      }
+
+      // Blank = no animation
+      return "";
     }
 
     /**
@@ -85,12 +98,18 @@ namespace BlueBear {
     void Instance::updateAnimationPose() {
       if( currentAnimation ) {
         // Use currentAnimation to get new Armature based off the bind pose
-        currentPose = currentAnimation->generateNextFrame( bindPose );
+        std::shared_ptr< Armature > candidatePose = currentAnimation->generateNextFrame( bindPose );
 
-        // When we get back the bind pose, we're done playing this animation
-        if( currentPose == bindPose ) {
-          currentAnimation = nullptr;
+        if( candidatePose ) {
+          currentPose = candidatePose;
+
+          // When we get back the bind pose, we're done playing this animation
+          if( currentPose == bindPose ) {
+            currentAnimation = nullptr;
+          }
         }
+
+        // Without a candidate pose (if nullptr is returned), there's no update to be made on this frame.
       }
     }
 
@@ -154,6 +173,10 @@ namespace BlueBear {
 
     std::shared_ptr< std::map< std::string, Animation > > Instance::getAnimList() {
       return animations;
+    }
+
+    std::shared_ptr< AnimPlayer > Instance::getAnimPlayer() {
+      return currentAnimation;
     }
 
   }
