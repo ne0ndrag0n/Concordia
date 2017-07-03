@@ -54,6 +54,8 @@ namespace BlueBear {
 
         std::string getAnimation();
 
+        void setAnimationFrame( double frame );
+
         std::shared_ptr< Instance > findChildByName( std::string name );
 
         void drawEntity();

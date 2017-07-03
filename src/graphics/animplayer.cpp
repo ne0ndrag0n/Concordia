@@ -33,6 +33,8 @@ namespace BlueBear {
     std::shared_ptr< Armature > AnimPlayer::generateFrame( std::shared_ptr< Armature > bindPose, double newStep ) {
       step = newStep;
 
+      Log::getInstance().debug( "AnimPlayer::generateFrame", std::to_string( step ) );
+
       if( step <= animation.duration ) {
         // Generate next frame
         std::shared_ptr< Armature > newPose = std::make_shared< Armature >( *bindPose );
@@ -58,6 +60,10 @@ namespace BlueBear {
 
     std::string AnimPlayer::getAnimationID() {
       return animation.animationID;
+    }
+
+    double AnimPlayer::getAnimationDuration() {
+      return animation.duration;
     }
   }
 }

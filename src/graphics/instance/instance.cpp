@@ -92,6 +92,14 @@ namespace BlueBear {
       return "";
     }
 
+    void Instance::setAnimationFrame( double frame ) {
+      if( currentAnimation ) {
+        currentPose = currentAnimation->generateFrame( bindPose, frame );
+      } else {
+        Log::getInstance().warn( "Instance::setAnimationFrame", "This instance has no active animation." );
+      }
+    }
+
     /**
      * Update the animation pose if an AnimPlayer is attached.
      */

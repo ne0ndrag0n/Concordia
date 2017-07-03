@@ -347,6 +347,10 @@ namespace BlueBear {
         { "get_anim_list", LuaInstanceHelper::lua_getAnimList },
         { "set_anim", LuaInstanceHelper::lua_setAnimation },
         { "get_anim", LuaInstanceHelper::lua_getAnimation },
+        { "pause_anim", LuaInstanceHelper::lua_pauseAnimation },
+        { "is_anim_paused", LuaInstanceHelper::lua_isAnimationPaused },
+        { "set_anim_frame", LuaInstanceHelper::lua_setAnimationFrame },
+        { "get_anim_duration", LuaInstanceHelper::lua_getAnimationDuration },
         { "__gc", LuaInstanceHelper::lua_gc },
         { NULL, NULL }
       };

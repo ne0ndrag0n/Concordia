@@ -32,6 +32,10 @@ namespace BlueBear {
       static int lua_getAnimList( lua_State* L );
       static int lua_getAnimation( lua_State* L );
       static int lua_setAnimation( lua_State* L );
+      static int lua_pauseAnimation( lua_State* L );
+      static int lua_isAnimationPaused( lua_State* L );
+      static int lua_setAnimationFrame( lua_State* L );
+      static int lua_getAnimationDuration( lua_State* L );
       static int lua_gc( lua_State* L );
     };
   }

@@ -1,6 +1,7 @@
 #include "graphics/modelloader.hpp"
 #include "graphics/model.hpp"
 #include "graphics/display.hpp"
+#include "graphics/animplayer.hpp"
 #include "tools/ctvalidators.hpp"
 #include "exceptions/nullpointerexception.hpp"
 #include "log.hpp"
@@ -118,6 +119,55 @@ namespace BlueBear {
 
       LuaInstanceHelper* self = *( ( LuaInstanceHelper** ) luaL_checkudata( L, 1, "bluebear_graphics_instance" ) );
       self->instance->setAnimation( animationID, playNow );
+
+      return 0;
+    }
+
+    int LuaInstanceHelper::lua_pauseAnimation( lua_State* L ) {
+      LuaInstanceHelper* self = *( ( LuaInstanceHelper** ) luaL_checkudata( L, 1, "bluebear_graphics_instance" ) );
+
+      if( std::shared_ptr< AnimPlayer > animPlayer = self->instance->getAnimPlayer() ) {
+        animPlayer->pause();
+      } else {
+        Log::getInstance().warn( "LuaInstanceHelper::lua_pauseAnimation", "Instance has no animation playing!" );
+      }
+
+      return 0;
+    }
+
+    int LuaInstanceHelper::lua_isAnimationPaused( lua_State* L ) {
+      LuaInstanceHelper* self = *( ( LuaInstanceHelper** ) luaL_checkudata( L, 1, "bluebear_graphics_instance" ) );
+
+      if( std::shared_ptr< AnimPlayer > animPlayer = self->instance->getAnimPlayer() ) {
+        lua_pushboolean( L, animPlayer->getPaused() ? 1 : 0 ); // true
+
+        return 1;
+      } else {
+        Log::getInstance().warn( "LuaInstanceHelper::lua_isAnimationPaused", "Instance has no animation playing!" );
+      }
+
+      return 0;
+    }
+
+    int LuaInstanceHelper::lua_setAnimationFrame( lua_State* L ) {
+      VERIFY_NUMBER_N( "LuaInstanceHelper::lua_setAnimationFrame", "set_anim_frame", 1 );
+
+      LuaInstanceHelper* self = *( ( LuaInstanceHelper** ) luaL_checkudata( L, 1, "bluebear_graphics_instance" ) );
+      self->instance->setAnimationFrame( lua_tonumber( L, -1 ) );
+
+      return 0;
+    }
+
+    int LuaInstanceHelper::lua_getAnimationDuration( lua_State* L ) {
+      LuaInstanceHelper* self = *( ( LuaInstanceHelper** ) luaL_checkudata( L, 1, "bluebear_graphics_instance" ) );
+
+      if( std::shared_ptr< AnimPlayer > animPlayer = self->instance->getAnimPlayer() ) {
+        lua_pushnumber( L, animPlayer->getAnimationDuration() ); // 42.0
+
+        return 1;
+      } else {
+        Log::getInstance().warn( "LuaInstanceHelper::lua_getAnimationDuration", "Instance has no animation playing!" );
+      }
 
       return 0;
     }

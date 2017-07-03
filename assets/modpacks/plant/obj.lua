@@ -1,5 +1,7 @@
 bluebear.engine.require_modpack( "trashpile" )
 
+local modpack_path = ...
+
 local Doll = bluebear.get_class( "system.doll.base" )
 local Flowers = bluebear.extend( "system.entity.base", "game.flowers.base", {
 
@@ -99,7 +101,8 @@ function Flowers:main()
 		self.water_level = self.water_level - 10
 	end
 
-	print( Flowers.name, "Hello from Lua! I am object instance ("..bluebear.util.get_pointer( self )..") and my water level is now "..self.water_level )
+	-- This is probably something we really don't need anymore...
+	--print( Flowers.name, "Hello from Lua! I am object instance ("..bluebear.util.get_pointer( self )..") and my water level is now "..self.water_level )
 
 	self:sleep( bluebear.util.time.minutes_to_ticks( 5 ) ):then_call( bluebear.util.bind( 'game.flowers.base:main', self ) )
 end
@@ -111,10 +114,60 @@ end
 
 function Flowers:setup_world()
 	self:setup_models( {
-		[ 'bgb' ] = 'dev/box/cylinder.fbx'
+		[ 'bgb' ] = 'dev/box/cylinder.fbx',
+		[ 'knight' ] = 'dev/box/mini_knight.fbx'
 	} )
+end
 
-	self.pipe = self:place_object( 'bgb', { 2.5, 2.5, 0.0 } )
+function Flowers:knight_debug()
+	self:setup_world()
+
+	self.knight = self:place_object( 'knight', { 0.0, 0.0, 0.5 } )
+	self.knight:set_anim( 'Armature|idle', false )
+
+	bluebear.gui.add_from_path( modpack_path..'/debug_ui.xml' )
+
+	local scale = bluebear.gui.find_by_id( 'bbgame_flowers_frame_setting' )
+	scale:on( 'click', bluebear.util.bind( 'game.flowers.base:on_frame_change', self ) )
+
+	-- Setup the shits for animations
+	local anim = self.knight:get_anim()
+	if not( anim == '' ) then
+		local anim_duration = self.knight:get_anim_duration()
+
+		bluebear.gui.find_by_id( 'bbgame_flowers_anim_id' ):set_content( anim )
+		bluebear.gui.find_by_id( 'bbgame_flowers_anim_max_frames' ):set_content( anim_duration )
+
+		bluebear.gui.find_by_id( 'bbgame_flowers_step_prev' ):on( 'click', bluebear.util.bind( 'game.flowers.base:frame_step_prev', self ) )
+		bluebear.gui.find_by_id( 'bbgame_flowers_step_next' ):on( 'click', bluebear.util.bind( 'game.flowers.base:frame_step_next', self ) )
+
+		scale:set_property( 'max', anim_duration )
+	end
+end
+
+function Flowers:frame_step_prev()
+	local scale = bluebear.gui.find_by_id( 'bbgame_flowers_frame_setting' )
+	local setting = tonumber( scale:get_content() ) - 0.25
+
+	scale:set_content( setting )
+	bluebear.gui.find_by_id( 'bbgame_flowers_anim_current_frame' ):set_content( setting )
+	self.knight:set_anim_frame( setting )
+end
+
+function Flowers:frame_step_next()
+	local scale = bluebear.gui.find_by_id( 'bbgame_flowers_frame_setting' )
+	local setting = tonumber( scale:get_content() ) + 0.25
+
+	scale:set_content( setting )
+	bluebear.gui.find_by_id( 'bbgame_flowers_anim_current_frame' ):set_content( setting )
+	self.knight:set_anim_frame( setting )
+end
+
+function Flowers:on_frame_change( event )
+	local new_frame = event.widget:get_content()
+
+	self.knight:set_anim_frame( tonumber( new_frame ) )
+	bluebear.gui.find_by_id( 'bbgame_flowers_anim_current_frame' ):set_content( new_frame )
 end
 
 bluebear.register_class( Flowers )
