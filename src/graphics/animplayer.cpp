@@ -1,6 +1,7 @@
 #include "graphics/animplayer.hpp"
 #include "graphics/keyframebundle.hpp"
 #include "graphics/armature/armature.hpp"
+#include "graphics/transform.hpp"
 #include "tools/utility.hpp"
 #include "configmanager.hpp"
 #include "log.hpp"
@@ -32,8 +33,6 @@ namespace BlueBear {
 
     std::shared_ptr< Armature > AnimPlayer::generateFrame( std::shared_ptr< Armature > bindPose, double newStep ) {
       step = newStep;
-
-      Log::getInstance().debug( "AnimPlayer::generateFrame", std::to_string( step ) );
 
       if( step <= animation.duration ) {
         // Generate next frame
