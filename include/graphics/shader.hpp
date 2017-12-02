@@ -8,6 +8,7 @@ namespace BlueBear {
     class Shader {
       public:
           GLuint Program;
+          static GLint CURRENT_PROGRAM;
           Shader( const GLchar* vertexPath, const GLchar* fragmentPath );
           void use();
     };

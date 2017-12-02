@@ -14,6 +14,8 @@
 namespace BlueBear {
   namespace Graphics {
 
+    GLint Shader::CURRENT_PROGRAM = -1;
+
     Shader::Shader(const GLchar* vertexPath, const GLchar* fragmentPath) {
         // 1. Retrieve the vertex/fragment source code from filePath
         std::string vertexCode;
@@ -96,6 +98,7 @@ namespace BlueBear {
 
     void Shader::use() {
         glUseProgram(this->Program);
+        Shader::CURRENT_PROGRAM = this->Program;
     }
 
   }

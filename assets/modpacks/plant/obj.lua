@@ -115,8 +115,12 @@ end
 function Flowers:setup_world()
 	self:setup_models( {
 		[ 'bgb' ] = 'dev/box/cylinder.fbx',
-		[ 'knight' ] = 'dev/box/mini_knight.fbx'
+		[ 'plant' ] = modpack_path..'/model/plant.dae'
 	} )
+end
+
+function Flowers:test_placement()
+	self.o1 = self:place_object( 'plant', { 0.0, 0.0, 0.0 } )
 end
 
 function Flowers:knight_debug()

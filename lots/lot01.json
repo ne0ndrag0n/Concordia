@@ -2,8 +2,8 @@
 	"rev": 0,
 
 	"lot": {
-		"floorx": 6,
-		"floory": 6,
+		"floorx": 12,
+		"floory": 12,
 		"stories": 1,
 		"subtr": 0,
 		"terrain": 1,
@@ -13,10 +13,7 @@
 				"dict": [ "hardwood1", "hardwood2" ],
 				"levels": [
 					[
-						1, 0, 0, 0, 0, 0,
-						0, 0, 0, 0, 0, 0,
-						0, 0, 0, 0, 0, 0,
-						{ "run": 18, "value": 0 }
+						1, { "run": 143, "value": 0 }
 					]
 				]
 			},
@@ -25,7 +22,7 @@
 				"levels": [
 					[
 						{ "x": { "f": 0, "b": 0 } },
-						{ "run": 49, "value": -1 }
+						{ "run": 255, "value": -1 }
 					]
 				]
 			}

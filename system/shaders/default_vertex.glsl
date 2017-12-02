@@ -6,6 +6,8 @@ layout (location = 3) in ivec4 boneIDs;
 layout (location = 4) in vec4 boneWeights;
 
 out vec2 fragTexture;
+out vec3 fragNormal;
+out vec3 fragPos;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -22,7 +24,9 @@ void main()
     ( bones[ boneIDs[ 3 ] ] * boneWeights[ 3 ] );
 
   mat4 mvp = projection * view * model;
-  gl_Position = mvp * boneTransform * vec4( position, 1.0f );
 
+  gl_Position = mvp * boneTransform * vec4( position, 1.0f );
   fragTexture = texture;
+  fragNormal = normal;
+  fragPos = vec3( model * vec4( position, 1.0 ) );
 }
