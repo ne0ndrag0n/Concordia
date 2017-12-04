@@ -5,7 +5,7 @@ namespace BlueBear {
     namespace SceneGraph {
 
       void Style::sendToShader() {
-        
+
       }
 
     }
