@@ -7,7 +7,6 @@
 #include "graphics/transform.hpp"
 #include "localemanager.hpp"
 #include "scripting/lot.hpp"
-#include <thread>
 #include <SFML/Window.hpp>
 #include <SFML/System.hpp>
 #include <memory>

@@ -11,6 +11,7 @@ namespace BlueBear {
     class OpenGL {
     public:
       static GLint getUniformLocation( const std::string& uniform );
+      static GLint getUniformID( const std::string& uniform );
 
       struct IncorrectShaderException : public std::exception {
 
