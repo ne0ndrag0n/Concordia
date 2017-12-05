@@ -23,7 +23,7 @@ namespace BlueBear {
 
       public:
         Model( std::weak_ptr< Model > parent, std::string id, std::shared_ptr< Mesh > mesh, std::unique_ptr< Style > style );
-        Model::~Model() = default;
+        ~Model() = default;
 
         const std::string& getId() const;
         void setId( const std::string& id );

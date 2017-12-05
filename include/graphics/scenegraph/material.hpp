@@ -2,10 +2,9 @@
 #define SG_MATERIAL
 
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include <vector>
 #include <memory>
+#include <exception>
 
 namespace BlueBear {
   namespace Graphics {
@@ -22,13 +21,36 @@ namespace BlueBear {
         glm::vec4 specularColor;
         TextureList diffuseTextures;
         TextureList specularTextures;
-        float shininess;
+        float shininess = 0.0f;
+        bool useAmbient = false;
+
+        void checkTextureUnits();
 
       public:
-        Material( glm::vec4 ambientColor, glm::vec4 diffuseColor, glm::vec4 specularColor, float shininess );
-        Material( glm::vec4 ambientColor, TextureList diffuseTextures, TextureList specularTextures, float shininess );
+        struct ExceededTextureUnitsException : public std::exception {
+          const char* what() const throw() {
+            return "Exceeded the maximum texture units for this hardware.";
+          }
+        };
 
-        
+        Material( glm::vec4 ambientColor, glm::vec4 diffuseColor, glm::vec4 specularColor, float shininess );
+        Material( glm::vec4 diffuseColor, glm::vec4 specularColor, float shininess );
+
+        Material( glm::vec4 ambientColor, TextureList diffuseTextures, TextureList specularTextures, float shininess );
+        Material( TextureList diffuseTextures, TextureList specularTextures, float shininess );
+
+        Material( glm::vec4 ambientColor, TextureList diffuseTextures, float shininess );
+
+        glm::vec4 getAmbientColor();
+        glm::vec4 getDiffuseColor();
+        glm::vec4 getSpecularColor();
+
+        TextureList getDiffuseTextureList();
+        TextureList getSpecularTextureList();
+
+        float getShininess();
+
+        void send();
       };
 
     }
