@@ -16,9 +16,9 @@ namespace BlueBear {
       using TextureList = std::vector< std::shared_ptr< Texture > >;
 
       class Material {
-        glm::vec4 ambientColor;
-        glm::vec4 diffuseColor;
-        glm::vec4 specularColor;
+        glm::vec3 ambientColor;
+        glm::vec3 diffuseColor;
+        glm::vec3 specularColor;
         TextureList diffuseTextures;
         TextureList specularTextures;
         float shininess = 0.0f;
@@ -33,17 +33,17 @@ namespace BlueBear {
           }
         };
 
-        Material( glm::vec4 ambientColor, glm::vec4 diffuseColor, glm::vec4 specularColor, float shininess );
-        Material( glm::vec4 diffuseColor, glm::vec4 specularColor, float shininess );
+        Material( glm::vec3 ambientColor, glm::vec3 diffuseColor, glm::vec3 specularColor, float shininess );
+        Material( glm::vec3 diffuseColor, glm::vec3 specularColor, float shininess );
 
-        Material( glm::vec4 ambientColor, TextureList diffuseTextures, TextureList specularTextures, float shininess );
+        Material( glm::vec3 ambientColor, TextureList diffuseTextures, TextureList specularTextures, float shininess );
         Material( TextureList diffuseTextures, TextureList specularTextures, float shininess );
 
-        Material( glm::vec4 ambientColor, TextureList diffuseTextures, float shininess );
+        Material( glm::vec3 ambientColor, TextureList diffuseTextures, float shininess );
 
-        glm::vec4 getAmbientColor();
-        glm::vec4 getDiffuseColor();
-        glm::vec4 getSpecularColor();
+        glm::vec3 getAmbientColor();
+        glm::vec3 getDiffuseColor();
+        glm::vec3 getSpecularColor();
 
         TextureList getDiffuseTextureList();
         TextureList getSpecularTextureList();

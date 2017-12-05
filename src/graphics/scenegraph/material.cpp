@@ -7,13 +7,13 @@ namespace BlueBear {
   namespace Graphics {
     namespace SceneGraph {
 
-      Material::Material( glm::vec4 ambientColor, glm::vec4 diffuseColor, glm::vec4 specularColor, float shininess ) :
+      Material::Material( glm::vec3 ambientColor, glm::vec3 diffuseColor, glm::vec3 specularColor, float shininess ) :
         ambientColor( ambientColor ), diffuseColor( diffuseColor ), specularColor( specularColor ), shininess( shininess ), useAmbient( true ) {}
 
-      Material::Material( glm::vec4 diffuseColor, glm::vec4 specularColor, float shininess ) :
+      Material::Material( glm::vec3 diffuseColor, glm::vec3 specularColor, float shininess ) :
         diffuseColor( diffuseColor ), specularColor( specularColor ), shininess( shininess ) {}
 
-      Material::Material( glm::vec4 ambientColor, TextureList diffuseTextures, TextureList specularTextures, float shininess ) :
+      Material::Material( glm::vec3 ambientColor, TextureList diffuseTextures, TextureList specularTextures, float shininess ) :
         ambientColor( ambientColor ), diffuseTextures( diffuseTextures ), specularTextures( specularTextures ), shininess( shininess ),
         useAmbient( true ) {
           checkTextureUnits();
@@ -24,7 +24,7 @@ namespace BlueBear {
           checkTextureUnits();
         }
 
-      Material::Material( glm::vec4 ambientColor, TextureList diffuseTextures, float shininess ) :
+      Material::Material( glm::vec3 ambientColor, TextureList diffuseTextures, float shininess ) :
         ambientColor( ambientColor ), diffuseTextures( diffuseTextures ), shininess( shininess ), useAmbient( true ) {
           checkTextureUnits();
         }
@@ -37,15 +37,15 @@ namespace BlueBear {
         }
       }
 
-      glm::vec4 Material::getAmbientColor() {
+      glm::vec3 Material::getAmbientColor() {
         return ambientColor;
       }
 
-      glm::vec4 Material::getDiffuseColor() {
+      glm::vec3 Material::getDiffuseColor() {
         return diffuseColor;
       }
 
-      glm::vec4 Material::getSpecularColor() {
+      glm::vec3 Material::getSpecularColor() {
         return specularColor;
       }
 
@@ -65,16 +65,16 @@ namespace BlueBear {
         unsigned int counter = 0;
 
         if( useAmbient ) {
-          glUniform4f(
+          glUniform3f(
             Tools::OpenGL::getUniformLocation( "material.ambient" ),
-            ambientColor[ 0 ], ambientColor[ 1 ], ambientColor[ 2 ], ambientColor[ 3 ]
+            ambientColor[ 0 ], ambientColor[ 1 ], ambientColor[ 2 ]
           );
         }
 
         if( diffuseTextures.empty() ) {
-          glUniform4f(
+          glUniform3f(
             Tools::OpenGL::getUniformLocation( "material.diffuse" ),
-            diffuseColor[ 0 ], diffuseColor[ 1 ], diffuseColor[ 2 ], diffuseColor[ 3 ]
+            diffuseColor[ 0 ], diffuseColor[ 1 ], diffuseColor[ 2 ]
           );
         } else {
           for( int i = 0; i != diffuseTextures.size(); i++ ) {
@@ -85,9 +85,9 @@ namespace BlueBear {
         }
 
         if( specularTextures.empty() ) {
-          glUniform4f(
+          glUniform3f(
             Tools::OpenGL::getUniformLocation( "material.specular" ),
-            specularColor[ 0 ], specularColor[ 1 ], specularColor[ 2 ], specularColor[ 3 ]
+            specularColor[ 0 ], specularColor[ 1 ], specularColor[ 2 ]
           );
         } else {
           for( int i = 0; i != specularTextures.size(); i++ ) {

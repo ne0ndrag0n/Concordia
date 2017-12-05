@@ -5,6 +5,7 @@ in vec3 fragPos;
 
 out vec4 color;
 
+uniform vec3 cameraPos;
 uniform sampler2D diffuse0;
 
 void main() {
