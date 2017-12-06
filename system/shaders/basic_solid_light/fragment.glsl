@@ -27,6 +27,10 @@ void main() {
   vec3 ambient = light.ambient * material.ambient;
 
   // diffuse
+  vec3 norm = normalize( fragNormal );
+  vec3 lightDirection = normalize( light.position - fragPos );
+  float difference = max( dot( norm, lightDirection ), 0.0 );
+  vec3 diffuse = light.diffuse * ( difference * material.diffuse );
 
   // specular
 }
