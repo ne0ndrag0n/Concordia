@@ -1,5 +1,5 @@
-#ifndef SG_MESH
-#define SG_MESH
+#ifndef SG_MESH_DEFINITION
+#define SG_MESH_DEFINITION
 
 #include "graphics/scenegraph/mesh/meshuniform.hpp"
 #include <GL/glew.h>
@@ -12,7 +12,7 @@ namespace BlueBear {
     namespace SceneGraph {
       namespace Mesh {
 
-        class Mesh {
+        template < typename VertexType, typename StorageMethod > class Mesh {
           using Index = GLuint;
 
           GLuint VAO;
@@ -27,10 +27,28 @@ namespace BlueBear {
         public:
           std::map< std::string, std::unique_ptr< MeshUniform > > meshUniforms;
 
-          Mesh();
-          virtual ~Mesh();
+          Mesh( const std::vector< VertexType >& vertices, const std::vector< GLuint >& indices ) {
+            StorageMethod::allocate( &VAO, &VBO, &EBO );
 
-          virtual void drawElements();
+            glBindVertexArray( VAO );
+              VertexType::setupShaderAttributes( VBO, EBO, vertices, indices );
+            glBindVertexArray( 0 );
+          }
+
+          ~Mesh() {
+            StorageMethod::deallocate( &VAO, &VBO, &EBO );
+          }
+
+          void drawElements() {
+            for( auto& pair : meshUniforms ) {
+              pair.second->send();
+            }
+
+            glBindVertexArray( VAO );
+              StorageMethod::draw( size );
+            glBindVertexArray( 0 );
+          }
+
         };
 
       }
