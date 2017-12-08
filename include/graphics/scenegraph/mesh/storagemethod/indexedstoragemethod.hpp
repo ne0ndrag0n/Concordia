@@ -2,6 +2,7 @@
 #define SG_INDEXED_STORAGE_METHOD
 
 #include <GL/glew.h>
+#include <vector>
 
 namespace BlueBear {
   namespace Graphics {
@@ -10,8 +11,10 @@ namespace BlueBear {
         namespace StorageMethod {
 
           class IndexedStorageMethod {
-            static void allocate( GLuint* VAO, GLuint* VBO, GLuint* EBO );
-            static void deallocate( GLuint* VAO, GLuint* VBO, GLuint* EBO );
+            static void allocateIndices( GLuint* EBO );
+            static void deallocateIndices( GLuint* EBO );
+            static void uploadIndices( GLuint EBO, const std::vector< GLuint >& data );
+
             static void draw( unsigned int size );
           };
 

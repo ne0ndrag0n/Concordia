@@ -28,15 +28,26 @@ namespace BlueBear {
           std::map< std::string, std::unique_ptr< MeshUniform > > meshUniforms;
 
           Mesh( const std::vector< VertexType >& vertices, const std::vector< GLuint >& indices ) {
-            StorageMethod::allocate( &VAO, &VBO, &EBO );
+            glGenVertexArrays( 1, &VAO );
+            glGenBuffers( 1, &VBO );
+            StorageMethod::allocateIndices( &EBO );
 
             glBindVertexArray( VAO );
-              VertexType::setupShaderAttributes( VBO, EBO, vertices, indices );
+              glBindBuffer( GL_ARRAY_BUFFER, VBO );
+
+                glBufferData( GL_ARRAY_BUFFER, vertices.size() * sizeof( VertexType ), &vertices[ 0 ], GL_STATIC_DRAW );
+                VertexType::setupLayout();
+
+                StorageMethod::uploadIndices( EBO, indices );
+
+              glBindBuffer( GL_ARRAY_BUFFER, 0 );
             glBindVertexArray( 0 );
           }
 
           ~Mesh() {
-            StorageMethod::deallocate( &VAO, &VBO, &EBO );
+            glDeleteVertexArrays( 1, &VAO );
+            glDeleteBuffers( 1, &VBO );
+            StorageMethod::deallocateIndices( &EBO );
           }
 
           void drawElements() {

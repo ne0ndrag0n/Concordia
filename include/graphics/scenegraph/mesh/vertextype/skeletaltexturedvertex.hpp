@@ -18,12 +18,7 @@ namespace BlueBear {
             glm::ivec4 boneIDs = glm::ivec4( 0, 0, 0, 0 );
             glm::vec4 boneWeights = glm::vec4( 1.0f, 0.0f, 0.0f, 0.0f );
 
-            static void setupShaderAttributes(
-              GLuint VBO,
-              GLuint EBO,
-              const std::vector< SkeletalTexturedVertex >& vertices,
-              const std::vector< GLuint >& indices
-            );
+            static void setupLayout();
           };
 
         }
