@@ -8,21 +8,23 @@
 namespace BlueBear {
   namespace Graphics {
     namespace SceneGraph {
+      namespace Mesh {
+        class Mesh;
+      }
 
-      class Mesh;
       class Style;
       class Transform;
 
       class Model {
         std::string id;
         std::weak_ptr< Model > parent;
-        std::shared_ptr< Mesh > mesh;
+        std::shared_ptr< Mesh::Mesh > mesh;
         std::unique_ptr< Style > style;
         std::unique_ptr< Transform > transform;
         std::vector< std::shared_ptr< Model > > submodels;
 
       public:
-        Model( std::weak_ptr< Model > parent, std::string id, std::shared_ptr< Mesh > mesh, std::unique_ptr< Style > style );
+        Model( std::weak_ptr< Model > parent, std::string id, std::shared_ptr< Mesh::Mesh > mesh, std::unique_ptr< Style > style );
         ~Model() = default;
 
         const std::string& getId() const;
