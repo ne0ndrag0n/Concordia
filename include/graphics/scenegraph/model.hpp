@@ -1,6 +1,8 @@
 #ifndef SG_MODEL
 #define SG_MODEL
 
+#include "graphics/scenegraph/style.hpp"
+#include "graphics/scenegraph/transform.hpp"
 #include <string>
 #include <vector>
 #include <memory>
@@ -12,26 +14,22 @@ namespace BlueBear {
         class Mesh;
       }
 
-      class Style;
-      class Transform;
-
       class Model {
         std::string id;
         std::weak_ptr< Model > parent;
         std::shared_ptr< Mesh::Mesh > mesh;
-        std::unique_ptr< Style > style;
+        Style style;
         std::unique_ptr< Transform > transform;
         std::vector< std::shared_ptr< Model > > submodels;
 
       public:
-        Model( std::weak_ptr< Model > parent, std::string id, std::shared_ptr< Mesh::Mesh > mesh, std::unique_ptr< Style > style );
-        ~Model() = default;
+        Model( std::weak_ptr< Model > parent, std::string id, std::shared_ptr< Mesh::Mesh > mesh, Style style );
 
         const std::string& getId() const;
         void setId( const std::string& id );
 
         std::shared_ptr< Model > getParent() const;
-        void setParent( std::shared_ptr< Model > parent );
+        void setParentTo( std::shared_ptr< Model > newParent );
 
         std::shared_ptr< Model > findChildById( const std::string& id ) const;
       };
