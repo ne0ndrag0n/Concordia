@@ -14,22 +14,42 @@ namespace BlueBear {
         class Mesh;
       }
 
-      class Model {
+      class Model : public std::enable_shared_from_this< Model > {
         std::string id;
         std::weak_ptr< Model > parent;
         std::shared_ptr< Mesh::Mesh > mesh;
         Style style;
-        std::unique_ptr< Transform > transform;
+        Transform transform;
         std::vector< std::shared_ptr< Model > > submodels;
 
+        Model() = delete;
+        Model(
+          std::weak_ptr< Model > parent,
+          std::string id,
+          std::shared_ptr< Mesh::Mesh > mesh,
+          Style style
+        );
+        Model( const Model& other );
+
       public:
-        Model( std::weak_ptr< Model > parent, std::string id, std::shared_ptr< Mesh::Mesh > mesh, Style style );
+        static std::shared_ptr< Model > create(
+          std::weak_ptr< Model > parent,
+          std::string id,
+          std::shared_ptr< Mesh::Mesh > mesh,
+          Style style
+        );
 
         const std::string& getId() const;
         void setId( const std::string& id );
 
         std::shared_ptr< Model > getParent() const;
-        void setParentTo( std::shared_ptr< Model > newParent );
+        void setParent( std::shared_ptr< Model > newParent );
+
+        Style& getStyle();
+        void setStyle( Style style );
+
+        Transform& getTransform();
+        void setTransform( Transform transform );
 
         std::shared_ptr< Model > findChildById( const std::string& id ) const;
       };

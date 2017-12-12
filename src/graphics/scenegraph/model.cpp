@@ -9,6 +9,12 @@ namespace BlueBear {
       Model::Model( std::weak_ptr< Model > parent, std::string id, std::shared_ptr< Mesh::Mesh > mesh, Style style ) :
         parent( parent ), id( id ), mesh( mesh ), style( style ) {}
 
+      std::shared_ptr< Model > Model::create( std::weak_ptr< Model > parent, std::string id, std::shared_ptr< Mesh::Mesh > mesh, Style style ) {
+        return std::shared_ptr< Model >(
+          new Model( parent, id, mesh, style )
+        );
+      }
+
       const std::string& Model::getId() const {
         return id;
       }
@@ -21,26 +27,57 @@ namespace BlueBear {
         return parent.lock();
       }
 
-      void Model::setParentTo( std::shared_ptr< Model > newParent ) {
-        // FIXME: fix undefined behaviour here
-        std::vector< std::shared_ptr< Model > >::iterator self;
+      void Model::setParent( std::shared_ptr< Model > newParent ) {
+        std::shared_ptr< Model > sharedFromThis = shared_from_this();
+
         std::shared_ptr< Model > oldParent = parent.lock();
+        parent = newParent;
 
         if( oldParent ) {
-          self = std::find_if(
+          std::vector< std::shared_ptr< Model > >::iterator self = std::find_if(
             oldParent->submodels.begin(),
             oldParent->submodels.end(),
             [ & ]( std::shared_ptr< Model > submodel ) {
-              return submodel.get() == this;
+              return submodel == sharedFromThis;
             }
           );
-        }
 
-        this->parent = newParent;
-        if( newParent && oldParent ) {
-          newParent->submodels.emplace_back( *self );
           oldParent->submodels.erase( self );
         }
+
+        if( newParent ) {
+          newParent->submodels.emplace_back( sharedFromThis );
+        }
+      }
+
+      Style& Model::getStyle() {
+        return style;
+      }
+
+      void Model::setStyle( Style style ) {
+        this->style = style;
+      }
+
+      Transform& Model::getTransform() {
+        return transform;
+      }
+
+      void Model::setTransform( Transform transform ) {
+        this->transform = transform;
+      }
+
+      std::shared_ptr< Model > Model::findChildById( const std::string& id ) const {
+        for( std::shared_ptr< Model > submodel : submodels ) {
+          if( submodel->getId() == id ) {
+            return submodel;
+          }
+
+          if( std::shared_ptr< Model > result = submodel->findChildById( id ) ) {
+            return result;
+          }
+        }
+
+        return std::shared_ptr< Model >();
       }
 
     }
