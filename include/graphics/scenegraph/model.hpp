@@ -52,6 +52,8 @@ namespace BlueBear {
         void setTransform( Transform transform );
 
         std::shared_ptr< Model > findChildById( const std::string& id ) const;
+
+        void draw();
       };
 
     }

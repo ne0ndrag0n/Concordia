@@ -1,5 +1,9 @@
 #include "graphics/scenegraph/model.hpp"
+#include "graphics/scenegraph/mesh/mesh.hpp"
+#include "graphics/scenegraph/material.hpp"
 #include "graphics/transform.hpp"
+#include "graphics/shader.hpp"
+#include <glm/glm.hpp>
 #include <algorithm>
 
 namespace BlueBear {
@@ -78,6 +82,29 @@ namespace BlueBear {
         }
 
         return std::shared_ptr< Model >();
+      }
+
+      void Model::draw() {
+
+        // Models can have empty nodes which do not draw any mesh
+        if( mesh ) {
+          glm::mat4 parentTransform;
+          if( std::shared_ptr< Model > realParent = parent.lock() ) {
+            parentTransform = realParent->transform.getMatrix();
+          }
+
+          style.shader->use();
+          // FIXME: Camera will need an event to update itself when shaders are changed
+
+          transform.send( parentTransform );
+          style.material->send();
+
+          mesh->drawElements();
+        }
+
+        for( std::shared_ptr< Model >& model : submodels ) {
+          model->draw();
+        }
       }
 
     }

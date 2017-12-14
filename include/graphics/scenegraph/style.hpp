@@ -5,16 +5,15 @@
 
 namespace BlueBear {
   namespace Graphics {
+    class Shader;
+
     namespace SceneGraph {
 
-        class Shader;
         class Material;
 
         struct Style {
           std::shared_ptr< Shader > shader;
           std::shared_ptr< Material > material;
-
-          void sendToShader();
         };
 
     }

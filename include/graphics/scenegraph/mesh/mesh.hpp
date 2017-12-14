@@ -7,6 +7,7 @@ namespace BlueBear {
       namespace Mesh {
 
         class Mesh {
+        public:
           virtual void drawElements() = 0;
         };
 
