@@ -90,6 +90,7 @@ namespace BlueBear {
     BasicEvent< void*, void*, int > ITEM_ADDED;
     BasicEvent< void*, void*, int > ITEM_REMOVED;
     BasicEvent< void*, std::string > MESSAGE_LOGGED;
+    BasicEvent< void* > SHADER_CHANGE;
   };
 
   extern EventManager eventManager;

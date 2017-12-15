@@ -1,4 +1,5 @@
 #include "graphics/shader.hpp"
+#include "eventmanager.hpp"
 #include "log.hpp"
 #include <string>
 #include <fstream>
@@ -97,8 +98,12 @@ namespace BlueBear {
     }
 
     void Shader::use() {
+      if( Shader::CURRENT_PROGRAM != this->Program ) {
         glUseProgram(this->Program);
         Shader::CURRENT_PROGRAM = this->Program;
+      }
+
+      eventManager.SHADER_CHANGE.trigger();
     }
 
   }

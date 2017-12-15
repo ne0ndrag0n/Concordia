@@ -14,7 +14,6 @@ namespace BlueBear {
 
     void ShaderInstanceBundle::drawInstances( Camera& camera ) {
       shader->use();
-      camera.sendToShader();
 
       for( std::shared_ptr< Instance > instance : instances ) {
         instance->drawEntity();

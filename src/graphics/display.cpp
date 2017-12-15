@@ -532,7 +532,6 @@ namespace BlueBear {
       // Draw entities of each type
       // Floor & Walls with nudging
       registeredShaders[ "default" ]->use();
-      camera.sendToShader();
       auto length = floorInstanceCollection->getLength();
       for( auto i = 0; i != length; i++ ) {
         std::shared_ptr< Instance > floorInstance = floorInstanceCollection->getItemDirect( i );
@@ -587,11 +586,8 @@ namespace BlueBear {
 
       // Now draw each
       for( auto& pair : bundles ) {
-        // pair.first is the shader
+        // pair.first is the shader. camera will be updated automatically with every shader change
         pair.first->use();
-
-        // need to re-send the camera
-        camera.sendToShader();
 
         for( std::shared_ptr< Instance > individualInstance : pair.second ) {
           individualInstance->drawEntity();

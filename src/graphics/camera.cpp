@@ -2,12 +2,14 @@
 #include "tools/opengl.hpp"
 #include <string>
 #include <sstream>
+#include <functional>
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "graphics/shader.hpp"
 #include "localemanager.hpp"
+#include "eventmanager.hpp"
 #include "log.hpp"
 
 namespace BlueBear {
@@ -17,6 +19,8 @@ namespace BlueBear {
       widthHalf = ( (float)screenWidth / 2 );
       heightHalf = ( (float)screenHeight / 2 );
       perspectiveAspectRatio = (float)screenWidth / (float)screenHeight;
+
+      eventManager.SHADER_CHANGE.listen( this, std::bind( &Camera::sendToShader, this ) );
     }
 
     void Camera::move( GLfloat x, GLfloat y, GLfloat z ) {

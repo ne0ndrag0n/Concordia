@@ -94,7 +94,6 @@ namespace BlueBear {
           }
 
           style.shader->use();
-          // FIXME: Camera will need an event to update itself when shaders are changed
 
           transform.send( parentTransform );
           style.material->send();
