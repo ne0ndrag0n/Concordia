@@ -3,6 +3,7 @@
 #include "log.hpp"
 #include <assimp/postprocess.h>
 #include <assimp/matrix4x4.h>
+#include <vector>
 
 namespace BlueBear {
   namespace Graphics {
@@ -17,6 +18,16 @@ namespace BlueBear {
           }
 
           return result;
+        }
+
+        std::shared_ptr< Mesh::Mesh > AssimpModelLoader::getMesh( aiNode* node ) {
+          if( node->mNumMeshes ) {
+            aiMesh* mesh = importPackage.scene->mMeshes[ node->mMeshes[ 0 ] ];
+          }
+        }
+
+        std::shared_ptr< Model > AssimpModelLoader::getNode( aiNode* node ) {
+
         }
 
         std::shared_ptr< Model > AssimpModelLoader::get( const std::string& filename ) {
@@ -34,7 +45,6 @@ namespace BlueBear {
           importPackage.scene->mRootNode->mTransformation = aiMatrix4x4();
 
           std::shared_ptr< Model > result;
-
 
           importer.FreeScene();
           return result;

@@ -11,6 +11,10 @@ namespace BlueBear {
     namespace SceneGraph {
       class Model;
 
+      namespace Mesh {
+        class Mesh;
+      }
+
       namespace ModelLoader {
 
         class AssimpModelLoader : public FileModelLoader {
@@ -21,6 +25,8 @@ namespace BlueBear {
           } importPackage;
 
           unsigned int getFlags();
+          std::shared_ptr< Mesh::Mesh > getMesh( aiNode* node );
+          std::shared_ptr< Model > getNode( aiNode* node );
 
         public:
           struct BadModelException : public std::exception {
