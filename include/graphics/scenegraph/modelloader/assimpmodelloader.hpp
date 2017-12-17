@@ -28,6 +28,8 @@ namespace BlueBear {
 
           unsigned int getFlags();
           std::vector< GLuint > getIndices( aiMesh* mesh );
+          template < typename VertexType > VertexType getVertex( aiVector3D& vertex, aiVector3D& normal );
+          template < typename VertexType > void assignBonesToVertex( VertexType& vertex, unsigned int vertexIndex, aiBone** bones, unsigned int numBones );
           std::shared_ptr< Mesh::Mesh > getMesh( aiNode* node );
           std::shared_ptr< Model > getNode( aiNode* node );
 
@@ -35,6 +37,11 @@ namespace BlueBear {
           struct BadModelException : public std::exception {
             const char* what() const throw() {
               return "Model could not be loaded!";
+            }
+          };
+          struct TooManyBonesException : public std::exception {
+            const char* what() const throw() {
+              return "Too many bones for this vertex!";
             }
           };
 

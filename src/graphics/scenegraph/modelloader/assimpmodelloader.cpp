@@ -9,7 +9,7 @@
 #include "log.hpp"
 #include <assimp/postprocess.h>
 #include <assimp/matrix4x4.h>
-
+#include <map>
 
 namespace BlueBear {
   namespace Graphics {
@@ -39,6 +39,47 @@ namespace BlueBear {
           return indices;
         }
 
+        template < typename VertexType >
+        VertexType AssimpModelLoader::getVertex( aiVector3D& vertex, aiVector3D& normal ) {
+          VertexType result;
+          result.position = Tools::AssimpTools::aiToGLMvec3( vertex );
+          result.normal = Tools::AssimpTools::aiToGLMvec3( normal );
+          return result;
+        }
+        template Mesh::TexturedRiggedVertex AssimpModelLoader::getVertex( aiVector3D&, aiVector3D& );
+        template Mesh::RiggedVertex AssimpModelLoader::getVertex( aiVector3D&, aiVector3D& );
+        template Mesh::TexturedVertex AssimpModelLoader::getVertex( aiVector3D&, aiVector3D& );
+        template Mesh::BasicVertex AssimpModelLoader::getVertex( aiVector3D&, aiVector3D& );
+
+        template < typename VertexType >
+        void AssimpModelLoader::assignBonesToVertex( VertexType& vertex, unsigned int vertexIndex, aiBone** bones, unsigned int numBones ) {
+          // Max 4 bones per vertex
+          unsigned int vertexBoneNumber = 0;
+
+          for( int boneIndex = 0; boneIndex < numBones; boneIndex++ ) {
+            aiBone* bone = bones[ boneIndex ];
+
+            for( int weightIndex = 0; weightIndex < bone->mNumWeights; weightIndex++ ) {
+              aiVertexWeight& vertexWeight = bone->mWeights[ weightIndex ];
+
+              if( vertexWeight.mVertexId == vertexIndex ) {
+                if( vertexBoneNumber >= 4 ) {
+                  throw TooManyBonesException();
+                }
+
+                // boneIndex + 1, because bone 0 is always an identity bone
+                vertex.boneIDs[ vertexBoneNumber ] = boneIndex + 1;
+                vertex.boneWeights[ vertexBoneNumber ] = vertexWeight.mWeight;
+                vertexBoneNumber++;
+                // This same bone is not going to influence the same vertex twice
+                break;
+              }
+            }
+          }
+        }
+        template void AssimpModelLoader::assignBonesToVertex( Mesh::TexturedRiggedVertex&, unsigned int, aiBone**, unsigned int );
+        template void AssimpModelLoader::assignBonesToVertex( Mesh::RiggedVertex&, unsigned int, aiBone**, unsigned int );
+
         std::shared_ptr< Mesh::Mesh > AssimpModelLoader::getMesh( aiNode* node ) {
           if( node->mNumMeshes ) {
             aiMesh* mesh = importPackage.scene->mMeshes[ node->mMeshes[ 0 ] ];
@@ -54,28 +95,40 @@ namespace BlueBear {
             std::shared_ptr< Mesh::Mesh > result;
 
             if( usesBones ) {
-              // Bones are stored in this backward format where we need to put the IDs together first
-              // TODO
-
               if( usesTextures ) {
                 // usesBones && usesTextures - TexturedRiggedVertex (textured material, bones)
                 std::vector< Mesh::TexturedRiggedVertex > vertices;
-                vertices.reserve( mesh->mNumVertices );
+                for( int i = 0; i < mesh->mNumVertices; i++ ) {
+                  Mesh::TexturedRiggedVertex vertex = getVertex< Mesh::TexturedRiggedVertex >( mesh->mVertices[ i ], mesh->mNormals[ i ] );
+                  vertex.textureCoordinates = glm::vec2( mesh->mTextureCoords[ 0 ][ i ].x, mesh->mTextureCoords[ 0 ][ i ].y );
+                  assignBonesToVertex( vertex, i, mesh->mBones, mesh->mNumBones );
+                  vertices.push_back( vertex );
+                }
+
+                result = usesIndices ?
+                  std::make_shared< Mesh::MeshDefinition< Mesh::TexturedRiggedVertex > >( vertices, getIndices( mesh ) ) :
+                  std::make_shared< Mesh::MeshDefinition< Mesh::TexturedRiggedVertex > >( vertices );
 
               } else {
                 // usesBones && !usesTextures - RiggedVertex (solid material, bones)
                 std::vector< Mesh::RiggedVertex > vertices;
-                vertices.reserve( mesh->mNumVertices );
+                for( int i = 0; i < mesh->mNumVertices; i++ ) {
+                  Mesh::RiggedVertex vertex = getVertex< Mesh::RiggedVertex >( mesh->mVertices[ i ], mesh->mNormals[ i ] );
+                  assignBonesToVertex( vertex, i, mesh->mBones, mesh->mNumBones );
+                  vertices.push_back( vertex );
+                }
+
+                result = usesIndices ?
+                  std::make_shared< Mesh::MeshDefinition< Mesh::RiggedVertex > >( vertices, getIndices( mesh ) ) :
+                  std::make_shared< Mesh::MeshDefinition< Mesh::RiggedVertex > >( vertices );
+
               }
             } else {
               if( usesTextures ) {
                 // !usesBones && usesTextures - TexturedVertex (textured material, no bones)
                 std::vector< Mesh::TexturedVertex > vertices;
-
                 for( int i = 0; i < mesh->mNumVertices; i++ ) {
-                  Mesh::TexturedVertex vertex;
-                  vertex.position = glm::vec3( Tools::AssimpTools::aiToGLMvec4( mesh->mVertices[ i ] ) );
-                  vertex.normal = glm::vec3( mesh->mNormals[ i ].x, mesh->mNormals[ i ].y, mesh->mNormals[ i ].z );
+                  Mesh::TexturedVertex vertex = getVertex< Mesh::TexturedVertex >( mesh->mVertices[ i ], mesh->mNormals[ i ] );
                   vertex.textureCoordinates = glm::vec2( mesh->mTextureCoords[ 0 ][ i ].x, mesh->mTextureCoords[ 0 ][ i ].y );
                   vertices.push_back( vertex );
                 }
@@ -87,12 +140,8 @@ namespace BlueBear {
               } else {
                 // !usesBones && !usesTextures - BasicVertex (solid material, no bones)
                 std::vector< Mesh::BasicVertex > vertices;
-
                 for( int i = 0; i < mesh->mNumVertices; i++ ) {
-                  Mesh::BasicVertex vertex;
-                  vertex.position = glm::vec3( Tools::AssimpTools::aiToGLMvec4( mesh->mVertices[ i ] ) );
-                  vertex.normal = glm::vec3( mesh->mNormals[ i ].x, mesh->mNormals[ i ].y, mesh->mNormals[ i ].z );
-                  vertices.push_back( vertex );
+                  vertices.push_back( getVertex< Mesh::BasicVertex >( mesh->mVertices[ i ], mesh->mNormals[ i ] ) );
                 }
 
                 result = usesIndices ?
