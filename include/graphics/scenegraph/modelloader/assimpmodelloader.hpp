@@ -10,6 +10,8 @@
 
 namespace BlueBear {
   namespace Graphics {
+    class Texture;
+
     namespace SceneGraph {
       class Model;
       class Material;
@@ -29,6 +31,7 @@ namespace BlueBear {
 
           unsigned int getFlags();
           std::vector< GLuint > getIndices( aiMesh* mesh );
+          std::vector< std::shared_ptr< Texture > > getTextureList( aiMaterial* material, aiTextureType type );
           template < typename VertexType > VertexType getVertex( aiVector3D& vertex, aiVector3D& normal );
           template < typename VertexType > void assignBonesToVertex( VertexType& vertex, unsigned int vertexIndex, aiBone** bones, unsigned int numBones );
           std::shared_ptr< Mesh::Mesh > getMesh( aiNode* node );

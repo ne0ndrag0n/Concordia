@@ -7,6 +7,7 @@
 #include "graphics/scenegraph/model.hpp"
 #include "graphics/scenegraph/material.hpp"
 #include "graphics/scenegraph/transform.hpp"
+#include "graphics/texture.hpp"
 #include "graphics/shader.hpp"
 #include "tools/assimptools.hpp"
 #include "log.hpp"
@@ -158,6 +159,19 @@ namespace BlueBear {
           } else {
             return std::shared_ptr< Mesh::Mesh >( nullptr );
           }
+        }
+
+        std::vector< std::shared_ptr< Texture > > AssimpModelLoader::getTextureList( aiMaterial* material, aiTextureType type ) {
+          std::vector< std::shared_ptr< Texture > > textures;
+
+          unsigned int texCount = material->GetTextureCount( type );
+          for( int i = 0; i < texCount; i++ ) {
+            aiString filename;
+            material->GetTexture( type, i, &filename );
+            textures.push_back( std::make_shared< Texture >( importPackage.directory + "/" + filename.C_Str() ) );
+          }
+
+          return textures;
         }
 
         std::shared_ptr< Material > AssimpModelLoader::getMaterial( aiMaterial* material ) {
