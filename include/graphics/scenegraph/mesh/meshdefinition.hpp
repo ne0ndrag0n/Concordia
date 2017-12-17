@@ -39,7 +39,7 @@ namespace BlueBear {
           std::map< std::string, std::unique_ptr< MeshUniform > > meshUniforms;
 
           MeshDefinition( const std::vector< VertexType >& vertices, const std::vector< GLuint >& indices ) :
-            size( indices.size() ), indexed( true ), drawMethod( &MeshDefinition::drawIndexed ) {
+            size( indices.size() ), indexed( true ), drawMethod( std::bind( &MeshDefinition::drawIndexed, this ) ) {
             glGenVertexArrays( 1, &VAO );
             glGenBuffers( 1, &VBO );
             glGenBuffers( 1, &EBO );
@@ -48,7 +48,7 @@ namespace BlueBear {
               glBindBuffer( GL_ARRAY_BUFFER, VBO );
 
                 glBufferData( GL_ARRAY_BUFFER, vertices.size() * sizeof( VertexType ), &vertices[ 0 ], GL_STATIC_DRAW );
-                VertexType::setupLayout();
+                VertexType::setupShaderAttributes();
 
                 glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, EBO );
                 glBufferData( GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof( GLuint ), &indices[ 0 ], GL_STATIC_DRAW );
@@ -58,7 +58,7 @@ namespace BlueBear {
           }
 
           MeshDefinition( const std::vector< VertexType >& vertices ) :
-            size( vertices.size() ), indexed( false ), drawMethod( &MeshDefinition::drawVertices ) {
+            size( vertices.size() ), indexed( false ), drawMethod( std::bind( &MeshDefinition::drawVertices, this ) ) {
             glGenVertexArrays( 1, &VAO );
             glGenBuffers( 1, &VBO );
 
@@ -66,7 +66,7 @@ namespace BlueBear {
               glBindBuffer( GL_ARRAY_BUFFER, VBO );
 
                 glBufferData( GL_ARRAY_BUFFER, vertices.size() * sizeof( VertexType ), &vertices[ 0 ], GL_STATIC_DRAW );
-                VertexType::setupLayout();
+                VertexType::setupShaderAttributes();
 
               glBindBuffer( GL_ARRAY_BUFFER, 0 );
             glBindVertexArray( 0 );

@@ -4,7 +4,9 @@
 #include "graphics/scenegraph/modelloader/modelloader.hpp"
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
+#include <GL/glew.h>
 #include <exception>
+#include <vector>
 
 namespace BlueBear {
   namespace Graphics {
@@ -25,6 +27,7 @@ namespace BlueBear {
           } importPackage;
 
           unsigned int getFlags();
+          std::vector< GLuint > getIndices( aiMesh* mesh );
           std::shared_ptr< Mesh::Mesh > getMesh( aiNode* node );
           std::shared_ptr< Model > getNode( aiNode* node );
 
@@ -35,7 +38,8 @@ namespace BlueBear {
             }
           };
 
-          bool useIndices = false;
+          bool hintNoIndices = false;
+          bool useBones = true;
 
           std::shared_ptr< Model > get( const std::string& filename ) override;
         };
