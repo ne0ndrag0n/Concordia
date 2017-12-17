@@ -1,4 +1,5 @@
 #include "graphics/scenegraph/mesh/basicvertex.hpp"
+#include "graphics/shader.hpp"
 #include <GL/glew.h>
 
 namespace BlueBear {
@@ -12,6 +13,10 @@ namespace BlueBear {
 
           glEnableVertexAttribArray( 1 );
           glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, sizeof( BasicVertex ), ( GLvoid* ) offsetof( BasicVertex, normal ) );
+        }
+
+        std::shared_ptr< Shader > BasicVertex::getDefaultShader() {
+          return std::shared_ptr< Shader >();
         }
 
       }

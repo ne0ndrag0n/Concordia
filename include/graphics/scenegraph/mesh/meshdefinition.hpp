@@ -11,6 +11,8 @@
 
 namespace BlueBear {
   namespace Graphics {
+    class Shader;
+
     namespace SceneGraph {
       namespace Mesh {
 
@@ -20,7 +22,6 @@ namespace BlueBear {
           GLuint EBO;
           unsigned int size;
           bool indexed;
-
           std::function< void() > drawMethod;
 
           // Disable copy
@@ -40,6 +41,8 @@ namespace BlueBear {
 
           MeshDefinition( const std::vector< VertexType >& vertices, const std::vector< GLuint >& indices ) :
             size( indices.size() ), indexed( true ), drawMethod( std::bind( &MeshDefinition::drawIndexed, this ) ) {
+            getDefaultShader = VertexType::getDefaultShader;
+
             glGenVertexArrays( 1, &VAO );
             glGenBuffers( 1, &VBO );
             glGenBuffers( 1, &EBO );
@@ -59,6 +62,8 @@ namespace BlueBear {
 
           MeshDefinition( const std::vector< VertexType >& vertices ) :
             size( vertices.size() ), indexed( false ), drawMethod( std::bind( &MeshDefinition::drawVertices, this ) ) {
+            getDefaultShader = VertexType::getDefaultShader;
+
             glGenVertexArrays( 1, &VAO );
             glGenBuffers( 1, &VBO );
 

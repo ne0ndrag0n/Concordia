@@ -10,13 +10,11 @@ namespace BlueBear {
   namespace Graphics {
     namespace SceneGraph {
 
-      Model::Model( std::weak_ptr< Model > parent, std::string id, std::shared_ptr< Mesh::Mesh > mesh, Style style ) :
-        parent( parent ), id( id ), mesh( mesh ), style( style ) {}
+      Model::Model( std::string id, std::shared_ptr< Mesh::Mesh > mesh, Style style ) :
+        id( id ), mesh( mesh ), style( style ) {}
 
-      std::shared_ptr< Model > Model::create( std::weak_ptr< Model > parent, std::string id, std::shared_ptr< Mesh::Mesh > mesh, Style style ) {
-        return std::shared_ptr< Model >(
-          new Model( parent, id, mesh, style )
-        );
+      std::shared_ptr< Model > Model::create( std::string id, std::shared_ptr< Mesh::Mesh > mesh, Style style ) {
+        return std::shared_ptr< Model >( new Model( id, mesh, style ) );
       }
 
       const std::string& Model::getId() const {

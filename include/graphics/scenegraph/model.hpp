@@ -24,7 +24,6 @@ namespace BlueBear {
 
         Model() = delete;
         Model(
-          std::weak_ptr< Model > parent,
           std::string id,
           std::shared_ptr< Mesh::Mesh > mesh,
           Style style
@@ -33,7 +32,6 @@ namespace BlueBear {
 
       public:
         static std::shared_ptr< Model > create(
-          std::weak_ptr< Model > parent,
           std::string id,
           std::shared_ptr< Mesh::Mesh > mesh,
           Style style

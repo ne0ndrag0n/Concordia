@@ -5,10 +5,14 @@
 #include "graphics/scenegraph/mesh/riggedvertex.hpp"
 #include "graphics/scenegraph/mesh/texturedriggedvertex.hpp"
 #include "graphics/scenegraph/model.hpp"
+#include "graphics/scenegraph/material.hpp"
+#include "graphics/scenegraph/transform.hpp"
+#include "graphics/shader.hpp"
 #include "tools/assimptools.hpp"
 #include "log.hpp"
 #include <assimp/postprocess.h>
 #include <assimp/matrix4x4.h>
+#include <assimp/material.h>
 #include <map>
 
 namespace BlueBear {
@@ -156,8 +160,46 @@ namespace BlueBear {
           }
         }
 
-        std::shared_ptr< Model > AssimpModelLoader::getNode( aiNode* node ) {
+        std::shared_ptr< Material > AssimpModelLoader::getMaterial( aiMaterial* material ) {
+          // Determine the magic combo of solids and textures
+          unsigned int diffuseTextures = material->GetTextureCount( aiTextureType_DIFFUSE );
+          unsigned int specularTextures = material->GetTextureCount( aiTextureType_SPECULAR );
 
+          if( diffuseTextures && specularTextures ) {
+
+          } else if ( diffuseTextures ) {
+
+          } else if ( specularTextures ) {
+
+          } else {
+            // Solid colours only
+          }
+
+        }
+
+        std::shared_ptr< Model > AssimpModelLoader::getNode( aiNode* node ) {
+          std::shared_ptr< Mesh::Mesh > mesh = getMesh( node );
+          std::shared_ptr< Shader > shader = mesh ? mesh->getDefaultShader() : nullptr;
+          std::shared_ptr< Material > material = nullptr;
+
+          // Try to load the material
+          if( node->mNumMeshes ) {
+            unsigned int materialIndex = importPackage.scene->mMeshes[ node->mMeshes[ 0 ] ]->mMaterialIndex;
+            if( materialIndex >= 0 ) {
+              material = getMaterial( importPackage.scene->mMaterials[ materialIndex ] );
+            }
+          }
+
+          std::shared_ptr< Model > model = Model::create( node->mName.C_Str(), mesh, { shader, material } );
+          model->setTransform( Transform( Tools::AssimpTools::aiToGLMmat4( node->mTransformation ) ) );
+
+          // Add children - check this
+          for( int i = 0; i < node->mNumChildren; i++ ) {
+            std::shared_ptr< Model > child = getNode( node->mChildren[ i ] );
+            child->setParent( model );
+          }
+
+          return model;
         }
 
         std::shared_ptr< Model > AssimpModelLoader::get( const std::string& filename ) {
@@ -174,7 +216,7 @@ namespace BlueBear {
           // Fix Assimp's incoorect root transformation for COLLADA imports
           importPackage.scene->mRootNode->mTransformation = aiMatrix4x4();
 
-          std::shared_ptr< Model > result;
+          std::shared_ptr< Model > result = getNode( importPackage.scene->mRootNode );
 
           importer.FreeScene();
           return result;

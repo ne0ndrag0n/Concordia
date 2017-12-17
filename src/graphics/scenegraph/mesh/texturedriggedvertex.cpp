@@ -1,4 +1,5 @@
 #include "graphics/scenegraph/mesh/texturedriggedvertex.hpp"
+#include "graphics/shader.hpp"
 #include <GL/glew.h>
 
 namespace BlueBear {
@@ -21,6 +22,10 @@ namespace BlueBear {
 
           glEnableVertexAttribArray( 4 );
           glVertexAttribPointer( 4, 4, GL_FLOAT, GL_FALSE, sizeof( TexturedRiggedVertex ), ( GLvoid* ) offsetof( TexturedRiggedVertex, boneWeights ) );
+        }
+
+        std::shared_ptr< Shader > TexturedRiggedVertex::getDefaultShader() {
+          return std::shared_ptr< Shader >();
         }
 
       }

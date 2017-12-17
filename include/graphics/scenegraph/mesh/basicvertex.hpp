@@ -2,9 +2,12 @@
 #define SG_BASIC_VERTEX
 
 #include <glm/glm.hpp>
+#include <memory>
 
 namespace BlueBear {
   namespace Graphics {
+    class Shader;
+
     namespace SceneGraph {
       namespace Mesh {
 
@@ -13,6 +16,7 @@ namespace BlueBear {
           glm::vec3 normal;
 
           static void setupShaderAttributes();
+          static std::shared_ptr< Shader > getDefaultShader();
         };
 
       }

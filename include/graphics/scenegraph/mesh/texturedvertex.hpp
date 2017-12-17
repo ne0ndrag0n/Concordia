@@ -2,9 +2,12 @@
 #define SG_TEXTURED
 
 #include <glm/glm.hpp>
+#include <memory>
 
 namespace BlueBear {
   namespace Graphics {
+    class Shader;
+
     namespace SceneGraph {
       namespace Mesh {
 
@@ -14,6 +17,7 @@ namespace BlueBear {
           glm::vec2 textureCoordinates;
 
           static void setupShaderAttributes();
+          static std::shared_ptr< Shader > getDefaultShader();
         };
 
       }

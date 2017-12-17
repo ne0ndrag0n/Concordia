@@ -1,4 +1,5 @@
 #include "graphics/scenegraph/mesh/riggedvertex.hpp"
+#include "graphics/shader.hpp"
 #include <GL/glew.h>
 
 namespace BlueBear {
@@ -18,6 +19,10 @@ namespace BlueBear {
 
           glEnableVertexAttribArray( 3 );
           glVertexAttribPointer( 3, 4, GL_FLOAT, GL_FALSE, sizeof( RiggedVertex ), ( GLvoid* ) offsetof( RiggedVertex, boneWeights ) );
+        }
+
+        std::shared_ptr< Shader > RiggedVertex::getDefaultShader() {
+          return std::shared_ptr< Shader >();
         }
 
       }

@@ -1,4 +1,5 @@
 #include "graphics/scenegraph/mesh/texturedvertex.hpp"
+#include "graphics/shader.hpp"
 #include <GL/glew.h>
 
 namespace BlueBear {
@@ -15,6 +16,10 @@ namespace BlueBear {
 
           glEnableVertexAttribArray( 2 );
           glVertexAttribPointer( 2, 2, GL_FLOAT, GL_FALSE, sizeof( TexturedVertex ), ( GLvoid* ) offsetof( TexturedVertex, textureCoordinates ) );
+        }
+
+        std::shared_ptr< Shader > TexturedVertex::getDefaultShader() {
+          return std::shared_ptr< Shader >();
         }
 
       }

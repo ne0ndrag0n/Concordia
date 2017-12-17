@@ -2,9 +2,12 @@
 #define SG_TEXTURED_RIGGED
 
 #include <glm/glm.hpp>
+#include <memory>
 
 namespace BlueBear {
   namespace Graphics {
+    class Shader;
+
     namespace SceneGraph {
       namespace Mesh {
 
@@ -16,6 +19,7 @@ namespace BlueBear {
           glm::vec4 boneWeights = glm::vec4( 1.0f, 0.0f, 0.0f, 0.0f );
 
           static void setupShaderAttributes();
+          static std::shared_ptr< Shader > getDefaultShader();
         };
 
       }
