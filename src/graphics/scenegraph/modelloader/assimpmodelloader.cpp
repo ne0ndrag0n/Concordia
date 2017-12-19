@@ -175,20 +175,54 @@ namespace BlueBear {
         }
 
         std::shared_ptr< Material > AssimpModelLoader::getMaterial( aiMaterial* material ) {
+          std::shared_ptr< Material > result;
+
           // Determine the magic combo of solids and textures
           unsigned int diffuseTextures = material->GetTextureCount( aiTextureType_DIFFUSE );
           unsigned int specularTextures = material->GetTextureCount( aiTextureType_SPECULAR );
 
+          // Defaults
+          aiVector3D ambient( 0.f, 0.f, 0.f );
+          material->Get( AI_MATKEY_COLOR_AMBIENT, ambient );
+          aiVector3D diffuse( 0.f, 0.f, 0.f );
+          material->Get( AI_MATKEY_COLOR_DIFFUSE, diffuse );
+          aiVector3D specular( 0.f, 0.f, 0.f );
+          material->Get( AI_MATKEY_COLOR_SPECULAR, specular );
+          float shininess = 0.0f;
+          material->Get( AI_MATKEY_SHININESS, shininess );
+
           if( diffuseTextures && specularTextures ) {
-
+            result = std::make_shared< Material >(
+              Tools::AssimpTools::aiToGLMvec3( ambient ),
+              getTextureList( material, aiTextureType_DIFFUSE ),
+              getTextureList( material, aiTextureType_SPECULAR ),
+              shininess
+            );
           } else if ( diffuseTextures ) {
-
+            result = std::make_shared< Material >(
+              Tools::AssimpTools::aiToGLMvec3( ambient ),
+              getTextureList( material, aiTextureType_DIFFUSE ),
+              Tools::AssimpTools::aiToGLMvec3( specular ),
+              shininess
+            );
           } else if ( specularTextures ) {
-
+            result = std::make_shared< Material >(
+              Tools::AssimpTools::aiToGLMvec3( ambient ),
+              Tools::AssimpTools::aiToGLMvec3( diffuse ),
+              getTextureList( material, aiTextureType_SPECULAR ),
+              shininess
+            );
           } else {
             // Solid colours only
+            result = std::make_shared< Material >(
+              Tools::AssimpTools::aiToGLMvec3( ambient ),
+              Tools::AssimpTools::aiToGLMvec3( diffuse ),
+              Tools::AssimpTools::aiToGLMvec3( specular ),
+              shininess
+            );
           }
 
+          return result;
         }
 
         std::shared_ptr< Model > AssimpModelLoader::getNode( aiNode* node ) {

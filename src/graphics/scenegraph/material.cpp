@@ -24,8 +24,13 @@ namespace BlueBear {
           checkTextureUnits();
         }
 
-      Material::Material( glm::vec3 ambientColor, TextureList diffuseTextures, float shininess ) :
-        ambientColor( ambientColor ), diffuseTextures( diffuseTextures ), shininess( shininess ), useAmbient( true ) {
+      Material::Material( glm::vec3 ambientColor, TextureList diffuseTextures, glm::vec3 specularColor, float shininess ) :
+        ambientColor( ambientColor ), diffuseTextures( diffuseTextures ), specularColor( specularColor ), shininess( shininess ), useAmbient( true ) {
+          checkTextureUnits();
+        }
+
+      Material::Material( glm::vec3 ambientColor, glm::vec3 diffuseColor, TextureList specularTextures, float shininess ) :
+        ambientColor( ambientColor ), diffuseColor( diffuseColor ), specularTextures( specularTextures ), shininess( shininess ), useAmbient( true ) {
           checkTextureUnits();
         }
 
