@@ -4,6 +4,7 @@
 #include "graphics/scenegraph/mesh/texturedvertex.hpp"
 #include "graphics/scenegraph/mesh/riggedvertex.hpp"
 #include "graphics/scenegraph/mesh/texturedriggedvertex.hpp"
+#include "graphics/scenegraph/mesh/boneuniform.hpp"
 #include "graphics/scenegraph/model.hpp"
 #include "graphics/scenegraph/material.hpp"
 #include "graphics/scenegraph/transform.hpp"
@@ -42,6 +43,16 @@ namespace BlueBear {
           }
 
           return indices;
+        }
+
+        std::vector< std::string > AssimpModelLoader::getBoneIds( aiBone** bones, unsigned int numBones ) {
+          std::vector< std::string > boneIDs;
+
+          for( int boneIndex = 0; boneIndex < numBones; boneIndex++ ) {
+            boneIDs.push_back( bones[ boneIndex ]->mName.C_Str() );
+          }
+
+          return boneIDs;
         }
 
         template < typename VertexType >
@@ -87,12 +98,12 @@ namespace BlueBear {
 
         std::shared_ptr< Mesh::Mesh > AssimpModelLoader::getMesh( aiNode* node ) {
           if( node->mNumMeshes ) {
-            aiMesh* mesh = importPackage.scene->mMeshes[ node->mMeshes[ 0 ] ];
+            aiMesh* mesh = context.scene->mMeshes[ node->mMeshes[ 0 ] ];
             bool usesBones = useBones && mesh->HasBones();
             bool usesTextures = (
               mesh->mMaterialIndex >= 0 && (
-                importPackage.scene->mMaterials[ mesh->mMaterialIndex ]->GetTextureCount( aiTextureType_DIFFUSE ) > 0 ||
-                importPackage.scene->mMaterials[ mesh->mMaterialIndex ]->GetTextureCount( aiTextureType_SPECULAR ) > 0
+                context.scene->mMaterials[ mesh->mMaterialIndex ]->GetTextureCount( aiTextureType_DIFFUSE ) > 0 ||
+                context.scene->mMaterials[ mesh->mMaterialIndex ]->GetTextureCount( aiTextureType_SPECULAR ) > 0
               )
             );
             bool usesIndices = !hintNoIndices || mesh->mNumFaces;
@@ -110,9 +121,14 @@ namespace BlueBear {
                   vertices.push_back( vertex );
                 }
 
-                result = usesIndices ?
+                auto md = usesIndices ?
                   std::make_shared< Mesh::MeshDefinition< Mesh::TexturedRiggedVertex > >( vertices, getIndices( mesh ) ) :
                   std::make_shared< Mesh::MeshDefinition< Mesh::TexturedRiggedVertex > >( vertices );
+
+                md->meshUniforms.emplace( "bone", std::make_unique< Mesh::BoneUniform >(
+                  getBoneIds( mesh->mBones, mesh->mNumBones )
+                ) );
+                result = md;
 
               } else {
                 // usesBones && !usesTextures - RiggedVertex (solid material, bones)
@@ -123,9 +139,14 @@ namespace BlueBear {
                   vertices.push_back( vertex );
                 }
 
-                result = usesIndices ?
+                auto md = usesIndices ?
                   std::make_shared< Mesh::MeshDefinition< Mesh::RiggedVertex > >( vertices, getIndices( mesh ) ) :
                   std::make_shared< Mesh::MeshDefinition< Mesh::RiggedVertex > >( vertices );
+
+                md->meshUniforms.emplace( "bone", std::make_unique< Mesh::BoneUniform >(
+                  getBoneIds( mesh->mBones, mesh->mNumBones )
+                ) );
+                result = md;
 
               }
             } else {
@@ -168,7 +189,7 @@ namespace BlueBear {
           for( int i = 0; i < texCount; i++ ) {
             aiString filename;
             material->GetTexture( type, i, &filename );
-            textures.push_back( std::make_shared< Texture >( importPackage.directory + "/" + filename.C_Str() ) );
+            textures.push_back( std::make_shared< Texture >( context.directory + "/" + filename.C_Str() ) );
           }
 
           return textures;
@@ -232,9 +253,9 @@ namespace BlueBear {
 
           // Try to load the material
           if( node->mNumMeshes ) {
-            unsigned int materialIndex = importPackage.scene->mMeshes[ node->mMeshes[ 0 ] ]->mMaterialIndex;
+            unsigned int materialIndex = context.scene->mMeshes[ node->mMeshes[ 0 ] ]->mMaterialIndex;
             if( materialIndex >= 0 ) {
-              material = getMaterial( importPackage.scene->mMaterials[ materialIndex ] );
+              material = getMaterial( context.scene->mMaterials[ materialIndex ] );
             }
           }
 
@@ -251,20 +272,20 @@ namespace BlueBear {
         }
 
         std::shared_ptr< Model > AssimpModelLoader::get( const std::string& filename ) {
-          importPackage = ImportPackage();
+          context = ImportContext();
 
-          importPackage.scene = importer.ReadFile( filename, getFlags() );
-          if( !importPackage.scene || importPackage.scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !importPackage.scene->mRootNode ) {
+          context.scene = importer.ReadFile( filename, getFlags() );
+          if( !context.scene || context.scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !context.scene->mRootNode ) {
             Log::getInstance().error( "AssimpModelLoader::get", std::string( "Warning: could not import file " ) + filename );
             Log::getInstance().error( "AssimpModelLoader::get", importer.GetErrorString() );
             throw BadModelException();
           }
 
-          importPackage.directory = filename.substr( 0, filename.find_last_of( '/' ) );
+          context.directory = filename.substr( 0, filename.find_last_of( '/' ) );
           // Fix Assimp's incoorect root transformation for COLLADA imports
-          importPackage.scene->mRootNode->mTransformation = aiMatrix4x4();
+          context.scene->mRootNode->mTransformation = aiMatrix4x4();
 
-          std::shared_ptr< Model > result = getNode( importPackage.scene->mRootNode );
+          std::shared_ptr< Model > result = getNode( context.scene->mRootNode );
 
           importer.FreeScene();
           return result;

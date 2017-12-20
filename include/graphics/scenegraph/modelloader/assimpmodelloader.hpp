@@ -24,14 +24,15 @@ namespace BlueBear {
 
         class AssimpModelLoader : public FileModelLoader {
           Assimp::Importer importer;
-          struct ImportPackage {
+          struct ImportContext {
             const aiScene* scene;
             std::string directory;
-          } importPackage;
+          } context;
 
           unsigned int getFlags();
           std::vector< GLuint > getIndices( aiMesh* mesh );
           std::vector< std::shared_ptr< Texture > > getTextureList( aiMaterial* material, aiTextureType type );
+          std::vector< std::string > getBoneIds( aiBone** bones, unsigned int numBones );
           template < typename VertexType > VertexType getVertex( aiVector3D& vertex, aiVector3D& normal );
           template < typename VertexType > void assignBonesToVertex( VertexType& vertex, unsigned int vertexIndex, aiBone** bones, unsigned int numBones );
           std::shared_ptr< Mesh::Mesh > getMesh( aiNode* node );
