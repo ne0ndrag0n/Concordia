@@ -18,6 +18,7 @@ namespace BlueBear {
 
       namespace Mesh {
         class Mesh;
+        class Bone;
       }
 
       namespace ModelLoader {
@@ -27,6 +28,7 @@ namespace BlueBear {
           struct ImportContext {
             const aiScene* scene;
             std::string directory;
+            std::shared_ptr< Model > armature;
           } context;
 
           unsigned int getFlags();

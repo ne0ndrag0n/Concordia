@@ -1,17 +1,15 @@
-#ifndef SG_MESH_UNIFORM
-#define SG_MESH_UNIFORM
+#ifndef SG_BASIC_UNIFORM
+#define SG_BASIC_UNIFORM
 
 namespace BlueBear {
   namespace Graphics {
     namespace SceneGraph {
-      namespace Mesh {
 
-        class MeshUniform {
+        class Uniform {
         public:
           virtual void send() = 0;
         };
 
-      }
     }
   }
 }

@@ -2,7 +2,7 @@
 #define SG_MESH_DEFINITION
 
 #include "graphics/scenegraph/mesh/mesh.hpp"
-#include "graphics/scenegraph/mesh/meshuniform.hpp"
+#include "graphics/scenegraph/uniform.hpp"
 #include <GL/glew.h>
 #include <vector>
 #include <memory>
@@ -37,7 +37,7 @@ namespace BlueBear {
           }
 
         public:
-          std::map< std::string, std::unique_ptr< MeshUniform > > meshUniforms;
+          std::map< std::string, std::unique_ptr< Uniform > > meshUniforms;
 
           MeshDefinition( const std::vector< VertexType >& vertices, const std::vector< GLuint >& indices ) :
             size( indices.size() ), indexed( true ), drawMethod( std::bind( &MeshDefinition::drawIndexed, this ) ) {

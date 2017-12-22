@@ -126,7 +126,8 @@ namespace BlueBear {
                   std::make_shared< Mesh::MeshDefinition< Mesh::TexturedRiggedVertex > >( vertices );
 
                 md->meshUniforms.emplace( "bone", std::make_unique< Mesh::BoneUniform >(
-                  getBoneIds( mesh->mBones, mesh->mNumBones )
+                  getBoneIds( mesh->mBones, mesh->mNumBones ),
+                  context.armature
                 ) );
                 result = md;
 
@@ -144,7 +145,8 @@ namespace BlueBear {
                   std::make_shared< Mesh::MeshDefinition< Mesh::RiggedVertex > >( vertices );
 
                 md->meshUniforms.emplace( "bone", std::make_unique< Mesh::BoneUniform >(
-                  getBoneIds( mesh->mBones, mesh->mNumBones )
+                  getBoneIds( mesh->mBones, mesh->mNumBones ),
+                  context.armature
                 ) );
                 result = md;
 
@@ -266,6 +268,11 @@ namespace BlueBear {
           for( int i = 0; i < node->mNumChildren; i++ ) {
             std::shared_ptr< Model > child = getNode( node->mChildren[ i ] );
             child->setParent( model );
+
+            // Set armature
+            if( child->getId() == "_armature" ) {
+              context.armature = child;
+            }
           }
 
           return model;

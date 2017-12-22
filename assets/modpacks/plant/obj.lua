@@ -115,6 +115,7 @@ end
 function Flowers:setup_world()
 	self:setup_models( {
 		[ 'bgb' ] = 'dev/box/cylinder.fbx',
+		[ 'knight' ] = 'dev/box/mini_knight.fbx',
 		[ 'plant' ] = modpack_path..'/model/plant.dae'
 	} )
 end
