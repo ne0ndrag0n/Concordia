@@ -6,7 +6,7 @@ namespace BlueBear {
     namespace SceneGraph {
       namespace Mesh {
 
-        BoneUniform::BoneUniform( const std::vector< std::string >& boneIDs, std::shared_ptr< Model > armature ) : boneIDs( boneIDs ), armature( armature ) {}
+        BoneUniform::BoneUniform( const std::vector< std::string >& boneIDs ) : boneIDs( boneIDs ) {}
 
         void BoneUniform::send() {
 

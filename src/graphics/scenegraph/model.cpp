@@ -68,6 +68,10 @@ namespace BlueBear {
         this->transform = transform;
       }
 
+      std::unique_ptr< Animation::Animator >& Model::getAnimatorRef() {
+        return animator;
+      }
+
       std::shared_ptr< Model > Model::findChildById( const std::string& id ) const {
         for( std::shared_ptr< Model > submodel : submodels ) {
           if( submodel->getId() == id ) {

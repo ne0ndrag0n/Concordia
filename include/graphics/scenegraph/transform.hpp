@@ -16,6 +16,7 @@ namespace BlueBear {
         bool dirty = true;
 
         void recalculate();
+        void decompose();
 
       public:
         Transform();
@@ -26,18 +27,18 @@ namespace BlueBear {
 
         glm::mat4 getMatrix();
 
-        glm::vec3 getPosition();
+        glm::vec3 getPosition() const;
         void setPosition( const glm::vec3& position );
 
-        glm::vec3 getScale();
+        glm::vec3 getScale() const;
         void setScale( const glm::vec3& scale );
 
-        glm::quat getRotation();
+        glm::quat getRotation() const;
         void setRotation( const glm::quat& rotation );
 
         void send( const glm::mat4& parentMixin );
 
-        static Transform interpolate( Transform& t1, Transform& t2, float alpha );
+        static Transform interpolate( const Transform& t1, const Transform& t2, float alpha );
         static glm::mat4 componentsToMatrix( const glm::vec3& position, const glm::vec3& scale, const glm::quat& rotation );
 
       };

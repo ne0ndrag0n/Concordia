@@ -126,8 +126,7 @@ namespace BlueBear {
                   std::make_shared< Mesh::MeshDefinition< Mesh::TexturedRiggedVertex > >( vertices );
 
                 md->meshUniforms.emplace( "bone", std::make_unique< Mesh::BoneUniform >(
-                  getBoneIds( mesh->mBones, mesh->mNumBones ),
-                  context.armature
+                  getBoneIds( mesh->mBones, mesh->mNumBones )
                 ) );
                 result = md;
 
@@ -145,8 +144,7 @@ namespace BlueBear {
                   std::make_shared< Mesh::MeshDefinition< Mesh::RiggedVertex > >( vertices );
 
                 md->meshUniforms.emplace( "bone", std::make_unique< Mesh::BoneUniform >(
-                  getBoneIds( mesh->mBones, mesh->mNumBones ),
-                  context.armature
+                  getBoneIds( mesh->mBones, mesh->mNumBones )
                 ) );
                 result = md;
 
@@ -248,6 +246,11 @@ namespace BlueBear {
           return result;
         }
 
+        std::unique_ptr< Animation::Animator > AssimpModelLoader::getAnimator( aiNode* node ) {
+          // TODO
+          return std::unique_ptr< Animation::Animator >();
+        }
+
         std::shared_ptr< Model > AssimpModelLoader::getNode( aiNode* node ) {
           std::shared_ptr< Mesh::Mesh > mesh = getMesh( node );
           std::shared_ptr< Shader > shader = mesh ? mesh->getDefaultShader() : nullptr;
@@ -266,12 +269,12 @@ namespace BlueBear {
 
           // Add children - check this
           for( int i = 0; i < node->mNumChildren; i++ ) {
-            std::shared_ptr< Model > child = getNode( node->mChildren[ i ] );
-            child->setParent( model );
-
-            // Set armature
-            if( child->getId() == "_armature" ) {
-              context.armature = child;
+            aiNode* assimpChild = node->mChildren[ i ];
+            if( assimpChild->mName.C_Str() == "_armature" ) {
+              model->getAnimatorRef() = getAnimator( assimpChild );
+            } else {
+              std::shared_ptr< Model > child = getNode( node->mChildren[ i ] );
+              child->setParent( model );
             }
           }
 

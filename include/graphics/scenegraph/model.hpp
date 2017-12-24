@@ -3,6 +3,7 @@
 
 #include "graphics/scenegraph/style.hpp"
 #include "graphics/scenegraph/transform.hpp"
+#include "graphics/scenegraph/animation/animator.hpp"
 #include <string>
 #include <vector>
 #include <memory>
@@ -20,6 +21,7 @@ namespace BlueBear {
         std::shared_ptr< Mesh::Mesh > mesh;
         Style style;
         Transform transform;
+        std::unique_ptr< Animation::Animator > animator;
         std::vector< std::shared_ptr< Model > > submodels;
 
         Model() = delete;
@@ -48,6 +50,8 @@ namespace BlueBear {
 
         Transform& getTransform();
         void setTransform( Transform transform );
+
+        std::unique_ptr< Animation::Animator >& getAnimatorRef();
 
         std::shared_ptr< Model > findChildById( const std::string& id ) const;
 

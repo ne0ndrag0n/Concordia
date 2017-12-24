@@ -2,6 +2,7 @@
 #define SG_MODEL_LOADER_ASSIMP
 
 #include "graphics/scenegraph/modelloader/modelloader.hpp"
+#include "graphics/scenegraph/animation/animator.hpp"
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <GL/glew.h>
@@ -28,7 +29,6 @@ namespace BlueBear {
           struct ImportContext {
             const aiScene* scene;
             std::string directory;
-            std::shared_ptr< Model > armature;
           } context;
 
           unsigned int getFlags();
@@ -40,6 +40,7 @@ namespace BlueBear {
           std::shared_ptr< Mesh::Mesh > getMesh( aiNode* node );
           std::shared_ptr< Material > getMaterial( aiMaterial* material );
           std::shared_ptr< Model > getNode( aiNode* node );
+          std::unique_ptr< Animation::Animator > getAnimator( aiNode* node );
 
         public:
           struct BadModelException : public std::exception {

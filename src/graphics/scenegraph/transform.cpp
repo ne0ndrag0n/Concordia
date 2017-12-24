@@ -16,7 +16,7 @@ namespace BlueBear {
       Transform::Transform( const glm::vec3& position, const glm::vec3& scale, const glm::quat& rotation ) :
         position( position ), scale( scale ), rotation( rotation ) {}
 
-      Transform::Transform( const glm::mat4& existingTransform ) : result( existingTransform ), dirty( false ) {}
+      Transform::Transform( const glm::mat4& existingTransform ) : result( existingTransform ), dirty( false ) { decompose(); }
 
       Transform::Transform( const Transform& transform ) : position( transform.position ), scale( transform.scale ), rotation( transform.rotation ), result( transform.result ), dirty( transform.dirty ) {}
 
@@ -38,13 +38,22 @@ namespace BlueBear {
         }
       }
 
+      void Transform::decompose() {
+        // these just get thrown out for now
+        glm::vec3 skew;
+        glm::vec4 perspective;
+
+        glm::decompose( result, scale, rotation, position, skew, perspective );
+        rotation = glm::conjugate( rotation );
+      }
+
       glm::mat4 Transform::getMatrix() {
         recalculate();
 
         return result;
       }
 
-      glm::vec3 Transform::getPosition() {
+      glm::vec3 Transform::getPosition() const {
         return position;
       }
 
@@ -53,7 +62,7 @@ namespace BlueBear {
         dirty = true;
       }
 
-      glm::vec3 Transform::getScale() {
+      glm::vec3 Transform::getScale() const {
         return scale;
       }
 
@@ -62,7 +71,7 @@ namespace BlueBear {
         dirty = true;
       }
 
-      glm::quat Transform::getRotation() {
+      glm::quat Transform::getRotation() const {
         return rotation;
       }
 
@@ -78,7 +87,7 @@ namespace BlueBear {
         glUniformMatrix4fv( Tools::OpenGL::getUniformLocation( "model" ), 1, GL_FALSE, glm::value_ptr( quickMatrix ) );
       }
 
-      Transform Transform::interpolate( Transform& t1, Transform& t2, float alpha ) {
+      Transform Transform::interpolate( const Transform& t1, const Transform& t2, float alpha ) {
         return Transform(
           glm::mix( t1.getPosition(), t2.getPosition(), alpha ),
           glm::mix( t1.getScale(), t2.getScale(), alpha ),

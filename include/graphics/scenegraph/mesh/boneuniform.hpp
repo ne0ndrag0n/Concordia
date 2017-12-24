@@ -15,10 +15,9 @@ namespace BlueBear {
 
         class BoneUniform : public Uniform {
           std::vector< std::string > boneIDs;
-          std::weak_ptr< Model > armature;
 
         public:
-          BoneUniform( const std::vector< std::string >& boneIDs, std::shared_ptr< Model > armature );
+          BoneUniform( const std::vector< std::string >& boneIDs );
           void send() override;
         };
 
