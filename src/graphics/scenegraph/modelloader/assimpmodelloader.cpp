@@ -246,7 +246,95 @@ namespace BlueBear {
           return result;
         }
 
+        std::map< double, glm::mat4 > AssimpModelLoader::getKeyframes( aiNodeAnim* nodeAnim ) {
+          std::map< double, glm::mat4 > result;
+
+          // Animation must have fully-formed first keyframe
+          if( nodeAnim->mNumPositionKeys && nodeAnim->mNumRotationKeys && nodeAnim->mNumScalingKeys ) {
+            struct Triplet { aiVector3D* position; aiQuaternion* rotation; aiVector3D* scale; };
+            std::map< double, Triplet > triplets;
+
+            // Spray keyframes into a triplet map; missing keyframes will be substituited with the one before
+            for( int i = 0; i < nodeAnim->mNumPositionKeys; i++ ) {
+              aiVectorKey& key = nodeAnim->mPositionKeys[ i ];
+              triplets[ key.mTime ].position = &( key.mValue );
+            }
+
+            for( int i = 0; i < nodeAnim->mNumRotationKeys; i++ ) {
+              aiQuatKey& key = nodeAnim->mRotationKeys[ i ];
+              triplets[ key.mTime ].rotation = &( key.mValue );
+            }
+
+            for( int i = 0; i < nodeAnim->mNumScalingKeys; i++ ) {
+              aiVectorKey& key = nodeAnim->mScalingKeys[ i ];
+              triplets[ key.mTime ].scale = &( key.mValue );
+            }
+
+            // First one is guaranteed to be a complete triplet, so just check the previous ones for gaps
+            for( auto it = triplets.begin(); it != triplets.end(); ++it ) {
+              Triplet triplet = it->second;
+              if( !triplet.position ) { triplet.position = std::prev( it, 1 )->second.position; }
+              if( !triplet.rotation ) { triplet.rotation = std::prev( it, 1 )->second.rotation; }
+              if( !triplet.scale    ) { triplet.scale    = std::prev( it, 1 )->second.scale;    }
+
+              // Use triplet to assemble a glm::mat4 from a Transform
+              result[ it->first ] = Transform::componentsToMatrix(
+                Tools::AssimpTools::aiToGLMvec3( *triplet.position ),
+                Tools::AssimpTools::aiToGLMquat( *triplet.rotation ),
+                Tools::AssimpTools::aiToGLMvec3( *triplet.scale )
+              );
+            }
+
+          } else {
+            throw MalformedAnimationException();
+          }
+
+          return result;
+        }
+
+        std::shared_ptr< Animation::Bone::AnimationMap > AssimpModelLoader::getAnimationMapForBone( const std::string& boneId ) {
+          if( context.scene->HasAnimations() ) {
+            std::shared_ptr< Animation::Bone::AnimationMap > animationMap = std::make_shared< Animation::Bone::AnimationMap >();
+
+            for( int i = 0; i < context.scene->mNumAnimations; i++ ) {
+              aiAnimation* animation = context.scene->mAnimations[ i ];
+
+              for( int j = 0; j < animation->mNumChannels; j++ ) {
+                aiNodeAnim* nodeAnim = animation->mChannels[ j ];
+                if( std::string( nodeAnim->mNodeName.C_Str() ) == boneId ) {
+
+                  try {
+                    ( *animationMap )[ animation->mName.C_Str() ] = getKeyframes( nodeAnim );
+                  } catch( MalformedAnimationException& e ) {
+                    Log::getInstance().warn(
+                      "AssimpModelLoader::getAnimationMapForBone",
+                       std::string( "Malformed animation " ) + animation->mName.C_Str() + " for bone ID " + boneId
+                     );
+                  }
+
+                }
+              }
+            }
+
+            return animationMap->empty() ? nullptr : animationMap;
+          } else {
+            return nullptr;
+          }
+        }
+
+        Animation::Bone AssimpModelLoader::getBoneFromNode( aiNode* node ) {
+          std::string boneId = node->mName.C_Str();
+          Animation::Bone result( boneId, Tools::AssimpTools::aiToGLMmat4( node->mTransformation ), getAnimationMapForBone( boneId ) );
+
+          for( int i = 0; i < node->mNumChildren; i++ ) {
+            result.addChild( getBoneFromNode( node->mChildren[ i ] ) );
+          }
+
+          return result;
+        }
+
         std::unique_ptr< Animation::Animator > AssimpModelLoader::getAnimator( aiNode* node ) {
+          Animation::Bone rootSkeleton = getBoneFromNode( node );
           // TODO
           return std::unique_ptr< Animation::Animator >();
         }
@@ -267,13 +355,13 @@ namespace BlueBear {
           std::shared_ptr< Model > model = Model::create( node->mName.C_Str(), mesh, { shader, material } );
           model->setTransform( Transform( Tools::AssimpTools::aiToGLMmat4( node->mTransformation ) ) );
 
-          // Add children - check this
           for( int i = 0; i < node->mNumChildren; i++ ) {
             aiNode* assimpChild = node->mChildren[ i ];
-            if( assimpChild->mName.C_Str() == "_armature" ) {
-              model->getAnimatorRef() = getAnimator( assimpChild );
+            // A skeleton is contained within a node called "_armature", with a single root bone as its child
+            if( assimpChild->mName.C_Str() == "_armature" && assimpChild->mNumChildren == 1 ) {
+              model->getAnimatorRef() = getAnimator( assimpChild->mChildren[ 0 ] );
             } else {
-              std::shared_ptr< Model > child = getNode( node->mChildren[ i ] );
+              std::shared_ptr< Model > child = getNode( assimpChild );
               child->setParent( model );
             }
           }

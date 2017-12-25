@@ -13,12 +13,12 @@ namespace BlueBear {
 
       Transform::Transform() {}
 
-      Transform::Transform( const glm::vec3& position, const glm::vec3& scale, const glm::quat& rotation ) :
-        position( position ), scale( scale ), rotation( rotation ) {}
+      Transform::Transform( const glm::vec3& position, const glm::quat& rotation, const glm::vec3& scale ) :
+        position( position ), rotation( rotation ), scale( scale ) {}
 
       Transform::Transform( const glm::mat4& existingTransform ) : result( existingTransform ), dirty( false ) { decompose(); }
 
-      Transform::Transform( const Transform& transform ) : position( transform.position ), scale( transform.scale ), rotation( transform.rotation ), result( transform.result ), dirty( transform.dirty ) {}
+      Transform::Transform( const Transform& transform ) : position( transform.position ), rotation( transform.rotation ), scale( transform.scale ), result( transform.result ), dirty( transform.dirty ) {}
 
       Transform& Transform::operator=( const Transform& other ) {
         position = other.position;
@@ -90,12 +90,12 @@ namespace BlueBear {
       Transform Transform::interpolate( const Transform& t1, const Transform& t2, float alpha ) {
         return Transform(
           glm::mix( t1.getPosition(), t2.getPosition(), alpha ),
-          glm::mix( t1.getScale(), t2.getScale(), alpha ),
-          glm::mix( t1.getRotation(), t2.getRotation(), alpha )
+          glm::mix( t1.getRotation(), t2.getRotation(), alpha ),
+          glm::mix( t1.getScale(), t2.getScale(), alpha )
         );
       }
 
-      glm::mat4 Transform::componentsToMatrix( const glm::vec3& position, const glm::vec3& scale, const glm::quat& rotation ) {
+      glm::mat4 Transform::componentsToMatrix( const glm::vec3& position, const glm::quat& rotation, const glm::vec3& scale ) {
         glm::mat4 quickMatrix;
 
         quickMatrix = glm::translate( quickMatrix, position );

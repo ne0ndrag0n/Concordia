@@ -10,8 +10,8 @@ namespace BlueBear {
 
       class Transform {
         glm::vec3 position = glm::vec3( 0.0f, 0.0f, 0.0f );
-        glm::vec3 scale = glm::vec3( 1.0f, 1.0f, 1.0f );
         glm::quat rotation = glm::quat( 1.0f, 0.0f, 0.0f, 0.0f );
+        glm::vec3 scale = glm::vec3( 1.0f, 1.0f, 1.0f );
         glm::mat4 result;
         bool dirty = true;
 
@@ -21,7 +21,7 @@ namespace BlueBear {
       public:
         Transform();
         Transform( const Transform& transform );
-        Transform( const glm::vec3& position, const glm::vec3& scale, const glm::quat& rotation );
+        Transform( const glm::vec3& position, const glm::quat& rotation, const glm::vec3& scale );
         Transform( const glm::mat4& existingTransform );
         Transform& operator=( const Transform& other );
 
@@ -39,7 +39,7 @@ namespace BlueBear {
         void send( const glm::mat4& parentMixin );
 
         static Transform interpolate( const Transform& t1, const Transform& t2, float alpha );
-        static glm::mat4 componentsToMatrix( const glm::vec3& position, const glm::vec3& scale, const glm::quat& rotation );
+        static glm::mat4 componentsToMatrix( const glm::vec3& position, const glm::quat& rotation, const glm::vec3& scale );
 
       };
 

@@ -1,6 +1,7 @@
 #ifndef SG_MODEL_LOADER_ASSIMP
 #define SG_MODEL_LOADER_ASSIMP
 
+#include "exceptions/genexc.hpp"
 #include "graphics/scenegraph/modelloader/modelloader.hpp"
 #include "graphics/scenegraph/animation/animator.hpp"
 #include <assimp/Importer.hpp>
@@ -19,12 +20,17 @@ namespace BlueBear {
 
       namespace Mesh {
         class Mesh;
+      }
+
+      namespace Animation {
         class Bone;
       }
 
       namespace ModelLoader {
 
         class AssimpModelLoader : public FileModelLoader {
+          EXCEPTION_TYPE( MalformedAnimationException, "Malformed animation" );
+
           Assimp::Importer importer;
           struct ImportContext {
             const aiScene* scene;
@@ -40,19 +46,14 @@ namespace BlueBear {
           std::shared_ptr< Mesh::Mesh > getMesh( aiNode* node );
           std::shared_ptr< Material > getMaterial( aiMaterial* material );
           std::shared_ptr< Model > getNode( aiNode* node );
+          std::map< double, glm::mat4 > getKeyframes( aiNodeAnim* nodeAnim );
+          std::shared_ptr< Animation::Bone::AnimationMap > getAnimationMapForBone( const std::string& boneId );
+          Animation::Bone getBoneFromNode( aiNode* node );
           std::unique_ptr< Animation::Animator > getAnimator( aiNode* node );
 
         public:
-          struct BadModelException : public std::exception {
-            const char* what() const throw() {
-              return "Model could not be loaded!";
-            }
-          };
-          struct TooManyBonesException : public std::exception {
-            const char* what() const throw() {
-              return "Too many bones for this vertex!";
-            }
-          };
+          EXCEPTION_TYPE( BadModelException, "Model could not be loaded!" );
+          EXCEPTION_TYPE( TooManyBonesException, "Too many bones for this vertex!" );
 
           bool hintNoIndices = false;
           bool useBones = true;
