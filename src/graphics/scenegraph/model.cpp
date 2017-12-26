@@ -1,4 +1,5 @@
 #include "graphics/scenegraph/model.hpp"
+#include "graphics/scenegraph/animation/animator.hpp"
 #include "graphics/scenegraph/mesh/mesh.hpp"
 #include "graphics/scenegraph/material.hpp"
 #include "graphics/transform.hpp"
@@ -68,7 +69,7 @@ namespace BlueBear {
         this->transform = transform;
       }
 
-      std::unique_ptr< Animation::Animator >& Model::getAnimatorRef() {
+      std::shared_ptr< Animation::Animator >& Model::getAnimatorRef() {
         return animator;
       }
 
@@ -99,6 +100,10 @@ namespace BlueBear {
 
           transform.send( parentTransform );
           style.material->send();
+
+          if( animator ) {
+            animator->update();
+          }
 
           mesh->drawElements();
         }

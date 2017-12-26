@@ -40,7 +40,7 @@ namespace BlueBear {
           void setCurrentAnimation( const std::string& animationId );
           void setPause( bool status );
           void reset();
-          void nextFrame();
+          void update();
         };
 
       }

@@ -44,8 +44,8 @@ namespace BlueBear {
           currentSkeleton = bindSkeleton;
         }
 
-        void Animator::nextFrame() {
-          if( !paused ) {
+        void Animator::update() {
+          if( animation && !paused ) {
             double currentFps = getFPS();
             if( frame + currentFps <= animation->duration ) {
               frame += currentFps;

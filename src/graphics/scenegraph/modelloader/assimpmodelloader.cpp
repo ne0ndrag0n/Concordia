@@ -1,4 +1,6 @@
 #include "graphics/scenegraph/modelloader/assimpmodelloader.hpp"
+#include "graphics/scenegraph/animation/animation.hpp"
+#include "graphics/scenegraph/animation/animator.hpp"
 #include "graphics/scenegraph/mesh/meshdefinition.hpp"
 #include "graphics/scenegraph/mesh/basicvertex.hpp"
 #include "graphics/scenegraph/mesh/texturedvertex.hpp"
@@ -25,7 +27,7 @@ namespace BlueBear {
         unsigned int AssimpModelLoader::getFlags() {
           unsigned int result = aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals;
 
-          if( hintNoIndices ) {
+          if( !hintNoIndices ) {
             result |= aiProcess_JoinIdenticalVertices;
           }
 
@@ -126,7 +128,8 @@ namespace BlueBear {
                   std::make_shared< Mesh::MeshDefinition< Mesh::TexturedRiggedVertex > >( vertices );
 
                 md->meshUniforms.emplace( "bone", std::make_unique< Mesh::BoneUniform >(
-                  getBoneIds( mesh->mBones, mesh->mNumBones )
+                  getBoneIds( mesh->mBones, mesh->mNumBones ),
+                  context.animator
                 ) );
                 result = md;
 
@@ -144,7 +147,8 @@ namespace BlueBear {
                   std::make_shared< Mesh::MeshDefinition< Mesh::RiggedVertex > >( vertices );
 
                 md->meshUniforms.emplace( "bone", std::make_unique< Mesh::BoneUniform >(
-                  getBoneIds( mesh->mBones, mesh->mNumBones )
+                  getBoneIds( mesh->mBones, mesh->mNumBones ),
+                  context.animator
                 ) );
                 result = md;
 
@@ -272,7 +276,7 @@ namespace BlueBear {
 
             // First one is guaranteed to be a complete triplet, so just check the previous ones for gaps
             for( auto it = triplets.begin(); it != triplets.end(); ++it ) {
-              Triplet triplet = it->second;
+              Triplet& triplet = it->second;
               if( !triplet.position ) { triplet.position = std::prev( it, 1 )->second.position; }
               if( !triplet.rotation ) { triplet.rotation = std::prev( it, 1 )->second.rotation; }
               if( !triplet.scale    ) { triplet.scale    = std::prev( it, 1 )->second.scale;    }
@@ -333,10 +337,32 @@ namespace BlueBear {
           return result;
         }
 
-        std::unique_ptr< Animation::Animator > AssimpModelLoader::getAnimator( aiNode* node ) {
+        std::map< std::string, std::shared_ptr< Animation::Animation > > AssimpModelLoader::getAnimationList() {
+          std::map< std::string, std::shared_ptr< Animation::Animation > > animList;
+
+          for( int i = 0; i < context.scene->mNumAnimations; i++ ) {
+            aiAnimation* animation = context.scene->mAnimations[ i ];
+
+            animList[ animation->mName.C_Str() ] = std::make_shared< Animation::Animation >(
+              Animation::Animation{
+                animation->mName.C_Str(),
+                animation->mTicksPerSecond,
+                animation->mDuration
+              }
+            );
+          }
+
+          return animList;
+        }
+
+        std::shared_ptr< Animation::Animator > AssimpModelLoader::getAnimator( aiNode* node ) {
           Animation::Bone rootSkeleton = getBoneFromNode( node );
-          // TODO
-          return std::unique_ptr< Animation::Animator >();
+
+          return std::shared_ptr< Animation::Animator >( std::make_shared< Animation::Animator >(
+            rootSkeleton,
+            rootSkeleton,
+            getAnimationList()
+          ) );
         }
 
         std::shared_ptr< Model > AssimpModelLoader::getNode( aiNode* node ) {
@@ -359,6 +385,11 @@ namespace BlueBear {
             aiNode* assimpChild = node->mChildren[ i ];
             // A skeleton is contained within a node called "_armature", with a single root bone as its child
             if( assimpChild->mName.C_Str() == "_armature" && assimpChild->mNumChildren == 1 ) {
+
+              if( context.animator ) {
+                throw DuplicateArmatureException();
+              }
+
               model->getAnimatorRef() = getAnimator( assimpChild->mChildren[ 0 ] );
             } else {
               std::shared_ptr< Model > child = getNode( assimpChild );
@@ -376,7 +407,7 @@ namespace BlueBear {
           if( !context.scene || context.scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !context.scene->mRootNode ) {
             Log::getInstance().error( "AssimpModelLoader::get", std::string( "Warning: could not import file " ) + filename );
             Log::getInstance().error( "AssimpModelLoader::get", importer.GetErrorString() );
-            throw BadModelException();
+            throw MissingSceneException();
           }
 
           context.directory = filename.substr( 0, filename.find_last_of( '/' ) );

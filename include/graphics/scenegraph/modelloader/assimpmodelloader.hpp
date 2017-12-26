@@ -3,12 +3,15 @@
 
 #include "exceptions/genexc.hpp"
 #include "graphics/scenegraph/modelloader/modelloader.hpp"
-#include "graphics/scenegraph/animation/animator.hpp"
+#include "graphics/scenegraph/animation/bone.hpp"
+#include <glm/glm.hpp>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <GL/glew.h>
 #include <exception>
 #include <vector>
+#include <memory>
+#include <map>
 
 namespace BlueBear {
   namespace Graphics {
@@ -23,18 +26,18 @@ namespace BlueBear {
       }
 
       namespace Animation {
-        class Bone;
+        class Animation;
+        class Animator;
       }
 
       namespace ModelLoader {
 
         class AssimpModelLoader : public FileModelLoader {
-          EXCEPTION_TYPE( MalformedAnimationException, "Malformed animation" );
-
           Assimp::Importer importer;
           struct ImportContext {
             const aiScene* scene;
             std::string directory;
+            std::shared_ptr< Animation::Animator > animator;
           } context;
 
           unsigned int getFlags();
@@ -49,10 +52,13 @@ namespace BlueBear {
           std::map< double, glm::mat4 > getKeyframes( aiNodeAnim* nodeAnim );
           std::shared_ptr< Animation::Bone::AnimationMap > getAnimationMapForBone( const std::string& boneId );
           Animation::Bone getBoneFromNode( aiNode* node );
-          std::unique_ptr< Animation::Animator > getAnimator( aiNode* node );
+          std::map< std::string, std::shared_ptr< Animation::Animation > > getAnimationList();
+          std::shared_ptr< Animation::Animator > getAnimator( aiNode* node );
 
         public:
-          EXCEPTION_TYPE( BadModelException, "Model could not be loaded!" );
+          EXCEPTION_TYPE( MissingSceneException, "Missing scene data!" );
+          EXCEPTION_TYPE( DuplicateArmatureException, "Duplicate armature data in mesh!" );
+          EXCEPTION_TYPE( MalformedAnimationException, "Malformed animation data" );
           EXCEPTION_TYPE( TooManyBonesException, "Too many bones for this vertex!" );
 
           bool hintNoIndices = false;
