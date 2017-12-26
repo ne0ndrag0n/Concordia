@@ -26,7 +26,7 @@ namespace BlueBear {
         std::shared_ptr< Animation::Animator > animator;
         std::vector< std::shared_ptr< Model > > submodels;
 
-        Model() = delete;
+        Model() = default;
         Model(
           std::string id,
           std::shared_ptr< Mesh::Mesh > mesh,
@@ -41,11 +41,14 @@ namespace BlueBear {
           Style style
         );
 
+        std::shared_ptr< Model > copy();
+
         const std::string& getId() const;
         void setId( const std::string& id );
 
         std::shared_ptr< Model > getParent() const;
-        void setParent( std::shared_ptr< Model > newParent );
+        void addChild( std::shared_ptr< Model > child );
+        void detach();
 
         Style& getStyle();
         void setStyle( Style style );

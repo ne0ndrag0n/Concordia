@@ -10,6 +10,11 @@ namespace BlueBear {
         Animator::Animator( const Bone& bindSkeleton, const Bone& currentSkeleton, const std::map< std::string, std::shared_ptr< Animation > >& animationList ) :
           bindSkeleton( bindSkeleton ), currentSkeleton( currentSkeleton ), animationList( animationList ) {}
 
+        Animator::Animator( const Animator& animator ) {
+          currentSkeleton = bindSkeleton = animator.bindSkeleton;
+          animationList = animator.animationList;
+        }
+
         double Animator::getFPS() {
           return animation->fps / ConfigManager::getInstance().getIntValue( "fps_overview" );
         }

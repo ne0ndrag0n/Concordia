@@ -392,8 +392,7 @@ namespace BlueBear {
 
               model->getAnimatorRef() = getAnimator( assimpChild->mChildren[ 0 ] );
             } else {
-              std::shared_ptr< Model > child = getNode( assimpChild );
-              child->setParent( model );
+              model->addChild( getNode( assimpChild ) );
             }
           }
 

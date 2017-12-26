@@ -28,6 +28,7 @@ namespace BlueBear {
 
         public:
           EXCEPTION_TYPE( AnimationNotFoundException, "Animation ID not found!" );
+          Animator( const Animator& animator );
           Animator(
             const Bone& bindSkeleton,
             const Bone& currentSkeleton,
