@@ -61,11 +61,21 @@ namespace BlueBear {
         this->style = style;
       }
 
-      Transform& Model::getTransform() {
+      Transform Model::getComputedTransform() const {
+        if( std::shared_ptr< Model > realParent = parent.lock() ) {
+          // A -> B -> C -> D
+          // ( D * ( C * ( B * A ) ) )
+          return transform * realParent->getComputedTransform();
+        }
+
         return transform;
       }
 
-      void Model::setTransform( Transform transform ) {
+      Transform Model::getLocalTransform() const {
+        return transform;
+      }
+
+      void Model::setLocalTransform( Transform transform ) {
         this->transform = transform;
       }
 
@@ -91,14 +101,9 @@ namespace BlueBear {
 
         // Models can have empty nodes which do not draw any mesh
         if( mesh ) {
-          glm::mat4 parentTransform;
-          if( std::shared_ptr< Model > realParent = parent.lock() ) {
-            parentTransform = realParent->transform.getMatrix();
-          }
-
           style.shader->use();
 
-          transform.send( parentTransform );
+          getComputedTransform().send();
           style.material->send();
 
           if( animator ) {

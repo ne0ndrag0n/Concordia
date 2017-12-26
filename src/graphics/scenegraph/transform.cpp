@@ -20,20 +20,41 @@ namespace BlueBear {
 
       Transform::Transform( const Transform& transform ) : position( transform.position ), rotation( transform.rotation ), scale( transform.scale ), result( transform.result ), dirty( transform.dirty ) {}
 
-      Transform& Transform::operator=( const Transform& other ) {
-        position = other.position;
-        scale = other.scale;
-        rotation = other.rotation;
-        result = other.result;
-        dirty = other.dirty;
+      Transform& Transform::operator=( const Transform& rhs ) {
+        position = rhs.position;
+        scale = rhs.scale;
+        rotation = rhs.rotation;
+        result = rhs.result;
+        dirty = rhs.dirty;
+      }
+
+      Transform Transform::operator*( const Transform& rhs ) const {
+        return Transform( getMatrixImmediate() * rhs.getMatrixImmediate() );
+      }
+
+      Transform& Transform::operator*=( const Transform& rhs ) {
+        recalculate();
+
+        result *= rhs.getMatrixImmediate();
+        decompose();
+
+        return *this;
+      }
+
+      glm::mat4 Transform::getMatrixImmediate() const {
+        glm::mat4 matrix;
+
+        matrix = glm::mat4( 1.0f );
+        matrix *= glm::translate( position );
+        matrix *= glm::toMat4( rotation );
+        matrix *= glm::scale( scale );
+
+        return matrix;
       }
 
       void Transform::recalculate() {
         if( dirty ) {
-          result = glm::mat4( 1.0f );
-          result *= glm::translate( position );
-          result *= glm::toMat4( rotation );
-          result *= glm::scale( scale );
+          result = getMatrixImmediate();
           dirty = false;
         }
       }
@@ -80,11 +101,10 @@ namespace BlueBear {
         dirty = true;
       }
 
-      void Transform::send( const glm::mat4& parentMixin ) {
+      void Transform::send() {
         recalculate();
 
-        glm::mat4 quickMatrix = parentMixin * result;
-        glUniformMatrix4fv( Tools::OpenGL::getUniformLocation( "model" ), 1, GL_FALSE, glm::value_ptr( quickMatrix ) );
+        glUniformMatrix4fv( Tools::OpenGL::getUniformLocation( "model" ), 1, GL_FALSE, glm::value_ptr( result ) );
       }
 
       Transform Transform::interpolate( const Transform& t1, const Transform& t2, float alpha ) {

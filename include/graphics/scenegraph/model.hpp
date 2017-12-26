@@ -50,8 +50,9 @@ namespace BlueBear {
         Style& getStyle();
         void setStyle( Style style );
 
-        Transform& getTransform();
-        void setTransform( Transform transform );
+        Transform getComputedTransform() const;
+        Transform getLocalTransform() const;
+        void setLocalTransform( Transform transform );
 
         std::shared_ptr< Animation::Animator >& getAnimatorRef();
 
