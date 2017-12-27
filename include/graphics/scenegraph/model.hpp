@@ -34,6 +34,8 @@ namespace BlueBear {
         );
         Model( const Model& other );
 
+        void computeAnimation();
+
       public:
         static std::shared_ptr< Model > create(
           std::string id,
@@ -57,7 +59,8 @@ namespace BlueBear {
         Transform getLocalTransform() const;
         void setLocalTransform( Transform transform );
 
-        std::shared_ptr< Animation::Animator >& getAnimatorRef();
+        std::shared_ptr< Animation::Animator > findNearestAnimator() const;
+        void setAnimator( std::shared_ptr< Animation::Animator > animator );
 
         std::shared_ptr< Model > findChildById( const std::string& id ) const;
 

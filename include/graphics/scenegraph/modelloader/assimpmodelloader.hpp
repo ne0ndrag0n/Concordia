@@ -37,7 +37,6 @@ namespace BlueBear {
           struct ImportContext {
             const aiScene* scene;
             std::string directory;
-            std::shared_ptr< Animation::Animator > animator;
           } context;
 
           unsigned int getFlags();
@@ -57,7 +56,6 @@ namespace BlueBear {
 
         public:
           EXCEPTION_TYPE( MissingSceneException, "Missing scene data!" );
-          EXCEPTION_TYPE( DuplicateArmatureException, "Duplicate armature data in mesh!" );
           EXCEPTION_TYPE( MalformedAnimationException, "Malformed animation data" );
           EXCEPTION_TYPE( TooManyBonesException, "Too many bones for this vertex!" );
 

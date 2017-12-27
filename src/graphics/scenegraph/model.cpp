@@ -1,5 +1,6 @@
 #include "graphics/scenegraph/model.hpp"
 #include "graphics/scenegraph/animation/animator.hpp"
+#include "graphics/scenegraph/mesh/boneuniform.hpp"
 #include "graphics/scenegraph/mesh/mesh.hpp"
 #include "graphics/scenegraph/material.hpp"
 #include "graphics/transform.hpp"
@@ -93,8 +94,18 @@ namespace BlueBear {
         this->transform = transform;
       }
 
-      std::shared_ptr< Animation::Animator >& Model::getAnimatorRef() {
-        return animator;
+      std::shared_ptr< Animation::Animator > Model::findNearestAnimator() const {
+        if( animator ) {
+          return animator;
+        } else if( std::shared_ptr< Model > realParent = parent.lock() ) {
+          return realParent->findNearestAnimator();
+        } else {
+          return nullptr;
+        }
+      }
+
+      void Model::setAnimator( std::shared_ptr< Animation::Animator > animator ) {
+        this->animator = animator;
       }
 
       std::shared_ptr< Model > Model::findChildById( const std::string& id ) const {
@@ -111,19 +122,27 @@ namespace BlueBear {
         return std::shared_ptr< Model >();
       }
 
+      void Model::computeAnimation() {
+        if( std::shared_ptr< Animation::Animator > animator = findNearestAnimator() ) {
+          auto it = mesh->meshUniforms.find( "bone" );
+          if( it != mesh->meshUniforms.end() ) {
+            animator->update();
+
+            Mesh::BoneUniform* boneUniform = ( Mesh::BoneUniform* ) it->second.get();
+            boneUniform->configure( animator );
+            boneUniform->send();
+          }
+        }
+      }
+
       void Model::draw() {
 
         // Models can have empty nodes which do not draw any mesh
         if( mesh ) {
           style.shader->use();
-
           getComputedTransform().send();
           style.material->send();
-
-          if( animator ) {
-            animator->update();
-          }
-
+          computeAnimation();
           mesh->drawElements();
         }
 

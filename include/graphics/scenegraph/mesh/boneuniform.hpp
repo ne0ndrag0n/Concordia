@@ -2,6 +2,7 @@
 #define SG_BONE_UNIFORM
 
 #include "graphics/scenegraph/uniform.hpp"
+#include <glm/glm.hpp>
 #include <vector>
 #include <string>
 #include <memory>
@@ -19,10 +20,11 @@ namespace BlueBear {
 
         class BoneUniform : public Uniform {
           std::vector< std::string > boneIDs;
-          std::weak_ptr< Animation::Animator > animator;
+          std::vector< glm::mat4 > boneUniform;
 
         public:
-          BoneUniform( const std::vector< std::string >& boneIDs, std::shared_ptr< Animation::Animator > animator );
+          BoneUniform( const std::vector< std::string >& boneIDs );
+          void configure( std::shared_ptr< Animation::Animator > animator );
           void send() override;
         };
 

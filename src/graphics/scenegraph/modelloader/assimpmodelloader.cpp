@@ -127,10 +127,7 @@ namespace BlueBear {
                   std::make_shared< Mesh::MeshDefinition< Mesh::TexturedRiggedVertex > >( vertices, getIndices( mesh ) ) :
                   std::make_shared< Mesh::MeshDefinition< Mesh::TexturedRiggedVertex > >( vertices );
 
-                md->meshUniforms.emplace( "bone", std::make_unique< Mesh::BoneUniform >(
-                  getBoneIds( mesh->mBones, mesh->mNumBones ),
-                  context.animator
-                ) );
+                md->meshUniforms.emplace( "bone", std::make_unique< Mesh::BoneUniform >( getBoneIds( mesh->mBones, mesh->mNumBones ) ) );
                 result = md;
 
               } else {
@@ -146,10 +143,7 @@ namespace BlueBear {
                   std::make_shared< Mesh::MeshDefinition< Mesh::RiggedVertex > >( vertices, getIndices( mesh ) ) :
                   std::make_shared< Mesh::MeshDefinition< Mesh::RiggedVertex > >( vertices );
 
-                md->meshUniforms.emplace( "bone", std::make_unique< Mesh::BoneUniform >(
-                  getBoneIds( mesh->mBones, mesh->mNumBones ),
-                  context.animator
-                ) );
+                md->meshUniforms.emplace( "bone", std::make_unique< Mesh::BoneUniform >( getBoneIds( mesh->mBones, mesh->mNumBones ) ) );
                 result = md;
 
               }
@@ -385,12 +379,7 @@ namespace BlueBear {
             aiNode* assimpChild = node->mChildren[ i ];
             // A skeleton is contained within a node called "_armature", with a single root bone as its child
             if( assimpChild->mName.C_Str() == "_armature" && assimpChild->mNumChildren == 1 ) {
-
-              if( context.animator ) {
-                throw DuplicateArmatureException();
-              }
-
-              model->getAnimatorRef() = getAnimator( assimpChild->mChildren[ 0 ] );
+              model->setAnimator( getAnimator( assimpChild->mChildren[ 0 ] ) );
             } else {
               model->addChild( getNode( assimpChild ) );
             }

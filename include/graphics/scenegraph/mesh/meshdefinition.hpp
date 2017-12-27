@@ -2,7 +2,6 @@
 #define SG_MESH_DEFINITION
 
 #include "graphics/scenegraph/mesh/mesh.hpp"
-#include "graphics/scenegraph/uniform.hpp"
 #include "tools/opengl.hpp"
 #include <GL/glew.h>
 #include <vector>
@@ -38,8 +37,6 @@ namespace BlueBear {
           }
 
         public:
-          std::map< std::string, std::unique_ptr< Uniform > > meshUniforms;
-
           MeshDefinition( const std::vector< VertexType >& vertices, const std::vector< GLuint >& indices ) :
             size( indices.size() ), indexed( true ), drawMethod( std::bind( &MeshDefinition::drawIndexed, this ) ) {
             getDefaultShader = VertexType::getDefaultShader;
