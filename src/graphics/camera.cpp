@@ -99,12 +99,14 @@ namespace BlueBear {
     }
 
     void Camera::sendToShader() {
-      GLint cameraPos = Tools::OpenGL::getUniformID( "cameraPos" );
-      if( cameraPos != -1 ) {
-        glUniform3f( cameraPos, camera[ 0 ], camera[ 1 ], camera[ 2 ] );
-      }
-      glUniformMatrix4fv( Tools::OpenGL::getUniformLocation( "view" ), 1, GL_FALSE, glm::value_ptr( view ) );
-      glUniformMatrix4fv( Tools::OpenGL::getUniformLocation( "projection" ), 1, GL_FALSE, glm::value_ptr( projection ) );
+      Tools::OpenGL::lock( [ & ]() {
+        GLint cameraPos = Tools::OpenGL::getUniformID( "cameraPos" );
+        if( cameraPos != -1 ) {
+          glUniform3f( cameraPos, camera[ 0 ], camera[ 1 ], camera[ 2 ] );
+        }
+        glUniformMatrix4fv( Tools::OpenGL::getUniformLocation( "view" ), 1, GL_FALSE, glm::value_ptr( view ) );
+        glUniformMatrix4fv( Tools::OpenGL::getUniformLocation( "projection" ), 1, GL_FALSE, glm::value_ptr( projection ) );
+      } );
     }
 
     glm::mat4 Camera::getOrthoView() {

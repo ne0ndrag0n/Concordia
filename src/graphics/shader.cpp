@@ -1,4 +1,5 @@
 #include "graphics/shader.hpp"
+#include "tools/opengl.hpp"
 #include "eventmanager.hpp"
 #include "log.hpp"
 #include <string>
@@ -99,7 +100,9 @@ namespace BlueBear {
 
     void Shader::use() {
       if( Shader::CURRENT_PROGRAM != this->Program ) {
-        glUseProgram(this->Program);
+        Tools::OpenGL::lock( [ & ]() {
+          glUseProgram( this->Program );
+        } );
         Shader::CURRENT_PROGRAM = this->Program;
       }
 

@@ -1,6 +1,7 @@
 #ifndef SG_MATERIAL
 #define SG_MATERIAL
 
+#include "exceptions/genexc.hpp"
 #include <glm/glm.hpp>
 #include <vector>
 #include <memory>
@@ -27,11 +28,7 @@ namespace BlueBear {
         void checkTextureUnits();
 
       public:
-        struct ExceededTextureUnitsException : public std::exception {
-          const char* what() const throw() {
-            return "Exceeded the maximum texture units for this hardware.";
-          }
-        };
+        EXCEPTION_TYPE( ExceededTextureUnitsException, "Exceeded the maximum texture units for this hardware." );
 
         Material( glm::vec3 ambientColor, glm::vec3 diffuseColor, glm::vec3 specularColor, float shininess );
         Material( glm::vec3 diffuseColor, glm::vec3 specularColor, float shininess );

@@ -34,7 +34,9 @@ namespace BlueBear {
             }
           }
 
-          glUniformMatrix4fv( Tools::OpenGL::getUniformLocation( "bones" ), boneUniform.size(), GL_FALSE, glm::value_ptr( boneUniform[ 0 ] ) );
+          Tools::OpenGL::lock( [ & ]() {
+            glUniformMatrix4fv( Tools::OpenGL::getUniformLocation( "bones" ), boneUniform.size(), GL_FALSE, glm::value_ptr( boneUniform[ 0 ] ) );
+          } );
         }
 
       }

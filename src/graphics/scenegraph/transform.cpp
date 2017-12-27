@@ -104,7 +104,9 @@ namespace BlueBear {
       void Transform::send() {
         recalculate();
 
-        glUniformMatrix4fv( Tools::OpenGL::getUniformLocation( "model" ), 1, GL_FALSE, glm::value_ptr( result ) );
+        Tools::OpenGL::lock( [ & ]() {
+          glUniformMatrix4fv( Tools::OpenGL::getUniformLocation( "model" ), 1, GL_FALSE, glm::value_ptr( result ) );
+        } );
       }
 
       Transform Transform::interpolate( const Transform& t1, const Transform& t2, float alpha ) {
