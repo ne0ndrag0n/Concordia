@@ -1,7 +1,6 @@
 #ifndef SG_MODEL
 #define SG_MODEL
 
-#include "graphics/scenegraph/style.hpp"
 #include "graphics/scenegraph/transform.hpp"
 #include <string>
 #include <vector>
@@ -9,7 +8,11 @@
 
 namespace BlueBear {
   namespace Graphics {
+    class Shader;
+
     namespace SceneGraph {
+      class Material;
+
       namespace Mesh {
         class Mesh;
       }
@@ -19,10 +22,11 @@ namespace BlueBear {
 
       class Model : public std::enable_shared_from_this< Model > {
         std::string id;
+        Transform transform;
         std::weak_ptr< Model > parent;
         std::shared_ptr< Mesh::Mesh > mesh;
-        Style style;
-        Transform transform;
+        std::shared_ptr< Shader > shader;
+        std::shared_ptr< Material > material;
         std::shared_ptr< Animation::Animator > animator;
         std::vector< std::shared_ptr< Model > > submodels;
 
@@ -30,7 +34,8 @@ namespace BlueBear {
         Model(
           std::string id,
           std::shared_ptr< Mesh::Mesh > mesh,
-          Style style
+          std::shared_ptr< Shader > shader,
+          std::shared_ptr< Material > material
         );
         Model( const Model& other );
 
@@ -40,7 +45,8 @@ namespace BlueBear {
         static std::shared_ptr< Model > create(
           std::string id,
           std::shared_ptr< Mesh::Mesh > mesh,
-          Style style
+          std::shared_ptr< Shader > shader,
+          std::shared_ptr< Material > material
         );
 
         std::shared_ptr< Model > copy();
@@ -52,8 +58,11 @@ namespace BlueBear {
         void addChild( std::shared_ptr< Model > child );
         void detach();
 
-        Style& getStyle();
-        void setStyle( Style style );
+        std::shared_ptr< Shader > getShader() const;
+        void setShader( std::shared_ptr< Shader > shader );
+
+        std::shared_ptr< Material > getMaterial() const;
+        void setMaterial( std::shared_ptr< Material > material );
 
         Transform getComputedTransform() const;
         Transform getLocalTransform() const;

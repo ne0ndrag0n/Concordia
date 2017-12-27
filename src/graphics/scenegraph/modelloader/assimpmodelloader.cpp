@@ -372,7 +372,7 @@ namespace BlueBear {
             }
           }
 
-          std::shared_ptr< Model > model = Model::create( node->mName.C_Str(), mesh, { shader, material } );
+          std::shared_ptr< Model > model = Model::create( node->mName.C_Str(), mesh, shader, material );
           model->setLocalTransform( Transform( Tools::AssimpTools::aiToGLMmat4( node->mTransformation ) ) );
 
           for( int i = 0; i < node->mNumChildren; i++ ) {

@@ -13,11 +13,11 @@ namespace BlueBear {
   namespace Graphics {
     namespace SceneGraph {
 
-      Model::Model( std::string id, std::shared_ptr< Mesh::Mesh > mesh, Style style ) :
-        id( id ), mesh( mesh ), style( style ) {}
+      Model::Model( std::string id, std::shared_ptr< Mesh::Mesh > mesh, std::shared_ptr< Shader > shader, std::shared_ptr< Material > material ) :
+        id( id ), mesh( mesh ), shader( shader ), material( material ) {}
 
-      std::shared_ptr< Model > Model::create( std::string id, std::shared_ptr< Mesh::Mesh > mesh, Style style ) {
-        return std::shared_ptr< Model >( new Model( id, mesh, style ) );
+      std::shared_ptr< Model > Model::create( std::string id, std::shared_ptr< Mesh::Mesh > mesh, std::shared_ptr< Shader > shader, std::shared_ptr< Material > material ) {
+        return std::shared_ptr< Model >( new Model( id, mesh, shader, material ) );
       }
 
       std::shared_ptr< Model > Model::copy() {
@@ -28,7 +28,8 @@ namespace BlueBear {
           Log::getInstance().warn( "Model::copy", "Disconnecting new Model copy from old parent" );
         }
         copy->mesh = mesh;
-        copy->style = style;
+        copy->shader = shader;
+        copy->material = material;
         copy->transform = transform;
         copy->animator = std::make_shared< Animation::Animator >( *animator );
 
@@ -68,12 +69,20 @@ namespace BlueBear {
         child->parent = shared_from_this();
       }
 
-      Style& Model::getStyle() {
-        return style;
+      std::shared_ptr< Shader > Model::getShader() const {
+        return shader;
       }
 
-      void Model::setStyle( Style style ) {
-        this->style = style;
+      void Model::setShader( std::shared_ptr< Shader > shader ) {
+        this->shader = shader;
+      }
+
+      std::shared_ptr< Material > Model::getMaterial() const {
+        return material;
+      }
+
+      void Model::setMaterial( std::shared_ptr< Material > material ) {
+        this->material = material;
       }
 
       Transform Model::getComputedTransform() const {
@@ -139,9 +148,9 @@ namespace BlueBear {
 
         // Models can have empty nodes which do not draw any mesh
         if( mesh ) {
-          style.shader->use();
+          shader->use();
           getComputedTransform().send();
-          style.material->send();
+          material->send();
           computeAnimation();
           mesh->drawElements();
         }
