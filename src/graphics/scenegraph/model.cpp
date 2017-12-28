@@ -69,8 +69,14 @@ namespace BlueBear {
         child->parent = shared_from_this();
       }
 
-      std::shared_ptr< Shader > Model::getShader() const {
-        return shader;
+      std::shared_ptr< Shader > Model::findNearestShader() const {
+        if( shader ) {
+          return shader;
+        } else if( std::shared_ptr< Model > realParent = parent.lock() ) {
+          return realParent->findNearestShader();
+        } else {
+          return nullptr;
+        }
       }
 
       void Model::setShader( std::shared_ptr< Shader > shader ) {
@@ -148,7 +154,7 @@ namespace BlueBear {
 
         // Models can have empty nodes which do not draw any mesh
         if( mesh ) {
-          shader->use();
+          findNearestShader()->use();
           getComputedTransform().send();
           material->send();
           computeAnimation();

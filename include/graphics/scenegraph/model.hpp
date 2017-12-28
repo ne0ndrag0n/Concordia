@@ -58,7 +58,7 @@ namespace BlueBear {
         void addChild( std::shared_ptr< Model > child );
         void detach();
 
-        std::shared_ptr< Shader > getShader() const;
+        std::shared_ptr< Shader > findNearestShader() const;
         void setShader( std::shared_ptr< Shader > shader );
 
         std::shared_ptr< Material > getMaterial() const;
