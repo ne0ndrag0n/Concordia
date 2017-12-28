@@ -601,6 +601,24 @@ namespace BlueBear {
       gui.desktop.HandleEvent( event );
       inputManager.handleEvent( event );
 
+      if( event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Z ) {
+        World::Renderer testRenderer;
+
+        std::vector< std::string > boxes;
+        for( int i = 0; i <= 5; i++ ) {
+          boxes.push_back( std::string( "dev/box/scale_test/s" ) + std::to_string( i ) + ".fbx" );
+        }
+
+        std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+        testRenderer.loadPathsParallel( boxes );
+        std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+
+        Log::getInstance().debug(
+          "Z-key renderer debugging",
+          std::to_string( std::chrono::duration_cast< std::chrono::milliseconds >( end - start ).count() ) + "ms"
+        );
+      }
+
       // Never leave a pointer dangling
       currentEvent = nullptr;
     }

@@ -27,6 +27,7 @@ namespace BlueBear {
       public:
         virtual ~Renderer() = default;
 
+        void loadPathsParallel( const std::vector< std::string >& paths );
         void loadPaths( const std::vector< std::string >& paths );
       };
 

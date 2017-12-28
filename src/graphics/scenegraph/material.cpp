@@ -70,51 +70,39 @@ namespace BlueBear {
         unsigned int counter = 0;
 
         if( useAmbient ) {
-          Tools::OpenGL::lock( [ & ]() {
-            glUniform3f(
-              Tools::OpenGL::getUniformLocation( "material.ambient" ),
-              ambientColor[ 0 ], ambientColor[ 1 ], ambientColor[ 2 ]
-            );
-          } );
+          glUniform3f(
+            Tools::OpenGL::getUniformLocation( "material.ambient" ),
+            ambientColor[ 0 ], ambientColor[ 1 ], ambientColor[ 2 ]
+          );
         }
 
         if( diffuseTextures.empty() ) {
-          Tools::OpenGL::lock( [ & ]() {
-            glUniform3f(
-              Tools::OpenGL::getUniformLocation( "material.diffuse" ),
-              diffuseColor[ 0 ], diffuseColor[ 1 ], diffuseColor[ 2 ]
-            );
-          } );
+          glUniform3f(
+            Tools::OpenGL::getUniformLocation( "material.diffuse" ),
+            diffuseColor[ 0 ], diffuseColor[ 1 ], diffuseColor[ 2 ]
+          );
         } else {
           for( int i = 0; i != diffuseTextures.size(); i++ ) {
-            Tools::OpenGL::lock( [ & ]() {
-              glActiveTexture( GL_TEXTURE0 + counter++ );
-              glBindTexture( GL_TEXTURE_2D, diffuseTextures[ i ]->id );
-              glUniform1i( Tools::OpenGL::getUniformLocation( std::string( "material.diffuse" ) + std::to_string( i ) ), i );
-            } );
+            glActiveTexture( GL_TEXTURE0 + counter++ );
+            glBindTexture( GL_TEXTURE_2D, diffuseTextures[ i ]->id );
+            glUniform1i( Tools::OpenGL::getUniformLocation( std::string( "material.diffuse" ) + std::to_string( i ) ), i );
           }
         }
 
         if( specularTextures.empty() ) {
-          Tools::OpenGL::lock( [ & ]() {
-            glUniform3f(
-              Tools::OpenGL::getUniformLocation( "material.specular" ),
-              specularColor[ 0 ], specularColor[ 1 ], specularColor[ 2 ]
-            );
-          } );
+          glUniform3f(
+            Tools::OpenGL::getUniformLocation( "material.specular" ),
+            specularColor[ 0 ], specularColor[ 1 ], specularColor[ 2 ]
+          );
         } else {
           for( int i = 0; i != specularTextures.size(); i++ ) {
-            Tools::OpenGL::lock( [ & ]() {
-              glActiveTexture( GL_TEXTURE0 + counter++ );
-              glBindTexture( GL_TEXTURE_2D, specularTextures[ i ]->id );
-              glUniform1i( Tools::OpenGL::getUniformLocation( std::string( "material.specular" ) + std::to_string( i ) ), i );
-            } );
+            glActiveTexture( GL_TEXTURE0 + counter++ );
+            glBindTexture( GL_TEXTURE_2D, specularTextures[ i ]->id );
+            glUniform1i( Tools::OpenGL::getUniformLocation( std::string( "material.specular" ) + std::to_string( i ) ), i );
           }
         }
 
-        Tools::OpenGL::lock( [ & ]() {
-          glUniform1f( Tools::OpenGL::getUniformLocation( "material.shininess" ), shininess );
-        } );
+        glUniform1f( Tools::OpenGL::getUniformLocation( "material.shininess" ), shininess );
       }
 
     }

@@ -55,7 +55,6 @@ namespace BlueBear {
           std::shared_ptr< Animation::Animator > getAnimator( aiNode* node );
 
         public:
-          EXCEPTION_TYPE( MissingSceneException, "Missing scene data!" );
           EXCEPTION_TYPE( MalformedAnimationException, "Malformed animation data" );
           EXCEPTION_TYPE( TooManyBonesException, "Too many bones for this vertex!" );
 

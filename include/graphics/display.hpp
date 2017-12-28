@@ -30,6 +30,7 @@
 #include "graphics/camera.hpp"
 #include "graphics/instance/instance.hpp"
 #include "graphics/input/inputmanager.hpp"
+#include "graphics/world/renderer.hpp"
 
 namespace BlueBear {
   class EventManager;
@@ -106,6 +107,9 @@ namespace BlueBear {
           // These are ours!
           std::unique_ptr< Containers::Collection3D< std::shared_ptr< Instance > > > floorInstanceCollection;
           std::unique_ptr< Containers::Collection3D< std::shared_ptr< WallCellBundler > > > wallInstanceCollection;
+
+          // TODO: This object will replace most of what's already in MainGameState
+          World::Renderer renderer;
           void registerEvents();
           void loadIntrinsicModels();
           void processOsd();

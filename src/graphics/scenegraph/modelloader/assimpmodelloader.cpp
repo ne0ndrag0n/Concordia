@@ -395,7 +395,7 @@ namespace BlueBear {
           if( !context.scene || context.scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !context.scene->mRootNode ) {
             Log::getInstance().error( "AssimpModelLoader::get", std::string( "Warning: could not import file " ) + filename );
             Log::getInstance().error( "AssimpModelLoader::get", importer.GetErrorString() );
-            throw MissingSceneException();
+            return nullptr;
           }
 
           context.directory = filename.substr( 0, filename.find_last_of( '/' ) );

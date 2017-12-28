@@ -100,9 +100,7 @@ namespace BlueBear {
 
     void Shader::use() {
       if( Shader::CURRENT_PROGRAM != this->Program ) {
-        Tools::OpenGL::lock( [ & ]() {
-          glUseProgram( this->Program );
-        } );
+        glUseProgram( this->Program );
         Shader::CURRENT_PROGRAM = this->Program;
       }
 
