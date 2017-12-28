@@ -605,8 +605,8 @@ namespace BlueBear {
         World::Renderer testRenderer;
 
         std::vector< std::string > boxes;
-        for( int i = 0; i <= 5; i++ ) {
-          boxes.push_back( std::string( "dev/box/scale_test/s" ) + std::to_string( i ) + ".fbx" );
+        for( int i = 0; i <= 100; i++ ) {
+          boxes.push_back( std::string( "dev/box/scale_test/mini_knight" ) + std::to_string( i ) + ".fbx" );
         }
 
         std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();

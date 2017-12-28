@@ -73,6 +73,8 @@ namespace BlueBear {
 
         std::shared_ptr< Model > findChildById( const std::string& id ) const;
 
+        void sendDeferredObjects();
+
         void draw();
       };
 

@@ -1,36 +1,29 @@
 #include "graphics/texture.hpp"
 #include "tools/opengl.hpp"
 #include "log.hpp"
-#include <assimp/types.h>
-#include <GL/glew.h>
-#include <SFML/Graphics.hpp>
-#include <string>
-#include <sstream>
 
 namespace BlueBear {
   namespace Graphics {
-
-    Texture::Texture( GLuint id, aiString path ) :
-      id( id ), path( path ) {}
 
     Texture::Texture( sf::Image& texture ) {
       prepareTextureFromImage( texture );
     }
 
-    Texture::Texture( std::string texFromFile ) {
-      sf::Image texture;
-      if( !texture.loadFromFile( texFromFile ) ) {
-        std::stringstream stream( "Couldn't load texture " );
-        stream << texFromFile;
-        Log::getInstance().error( "Texture::Texture", stream.str() );
-        return;
+    Texture::Texture( const std::string& texFromFile, bool defer ) {
+      deferred = std::make_unique< sf::Image >();
+      if( !deferred->loadFromFile( texFromFile ) ) {
+        throw ImageLoadFailureException();
       }
 
-      prepareTextureFromImage( texture );
+      if( !defer ) {
+        sendDeferred();
+      }
     }
 
     Texture::~Texture() {
-      glDeleteTextures( 1, &id );
+      if( !deferred ) {
+        glDeleteTextures( 1, &id );
+      }
     }
 
     void Texture::prepareTextureFromImage( sf::Image& texture ) {
@@ -45,6 +38,13 @@ namespace BlueBear {
         glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture.getPixelsPtr() );
         glGenerateMipmap( GL_TEXTURE_2D );
       glBindTexture( GL_TEXTURE_2D, 0 );
+    }
+
+    void Texture::sendDeferred() {
+      if( deferred ) {
+        prepareTextureFromImage( *deferred );
+        deferred = nullptr;
+      }
     }
   }
 }

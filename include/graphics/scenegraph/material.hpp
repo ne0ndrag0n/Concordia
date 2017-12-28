@@ -48,6 +48,8 @@ namespace BlueBear {
 
         float getShininess();
 
+        void sendDeferredTextures();
+
         void send();
       };
 

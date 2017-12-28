@@ -150,6 +150,20 @@ namespace BlueBear {
         }
       }
 
+      void Model::sendDeferredObjects() {
+        if( mesh ) {
+          mesh->sendDeferred();
+        }
+
+        if( material ) {
+          material->sendDeferredTextures();
+        }
+
+        for( std::shared_ptr< Model > child : submodels ) {
+          child->sendDeferredObjects();
+        }
+      }
+
       void Model::draw() {
 
         // Models can have empty nodes which do not draw any mesh

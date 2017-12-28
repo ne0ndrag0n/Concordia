@@ -18,6 +18,7 @@ namespace BlueBear {
         public:
           std::map< std::string, std::shared_ptr< Uniform > > meshUniforms;
           std::function< std::shared_ptr< Shader >() > getDefaultShader;
+          virtual void sendDeferred() = 0;
           virtual void drawElements() = 0;
         };
 

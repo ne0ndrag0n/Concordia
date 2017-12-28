@@ -22,7 +22,7 @@ namespace BlueBear {
       class Renderer {
         tbb::concurrent_unordered_map< std::string, std::shared_ptr< SceneGraph::Model > > originals;
 
-        std::unique_ptr< SceneGraph::ModelLoader::FileModelLoader > getFileModelLoader() const;
+        std::unique_ptr< SceneGraph::ModelLoader::FileModelLoader > getFileModelLoader( bool deferGLOperations ) const;
 
       public:
         virtual ~Renderer() = default;

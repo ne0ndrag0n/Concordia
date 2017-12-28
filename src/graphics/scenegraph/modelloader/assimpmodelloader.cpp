@@ -124,8 +124,8 @@ namespace BlueBear {
                 }
 
                 auto md = usesIndices ?
-                  std::make_shared< Mesh::MeshDefinition< Mesh::TexturedRiggedVertex > >( vertices, getIndices( mesh ) ) :
-                  std::make_shared< Mesh::MeshDefinition< Mesh::TexturedRiggedVertex > >( vertices );
+                  std::make_shared< Mesh::MeshDefinition< Mesh::TexturedRiggedVertex > >( vertices, getIndices( mesh ), deferGLOperations ) :
+                  std::make_shared< Mesh::MeshDefinition< Mesh::TexturedRiggedVertex > >( vertices, deferGLOperations );
 
                 md->meshUniforms.emplace( "bone", std::make_unique< Mesh::BoneUniform >( getBoneIds( mesh->mBones, mesh->mNumBones ) ) );
                 result = md;
@@ -140,8 +140,8 @@ namespace BlueBear {
                 }
 
                 auto md = usesIndices ?
-                  std::make_shared< Mesh::MeshDefinition< Mesh::RiggedVertex > >( vertices, getIndices( mesh ) ) :
-                  std::make_shared< Mesh::MeshDefinition< Mesh::RiggedVertex > >( vertices );
+                  std::make_shared< Mesh::MeshDefinition< Mesh::RiggedVertex > >( vertices, getIndices( mesh ), deferGLOperations ) :
+                  std::make_shared< Mesh::MeshDefinition< Mesh::RiggedVertex > >( vertices, deferGLOperations );
 
                 md->meshUniforms.emplace( "bone", std::make_unique< Mesh::BoneUniform >( getBoneIds( mesh->mBones, mesh->mNumBones ) ) );
                 result = md;
@@ -158,8 +158,8 @@ namespace BlueBear {
                 }
 
                 result = usesIndices ?
-                  std::make_shared< Mesh::MeshDefinition< Mesh::TexturedVertex > >( vertices, getIndices( mesh ) ) :
-                  std::make_shared< Mesh::MeshDefinition< Mesh::TexturedVertex > >( vertices );
+                  std::make_shared< Mesh::MeshDefinition< Mesh::TexturedVertex > >( vertices, getIndices( mesh ), deferGLOperations ) :
+                  std::make_shared< Mesh::MeshDefinition< Mesh::TexturedVertex > >( vertices, deferGLOperations );
 
               } else {
                 // !usesBones && !usesTextures - BasicVertex (solid material, no bones)
@@ -169,8 +169,8 @@ namespace BlueBear {
                 }
 
                 result = usesIndices ?
-                  std::make_shared< Mesh::MeshDefinition< Mesh::BasicVertex > >( vertices, getIndices( mesh ) ) :
-                  std::make_shared< Mesh::MeshDefinition< Mesh::BasicVertex > >( vertices );
+                  std::make_shared< Mesh::MeshDefinition< Mesh::BasicVertex > >( vertices, getIndices( mesh ), deferGLOperations ) :
+                  std::make_shared< Mesh::MeshDefinition< Mesh::BasicVertex > >( vertices, deferGLOperations );
               }
             }
 
@@ -187,7 +187,7 @@ namespace BlueBear {
           for( int i = 0; i < texCount; i++ ) {
             aiString filename;
             material->GetTexture( type, i, &filename );
-            textures.push_back( std::make_shared< Texture >( context.directory + "/" + filename.C_Str() ) );
+            textures.push_back( std::make_shared< Texture >( context.directory + "/" + filename.C_Str(), deferGLOperations ) );
           }
 
           return textures;

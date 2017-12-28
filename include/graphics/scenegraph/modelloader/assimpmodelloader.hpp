@@ -60,6 +60,7 @@ namespace BlueBear {
 
           bool hintNoIndices = false;
           bool useBones = true;
+          bool deferGLOperations = false;
 
           std::shared_ptr< Model > get( const std::string& filename ) override;
         };

@@ -23,23 +23,15 @@ namespace BlueBear {
           bool indexed;
           std::function< void() > drawMethod;
 
+          // Deferred loading of meshes
+          std::unique_ptr< const std::vector< VertexType > > deferredVertices;
+          std::unique_ptr< const std::vector< GLuint > > deferredIndices;
+
           // Disable copy
           MeshDefinition( const MeshDefinition& );
           MeshDefinition& operator=( const MeshDefinition& );
 
-          void drawIndexed() {
-            glDrawElements( GL_TRIANGLES, size, GL_UNSIGNED_INT, 0 );
-          }
-
-          void drawVertices() {
-            glDrawArrays( GL_TRIANGLES, 0, size );
-          }
-
-        public:
-          MeshDefinition( const std::vector< VertexType >& vertices, const std::vector< GLuint >& indices ) :
-            size( indices.size() ), indexed( true ), drawMethod( std::bind( &MeshDefinition::drawIndexed, this ) ) {
-            getDefaultShader = VertexType::getDefaultShader;
-
+          void loadIndexed( const std::vector< VertexType >& vertices, const std::vector< GLuint >& indices ) {
             glGenVertexArrays( 1, &VAO );
             glGenBuffers( 1, &VBO );
             glGenBuffers( 1, &EBO );
@@ -57,10 +49,7 @@ namespace BlueBear {
             glBindVertexArray( 0 );
           }
 
-          MeshDefinition( const std::vector< VertexType >& vertices ) :
-            size( vertices.size() ), indexed( false ), drawMethod( std::bind( &MeshDefinition::drawVertices, this ) ) {
-            getDefaultShader = VertexType::getDefaultShader;
-
+          void loadVertices( const std::vector< VertexType >& vertices ) {
             glGenVertexArrays( 1, &VAO );
             glGenBuffers( 1, &VBO );
 
@@ -74,11 +63,58 @@ namespace BlueBear {
             glBindVertexArray( 0 );
           }
 
+          void drawIndexed() {
+            glDrawElements( GL_TRIANGLES, size, GL_UNSIGNED_INT, 0 );
+          }
+
+          void drawVertices() {
+            glDrawArrays( GL_TRIANGLES, 0, size );
+          }
+
+        public:
+          MeshDefinition( const std::vector< VertexType >& vertices, const std::vector< GLuint >& indices, bool defer = false ) :
+            size( indices.size() ), indexed( true ), drawMethod( std::bind( &MeshDefinition::drawIndexed, this ) ) {
+            getDefaultShader = VertexType::getDefaultShader;
+
+            if( defer ) {
+              deferredVertices = std::make_unique< const std::vector< VertexType > >( vertices );
+              deferredIndices = std::make_unique< const std::vector< GLuint > >( indices );
+            } else {
+              loadIndexed( vertices, indices );
+            }
+          }
+
+          MeshDefinition( const std::vector< VertexType >& vertices, bool defer = false ) :
+            size( vertices.size() ), indexed( false ), drawMethod( std::bind( &MeshDefinition::drawVertices, this ) ) {
+            getDefaultShader = VertexType::getDefaultShader;
+
+            if( defer ) {
+              deferredVertices = std::make_unique< const std::vector< VertexType > >( vertices );
+            } else {
+              loadVertices( vertices );
+            }
+          }
+
           ~MeshDefinition() {
-            glDeleteVertexArrays( 1, &VAO );
-            glDeleteBuffers( 1, &VBO );
-            if( indexed ) {
-              glDeleteBuffers( 1, &EBO );
+            if( !deferredVertices && !deferredIndices ) {
+              glDeleteVertexArrays( 1, &VAO );
+              glDeleteBuffers( 1, &VBO );
+              if( indexed ) {
+                glDeleteBuffers( 1, &EBO );
+              }
+            }
+          }
+
+          void sendDeferred() override {
+            if( deferredVertices ) {
+              if( deferredIndices ) {
+                loadIndexed( *deferredVertices, *deferredIndices );
+                deferredVertices = nullptr;
+                deferredIndices = nullptr;
+              } else {
+                loadVertices( *deferredVertices );
+                deferredVertices = nullptr;
+              }
             }
           }
 

@@ -66,6 +66,16 @@ namespace BlueBear {
         return shininess;
       }
 
+      void Material::sendDeferredTextures() {
+        for( std::shared_ptr< Texture > diffuse : diffuseTextures ) {
+          diffuse->sendDeferred();
+        }
+
+        for( std::shared_ptr< Texture > specular : specularTextures ) {
+          specular->sendDeferred();
+        }
+      }
+
       void Material::send() {
         unsigned int counter = 0;
 

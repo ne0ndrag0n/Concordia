@@ -1,28 +1,33 @@
 #ifndef GFXTEXTURE
 #define GFXTEXTURE
 
+#include "exceptions/genexc.hpp"
 #include <GL/glew.h>
 #include <assimp/types.h>
-#include <string>
 #include <SFML/Graphics.hpp>
+#include <string>
+#include <memory>
 
 namespace BlueBear {
   namespace Graphics {
 
     class Texture {
-      private:
+        std::unique_ptr< sf::Image > deferred;
+
         Texture( const Texture& );
         Texture& operator=( const Texture& );
 
         void prepareTextureFromImage( sf::Image& texture );
 
       public:
-        Texture( GLuint id, aiString path );
+        EXCEPTION_TYPE( ImageLoadFailureException, "Image could not be loaded!" );
+        GLuint id;
+
         Texture( sf::Image& texture );
-        Texture( std::string texFromFile );
+        Texture( const std::string& texFromFile, bool defer = false );
         ~Texture();
-        GLuint id = -1;
-        aiString path;
+
+        void sendDeferred();
     };
   }
 }
