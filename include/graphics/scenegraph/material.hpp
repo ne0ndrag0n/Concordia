@@ -39,6 +39,8 @@ namespace BlueBear {
         Material( glm::vec3 ambientColor, TextureList diffuseTextures, glm::vec3 specularColor, float shininess );
         Material( glm::vec3 ambientColor, glm::vec3 diffuseColor, TextureList specularTextures, float shininess );
 
+        virtual ~Material() = default;
+
         glm::vec3 getAmbientColor();
         glm::vec3 getDiffuseColor();
         glm::vec3 getSpecularColor();

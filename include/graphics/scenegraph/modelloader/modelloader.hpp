@@ -13,6 +13,7 @@ namespace BlueBear {
 
         class FileModelLoader {
         public:
+          virtual ~FileModelLoader() = default;
           virtual std::shared_ptr< Model > get( const std::string& filename ) = 0;
         };
 

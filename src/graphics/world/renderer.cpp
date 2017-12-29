@@ -3,12 +3,11 @@
 #include "graphics/scenegraph/modelloader/modelloader.hpp"
 #include "graphics/scenegraph/modelloader/assimpmodelloader.hpp"
 #include "tools/objectpool.hpp"
+#include "tools/utility.hpp"
 #include "log.hpp"
 #include <tbb/task_group.h>
 #include <tbb/concurrent_queue.h>
-#include <tbb/concurrent_vector.h>
 #include <functional>
-#include <atomic>
 
 namespace BlueBear {
   namespace Graphics {
@@ -24,27 +23,33 @@ namespace BlueBear {
 
       void Renderer::loadPathsParallel( const std::vector< std::string >& paths ) {
         tbb::task_group group;
-        tbb::concurrent_vector< std::shared_ptr< SceneGraph::Model > > sequentials;
         Tools::ObjectPool< SceneGraph::ModelLoader::FileModelLoader > pool( std::bind( &Renderer::getFileModelLoader, this, true ) );
 
         for( const std::string& path : paths ) {
           group.run( [ & ]() {
-            pool.acquire( [ & ]( SceneGraph::ModelLoader::FileModelLoader& loader ) {
-              try {
-                if( std::shared_ptr< SceneGraph::Model > model = loader.get( path ) ) {
-                  sequentials.push_back( originals[ path ] = model );
+            if( originals.find( path ) == originals.end() ) {
+              pool.acquire( [ & ]( SceneGraph::ModelLoader::FileModelLoader& loader ) {
+                try {
+                  if( std::shared_ptr< SceneGraph::Model > model = loader.get( path ) ) {
+                    originals[ path ] = model;
+                  }
+                } catch( std::exception& e ) {
+                  Log::getInstance().error( "Renderer::loadPathsParallel", std::string( "Could not load model " ) + path + ": " + e.what() );
                 }
-              } catch( std::exception& e ) {
-                Log::getInstance().error( "Renderer::loadPathsParallel", std::string( "Could not load model " ) + path + ": " + e.what() );
-              }
-            } );
+              } );
+            } else {
+              Log::getInstance().warn( "Renderer::loadPathsParallel", path + " is already inserted in this map; skipping" );
+            }
           } );
         }
 
         group.wait();
 
-        for( std::shared_ptr< SceneGraph::Model > sequential : sequentials ) {
-          sequential->sendDeferredObjects();
+        for( const std::string& path : paths ) {
+          auto pair = originals.find( path );
+          if( pair != originals.end() ) {
+            pair->second->sendDeferredObjects();
+          }
         }
       }
 

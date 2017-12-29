@@ -42,6 +42,8 @@ namespace BlueBear {
         void computeAnimation();
 
       public:
+        virtual ~Model() = default;
+
         static std::shared_ptr< Model > create(
           std::string id,
           std::shared_ptr< Mesh::Mesh > mesh,
