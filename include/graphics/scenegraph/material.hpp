@@ -41,14 +41,14 @@ namespace BlueBear {
 
         virtual ~Material() = default;
 
-        glm::vec3 getAmbientColor();
-        glm::vec3 getDiffuseColor();
-        glm::vec3 getSpecularColor();
+        const glm::vec3& getAmbientColor() const;
+        const glm::vec3& getDiffuseColor() const;
+        const glm::vec3& getSpecularColor() const;
 
-        TextureList getDiffuseTextureList();
-        TextureList getSpecularTextureList();
+        const TextureList& getDiffuseTextureList() const;
+        const TextureList& getSpecularTextureList() const;
 
-        float getShininess();
+        float getShininess() const;
 
         void sendDeferredTextures();
 

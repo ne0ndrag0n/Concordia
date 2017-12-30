@@ -4,6 +4,7 @@
 #include <tbb/concurrent_queue.h>
 #include <functional>
 #include <memory>
+#include <mutex>
 
 namespace BlueBear {
   namespace Tools {
@@ -17,9 +18,16 @@ namespace BlueBear {
       ObjectPool( std::function< std::unique_ptr< Class >() > createMethod ) : createMethod( createMethod ) {}
 
       void acquire( std::function< void( Class& ) > predicate ) {
+        static std::mutex mutex;
+
         // Acquire or create resource
         std::unique_ptr< Class > resource;
-        if( !pool.try_pop( resource ) ) {
+        bool obtained;
+        {
+          std::lock_guard< std::mutex > lock( mutex );
+          obtained = pool.try_pop( resource );
+        }
+        if( !obtained ) {
           resource = createMethod();
         }
 
@@ -27,7 +35,10 @@ namespace BlueBear {
         predicate( *resource );
 
         // Replace resource
-        pool.push( std::move( resource ) );
+        {
+          std::lock_guard< std::mutex > lock( mutex );
+          pool.push( std::move( resource ) );
+        }
       }
     };
 

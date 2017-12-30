@@ -42,27 +42,27 @@ namespace BlueBear {
         }
       }
 
-      glm::vec3 Material::getAmbientColor() {
+      const glm::vec3& Material::getAmbientColor() const {
         return ambientColor;
       }
 
-      glm::vec3 Material::getDiffuseColor() {
+      const glm::vec3& Material::getDiffuseColor() const {
         return diffuseColor;
       }
 
-      glm::vec3 Material::getSpecularColor() {
+      const glm::vec3& Material::getSpecularColor() const {
         return specularColor;
       }
 
-      TextureList Material::getDiffuseTextureList() {
+      const TextureList& Material::getDiffuseTextureList() const {
         return diffuseTextures;
       }
 
-      TextureList Material::getSpecularTextureList() {
+      const TextureList& Material::getSpecularTextureList() const {
         return specularTextures;
       }
 
-      float Material::getShininess() {
+      float Material::getShininess() const {
         return shininess;
       }
 

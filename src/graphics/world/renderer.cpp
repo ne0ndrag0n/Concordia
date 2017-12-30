@@ -13,10 +13,12 @@ namespace BlueBear {
   namespace Graphics {
     namespace World {
 
-      std::unique_ptr< SceneGraph::ModelLoader::FileModelLoader > Renderer::getFileModelLoader( bool deferGLOperations ) const {
+      std::unique_ptr< SceneGraph::ModelLoader::FileModelLoader > Renderer::getFileModelLoader( bool deferGLOperations ) {
         std::unique_ptr< SceneGraph::ModelLoader::FileModelLoader > result = std::make_unique< SceneGraph::ModelLoader::AssimpModelLoader >();
 
-        ( ( SceneGraph::ModelLoader::AssimpModelLoader& ) *result ).deferGLOperations = true;
+        SceneGraph::ModelLoader::AssimpModelLoader& asAssimp = ( SceneGraph::ModelLoader::AssimpModelLoader& )*result;
+        asAssimp.deferGLOperations = true;
+        asAssimp.cache = &cache;
 
         return result;
       }

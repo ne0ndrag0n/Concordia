@@ -20,6 +20,7 @@ namespace BlueBear {
     namespace SceneGraph {
       class Model;
       class Material;
+      class ResourceBank;
 
       namespace Mesh {
         class Mesh;
@@ -38,6 +39,9 @@ namespace BlueBear {
             const aiScene* scene;
             std::string directory;
           } context;
+
+          std::shared_ptr< Texture > getTexture( const std::string& path );
+          template < typename... Signature > std::shared_ptr< Material > getMaterial( Signature... params );
 
           unsigned int getFlags();
           std::vector< GLuint > getIndices( aiMesh* mesh );
@@ -61,6 +65,7 @@ namespace BlueBear {
           bool hintNoIndices = false;
           bool useBones = true;
           bool deferGLOperations = false;
+          SceneGraph::ResourceBank* cache = nullptr;
 
           std::shared_ptr< Model > get( const std::string& filename ) override;
         };

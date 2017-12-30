@@ -10,6 +10,7 @@
 #include "graphics/scenegraph/model.hpp"
 #include "graphics/scenegraph/material.hpp"
 #include "graphics/scenegraph/transform.hpp"
+#include "graphics/scenegraph/resourcebank.hpp"
 #include "graphics/texture.hpp"
 #include "graphics/shader.hpp"
 #include "tools/assimptools.hpp"
@@ -23,6 +24,27 @@ namespace BlueBear {
   namespace Graphics {
     namespace SceneGraph {
       namespace ModelLoader {
+
+        std::shared_ptr< Texture > AssimpModelLoader::getTexture( const std::string& path ) {
+          if( cache ) {
+            return cache->getOrCreateTexture( path, deferGLOperations );
+          }
+
+          return std::make_shared< Texture >( path, deferGLOperations );
+        }
+
+        template < typename... Signature >
+        std::shared_ptr< Material > AssimpModelLoader::getMaterial( Signature... params ) {
+          if( cache ) {
+            return cache->getOrCreateMaterial( params... );
+          }
+
+          return std::make_shared< Material >( params... );
+        }
+        template std::shared_ptr< Material > AssimpModelLoader::getMaterial( const glm::vec3&, const TextureList&, const TextureList&, float );
+        template std::shared_ptr< Material > AssimpModelLoader::getMaterial( const glm::vec3&, const TextureList&, const glm::vec3&, float );
+        template std::shared_ptr< Material > AssimpModelLoader::getMaterial( const glm::vec3&, const glm::vec3&, const TextureList&, float );
+        template std::shared_ptr< Material > AssimpModelLoader::getMaterial( const glm::vec3&, const glm::vec3&, const glm::vec3&, float );
 
         unsigned int AssimpModelLoader::getFlags() {
           unsigned int result = aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals;
@@ -187,7 +209,7 @@ namespace BlueBear {
           for( int i = 0; i < texCount; i++ ) {
             aiString filename;
             material->GetTexture( type, i, &filename );
-            textures.push_back( std::make_shared< Texture >( context.directory + "/" + filename.C_Str(), deferGLOperations ) );
+            textures.push_back( getTexture( context.directory + "/" + filename.C_Str() ) );
           }
 
           return textures;
@@ -211,21 +233,21 @@ namespace BlueBear {
           material->Get( AI_MATKEY_SHININESS, shininess );
 
           if( diffuseTextures && specularTextures ) {
-            result = std::make_shared< Material >(
+            result = getMaterial(
               Tools::AssimpTools::aiToGLMvec3( ambient ),
               getTextureList( material, aiTextureType_DIFFUSE ),
               getTextureList( material, aiTextureType_SPECULAR ),
               shininess
             );
           } else if ( diffuseTextures ) {
-            result = std::make_shared< Material >(
+            result = getMaterial(
               Tools::AssimpTools::aiToGLMvec3( ambient ),
               getTextureList( material, aiTextureType_DIFFUSE ),
               Tools::AssimpTools::aiToGLMvec3( specular ),
               shininess
             );
           } else if ( specularTextures ) {
-            result = std::make_shared< Material >(
+            result = getMaterial(
               Tools::AssimpTools::aiToGLMvec3( ambient ),
               Tools::AssimpTools::aiToGLMvec3( diffuse ),
               getTextureList( material, aiTextureType_SPECULAR ),
@@ -233,7 +255,7 @@ namespace BlueBear {
             );
           } else {
             // Solid colours only
-            result = std::make_shared< Material >(
+            result = getMaterial(
               Tools::AssimpTools::aiToGLMvec3( ambient ),
               Tools::AssimpTools::aiToGLMvec3( diffuse ),
               Tools::AssimpTools::aiToGLMvec3( specular ),
