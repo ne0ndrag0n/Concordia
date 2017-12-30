@@ -602,27 +602,25 @@ namespace BlueBear {
       inputManager.handleEvent( event );
 
       if( event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Z ) {
-        for( int index = 0; index != 1000; index++ ) {
-          World::Renderer testRenderer;
+        World::Renderer testRenderer;
 
-          std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-          testRenderer.loadPathsParallel( {
-            "dev/box/12vert.fbx",
-            "dev/box/armaturebox.fbx",
-            "dev/box/box.fbx",
-            "dev/box/box_no_anim.fbx",
-            "dev/box/cylinder.fbx",
-            "dev/box/even_simpler_2.fbx",
-            "dev/box/even_simpler.fbx",
-            "dev/box/mini_knight.fbx"
-          } );
-          std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+        std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+        testRenderer.loadPathsParallel( {
+          "dev/box/12vert.fbx",
+          "dev/box/armaturebox.fbx",
+          "dev/box/box.fbx",
+          "dev/box/box_no_anim.fbx",
+          "dev/box/cylinder.fbx",
+          "dev/box/even_simpler_2.fbx",
+          "dev/box/even_simpler.fbx",
+          "dev/box/mini_knight.fbx"
+        } );
+        std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
-          Log::getInstance().debug(
-            "Z-key renderer debugging",
-            std::to_string( std::chrono::duration_cast< std::chrono::milliseconds >( end - start ).count() ) + "ms"
-          );
-        }
+        Log::getInstance().debug(
+          "Z-key renderer debugging",
+          std::to_string( std::chrono::duration_cast< std::chrono::milliseconds >( end - start ).count() ) + "ms"
+        );
       }
 
       // Never leave a pointer dangling

@@ -151,6 +151,10 @@ namespace BlueBear {
       }
 
       void Model::sendDeferredObjects() {
+        if( shader ) {
+          shader->sendDeferred();
+        }
+
         if( mesh ) {
           mesh->sendDeferred();
         }

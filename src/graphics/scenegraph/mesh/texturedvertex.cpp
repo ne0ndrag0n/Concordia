@@ -18,8 +18,11 @@ namespace BlueBear {
           glVertexAttribPointer( 2, 2, GL_FLOAT, GL_FALSE, sizeof( TexturedVertex ), ( GLvoid* ) offsetof( TexturedVertex, textureCoordinates ) );
         }
 
-        std::shared_ptr< Shader > TexturedVertex::getDefaultShader() {
-          return std::shared_ptr< Shader >();
+        std::pair< std::string, std::string > TexturedVertex::getDefaultShader() {
+          return std::pair< std::string, std::string >(
+            "system/shaders/textured_vertex_nolight/vertex.glsl",
+            "system/shaders/textured_vertex_nolight/fragment.glsl"
+          );
         }
 
       }

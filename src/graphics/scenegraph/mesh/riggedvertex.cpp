@@ -21,8 +21,11 @@ namespace BlueBear {
           glVertexAttribPointer( 3, 4, GL_FLOAT, GL_FALSE, sizeof( RiggedVertex ), ( GLvoid* ) offsetof( RiggedVertex, boneWeights ) );
         }
 
-        std::shared_ptr< Shader > RiggedVertex::getDefaultShader() {
-          return std::shared_ptr< Shader >();
+        std::pair< std::string, std::string > RiggedVertex::getDefaultShader() {
+          return std::pair< std::string, std::string >(
+            "system/shaders/rigged_vertex_nolight/vertex.glsl",
+            "system/shaders/rigged_vertex_nolight/fragment.glsl"
+          );
         }
 
       }

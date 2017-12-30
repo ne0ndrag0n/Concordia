@@ -3,6 +3,7 @@
 
 #include <glm/glm.hpp>
 #include <memory>
+#include <utility>
 
 namespace BlueBear {
   namespace Graphics {
@@ -19,7 +20,7 @@ namespace BlueBear {
           glm::vec4 boneWeights = glm::vec4( 1.0f, 0.0f, 0.0f, 0.0f );
 
           static void setupShaderAttributes();
-          static std::shared_ptr< Shader > getDefaultShader();
+          static std::pair< std::string, std::string > getDefaultShader();
         };
 
       }

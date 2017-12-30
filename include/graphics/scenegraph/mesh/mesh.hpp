@@ -5,6 +5,7 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <utility>
 #include <map>
 
 namespace BlueBear {
@@ -17,7 +18,7 @@ namespace BlueBear {
         class Mesh {
         public:
           std::map< std::string, std::shared_ptr< Uniform > > meshUniforms;
-          std::function< std::shared_ptr< Shader >() > getDefaultShader;
+          std::function< std::pair< std::string, std::string >() > getDefaultShader;
 
           virtual ~Mesh() = default;
 

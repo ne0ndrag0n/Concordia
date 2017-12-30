@@ -20,7 +20,7 @@ namespace BlueBear {
         return false;
       }
 
-      std::shared_ptr< Shader > ResourceBank::getOrCreateShader( const std::string& vertexPath, const std::string& fragmentPath ) {
+      std::shared_ptr< Shader > ResourceBank::getOrCreateShader( const std::string& vertexPath, const std::string& fragmentPath, bool defer ) {
         std::string key = vertexPath + ":" + fragmentPath;
 
         std::lock_guard< std::mutex > lock( shadersMutex );
@@ -28,7 +28,7 @@ namespace BlueBear {
         if( it != shaders.end() ) {
           return it->second;
         } else {
-          return shaders[ key ] = std::make_shared< Shader >( vertexPath.c_str(), fragmentPath.c_str() );
+          return shaders[ key ] = std::make_shared< Shader >( vertexPath, fragmentPath, defer );
         }
       }
 

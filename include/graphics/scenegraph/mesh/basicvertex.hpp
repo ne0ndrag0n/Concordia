@@ -3,6 +3,7 @@
 
 #include <glm/glm.hpp>
 #include <memory>
+#include <utility>
 
 namespace BlueBear {
   namespace Graphics {
@@ -16,7 +17,7 @@ namespace BlueBear {
           glm::vec3 normal;
 
           static void setupShaderAttributes();
-          static std::shared_ptr< Shader > getDefaultShader();
+          static std::pair< std::string, std::string > getDefaultShader();
         };
 
       }

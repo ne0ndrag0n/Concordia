@@ -25,6 +25,14 @@ namespace BlueBear {
     namespace SceneGraph {
       namespace ModelLoader {
 
+        std::shared_ptr< Shader > AssimpModelLoader::getShader( const std::string& vertexPath, const std::string& fragmentPath ) {
+          if( cache ) {
+            return cache->getOrCreateShader( vertexPath, fragmentPath, deferGLOperations );
+          }
+
+          return std::make_shared< Shader >( vertexPath, fragmentPath, deferGLOperations );
+        }
+
         std::shared_ptr< Texture > AssimpModelLoader::getTexture( const std::string& path ) {
           if( cache ) {
             return cache->getOrCreateTexture( path, deferGLOperations );
@@ -383,7 +391,11 @@ namespace BlueBear {
 
         std::shared_ptr< Model > AssimpModelLoader::getNode( aiNode* node ) {
           std::shared_ptr< Mesh::Mesh > mesh = getMesh( node );
-          std::shared_ptr< Shader > shader = mesh ? mesh->getDefaultShader() : nullptr;
+          std::shared_ptr< Shader > shader;
+          if( mesh ) {
+            std::pair< std::string, std::string > shaderPair = mesh->getDefaultShader();
+            shader = getShader( shaderPair.first, shaderPair.second );
+          }
           std::shared_ptr< Material > material = nullptr;
 
           // Try to load the material

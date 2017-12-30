@@ -17,7 +17,6 @@ namespace BlueBear {
 
       /**
        * Facilitates reuse of common by-ref objects used in Models
-       * FIXME: Concurrent programming is really hard.
        */
       class ResourceBank {
         tbb::concurrent_vector< std::shared_ptr< Material > > materials;
@@ -30,7 +29,7 @@ namespace BlueBear {
         bool listsCongruent( const TextureList& list1, const TextureList& list2 );
 
       public:
-        std::shared_ptr< Shader > getOrCreateShader( const std::string& vertexPath, const std::string& fragmentPath );
+        std::shared_ptr< Shader > getOrCreateShader( const std::string& vertexPath, const std::string& fragmentPath, bool defer );
 
         std::shared_ptr< Texture > getOrCreateTexture( const std::string& path, bool defer );
 

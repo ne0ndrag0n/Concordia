@@ -16,6 +16,7 @@
 namespace BlueBear {
   namespace Graphics {
     class Texture;
+    class Shader;
 
     namespace SceneGraph {
       class Model;
@@ -40,6 +41,7 @@ namespace BlueBear {
             std::string directory;
           } context;
 
+          std::shared_ptr< Shader > getShader( const std::string& vertexPath, const std::string& fragmentPath );
           std::shared_ptr< Texture > getTexture( const std::string& path );
           template < typename... Signature > std::shared_ptr< Material > getMaterial( Signature... params );
 
