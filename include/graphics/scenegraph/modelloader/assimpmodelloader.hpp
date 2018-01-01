@@ -2,7 +2,7 @@
 #define SG_MODEL_LOADER_ASSIMP
 
 #include "exceptions/genexc.hpp"
-#include "graphics/scenegraph/modelloader/modelloader.hpp"
+#include "graphics/scenegraph/modelloader/filemodelloader.hpp"
 #include "graphics/scenegraph/animation/bone.hpp"
 #include <glm/glm.hpp>
 #include <assimp/Importer.hpp>

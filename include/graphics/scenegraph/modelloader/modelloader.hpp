@@ -1,25 +1,20 @@
-#ifndef SG_MODEL_LOADER_BASE
-#define SG_MODEL_LOADER_BASE
-
-#include <memory>
-#include <string>
+#ifndef BB_SCENEGRAPH_MODELLOADER
+#define BB_SCENEGRAPH_MODELLOADER
 
 namespace BlueBear {
   namespace Graphics {
     namespace SceneGraph {
-      class Model;
-
       namespace ModelLoader {
 
-        class FileModelLoader {
+        class ModelLoader {
         public:
-          virtual ~FileModelLoader() = default;
-          virtual std::shared_ptr< Model > get( const std::string& filename ) = 0;
+          virtual ~ModelLoader() = default;
         };
 
       }
     }
   }
 }
+
 
 #endif

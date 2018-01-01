@@ -1,6 +1,6 @@
 #include "graphics/world/renderer.hpp"
 #include "graphics/scenegraph/model.hpp"
-#include "graphics/scenegraph/modelloader/modelloader.hpp"
+#include "graphics/scenegraph/modelloader/filemodelloader.hpp"
 #include "graphics/scenegraph/modelloader/assimpmodelloader.hpp"
 #include "tools/objectpool.hpp"
 #include "tools/utility.hpp"
