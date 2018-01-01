@@ -9,6 +9,9 @@
 		"terrain": 1,
 		"rot": 0,
 		"infr": {
+			"terrain": [
+				{ "run": 169, "value": 0 }
+			],
 			"floor": {
 				"dict": [ "hardwood1", "hardwood2" ],
 				"levels": [
