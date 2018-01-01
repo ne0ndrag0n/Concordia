@@ -23,49 +23,62 @@ namespace BlueBear {
         return result;
       }
 
-      void Renderer::loadPathsParallel( const std::vector< std::string >& paths ) {
+      void Renderer::loadPathsParallel( const std::vector< std::pair< std::string, std::string > >& paths ) {
         tbb::task_group group;
         Tools::ObjectPool< SceneGraph::ModelLoader::FileModelLoader > pool( std::bind( &Renderer::getFileModelLoader, this, true ) );
 
-        for( const std::string& path : paths ) {
+        for( auto& path : paths ) {
           group.run( [ & ]() {
-            if( originals.find( path ) == originals.end() ) {
+            if( originals.find( path.first ) == originals.end() ) {
               pool.acquire( [ & ]( SceneGraph::ModelLoader::FileModelLoader& loader ) {
                 try {
-                  if( std::shared_ptr< SceneGraph::Model > model = loader.get( path ) ) {
-                    originals[ path ] = model;
+                  if( std::shared_ptr< SceneGraph::Model > model = loader.get( path.second ) ) {
+                    originals[ path.first ] = model;
                   }
                 } catch( std::exception& e ) {
-                  Log::getInstance().error( "Renderer::loadPathsParallel", std::string( "Could not load model " ) + path + ": " + e.what() );
+                  Log::getInstance().error( "Renderer::loadPathsParallel", std::string( "Could not load model " ) + path.second + ": " + e.what() );
                 }
               } );
             } else {
-              Log::getInstance().warn( "Renderer::loadPathsParallel", path + " is already inserted in this map; skipping" );
+              Log::getInstance().warn( "Renderer::loadPathsParallel", path.first + " is already inserted into this map; skipping" );
             }
           } );
         }
 
         group.wait();
 
-        for( const std::string& path : paths ) {
-          auto pair = originals.find( path );
+        for( auto& path : paths ) {
+          auto pair = originals.find( path.first );
           if( pair != originals.end() ) {
             pair->second->sendDeferredObjects();
           }
         }
       }
 
-      void Renderer::loadPaths( const std::vector< std::string >& paths ) {
+      void Renderer::loadPaths( const std::vector< std::pair< std::string, std::string > >& paths ) {
         std::unique_ptr< SceneGraph::ModelLoader::FileModelLoader > loader = getFileModelLoader( false );
 
-        for( const std::string& path : paths ) {
+        for( auto& path : paths ) {
           try {
-            if( std::shared_ptr< SceneGraph::Model > model = loader->get( path ) ) {
-              originals[ path ] = model;
+            if( std::shared_ptr< SceneGraph::Model > model = loader->get( path.second ) ) {
+              originals[ path.first ] = model;
             }
           } catch( std::exception& e ) {
-            Log::getInstance().error( "Renderer::loadPathsParallel", std::string( "Could not load model " ) + path + ": " + e.what() );
+            Log::getInstance().error( "Renderer::loadPathsParallel", std::string( "Could not load model " ) + path.second + ": " + e.what() );
           }
+        }
+      }
+
+      /**
+       * TODO: Optimized renderer that sorts by shader to minimize shader changes
+       */
+      void Renderer::render() {
+        // Draw floor and walls
+        floor.each( []( const glm::vec3& key, std::shared_ptr< SceneGraph::Model >& model ) { model->draw(); } );
+        walls.each( []( const glm::vec3& key, std::shared_ptr< SceneGraph::Model >& model ) { model->draw(); } );
+
+        for( auto& pair : models ) {
+          pair.second->draw();
         }
       }
 

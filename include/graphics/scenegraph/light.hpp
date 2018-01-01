@@ -2,16 +2,22 @@
 #define SG_LIGHT
 
 #include <glm/glm.hpp>
+#include <atomic>
 
 namespace BlueBear {
   namespace Graphics {
     namespace SceneGraph {
 
       class Light {
+        int id = -1;
         glm::vec3 position;
         glm::vec3 ambientComponent;
         glm::vec3 diffuseComponent;
         glm::vec3 specularComponent;
+
+        static std::atomic< unsigned int > counter;
+
+        void send();
 
       public:
         Light(
@@ -20,6 +26,8 @@ namespace BlueBear {
           glm::vec3 diffuseComponent,
           glm::vec3 specularComponent
         );
+
+        ~Light();
 
         glm::vec3 getPosition();
         glm::vec3 getAmbient();
@@ -30,8 +38,6 @@ namespace BlueBear {
         void setAmbient( glm::vec3 ambientComponent );
         void setDiffuse( glm::vec3 diffuseComponent );
         void setSpecular( glm::vec3 specularComponent );
-
-        void send();
       };
 
     }
