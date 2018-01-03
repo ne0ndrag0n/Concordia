@@ -9,9 +9,6 @@
 		"terrain": 1,
 		"rot": 0,
 		"infr": {
-			"terrain": [
-				{ "run": 169, "value": 0 }
-			],
 			"floor": {
 				"dict": [ "hardwood1", "hardwood2" ],
 				"levels": [
@@ -29,7 +26,24 @@
 					]
 				]
 			}
-		}
+		},
+		"dict": [ "hardwood1", "hardwood2", "_grey", "fancy", "star_test" ],
+		"world": [
+			{
+				"comment": "The world array and subsequent objects will replace \"infr\" for infrastructure",
+				"elevation": 0.0,
+				"dimensions": { "x": 12, "y": 12 },
+				"vertices": [
+					{ "run": 169, "value": 0.0 }
+				],
+				"tiles": [
+					{ "run": 144, "value": 0 }
+				],
+				"walls": {
+					"0:1": { "f": 2, "b": 2 }
+				}
+			}
+		]
 	},
 
 	"engine": {
