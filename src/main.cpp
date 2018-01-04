@@ -1,6 +1,4 @@
 #include "application.hpp"
-#include "log.hpp"
-#include "localemanager.hpp"
 
 int main() {
 	BlueBear::Application application;
