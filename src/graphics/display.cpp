@@ -18,7 +18,6 @@
 #include "graphics/modelloader.hpp"
 #include "scripting/luakit/gchelper.hpp"
 #include "scripting/lot.hpp"
-#include "scripting/tile.hpp"
 #include "scripting/engine.hpp"
 #include "scripting/wallcell.hpp"
 #include "scripting/wallpaper.hpp"

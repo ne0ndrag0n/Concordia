@@ -57,18 +57,6 @@ namespace BlueBear {
       }
     }
 
-    Tile* HouseEnvironment::getOrCreateTile( const std::string& id, const std::string& path ) {
-      auto it = std::find_if( tileStore.begin(), tileStore.end(), [ & ]( std::unique_ptr< Tile >& tile ) {
-        return tile->id == id;
-      } );
-
-      if( it != tileStore.end() ) {
-        return it->get();
-      } else {
-        return nullptr;
-      }
-    }
-
     std::shared_ptr< Graphics::SceneGraph::Model > HouseEnvironment::generateEnvironment() {
       return nullptr;
     }
