@@ -14,9 +14,12 @@
 #include <memory>
 
 namespace BlueBear {
+	namespace Models {
+		class Tile;
+	}
+
 	namespace Scripting {
 		class SerializableInstance;
-		class Tile;
 		struct WallCell;
 
 		class Lot {
@@ -27,10 +30,10 @@ namespace BlueBear {
 				void buildFloorMap( Json::Value& floor );
 				void buildWallMap( Json::Value& walls );
 				std::shared_ptr< WallCell > getWallCell( Json::Value& object, std::vector< std::shared_ptr< Wallpaper > >& lookup );
-				inline std::shared_ptr< Tile > getTile( int index, std::vector< std::shared_ptr< Tile > >& lookup );
+				inline std::shared_ptr< Models::Tile > getTile( int index, std::vector< std::shared_ptr< Models::Tile > >& lookup );
 
 			public:
-				std::unique_ptr< Containers::Collection3D< std::shared_ptr< Tile > > > floorMap;
+				std::unique_ptr< Containers::Collection3D< std::shared_ptr< Models::Tile > > > floorMap;
 				std::unique_ptr< Containers::Collection3D< std::shared_ptr< WallCell > > > wallMap;
 				int floorX;
 				int floorY;

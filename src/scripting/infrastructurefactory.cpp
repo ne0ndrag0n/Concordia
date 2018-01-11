@@ -1,5 +1,5 @@
 #include "scripting/infrastructurefactory.hpp"
-#include "scripting/tile.hpp"
+#include "models/tile.hpp"
 #include "scripting/wallpaper.hpp"
 #include "log.hpp"
 #include "tools/utility.hpp"
@@ -48,7 +48,7 @@ namespace BlueBear {
           Json::Value tileDefinition = *jsonIterator;
 
           if( tileDefinition.isMember( "sound" ) && tileDefinition.isMember( "image" ) ) {
-            tileRegistry[ key ] = std::make_shared< Tile >(
+            tileRegistry[ key ] = std::make_shared< Models::Tile >(
               key,
               path + "/" + getVariableOrValue( "sound", tileDefinition[ "sound" ].asString() ),
               path + "/" + getVariableOrValue( "image", tileDefinition[ "image" ].asString() ),
@@ -91,7 +91,7 @@ namespace BlueBear {
     /**
      * Throw an exception if the entry does not exist, crash the game gracefully so there's no undefined behavior.
      */
-    std::shared_ptr< Tile > InfrastructureFactory::getFloorTile( const std::string& key ) {
+    std::shared_ptr< Models::Tile > InfrastructureFactory::getFloorTile( const std::string& key ) {
       return tileRegistry.at( key );
     }
 

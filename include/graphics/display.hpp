@@ -21,7 +21,7 @@
 #include <map>
 #include "graphics/texturecache.hpp"
 #include "graphics/imagecache.hpp"
-#include "scripting/tile.hpp"
+#include "models/tile.hpp"
 #include "scripting/wallcell.hpp"
 #include "graphics/gui/sfgroot.hpp"
 #include "graphics/imagebuilder/imagesource.hpp"
@@ -66,7 +66,7 @@ namespace BlueBear {
 
       void openDisplay();
       bool update();
-      void changeToMainGameState( unsigned int currentRotation, Containers::Collection3D< std::shared_ptr< Scripting::Tile > >& floorMap, Containers::Collection3D< std::shared_ptr< Scripting::WallCell > >& wallMap );
+      void changeToMainGameState( unsigned int currentRotation, Containers::Collection3D< std::shared_ptr< Models::Tile > >& floorMap, Containers::Collection3D< std::shared_ptr< Scripting::WallCell > >& wallMap );
 
       // ---------- STATES ----------
       class State {
@@ -102,7 +102,7 @@ namespace BlueBear {
           ImageCache imageCache;
           TextureCache texCache;
           // These are from the lot!
-          Containers::Collection3D< std::shared_ptr< Scripting::Tile > >& floorMap;
+          Containers::Collection3D< std::shared_ptr< Models::Tile > >& floorMap;
           Containers::Collection3D< std::shared_ptr< Scripting::WallCell > >& wallMap;
           // These are ours!
           std::unique_ptr< Containers::Collection3D< std::shared_ptr< Instance > > > floorInstanceCollection;
@@ -135,7 +135,7 @@ namespace BlueBear {
           ImageCache& getImageCache();
           Input::InputManager& getInputManager();
           std::map< std::string, std::shared_ptr< Shader > >& getRegisteredShaders();
-          MainGameState( Display& instance, unsigned int currentRotation, Containers::Collection3D< std::shared_ptr< Scripting::Tile > >& floorMap, Containers::Collection3D< std::shared_ptr< Scripting::WallCell > >& wallMap );
+          MainGameState( Display& instance, unsigned int currentRotation, Containers::Collection3D< std::shared_ptr< Models::Tile > >& floorMap, Containers::Collection3D< std::shared_ptr< Scripting::WallCell > >& wallMap );
           ~MainGameState();
       };
       // ----------------------------

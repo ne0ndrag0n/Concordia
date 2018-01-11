@@ -6,7 +6,7 @@
 #include <jsoncpp/json/json.h>
 
 namespace BlueBear {
-  namespace Scripting {
+  namespace Models {
 
     struct Tile {
       std::string id;

@@ -10,10 +10,6 @@
 #include <vector>
 
 namespace BlueBear {
-  namespace Scripting {
-    class Tile;
-  }
-
   namespace Graphics {
     namespace SceneGraph {
       class Model;
@@ -21,11 +17,12 @@ namespace BlueBear {
   }
 
   namespace Models {
+    class Tile;
 
     class HouseEnvironment : public Environment {
       glm::uvec2 dimensions;
       std::map< double, std::vector< double > > vertices;
-      std::map< double, std::vector< std::shared_ptr< Scripting::Tile > > > tiles;
+      std::map< double, std::vector< std::shared_ptr< Models::Tile > > > tiles;
 
       void prepElevationPairs( double elevation );
       void prepVertices( const Json::Value& elevationSegment, double elevation );
