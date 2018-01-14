@@ -4,6 +4,7 @@
 /**
  * Abstracted class representing the display device that is available to BlueBear.
  */
+#include "state/substate.hpp"
 #include "bbtypes.hpp"
 #include "containers/collection3d.hpp"
 #include <lua.h>
@@ -44,6 +45,10 @@ namespace BlueBear {
     class CommandBus;
   }
 
+  namespace State {
+    class State;
+  }
+
   namespace Graphics {
     class Instance;
     class WallInstance;
@@ -54,18 +59,17 @@ namespace BlueBear {
     class WallCellBundler;
     class ShaderInstanceBundle;
 
-    class Display {
+    class Display : public BlueBear::State::Substate {
     public:
       static const std::string WALLPANEL_MODEL_XY_PATH;
       static const std::string WALLPANEL_MODEL_DR_PATH;
       static const std::string FLOOR_MODEL_PATH;
 
       // RAII style
-      Display( Scripting::Engine* e );
-      ~Display();
+      Display( BlueBear::State::State& s, Scripting::Engine* e );
 
       void openDisplay();
-      bool update();
+      bool update() override;
       void changeToMainGameState( unsigned int currentRotation, Containers::Collection3D< std::shared_ptr< Models::Tile > >& floorMap, Containers::Collection3D< std::shared_ptr< Scripting::WallCell > >& wallMap );
 
       // ---------- STATES ----------

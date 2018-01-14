@@ -20,6 +20,7 @@ SRCS += $(wildcard src/models/*.cpp)
 SRCS += $(wildcard src/scripting/*.cpp)
 SRCS += $(wildcard src/scripting/event/*.cpp)
 SRCS += $(wildcard src/scripting/luakit/*.cpp)
+SRCS += $(wildcard src/state/*.cpp)
 SRCS += $(wildcard src/threading/*.cpp)
 SRCS += $(wildcard src/tools/*.cpp)
 

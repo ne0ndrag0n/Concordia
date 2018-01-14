@@ -45,7 +45,7 @@ namespace BlueBear {
     const std::string Display::WALLPANEL_MODEL_DR_PATH = "system/models/wall/diagwall.dae";
     const std::string Display::FLOOR_MODEL_PATH = "system/models/floor/floor.dae";
 
-    Display::Display( Scripting::Engine* e ) : engine( e ), L( e->L ) {
+    Display::Display( BlueBear::State::State& s, Scripting::Engine* e ) : BlueBear::State::Substate( s ), engine( e ), L( e->L ) {
       // Get our settings out of the config manager
       x = ConfigManager::getInstance().getIntValue( "viewport_x" );
       y = ConfigManager::getInstance().getIntValue( "viewport_y" );
@@ -53,8 +53,6 @@ namespace BlueBear {
       // There must always be a defined State (avoid branch penalty/null check in tight loop)
       currentState = std::make_unique< IdleState >( *this );
     }
-
-    Display::~Display() = default;
 
     void Display::openDisplay() {
       mainWindow.create( sf::VideoMode( x, y ), LocaleManager::getInstance().getString( "BLUEBEAR_WINDOW_TITLE" ), sf::Style::Close, sf::ContextSettings( 24, 8, 0, 3, 3 ) );

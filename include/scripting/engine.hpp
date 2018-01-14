@@ -1,6 +1,7 @@
 #ifndef ENGINE
 #define ENGINE
 
+#include "state/substate.hpp"
 #include "scripting/event/waitingtable.hpp"
 #include "scripting/luakit/eventbridge.hpp"
 #include <lua.h>
@@ -16,6 +17,11 @@
 #include <jsoncpp/json/json.h>
 
 namespace BlueBear {
+
+	namespace State {
+		class State;
+	}
+
 	namespace Scripting {
 		namespace LuaKit {
 			class Serializer;
@@ -24,7 +30,7 @@ namespace BlueBear {
 		class Lot;
 		class InfrastructureFactory;
 
-		class Engine {
+		class Engine : public State::Substate {
 			public:
 				lua_State* L;
 
@@ -60,10 +66,11 @@ namespace BlueBear {
 				std::vector< LuaReference > objects;
 				std::shared_ptr< Lot > currentLot;
 
-				Engine();
+				Engine( State::State& state );
 				~Engine();
 				void setupEvents();
 				void enqueue( LuaReference edibleReference );
+				bool update() override;
 				void objectLoop();
 				bool loadLot( const char* lotPath );
 				bool submitLuaContributions();

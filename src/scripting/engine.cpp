@@ -26,7 +26,8 @@
 namespace BlueBear {
 	namespace Scripting {
 
-		Engine::Engine() :
+		Engine::Engine( State::State& state ) :
+		 State::Substate( state ),
 		 lastExecuted( std::chrono::steady_clock::now() ),
 		 L( luaL_newstate() ),
 		 ticksPerSecond( 1000 / ConfigManager::getInstance().getIntValue( "fps_overview" ) ),
@@ -340,6 +341,14 @@ namespace BlueBear {
 			} else {
 				sleepInterval = 300;
 			}
+		}
+
+		/**
+		 * TODO: Get rid of this connector function
+		 */
+		bool Engine::update() {
+			objectLoop();
+			return true;
 		}
 
 		/**
