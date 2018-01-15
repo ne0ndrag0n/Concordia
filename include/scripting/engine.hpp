@@ -28,7 +28,6 @@ namespace BlueBear {
 		}
 
 		class Lot;
-		class InfrastructureFactory;
 
 		class Engine : public State::Substate {
 			public:
@@ -49,7 +48,6 @@ namespace BlueBear {
 				Event::WaitingTable waitingTable;
 
 				std::unique_ptr< LuaKit::EventBridge > eventBridge;
-				std::unique_ptr< InfrastructureFactory > infrastructureFactory;
 				const char* currentModpackDirectory;
 				std::map< std::string, BlueBear::ModpackStatus > loadedModpacks;
 				bool active;

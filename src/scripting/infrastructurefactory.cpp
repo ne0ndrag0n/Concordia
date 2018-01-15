@@ -14,7 +14,10 @@
 namespace BlueBear {
   namespace Scripting {
 
-    const std::string InfrastructureFactory::GREY_SYSTEM_WALLPAPER = "system/models/wall/greywallpaper.png";
+    InfrastructureFactory::InfrastructureFactory() {
+      registerFloorTiles();
+      registerWallpapers();
+    }
 
     /**
      * Given the key and value, check against tileConstants for a value. If the value is present within, return THAT value,
@@ -108,7 +111,7 @@ namespace BlueBear {
     void InfrastructureFactory::registerWallpapers() {
       // First and foremost - register _grey, the standard, hardcoded grey wallaper.
       // No more constexpr - GCC bug breaks them randomly
-      wallpaperRegistry[ "_grey" ] = std::make_shared< Wallpaper >( "_grey", GREY_SYSTEM_WALLPAPER, 0.0 );
+      wallpaperRegistry[ "_grey" ] = std::make_shared< Wallpaper >( "_grey", std::string( GREY_SYSTEM_WALLPAPER ), 0.0 );
 
       std::vector< std::string > directories = Tools::Utility::getSubdirectoryList( WALL_ASSETS_PATH );
       std::for_each( directories.begin(), directories.end(), [ & ]( std::string& directory ) {

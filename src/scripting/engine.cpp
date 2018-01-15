@@ -11,6 +11,7 @@
 #include "scripting/infrastructurefactory.hpp"
 #include "scripting/luakit/serializer.hpp"
 #include "log.hpp"
+#include "state/householdgameplaystate.hpp"
 #include <jsoncpp/json/json.h>
 #include <iterator>
 #include <string>
@@ -172,11 +173,6 @@ namespace BlueBear {
 				return false;
 			}
 
-			// Set up an InfrastructureFactory to load things like floor tiles and wallpapers
-			infrastructureFactory = std::make_unique< InfrastructureFactory >();
-			infrastructureFactory->registerFloorTiles();
-			infrastructureFactory->registerWallpapers();
-
 			return true;
 		}
 
@@ -309,7 +305,7 @@ namespace BlueBear {
 					currentTick = engineJSON[ "ticks" ].asInt();
 
 					// Instantiate the lot
-					currentLot = std::make_shared< Lot >( L, *infrastructureFactory, lotJSON );
+					currentLot = std::make_shared< Lot >( L, state.as< State::HouseholdGameplayState >().getInfrastructureFactory(), lotJSON );
 
 					// Clear the std::map containing all objects
 					objects.clear();

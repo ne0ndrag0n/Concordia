@@ -14,6 +14,11 @@ namespace BlueBear {
       State( Application& application );
       virtual ~State() = default;
 
+      template < typename Class >
+      Class& as() {
+        return dynamic_cast< Class& >( *this );
+      }
+
       virtual void update() = 0;
     };
 
