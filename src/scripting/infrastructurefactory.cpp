@@ -1,6 +1,6 @@
 #include "scripting/infrastructurefactory.hpp"
 #include "models/tile.hpp"
-#include "scripting/wallpaper.hpp"
+#include "models/wallpaper.hpp"
 #include "log.hpp"
 #include "tools/utility.hpp"
 #include <algorithm>
@@ -98,7 +98,7 @@ namespace BlueBear {
       return tileRegistry.at( key );
     }
 
-    std::shared_ptr< Wallpaper > InfrastructureFactory::getWallpaper( const std::string& key ) {
+    std::shared_ptr< Models::Wallpaper > InfrastructureFactory::getWallpaper( const std::string& key ) {
       return wallpaperRegistry.at( key );
     }
 
@@ -111,7 +111,7 @@ namespace BlueBear {
     void InfrastructureFactory::registerWallpapers() {
       // First and foremost - register _grey, the standard, hardcoded grey wallaper.
       // No more constexpr - GCC bug breaks them randomly
-      wallpaperRegistry[ "_grey" ] = std::make_shared< Wallpaper >( "_grey", std::string( GREY_SYSTEM_WALLPAPER ), 0.0 );
+      wallpaperRegistry[ "_grey" ] = std::make_shared< Models::Wallpaper >( "_grey", std::string( GREY_SYSTEM_WALLPAPER ), 0.0 );
 
       std::vector< std::string > directories = Tools::Utility::getSubdirectoryList( WALL_ASSETS_PATH );
       std::for_each( directories.begin(), directories.end(), [ & ]( std::string& directory ) {
@@ -135,7 +135,7 @@ namespace BlueBear {
             Json::Value wallpaperDefinition = *jsonIterator;
 
             if( wallpaperDefinition.isMember( "image" ) ) {
-              wallpaperRegistry[ key ] = std::make_shared< Wallpaper >(
+              wallpaperRegistry[ key ] = std::make_shared< Models::Wallpaper >(
                 key,
                 path + "/" + wallpaperDefinition[ "image" ].asString(),
                 wallpaperDefinition[ "price" ].asDouble()

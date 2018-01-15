@@ -20,7 +20,7 @@
 #include "scripting/lot.hpp"
 #include "scripting/engine.hpp"
 #include "scripting/wallcell.hpp"
-#include "scripting/wallpaper.hpp"
+#include "models/wallpaper.hpp"
 #include "localemanager.hpp"
 #include "configmanager.hpp"
 #include "tools/utility.hpp"

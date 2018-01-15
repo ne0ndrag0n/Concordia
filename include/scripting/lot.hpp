@@ -16,6 +16,7 @@
 namespace BlueBear {
 	namespace Models {
 		class Tile;
+		class Wallpaper;
 	}
 
 	namespace Scripting {
@@ -29,7 +30,7 @@ namespace BlueBear {
 				InfrastructureFactory& infrastructureFactory;
 				void buildFloorMap( Json::Value& floor );
 				void buildWallMap( Json::Value& walls );
-				std::shared_ptr< WallCell > getWallCell( Json::Value& object, std::vector< std::shared_ptr< Wallpaper > >& lookup );
+				std::shared_ptr< WallCell > getWallCell( Json::Value& object, std::vector< std::shared_ptr< Models::Wallpaper > >& lookup );
 				inline std::shared_ptr< Models::Tile > getTile( int index, std::vector< std::shared_ptr< Models::Tile > >& lookup );
 
 			public:

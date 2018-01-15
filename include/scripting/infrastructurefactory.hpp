@@ -10,11 +10,10 @@
 namespace BlueBear {
   namespace Models {
     class Tile;
+    class Wallpaper;
   }
 
   namespace Scripting {
-
-    class Wallpaper;
 
     class InfrastructureFactory {
       // Phase in new static convention here
@@ -27,7 +26,7 @@ namespace BlueBear {
 
       Json::Value tileConstants;
       std::map< std::string, std::shared_ptr< Models::Tile > > tileRegistry;
-      std::map< std::string, std::shared_ptr< Wallpaper > > wallpaperRegistry;
+      std::map< std::string, std::shared_ptr< Models::Wallpaper > > wallpaperRegistry;
 
       void registerFloorTile( const std::string& path );
       void registerWallpaper( const std::string& path );
@@ -41,7 +40,7 @@ namespace BlueBear {
         EXCEPTION_TYPE( CannotLoadFileException, "Could not load a required file!" );
 
         std::shared_ptr< Models::Tile > getFloorTile( const std::string& key );
-        std::shared_ptr< Wallpaper > getWallpaper( const std::string& key );
+        std::shared_ptr< Models::Wallpaper > getWallpaper( const std::string& key );
     };
 
   }

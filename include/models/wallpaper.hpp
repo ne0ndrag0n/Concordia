@@ -4,7 +4,7 @@
 #include <string>
 
 namespace BlueBear {
-  namespace Scripting {
+  namespace Models {
 
     struct Wallpaper {
       std::string id;

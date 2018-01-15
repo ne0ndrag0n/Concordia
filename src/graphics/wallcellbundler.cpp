@@ -10,7 +10,7 @@
 #include "graphics/material.hpp"
 #include "containers/collection3d.hpp"
 #include "scripting/wallcell.hpp"
-#include "scripting/wallpaper.hpp"
+#include "models/wallpaper.hpp"
 #include "log.hpp"
 #include <memory>
 #include <string>
