@@ -16,10 +16,15 @@ namespace BlueBear {
     }
   }
 
+  namespace Scripting {
+    class InfrastructureFactory;
+  }
+
   namespace Models {
     class Tile;
 
     class HouseEnvironment : public Environment {
+      Scripting::InfrastructureFactory& infrastructureFactory;
       glm::uvec2 dimensions;
       std::map< double, std::vector< double > > vertices;
       std::map< double, std::vector< std::shared_ptr< Models::Tile > > > tiles;
@@ -33,7 +38,7 @@ namespace BlueBear {
       );
 
     public:
-      HouseEnvironment( const Json::Value& lot );
+      HouseEnvironment( Scripting::InfrastructureFactory& infrastructureFactory, const Json::Value& lot );
 
       std::shared_ptr< Graphics::SceneGraph::Model > generateEnvironment();
     };

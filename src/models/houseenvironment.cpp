@@ -1,12 +1,13 @@
 #include "models/houseenvironment.hpp"
 #include "tools/jsontools.hpp"
+#include "scripting/infrastructurefactory.hpp"
 #include <algorithm>
 
 namespace BlueBear {
   namespace Models {
 
-    HouseEnvironment::HouseEnvironment( const Json::Value& lot ) :
-      dimensions( { lot[ "floorx" ].asDouble(), lot[ "floory" ].asDouble() } ) {
+    HouseEnvironment::HouseEnvironment( Scripting::InfrastructureFactory& infrastructureFactory, const Json::Value& lot ) :
+      infrastructureFactory( infrastructureFactory ), dimensions( { lot[ "floorx" ].asDouble(), lot[ "floory" ].asDouble() } ) {
       Json::Value world = Tools::JsonTools::getUncompressedRLEArray( lot[ "world" ] );
 
       for( const Json::Value& elevationSegment : world ) {
@@ -33,7 +34,7 @@ namespace BlueBear {
     }
 
     void HouseEnvironment::prepTiles( const Json::Value& elevationSegment, const Json::Value& dict, double elevation ) {
-      Json::Value tiles = Tools::JsonTools::getUncompressedRLEArray( elevationSegment[ "tiles" ] );
+      Json::Value tilesJson = Tools::JsonTools::getUncompressedRLEArray( elevationSegment[ "tiles" ] );
 
       glm::uvec2 segmentDimensions( elevationSegment[ "dimensions" ][ 0 ].asUInt(), elevationSegment[ "dimensions" ][ 1 ].asUInt() );
       glm::uvec2 origin( elevationSegment[ "originVertex" ][ 0 ].asUInt(), elevationSegment[ "originVertex" ][ 1 ].asUInt() );
@@ -42,9 +43,9 @@ namespace BlueBear {
       unsigned int i = 0;
       for( unsigned int y = origin.y; y != boundary.y; y++ ) {
         for( unsigned int x = origin.x; x != boundary.x; x++ ) {
-          int dictIndex = tiles[ i++ ].asInt();
+          int dictIndex = tilesJson[ i++ ].asInt();
           if( dictIndex != -1 ) {
-
+            tiles[ elevation ][ ( y * dimensions.y ) + x ] = infrastructureFactory.getFloorTile( dict[ dictIndex ].asString() );
           }
         }
       }
