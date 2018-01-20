@@ -5,6 +5,7 @@
 #include "tools/utility.hpp"
 #include "eventmanager.hpp"
 #include "log.hpp"
+#include "scripting/luastate.hpp"
 #include <algorithm>
 #include <string>
 
@@ -12,7 +13,7 @@ namespace BlueBear {
   namespace Graphics {
     namespace Input {
 
-      InputManager::InputManager( lua_State* L ) : L( L ) {
+      InputManager::InputManager() {
         eventManager.SFGUI_EAT_EVENT.listen( SFGUIEatEvent::Event::EAT_KEYBOARD_EVENT, [ & ]() {
           eatKeyEvents = true;
         } );

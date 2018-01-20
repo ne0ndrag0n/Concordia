@@ -147,7 +147,6 @@ namespace BlueBear {
     Display::MainGameState::MainGameState( Display& instance, unsigned int currentRotation, Containers::Collection3D< std::shared_ptr< Models::Tile > >& floorMap, Containers::Collection3D< std::shared_ptr< Scripting::WallCell > >& wallMap ) :
       Display::State::State( instance ),
       L( instance.L ),
-      inputManager( Input::InputManager( instance.L ) ),
       camera( Camera( instance.x, instance.y ) ),
       floorMap( floorMap ),
       wallMap( wallMap ),

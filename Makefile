@@ -4,6 +4,10 @@ INCLUDES = -Iinclude -Ilib
 LIBS = -lpthread -ltbb -lassimp -lGLEW -lGL -lsfml-graphics -lsfml-window -lsfml-system -lsfgui -ltinyxml2 -ljsoncpp -llua -ldl
 
 SRCS = $(wildcard src/*.cpp)
+SRCS += $(wildcard src/device/*.cpp)
+SRCS += $(wildcard src/device/display/*.cpp)
+SRCS += $(wildcard src/device/display/adapter/*.cpp)
+SRCS += $(wildcard src/device/display/adapter/component/*.cpp)
 SRCS += $(wildcard src/graphics/*.cpp)
 SRCS += $(wildcard src/graphics/armature/*.cpp)
 SRCS += $(wildcard src/graphics/gui/*.cpp)

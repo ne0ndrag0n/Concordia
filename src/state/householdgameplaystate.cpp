@@ -5,6 +5,7 @@
 #include "scripting/infrastructurefactory.hpp"
 #include "scripting/engine.hpp"
 #include "graphics/display.hpp"
+#include "scripting/luastate.hpp"
 
 namespace BlueBear {
   namespace State {
@@ -23,6 +24,7 @@ namespace BlueBear {
         throw LotNotFoundException();
       }
 
+      L = engine->L;
       display = std::make_unique< Graphics::Display >( *this, engine.get() );
       display->openDisplay();
       display->changeToMainGameState( engine->currentLot->currentRotation, *( engine->currentLot )->floorMap, *( engine->currentLot )->wallMap );

@@ -19,7 +19,6 @@ namespace BlueBear {
     namespace Input {
 
       class InputManager {
-        lua_State* L;
         std::map< sf::Keyboard::Key, std::function< void() > > keyEvents;
         std::map< sf::Keyboard::Key, std::vector< LuaReference > > luaKeyEvents;
 
@@ -35,7 +34,7 @@ namespace BlueBear {
         static sf::Keyboard::Key stringToKey( const std::string& key );
         static std::string keyToString( sf::Keyboard::Key key );
 
-        InputManager( lua_State* L );
+        InputManager();
         ~InputManager();
         void listen( sf::Keyboard::Key key, std::function< void() > callback );
         void handleEvent( sf::Event& event );
