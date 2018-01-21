@@ -19,6 +19,8 @@ namespace BlueBear {
         return dynamic_cast< Class& >( *this );
       }
 
+      Application& getApplication();
+
       virtual void update() = 0;
     };
 

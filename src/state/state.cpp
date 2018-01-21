@@ -5,5 +5,9 @@ namespace BlueBear {
 
     State::State( Application& application ) : application( application ) {}
 
+    Application& State::getApplication() {
+      return application;
+    }
+
   }
 }
