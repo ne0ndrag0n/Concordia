@@ -2,6 +2,7 @@
 #define DEVICE_DISPLAY
 
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <glm/glm.hpp>
 
 namespace BlueBear {
   namespace Device {
@@ -13,8 +14,7 @@ namespace BlueBear {
 
       class Display {
         sf::RenderWindow window;
-        const unsigned int x;
-        const unsigned int y;
+        const glm::uvec2 dimensions;
         std::unique_ptr< Adapter::Adapter > adapter;
 
       public:
@@ -22,6 +22,7 @@ namespace BlueBear {
         ~Display();
 
         sf::RenderWindow& getRenderWindow();
+        const glm::uvec2& getDimensions() const;
         void setAdapter( std::unique_ptr< Adapter::Adapter >& adapter );
         void update();
       };

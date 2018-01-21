@@ -43,5 +43,19 @@ namespace BlueBear {
       }
     }
 
+    /**
+     * This is intended to replace update() with new components that may have to be commented out
+     */
+    void HouseholdGameplayState::newUpdate() {
+      // Display::Device adapter that does:
+        // camera
+        // floor
+        // walls
+        // osd
+
+      // Pull events generated from the components in the Display::Device adapter (GuiComponent and ObjectComponent)
+      // and handle them here
+    }
+
   }
 }

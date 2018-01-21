@@ -32,6 +32,9 @@ namespace BlueBear {
 
       Scripting::InfrastructureFactory& getInfrastructureFactory();
       void update() override;
+
+      // TODO: Replace
+      void newUpdate();
     };
 
   }

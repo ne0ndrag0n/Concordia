@@ -13,9 +13,9 @@ namespace BlueBear {
     namespace Display {
 
       Display::Display() :
-        x( ConfigManager::getInstance().getIntValue( "viewport_x" ) ), y( ConfigManager::getInstance().getIntValue( "viewport_y" ) ) {
+        dimensions( glm::vec2{ ConfigManager::getInstance().getIntValue( "viewport_x" ), ConfigManager::getInstance().getIntValue( "viewport_y" ) } ) {
         window.create(
-          sf::VideoMode( x, y ),
+          sf::VideoMode( dimensions.x, dimensions.y ),
           LocaleManager::getInstance().getString( "BLUEBEAR_WINDOW_TITLE" ),
           sf::Style::Close,
           sf::ContextSettings( 24, 8, 0, 3, 3 )
@@ -39,7 +39,7 @@ namespace BlueBear {
           exit( 1 );
         }
 
-        glViewport( 0, 0, x, y );
+        glViewport( 0, 0, dimensions.x, dimensions.y );
         glEnable( GL_DEPTH_TEST );
         glEnable( GL_CULL_FACE );
       }
@@ -50,13 +50,22 @@ namespace BlueBear {
         return window;
       }
 
+      const glm::uvec2& Display::getDimensions() const {
+        return dimensions;
+      }
+
       void Display::setAdapter( std::unique_ptr< Adapter::Adapter >& adapter ) {
         this->adapter = std::move( adapter );
       }
 
       void Display::update() {
         if( adapter ) {
+          glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+          glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
           adapter->nextFrame();
+
+          window.display();
         }
       }
 

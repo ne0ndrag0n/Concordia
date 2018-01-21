@@ -52,6 +52,17 @@ namespace BlueBear {
             sfg::Entry::OnTextChanged = sfg::Signal::GetGUID();
           }
 
+          std::queue< sf::Event > GuiComponent::getEvents() {
+            std::queue< sf::Event > events;
+
+            sf::Event event;
+            while( renderWindow.pollEvent( event ) ) {
+              events.push( event );
+            }
+
+            return events;
+          }
+
           void GuiComponent::update() {
             glDisable( GL_DEPTH_TEST );
             desktop.Update( clock.restart().asSeconds() );

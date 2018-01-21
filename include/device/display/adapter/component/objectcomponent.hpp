@@ -1,7 +1,9 @@
 #ifndef BB_OBJECT_COMPONENT
 #define BB_OBJECT_COMPONENT
 
+#include "graphics/world/renderer.hpp"
 #include "graphics/camera.hpp"
+#include <glm/glm.hpp>
 #include <memory>
 
 namespace BlueBear {
@@ -17,11 +19,11 @@ namespace BlueBear {
         namespace Component {
 
           class ObjectComponent {
-            std::shared_ptr< Graphics::SceneGraph::Model > root;
-            Camera camera;
+            Graphics::Camera camera;
+            Graphics::World::Renderer renderer;
 
           public:
-            ObjectComponent();
+            ObjectComponent( const glm::uvec2& screenDimensions );
             void update();
           };
 

@@ -5,6 +5,8 @@
 #include <SFGUI/Desktop.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Window/Event.hpp>
+#include <queue>
 
 namespace BlueBear {
   namespace Device {
@@ -21,6 +23,7 @@ namespace BlueBear {
             void enumerateSignals();
 
           public:
+            std::queue< sf::Event > getEvents();
             GuiComponent( sf::RenderWindow& renderWindow );
             void update();
           };
