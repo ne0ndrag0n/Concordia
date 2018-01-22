@@ -2,6 +2,7 @@
 #define WORLD_RENDERER
 
 #include "containers/vec3map.hpp"
+#include "graphics/camera.hpp"
 #include "graphics/scenegraph/resourcebank.hpp"
 #include <tbb/concurrent_unordered_map.h>
 #include <memory>
@@ -26,16 +27,19 @@ namespace BlueBear {
     namespace World {
 
       class Renderer {
+        Camera camera;
+
         SceneGraph::ResourceBank cache;
         tbb::concurrent_unordered_map< std::string, std::shared_ptr< SceneGraph::Model > > originals;
-        Containers::Vec3Map< std::shared_ptr< SceneGraph::Model > > floor;
-        Containers::Vec3Map< std::shared_ptr< SceneGraph::Model > > walls;
+
+        // TODO: Walls and floor which both consist of one generated model
         std::unordered_map< std::string, std::shared_ptr< SceneGraph::Light > > lights;
         std::unordered_map< std::string, std::shared_ptr< SceneGraph::Model > > models;
 
         std::unique_ptr< SceneGraph::ModelLoader::FileModelLoader > getFileModelLoader( bool deferGLOperations );
 
       public:
+        Renderer();
         virtual ~Renderer() = default;
 
         void loadPathsParallel( const std::vector< std::pair< std::string, std::string > >& paths );

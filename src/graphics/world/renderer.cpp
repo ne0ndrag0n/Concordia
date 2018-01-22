@@ -4,6 +4,7 @@
 #include "graphics/scenegraph/modelloader/assimpmodelloader.hpp"
 #include "tools/objectpool.hpp"
 #include "tools/utility.hpp"
+#include "configmanager.hpp"
 #include "log.hpp"
 #include <tbb/task_group.h>
 #include <tbb/concurrent_queue.h>
@@ -12,6 +13,8 @@
 namespace BlueBear {
   namespace Graphics {
     namespace World {
+
+      Renderer::Renderer() : camera( Camera( ConfigManager::getInstance().getIntValue( "viewport_x" ), ConfigManager::getInstance().getIntValue( "viewport_y" ) ) ) {}
 
       std::unique_ptr< SceneGraph::ModelLoader::FileModelLoader > Renderer::getFileModelLoader( bool deferGLOperations ) {
         std::unique_ptr< SceneGraph::ModelLoader::FileModelLoader > result = std::make_unique< SceneGraph::ModelLoader::AssimpModelLoader >();
@@ -73,9 +76,7 @@ namespace BlueBear {
        * TODO: Optimized renderer that sorts by shader to minimize shader changes
        */
       void Renderer::render() {
-        // Draw floor and walls
-        floor.each( []( const glm::vec3& key, std::shared_ptr< SceneGraph::Model >& model ) { model->draw(); } );
-        walls.each( []( const glm::vec3& key, std::shared_ptr< SceneGraph::Model >& model ) { model->draw(); } );
+        // TODO: Draw floor and walls
 
         for( auto& pair : models ) {
           pair.second->draw();
