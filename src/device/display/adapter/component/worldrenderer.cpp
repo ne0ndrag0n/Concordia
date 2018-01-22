@@ -1,4 +1,4 @@
-#include "device/display/adapter/component/renderer.hpp"
+#include "device/display/adapter/component/worldrenderer.hpp"
 #include "graphics/scenegraph/model.hpp"
 #include "graphics/scenegraph/modelloader/filemodelloader.hpp"
 #include "graphics/scenegraph/modelloader/assimpmodelloader.hpp"
@@ -16,9 +16,9 @@ namespace BlueBear {
       namespace Adapter {
         namespace Component {
 
-          Renderer::Renderer() : camera( Graphics::Camera( ConfigManager::getInstance().getIntValue( "viewport_x" ), ConfigManager::getInstance().getIntValue( "viewport_y" ) ) ) {}
+          WorldRenderer::WorldRenderer() : camera( Graphics::Camera( ConfigManager::getInstance().getIntValue( "viewport_x" ), ConfigManager::getInstance().getIntValue( "viewport_y" ) ) ) {}
 
-          std::unique_ptr< Graphics::SceneGraph::ModelLoader::FileModelLoader > Renderer::getFileModelLoader( bool deferGLOperations ) {
+          std::unique_ptr< Graphics::SceneGraph::ModelLoader::FileModelLoader > WorldRenderer::getFileModelLoader( bool deferGLOperations ) {
             std::unique_ptr< Graphics::SceneGraph::ModelLoader::FileModelLoader > result = std::make_unique< Graphics::SceneGraph::ModelLoader::AssimpModelLoader >();
 
             Graphics::SceneGraph::ModelLoader::AssimpModelLoader& asAssimp = ( Graphics::SceneGraph::ModelLoader::AssimpModelLoader& )*result;
@@ -28,9 +28,9 @@ namespace BlueBear {
             return result;
           }
 
-          void Renderer::loadPathsParallel( const std::vector< std::pair< std::string, std::string > >& paths ) {
+          void WorldRenderer::loadPathsParallel( const std::vector< std::pair< std::string, std::string > >& paths ) {
             tbb::task_group group;
-            Tools::ObjectPool< Graphics::SceneGraph::ModelLoader::FileModelLoader > pool( std::bind( &Renderer::getFileModelLoader, this, true ) );
+            Tools::ObjectPool< Graphics::SceneGraph::ModelLoader::FileModelLoader > pool( std::bind( &WorldRenderer::getFileModelLoader, this, true ) );
 
             for( auto& path : paths ) {
               group.run( [ & ]() {
@@ -41,11 +41,11 @@ namespace BlueBear {
                         originals[ path.first ] = model;
                       }
                     } catch( std::exception& e ) {
-                      Log::getInstance().error( "Renderer::loadPathsParallel", std::string( "Could not load model " ) + path.second + ": " + e.what() );
+                      Log::getInstance().error( "WorldRenderer::loadPathsParallel", std::string( "Could not load model " ) + path.second + ": " + e.what() );
                     }
                   } );
                 } else {
-                  Log::getInstance().warn( "Renderer::loadPathsParallel", path.first + " is already inserted into this map; skipping" );
+                  Log::getInstance().warn( "WorldRenderer::loadPathsParallel", path.first + " is already inserted into this map; skipping" );
                 }
               } );
             }
@@ -60,7 +60,7 @@ namespace BlueBear {
             }
           }
 
-          void Renderer::loadPaths( const std::vector< std::pair< std::string, std::string > >& paths ) {
+          void WorldRenderer::loadPaths( const std::vector< std::pair< std::string, std::string > >& paths ) {
             std::unique_ptr< Graphics::SceneGraph::ModelLoader::FileModelLoader > loader = getFileModelLoader( false );
 
             for( auto& path : paths ) {
@@ -69,7 +69,7 @@ namespace BlueBear {
                   originals[ path.first ] = model;
                 }
               } catch( std::exception& e ) {
-                Log::getInstance().error( "Renderer::loadPathsParallel", std::string( "Could not load model " ) + path.second + ": " + e.what() );
+                Log::getInstance().error( "WorldRenderer::loadPathsParallel", std::string( "Could not load model " ) + path.second + ": " + e.what() );
               }
             }
           }
@@ -77,7 +77,7 @@ namespace BlueBear {
           /**
            * TODO: Optimized renderer that sorts by shader to minimize shader changes
            */
-          void Renderer::render() {
+          void WorldRenderer::render() {
             // Position camera
             camera.position();
 

@@ -30,7 +30,7 @@ namespace BlueBear {
       namespace Adapter {
         namespace Component {
 
-          class Renderer {
+          class WorldRenderer {
             Graphics::Camera camera;
 
             Graphics::SceneGraph::ResourceBank cache;
@@ -43,8 +43,8 @@ namespace BlueBear {
             std::unique_ptr< Graphics::SceneGraph::ModelLoader::FileModelLoader > getFileModelLoader( bool deferGLOperations );
 
           public:
-            Renderer();
-            virtual ~Renderer() = default;
+            WorldRenderer();
+            virtual ~WorldRenderer() = default;
 
             void loadPathsParallel( const std::vector< std::pair< std::string, std::string > >& paths );
             void loadPaths( const std::vector< std::pair< std::string, std::string > >& paths );
