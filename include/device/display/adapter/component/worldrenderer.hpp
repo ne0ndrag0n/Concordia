@@ -46,6 +46,7 @@ namespace BlueBear {
             WorldRenderer();
             virtual ~WorldRenderer() = default;
 
+            Graphics::Camera& getCamera();
             void loadPathsParallel( const std::vector< std::pair< std::string, std::string > >& paths );
             void loadPaths( const std::vector< std::pair< std::string, std::string > >& paths );
             void render();

@@ -23,7 +23,9 @@ namespace BlueBear {
 
         sf::RenderWindow& getRenderWindow();
         const glm::uvec2& getDimensions() const;
-        void setAdapter( std::unique_ptr< Adapter::Adapter >& adapter );
+        Adapter::Adapter& setAdapter( std::unique_ptr< Adapter::Adapter > adapter );
+        Adapter::Adapter& getAdapter();
+        void reset();
         void update();
       };
 

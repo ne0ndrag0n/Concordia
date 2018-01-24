@@ -24,6 +24,7 @@
 #include "localemanager.hpp"
 #include "configmanager.hpp"
 #include "tools/utility.hpp"
+#include "scripting/luastate.hpp"
 #include "log.hpp"
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
@@ -45,7 +46,7 @@ namespace BlueBear {
     const std::string Display::WALLPANEL_MODEL_DR_PATH = "system/models/wall/diagwall.dae";
     const std::string Display::FLOOR_MODEL_PATH = "system/models/floor/floor.dae";
 
-    Display::Display( BlueBear::State::State& s, Scripting::Engine* e ) : BlueBear::State::Substate( s ), engine( e ), L( e->L ) {
+    Display::Display( BlueBear::State::State& s, Scripting::Engine* e ) : BlueBear::State::Substate( s ), engine( e ) {
       // Get our settings out of the config manager
       x = ConfigManager::getInstance().getIntValue( "viewport_x" );
       y = ConfigManager::getInstance().getIntValue( "viewport_y" );
@@ -146,7 +147,6 @@ namespace BlueBear {
      */
     Display::MainGameState::MainGameState( Display& instance, unsigned int currentRotation, Containers::Collection3D< std::shared_ptr< Models::Tile > >& floorMap, Containers::Collection3D< std::shared_ptr< Scripting::WallCell > >& wallMap ) :
       Display::State::State( instance ),
-      L( instance.L ),
       camera( Camera( instance.x, instance.y ) ),
       floorMap( floorMap ),
       wallMap( wallMap ),

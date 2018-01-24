@@ -8,10 +8,6 @@
 namespace BlueBear {
   class Application;
 
-  namespace Graphics {
-    class Display;
-  }
-
   namespace Scripting {
     class Engine;
     class InfrastructureFactory;
@@ -21,8 +17,11 @@ namespace BlueBear {
 
     class HouseholdGameplayState : public State {
       std::unique_ptr< Scripting::Engine > engine;
-      std::unique_ptr< Graphics::Display > display;
       std::unique_ptr< Scripting::InfrastructureFactory > infrastructureFactory;
+
+      void setupEngine();
+      void setupDisplayDevice();
+      void setupInputDevice();
 
     public:
       EXCEPTION_TYPE( LotNotFoundException, "Lot not found!" );
@@ -32,9 +31,6 @@ namespace BlueBear {
 
       Scripting::InfrastructureFactory& getInfrastructureFactory();
       void update() override;
-
-      // TODO: Replace
-      void newUpdate();
     };
 
   }

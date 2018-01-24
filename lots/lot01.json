@@ -49,10 +49,7 @@
 	"engine": {
 		"ticks": 10,
 		"waitingTable": {
-			"timerMap": {
-				"30": [ "0xffffffffffff" ],
-				"60": [ "0xfffffffffffc" ]
-			}
+			"timerMap": {}
 		},
 		"entityManager": [
 			"0x5609738a47e0",

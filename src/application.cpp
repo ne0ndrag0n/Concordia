@@ -20,6 +20,14 @@ namespace BlueBear {
     currentState = std::make_unique< State::HouseholdGameplayState >( *this );
   }
 
+  Device::Display::Display& Application::getDisplayDevice() {
+    return display;
+  }
+
+  Device::Input::Input& Application::getInputDevice() {
+    return input;
+  }
+
   int Application::run() {
     while( currentState ) {
       currentState->update();

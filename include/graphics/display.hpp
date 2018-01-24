@@ -96,7 +96,6 @@ namespace BlueBear {
       };
 
       class MainGameState : public State {
-          lua_State* L;
           Input::InputManager inputManager;
           unsigned int currentRotation;
           std::map< std::string, std::shared_ptr< Shader > > registeredShaders;
@@ -142,7 +141,6 @@ namespace BlueBear {
 
       private:
         Scripting::Engine* engine;
-        lua_State* L;
         using ViewportDimension = int;
         ViewportDimension x;
         ViewportDimension y;

@@ -54,8 +54,18 @@ namespace BlueBear {
         return dimensions;
       }
 
-      void Display::setAdapter( std::unique_ptr< Adapter::Adapter >& adapter ) {
+      Adapter::Adapter& Display::setAdapter( std::unique_ptr< Adapter::Adapter > adapter ) {
         this->adapter = std::move( adapter );
+
+        return *this->adapter;
+      }
+
+      Adapter::Adapter& Display::getAdapter() {
+        return *adapter;
+      }
+
+      void Display::reset() {
+        this->adapter = nullptr;
       }
 
       void Display::update() {
