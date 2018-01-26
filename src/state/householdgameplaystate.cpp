@@ -42,9 +42,9 @@ namespace BlueBear {
     }
 
     void HouseholdGameplayState::setupDisplayDevice() {
-      Device::Display::Adapter::WorldAdapter& adapter = getApplication()
+      Device::Display::Adapter::WorldAdapter& adapter = application
         .getDisplayDevice()
-        .setAdapter( std::make_unique< Device::Display::Adapter::WorldAdapter >( getApplication().getDisplayDevice() ) )
+        .setAdapter( std::make_unique< Device::Display::Adapter::WorldAdapter >( application.getDisplayDevice() ) )
         .as< Device::Display::Adapter::WorldAdapter >();
 
       adapter.getCamera().setRotationDirect( engine->currentLot->currentRotation );
@@ -61,8 +61,8 @@ namespace BlueBear {
       sf::Keyboard::Key KEY_ZOOM_IN = ( sf::Keyboard::Key ) ConfigManager::getInstance().getIntValue( "key_zoom_in" );
       sf::Keyboard::Key KEY_ZOOM_OUT = ( sf::Keyboard::Key ) ConfigManager::getInstance().getIntValue( "key_zoom_out" );
 
-      Graphics::Camera& camera = getApplication().getDisplayDevice().getAdapter().as< Device::Display::Adapter::WorldAdapter >().getCamera();
-      Device::Input::Input& inputManager = ( getApplication().getInputDevice() = Device::Input::Input() );
+      Graphics::Camera& camera = application.getDisplayDevice().getAdapter().as< Device::Display::Adapter::WorldAdapter >().getCamera();
+      Device::Input::Input& inputManager = ( application.getInputDevice() = Device::Input::Input() );
       inputManager.listen( KEY_ROTATE_RIGHT, std::bind( &Graphics::Camera::rotateLeft, &camera ) );
       inputManager.listen( KEY_ROTATE_LEFT, std::bind( &Graphics::Camera::rotateRight, &camera ) );
       inputManager.listen( KEY_UP, std::bind( &Graphics::Camera::move, &camera, 0.0f, -0.1f, 0.0f ) );
@@ -78,7 +78,7 @@ namespace BlueBear {
     }
 
     void HouseholdGameplayState::update() {
-      auto& display = getApplication().getDisplayDevice();
+      auto& display = application.getDisplayDevice();
       display.update();
 
       // pull and use events
@@ -90,8 +90,7 @@ namespace BlueBear {
             application.close();
             return;
           default:
-            // TODO something with the event (handled by a substate for input events)
-            break;
+            application.getInputDevice().handleEvent( event );
         }
 
         guiEvents.pop();
