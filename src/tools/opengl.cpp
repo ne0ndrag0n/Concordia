@@ -24,7 +24,7 @@ namespace BlueBear {
       if( uniformLocation != -1 ) {
         glUniform3f( uniformLocation, value[ 0 ], value[ 1 ], value[ 2 ] );
       } else {
-        Log::getInstance().warn( "OpenGL::setUniform", id + " undefined or unused in current shader; not setting uniform." );
+        //Log::getInstance().warn( "OpenGL::setUniform", id + " undefined or unused in current shader; not setting uniform." );
       }
     }
 
@@ -33,7 +33,7 @@ namespace BlueBear {
       if( uniformLocation != -1 ) {
         glUniform1i( uniformLocation, value );
       } else {
-        Log::getInstance().warn( "OpenGL::setUniform", id + " undefined or unused in current shader; not setting uniform." );
+        //Log::getInstance().warn( "OpenGL::setUniform", id + " undefined or unused in current shader; not setting uniform." );
       }
     }
 
@@ -42,7 +42,7 @@ namespace BlueBear {
       if( uniformLocation != -1 ) {
         glUniform1f( uniformLocation, value );
       } else {
-        Log::getInstance().warn( "OpenGL::setUniform", id + " undefined or unused in current shader; not setting uniform." );
+        //Log::getInstance().warn( "OpenGL::setUniform", id + " undefined or unused in current shader; not setting uniform." );
       }
     }
 

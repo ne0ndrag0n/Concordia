@@ -75,11 +75,11 @@ namespace BlueBear {
 
       inputManager.listen( sf::Keyboard::Z, [ & ]() {
         application.getDisplayDevice().getAdapter().as< Device::Display::Adapter::WorldAdapter >().loadPathsParallel( {
-          { "box", "dev/box/even_simpler_2.fbx" }
+          { "floor", "dev/box/simplest_box.dae" }
         } );
       } );
       inputManager.listen( sf::Keyboard::X, [ & ]() {
-        application.getDisplayDevice().getAdapter().as< Device::Display::Adapter::WorldAdapter >().placeObject( "box", "box" );
+        application.getDisplayDevice().getAdapter().as< Device::Display::Adapter::WorldAdapter >().placeObject( "floor", "floor" );
       } );
     }
 
