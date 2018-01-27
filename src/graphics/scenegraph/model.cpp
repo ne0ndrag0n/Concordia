@@ -5,7 +5,6 @@
 #include "graphics/scenegraph/material.hpp"
 #include "graphics/transform.hpp"
 #include "graphics/shader.hpp"
-#include "log.hpp"
 #include <glm/glm.hpp>
 #include <algorithm>
 

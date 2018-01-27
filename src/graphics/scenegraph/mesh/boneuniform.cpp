@@ -5,6 +5,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <GL/glew.h>
 
+#include "log.hpp"
+
 namespace BlueBear {
   namespace Graphics {
     namespace SceneGraph {

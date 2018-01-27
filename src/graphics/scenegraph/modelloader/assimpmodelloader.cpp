@@ -426,7 +426,8 @@ namespace BlueBear {
           for( int i = 0; i < node->mNumChildren; i++ ) {
             aiNode* assimpChild = node->mChildren[ i ];
             // A skeleton is contained within a node called "Armature", with a single root bone as its child
-            if( assimpChild->mName.C_Str() == "Armature" && assimpChild->mNumChildren == 1 ) {
+            if( std::string( assimpChild->mName.C_Str() ) == "Armature" && assimpChild->mNumChildren == 1 ) {
+              log( "AssimpModelLoader::getNode", "Adding animator skeleton" ); 
               model->setAnimator( getAnimator( assimpChild->mChildren[ 0 ] ) );
             } else {
               model->addChild( getNode( assimpChild ) );
