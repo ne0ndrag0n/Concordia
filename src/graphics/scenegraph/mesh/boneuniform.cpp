@@ -2,10 +2,9 @@
 #include "graphics/scenegraph/animation/animator.hpp"
 #include "graphics/scenegraph/model.hpp"
 #include "tools/opengl.hpp"
+#include "log.hpp"
 #include <glm/gtc/type_ptr.hpp>
 #include <GL/glew.h>
-
-#include "log.hpp"
 
 namespace BlueBear {
   namespace Graphics {
@@ -28,6 +27,8 @@ namespace BlueBear {
               );
             }
           } else {
+            Log::getInstance().warn( "BoneUniform::configure", "Unable to obtain an animator; sending identity matrices to shader" );
+
             for( const std::string& bone : boneIDs ) {
               // Unable to obtain an animator for some reason; we can only roll out a bunch of identity matrices
               boneUniform.push_back( glm::mat4() );

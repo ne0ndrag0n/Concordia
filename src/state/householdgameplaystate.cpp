@@ -8,6 +8,7 @@
 #include "configmanager.hpp"
 #include "device/display/adapter/worldadapter.hpp"
 #include "device/input/input.hpp"
+#include "graphics/scenegraph/animation/animator.hpp"
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Event.hpp>
 #include <functional>
@@ -83,6 +84,12 @@ namespace BlueBear {
       } );
       inputManager.listen( sf::Keyboard::X, [ & ]() {
         application.getDisplayDevice().getAdapter().as< Device::Display::Adapter::WorldAdapter >().placeObject( "floor", "floor1" );
+      } );
+      inputManager.listen( sf::Keyboard::C, [ & ]() {
+        auto animator = application.getDisplayDevice().getAdapter().as< Device::Display::Adapter::WorldAdapter >().getObject( "floor1" )
+          ->findNearestAnimator();
+
+        animator->setCurrentAnimation( "Armature|Action" );
       } );
     }
 

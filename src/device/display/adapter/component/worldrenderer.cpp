@@ -32,6 +32,16 @@ namespace BlueBear {
             return models[ newId ] = originals.at( objectId )->copy();
           }
 
+          std::shared_ptr< Graphics::SceneGraph::Model > WorldRenderer::getObject( const std::string& instanceId ) {
+            auto it = models.find( instanceId );
+            if( it == models.end() ) {
+              Log::getInstance().warn( "WorldRenderer::getObject", std::string( "Warning: Instance with ID " ) + instanceId + " doesn't exist!" );
+              return nullptr;
+            }
+
+            return it->second;
+          }
+
           Graphics::Camera& WorldRenderer::getCamera() {
             return camera;
           }

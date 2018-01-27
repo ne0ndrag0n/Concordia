@@ -47,6 +47,7 @@ namespace BlueBear {
             virtual ~WorldRenderer() = default;
 
             std::shared_ptr< Graphics::SceneGraph::Model > placeObject( const std::string& objectId, const std::string& newId );
+            std::shared_ptr< Graphics::SceneGraph::Model > getObject( const std::string& instanceId );
 
             Graphics::Camera& getCamera();
             void loadPathsParallel( const std::vector< std::pair< std::string, std::string > >& paths );

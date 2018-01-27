@@ -377,6 +377,14 @@ namespace BlueBear {
           for( int i = 0; i < context.scene->mNumAnimations; i++ ) {
             aiAnimation* animation = context.scene->mAnimations[ i ];
 
+            log( "AssimpModelLoader::getAnimationList",
+              std::string( animation->mName.C_Str() ) +
+              ", fps: " +
+              std::to_string( animation->mTicksPerSecond ) +
+              ", duration: " +
+              std::to_string( animation->mDuration )
+            );
+
             animList[ animation->mName.C_Str() ] = std::make_shared< Animation::Animation >(
               Animation::Animation{
                 animation->mName.C_Str(),
@@ -427,7 +435,7 @@ namespace BlueBear {
             aiNode* assimpChild = node->mChildren[ i ];
             // A skeleton is contained within a node called "Armature", with a single root bone as its child
             if( std::string( assimpChild->mName.C_Str() ) == "Armature" && assimpChild->mNumChildren == 1 ) {
-              log( "AssimpModelLoader::getNode", "Adding animator skeleton" ); 
+              log( "AssimpModelLoader::getNode", "Adding animator skeleton" );
               model->setAnimator( getAnimator( assimpChild->mChildren[ 0 ] ) );
             } else {
               model->addChild( getNode( assimpChild ) );

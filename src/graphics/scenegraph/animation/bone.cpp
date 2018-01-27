@@ -102,7 +102,7 @@ namespace BlueBear {
               // A -> B -> C -> D
               // ( ( ( ( I * D ) * C ) * B ) * A )
               // glm is column major, column major puts the first matrix last in multiplication
-              matrix = matrix * current->matrix;
+              matrix = current->matrix * matrix;
             } while ( current = current->parent );
 
             return matrix;

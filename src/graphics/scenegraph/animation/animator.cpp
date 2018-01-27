@@ -1,6 +1,7 @@
 #include "graphics/scenegraph/animation/animator.hpp"
 #include "graphics/scenegraph/animation/animation.hpp"
 #include "configmanager.hpp"
+#include "log.hpp"
 
 namespace BlueBear {
   namespace Graphics {
@@ -40,6 +41,14 @@ namespace BlueBear {
 
         void Animator::setPause( bool status ) {
           paused = status;
+        }
+
+        void Animator::setFrame( double frame ) {
+          if( animation ) {
+            currentSkeleton = bindSkeleton.getAnimationCopy( animation->id, this->frame = frame );
+          } else {
+            Log::getInstance().warn( "Animator::setFrame", "Can't set frame; no animation currently set" );
+          }
         }
 
         void Animator::reset() {
