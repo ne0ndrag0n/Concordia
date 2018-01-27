@@ -53,7 +53,7 @@ namespace BlueBear {
 
         void Animator::reset() {
           animation = nullptr;
-          frame = -getFPS();
+          frame = 0.0f;
           paused = false;
           currentSkeleton = bindSkeleton;
         }
