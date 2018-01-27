@@ -14,6 +14,9 @@
 #include <queue>
 #include <map>
 
+#include "graphics/scenegraph/transform.hpp"
+#include "graphics/scenegraph/model.hpp"
+
 namespace BlueBear {
   namespace State {
 
@@ -79,7 +82,7 @@ namespace BlueBear {
         } );
       } );
       inputManager.listen( sf::Keyboard::X, [ & ]() {
-        application.getDisplayDevice().getAdapter().as< Device::Display::Adapter::WorldAdapter >().placeObject( "floor", "floor" );
+        application.getDisplayDevice().getAdapter().as< Device::Display::Adapter::WorldAdapter >().placeObject( "floor", "floor1" );
       } );
     }
 

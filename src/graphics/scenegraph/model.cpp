@@ -100,7 +100,7 @@ namespace BlueBear {
         return transform;
       }
 
-      Transform Model::getLocalTransform() const {
+      Transform& Model::getLocalTransform() {
         return transform;
       }
 

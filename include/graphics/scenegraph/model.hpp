@@ -67,7 +67,7 @@ namespace BlueBear {
         void setMaterial( std::shared_ptr< Material > material );
 
         Transform getComputedTransform() const;
-        Transform getLocalTransform() const;
+        Transform& getLocalTransform();
         void setLocalTransform( Transform transform );
 
         std::shared_ptr< Animation::Animator > findNearestAnimator() const;
