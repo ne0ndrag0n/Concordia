@@ -99,12 +99,6 @@ namespace BlueBear {
 
             const Bone* current = result;
             do {
-              // should be:
-              // A -> B -> C -> D
-              // ( ( ( ( I * D ) * C ) * B ) * A )
-              // glm is column major, column major puts the first matrix last in multiplication
-
-              // but this is what works. don't ask too many questions i guess.
               matrix = current->matrix * matrix;
             } while ( current = current->parent );
 

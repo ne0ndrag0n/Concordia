@@ -91,9 +91,7 @@ namespace BlueBear {
 
       Transform Model::getComputedTransform() const {
         if( std::shared_ptr< Model > realParent = parent.lock() ) {
-          // A -> B -> C -> D
-          // ( D * ( C * ( B * A ) ) )
-          return transform * realParent->getComputedTransform();
+          return realParent->getComputedTransform() * transform;
         }
 
         return transform;
