@@ -39,7 +39,10 @@ namespace BlueBear {
           struct ImportContext {
             const aiScene* scene;
             std::string directory;
+            unsigned int logIndentation = 0;
           } context;
+
+          void log( const std::string& tag, const std::string& message );
 
           std::shared_ptr< Shader > getShader( const std::string& vertexPath, const std::string& fragmentPath );
           std::shared_ptr< Texture > getTexture( const std::string& path );

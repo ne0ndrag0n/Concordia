@@ -13,6 +13,7 @@ namespace BlueBear {
 
         public:
           Adapter( Display& display );
+          virtual ~Adapter() = default;
 
           template < typename Class >
           Class& as() {

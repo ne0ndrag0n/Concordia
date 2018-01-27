@@ -25,6 +25,16 @@ namespace BlueBear {
     namespace SceneGraph {
       namespace ModelLoader {
 
+        void AssimpModelLoader::log( const std::string& tag, const std::string& message ) {
+          std::string indents;
+
+          for( int i = 0; i != context.logIndentation; i++ ) {
+            indents += "\t";
+          }
+
+          Log::getInstance().debug( tag, indents + message );
+        }
+
         std::shared_ptr< Shader > AssimpModelLoader::getShader( const std::string& vertexPath, const std::string& fragmentPath ) {
           if( cache ) {
             return cache->getOrCreateShader( vertexPath, fragmentPath, deferGLOperations );
@@ -334,7 +344,7 @@ namespace BlueBear {
                   try {
                     ( *animationMap )[ animation->mName.C_Str() ] = getKeyframes( nodeAnim );
                   } catch( MalformedAnimationException& e ) {
-                    Log::getInstance().warn(
+                    log(
                       "AssimpModelLoader::getAnimationMapForBone",
                        std::string( "Malformed animation " ) + animation->mName.C_Str() + " for bone ID " + boneId
                      );
@@ -390,10 +400,14 @@ namespace BlueBear {
         }
 
         std::shared_ptr< Model > AssimpModelLoader::getNode( aiNode* node ) {
+          log( "AssimpModelLoader::getNode", std::string( "Node " ) + node->mName.C_Str() + " {" );
+          context.logIndentation++;
+
           std::shared_ptr< Mesh::Mesh > mesh = getMesh( node );
           std::shared_ptr< Shader > shader;
           if( mesh ) {
             std::pair< std::string, std::string > shaderPair = mesh->getDefaultShader();
+            log( "AssimpModelLoader::getNode", std::string( "Attaching default shader " ) + shaderPair.first + ";" + shaderPair.second );
             shader = getShader( shaderPair.first, shaderPair.second );
           }
           std::shared_ptr< Material > material = nullptr;
@@ -411,18 +425,22 @@ namespace BlueBear {
 
           for( int i = 0; i < node->mNumChildren; i++ ) {
             aiNode* assimpChild = node->mChildren[ i ];
-            // A skeleton is contained within a node called "_armature", with a single root bone as its child
-            if( assimpChild->mName.C_Str() == "_armature" && assimpChild->mNumChildren == 1 ) {
+            // A skeleton is contained within a node called "Armature", with a single root bone as its child
+            if( assimpChild->mName.C_Str() == "Armature" && assimpChild->mNumChildren == 1 ) {
               model->setAnimator( getAnimator( assimpChild->mChildren[ 0 ] ) );
             } else {
               model->addChild( getNode( assimpChild ) );
             }
           }
 
+          context.logIndentation--;
+          log( "AssimpModelLoader::getNode", "}" );
           return model;
         }
 
         std::shared_ptr< Model > AssimpModelLoader::get( const std::string& filename ) {
+          Log::getInstance().debug( "AssimpModelLoader::get", std::string( "Attempting to load " ) + filename );
+
           context = ImportContext();
 
           context.scene = importer.ReadFile( filename, getFlags() );
@@ -439,6 +457,9 @@ namespace BlueBear {
           std::shared_ptr< Model > result = getNode( context.scene->mRootNode );
 
           importer.FreeScene();
+
+          Log::getInstance().debug( "AssimpModelLoader::get", std::string( "Succesfully loaded " ) + filename );
+
           return result;
         }
 

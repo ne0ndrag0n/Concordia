@@ -80,39 +80,30 @@ namespace BlueBear {
         unsigned int counter = 0;
 
         if( useAmbient ) {
-          glUniform3f(
-            Tools::OpenGL::getUniformLocation( "material.ambient" ),
-            ambientColor[ 0 ], ambientColor[ 1 ], ambientColor[ 2 ]
-          );
+          Tools::OpenGL::setUniform( "material.ambient", ambientColor );
         }
 
         if( diffuseTextures.empty() ) {
-          glUniform3f(
-            Tools::OpenGL::getUniformLocation( "material.diffuse" ),
-            diffuseColor[ 0 ], diffuseColor[ 1 ], diffuseColor[ 2 ]
-          );
+          Tools::OpenGL::setUniform( "material.diffuse", diffuseColor );
         } else {
           for( int i = 0; i != diffuseTextures.size(); i++ ) {
             glActiveTexture( GL_TEXTURE0 + counter++ );
             glBindTexture( GL_TEXTURE_2D, diffuseTextures[ i ]->id );
-            glUniform1i( Tools::OpenGL::getUniformLocation( std::string( "material.diffuse" ) + std::to_string( i ) ), i );
+            Tools::OpenGL::setUniform( std::string( "material.diffuse" ) + std::to_string( i ), i );
           }
         }
 
         if( specularTextures.empty() ) {
-          glUniform3f(
-            Tools::OpenGL::getUniformLocation( "material.specular" ),
-            specularColor[ 0 ], specularColor[ 1 ], specularColor[ 2 ]
-          );
+          Tools::OpenGL::setUniform( "material.specular", specularColor );
         } else {
           for( int i = 0; i != specularTextures.size(); i++ ) {
             glActiveTexture( GL_TEXTURE0 + counter++ );
             glBindTexture( GL_TEXTURE_2D, specularTextures[ i ]->id );
-            glUniform1i( Tools::OpenGL::getUniformLocation( std::string( "material.specular" ) + std::to_string( i ) ), i );
+            Tools::OpenGL::setUniform( std::string( "material.specular" ) + std::to_string( i ), i );
           }
         }
 
-        glUniform1f( Tools::OpenGL::getUniformLocation( "material.shininess" ), shininess );
+        Tools::OpenGL::setUniform( "material.shininess", shininess );
       }
 
     }

@@ -18,6 +18,20 @@ namespace BlueBear {
 
           WorldRenderer::WorldRenderer() : camera( Graphics::Camera( ConfigManager::getInstance().getIntValue( "viewport_x" ), ConfigManager::getInstance().getIntValue( "viewport_y" ) ) ) {}
 
+          std::shared_ptr< Graphics::SceneGraph::Model > WorldRenderer::placeObject( const std::string& objectId, const std::string& newId ) {
+            auto it = originals.find( objectId );
+            if( it == originals.end() ) {
+              Log::getInstance().warn( "WorldRenderer::placeObject", std::string( "Warning: Object " ) + objectId + " not loaded or registered!" );
+              return nullptr;
+            }
+
+            if( models.find( newId ) != models.end() ) {
+              Log::getInstance().warn( "WorldRenderer::placeObject", std::string( "Warning: Object with ID " ) + objectId + " already exists; it will be replaced." );
+            }
+
+            return models[ newId ] = originals.at( objectId )->copy();
+          }
+
           Graphics::Camera& WorldRenderer::getCamera() {
             return camera;
           }
@@ -26,7 +40,7 @@ namespace BlueBear {
             std::unique_ptr< Graphics::SceneGraph::ModelLoader::FileModelLoader > result = std::make_unique< Graphics::SceneGraph::ModelLoader::AssimpModelLoader >();
 
             Graphics::SceneGraph::ModelLoader::AssimpModelLoader& asAssimp = ( Graphics::SceneGraph::ModelLoader::AssimpModelLoader& )*result;
-            asAssimp.deferGLOperations = true;
+            asAssimp.deferGLOperations = deferGLOperations;
             asAssimp.cache = &cache;
 
             return result;

@@ -24,14 +24,13 @@ namespace BlueBear {
         std::shared_ptr< Model > copy( new Model() );
 
         copy->id = id;
-        if( parent.lock() ) {
-          Log::getInstance().warn( "Model::copy", "Disconnecting new Model copy from old parent" );
-        }
         copy->mesh = mesh;
         copy->shader = shader;
         copy->material = material;
         copy->transform = transform;
-        copy->animator = std::make_shared< Animation::Animator >( *animator );
+        if( animator ) {
+          copy->animator = std::make_shared< Animation::Animator >( *animator );
+        }
 
         for( std::shared_ptr< Model > child : submodels ) {
           copy->addChild( child->copy() );

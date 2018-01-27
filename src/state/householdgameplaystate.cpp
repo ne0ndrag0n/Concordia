@@ -12,6 +12,7 @@
 #include <SFML/Window/Event.hpp>
 #include <functional>
 #include <queue>
+#include <map>
 
 namespace BlueBear {
   namespace State {
@@ -71,6 +72,15 @@ namespace BlueBear {
       inputManager.listen( KEY_RIGHT, std::bind( &Graphics::Camera::move, &camera, -0.1f, 0.0f, 0.0f ) );
       inputManager.listen( KEY_ZOOM_IN, std::bind( &Graphics::Camera::zoomIn, &camera ) );
       inputManager.listen( KEY_ZOOM_OUT, std::bind( &Graphics::Camera::zoomOut, &camera ) );
+
+      inputManager.listen( sf::Keyboard::Z, [ & ]() {
+        application.getDisplayDevice().getAdapter().as< Device::Display::Adapter::WorldAdapter >().loadPathsParallel( {
+          { "box", "dev/box/even_simpler_2.fbx" }
+        } );
+      } );
+      inputManager.listen( sf::Keyboard::X, [ & ]() {
+        application.getDisplayDevice().getAdapter().as< Device::Display::Adapter::WorldAdapter >().placeObject( "box", "box" );
+      } );
     }
 
     Scripting::InfrastructureFactory& HouseholdGameplayState::getInfrastructureFactory() {

@@ -56,11 +56,16 @@ namespace BlueBear {
       const GLchar* vShaderCode = vertexCode.c_str();
       const GLchar * fShaderCode = fragmentCode.c_str();
       // 2. Compile shaders
-      GLuint vertex, fragment;
-      GLint success;
+      GLuint vertex = 0;
+      GLuint fragment = 0;
+      GLint success = 0;
       GLchar infoLog[512];
       // Vertex Shader
       vertex = glCreateShader(GL_VERTEX_SHADER);
+      if( !vertex ) {
+        Log::getInstance().error( "Shader::Shader", "Could not create shader object!" );
+        return;
+      }
       glShaderSource(vertex, 1, &vShaderCode, NULL);
       glCompileShader(vertex);
       // Print compile errors if any
@@ -102,6 +107,8 @@ namespace BlueBear {
       // Delete the shaders as they're linked into our program now and no longer necessery
       glDeleteShader(vertex);
       glDeleteShader(fragment);
+
+      Log::getInstance().debug( "Shader::Shader", vPath + ";" + fPath + " loaded successfully" );
 
       vPath.clear();
       fPath.clear();
