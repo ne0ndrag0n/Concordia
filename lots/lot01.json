@@ -36,8 +36,7 @@
 		"ticks": 10,
 		"waitingTable": {
 			"timerMap": {
-				"30": [ "0xffffffffffff" ],
-				"60": [ "0xfffffffffffc" ]
+				"30": [ "0xffffffffffff" ]
 			}
 		},
 		"entityManager": [
@@ -84,7 +83,7 @@
 			 "0xffffffffffff" : {
 				 "type": "sfunction",
 				 "class": "game.flowers.base",
-				 "method": "main",
+				 "method": "setup_demo",
 				 "args": {
 					 "type": "ref",
 					 "ptr": "0xfffffffffffe"

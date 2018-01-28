@@ -533,6 +533,8 @@ namespace BlueBear {
       // Floor & Walls with nudging
       registeredShaders[ "default" ]->use();
       camera.sendToShader();
+
+      /*
       auto length = floorInstanceCollection->getLength();
       for( auto i = 0; i != length; i++ ) {
         std::shared_ptr< Instance > floorInstance = floorInstanceCollection->getItemDirect( i );
@@ -550,10 +552,11 @@ namespace BlueBear {
           wallCellBundler->render();
         }
       }
+      */
 
       drawWorldInstances();
 
-      processOsd();
+      //processOsd();
 
       instance.mainWindow.display();
     }
