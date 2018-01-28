@@ -44,6 +44,8 @@ namespace BlueBear {
         static Transform interpolate( const Transform& t1, const Transform& t2, float alpha );
         static glm::mat4 componentsToMatrix( const glm::vec3& position, const glm::quat& rotation, const glm::vec3& scale );
 
+        void printToLog();
+
       };
 
     }

@@ -1,5 +1,6 @@
 #include "graphics/scenegraph/transform.hpp"
 #include "tools/opengl.hpp"
+#include "log.hpp"
 #include <glm/ext.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
 #include <glm/gtx/quaternion.hpp>
@@ -124,6 +125,11 @@ namespace BlueBear {
 
         return quickMatrix;
       }
+
+      void Transform::printToLog() {
+        Log::getInstance().debug( "Transform::printToLog", "T: " + glm::to_string( position ) + " S: " + glm::to_string( scale ) + " R: " + glm::to_string( rotation ) + " (angle: " + std::to_string( glm::degrees( glm::angle( rotation ) ) ) + " axis: " + glm::to_string( glm::axis( rotation ) ) + ")" );
+      }
+
 
     }
   }

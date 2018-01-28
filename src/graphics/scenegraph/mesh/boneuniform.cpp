@@ -6,6 +6,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <GL/glew.h>
 
+#include "graphics/scenegraph/transform.hpp"
+
 namespace BlueBear {
   namespace Graphics {
     namespace SceneGraph {
@@ -22,6 +24,18 @@ namespace BlueBear {
 
           if( animator ) {
             for( const std::string& bone : boneIDs ) {
+              /*
+              Log::getInstance().debug( "BoneUniform::configure", bone );
+              Log::getInstance().debug( "BoneUniform::configure", "Current bone then bind then result:" );
+
+              Transform current = Transform( animator->getCurrentSkeletonRef().getMatrixById( bone ) );
+              Transform bind = Transform( animator->getBindSkeletonRef().getMatrixById( bone ) );
+              Transform result = Transform( animator->getCurrentSkeletonRef().getMatrixById( bone ) * glm::inverse( animator->getBindSkeletonRef().getMatrixById( bone ) ) );
+              current.printToLog();
+              bind.printToLog();
+              result.printToLog();
+              */
+
               boneUniform.push_back(
                 animator->getCurrentSkeletonRef().getMatrixById( bone ) * glm::inverse( animator->getBindSkeletonRef().getMatrixById( bone ) )
               );
