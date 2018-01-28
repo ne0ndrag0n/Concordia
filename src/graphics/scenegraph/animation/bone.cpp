@@ -1,5 +1,6 @@
 #include "graphics/scenegraph/animation/bone.hpp"
 #include "graphics/scenegraph/transform.hpp"
+#include "log.hpp"
 
 namespace BlueBear {
   namespace Graphics {
@@ -65,6 +66,15 @@ namespace BlueBear {
           }
         }
 
+        void Bone::printToLog() {
+          Log::getInstance().debug( "Bone::printToLog", id );
+          Transform( matrix ).printToLog();
+
+          for( auto& child : children ) {
+            child.printToLog();
+          }
+        }
+
         Bone Bone::getAnimationCopy( const std::string& animationId, double animationTick ) const {
           Bone result = *this;
 
@@ -95,12 +105,11 @@ namespace BlueBear {
         glm::mat4 Bone::getMatrixById( const std::string& id ) const {
           const Bone* result = getChildById( id );
           if( result ) {
-            glm::mat4 matrix;
+            glm::mat4 matrix = result->matrix;
 
-            const Bone* current = result;
-            do {
-              matrix = current->matrix * matrix;
-            } while ( current = current->parent );
+            while( result = result->parent ) {
+              matrix = result->matrix * matrix;
+            }
 
             return matrix;
           } else {
