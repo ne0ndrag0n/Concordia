@@ -67,7 +67,8 @@ namespace BlueBear {
           EXCEPTION_TYPE( MalformedAnimationException, "Malformed animation data" );
           EXCEPTION_TYPE( TooManyBonesException, "Too many bones for this vertex!" );
 
-          bool hintNoIndices = false;
+          // Only a hint!
+          bool useIndices = true;
           bool useBones = true;
           bool deferGLOperations = false;
           SceneGraph::ResourceBank* cache = nullptr;

@@ -67,7 +67,7 @@ namespace BlueBear {
         unsigned int AssimpModelLoader::getFlags() {
           unsigned int result = aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals;
 
-          if( !hintNoIndices ) {
+          if( useIndices ) {
             result |= aiProcess_JoinIdenticalVertices;
           }
 
@@ -148,7 +148,10 @@ namespace BlueBear {
                 context.scene->mMaterials[ mesh->mMaterialIndex ]->GetTextureCount( aiTextureType_SPECULAR ) > 0
               )
             );
-            bool usesIndices = !hintNoIndices || mesh->mNumFaces;
+            bool usesIndices = useIndices || mesh->mNumFaces;
+
+            log( "AssimpModelLoader::getMesh", usesIndices ? "Uses indices" : "Doesn't use indices" );
+            log( "AssimpModelLoader::getMesh", std::to_string( mesh->mNumVertices ) + " vertices" );
 
             std::shared_ptr< Mesh::Mesh > result;
 

@@ -79,7 +79,7 @@ namespace BlueBear {
 
       inputManager.listen( sf::Keyboard::Z, [ & ]() {
         application.getDisplayDevice().getAdapter().as< Device::Display::Adapter::WorldAdapter >().loadPathsParallel( {
-          { "floor", "dev/box/cylinder.fbx" }
+          { "floor", "dev/box/armaturebox.fbx" }
         } );
       } );
       inputManager.listen( sf::Keyboard::X, [ & ]() {
@@ -89,7 +89,9 @@ namespace BlueBear {
         auto animator = application.getDisplayDevice().getAdapter().as< Device::Display::Adapter::WorldAdapter >().getObject( "floor1" )
           ->findNearestAnimator();
 
-        animator->setCurrentAnimation( "Armature|Action" );
+        animator->setCurrentAnimation( "Armature|OtherOne" );
+        animator->setPause( true );
+        animator->setFrame( 25.0 );
       } );
     }
 
