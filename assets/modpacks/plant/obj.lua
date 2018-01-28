@@ -114,9 +114,16 @@ end
 
 function Flowers:setup_world()
 	self:setup_models( {
-		[ 'bgb' ] = 'dev/box/cylinder.fbx',
+		[ 'armaturebox' ] = 'dev/box/armaturebox.fbx',
 		[ 'knight' ] = 'dev/box/mini_knight.fbx'
 	} )
+end
+
+function Flowers:setup_demo()
+	self:setup_world()
+	self.box = self:place_object( 'armaturebox', { 0,0,0 })
+	self.box:set_anim( 'Armature|OtherOne', false )
+	self.box:set_anim_frame( 25.0 )
 end
 
 function Flowers:knight_debug()
