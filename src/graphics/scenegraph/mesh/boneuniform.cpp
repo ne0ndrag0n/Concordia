@@ -25,7 +25,7 @@ namespace BlueBear {
           if( animator && parent ) {
             for( const std::string& bone : boneIDs ) {
               boneUniform.push_back(
-                glm::inverse( parent->getComputedTransform().getMatrix() ) * animator->getCurrentSkeletonRef().getMatrixById( bone ) * glm::inverse( animator->getBindSkeletonRef().getMatrixById( bone ) ) * parent->getComputedTransform().getMatrix()
+                animator->getCurrentSkeletonRef().getMatrixById( bone ) * glm::inverse( animator->getBindSkeletonRef().getMatrixById( bone ) )
               );
             }
           } else {

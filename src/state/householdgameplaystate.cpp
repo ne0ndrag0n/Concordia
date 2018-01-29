@@ -68,8 +68,8 @@ namespace BlueBear {
 
       Graphics::Camera& camera = application.getDisplayDevice().getAdapter().as< Device::Display::Adapter::WorldAdapter >().getCamera();
       Device::Input::Input& inputManager = ( application.getInputDevice() = Device::Input::Input() );
-      inputManager.listen( KEY_ROTATE_RIGHT, std::bind( &Graphics::Camera::rotateLeft, &camera ) );
-      inputManager.listen( KEY_ROTATE_LEFT, std::bind( &Graphics::Camera::rotateRight, &camera ) );
+      inputManager.listen( KEY_ROTATE_RIGHT, std::bind( &Graphics::Camera::rotateRight, &camera ) );
+      inputManager.listen( KEY_ROTATE_LEFT, std::bind( &Graphics::Camera::rotateLeft, &camera ) );
       inputManager.listen( KEY_UP, std::bind( &Graphics::Camera::move, &camera, 0.0f, -0.1f, 0.0f ) );
       inputManager.listen( KEY_DOWN, std::bind( &Graphics::Camera::move, &camera, 0.0f, 0.1f, 0.0f ) );
       inputManager.listen( KEY_LEFT, std::bind( &Graphics::Camera::move, &camera, 0.1f, 0.0f, 0.0f ) );
@@ -89,9 +89,7 @@ namespace BlueBear {
         auto animator = application.getDisplayDevice().getAdapter().as< Device::Display::Adapter::WorldAdapter >().getObject( "floor1" )
           ->findNearestAnimator();
 
-        animator->setCurrentAnimation( "Armature|OtherOne" );
-        animator->setPause( true );
-        animator->setFrame( 25.0 );
+        animator->setCurrentAnimation( "Armature|ArmatureAction" );
       } );
     }
 
