@@ -24,7 +24,7 @@ namespace BlueBear {
 
         public:
           BoneUniform( const std::vector< std::string >& boneIDs );
-          void configure( std::shared_ptr< Animation::Animator > animator );
+          void configure( std::shared_ptr< Animation::Animator > animator, std::shared_ptr< Model > parent );
           void send() override;
         };
 

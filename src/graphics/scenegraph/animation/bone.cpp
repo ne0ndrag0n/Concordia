@@ -102,6 +102,10 @@ namespace BlueBear {
           return nullptr;
         }
 
+        glm::mat4 Bone::getLocalMatrix() const {
+          return matrix;
+        }
+
         glm::mat4 Bone::getMatrixById( const std::string& id ) const {
           const Bone* result = getChildById( id );
           if( result ) {

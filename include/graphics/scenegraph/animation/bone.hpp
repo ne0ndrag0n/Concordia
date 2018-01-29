@@ -40,6 +40,7 @@ namespace BlueBear {
           void addChild( const Bone& bone );
           const Bone* getChildById( const std::string& id ) const;
           glm::mat4 getMatrixById( const std::string& id ) const;
+          glm::mat4 getLocalMatrix() const;
           void printToLog();
         };
 

@@ -16,16 +16,16 @@ namespace BlueBear {
         BoneUniform::BoneUniform( const std::vector< std::string >& boneIDs ) :
           boneIDs( boneIDs ) {}
 
-        void BoneUniform::configure( std::shared_ptr< Animation::Animator > animator ) {
+        void BoneUniform::configure( std::shared_ptr< Animation::Animator > animator, std::shared_ptr< Model > parent ) {
           boneUniform.clear();
 
           // Matrix 0 is always identity
           boneUniform.push_back( glm::mat4() );
 
-          if( animator ) {
+          if( animator && parent ) {
             for( const std::string& bone : boneIDs ) {
               boneUniform.push_back(
-                animator->getCurrentSkeletonRef().getMatrixById( bone ) * glm::inverse( animator->getBindSkeletonRef().getMatrixById( bone ) )
+                glm::inverse( parent->getComputedTransform().getMatrix() ) * animator->getCurrentSkeletonRef().getMatrixById( bone ) * glm::inverse( animator->getBindSkeletonRef().getMatrixById( bone ) ) * parent->getComputedTransform().getMatrix()
               );
             }
           } else {
