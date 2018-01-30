@@ -293,6 +293,7 @@ namespace BlueBear {
 
       lua_settable( L, -3 ); // bluebear
 
+      /*
       lua_getfield( L, -1, "event" ); // event bluebear
 
       lua_pushstring( L, "register_key" );
@@ -306,6 +307,7 @@ namespace BlueBear {
       lua_settable( L, -3 );
 
       lua_pop( L, 1 ); // bluebear
+      */
 
       lua_pushstring( L, "world" ); // "world" bluebear
       lua_newtable( L ); // {} "world" bluebear

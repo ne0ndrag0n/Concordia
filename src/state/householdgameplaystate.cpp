@@ -6,6 +6,7 @@
 #include "scripting/engine.hpp"
 #include "scripting/luastate.hpp"
 #include "configmanager.hpp"
+#include "eventmanager.hpp"
 #include "device/display/adapter/worldadapter.hpp"
 #include "device/input/input.hpp"
 #include "graphics/scenegraph/animation/animator.hpp"
@@ -25,6 +26,7 @@ namespace BlueBear {
       setupEngine();
       setupDisplayDevice();
       setupInputDevice();
+      eventManager.LUA_STATE_READY.trigger( engine->lua );
     }
 
     HouseholdGameplayState::~HouseholdGameplayState() {}
@@ -98,6 +100,8 @@ namespace BlueBear {
     }
 
     void HouseholdGameplayState::update() {
+      engine->update();
+
       auto& display = application.getDisplayDevice();
       display.update();
 

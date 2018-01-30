@@ -21,10 +21,19 @@ namespace BlueBear {
         eventManager.SFGUI_EAT_EVENT.listen( SFGUIEatEvent::Event::EAT_MOUSE_EVENT, [ & ]() {
           eatMouseEvents = true;
         } );
+
+        eventManager.LUA_STATE_READY.listen( this, std::bind( &Input::submitLuaContributions, this, std::placeholders::_1 ) );
+      }
+
+      void Input::submitLuaContributions( sol::state& lua ) {
+        sol::table event = lua[ "bluebear" ][ "event" ];
+        event.set_function( "register_key", &Input::registerScriptKey, this );
+        event.set_function( "unregister_key", &Input::unregisterScriptKey, this );
       }
 
       Input::~Input() {
         eventManager.SFGUI_EAT_EVENT.stopListening( SFGUIEatEvent::Event::EAT_KEYBOARD_EVENT );
+        eventManager.LUA_STATE_READY.stopListening( this );
       }
 
       /**
@@ -73,7 +82,8 @@ namespace BlueBear {
         }
       }
 
-      void Input::fireOff( std::vector< LuaReference >& refs ) {
+      void Input::fireOff( std::vector< sol::protected_function >& refs ) {
+        /*
         for( LuaReference reference : refs ) {
 
           if( reference != -1 ) {
@@ -96,6 +106,7 @@ namespace BlueBear {
           }
 
         }
+        */
       }
 
       /**
@@ -478,67 +489,47 @@ namespace BlueBear {
         }
       }
 
-      unsigned int Input::insertNearest( std::vector< LuaReference >& vector, LuaReference value ) {
-        for( unsigned int i = 0; i != vector.size(); i++ ) {
-          if( vector[ i ] == -1 ) {
-            vector[ i ] = value;
+      unsigned int Input::insertNearest( sf::Keyboard::Key key, sol::protected_function& function ) {
+        auto& collection = luaKeyEvents[ key ];
+
+        for( int i = 0; i != collection.size(); i++ ) {
+          if( !collection[ i ].valid() ) {
+            collection[ i ] = function;
             return i;
           }
         }
 
-        // push_back and return size - 1
-        vector.push_back( value );
-        return vector.size() - 1;
+        collection.push_back( function );
+        return collection.size() - 1;
       }
 
-      int Input::lua_registerScriptKey( lua_State* L ) {
-        #warning "Implement userdata for register_key method"
-        /*
-        VERIFY_FUNCTION_N( "Input::lua_registerScriptKey", "register_key", 1 );
-        VERIFY_STRING_N( "Input::lua_registerScriptKey", "register_key", 2 );
+      sol::variadic_results Input::registerScriptKey( sol::this_state L, const std::string& key, sol::protected_function callback ) {
+        sol::variadic_results result;
 
-        State::State* state = ( State::State* )lua_touserdata( L, lua_upvalueindex( 1 ) );
-        Input& self = state->getApplication()->getInputDevice();
-
-        sf::Keyboard::Key sfKey = stringToKey( lua_tostring( L, -2 ) );
-        auto it = self.keyEvents.find( sfKey );
-        if( it == self.keyEvents.end() ) {
-          std::vector< LuaReference >& vector = self.luaKeyEvents[ sfKey ];
-          lua_pushnumber( L, self.insertNearest( vector, luaL_ref( L, LUA_REGISTRYINDEX ) ) ); // 42 "str"
-
-          return 1;
+        if( callback.valid() ) {
+          sf::Keyboard::Key sfKey = stringToKey( key );
+          auto it = keyEvents.find( sfKey );
+          if( it == keyEvents.end() ) {
+            result.push_back( { L, sol::in_place, insertNearest( sfKey, callback ) } );
+          } else {
+            Log::getInstance().warn( "Input::lua_registerScriptKey", "This key is reserved by the engine and cannot be registered for an event." );
+          }
         } else {
-          Log::getInstance().warn( "Input::lua_registerScriptKey", "This key is reserved by the engine and cannot be registered for an event." );
+          Log::getInstance().error( "Input::registerScriptKey", "Invalid function provided to bluebear.event.register_key" );
         }
 
-        return 0;
-        */
+        return result;
       }
 
-      int Input::lua_unregisterScriptKey( lua_State* L ) {
-        #warning "Implement userdata for unregister_key method"
-        /*
-        VERIFY_NUMBER_N( "Input::lua_unregisterScriptKey", "unregister_key", 1 );
-        VERIFY_STRING_N( "Input::lua_unregisterScriptKey", "unregister_key", 2 );
-
-        State::State* state = ( State::State* )lua_touserdata( L, lua_upvalueindex( 1 ) );
-        Input& self = state->getApplication()->getInputDevice();
-
-        sf::Keyboard::Key sfKey = stringToKey( lua_tostring( L, -2 ) );
-        if( self.luaKeyEvents.find( sfKey ) != self.luaKeyEvents.end() ) {
-          std::vector< LuaReference >& vector = self.luaKeyEvents[ sfKey ];
-          int index = lua_tonumber( L, -1 );
-          if( index < vector.size() ) {
-            vector[ index ] = -1;
-          } else {
-            Log::getInstance().warn( "Input::lua_unregisterScriptKey", "Invalid ID to deregister event." );
+      void Input::unregisterScriptKey( const std::string& key, int id ) {
+        sf::Keyboard::Key sfKey = stringToKey( key );
+        if( luaKeyEvents.find( sfKey ) != luaKeyEvents.end() ) {
+          std::vector< sol::protected_function >& vector = luaKeyEvents[ sfKey ];
+          if( id < vector.size() ) {
+            vector[ id ] = sol::protected_function{};
           }
         }
-
-        return 0;
-        */
       }
-
 
     }
   }

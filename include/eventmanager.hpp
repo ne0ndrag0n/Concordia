@@ -6,6 +6,7 @@
 #include <functional>
 #include <memory>
 #include <SFGUI/Widget.hpp>
+#include <sol.hpp>
 
 namespace BlueBear {
 
@@ -91,6 +92,7 @@ namespace BlueBear {
     BasicEvent< void*, void*, int > ITEM_REMOVED;
     BasicEvent< void*, std::string > MESSAGE_LOGGED;
     BasicEvent< void* > SHADER_CHANGE;
+    BasicEvent< void*, sol::state& > LUA_STATE_READY;
   };
 
   extern EventManager eventManager;

@@ -29,8 +29,8 @@ namespace BlueBear {
 
 		Engine::Engine( State::State& state ) :
 		 State::Substate( state ),
+		 L( lua.lua_state() ),
 		 lastExecuted( std::chrono::steady_clock::now() ),
-		 L( luaL_newstate() ),
 		 ticksPerSecond( 1000 / ConfigManager::getInstance().getIntValue( "fps_overview" ) ),
 		 currentModpackDirectory( nullptr ),
 		 cancel( false ) {
@@ -42,9 +42,7 @@ namespace BlueBear {
 			eventBridge = std::make_unique< LuaKit::EventBridge >( L, *this );
 		}
 
-		Engine::~Engine() {
-			lua_close( L );
-		}
+		Engine::~Engine() {}
 
 		/**
 		 * Hook into eventmanager for everything we need

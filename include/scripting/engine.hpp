@@ -15,6 +15,7 @@
 #include <list>
 #include <queue>
 #include <jsoncpp/json/json.h>
+#include <sol.hpp>
 
 namespace BlueBear {
 
@@ -31,6 +32,7 @@ namespace BlueBear {
 
 		class Engine : public State::Substate {
 			public:
+				sol::state lua;
 				lua_State* L;
 
 			private:
