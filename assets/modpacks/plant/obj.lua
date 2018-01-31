@@ -102,7 +102,7 @@ function Flowers:main()
 	end
 
 	-- This is probably something we really don't need anymore...
-	--print( Flowers.name, "Hello from Lua! I am object instance ("..bluebear.util.get_pointer( self )..") and my water level is now "..self.water_level )
+	print( Flowers.name, "Hello from Lua! I am object instance ("..bluebear.util.get_pointer( self )..") and my water level is now "..self.water_level )
 
 	self:sleep( bluebear.util.time.minutes_to_ticks( 5 ) ):then_call( bluebear.util.bind( 'game.flowers.base:main', self ) )
 end

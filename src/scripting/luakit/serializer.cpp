@@ -32,10 +32,12 @@ namespace BlueBear {
       const std::string Serializer::ENVREF_MODE_BBGLOBAL = "bluebear";
       const std::string Serializer::ENVREF_MODE_G = "_G";
 
-      Serializer::Serializer( lua_State* L ) : L( L ) {}
+      Serializer::Serializer( sol::state& lua ) : lua( lua ), L( lua.lua_state() ) {}
 
       /**
        * Using the Engine-tracked index of system.entity.base objects as a starting point, save the current state of the Lua world.
+       *
+       * FIXME: SAVEWORLD IS BROKEN! CHECK WAITINGTABLE SAVE FIRST
        */
       Json::Value Serializer::saveWorld( std::vector< LuaReference >& objects, Engine& engine ) {
         world = Json::Value( Json::objectValue );
@@ -115,18 +117,13 @@ namespace BlueBear {
           }
         }
 
-        // Load waiting functions into waitingTableExclusions, returning a list of items that should NOT be unref'd
-        // TODO: This is shit. Would it kill us to repurpose globalInstanceEntities into a general list where references are not released?
-        std::unordered_set< LuaReference > waitingTableExclusions;
-
-        engine.waitingTable.loadFromJSON( engineDefinition[ "waitingTable" ], globalEntities, waitingTableExclusions );
-        unpackEntityManager( engineDefinition[ "entityManager" ], engine.objects, waitingTableExclusions );
+        engine.waitingTable.loadFromJSON( engineDefinition[ "waitingTable" ], globalEntities, lua );
+        unpackEntityManager( engineDefinition[ "entityManager" ], engine.objects );
 
         // Release references to items we no longer require. This allows the engine to start discarding items it no longer requires.
+        // Everything used here was copied, so we can safely dispose of the original references
         for( auto& entityPair : globalEntities ) {
-          if( waitingTableExclusions.find( entityPair.second ) == waitingTableExclusions.end() ) {
-            luaL_unref( L, LUA_REGISTRYINDEX, entityPair.second );
-          }
+          luaL_unref( L, LUA_REGISTRYINDEX, entityPair.second );
         }
 
         // After we're done, restart the garbage collector and give it a good cycle
@@ -135,13 +132,12 @@ namespace BlueBear {
         lua_gc( L, LUA_GCCOLLECT, 0 );
       }
 
-      void Serializer::unpackEntityManager( const Json::Value& entityManager, std::vector< LuaReference >& refs, std::unordered_set< LuaReference >& waitingTableExclusions ) {
+      void Serializer::unpackEntityManager( const Json::Value& entityManager, std::vector< LuaReference >& refs ) {
         for( const Json::Value& arrayVal : entityManager ) {
           std::string pointer = arrayVal.asString();
 
-          LuaReference entity = globalEntities.at( pointer );
-          refs.push_back( entity );
-          waitingTableExclusions.insert( entity );
+          lua_rawgeti( L, LUA_REGISTRYINDEX, globalEntities.at( pointer ) ); // entity
+          refs.push_back( luaL_ref( L, LUA_REGISTRYINDEX ) ); // EMPTY
         }
       }
 

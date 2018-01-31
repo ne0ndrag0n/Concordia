@@ -5,13 +5,13 @@
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
+#include <sol.hpp>
 #include <jsoncpp/json/json.h>
 #include <vector>
 #include <string>
 #include <functional>
 #include <map>
 #include <regex>
-#include <unordered_set>
 
 namespace BlueBear {
   namespace Scripting {
@@ -36,6 +36,8 @@ namespace BlueBear {
         // They should accept table/function as the first argument on the stack
         using Callback = std::function< Json::Value() >;
 
+        sol::state& lua;
+        // L is for Legacy
         lua_State* L;
         Json::Value world;
         // Pointer-to-substitution map usable by both upvalues and tables
@@ -74,14 +76,10 @@ namespace BlueBear {
         bool globalItemExists( const std::string& addressKey );
         void unpackUpvalues( Json::Value& upvalues );
         void setUpvalueByIndex( int upvalueIndex );
-        void unpackEntityManager(
-          const Json::Value& entityManager,
-          std::vector< LuaReference >& refs,
-          std::unordered_set< LuaReference >& waitingTableExclusions
-        );
+        void unpackEntityManager( const Json::Value& entityManager, std::vector< LuaReference >& refs );
 
       public:
-        Serializer( lua_State* L );
+        Serializer( sol::state& lua );
 
         /**
          * Save the world to JSON value

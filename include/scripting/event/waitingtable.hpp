@@ -6,11 +6,11 @@
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
+#include <sol.hpp>
 #include <map>
 #include <list>
 #include <queue>
 #include <string>
-#include <unordered_set>
 
 namespace BlueBear {
   namespace Scripting {
@@ -26,21 +26,21 @@ namespace BlueBear {
        */
       class WaitingTable {
 
-        std::map< Tick, std::list< LuaReference > > timerMap;
+        std::map< Tick, std::list< sol::function > > timerMap;
 
-        std::list< LuaReference >& getBucket( Tick key );
+        std::list< sol::function >& getBucket( Tick key );
 
       public:
-        std::queue< LuaReference > queuedCallbacks;
+        std::queue< sol::function > queuedCallbacks;
 
         void loadFromJSON(
           Json::Value& loadingTable,
           std::map< std::string, LuaReference >& entities,
-          std::unordered_set< LuaReference >& visitedItems
+          sol::state& lua
         );
         Json::Value saveToJSON( lua_State* L );
 
-        std::string waitForTick( Tick deadline, LuaReference function );
+        std::string waitForTick( Tick deadline, sol::function function );
         void cancelTick( const std::string& handle );
         void triggerTick( Tick tick );
 

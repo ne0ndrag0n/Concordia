@@ -52,7 +52,10 @@ namespace BlueBear {
 		}
 
 		void Engine::enqueue( LuaReference edibleReference ) {
-			waitingTable.waitForTick( currentTick + 1, edibleReference );
+			// FIXME: Glue code before a refactor of anything using UI_ACTION_EVENT or Engine::enqueue
+			// The above function will be copied and then "eaten"
+			waitingTable.waitForTick( currentTick + 1, sol::function( lua.lua_state(), sol::ref_index{ edibleReference } ) );
+			luaL_unref( lua.lua_state(), LUA_REGISTRYINDEX, edibleReference );
 		}
 
 		/**
@@ -309,7 +312,7 @@ namespace BlueBear {
 					objects.clear();
 
 					// Deserialize the world
-					LuaKit::Serializer serializer( L );
+					LuaKit::Serializer serializer( lua );
 					serializer.loadWorld( engineJSON, *this );
 				} else {
 					Log::getInstance().error( "Engine::loadLot", "Unable to parse " + std::string( lotPath ) );
@@ -355,36 +358,13 @@ namespace BlueBear {
 
 			// If there are any callbacks, update bluebear.engine.current_tick
 			if( !waitingTable.queuedCallbacks.empty() ) {
-				lua_getglobal( L, "bluebear" ); // bluebear
-				lua_pushstring( L, "engine" ); // "engine" bluebear
-				lua_gettable( L, -2 ); // bluebear.engine bluebear
-
-				lua_pushstring( L, "current_tick" ); // "current_tick" bluebear.engine bluebear
-				lua_pushnumber( L, currentTick ); // currentTick "current_tick" bluebear.engine bluebear
-				lua_settable( L, -3 ); // bluebear.engine bluebear
-
-				lua_pop( L, 2 ); // EMPTY
+				lua[ "bluebear" ][ "engine" ][ "current_tick" ] = currentTick;
 
 				// Burn out every function scheduled for this tick
 				while( !waitingTable.queuedCallbacks.empty() ) {
-					LuaReference function = waitingTable.queuedCallbacks.front();
+					sol::protected_function queuedFunction( waitingTable.queuedCallbacks.front(), lua[ "bluebear" ][ "util" ][ "traceback" ] );
 
-					lua_getglobal( L, "bluebear" ); // bluebear
-					Tools::Utility::getTableValue( L, "util" ); // bluebear.util bluebear
-					Tools::Utility::getTableValue( L, "traceback" ); // <err_handler> bluebear.util bluebear
-
-					lua_rawgeti( L, LUA_REGISTRYINDEX, function ); // <function> <err_handler> bluebear.util bluebear
-
-					if( int stat = lua_pcall( L, 0, 0, -2 ) ) { // error <err_handler> bluebear.util bluebear
-						Log::getInstance().error( "Engine::objectLoop", "Exception thrown on tick " + std::to_string( currentTick ) + ": " + ( stat == -1 ? "<C++ exception>" : lua_tostring( L, -1 ) ) );
-						lua_pop( L, 1 ); // <err_handler> bluebear.util bluebear
-					}
-
-					lua_pop( L, 3 ); // EMPTY
-
-					// Only YOU can prevent memory leaks!
-					// The "function" reference should have not been used anywhere else in the pipeline (enqueued to now)
-					luaL_unref( L, LUA_REGISTRYINDEX, function );
+					queuedFunction();
 
 					waitingTable.queuedCallbacks.pop();
 				}
@@ -465,7 +445,8 @@ namespace BlueBear {
 				 // This reference should be a reference owned by the queue-waiting table pair, and should never be used anywhere else.
 				 // When the engine consumes the function, the reference should be luaL_unref'd and freed.
 				 // If you don't do this, you'll get horriffic memory leaks that slowly worsen as a lot is played.
-				 LuaReference function = luaL_ref( L, LUA_REGISTRYINDEX ); // EMPTY
+				 sol::function function( L, -1 );
+				 lua_pop( L, 1 ); // EMPTY
 
 				 if( interval == 0 ) {
 					 // This function was scheduled to run in the same tick, but when the current stack has completed.
