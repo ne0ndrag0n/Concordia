@@ -2397,7 +2397,7 @@ namespace BlueBear {
         int edibleReference = luaL_ref( L, LUA_REGISTRYINDEX ); // bluebear.util bluebear
         lua_pop( L, 2 ); // EMPTY
 
-        eventManager.UI_ACTION_EVENT.trigger( edibleReference );
+        eventManager.UI_ACTION_EVENT_LEGACY.trigger( edibleReference );
       }
 
       /**
@@ -2439,7 +2439,7 @@ namespace BlueBear {
         int edibleReference = luaL_ref( L, LUA_REGISTRYINDEX ); // bluebear.util bluebear
         lua_pop( L, 2 ); // EMPTY
 
-        eventManager.UI_ACTION_EVENT.trigger( edibleReference );
+        eventManager.UI_ACTION_EVENT_LEGACY.trigger( edibleReference );
       }
 
       /**
@@ -2476,7 +2476,7 @@ namespace BlueBear {
         int edibleReference = luaL_ref( L, LUA_REGISTRYINDEX ); // bluebear.util bluebear
         lua_pop( L, 2 ); // EMPTY
 
-        eventManager.UI_ACTION_EVENT.trigger( edibleReference );
+        eventManager.UI_ACTION_EVENT_LEGACY.trigger( edibleReference );
       }
 
       /**

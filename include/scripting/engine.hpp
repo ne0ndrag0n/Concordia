@@ -70,6 +70,7 @@ namespace BlueBear {
 				~Engine();
 				void setupEvents();
 				void enqueue( LuaReference edibleReference );
+				void enqueue( sol::function& incoming );
 				bool update() override;
 				void objectLoop();
 				bool loadLot( const char* lotPath );

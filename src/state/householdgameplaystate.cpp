@@ -29,7 +29,9 @@ namespace BlueBear {
       eventManager.LUA_STATE_READY.trigger( engine->lua );
     }
 
-    HouseholdGameplayState::~HouseholdGameplayState() {}
+    HouseholdGameplayState::~HouseholdGameplayState() {
+      application.getInputDevice() = Device::Input::Input();
+    }
 
     void HouseholdGameplayState::setupEngine() {
       infrastructureFactory = std::make_unique< Scripting::InfrastructureFactory >();

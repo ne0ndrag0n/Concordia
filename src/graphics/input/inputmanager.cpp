@@ -92,7 +92,7 @@ namespace BlueBear {
             lua_pop( L, 2 ); // EMPTY
 
             // Enqueue the edible reference
-            eventManager.UI_ACTION_EVENT.trigger( edibleReference );
+            eventManager.UI_ACTION_EVENT_LEGACY.trigger( edibleReference );
           }
 
         }

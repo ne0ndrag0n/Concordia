@@ -23,6 +23,7 @@
 #include <list>
 #include <stdexcept>
 #include <functional>
+#include <tuple>
 
 namespace BlueBear {
 	namespace Scripting {
@@ -48,14 +49,19 @@ namespace BlueBear {
 		 * Hook into eventmanager for everything we need
 		 */
 		void Engine::setupEvents() {
-			eventManager.UI_ACTION_EVENT.listen( this, std::bind( &Engine::enqueue, this, std::placeholders::_1 ) );
+			eventManager.UI_ACTION_EVENT_LEGACY.listen( this, std::bind( ( void( Engine::* )( LuaReference ) ) &Engine::enqueue, this, std::placeholders::_1 ) );
+			eventManager.UI_ACTION_EVENT.listen( this, std::bind( ( void( Engine::* )( sol::function& ) ) &Engine::enqueue, this, std::placeholders::_1 ) );
 		}
 
 		void Engine::enqueue( LuaReference edibleReference ) {
-			// FIXME: Glue code before a refactor of anything using UI_ACTION_EVENT or Engine::enqueue
+			// FIXME: Glue code before a refactor of anything using UI_ACTION_EVENT_LEGACY or Engine::enqueue
 			// The above function will be copied and then "eaten"
 			waitingTable.waitForTick( currentTick + 1, sol::function( lua.lua_state(), sol::ref_index{ edibleReference } ) );
 			luaL_unref( lua.lua_state(), LUA_REGISTRYINDEX, edibleReference );
+		}
+
+		void Engine::enqueue( sol::function& incoming ) {
+			waitingTable.waitForTick( currentTick + 1, incoming );
 		}
 
 		/**
@@ -357,14 +363,18 @@ namespace BlueBear {
 			waitingTable.triggerTick( currentTick );
 
 			// If there are any callbacks, update bluebear.engine.current_tick
-			if( !waitingTable.queuedCallbacks.empty() ) {
+		if( !waitingTable.queuedCallbacks.empty() ) {
 				lua[ "bluebear" ][ "engine" ][ "current_tick" ] = currentTick;
 
 				// Burn out every function scheduled for this tick
 				while( !waitingTable.queuedCallbacks.empty() ) {
-					sol::protected_function queuedFunction( waitingTable.queuedCallbacks.front(), lua[ "bluebear" ][ "util" ][ "traceback" ] );
+					sol::protected_function call( waitingTable.queuedCallbacks.front(), lua[ "bluebear" ][ "util" ][ "traceback" ] );
 
-					queuedFunction();
+					auto result = call();
+					if( !result.valid() ) {
+						sol::error error = result;
+						Log::getInstance().error( "Engine::objectLoop", "Exception thrown on tick " + std::to_string( currentTick ) + ": " + error.what() );
+					}
 
 					waitingTable.queuedCallbacks.pop();
 				}

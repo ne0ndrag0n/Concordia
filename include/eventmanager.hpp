@@ -86,7 +86,8 @@ namespace BlueBear {
   };
 
   struct EventManager {
-    BasicEvent< void*, LuaReference > UI_ACTION_EVENT;
+    BasicEvent< void*, LuaReference > UI_ACTION_EVENT_LEGACY;
+    BasicEvent< void*, sol::function& > UI_ACTION_EVENT;
     SFGUIEatEvent SFGUI_EAT_EVENT;
     BasicEvent< void*, void*, int > ITEM_ADDED;
     BasicEvent< void*, void*, int > ITEM_REMOVED;
@@ -97,8 +98,8 @@ namespace BlueBear {
 
   extern EventManager eventManager;
 
-  // eventManager.UI_ACTION_EVENT.listen( this, [ & ]( LuaReference luaref ) { engine queues up passed-in lua reference } )
-  // eventManager.UI_ACTION_EVENT.trigger( 3 )
+  // eventManager.UI_ACTION_EVENT_LEGACY.listen( this, [ & ]( LuaReference luaref ) { engine queues up passed-in lua reference } )
+  // eventManager.UI_ACTION_EVENT_LEGACY.trigger( 3 )
 }
 
 

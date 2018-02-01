@@ -19,14 +19,14 @@ namespace BlueBear {
 
       class Input {
         std::map< sf::Keyboard::Key, std::function< void() > > keyEvents;
-        std::map< sf::Keyboard::Key, std::vector< sol::protected_function > > luaKeyEvents;
+        std::map< sf::Keyboard::Key, std::vector< sol::function > > luaKeyEvents;
         bool eatKeyEvents = false;
         bool eatMouseEvents = false;
 
         void submitLuaContributions( sol::state& lua );
         void removeSFGUIFocus();
-        void fireOff( std::vector< sol::protected_function >& refs );
-        unsigned int insertNearest( sf::Keyboard::Key key, sol::protected_function& function );
+        void fireOff( std::vector< sol::function >& refs );
+        unsigned int insertNearest( sf::Keyboard::Key key, sol::function& function );
 
         static sf::Keyboard::Key stringToKey( const std::string& key );
         static std::string keyToString( sf::Keyboard::Key key );
@@ -37,7 +37,7 @@ namespace BlueBear {
         void listen( sf::Keyboard::Key key, std::function< void() > callback );
         void handleEvent( sf::Event& event );
 
-        sol::variadic_results registerScriptKey( sol::this_state L, const std::string& key, sol::protected_function callback );
+        sol::variadic_results registerScriptKey( sol::this_state L, const std::string& key, sol::function callback );
         void unregisterScriptKey( const std::string& key, int id );
 
       };

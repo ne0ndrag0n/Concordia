@@ -82,31 +82,12 @@ namespace BlueBear {
         }
       }
 
-      void Input::fireOff( std::vector< sol::protected_function >& refs ) {
-        /*
-        for( LuaReference reference : refs ) {
-
-          if( reference != -1 ) {
-            lua_getglobal( L, "bluebear" ); // bluebear
-            Tools::Utility::getTableValue( L, "util" ); // bluebear.util bluebear
-            Tools::Utility::getTableValue( L, "bind" ); // <bind> bluebear.util bluebear
-            lua_rawgeti( L, LUA_REGISTRYINDEX, reference ); // <function> <bind> bluebear.util bluebear
-
-            if( lua_pcall( L, 1, 1, 0 ) ) { // error bluebear.util bluebear
-              Log::getInstance().error( "Input::fireOff", "Couldn't create required closure to fire event: " + std::string( lua_tostring( L, -1 ) ) );
-              lua_pop( L, 3 ); // EMPTY
-              return;
-            } // <temp_function> bluebear.util bluebear
-
-            int edibleReference = luaL_ref( L, LUA_REGISTRYINDEX ); // bluebear.util bluebear
-            lua_pop( L, 2 ); // EMPTY
-
-            // Enqueue the edible reference
-            eventManager.UI_ACTION_EVENT.trigger( edibleReference );
+      void Input::fireOff( std::vector< sol::function >& refs ) {
+        for( sol::function copy : refs ) {
+          if( copy.valid() ) {
+            eventManager.UI_ACTION_EVENT.trigger( copy );
           }
-
         }
-        */
       }
 
       /**
@@ -489,7 +470,7 @@ namespace BlueBear {
         }
       }
 
-      unsigned int Input::insertNearest( sf::Keyboard::Key key, sol::protected_function& function ) {
+      unsigned int Input::insertNearest( sf::Keyboard::Key key, sol::function& function ) {
         auto& collection = luaKeyEvents[ key ];
 
         for( int i = 0; i != collection.size(); i++ ) {
@@ -503,7 +484,7 @@ namespace BlueBear {
         return collection.size() - 1;
       }
 
-      sol::variadic_results Input::registerScriptKey( sol::this_state L, const std::string& key, sol::protected_function callback ) {
+      sol::variadic_results Input::registerScriptKey( sol::this_state L, const std::string& key, sol::function callback ) {
         sol::variadic_results result;
 
         if( callback.valid() ) {
@@ -524,9 +505,9 @@ namespace BlueBear {
       void Input::unregisterScriptKey( const std::string& key, int id ) {
         sf::Keyboard::Key sfKey = stringToKey( key );
         if( luaKeyEvents.find( sfKey ) != luaKeyEvents.end() ) {
-          std::vector< sol::protected_function >& vector = luaKeyEvents[ sfKey ];
+          std::vector< sol::function >& vector = luaKeyEvents[ sfKey ];
           if( id < vector.size() ) {
-            vector[ id ] = sol::protected_function{};
+            vector[ id ] = sol::function{};
           }
         }
       }

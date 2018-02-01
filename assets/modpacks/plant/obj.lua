@@ -104,7 +104,8 @@ function Flowers:main()
 	-- This is probably something we really don't need anymore...
 	print( Flowers.name, "Hello from Lua! I am object instance ("..bluebear.util.get_pointer( self )..") and my water level is now "..self.water_level )
 
-	self:sleep( bluebear.util.time.minutes_to_ticks( 5 ) ):then_call( bluebear.util.bind( 'game.flowers.base:main', self ) )
+	-- promises as implemented don't return errors properly and are just generally fucked up
+	bluebear.engine.set_timeout( bluebear.util.bind( 'game.flowers.base:main', self ), bluebear.util.time.minutes_to_ticks( 5 ) )
 end
 
 function Flowers:replenish_water()
