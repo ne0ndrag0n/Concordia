@@ -1,0 +1,11 @@
+#segment {
+  padding: 10px;
+  background: #ffffffff;
+  foreground: #000000ff;
+  flow: down;
+
+  .class {
+    /* Inherits padding and foreground */
+    background: #ccccccff;
+  }
+}

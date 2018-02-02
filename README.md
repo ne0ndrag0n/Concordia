@@ -22,11 +22,10 @@ Concordia
 * Lua 5.3 scripting system: everything the game uses outside of its base structure as a dollhouse game is designed as an extensible script (e.g. all objects and types of objects are defined as Lua classes)
 * Isometric 2.5D presentation with a retro-inspired pixel art look-and-feel
 * SFML-powered multimedia framework featuring the SFGUI widget toolkit
-* Multi-threaded architecture, using modern C++14 to make the most of your multi-core CPU
+* Multi-threaded architecture, using modern C++17 to make the most of your multi-core CPU
 
 ## Dependencies
 * SFML 2.3.x
-* SFGUI 0.3.1 (use custom repo in ne0ndrag0n/SFGUI with some Concordia-specific changes)
 * TinyXML2
 * Lua 5.3.x
 * JsonCpp 1.7.x
@@ -35,3 +34,4 @@ Concordia
 * Assimp
 * cparser f465747
 * Intel Threading Building Blocks (TBB) 4.4
+* Sol Lua bindings

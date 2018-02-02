@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<seg id="segment">
+  Outer Segment
+  <seg class="class">
+    Inner Segment
+  </seg>
+  <seg class="class">
+    Inner Segment 2
+  </seg>
+</seg>
