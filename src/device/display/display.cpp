@@ -54,29 +54,29 @@ namespace BlueBear {
         return dimensions;
       }
 
-      Adapter::Adapter& Display::setAdapter( std::unique_ptr< Adapter::Adapter > adapter ) {
-        this->adapter = std::move( adapter );
-
-        return *this->adapter;
+      Adapter::Adapter& Display::pushAdapter( std::unique_ptr< Adapter::Adapter > adapter ) {
+        return *adapters.emplace_back( std::move( adapter ) );
       }
 
-      Adapter::Adapter& Display::getAdapter() {
-        return *adapter;
+      Adapter::Adapter& Display::getAdapterAt( unsigned int index ) {
+        return *adapters.at( index );
       }
 
       void Display::reset() {
-        this->adapter = nullptr;
+        adapters.clear();
       }
 
       void Display::update() {
-        if( adapter ) {
-          glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
-          glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+        glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-          adapter->nextFrame();
-
-          window.display();
+        for( std::unique_ptr< Adapter::Adapter >& adapter : adapters ) {
+          if( adapter ) {
+            adapter->nextFrame();
+          }
         }
+
+        window.display();
       }
 
     }

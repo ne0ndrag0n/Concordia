@@ -3,6 +3,8 @@
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <glm/glm.hpp>
+#include <vector>
+#include <memory>
 
 namespace BlueBear {
   namespace Device {
@@ -15,7 +17,7 @@ namespace BlueBear {
       class Display {
         sf::RenderWindow window;
         const glm::uvec2 dimensions;
-        std::unique_ptr< Adapter::Adapter > adapter;
+        std::vector< std::unique_ptr< Adapter::Adapter > > adapters;
 
       public:
         Display();
@@ -23,8 +25,8 @@ namespace BlueBear {
 
         sf::RenderWindow& getRenderWindow();
         const glm::uvec2& getDimensions() const;
-        Adapter::Adapter& setAdapter( std::unique_ptr< Adapter::Adapter > adapter );
-        Adapter::Adapter& getAdapter();
+        Adapter::Adapter& pushAdapter( std::unique_ptr< Adapter::Adapter > adapter );
+        Adapter::Adapter& getAdapterAt( unsigned int index );
         void reset();
         void update();
       };

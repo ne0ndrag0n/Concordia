@@ -1,9 +1,7 @@
 #ifndef ADAPTER_COMPONENT_GUI
 #define ADAPTER_COMPONENT_GUI
 
-#include <SFGUI/SFGUI.hpp>
-#include <SFGUI/Desktop.hpp>
-#include <SFML/System/Clock.hpp>
+#include "device/display/adapter/adapter.hpp"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 #include <queue>
@@ -11,21 +9,17 @@
 namespace BlueBear {
   namespace Device {
     namespace Display {
+      class Display;
+
       namespace Adapter {
         namespace Component {
 
-          class GuiComponent {
-            sf::RenderWindow& renderWindow;
-            sfg::Desktop desktop;
-            sfg::SFGUI sfgui;
-            sf::Clock clock;
-
-            void enumerateSignals();
+          class GuiComponent : public Adapter {
 
           public:
             std::queue< sf::Event > getEvents();
-            GuiComponent( sf::RenderWindow& renderWindow );
-            void update();
+            GuiComponent( Device::Display::Display& display );
+            void nextFrame() override;
           };
 
         }

@@ -16,6 +16,9 @@ namespace BlueBear {
   namespace State {
 
     class HouseholdGameplayState : public State {
+      static const unsigned int RENDER3D_ADAPTER = 0;
+      static const unsigned int GUI_ADAPTER = 1;
+
       std::unique_ptr< Scripting::Engine > engine;
       std::unique_ptr< Scripting::InfrastructureFactory > infrastructureFactory;
 

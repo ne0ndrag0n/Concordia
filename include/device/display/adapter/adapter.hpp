@@ -9,6 +9,7 @@ namespace BlueBear {
       namespace Adapter {
 
         class Adapter {
+        protected:
           Display& display;
 
         public:

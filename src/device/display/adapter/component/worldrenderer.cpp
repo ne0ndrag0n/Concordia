@@ -16,7 +16,9 @@ namespace BlueBear {
       namespace Adapter {
         namespace Component {
 
-          WorldRenderer::WorldRenderer() : camera( Graphics::Camera( ConfigManager::getInstance().getIntValue( "viewport_x" ), ConfigManager::getInstance().getIntValue( "viewport_y" ) ) ) {}
+          WorldRenderer::WorldRenderer( Device::Display::Display& display ) :
+            Adapter::Adapter( display ),
+            camera( Graphics::Camera( ConfigManager::getInstance().getIntValue( "viewport_x" ), ConfigManager::getInstance().getIntValue( "viewport_y" ) ) ) {}
 
           std::shared_ptr< Graphics::SceneGraph::Model > WorldRenderer::placeObject( const std::string& objectId, const std::string& newId ) {
             auto it = originals.find( objectId );
@@ -105,7 +107,7 @@ namespace BlueBear {
           /**
            * TODO: Optimized renderer that sorts by shader to minimize shader changes
            */
-          void WorldRenderer::render() {
+          void WorldRenderer::nextFrame() {
             // Position camera
             camera.position();
 

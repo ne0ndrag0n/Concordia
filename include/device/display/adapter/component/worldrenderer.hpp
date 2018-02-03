@@ -1,6 +1,7 @@
 #ifndef WORLD_RENDERER
 #define WORLD_RENDERER
 
+#include "device/display/adapter/adapter.hpp"
 #include "containers/vec3map.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/scenegraph/resourcebank.hpp"
@@ -27,10 +28,12 @@ namespace BlueBear {
 
   namespace Device {
     namespace Display {
+      class Display;
+
       namespace Adapter {
         namespace Component {
 
-          class WorldRenderer {
+          class WorldRenderer : public Adapter {
             Graphics::Camera camera;
 
             Graphics::SceneGraph::ResourceBank cache;
@@ -43,7 +46,7 @@ namespace BlueBear {
             std::unique_ptr< Graphics::SceneGraph::ModelLoader::FileModelLoader > getFileModelLoader( bool deferGLOperations );
 
           public:
-            WorldRenderer();
+            WorldRenderer( Display& display );
             virtual ~WorldRenderer() = default;
 
             std::shared_ptr< Graphics::SceneGraph::Model > placeObject( const std::string& objectId, const std::string& newId );
@@ -52,7 +55,7 @@ namespace BlueBear {
             Graphics::Camera& getCamera();
             void loadPathsParallel( const std::vector< std::pair< std::string, std::string > >& paths );
             void loadPaths( const std::vector< std::pair< std::string, std::string > >& paths );
-            void render();
+            void nextFrame() override;
           };
 
         }

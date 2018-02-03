@@ -7,7 +7,8 @@
 #include "scripting/luastate.hpp"
 #include "configmanager.hpp"
 #include "eventmanager.hpp"
-#include "device/display/adapter/worldadapter.hpp"
+#include "device/display/adapter/component/worldrenderer.hpp"
+#include "device/display/adapter/component/guicomponent.hpp"
 #include "device/input/input.hpp"
 #include "graphics/scenegraph/animation/animator.hpp"
 #include <SFML/Window/Keyboard.hpp>
@@ -51,10 +52,12 @@ namespace BlueBear {
     }
 
     void HouseholdGameplayState::setupDisplayDevice() {
-      Device::Display::Adapter::WorldAdapter& adapter = application
+      Device::Display::Adapter::Component::WorldRenderer& adapter = application
         .getDisplayDevice()
-        .setAdapter( std::make_unique< Device::Display::Adapter::WorldAdapter >( application.getDisplayDevice() ) )
-        .as< Device::Display::Adapter::WorldAdapter >();
+        .pushAdapter( std::make_unique< Device::Display::Adapter::Component::WorldRenderer >( application.getDisplayDevice() ) )
+        .as< Device::Display::Adapter::Component::WorldRenderer >();
+
+      application.getDisplayDevice().pushAdapter( std::make_unique< Device::Display::Adapter::Component::GuiComponent >( application.getDisplayDevice() ) );
 
       adapter.getCamera().setRotationDirect( engine->currentLot->currentRotation );
     }
@@ -70,7 +73,7 @@ namespace BlueBear {
       sf::Keyboard::Key KEY_ZOOM_IN = ( sf::Keyboard::Key ) ConfigManager::getInstance().getIntValue( "key_zoom_in" );
       sf::Keyboard::Key KEY_ZOOM_OUT = ( sf::Keyboard::Key ) ConfigManager::getInstance().getIntValue( "key_zoom_out" );
 
-      Graphics::Camera& camera = application.getDisplayDevice().getAdapter().as< Device::Display::Adapter::WorldAdapter >().getCamera();
+      Graphics::Camera& camera = application.getDisplayDevice().getAdapterAt( RENDER3D_ADAPTER ).as< Device::Display::Adapter::Component::WorldRenderer >().getCamera();
       Device::Input::Input& inputManager = ( application.getInputDevice() = Device::Input::Input() );
       inputManager.listen( KEY_ROTATE_RIGHT, std::bind( &Graphics::Camera::rotateRight, &camera ) );
       inputManager.listen( KEY_ROTATE_LEFT, std::bind( &Graphics::Camera::rotateLeft, &camera ) );
@@ -82,15 +85,15 @@ namespace BlueBear {
       inputManager.listen( KEY_ZOOM_OUT, std::bind( &Graphics::Camera::zoomOut, &camera ) );
 
       inputManager.listen( sf::Keyboard::Z, [ & ]() {
-        application.getDisplayDevice().getAdapter().as< Device::Display::Adapter::WorldAdapter >().loadPathsParallel( {
+        application.getDisplayDevice().getAdapterAt( RENDER3D_ADAPTER ).as< Device::Display::Adapter::Component::WorldRenderer >().loadPathsParallel( {
           { "floor", "dev/box/armaturebox.fbx" }
         } );
       } );
       inputManager.listen( sf::Keyboard::X, [ & ]() {
-        application.getDisplayDevice().getAdapter().as< Device::Display::Adapter::WorldAdapter >().placeObject( "floor", "floor1" );
+        application.getDisplayDevice().getAdapterAt( RENDER3D_ADAPTER ).as< Device::Display::Adapter::Component::WorldRenderer >().placeObject( "floor", "floor1" );
       } );
       inputManager.listen( sf::Keyboard::C, [ & ]() {
-        auto animator = application.getDisplayDevice().getAdapter().as< Device::Display::Adapter::WorldAdapter >().getObject( "floor1" )
+        auto animator = application.getDisplayDevice().getAdapterAt( RENDER3D_ADAPTER ).as< Device::Display::Adapter::Component::WorldRenderer >().getObject( "floor1" )
           ->findNearestAnimator();
 
         animator->setCurrentAnimation( "Armature|ArmatureAction" );
@@ -108,7 +111,7 @@ namespace BlueBear {
       display.update();
 
       // pull and use events
-      std::queue< sf::Event > guiEvents = display.getAdapter().as< Device::Display::Adapter::WorldAdapter >().getEvents();
+      std::queue< sf::Event > guiEvents = display.getAdapterAt( GUI_ADAPTER ).as< Device::Display::Adapter::Component::GuiComponent >().getEvents();
       while( !guiEvents.empty() ) {
         sf::Event& event = guiEvents.front();
         switch( event.type ) {
