@@ -11,6 +11,8 @@ namespace BlueBear {
       public:
         Drawable( unsigned int x, unsigned int y, unsigned int width, unsigned int height );
         ~Drawable();
+
+        void draw();
       };
 
     }

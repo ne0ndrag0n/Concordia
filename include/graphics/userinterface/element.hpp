@@ -1,6 +1,8 @@
 #ifndef NEW_GUI_ELEMENT
 #define NEW_GUI_ELEMENT
 
+#include "graphics/userinterface/style.hpp"
+#include "graphics/userinterface/drawable.hpp"
 #include <sol.hpp>
 #include <string>
 #include <vector>
@@ -13,7 +15,7 @@ namespace BlueBear {
   namespace Graphics {
     namespace UserInterface {
 
-      class Element {
+      class Element : public std::enable_shared_from_this< Element > {
         std::weak_ptr< Element > parent;
         const std::string& tag;
         std::string id;
@@ -23,7 +25,7 @@ namespace BlueBear {
         std::vector< std::shared_ptr< Element > > children;
         std::unordered_map< std::string, sol::function > events;
 
-        Element();
+        Element( const std::string& tag, const std::string& id, const std::vector< std::string >& classes );
         Element( const Element& other );
 
       public:
@@ -39,6 +41,8 @@ namespace BlueBear {
         bool hasClass() const;
         void addClass( const std::string& clss );
         void removeClass( const std::string& clss );
+
+        void draw();
       };
 
     }

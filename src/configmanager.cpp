@@ -38,7 +38,8 @@ namespace BlueBear {
     configRoot[ "disable_image_cache" ] = false;
     configRoot[ "disable_texture_cache" ] = false;
     configRoot[ "ui_theme" ] = "system/ui/default.theme";
-    configRoot[ "max_ingame_terminal_scrollback" ] = 100; 
+    configRoot[ "max_ingame_terminal_scrollback" ] = 100;
+    configRoot[ "hud_zorder_max" ] = 1000;
 
     // Load settings.json from file
     std::ifstream settingsFile( SETTINGS_PATH );
