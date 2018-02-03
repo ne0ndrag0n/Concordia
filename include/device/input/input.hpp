@@ -8,7 +8,6 @@
 #include <map>
 #include <functional>
 #include <memory>
-#include <SFGUI/Container.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Event.hpp>
 #include <sol.hpp>
@@ -24,7 +23,6 @@ namespace BlueBear {
         bool eatMouseEvents = false;
 
         void submitLuaContributions( sol::state& lua );
-        void removeSFGUIFocus();
         void fireOff( std::vector< sol::function >& refs );
         unsigned int insertNearest( sf::Keyboard::Key key, sol::function& function );
 

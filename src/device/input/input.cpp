@@ -14,14 +14,6 @@ namespace BlueBear {
     namespace Input {
 
       Input::Input() {
-        eventManager.SFGUI_EAT_EVENT.listen( SFGUIEatEvent::Event::EAT_KEYBOARD_EVENT, [ & ]() {
-          eatKeyEvents = true;
-        } );
-
-        eventManager.SFGUI_EAT_EVENT.listen( SFGUIEatEvent::Event::EAT_MOUSE_EVENT, [ & ]() {
-          eatMouseEvents = true;
-        } );
-
         eventManager.LUA_STATE_READY.listen( this, std::bind( &Input::submitLuaContributions, this, std::placeholders::_1 ) );
       }
 
@@ -32,15 +24,7 @@ namespace BlueBear {
       }
 
       Input::~Input() {
-        eventManager.SFGUI_EAT_EVENT.stopListening( SFGUIEatEvent::Event::EAT_KEYBOARD_EVENT );
         eventManager.LUA_STATE_READY.stopListening( this );
-      }
-
-      /**
-       * Whatta hack
-       */
-      void Input::removeSFGUIFocus() {
-        Graphics::GUI::RootContainer::Create()->GrabFocus();
       }
 
       void Input::listen( sf::Keyboard::Key key, std::function< void() > callback ) {
@@ -71,7 +55,7 @@ namespace BlueBear {
           case sf::Event::MouseButtonReleased:
             {
               if( eatMouseEvents == false ) {
-                removeSFGUIFocus();
+                // TODO: Remove focus
                 // TODO mouse shit
               } else {
                 eatMouseEvents = false;
