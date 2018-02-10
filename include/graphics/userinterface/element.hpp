@@ -12,6 +12,16 @@
 #include <optional>
 
 namespace BlueBear {
+  namespace Device {
+    namespace Display {
+      namespace Adapter {
+        namespace Component {
+          class GuiComponent;
+        }
+      }
+    }
+  }
+
   namespace Graphics {
     namespace UserInterface {
 
@@ -29,6 +39,8 @@ namespace BlueBear {
         Element( const Element& other );
 
       public:
+        static Device::Display::Adapter::Component::GuiComponent* host;
+
         static std::shared_ptr< Element > create( const std::string& tag, const std::string& id, const std::vector< std::string >& classes );
         std::shared_ptr< Element > copy();
 
@@ -41,6 +53,8 @@ namespace BlueBear {
         bool hasClass() const;
         void addClass( const std::string& clss );
         void removeClass( const std::string& clss );
+
+        Style& getStyle();
 
         void draw();
       };

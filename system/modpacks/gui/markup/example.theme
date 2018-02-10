@@ -1,11 +1,33 @@
-#segment {
-  padding: 10px;
-  background: #ffffffff;
-  foreground: #000000ff;
-  flow: down;
+.bb-window-base {
+  placement: 'free';
+  min-width: 100;
+  min-height: 100;
+  color: '#ffffffff';
 
-  .class {
-    /* Inherits padding and foreground */
-    background: #ccccccff;
+  .bb-window-titlebar {
+    color: '#ccccccff';
+    drop-shadow: 'down';
+    drop-shadow-down-begin: '#000000FF';
+    drop-shadow-down-end: '#00000000';
+    drop-shadow-down-length: 10;
+
+    text {
+      color: '#000000ff';
+    }
+  }
+
+  .bb-window-closebar {
+    placement: 'free';
+    flow: 'rtl';
+  }
+}
+
+.about-screen-grid {
+  image {
+    grid-proportion: 1.0;
+  }
+
+  text {
+    grid-proportion: 2.0;
   }
 }

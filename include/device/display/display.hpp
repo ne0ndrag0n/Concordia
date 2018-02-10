@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include <memory>
+#include <functional>
 
 namespace BlueBear {
   namespace Device {
@@ -27,6 +28,7 @@ namespace BlueBear {
         const glm::uvec2& getDimensions() const;
         Adapter::Adapter& pushAdapter( std::unique_ptr< Adapter::Adapter > adapter );
         Adapter::Adapter& getAdapterAt( unsigned int index );
+        void executeOnSecondaryContext( std::function< void() > closure );
         void reset();
         void update();
       };

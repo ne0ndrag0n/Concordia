@@ -23,15 +23,18 @@ namespace BlueBear {
         std::unordered_map< std::string, Value > values;
 
       public:
-        std::weak_ptr< Element > parent;
-
         Style() = default;
         Style( const Style& other );
 
         Value getValue( const std::string& id );
+
         void setValue( const std::string& id, const std::string& value );
         void setValue( const std::string& id, const int value );
         void setValue( const std::string& id, const double value );
+
+        void setComputedValue( const std::string& id, const std::string& value );
+        void setComputedValue( const std::string& id, const int value );
+        void setComputedValue( const std::string& id, const double value );
       };
 
     }

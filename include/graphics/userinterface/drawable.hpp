@@ -6,8 +6,19 @@
 #include <vector>
 
 namespace BlueBear {
+  namespace Device {
+    namespace Display {
+      namespace Adapter {
+        namespace Component {
+          class GuiComponent;
+        }
+      }
+    }
+  }
+
   namespace Graphics {
     namespace UserInterface {
+      class Element;
 
       class Drawable {
         unsigned int VAO;
@@ -21,10 +32,11 @@ namespace BlueBear {
 
         static std::vector< GLuint > MESH_INDICES;
 
+        void generateTexture();
         std::vector< Corner > generateMesh( unsigned int x, unsigned int y, unsigned int width, unsigned int height );
 
       public:
-        Drawable( unsigned int x, unsigned int y, unsigned int width, unsigned int height );
+        Drawable( Element& element );
         ~Drawable();
 
         void draw();

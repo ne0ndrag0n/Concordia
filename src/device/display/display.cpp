@@ -6,6 +6,7 @@
 #include <SFML/Window/VideoMode.hpp>
 #include <SFML/Window/WindowStyle.hpp>
 #include <SFML/Window/ContextSettings.hpp>
+#include <SFML/Window/Context.hpp>
 #include <GL/glew.h>
 
 namespace BlueBear {
@@ -21,6 +22,7 @@ namespace BlueBear {
           sf::ContextSettings( 24, 8, 0, 3, 3 )
         );
 
+        window.setActive( true );
         window.resetGLStates();
 
         // Set sync on window by these params:
@@ -60,6 +62,18 @@ namespace BlueBear {
 
       Adapter::Adapter& Display::getAdapterAt( unsigned int index ) {
         return *adapters.at( index );
+      }
+
+      void Display::executeOnSecondaryContext( std::function< void() > closure ) {
+        {
+          sf::Context context; // calls setActive( true ) on itself, or should anyway
+          glEnable( GL_DEPTH_TEST );
+          glEnable( GL_STENCIL_TEST );
+
+          closure();
+        }
+
+        window.setActive( true );
       }
 
       void Display::reset() {
