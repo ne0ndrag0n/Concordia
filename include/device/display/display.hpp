@@ -29,6 +29,7 @@ namespace BlueBear {
         Adapter::Adapter& pushAdapter( std::unique_ptr< Adapter::Adapter > adapter );
         Adapter::Adapter& getAdapterAt( unsigned int index );
         void executeOnSecondaryContext( std::function< void() > closure );
+        void executeOnSecondaryContext( sf::Context& context, std::function< void() > closure );
         void reset();
         void update();
       };

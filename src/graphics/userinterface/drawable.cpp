@@ -1,7 +1,6 @@
 #include "graphics/userinterface/drawable.hpp"
 #include "graphics/userinterface/element.hpp"
 #include "device/display/adapter/component/guicomponent.hpp"
-#include <variant>
 
 namespace BlueBear {
   namespace Graphics {
@@ -12,19 +11,15 @@ namespace BlueBear {
         1, 2, 3
       };
 
-      Drawable::Drawable( Element& element ) {
+      Drawable::Drawable( std::shared_ptr< Vector::Renderer::Texture > texture, unsigned int x, unsigned int y, unsigned int width, unsigned int height ) :
+        texture( texture ) {
         glGenVertexArrays( 1, &VAO );
         glGenBuffers( 1, &VBO );
         glGenBuffers( 1, &EBO );
 
         glBindVertexArray( VAO );
           glBindBuffer( GL_ARRAY_BUFFER, VBO );
-            std::vector< Drawable::Corner > quad = generateMesh(
-              std::get< int >( element.getStyle().getValue( "left" ).computed ),
-              std::get< int >( element.getStyle().getValue( "top" ).computed ),
-              std::get< int >( element.getStyle().getValue( "width" ).computed ),
-              std::get< int >( element.getStyle().getValue( "height" ).computed )
-            );
+            std::vector< Drawable::Corner > quad = generateMesh( x, y, width, height );
             glBufferData( GL_ARRAY_BUFFER, quad.size() * sizeof( Drawable::Corner ), &quad[ 0 ], GL_STATIC_DRAW );
               glEnableVertexAttribArray( 0 );
               glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, sizeof( Drawable::Corner ), ( GLvoid* ) 0 );
@@ -43,10 +38,6 @@ namespace BlueBear {
         glDeleteVertexArrays( 1, &VAO );
         glDeleteBuffers( 1, &VBO );
         glDeleteBuffers( 1, &EBO );
-      }
-
-      void Drawable::generateTexture() {
-
       }
 
       std::vector< Drawable::Corner > Drawable::generateMesh( unsigned int x, unsigned int y, unsigned int width, unsigned int height ) {
@@ -70,6 +61,10 @@ namespace BlueBear {
         };
 
         return vertices;
+      }
+
+      void Drawable::draw() {
+        // TODO
       }
 
     }

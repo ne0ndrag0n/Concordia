@@ -1,9 +1,11 @@
 #ifndef NEW_GUI_DRAWABLE
 #define NEW_GUI_DRAWABLE
 
+#include "graphics/vector/renderer.hpp"
 #include <glm/glm.hpp>
 #include <GL/glew.h>
 #include <vector>
+#include <memory>
 
 namespace BlueBear {
   namespace Device {
@@ -24,6 +26,7 @@ namespace BlueBear {
         unsigned int VAO;
         unsigned int VBO;
         unsigned int EBO;
+        std::shared_ptr< Vector::Renderer::Texture > texture;
 
         struct Corner {
           glm::vec3 position;
@@ -32,11 +35,10 @@ namespace BlueBear {
 
         static std::vector< GLuint > MESH_INDICES;
 
-        void generateTexture();
         std::vector< Corner > generateMesh( unsigned int x, unsigned int y, unsigned int width, unsigned int height );
 
       public:
-        Drawable( Element& element );
+        Drawable( std::shared_ptr< Vector::Renderer::Texture > texture, unsigned int x, unsigned int y, unsigned int width, unsigned int height );
         ~Drawable();
 
         void draw();

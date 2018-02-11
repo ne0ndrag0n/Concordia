@@ -1,10 +1,9 @@
 #include "graphics/userinterface/element.hpp"
+#include "graphics/vector/renderer.hpp"
 
 namespace BlueBear {
   namespace Graphics {
     namespace UserInterface {
-
-      Device::Display::Adapter::Component::GuiComponent* Element::host = nullptr;
 
       Element::Element( const std::string& tag, const std::string& id, const std::vector< std::string >& classes ) : tag( tag ), id( id ), classes( classes ) {}
 
@@ -14,8 +13,11 @@ namespace BlueBear {
         return result;
       }
 
-      Style& Element::getStyle() {
-        return style;
+      /**
+       * Reflow element and all children (rerender quad and texture as well as all its children)
+       */
+      void Element::reflow( Vector::Renderer& vectorRenderer ) {
+        
       }
 
     }

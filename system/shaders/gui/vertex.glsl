@@ -6,6 +6,6 @@ out vec2 fragTexture;
 uniform mat4 orthoProjection;
 
 void main() {
-  fragTexture = texture;
   gl_Position = orthoProjection * vec4( position, 1.0f );
+  fragTexture = texture;
 }

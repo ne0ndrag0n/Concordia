@@ -17,8 +17,10 @@
 #include <queue>
 #include <map>
 
+// Remove these after dev
 #include "graphics/scenegraph/transform.hpp"
 #include "graphics/scenegraph/model.hpp"
+#include "graphics/vector/renderer.hpp"
 
 namespace BlueBear {
   namespace State {
@@ -95,6 +97,20 @@ namespace BlueBear {
           ->findNearestAnimator();
 
         animator->setCurrentAnimation( "Armature|ArmatureAction" );
+      } );
+      inputManager.listen( sf::Keyboard::V, [ & ]() {
+        Log::getInstance().debug( "HouseholdGameplayState::setupInputDevice", "Trying this context shit..." );
+
+        application
+          .getDisplayDevice()
+          .getAdapterAt( GUI_ADAPTER )
+          .as< Device::Display::Adapter::Component::GuiComponent >()
+          .getVectorRenderer()
+          .createTexture( glm::uvec2{ 100, 100 }, [ & ]( Graphics::Vector::Renderer& renderer ) {
+            renderer.drawRect( glm::uvec4{ 10, 10, 10, 10 }, glm::uvec4{ 10, 0, 0, 255 } );
+          } );
+
+        Log::getInstance().debug( "HouseholdGameplayState::setupInputDevice", "Back to the original context" );
       } );
     }
 

@@ -67,11 +67,16 @@ namespace BlueBear {
       void Display::executeOnSecondaryContext( std::function< void() > closure ) {
         {
           sf::Context context; // calls setActive( true ) on itself, or should anyway
-          glEnable( GL_DEPTH_TEST );
-          glEnable( GL_STENCIL_TEST );
-
           closure();
         }
+
+        window.setActive( true );
+      }
+
+      void Display::executeOnSecondaryContext( sf::Context& context, std::function< void() > closure ) {
+        context.setActive( true );
+
+        closure();
 
         window.setActive( true );
       }

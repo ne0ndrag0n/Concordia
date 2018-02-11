@@ -13,7 +13,11 @@ namespace BlueBear {
       namespace Adapter {
         namespace Component {
 
-          GuiComponent::GuiComponent( Device::Display::Display& display ) : Adapter::Adapter( display ) {}
+          GuiComponent::GuiComponent( Device::Display::Display& display ) : Adapter::Adapter( display ), vector( display ) {}
+
+          Graphics::Vector::Renderer& GuiComponent::getVectorRenderer() {
+            return vector;
+          }
 
           /**
            * Getting the feeling that the only reason we do this is because it's awkward to pass a "renderwindow" to inputmanager
