@@ -19,7 +19,7 @@ namespace BlueBear {
 
       void sendDeferred();
 
-      void use();
+      void use( bool silent = false );
     };
   }
 }

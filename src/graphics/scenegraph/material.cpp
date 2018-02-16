@@ -87,9 +87,9 @@ namespace BlueBear {
           Tools::OpenGL::setUniform( "material.diffuse", diffuseColor );
         } else {
           for( int i = 0; i != diffuseTextures.size(); i++ ) {
-            glActiveTexture( GL_TEXTURE0 + counter++ );
+            glActiveTexture( GL_TEXTURE0 + counter );
             glBindTexture( GL_TEXTURE_2D, diffuseTextures[ i ]->id );
-            Tools::OpenGL::setUniform( std::string( "material.diffuse" ) + std::to_string( i ), i );
+            Tools::OpenGL::setUniform( std::string( "material.diffuse" ) + std::to_string( i ), (int) counter++ );
           }
         }
 
@@ -97,9 +97,10 @@ namespace BlueBear {
           Tools::OpenGL::setUniform( "material.specular", specularColor );
         } else {
           for( int i = 0; i != specularTextures.size(); i++ ) {
-            glActiveTexture( GL_TEXTURE0 + counter++ );
+            glActiveTexture( GL_TEXTURE0 + counter );
             glBindTexture( GL_TEXTURE_2D, specularTextures[ i ]->id );
-            Tools::OpenGL::setUniform( std::string( "material.specular" ) + std::to_string( i ), i );
+            Tools::OpenGL::setUniform( std::string( "material.specular" ) + std::to_string( i ), (int) counter++ );
+
           }
         }
 

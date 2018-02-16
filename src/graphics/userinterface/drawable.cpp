@@ -1,6 +1,9 @@
 #include "graphics/userinterface/drawable.hpp"
 #include "graphics/userinterface/element.hpp"
 #include "device/display/adapter/component/guicomponent.hpp"
+#include "configmanager.hpp"
+#include "tools/opengl.hpp"
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace BlueBear {
   namespace Graphics {
@@ -64,7 +67,24 @@ namespace BlueBear {
       }
 
       void Drawable::draw() {
-        // TODO
+        glm::mat4 orthoProjection = glm::ortho(
+          0.0f,
+          ( float ) ConfigManager::getInstance().getIntValue( "viewport_x" ),
+          ( float ) ConfigManager::getInstance().getIntValue( "viewport_y" ),
+          0.0f,
+          -1.0f,
+          1000.0f
+        );
+
+        Tools::OpenGL::setUniform( "orthoProjection", orthoProjection );
+
+        glActiveTexture( GL_TEXTURE0 );
+        glBindTexture( GL_TEXTURE_2D, texture->getTextureId() );
+        Tools::OpenGL::setUniform( "surface", 0 );
+
+        glBindVertexArray( VAO );
+          glDrawElements( GL_TRIANGLES, 2, GL_UNSIGNED_INT, 0 );
+        glBindVertexArray( 0 );
       }
 
     }

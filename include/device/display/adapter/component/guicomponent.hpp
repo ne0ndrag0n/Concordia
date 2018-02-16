@@ -3,11 +3,20 @@
 
 #include "device/display/adapter/adapter.hpp"
 #include "graphics/vector/renderer.hpp"
+#include "graphics/userinterface/propertylist.hpp"
+#include "graphics/shader.hpp"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 #include <queue>
+#include <memory>
 
 namespace BlueBear {
+  namespace Graphics {
+    namespace UserInterface {
+      class Element;
+    }
+  }
+
   namespace Device {
     namespace Display {
       class Display;
@@ -17,9 +26,13 @@ namespace BlueBear {
 
           class GuiComponent : public Adapter {
             Graphics::Vector::Renderer vector;
+            Graphics::Shader guiShader;
+            static const Graphics::UserInterface::PropertyList rootPropertyList;
+            std::shared_ptr< Graphics::UserInterface::Element > rootElement;
 
           public:
             Graphics::Vector::Renderer& getVectorRenderer();
+            const Graphics::UserInterface::PropertyList& getRootPropertyList() const;
 
             std::queue< sf::Event > getEvents();
             GuiComponent( Device::Display::Display& display );

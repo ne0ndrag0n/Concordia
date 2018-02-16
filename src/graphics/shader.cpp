@@ -124,13 +124,15 @@ namespace BlueBear {
       sendDeferred();
     }
 
-    void Shader::use() {
+    void Shader::use( bool silent ) {
       if( Shader::CURRENT_PROGRAM != this->Program ) {
         glUseProgram( this->Program );
         Shader::CURRENT_PROGRAM = this->Program;
       }
 
-      eventManager.SHADER_CHANGE.trigger();
+      if( !silent ) {
+        eventManager.SHADER_CHANGE.trigger();
+      }
     }
 
   }
