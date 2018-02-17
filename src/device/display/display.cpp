@@ -5,7 +5,6 @@
 #include "log.hpp"
 #include <SFML/Window/VideoMode.hpp>
 #include <SFML/Window/WindowStyle.hpp>
-#include <SFML/Window/ContextSettings.hpp>
 #include <SFML/Window/Context.hpp>
 #include <GL/glew.h>
 
@@ -19,7 +18,7 @@ namespace BlueBear {
           sf::VideoMode( dimensions.x, dimensions.y ),
           LocaleManager::getInstance().getString( "BLUEBEAR_WINDOW_TITLE" ),
           sf::Style::Close,
-          sf::ContextSettings( 24, 8, 0, 3, 3 )
+          getDefaultContextSettings()
         );
 
         window.setActive( true );
@@ -48,6 +47,10 @@ namespace BlueBear {
 
       Display::~Display() {}
 
+      sf::ContextSettings Display::getDefaultContextSettings() const {
+        return sf::ContextSettings( 24, 8, 0, 3, 3, sf::ContextSettings::Core );
+      }
+
       sf::RenderWindow& Display::getRenderWindow() {
         return window;
       }
@@ -66,7 +69,7 @@ namespace BlueBear {
 
       void Display::executeOnSecondaryContext( std::function< void() > closure ) {
         {
-          sf::Context context; // calls setActive( true ) on itself, or should anyway
+          sf::Context context( getDefaultContextSettings(), dimensions.x, dimensions.y ); // calls setActive( true ) on itself, or should anyway
           closure();
         }
 

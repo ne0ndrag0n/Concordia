@@ -2,6 +2,7 @@
 #define DEVICE_DISPLAY
 
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Window/ContextSettings.hpp>
 #include <glm/glm.hpp>
 #include <vector>
 #include <memory>
@@ -24,6 +25,7 @@ namespace BlueBear {
         Display();
         ~Display();
 
+        sf::ContextSettings getDefaultContextSettings() const;
         sf::RenderWindow& getRenderWindow();
         const glm::uvec2& getDimensions() const;
         Adapter::Adapter& pushAdapter( std::unique_ptr< Adapter::Adapter > adapter );

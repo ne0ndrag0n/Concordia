@@ -1,6 +1,7 @@
 #include "graphics/vector/renderer.hpp"
 #include "device/display/display.hpp"
 #include "configmanager.hpp"
+#include "log.hpp"
 #define NANOVG_GL3_IMPLEMENTATION
 #include <nanovg_gl.h>
 #include <nanovg_gl_utils.h>
@@ -9,9 +10,15 @@ namespace BlueBear {
   namespace Graphics {
     namespace Vector {
 
-      Renderer::Renderer( Device::Display::Display& device ) : device( device ) {
-        context = nvgCreateGL3( NVG_STENCIL_STROKES | NVG_DEBUG );
-        device.getRenderWindow().setActive( true );
+      Renderer::Renderer( Device::Display::Display& device ) :
+        secondaryGLContext( device.getDefaultContextSettings(), device.getDimensions().x, device.getDimensions().y ),
+        device( device ) {
+        device.executeOnSecondaryContext( secondaryGLContext, [ & ]() {
+          context = nvgCreateGL3( NVG_STENCIL_STROKES | NVG_DEBUG );
+          if( context == NULL ) {
+            Log::getInstance().error( "Renderer::Renderer", "NanoVG failed to init" );
+          }
+        } );
       }
 
       Renderer::~Renderer() {
