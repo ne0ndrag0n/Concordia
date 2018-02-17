@@ -22,6 +22,10 @@ namespace BlueBear {
   }
 
   namespace Graphics {
+    namespace Vector {
+      class Renderer;
+    }
+
     namespace UserInterface {
 
       class Element : public std::enable_shared_from_this< Element > {
@@ -41,8 +45,10 @@ namespace BlueBear {
         virtual ~Element();
 
       public:
-        virtual void reflow( Device::Display::Adapter::Component::GuiComponent& manager ) = 0;
-        virtual void draw() = 0;
+        virtual glm::uvec2 getRequestedSize() = 0;
+        virtual void render( Graphics::Vector::Renderer& renderer ) = 0;
+        void reflow( Device::Display::Adapter::Component::GuiComponent& manager );
+        void draw();
       };
 
     }

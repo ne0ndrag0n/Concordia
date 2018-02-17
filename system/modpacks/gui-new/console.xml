@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Layout id="concordia_terminal">
+  <ScrollLayout id="concordia_terminal_scrollback">
+    <!--
+    <Layout class="concordia_log_message">
+      <Text class="concordia_debug_text">(d) 2018-02-16 17:19:42: </Text>
+      <Text>[LocaleManager] Loaded locale for en_US successfully.</Text>
+    </Layout>
+    -->
+  </ScrollLayout>
+  <Layout id="concordia_terminal_control_box">
+    <TextInput id="concordia_terminal_input" />
+    <Button id="concordia_terminal_submit">Submit</Button>
+  </Layout>
+</Layout>
