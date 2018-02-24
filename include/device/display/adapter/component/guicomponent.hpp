@@ -27,12 +27,10 @@ namespace BlueBear {
           class GuiComponent : public Adapter {
             Graphics::Vector::Renderer vector;
             Graphics::Shader guiShader;
-            static const Graphics::UserInterface::PropertyList rootPropertyList;
             std::shared_ptr< Graphics::UserInterface::Element > rootElement;
 
           public:
             Graphics::Vector::Renderer& getVectorRenderer();
-            const Graphics::UserInterface::PropertyList& getRootPropertyList() const;
 
             std::queue< sf::Event > getEvents();
             GuiComponent( Device::Display::Display& display );

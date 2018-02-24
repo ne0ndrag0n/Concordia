@@ -1,6 +1,7 @@
 #ifndef UI_PROPERTY_LIST
 #define UI_PROPERTY_LIST
 
+#include "exceptions/genexc.hpp"
 #include "log.hpp"
 #include <glm/glm.hpp>
 #include <unordered_map>
@@ -17,6 +18,9 @@ namespace BlueBear {
         std::unordered_map< std::string, std::any > values;
 
       public:
+        EXCEPTION_TYPE( InvalidValueException, "Property is not a valid property" );
+        static const PropertyList& rootPropertyList;
+
         PropertyList() = default;
         PropertyList( unsigned int computedSpecificity ) : computedSpecificity( computedSpecificity ) {}
         PropertyList( const std::unordered_map< std::string, std::any >& map ) : values( map ) {}
@@ -27,17 +31,24 @@ namespace BlueBear {
           values[ key ] = value;
         };
 
-        template < typename VariantType > const VariantType* get( const std::string& key ) const {
+        template < typename VariantType > const VariantType get( const std::string& key ) const {
           auto it = values.find( key );
           if( it != values.end() ) {
             try {
-              return &std::any_cast< VariantType >( it->second );
+              return std::any_cast< VariantType >( it->second );
             } catch ( const std::bad_any_cast& e ) {
               Log::getInstance().warn( "PropertyList::get", key + " could not be converted to the requested type. Please check the type with propertyIsType()." );
             }
           }
 
-          return nullptr;
+          // If we get here, we're about to return a no-value.
+          if( this != &rootPropertyList ) {
+            // Try rootPropertyList before giving up
+            return rootPropertyList.get< VariantType >( key );
+          } else {
+            // We're now in rootPropertyList and the value still wasn't found. We have no choice now but to return nullptr
+            throw InvalidValueException();
+          }
         };
 
         bool propertyIsType( const std::string& key, const std::type_info& type ) const {
@@ -53,6 +64,19 @@ namespace BlueBear {
           return computedSpecificity;
         };
 
+      };
+
+      enum class Gravity {
+        LEFT,
+        RIGHT,
+        TOP,
+        BOTTOM
+      };
+
+      enum class Requisition : int {
+        AUTO = -1,
+        NONE = -2,
+        FIT_PARENT = -3
       };
 
     }

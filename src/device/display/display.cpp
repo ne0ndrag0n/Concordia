@@ -21,8 +21,13 @@ namespace BlueBear {
           getDefaultContextSettings()
         );
 
-        window.setActive( true );
-        window.resetGLStates();
+        // Initialize OpenGL using GLEW
+        glewExperimental = true;
+        auto glewStatus = glewInit();
+        if( glewStatus != GLEW_OK ) {
+          Log::getInstance().error( "Display::Display", "FATAL: glewInit() did NOT return GLEW_OK! (" + std::string( ( const char* ) glewGetErrorString( glewStatus ) ) + ")" );
+          exit( 1 );
+        }
 
         // Set sync on window by these params:
         // vsync_limiter_overview = true or fps_overview
@@ -30,14 +35,6 @@ namespace BlueBear {
           window.setVerticalSyncEnabled( true );
         } else {
           window.setFramerateLimit( ConfigManager::getInstance().getIntValue( "fps_overview" ) );
-        }
-
-        // Initialize OpenGL using GLEW
-        glewExperimental = true;
-        auto glewStatus = glewInit();
-        if( glewStatus != GLEW_OK ) {
-          Log::getInstance().error( "Display::Display", "FATAL: glewInit() did NOT return GLEW_OK! (" + std::string( ( const char* ) glewGetErrorString( glewStatus ) ) + ")" );
-          exit( 1 );
         }
 
         glViewport( 0, 0, dimensions.x, dimensions.y );
