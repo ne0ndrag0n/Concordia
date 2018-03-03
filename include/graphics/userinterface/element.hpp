@@ -35,7 +35,8 @@ namespace BlueBear {
         std::vector< std::string > classes;
 
         PropertyList localStyle;
-        glm::uvec4 computedPosition;
+        glm::uvec2 requisition;
+        glm::uvec4 allocation;
         std::unique_ptr< Drawable > drawable;
 
         std::weak_ptr< Element > parent;
@@ -47,9 +48,13 @@ namespace BlueBear {
 
       public:
         virtual void positionAndSizeChildren() = 0;
-        virtual void render( Graphics::Vector::Renderer& renderer ) = 0;
-        virtual glm::uvec2 getRequestedSize() = 0;
+        virtual void render( Device::Display::Adapter::Component::GuiComponent& manager ) = 0;
+        virtual void calculate() = 0;
 
+        PropertyList& getPropertyList();
+        glm::uvec2 getRequisition();
+
+        void setAllocation( const glm::uvec4& allocation );
         void reflow( Device::Display::Adapter::Component::GuiComponent& manager );
         void draw();
       };

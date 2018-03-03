@@ -9,8 +9,21 @@ namespace BlueBear {
 
       Element::~Element() {}
 
+      void Element::setAllocation( const glm::uvec4& allocation ) {
+        this->allocation = allocation;
+      }
+
+      PropertyList& Element::getPropertyList() {
+        return localStyle;
+      }
+
+      glm::uvec2 Element::getRequisition() {
+        return requisition;
+      }
+
       void Element::reflow( Device::Display::Adapter::Component::GuiComponent& manager ) {
-        render( manager.getVectorRenderer() );
+        // Render myself, since I've already been positioned and sized
+        render( manager );
         positionAndSizeChildren();
 
         for( std::shared_ptr< Element > child : children ) {

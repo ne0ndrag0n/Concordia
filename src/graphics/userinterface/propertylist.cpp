@@ -14,7 +14,7 @@ namespace BlueBear {
         { "min-height", 10 },
         { "max-width", -1 },
         { "max-height", -1 },
-        { "placement", "grid" },
+        { "placement", Placement::FLOW },
         { "background-mode", "color" },
         { "background-pattern", "" },
         { "background-color", glm::uvec4{ 255, 255, 255, 255 } },

@@ -76,7 +76,20 @@ namespace BlueBear {
       enum class Requisition : int {
         AUTO = -1,
         NONE = -2,
-        FIT_PARENT = -3
+        FILL_PARENT = -3
+      };
+
+      enum class Placement : int {
+        FLOW,
+        FREE
+      };
+
+      enum class Orientation : int {
+        TOP,
+        MIDDLE,
+        BOTTOM,
+        LEFT,
+        RIGHT
       };
 
     }
