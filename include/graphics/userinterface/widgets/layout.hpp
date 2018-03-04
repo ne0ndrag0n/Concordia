@@ -44,7 +44,6 @@ namespace BlueBear {
         protected:
           Layout( const std::string& id, const std::vector< std::string >& classes );
 
-          bool valueIsLiteral( int r );
           Relations getRelations( Gravity gravity, int padding );
 
         public:

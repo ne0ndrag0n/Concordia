@@ -46,8 +46,11 @@ namespace BlueBear {
         Element( const Element& other );
         virtual ~Element();
 
+        bool valueIsLiteral( int r );
+        glm::uvec2 bindCalculations( glm::ivec2 total );
+
       public:
-        virtual void positionAndSizeChildren() = 0;
+        virtual void positionAndSizeChildren();
         virtual void render( Device::Display::Adapter::Component::GuiComponent& manager ) = 0;
         virtual void calculate() = 0;
 

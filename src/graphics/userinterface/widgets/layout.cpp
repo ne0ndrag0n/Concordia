@@ -16,12 +16,6 @@ namespace BlueBear {
           return layout;
         }
 
-        bool Layout::valueIsLiteral( int r ) {
-          return ( Requisition ) r != Requisition::AUTO &&
-            ( Requisition ) r != Requisition::NONE &&
-            ( Requisition ) r != Requisition::FILL_PARENT;
-        }
-
         void Layout::calculate() {
           glm::ivec2 total{ localStyle.get< int >( "width" ), localStyle.get< int >( "height" ) };
           int padding = localStyle.get< int >( "padding" );
@@ -65,17 +59,7 @@ namespace BlueBear {
             }
           }
 
-          // Bound by min-height and max-height
-          glm::ivec2 minima{ localStyle.get< int >( "min-width" ), localStyle.get< int >( "min-height" ) };
-          glm::ivec2 maxima{ localStyle.get< int >( "max-width" ), localStyle.get< int >( "max-height" ) };
-
-          if( valueIsLiteral( minima.x ) ) { total.x = std::max( minima.x, total.x ); }
-          if( valueIsLiteral( minima.y ) ) { total.y = std::max( minima.y, total.y ); }
-
-          if( valueIsLiteral( maxima.x ) ) { total.x = std::min( total.x, maxima.x ); }
-          if( valueIsLiteral( maxima.y ) ) { total.x = std::min( total.y, maxima.y ); }
-
-          requisition = total;
+          requisition = bindCalculations( total );
         }
 
         void Layout::render( Device::Display::Adapter::Component::GuiComponent& manager ) {

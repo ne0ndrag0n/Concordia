@@ -5,6 +5,8 @@
 #define NANOVG_GL3_IMPLEMENTATION
 #include <nanovg_gl.h>
 #include <nanovg_gl_utils.h>
+#include <fstream>
+#include <jsoncpp/json/json.h>
 
 namespace BlueBear {
   namespace Graphics {
@@ -17,7 +19,9 @@ namespace BlueBear {
           context = nvgCreateGL3( NVG_STENCIL_STROKES | NVG_DEBUG );
           if( context == NULL ) {
             Log::getInstance().error( "Renderer::Renderer", "NanoVG failed to init" );
+            return;
           }
+          loadFonts();
         } );
       }
 
@@ -33,6 +37,28 @@ namespace BlueBear {
         }
       }
 
+      void Renderer::loadFonts() {
+        std::ifstream fonts( "system/ui/fonts.json" );
+        if( fonts.is_open() && fonts.good() ) {
+          Json::Value fontJson;
+          Json::Reader reader;
+          if( reader.parse( fonts, fontJson ) && fontJson.isObject() ) {
+            for( Json::Value::iterator jsonIterator = fontJson.begin(); jsonIterator != fontJson.end(); ++jsonIterator ) {
+              std::string key = jsonIterator.key().asString();
+              std::string value = ( *jsonIterator ).asString();
+
+              if( nvgCreateFont( context, key.c_str(), value.c_str() ) == -1 ) {
+                Log::getInstance().warn( "Renderer::loadFonts", std::string( "Failed to load font face " ) + key + " at path " + value );
+              }
+            }
+
+            return;
+          }
+        }
+
+        Log::getInstance().error( "Renderer::loadFonts", "Failed to load font data. Fonts may not display in the UI!" );
+      }
+
       void Renderer::drawRect( const glm::uvec4& dimensions, const glm::uvec4& color ) {
         checkTexture();
 
@@ -40,6 +66,15 @@ namespace BlueBear {
         nvgRect( context, dimensions[ 0 ], dimensions[ 1 ], dimensions[ 2 ], dimensions[ 3 ] );
         nvgFillColor( context, nvgRGBA( color[ 0 ], color[ 1 ], color[ 2 ], color[ 3 ] ) );
         nvgFill( context );
+      }
+
+      void Renderer::drawText( const std::string& fontFace, const std::string& text, const glm::uvec2& position, const glm::uvec4& color, double points ) {
+        nvgFontSize( context, points );
+        nvgFontFace( context, fontFace.c_str() );
+        nvgFillColor( context, nvgRGBA( color[ 0 ], color[ 1 ], color[ 2 ], color[ 3 ] ) );
+
+        nvgTextAlign( context, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE );
+        nvgText( context, position.x, position.y, text.c_str(), NULL );
       }
 
       std::shared_ptr< Renderer::Texture > Renderer::createTexture( const glm::uvec2& dimensions, std::function< void( Renderer& ) > functor ) {

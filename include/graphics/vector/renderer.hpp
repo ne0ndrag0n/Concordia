@@ -46,12 +46,14 @@ namespace BlueBear {
         std::shared_ptr< Texture > currentTexture;
 
         void checkTexture();
+        void loadFonts();
 
       public:
         Renderer( Device::Display::Display& device );
         ~Renderer();
 
         void drawRect( const glm::uvec4& dimensions, const glm::uvec4& color );
+        void drawText( const std::string& fontFace, const std::string& text, const glm::uvec2& position, const glm::uvec4& color, double points );
 
         std::shared_ptr< Renderer::Texture > createTexture( const glm::uvec2& dimensions, std::function< void( Renderer& ) > functor );
       };
