@@ -17,7 +17,7 @@ namespace BlueBear {
         }
 
         void Layout::calculate() {
-          glm::ivec2 total{ localStyle.get< int >( "width" ), localStyle.get< int >( "height" ) };
+          glm::ivec2 total{ 0, 0 };
           int padding = localStyle.get< int >( "padding" );
           Gravity gravity = localStyle.get< Gravity >( "gravity" );
           bool horizontal = ( gravity == Gravity::LEFT || gravity == Gravity::RIGHT );
@@ -26,40 +26,34 @@ namespace BlueBear {
           std::vector< glm::uvec2 > requisitions;
           for( std::shared_ptr< Element > child : children ) {
             child->calculate();
-            requisitions.push_back( child->getRequisition() );
+            requisitions.push_back( getFinalRequisition( child ) );
           }
 
-          if( !valueIsLiteral( total.x ) ) {
-            if( horizontal ) {
-              total.x = padding;
-              for( glm::uvec2& requisition : requisitions ) {
-                total.x += requisition.x + padding;
-              }
-            } else {
-              unsigned int maxWidth = 0;
-              for( glm::uvec2& requisition : requisitions ) {
-                maxWidth = std::max( maxWidth, requisition.x );
-              }
-              total.x = maxWidth + ( padding * 2 );
+          if( horizontal ) {
+            total.x = padding;
+            for( glm::uvec2& requisition : requisitions ) {
+              total.x += requisition.x + padding;
+            }
+
+            unsigned maxHeight = 0;
+            for( glm::uvec2& requisition : requisitions ) {
+              maxHeight = std::max( maxHeight, requisition.y );
+            }
+            total.y = maxHeight + ( padding * 2 );
+          } else {
+            unsigned int maxWidth = 0;
+            for( glm::uvec2& requisition : requisitions ) {
+              maxWidth = std::max( maxWidth, requisition.x );
+            }
+            total.x = maxWidth + ( padding * 2 );
+
+            total.y = padding;
+            for( glm::uvec2& requisition : requisitions ) {
+              total.y += requisition.y + padding;
             }
           }
 
-          if( !valueIsLiteral( total.y ) ) {
-            if( horizontal ) {
-              unsigned maxHeight = 0;
-              for( glm::uvec2& requisition : requisitions ) {
-                maxHeight = std::max( maxHeight, requisition.y );
-              }
-              total.y = maxHeight + ( padding * 2 );
-            } else {
-              total.y = padding;
-              for( glm::uvec2& requisition : requisitions ) {
-                total.y += requisition.y + padding;
-              }
-            }
-          }
-
-          requisition = bindCalculations( total );
+          requisition = total;
         }
 
         void Layout::render( Device::Display::Adapter::Component::GuiComponent& manager ) {
@@ -110,6 +104,16 @@ namespace BlueBear {
           };
         }
 
+        glm::uvec2 Layout::getFinalRequisition( std::shared_ptr< Element > prospect ) {
+          int width = prospect->getPropertyList().get< int >( "width" );
+          int height = prospect->getPropertyList().get< int >( "height" );
+
+          return glm::uvec2{
+            valueIsLiteral( width ) ? width : prospect->getRequisition().x,
+            valueIsLiteral( height ) ? height : prospect->getRequisition().y
+          };
+        }
+
         /**
          * Boudnaries already defined by parent element
          */
@@ -120,18 +124,19 @@ namespace BlueBear {
           Layout::Relations relations = getRelations( gravity, padding );
           for( std::shared_ptr< Element > child : children ) {
             glm::uvec4 childAllocation;
+            glm::uvec2 childRequisition = getFinalRequisition( child );
 
             if( child->getPropertyList().get< Placement >( "placement" ) == Placement::FLOW ) {
               // flow size - either a proportion derived from layout-weight or the requisition size
               int layoutWeight = child->getPropertyList().get< int >( "layout-weight" );
               childAllocation[ relations.aFlowSize ] = ( layoutWeight >= 1 ) ?
                 ( ( layoutWeight / relations.flowTotalWeight ) * relations.flowTotalSpace ) :
-                child->getRequisition()[ relations.rFlowSize ];
+                childRequisition[ relations.rFlowSize ];
 
               // perp size - fill parent or use requisition
               childAllocation[ relations.aPerpSize ] = ( ( Requisition ) child->getPropertyList().get< int >( relations.perpProperty ) == Requisition::FILL_PARENT ) ?
                 relations.perpSizeAdjusted :
-                child->getRequisition()[ relations.rPerpSize ];
+                childRequisition[ relations.rPerpSize ];
 
               // flow position - will just be current position of the cursor. However, you need to increment the cursor by the above calculated flow dimension
               childAllocation[ relations.aFlowPos ] = relations.cursor;
@@ -157,8 +162,8 @@ namespace BlueBear {
 
               childAllocation[ 0 ] = left;
               childAllocation[ 1 ] = top;
-              childAllocation[ 2 ] = child->getRequisition().x;
-              childAllocation[ 3 ] = child->getRequisition().y;
+              childAllocation[ 2 ] = childRequisition.x;
+              childAllocation[ 3 ] = childRequisition.y;
             }
 
             // That's everything: compute the allocation

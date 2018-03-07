@@ -45,6 +45,7 @@ namespace BlueBear {
           Layout( const std::string& id, const std::vector< std::string >& classes );
 
           Relations getRelations( Gravity gravity, int padding );
+          glm::uvec2 getFinalRequisition( std::shared_ptr< Element > prospect );
 
         public:
           virtual void positionAndSizeChildren();

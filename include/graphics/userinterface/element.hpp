@@ -47,7 +47,6 @@ namespace BlueBear {
         virtual ~Element();
 
         bool valueIsLiteral( int r );
-        glm::uvec2 bindCalculations( glm::ivec2 total );
 
       public:
         virtual void positionAndSizeChildren();
