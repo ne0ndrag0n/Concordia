@@ -3,7 +3,6 @@
 #include "graphics/scenegraph/mesh/boneuniform.hpp"
 #include "graphics/scenegraph/mesh/mesh.hpp"
 #include "graphics/scenegraph/material.hpp"
-#include "graphics/transform.hpp"
 #include "graphics/shader.hpp"
 #include <glm/glm.hpp>
 #include <algorithm>

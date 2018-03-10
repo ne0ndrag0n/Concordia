@@ -1,4 +1,5 @@
 #include "tools/assimptools.hpp"
+#include <assimp/postprocess.h>
 
 namespace BlueBear {
   namespace Tools {
