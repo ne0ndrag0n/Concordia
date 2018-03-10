@@ -61,7 +61,7 @@ namespace BlueBear {
       }
 
       glm::uvec2 Element::getAbsolutePosition() {
-        if( std::shared_ptr< Element > parent = parentWeak.lock() ) {
+        if( std::shared_ptr< Element > parent = getParent() ) {
           return glm::uvec2{
             allocation.x + parent->getAbsolutePosition().x,
             allocation.y + parent->getAbsolutePosition().y
@@ -69,6 +69,27 @@ namespace BlueBear {
         }
 
         return glm::uvec2{ allocation.x, allocation.y };
+      }
+
+      std::shared_ptr< Element > Element::getParent() {
+        return parentWeak.lock();
+      }
+
+      void Element::addChild( std::shared_ptr< Element > child ) {
+        child->detach();
+        children.emplace_back( child );
+        child->parentWeak = shared_from_this();
+      }
+
+      void Element::detach() {
+        if( std::shared_ptr< Element > parent = getParent() ) {
+          parent->children.erase(
+            std::remove( parent->children.begin(), parent->children.end(), shared_from_this() ),
+            parent->children.end()
+          );
+
+          parentWeak = std::weak_ptr< Element >();
+        }
       }
 
       void Element::reflow( Device::Display::Adapter::Component::GuiComponent& manager ) {

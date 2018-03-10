@@ -55,6 +55,10 @@ namespace BlueBear {
         virtual void render( Device::Display::Adapter::Component::GuiComponent& manager ) = 0;
         virtual void calculate() = 0;
 
+        std::shared_ptr< Element > getParent();
+        void addChild( std::shared_ptr< Element > child );
+        void detach();
+
         PropertyList& getPropertyList();
         glm::uvec2 getRequisition();
 
