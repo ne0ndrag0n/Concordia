@@ -14,6 +14,8 @@ namespace BlueBear {
         1, 2, 3
       };
 
+      unsigned int Drawable::zOrder = 0;
+
       Drawable::Drawable( std::shared_ptr< Vector::Renderer::Texture > texture, unsigned int x, unsigned int y, unsigned int width, unsigned int height ) :
         texture( texture ) {
         glGenVertexArrays( 1, &VAO );
@@ -66,6 +68,10 @@ namespace BlueBear {
         return vertices;
       }
 
+      void Drawable::resetZCount() {
+        zOrder = 0;
+      }
+
       void Drawable::draw() {
         glm::mat4 orthoProjection = glm::ortho(
           0.0f,
@@ -75,8 +81,10 @@ namespace BlueBear {
           -1.0f,
           1000.0f
         );
+        glm::mat4 zOrderTransform = glm::translate( glm::mat4{ 1.0f }, glm::vec3{ 0, 0, 1000 - zOrder } );
 
         Tools::OpenGL::setUniform( "orthoProjection", orthoProjection );
+        Tools::OpenGL::setUniform( "zOrderTransform", zOrderTransform );
 
         glActiveTexture( GL_TEXTURE0 );
         glBindTexture( GL_TEXTURE_2D, texture->getTextureId() );
@@ -85,6 +93,8 @@ namespace BlueBear {
         glBindVertexArray( VAO );
           glDrawElements( GL_TRIANGLES, 2, GL_UNSIGNED_INT, 0 );
         glBindVertexArray( 0 );
+
+        zOrder++;
       }
 
     }

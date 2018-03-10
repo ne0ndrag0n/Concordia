@@ -1,5 +1,6 @@
 #include "graphics/userinterface/propertylist.hpp"
 #include <glm/glm.hpp>
+#include <string>
 
 namespace BlueBear {
   namespace Graphics {
@@ -18,7 +19,7 @@ namespace BlueBear {
         { "horizontal-orientation", Orientation::LEFT },
         { "background-color", glm::uvec4{ 255, 255, 255, 255 } },
         { "color", glm::uvec4{ 0, 0, 0, 255 } },
-        { "font", "roboto" },
+        { "font", std::string{ "roboto" } },
         { "font-size", 16.0 },
         { "font-bold", false },
         { "font-italic", false },

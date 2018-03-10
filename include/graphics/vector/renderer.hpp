@@ -8,6 +8,7 @@
 #include <SFML/Window/Context.hpp>
 #include <memory>
 #include <functional>
+#include <optional>
 
 struct NVGLUframebuffer;
 
@@ -55,7 +56,11 @@ namespace BlueBear {
         void drawRect( const glm::uvec4& dimensions, const glm::uvec4& color );
         void drawText( const std::string& fontFace, const std::string& text, const glm::uvec2& position, const glm::uvec4& color, double points );
 
-        std::shared_ptr< Renderer::Texture > createTexture( const glm::uvec2& dimensions, std::function< void( Renderer& ) > functor );
+        std::shared_ptr< Renderer::Texture > createTexture(
+          const glm::uvec2& dimensions,
+          std::function< void( Renderer& ) > functor,
+          std::optional< glm::uvec4 > scissor = {}
+        );
       };
 
     }

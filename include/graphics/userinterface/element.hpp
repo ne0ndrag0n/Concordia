@@ -39,7 +39,7 @@ namespace BlueBear {
         glm::uvec4 allocation;
         std::unique_ptr< Drawable > drawable;
 
-        std::weak_ptr< Element > parent;
+        std::weak_ptr< Element > parentWeak;
         std::vector< std::shared_ptr< Element > > children;
 
         Element( const std::string& tag, const std::string& id, const std::vector< std::string >& classes );
@@ -47,6 +47,8 @@ namespace BlueBear {
         virtual ~Element();
 
         bool valueIsLiteral( int r );
+        glm::uvec2 getAbsolutePosition();
+        virtual std::vector< std::shared_ptr< Element > > getSortedElements();
 
       public:
         virtual void positionAndSizeChildren();

@@ -77,7 +77,7 @@ namespace BlueBear {
         nvgText( context, position.x, position.y, text.c_str(), NULL );
       }
 
-      std::shared_ptr< Renderer::Texture > Renderer::createTexture( const glm::uvec2& dimensions, std::function< void( Renderer& ) > functor ) {
+      std::shared_ptr< Renderer::Texture > Renderer::createTexture( const glm::uvec2& dimensions, std::function< void( Renderer& ) > functor, std::optional< glm::uvec4 > scissor ) {
         device.executeOnSecondaryContext( secondaryGLContext, [ & ]() {
           currentTexture = std::make_shared< Renderer::Texture >( *this, dimensions );
 
@@ -91,6 +91,10 @@ namespace BlueBear {
 
             nvgBeginFrame( context, ConfigManager::getInstance().getIntValue( "viewport_x" ), ConfigManager::getInstance().getIntValue( "viewport_y" ), 1.0f );
               functor( *this );
+              if( scissor ) {
+                glm::uvec4& scissorDims = *scissor;
+                nvgScissor( context, scissorDims[ 0 ], scissorDims[ 1 ], scissorDims[ 2 ], scissorDims[ 3 ] );
+              }
             nvgEndFrame( context );
           nvgluBindFramebuffer( nullptr );
         } );
