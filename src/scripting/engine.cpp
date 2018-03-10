@@ -5,7 +5,6 @@
 #include "tools/utility.hpp"
 #include "scripting/lot.hpp"
 #include "scripting/engine.hpp"
-#include "graphics/display.hpp"
 #include "configmanager.hpp"
 #include "eventmanager.hpp"
 #include "scripting/infrastructurefactory.hpp"

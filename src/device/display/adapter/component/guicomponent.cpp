@@ -1,6 +1,5 @@
 #include "device/display/adapter/component/guicomponent.hpp"
 #include "device/display/display.hpp"
-#include "graphics/gui/luaelement.hpp"
 #include "configmanager.hpp"
 #include "log.hpp"
 #include <SFGUI/Widget.hpp>

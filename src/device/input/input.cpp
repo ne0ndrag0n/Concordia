@@ -1,5 +1,4 @@
 #include "device/input/input.hpp"
-#include "graphics/gui/sfgroot.hpp"
 #include "tools/ctvalidators.hpp"
 #include "tools/utility.hpp"
 #include "eventmanager.hpp"
