@@ -19,6 +19,7 @@ namespace BlueBear {
 
         void Text::render( Device::Display::Adapter::Component::GuiComponent& manager ) {
           glm::uvec2 absolutePosition = getAbsolutePosition();
+          double fontSize = localStyle.get< double >( "font-size" );
 
           drawable = std::make_unique< UserInterface::Drawable >(
             manager.getVectorRenderer().createTexture(
@@ -27,16 +28,16 @@ namespace BlueBear {
                 renderer.drawText(
                   localStyle.get< std::string >( "font" ),
                   innerText,
-                  glm::uvec2{ 0, 0 },
+                  glm::uvec2{ 0, fontSize / 2 },
                   localStyle.get< glm::uvec4 >( "color" ),
-                  localStyle.get< double >( "font-size" )
+                  fontSize
                 );
               }
             ),
             absolutePosition.x,
             absolutePosition.y,
-            absolutePosition.x + allocation[ 2 ],
-            absolutePosition.y + allocation[ 3 ]
+            allocation[ 2 ],
+            allocation[ 3 ]
           );
         }
 

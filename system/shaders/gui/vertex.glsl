@@ -10,6 +10,6 @@ uniform mat4 zOrderTransform;
 void main() {
   // p * v * m * vector
   // p * m * vector
-  gl_Position = orthoProjection * zOrderTransform * vec4( position, 1.0f );
+  gl_Position = orthoProjection /* * zOrderTransform */ * vec4( position, 1.0f );
   fragTexture = texture;
 }

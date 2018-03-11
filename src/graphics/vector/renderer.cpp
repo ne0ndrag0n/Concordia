@@ -89,7 +89,7 @@ namespace BlueBear {
             glClearColor( 0, 0, 0, 0 );
             glClear( GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
 
-            nvgBeginFrame( context, ConfigManager::getInstance().getIntValue( "viewport_x" ), ConfigManager::getInstance().getIntValue( "viewport_y" ), 1.0f );
+            nvgBeginFrame( context, dimensions.x, dimensions.y, 1.0f );
               functor( *this );
               if( scissor ) {
                 glm::uvec4& scissorDims = *scissor;

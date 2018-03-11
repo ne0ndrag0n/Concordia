@@ -43,6 +43,7 @@ namespace BlueBear {
           // TODO: remove TEST code
           void GuiComponent::__testadd() {
             auto text = Graphics::UserInterface::Widgets::Text::create( "text", {}, "42" );
+            text->getPropertyList().set< glm::uvec4 >( "color", glm::uvec4{ 255, 255, 255, 255 } );
             rootElement->addChild( text );
 
             rootElement->calculate();
@@ -70,12 +71,14 @@ namespace BlueBear {
           }
 
           void GuiComponent::nextFrame() {
+            glDisable( GL_CULL_FACE );
+
             guiShader.use( true );
             Graphics::UserInterface::Drawable::resetZCount();
 
-            /*
             rootElement->draw();
-            */
+
+            glEnable( GL_CULL_FACE );
           }
 
         }

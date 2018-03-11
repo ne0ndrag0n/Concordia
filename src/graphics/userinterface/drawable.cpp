@@ -81,7 +81,7 @@ namespace BlueBear {
           -1.0f,
           1000.0f
         );
-        glm::mat4 zOrderTransform = glm::translate( glm::mat4{ 1.0f }, glm::vec3{ 0, 0, 1000 - zOrder } );
+        glm::mat4 zOrderTransform = glm::translate( glm::mat4{ 1.0f }, glm::vec3{ 0, 0, 999 - zOrder } );
 
         Tools::OpenGL::setUniform( "orthoProjection", orthoProjection );
         Tools::OpenGL::setUniform( "zOrderTransform", zOrderTransform );
@@ -91,7 +91,7 @@ namespace BlueBear {
         Tools::OpenGL::setUniform( "surface", 0 );
 
         glBindVertexArray( VAO );
-          glDrawElements( GL_TRIANGLES, 2, GL_UNSIGNED_INT, 0 );
+          glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );
         glBindVertexArray( 0 );
 
         zOrder++;
