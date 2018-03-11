@@ -99,8 +99,9 @@ namespace BlueBear {
         animator->setCurrentAnimation( "Armature|ArmatureAction" );
       } );
       inputManager.listen( sf::Keyboard::V, [ & ]() {
-        Log::getInstance().debug( "HouseholdGameplayState::setupInputDevice", "Trying this context shit..." );
+        Log::getInstance().debug( "HouseholdGameplayState::setupInputDevice", "Trying this shit..." );
 
+        /*
         application
           .getDisplayDevice()
           .getAdapterAt( GUI_ADAPTER )
@@ -109,8 +110,15 @@ namespace BlueBear {
           .createTexture( glm::uvec2{ 100, 100 }, [ & ]( Graphics::Vector::Renderer& renderer ) {
             renderer.drawRect( glm::uvec4{ 10, 10, 10, 10 }, glm::uvec4{ 10, 0, 0, 255 } );
           } );
+          */
 
-        Log::getInstance().debug( "HouseholdGameplayState::setupInputDevice", "Back to the original context" );
+        application
+          .getDisplayDevice()
+          .getAdapterAt( GUI_ADAPTER )
+          .as< Device::Display::Adapter::Component::GuiComponent >()
+          .__testadd();
+
+        Log::getInstance().debug( "HouseholdGameplayState::setupInputDevice", "Done" );
       } );
     }
 

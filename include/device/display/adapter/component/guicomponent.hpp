@@ -30,6 +30,9 @@ namespace BlueBear {
             std::shared_ptr< Graphics::UserInterface::Element > rootElement;
 
           public:
+
+            void __testadd();
+
             Graphics::Vector::Renderer& getVectorRenderer();
 
             std::queue< sf::Event > getEvents();

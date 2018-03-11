@@ -26,9 +26,9 @@ namespace BlueBear {
         class Layout : public Element {
 
           struct Relations {
-            const std::string& orientation;
-            const std::string& flowProperty;
-            const std::string& perpProperty;
+            const std::string orientation;
+            const std::string flowProperty;
+            const std::string perpProperty;
             int cursor;
             const int rFlowSize;
             const int rPerpSize;
@@ -52,7 +52,7 @@ namespace BlueBear {
           virtual void render( Device::Display::Adapter::Component::GuiComponent& manager );
           virtual void calculate() override;
 
-          std::shared_ptr< Layout > create( const std::string& id, const std::vector< std::string >& classes );
+          static std::shared_ptr< Layout > create( const std::string& id, const std::vector< std::string >& classes );
         };
 
       }

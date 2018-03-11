@@ -9,8 +9,8 @@ namespace BlueBear {
       const PropertyList _default( {
         { "left", 0 },
         { "top", 0 },
-        { "width", 0 },
-        { "height", 0 },
+        { "width", ( int ) Requisition::AUTO },
+        { "height", ( int ) Requisition::AUTO },
         { "padding", 0 },
         { "placement", Placement::FLOW },
         { "gravity", Gravity::LEFT },

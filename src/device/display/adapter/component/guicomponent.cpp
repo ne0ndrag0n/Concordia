@@ -1,11 +1,16 @@
 #include "device/display/adapter/component/guicomponent.hpp"
 #include "device/display/display.hpp"
+#include "graphics/userinterface/widgets/layout.hpp"
+#include "graphics/userinterface/propertylist.hpp"
+#include "graphics/userinterface/drawable.hpp"
 #include "configmanager.hpp"
 #include "log.hpp"
 #include <SFGUI/Widget.hpp>
 #include <SFGUI/Entry.hpp>
 #include <GL/glew.h>
 #include <glm/glm.hpp>
+
+#include "graphics/userinterface/widgets/text.hpp"
 
 namespace BlueBear {
   namespace Device {
@@ -16,7 +21,33 @@ namespace BlueBear {
           GuiComponent::GuiComponent( Device::Display::Display& display ) :
             Adapter::Adapter( display ),
             vector( display ),
-            guiShader( "system/shaders/gui/vertex.glsl", "system/shaders/gui/fragment.glsl" ) {}
+            guiShader( "system/shaders/gui/vertex.glsl", "system/shaders/gui/fragment.glsl" ) {
+              rootElement = Graphics::UserInterface::Widgets::Layout::create( "", {} );
+
+              rootElement->getPropertyList().set< int >( "top", 0 );
+              rootElement->getPropertyList().set< int >( "left", 0 );
+              rootElement->getPropertyList().set< int >( "width", ConfigManager::getInstance().getIntValue( "viewport_x" ) );
+              rootElement->getPropertyList().set< int >( "height", ConfigManager::getInstance().getIntValue( "viewport_y" ) );
+              rootElement->getPropertyList().set< Graphics::UserInterface::Gravity >( "gravity", Graphics::UserInterface::Gravity::TOP );
+              rootElement->setAllocation( {
+                0,
+                0,
+                ConfigManager::getInstance().getIntValue( "viewport_x" ),
+                ConfigManager::getInstance().getIntValue( "viewport_y" )
+              } );
+
+              rootElement->calculate();
+              rootElement->reflow( *this );
+            }
+
+          // TODO: remove TEST code
+          void GuiComponent::__testadd() {
+            auto text = Graphics::UserInterface::Widgets::Text::create( "text", {}, "42" );
+            rootElement->addChild( text );
+
+            rootElement->calculate();
+            rootElement->reflow( *this );
+          }
 
           Graphics::Vector::Renderer& GuiComponent::getVectorRenderer() {
             return vector;
@@ -38,7 +69,14 @@ namespace BlueBear {
             return events;
           }
 
-          void GuiComponent::nextFrame() {}
+          void GuiComponent::nextFrame() {
+            guiShader.use( true );
+            Graphics::UserInterface::Drawable::resetZCount();
+
+            /*
+            rootElement->draw();
+            */
+          }
 
         }
       }

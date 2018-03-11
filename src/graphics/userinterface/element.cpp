@@ -95,10 +95,13 @@ namespace BlueBear {
       void Element::reflow( Device::Display::Adapter::Component::GuiComponent& manager ) {
         // Render myself, since I've already been positioned and sized
         render( manager );
-        positionAndSizeChildren();
 
-        for( std::shared_ptr< Element > child : children ) {
-          child->reflow( manager );
+        if( !children.empty() ) {
+          positionAndSizeChildren();
+
+          for( std::shared_ptr< Element > child : children ) {
+            child->reflow( manager );
+          }
         }
       }
 

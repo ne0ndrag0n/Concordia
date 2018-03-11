@@ -37,7 +37,8 @@ namespace BlueBear {
             try {
               return std::any_cast< VariantType >( it->second );
             } catch ( const std::bad_any_cast& e ) {
-              Log::getInstance().warn( "PropertyList::get", key + " could not be converted to the requested type. Please check the type with propertyIsType()." );
+              Log::getInstance().error( "PropertyList::get", key + " could not be converted to the requested type. Please check the type with propertyIsType()." );
+              throw e;
             }
           }
 

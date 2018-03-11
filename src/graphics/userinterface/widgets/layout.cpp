@@ -57,7 +57,7 @@ namespace BlueBear {
         }
 
         void Layout::render( Device::Display::Adapter::Component::GuiComponent& manager ) {
-          // crazy nanovg shit goes here
+          // Nothing to render.
         }
 
         Layout::Relations Layout::getRelations( Gravity gravity, int padding ) {

@@ -9,6 +9,14 @@ namespace BlueBear {
     namespace UserInterface {
       namespace Widgets {
 
+        Text::Text( const std::string& id, const std::vector< std::string >& classes, const std::string& innerText ) : Element::Element( "Text", id, classes ), innerText( innerText ) {}
+
+        std::shared_ptr< Text > Text::create( const std::string& id, const std::vector< std::string >& classes, const std::string& innerText ) {
+          std::shared_ptr< Text > text( new Text( id, classes, innerText ) );
+
+          return text;
+        }
+
         void Text::render( Device::Display::Adapter::Component::GuiComponent& manager ) {
           glm::uvec2 absolutePosition = getAbsolutePosition();
 
@@ -35,7 +43,7 @@ namespace BlueBear {
         void Text::calculate() {
           int padding = localStyle.get< int >( "padding" );
           int len = innerText.size();
-          int fontSize = localStyle.get< int >( "font-size" );
+          double fontSize = localStyle.get< double >( "font-size" );
 
           requisition = glm::uvec2{
             ( padding * 2 ) + ( fontSize * len ),
