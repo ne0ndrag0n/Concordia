@@ -5,8 +5,6 @@
 #include "graphics/userinterface/drawable.hpp"
 #include "configmanager.hpp"
 #include "log.hpp"
-#include <SFGUI/Widget.hpp>
-#include <SFGUI/Entry.hpp>
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 

@@ -12,8 +12,6 @@
 #include <vector>
 #include <string>
 #include <functional>
-#include <SFGUI/Widget.hpp>
-#include <SFGUI/Container.hpp>
 #include <memory>
 #include <cparse/shunting-yard.h>
 
@@ -92,12 +90,6 @@ namespace BlueBear {
 				static std::string xmlToString( tinyxml2::XMLElement* element );
 
 				static tinyxml2::XMLElement* getRootNode( tinyxml2::XMLDocument& document, const std::string& xmlString );
-
-				static std::shared_ptr< sfg::Widget > isActualParent( std::shared_ptr< sfg::Widget > widget, std::shared_ptr< sfg::Widget > parent );
-
-				static bool widgetIsContainer( std::shared_ptr< sfg::Widget > widget );
-
-				static std::shared_ptr< sfg::Widget > getWidgetOrAncestor( std::shared_ptr< sfg::Widget > widget );
 
 				static void queryFloatExpression( tinyxml2::XMLElement* element, const std::string& attribute, TokenMap& tokenMap, float* destination );
 
