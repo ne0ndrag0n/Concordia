@@ -77,6 +77,8 @@ namespace BlueBear {
       }
 
       void Renderer::drawText( const std::string& fontFace, const std::string& text, const glm::uvec2& position, const glm::uvec4& color, double points ) {
+        checkTexture();
+
         nvgFontSize( context, points );
         nvgFontFace( context, fontFace.c_str() );
         nvgFillColor( context, nvgRGBA( color[ 0 ], color[ 1 ], color[ 2 ], color[ 3 ] ) );

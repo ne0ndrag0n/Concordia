@@ -13,6 +13,7 @@ namespace BlueBear {
 
         class Text : public Element {
           std::string innerText;
+          double textSpan = 0;
 
         protected:
           Text( const std::string& id, const std::vector< std::string >& classes, const std::string& innerText );
