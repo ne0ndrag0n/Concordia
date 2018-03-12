@@ -21,7 +21,7 @@ Concordia
 
 * Lua 5.3 scripting system: everything the game uses outside of its base structure as a dollhouse game is designed as an extensible script (e.g. all objects and types of objects are defined as Lua classes)
 * Isometric 2.5D presentation with a retro-inspired pixel art look-and-feel
-* SFML-powered multimedia framework featuring the SFGUI widget toolkit
+* SFML-powered multimedia framework
 * Multi-threaded architecture, using modern C++17 to make the most of your multi-core CPU
 
 ## Dependencies

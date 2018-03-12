@@ -5,7 +5,6 @@
 #include <map>
 #include <functional>
 #include <memory>
-#include <SFGUI/Widget.hpp>
 #include <sol.hpp>
 
 namespace BlueBear {
@@ -65,30 +64,9 @@ namespace BlueBear {
      }
    };
 
-  /**
-   * This is mainly meant to be a many-to-one mapping for internal use
-   */
-  class SFGUIEatEvent {
-  public:
-    enum class Event {
-      EAT_KEYBOARD_EVENT,
-      EAT_MOUSE_EVENT
-    };
-
-    void listen( Event event, std::function< void() > callback );
-
-    void stopListening( Event event );
-
-    void trigger( Event event );
-
-  private:
-    std::map< Event, std::function< void() > > listeners;
-  };
-
   struct EventManager {
     BasicEvent< void*, LuaReference > UI_ACTION_EVENT_LEGACY;
     BasicEvent< void*, sol::function& > UI_ACTION_EVENT;
-    SFGUIEatEvent SFGUI_EAT_EVENT;
     BasicEvent< void*, void*, int > ITEM_ADDED;
     BasicEvent< void*, void*, int > ITEM_REMOVED;
     BasicEvent< void*, std::string > MESSAGE_LOGGED;
