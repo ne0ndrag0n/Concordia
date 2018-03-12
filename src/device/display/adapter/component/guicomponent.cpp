@@ -1,5 +1,6 @@
 #include "device/display/adapter/component/guicomponent.hpp"
 #include "device/display/display.hpp"
+#include "graphics/userinterface/element.hpp"
 #include "graphics/userinterface/widgets/layout.hpp"
 #include "graphics/userinterface/propertylist.hpp"
 #include "graphics/userinterface/drawable.hpp"
@@ -20,6 +21,8 @@ namespace BlueBear {
             Adapter::Adapter( display ),
             vector( display ),
             guiShader( "system/shaders/gui/vertex.glsl", "system/shaders/gui/fragment.glsl" ) {
+              Graphics::UserInterface::Element::manager = this;
+
               rootElement = Graphics::UserInterface::Widgets::Layout::create( "", {} );
 
               rootElement->getPropertyList().set< int >( "top", 0 );
@@ -33,17 +36,6 @@ namespace BlueBear {
                 ConfigManager::getInstance().getIntValue( "viewport_x" ),
                 ConfigManager::getInstance().getIntValue( "viewport_y" )
               } );
-
-              rootElement->calculate();
-              rootElement->reflow( *this );
-
-              Graphics::UserInterface::Widgets::Text::getTextSizeParams = std::bind(
-                &Graphics::Vector::Renderer::getTextSizeParams,
-                &vector,
-                std::placeholders::_1,
-                std::placeholders::_2,
-                std::placeholders::_3
-              );
             }
 
           // TODO: remove TEST code
@@ -51,10 +43,8 @@ namespace BlueBear {
             auto text = Graphics::UserInterface::Widgets::Text::create( "text", {}, "This is test text." );
             text->getPropertyList().set< glm::uvec4 >( "color", glm::uvec4{ 255, 255, 255, 255 } );
             text->getPropertyList().set< glm::uvec4 >( "background-color", glm::uvec4{ 64, 64, 64, 255 } );
-            rootElement->addChild( text );
 
-            rootElement->calculate();
-            rootElement->reflow( *this );
+            rootElement->addChild( text );
           }
 
           Graphics::Vector::Renderer& GuiComponent::getVectorRenderer() {

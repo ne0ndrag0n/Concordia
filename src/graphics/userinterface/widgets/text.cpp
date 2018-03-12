@@ -10,8 +10,6 @@ namespace BlueBear {
     namespace UserInterface {
       namespace Widgets {
 
-        std::function< glm::vec4( const std::string&, const std::string&, float ) > Text::getTextSizeParams;
-
         Text::Text( const std::string& id, const std::vector< std::string >& classes, const std::string& innerText ) : Element::Element( "Text", id, classes ), innerText( innerText ) {}
 
         std::shared_ptr< Text > Text::create( const std::string& id, const std::vector< std::string >& classes, const std::string& innerText ) {
@@ -20,11 +18,11 @@ namespace BlueBear {
           return text;
         }
 
-        void Text::render( Device::Display::Adapter::Component::GuiComponent& manager ) {
+        void Text::render() {
           glm::uvec2 absolutePosition = getAbsolutePosition();
 
           drawable = std::make_unique< UserInterface::Drawable >(
-            manager.getVectorRenderer().createTexture(
+            manager->getVectorRenderer().createTexture(
               glm::uvec2{ allocation[ 2 ], allocation[ 3 ] },
               [ & ]( Graphics::Vector::Renderer& renderer ) {
                 double fontSize = localStyle.get< double >( "font-size" );
@@ -53,7 +51,7 @@ namespace BlueBear {
         void Text::calculate() {
           int padding = localStyle.get< int >( "padding" );
           double fontSize = localStyle.get< double >( "font-size" );
-          glm::vec4 size = getTextSizeParams( localStyle.get< std::string >( "font" ), innerText, fontSize );
+          glm::vec4 size = manager->getVectorRenderer().getTextSizeParams( localStyle.get< std::string >( "font" ), innerText, fontSize );
           textSpan = size[ 2 ];
 
           requisition = glm::uvec2{

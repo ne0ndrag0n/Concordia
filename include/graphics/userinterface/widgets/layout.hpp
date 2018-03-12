@@ -49,7 +49,7 @@ namespace BlueBear {
 
         public:
           virtual void positionAndSizeChildren();
-          virtual void render( Device::Display::Adapter::Component::GuiComponent& manager );
+          virtual void render();
           virtual void calculate() override;
 
           static std::shared_ptr< Layout > create( const std::string& id, const std::vector< std::string >& classes );

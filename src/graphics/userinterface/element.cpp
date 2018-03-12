@@ -7,12 +7,15 @@ namespace BlueBear {
   namespace Graphics {
     namespace UserInterface {
 
+      Device::Display::Adapter::Component::GuiComponent* Element::manager = nullptr;
+
       Element::Element( const std::string& tag, const std::string& id, const std::vector< std::string >& classes ) : tag( tag ), id( id ), classes( classes ) {}
 
       Element::~Element() {}
 
       void Element::setAllocation( const glm::uvec4& allocation ) {
         this->allocation = allocation;
+        reflow();
       }
 
       PropertyList& Element::getPropertyList() {
@@ -79,28 +82,34 @@ namespace BlueBear {
         child->detach();
         children.emplace_back( child );
         child->parentWeak = shared_from_this();
+
+        reflow();
       }
 
       void Element::detach() {
         if( std::shared_ptr< Element > parent = getParent() ) {
+          std::shared_ptr< Element > thisElement = shared_from_this();
           parent->children.erase(
-            std::remove( parent->children.begin(), parent->children.end(), shared_from_this() ),
+            std::remove( parent->children.begin(), parent->children.end(), thisElement ),
             parent->children.end()
           );
 
           parentWeak = std::weak_ptr< Element >();
+
+          parent->reflow();
+          thisElement->reflow();
         }
       }
 
-      void Element::reflow( Device::Display::Adapter::Component::GuiComponent& manager ) {
+      void Element::reflow() {
         // Render myself, since I've already been positioned and sized
-        render( manager );
+        render();
 
         if( !children.empty() ) {
           positionAndSizeChildren();
 
           for( std::shared_ptr< Element > child : children ) {
-            child->reflow( manager );
+            child->reflow();
           }
         }
       }

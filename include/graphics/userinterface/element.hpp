@@ -51,8 +51,10 @@ namespace BlueBear {
         virtual std::vector< std::shared_ptr< Element > > getSortedElements();
 
       public:
+        static Device::Display::Adapter::Component::GuiComponent* manager;
+
         virtual void positionAndSizeChildren();
-        virtual void render( Device::Display::Adapter::Component::GuiComponent& manager ) = 0;
+        virtual void render() = 0;
         virtual void calculate() = 0;
 
         std::shared_ptr< Element > getParent();
@@ -63,7 +65,7 @@ namespace BlueBear {
         glm::uvec2 getRequisition();
 
         void setAllocation( const glm::uvec4& allocation );
-        void reflow( Device::Display::Adapter::Component::GuiComponent& manager );
+        void reflow();
         void draw();
       };
 

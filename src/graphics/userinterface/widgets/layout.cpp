@@ -56,7 +56,7 @@ namespace BlueBear {
           requisition = total;
         }
 
-        void Layout::render( Device::Display::Adapter::Component::GuiComponent& manager ) {
+        void Layout::render() {
           // Nothing to render.
         }
 
@@ -123,6 +123,8 @@ namespace BlueBear {
 
           Layout::Relations relations = getRelations( gravity, padding );
           for( std::shared_ptr< Element > child : children ) {
+            child->calculate();
+
             glm::uvec4 childAllocation;
             glm::uvec2 childRequisition = getFinalRequisition( child );
 
