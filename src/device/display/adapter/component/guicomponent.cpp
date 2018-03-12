@@ -36,11 +36,19 @@ namespace BlueBear {
 
               rootElement->calculate();
               rootElement->reflow( *this );
+
+              Graphics::UserInterface::Widgets::Text::getTextSizeParams = std::bind(
+                &Graphics::Vector::Renderer::getTextSizeParams,
+                &vector,
+                std::placeholders::_1,
+                std::placeholders::_2,
+                std::placeholders::_3
+              );
             }
 
           // TODO: remove TEST code
           void GuiComponent::__testadd() {
-            auto text = Graphics::UserInterface::Widgets::Text::create( "text", {}, "42" );
+            auto text = Graphics::UserInterface::Widgets::Text::create( "text", {}, "This is test text." );
             text->getPropertyList().set< glm::uvec4 >( "color", glm::uvec4{ 255, 255, 255, 255 } );
             rootElement->addChild( text );
 

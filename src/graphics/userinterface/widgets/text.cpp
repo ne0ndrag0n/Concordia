@@ -3,11 +3,14 @@
 #include "device/display/adapter/component/guicomponent.hpp"
 #include "graphics/vector/renderer.hpp"
 #include "graphics/userinterface/drawable.hpp"
+#include <cstdlib>
 
 namespace BlueBear {
   namespace Graphics {
     namespace UserInterface {
       namespace Widgets {
+
+        std::function< glm::vec4( const std::string&, const std::string&, float ) > Text::getTextSizeParams;
 
         Text::Text( const std::string& id, const std::vector< std::string >& classes, const std::string& innerText ) : Element::Element( "Text", id, classes ), innerText( innerText ) {}
 
@@ -43,11 +46,11 @@ namespace BlueBear {
 
         void Text::calculate() {
           int padding = localStyle.get< int >( "padding" );
-          int len = innerText.size();
           double fontSize = localStyle.get< double >( "font-size" );
+          glm::vec4 size = getTextSizeParams( localStyle.get< std::string >( "font" ), innerText, fontSize );
 
           requisition = glm::uvec2{
-            ( padding * 2 ) + ( fontSize * len ),
+            ( padding * 2 ) + size[ 2 ],
             ( padding * 2 ) + fontSize
           };
         }
