@@ -9,7 +9,9 @@ namespace BlueBear {
 
       Device::Display::Adapter::Component::GuiComponent* Element::manager = nullptr;
 
-      Element::Element( const std::string& tag, const std::string& id, const std::vector< std::string >& classes ) : tag( tag ), id( id ), classes( classes ) {}
+      Element::Element( const std::string& tag, const std::string& id, const std::vector< std::string >& classes ) : tag( tag ), id( id ), classes( classes ) {
+        localStyle.setParent( this );
+      }
 
       Element::~Element() {}
 

@@ -4,6 +4,7 @@
 #include "exceptions/genexc.hpp"
 #include "log.hpp"
 #include <glm/glm.hpp>
+#include <memory>
 #include <unordered_map>
 #include <string>
 #include <typeinfo>
@@ -12,9 +13,11 @@
 namespace BlueBear {
   namespace Graphics {
     namespace UserInterface {
+      class Element;
 
       class PropertyList {
         unsigned int computedSpecificity = 0;
+        Element* parent = nullptr;
         std::unordered_map< std::string, std::any > values;
 
       public:
@@ -27,9 +30,19 @@ namespace BlueBear {
         PropertyList( unsigned int computedSpecificity, const std::unordered_map< std::string, std::any >& map ) :
           computedSpecificity( computedSpecificity ), values( map ) {}
 
+        void setParent( Element* parent ) {
+          this->parent = parent;
+        };
+
+        void reflowParent();
+
         template < typename VariantType > void set( const std::string& key, VariantType value ) {
           values[ key ] = value;
+
+          reflowParent();
         };
+
+        // TODO: bulk set where reflow doesn't continuously occur
 
         template < typename VariantType > const VariantType get( const std::string& key ) const {
           auto it = values.find( key );

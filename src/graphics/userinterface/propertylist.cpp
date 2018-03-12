@@ -1,4 +1,5 @@
 #include "graphics/userinterface/propertylist.hpp"
+#include "graphics/userinterface/element.hpp"
 #include <glm/glm.hpp>
 #include <string>
 
@@ -28,6 +29,12 @@ namespace BlueBear {
         { "local-z-order", 0 },
         { "visible", true }
       } );
+
+      void PropertyList::reflowParent() {
+        if( parent ) {
+          parent->reflow();
+        }
+      }
 
       const PropertyList& PropertyList::rootPropertyList = _default;
 
