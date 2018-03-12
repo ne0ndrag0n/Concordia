@@ -34,15 +34,12 @@ namespace BlueBear {
         };
 
         static std::vector< GLuint > MESH_INDICES;
-        static unsigned int zOrder;
 
         std::vector< Corner > generateMesh( unsigned int x, unsigned int y, unsigned int width, unsigned int height );
 
       public:
         Drawable( std::shared_ptr< Vector::Renderer::Texture > texture, unsigned int x, unsigned int y, unsigned int width, unsigned int height );
         ~Drawable();
-
-        static void resetZCount();
 
         void draw();
       };

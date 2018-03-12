@@ -74,8 +74,6 @@ namespace BlueBear {
             glDisable( GL_CULL_FACE );
 
             guiShader.use( true );
-            Graphics::UserInterface::Drawable::resetZCount();
-
             rootElement->draw();
 
             glEnable( GL_CULL_FACE );

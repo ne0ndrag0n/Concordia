@@ -5,11 +5,8 @@ layout (location = 1) in vec2 texture;
 out vec2 fragTexture;
 
 uniform mat4 orthoProjection;
-uniform mat4 zOrderTransform;
 
 void main() {
-  // p * v * m * vector
-  // p * m * vector
-  gl_Position = orthoProjection /* * zOrderTransform */ * vec4( position, 1.0f );
+  gl_Position = orthoProjection * vec4( position, 1.0f );
   fragTexture = texture;
 }
