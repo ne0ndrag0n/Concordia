@@ -1,5 +1,0 @@
-* {
-  FontSize: 16;
-  FontName: system/ui/dosvga.ttf;
-  CFontCompensation: -3.0;
-}
