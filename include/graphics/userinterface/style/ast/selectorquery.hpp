@@ -14,6 +14,7 @@ namespace BlueBear {
             std::string tag;
             std::string id;
             std::vector< std::string > classes;
+            bool all = false;
           };
 
         }
