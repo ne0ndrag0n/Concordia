@@ -79,6 +79,10 @@ namespace BlueBear {
                 tokens.push_back( { currentRow, currentColumn, TokenType::SEMICOLON } );
                 currentColumn++;
                 break;
+              case ',':
+                tokens.push_back( { currentRow, currentColumn, TokenType::COMMA } );
+                currentColumn++;
+                break;
               case ':':
                 tokens.push_back( { currentRow, currentColumn, checkAndAdvanceChar( ':' ) ? TokenType::SCOPE_RESOLUTION : TokenType::COLON } );
                 currentColumn++;
@@ -163,11 +167,27 @@ namespace BlueBear {
         }
 
         bool Parser::checkToken( TokenType expectedType ) {
-          if( tokens.empty() ) {
+          return checkToken( tokens.begin(), expectedType );
+        }
+
+        bool Parser::checkToken( std::list< Token >::iterator iterator, TokenType expectedType ) {
+          if( iterator == tokens.end() ) {
             return false;
           }
 
-          return tokens.front().type == expectedType;
+          return iterator->type == expectedType;
+        }
+
+        bool Parser::lookaheadAndCheckToken( std::list< Token >::iterator iterator, unsigned int lookahead, TokenType expectedType ) {
+          for( unsigned int i = 0; i != lookahead; i++ ) {
+            std::advance( iterator, 1 );
+
+            if( iterator == tokens.end() ) {
+              return false;
+            }
+          }
+
+          return checkToken( iterator, expectedType );
         }
 
         Token Parser::getAndExpect( TokenType expectedType, const std::string& expectation ) {
@@ -176,13 +196,98 @@ namespace BlueBear {
           }
 
           Token next = tokens.front();
-          tokens.pop_front();
+          increment();
           return next;
+        }
+
+        void Parser::increment() {
+          if( tokens.begin() != tokens.end() ) {
+            tokens.pop_front();
+          }
         }
 
         bool Parser::isSelectorToken() {
           return checkToken( TokenType::IDENTIFIER ) || checkToken( TokenType::POUND ) ||
             checkToken( TokenType::DOT ) || checkToken( TokenType::STAR );
+        }
+
+        AST::Call Parser::getCall() {
+          AST::Call call;
+
+          call.identifier = getIdentifier();
+
+          getAndExpect( TokenType::LEFT_PAREN, "(" );
+
+          while( true ) {
+            if( checkToken( TokenType::INTEGER ) ) {
+              call.arguments.push_back( AST::Literal{ std::any_cast< int >( tokens.front().metadata ) } );
+              increment();
+            } else if( checkToken( TokenType::DOUBLE ) ) {
+              call.arguments.push_back( AST::Literal{ std::any_cast< double >( tokens.front().metadata ) } );
+              increment();
+            } else if( checkToken( TokenType::BOOLEAN ) ) {
+              call.arguments.push_back( AST::Literal{ std::any_cast< bool >( tokens.front().metadata ) } );
+              increment();
+            } else if( checkToken( TokenType::STRING ) ) {
+              call.arguments.push_back( AST::Literal{ std::any_cast< std::string >( tokens.front().metadata ) } );
+              increment();
+            } else if( checkToken( TokenType::IDENTIFIER ) ) {
+              auto current = tokens.begin();
+              while( true ) {
+                if( !checkToken( current, TokenType::IDENTIFIER ) ) {
+                  break;
+                }
+
+                std::advance( current, 1 );
+
+                if( !checkToken( current, TokenType::SCOPE_RESOLUTION ) ) {
+                  break;
+                }
+
+                std::advance( current, 1 );
+              }
+
+              if( checkToken( current, TokenType::LEFT_PAREN ) ) {
+                call.arguments.push_back( getCall() );
+              } else {
+                call.arguments.push_back( getIdentifier() );
+              }
+            } else {
+              throwParseException( "integer, double, boolean, string, or identifier token" );
+            }
+
+            if( checkToken( TokenType::COMMA ) ) {
+              increment();
+            } else {
+              break;
+            }
+          }
+
+          getAndExpect( TokenType::RIGHT_PAREN, ")" );
+
+          return call;
+        }
+
+        AST::Identifier Parser::getIdentifier() {
+          AST::Identifier identifier;
+
+          while( true ) {
+            // Lookahead for SCOPE_RESOLUTION
+            if( lookaheadAndCheckToken( tokens.begin(), 1, TokenType::SCOPE_RESOLUTION ) ) {
+              Token identifierToken = getAndExpect( TokenType::IDENTIFIER, "identifier" );
+              identifier.scope.push_back( std::any_cast< std::string >( identifierToken.metadata ) );
+
+              // Pop the SCOPE_RESOLUTION token
+              increment();
+            } else {
+              break;
+            }
+          }
+
+          Token identToken = getAndExpect( TokenType::IDENTIFIER, "identifier" );
+          identifier.value = std::any_cast< std::string >( identToken.metadata );
+
+          return identifier;
         }
 
         AST::SelectorQuery Parser::getSelectorQuery() {
@@ -195,16 +300,16 @@ namespace BlueBear {
 
           if( checkToken( TokenType::IDENTIFIER ) ) {
             selectorQuery.tag = std::any_cast< std::string >( tokens.front().metadata );
-            tokens.pop_front();
+            increment();
           }
 
           if( checkToken( TokenType::POUND ) ) {
-            tokens.pop_front();
+            increment();
             selectorQuery.id = std::any_cast< std::string >( getAndExpect( TokenType::IDENTIFIER, "identifier" ) );
           }
 
           while( checkToken( TokenType::DOT ) ) {
-            tokens.pop_front();
+            increment();
             selectorQuery.classes.push_back(
               std::any_cast< std::string >( getAndExpect( TokenType::IDENTIFIER, "identifier" ) )
             );
@@ -217,42 +322,48 @@ namespace BlueBear {
           AST::Property property;
 
           property.name = std::any_cast< std::string >( tokens.front().metadata );
-          tokens.pop_front();
+          increment();
+
+          getAndExpect( TokenType::COLON, ":" );
 
           if( checkToken( TokenType::INTEGER ) ) {
             property.value = AST::Literal{ std::any_cast< int >( tokens.front().metadata ) };
-            tokens.pop_front();
+            increment();
           } else if( checkToken( TokenType::DOUBLE ) ) {
             property.value = AST::Literal{ std::any_cast< double >( tokens.front().metadata ) };
-            tokens.pop_front();
+            increment();
           } else if( checkToken( TokenType::BOOLEAN ) ) {
             property.value = AST::Literal{ std::any_cast< bool >( tokens.front().metadata ) };
-            tokens.pop_front();
+            increment();
           } else if( checkToken( TokenType::STRING ) ) {
             property.value = AST::Literal{ std::any_cast< std::string >( tokens.front().metadata ) };
-            tokens.pop_front();
+            increment();
           } else if( checkToken( TokenType::IDENTIFIER ) ) {
-            // Call - IDENTIFIER ( SCOPE_RESOLUTION IDENTIFIER )* LEFT_PAREN
-            // Else plain old identifier
-            auto iterator = tokens.begin();
-            std::advance( iterator, 1 );
+            auto current = tokens.begin();
+            while( true ) {
+              if( !checkToken( current, TokenType::IDENTIFIER ) ) {
+                break;
+              }
 
-            if( iterator->type == TokenType::LEFT_PAREN ) {
-              // Skip directly to function call
-              // property.value = getCall();
-            } else if( iterator->type == TokenType::SCOPE_RESOLUTION ) {
-              // Get scope resolution and then check for left_paren after
-              // If a left_paren is not present after all that, then we use the identifier directly
-              auto scope = tokens.begin();
-              do {
+              std::advance( current, 1 );
 
-              } while( true );
+              if( !checkToken( current, TokenType::SCOPE_RESOLUTION ) ) {
+                break;
+              }
+
+              std::advance( current, 1 );
+            }
+
+            if( checkToken( current, TokenType::LEFT_PAREN ) ) {
+              property.value = getCall();
             } else {
-
+              property.value = getIdentifier();
             }
           } else {
             throwParseException( "integer, double, boolean, string, or identifier token" );
           }
+
+          getAndExpect( TokenType::SEMICOLON, ";" );
 
           return property;
         }
@@ -261,27 +372,27 @@ namespace BlueBear {
           AST::PropertyList rootPropertyList;
 
           // Get the selector
-          if( isSelectorToken() ) {
-            do {
-              rootPropertyList.selectorQueries.push_back( getSelectorQuery() );
-            } while( isSelectorToken() );
-          } else {
+          if( !isSelectorToken() ) {
             throwParseException( "identifier, #, ., or *" );
+          }
+
+          while( isSelectorToken() ) {
+            rootPropertyList.selectorQueries.push_back( getSelectorQuery() );
           }
 
           getAndExpect( TokenType::LEFT_BRACE, "{" );
 
-          // identifier plus colon is a property token
-          if( checkToken( TokenType::IDENTIFIER ) ) {
-            auto afterFront = tokens.begin();
-            std::advance( afterFront, 1 );
+          while( checkToken( TokenType::IDENTIFIER ) || isSelectorToken() ) {
+            auto nextAfter = tokens.begin();
+            std::advance( nextAfter, 1 );
 
-            if( afterFront != tokens.end() && afterFront->type == TokenType::DOT ) {
-              // Still on identifier here!
+            if( checkToken( nextAfter, TokenType::COLON ) ) {
+              // Identifier plus colon is a property token
               rootPropertyList.properties.push_back( getProperty() );
+            } else {
+              // It can only be another property list
+              rootPropertyList.children.push_back( getPropertyList() );
             }
-          } else if( isSelectorToken() ) {
-            rootPropertyList.children.push_back( getPropertyList() );
           }
 
           getAndExpect( TokenType::RIGHT_BRACE, "}" );

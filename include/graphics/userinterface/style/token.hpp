@@ -12,7 +12,7 @@ namespace BlueBear {
         enum class TokenType {
           POUND, DOT, STAR, IDENTIFIER, LEFT_BRACE, RIGHT_BRACE,
 
-          INTEGER, DOUBLE, STRING, BOOLEAN, SEMICOLON,
+          INTEGER, DOUBLE, STRING, BOOLEAN, SEMICOLON, COMMA,
           COLON, SCOPE_RESOLUTION, LEFT_PAREN, RIGHT_PAREN
         };
 
