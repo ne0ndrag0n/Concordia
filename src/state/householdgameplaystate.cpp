@@ -120,6 +120,17 @@ namespace BlueBear {
 
         Log::getInstance().debug( "HouseholdGameplayState::setupInputDevice", "Done" );
       } );
+      inputManager.listen( sf::Keyboard::B, [ & ]() {
+        Log::getInstance().debug( "HouseholdGameplayState::setupInputDevice", "Applying style..." );
+
+        application
+          .getDisplayDevice()
+          .getAdapterAt( GUI_ADAPTER )
+          .as< Device::Display::Adapter::Component::GuiComponent >()
+          .__teststyle();
+
+        Log::getInstance().debug( "HouseholdGameplayState::setupInputDevice", "Done" );
+      } );
     }
 
     Scripting::InfrastructureFactory& HouseholdGameplayState::getInfrastructureFactory() {

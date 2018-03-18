@@ -2,6 +2,7 @@
 #define STYLE_APPLIER
 
 #include "graphics/userinterface/propertylist.hpp"
+#include "graphics/userinterface/style/ast/propertylist.hpp"
 #include <unordered_map>
 #include <memory>
 #include <vector>
@@ -15,8 +16,10 @@ namespace BlueBear {
       namespace Style {
 
         class StyleApplier {
-          std::unordered_map< std::shared_ptr< Element >, std::vector< PropertyList > > propLists;
+          std::unordered_map< std::shared_ptr< Element >, std::vector< AST::PropertyList > > propLists;
           std::shared_ptr< Element > rootElement;
+
+          void associatePropertyList( const AST::PropertyList& propertyList );
 
         public:
           StyleApplier( std::shared_ptr< Element > rootElement );

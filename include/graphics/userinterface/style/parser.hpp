@@ -23,8 +23,8 @@ namespace BlueBear {
           std::string path;
           std::ifstream file;
           std::list< Token > tokens;
-          unsigned int currentRow = 0;
-          unsigned int currentColumn = 0;
+          unsigned int currentRow;
+          unsigned int currentColumn;
 
           bool checkAndAdvanceChar( char expect );
           static bool isAlpha( char c );

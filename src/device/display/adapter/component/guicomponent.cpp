@@ -20,10 +20,10 @@ namespace BlueBear {
           GuiComponent::GuiComponent( Device::Display::Display& display ) :
             Adapter::Adapter( display ),
             vector( display ),
-            guiShader( "system/shaders/gui/vertex.glsl", "system/shaders/gui/fragment.glsl" ) {
+            guiShader( "system/shaders/gui/vertex.glsl", "system/shaders/gui/fragment.glsl" ),
+            rootElement( Graphics::UserInterface::Widgets::Layout::create( "", {} ) ),
+            styleManager( rootElement ) {
               Graphics::UserInterface::Element::manager = this;
-
-              rootElement = Graphics::UserInterface::Widgets::Layout::create( "", {} );
 
               rootElement->getPropertyList().set< int >( "top", 0 );
               rootElement->getPropertyList().set< int >( "left", 0 );
@@ -45,6 +45,12 @@ namespace BlueBear {
             text->getPropertyList().set< glm::uvec4 >( "background-color", glm::uvec4{ 64, 64, 64, 255 } );
 
             rootElement->addChild( text );
+          }
+
+          void GuiComponent::__teststyle() {
+            styleManager.applyStyles( {
+              "system/modpacks/gui-new/console.style"
+            } );
           }
 
           Graphics::Vector::Renderer& GuiComponent::getVectorRenderer() {

@@ -4,6 +4,7 @@
 #include "device/display/adapter/adapter.hpp"
 #include "graphics/vector/renderer.hpp"
 #include "graphics/userinterface/propertylist.hpp"
+#include "graphics/userinterface/style/styleapplier.hpp"
 #include "graphics/shader.hpp"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
@@ -28,10 +29,12 @@ namespace BlueBear {
             Graphics::Vector::Renderer vector;
             Graphics::Shader guiShader;
             std::shared_ptr< Graphics::UserInterface::Element > rootElement;
+            Graphics::UserInterface::Style::StyleApplier styleManager;
 
           public:
 
             void __testadd();
+            void __teststyle();
 
             Graphics::Vector::Renderer& getVectorRenderer();
 

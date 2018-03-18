@@ -7,7 +7,13 @@ namespace BlueBear {
     namespace UserInterface {
       namespace Style {
 
-        Parser::Parser( const std::string& path ) : path( path ), file( path ) {}
+        Parser::Parser( const std::string& path ) : path( path ) {
+          file.exceptions( std::ios::failbit | std::ios::badbit );
+          file.open( path );
+          file.exceptions( std::ios::goodbit );
+
+          getTokens();
+        }
 
         bool Parser::checkAndAdvanceChar( char expect ) {
           char peek = ( char ) file.peek();
@@ -24,7 +30,7 @@ namespace BlueBear {
          * static
          */
         bool Parser::isAlpha( char c ) {
-          return ( c >= 'A' && c <= 'Z' ) || ( c >= 'a' && c <= 'z' ) || c == '_';
+          return ( c >= 'A' && c <= 'Z' ) || ( c >= 'a' && c <= 'z' ) || c == '_' || c == '-';
         }
 
         /**
@@ -37,11 +43,15 @@ namespace BlueBear {
         std::string Parser::getWhile( std::function< bool( char ) > predicate ) {
           std::string result;
 
-          char c = ( char ) file.peek();
-          while( predicate( c ) ) {
-            result += c;
-            c = file.get();
-            currentColumn++;
+          while( true ) {
+            char c = ( char ) file.peek();
+            if( predicate( c ) ) {
+              file.get();
+              currentColumn++;
+              result += c;
+            } else {
+              break;
+            }
           }
 
           return result;
@@ -49,70 +59,63 @@ namespace BlueBear {
 
         void Parser::getTokens() {
           tokens = {};
-          currentRow = 0;
-          currentColumn = 0;
+          currentRow = 1;
+          currentColumn = 1;
 
           char current;
           while( file.get( current ) ) {
             switch( current ) {
               case '#':
                 tokens.push_back( { currentRow, currentColumn, TokenType::POUND } );
-                currentColumn++;
                 break;
               case '.':
                 tokens.push_back( { currentRow, currentColumn, TokenType::DOT } );
-                currentColumn++;
                 break;
               case '*':
                 tokens.push_back( { currentRow, currentColumn, TokenType::STAR } );
-                currentColumn++;
                 break;
               case '{':
                 tokens.push_back( { currentRow, currentColumn, TokenType::LEFT_BRACE } );
-                currentColumn++;
                 break;
               case '}':
                 tokens.push_back( { currentRow, currentColumn, TokenType::RIGHT_BRACE } );
-                currentColumn++;
                 break;
               case ';':
                 tokens.push_back( { currentRow, currentColumn, TokenType::SEMICOLON } );
-                currentColumn++;
                 break;
               case ',':
                 tokens.push_back( { currentRow, currentColumn, TokenType::COMMA } );
-                currentColumn++;
                 break;
               case ':':
                 tokens.push_back( { currentRow, currentColumn, checkAndAdvanceChar( ':' ) ? TokenType::SCOPE_RESOLUTION : TokenType::COLON } );
-                currentColumn++;
                 break;
               case '(':
                 tokens.push_back( { currentRow, currentColumn, TokenType::LEFT_PAREN } );
-                currentColumn++;
                 break;
               case ')':
                 tokens.push_back( { currentRow, currentColumn, TokenType::RIGHT_PAREN } );
-                currentColumn++;
                 break;
               case ' ':
               case '\r':
               case '\t':
-                currentColumn++;
+                break;
               case '\n':
                 currentColumn = 0;
                 currentRow++;
-                continue;
-              case '"':
-                // String literal
-                tokens.push_back( {
-                  currentRow, currentColumn,
-                  TokenType::STRING,
-                  getWhile( []( char c ) {
-                    return !( c == '"' );
-                  } )
-                } );
                 break;
+              case '"': {
+                // String literal
+                std::string literal = getWhile( []( char c ) {
+                  return !( c == '"' );
+                } );
+
+                // Next token was peeked as a " so swallow it and increment the counter
+                file.get();
+                currentColumn++;
+
+                tokens.push_back( { currentRow, currentColumn, TokenType::STRING, literal } );
+                break;
+              }
               default: {
                 if( isNumeric( current ) ) {
                   std::string num;
@@ -132,7 +135,9 @@ namespace BlueBear {
                 } else if( isAlpha( current ) ) {
                   std::string identifier;
                   identifier += current;
-                  identifier += getWhile( isAlpha );
+                  identifier += getWhile( [ & ]( char c ) {
+                    return isAlpha( c ) || isNumeric( c );
+                  } );
 
                   if( identifier == "true" || identifier == "false" ) {
                     // Boolean
@@ -150,6 +155,8 @@ namespace BlueBear {
                 }
               }
             }
+
+            currentColumn++;
           }
         }
 
@@ -164,6 +171,8 @@ namespace BlueBear {
               + std::to_string( tokens.front().row ) + ", " + std::to_string( tokens.front().column )
             );
           }
+
+          throw ParseException();
         }
 
         bool Parser::checkToken( TokenType expectedType ) {
@@ -220,16 +229,16 @@ namespace BlueBear {
 
           while( true ) {
             if( checkToken( TokenType::INTEGER ) ) {
-              call.arguments.push_back( AST::Literal{ std::any_cast< int >( tokens.front().metadata ) } );
+              call.arguments.push_back( AST::Literal{ std::get< int >( tokens.front().metadata ) } );
               increment();
             } else if( checkToken( TokenType::DOUBLE ) ) {
-              call.arguments.push_back( AST::Literal{ std::any_cast< double >( tokens.front().metadata ) } );
+              call.arguments.push_back( AST::Literal{ std::get< double >( tokens.front().metadata ) } );
               increment();
             } else if( checkToken( TokenType::BOOLEAN ) ) {
-              call.arguments.push_back( AST::Literal{ std::any_cast< bool >( tokens.front().metadata ) } );
+              call.arguments.push_back( AST::Literal{ std::get< bool >( tokens.front().metadata ) } );
               increment();
             } else if( checkToken( TokenType::STRING ) ) {
-              call.arguments.push_back( AST::Literal{ std::any_cast< std::string >( tokens.front().metadata ) } );
+              call.arguments.push_back( AST::Literal{ std::get< std::string >( tokens.front().metadata ) } );
               increment();
             } else if( checkToken( TokenType::IDENTIFIER ) ) {
               auto current = tokens.begin();
@@ -275,7 +284,7 @@ namespace BlueBear {
             // Lookahead for SCOPE_RESOLUTION
             if( lookaheadAndCheckToken( tokens.begin(), 1, TokenType::SCOPE_RESOLUTION ) ) {
               Token identifierToken = getAndExpect( TokenType::IDENTIFIER, "identifier" );
-              identifier.scope.push_back( std::any_cast< std::string >( identifierToken.metadata ) );
+              identifier.scope.push_back( std::get< std::string >( identifierToken.metadata ) );
 
               // Pop the SCOPE_RESOLUTION token
               increment();
@@ -285,7 +294,7 @@ namespace BlueBear {
           }
 
           Token identToken = getAndExpect( TokenType::IDENTIFIER, "identifier" );
-          identifier.value = std::any_cast< std::string >( identToken.metadata );
+          identifier.value = std::get< std::string >( identToken.metadata );
 
           return identifier;
         }
@@ -299,19 +308,19 @@ namespace BlueBear {
           }
 
           if( checkToken( TokenType::IDENTIFIER ) ) {
-            selectorQuery.tag = std::any_cast< std::string >( tokens.front().metadata );
+            selectorQuery.tag = std::get< std::string >( tokens.front().metadata );
             increment();
           }
 
           if( checkToken( TokenType::POUND ) ) {
             increment();
-            selectorQuery.id = std::any_cast< std::string >( getAndExpect( TokenType::IDENTIFIER, "identifier" ) );
+            selectorQuery.id = std::get< std::string >( getAndExpect( TokenType::IDENTIFIER, "identifier" ).metadata );
           }
 
           while( checkToken( TokenType::DOT ) ) {
             increment();
             selectorQuery.classes.push_back(
-              std::any_cast< std::string >( getAndExpect( TokenType::IDENTIFIER, "identifier" ) )
+              std::get< std::string >( getAndExpect( TokenType::IDENTIFIER, "identifier" ).metadata )
             );
           }
 
@@ -321,22 +330,22 @@ namespace BlueBear {
         AST::Property Parser::getProperty() {
           AST::Property property;
 
-          property.name = std::any_cast< std::string >( tokens.front().metadata );
+          property.name = std::get< std::string >( tokens.front().metadata );
           increment();
 
           getAndExpect( TokenType::COLON, ":" );
 
           if( checkToken( TokenType::INTEGER ) ) {
-            property.value = AST::Literal{ std::any_cast< int >( tokens.front().metadata ) };
+            property.value = AST::Literal{ std::get< int >( tokens.front().metadata ) };
             increment();
           } else if( checkToken( TokenType::DOUBLE ) ) {
-            property.value = AST::Literal{ std::any_cast< double >( tokens.front().metadata ) };
+            property.value = AST::Literal{ std::get< double >( tokens.front().metadata ) };
             increment();
           } else if( checkToken( TokenType::BOOLEAN ) ) {
-            property.value = AST::Literal{ std::any_cast< bool >( tokens.front().metadata ) };
+            property.value = AST::Literal{ std::get< bool >( tokens.front().metadata ) };
             increment();
           } else if( checkToken( TokenType::STRING ) ) {
-            property.value = AST::Literal{ std::any_cast< std::string >( tokens.front().metadata ) };
+            property.value = AST::Literal{ std::get< std::string >( tokens.front().metadata ) };
             increment();
           } else if( checkToken( TokenType::IDENTIFIER ) ) {
             auto current = tokens.begin();
