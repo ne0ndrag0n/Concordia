@@ -451,5 +451,15 @@ namespace BlueBear {
 				}
 			}
 		}
+
+		std::string Utility::generateIndentation( unsigned int amount ) {
+			std::string indentation;
+
+			for( unsigned int i = 0; i != amount; i++ ) {
+				indentation += "\t";
+			}
+
+			return indentation;
+		}
 	}
 }

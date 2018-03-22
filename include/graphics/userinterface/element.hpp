@@ -57,6 +57,11 @@ namespace BlueBear {
         virtual void render() = 0;
         virtual void calculate() = 0;
 
+        const std::string& getTag() const;
+        const std::string& getId() const;
+        bool hasClass( const std::string& clss ) const;
+        std::vector< std::shared_ptr< Element > > getChildren() const;
+
         std::shared_ptr< Element > getParent();
         void addChild( std::shared_ptr< Element > child );
         void detach();

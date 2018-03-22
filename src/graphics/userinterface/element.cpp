@@ -15,6 +15,28 @@ namespace BlueBear {
 
       Element::~Element() {}
 
+      std::vector< std::shared_ptr< Element > > Element::getChildren() const {
+        return children;
+      }
+
+      const std::string& Element::getTag() const {
+        return tag;
+      }
+
+      const std::string& Element::getId() const {
+        return id;
+      }
+
+      bool Element::hasClass( const std::string& clss ) const {
+        for( const std::string& c : classes ) {
+          if( c == clss ) {
+            return true;
+          }
+        }
+
+        return false;
+      }
+
       void Element::setAllocation( const glm::uvec4& allocation ) {
         this->allocation = allocation;
         reflow();

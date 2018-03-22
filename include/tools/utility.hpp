@@ -100,6 +100,18 @@ namespace BlueBear {
     			seed ^= hasher( v ) + 0x9e3779b9 + ( seed << 6 ) + ( seed >> 2 );
 				}
 
+				static std::string generateIndentation( unsigned int amount );
+
+				template< class T >
+				static inline std::vector< T > concatArrays( const std::vector< T >& left, const std::vector< T >& right ) {
+					std::vector< T > result = left;
+
+					for( auto& r : right ) {
+						result.push_back( r );
+					}
+
+					return result;
+				};
 		};
 	}
 }

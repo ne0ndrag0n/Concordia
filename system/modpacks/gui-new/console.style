@@ -1,7 +1,7 @@
-#concordia_terminal {
+#concordia_terminal .b {
   top: 0;
   left: 0;
-  width: getSetting( SCREEN_X );
+  width: getIntSetting( "viewport_x" );
   height: 300;
   gravity: Gravity::DOWN;
 
