@@ -1,4 +1,4 @@
-#concordia_terminal .b {
+#concordia_terminal {
   top: 0;
   left: 0;
   width: getIntSetting( "viewport_x" );

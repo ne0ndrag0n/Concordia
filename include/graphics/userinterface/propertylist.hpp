@@ -36,10 +36,12 @@ namespace BlueBear {
 
         void reflowParent();
 
-        template < typename VariantType > void set( const std::string& key, VariantType value ) {
+        template < typename VariantType > void set( const std::string& key, VariantType value, bool reflow = true ) {
           values[ key ] = value;
 
-          reflowParent();
+          if( reflow ) {
+            reflowParent();
+          }
         };
 
         // TODO: bulk set where reflow doesn't continuously occur

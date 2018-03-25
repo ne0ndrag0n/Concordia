@@ -20,7 +20,17 @@ namespace BlueBear {
             std::vector< Property > properties;
             std::vector< PropertyList > children;
 
-            void print( unsigned int indentation = 0 ) const {
+            unsigned int computeSpecificity() const {
+              unsigned int totalSpecificity;
+
+              for( const AST::SelectorQuery& selectorQuery : selectorQueries ) {
+                totalSpecificity += selectorQuery.computeSpecificity();
+              }
+
+              return totalSpecificity;
+            }
+
+            std::string generateSelectorString( unsigned int indentation = 0 ) const {
               std::string selectorResult = Tools::Utility::generateIndentation( indentation );
 
               for( auto& selectorQuery : selectorQueries ) {
@@ -41,6 +51,12 @@ namespace BlueBear {
                   selectorResult += ( "." + clss ) + " ";
                 }
               }
+
+              return selectorResult;
+            }
+
+            void print( unsigned int indentation = 0 ) const {
+              std::string selectorResult = generateSelectorString( indentation );
 
               Log::getInstance().debug( "PropertyList::print", selectorResult );
 

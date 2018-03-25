@@ -19,7 +19,7 @@ namespace BlueBear {
             bool all = false;
 
             unsigned int computeSpecificity() const {
-              unsigned int specificity;
+              unsigned int specificity = 0;
 
               if( id.length() ) {
                 specificity += 100;
