@@ -40,6 +40,10 @@ namespace BlueBear {
                   Log::getInstance().error( "StyleApplier::paint", "This should never happen" );
                 }
               }
+
+              if( propertyList.properties.size() ) {
+                pair.first->getPropertyList().reflowParent();
+              }
             }
           }
         }
@@ -284,6 +288,8 @@ namespace BlueBear {
               associatePropertyList( propertyList );
             }
           }
+
+          paint();
         }
 
       }
