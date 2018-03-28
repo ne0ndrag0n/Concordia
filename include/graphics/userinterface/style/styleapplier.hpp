@@ -4,10 +4,12 @@
 #include "exceptions/genexc.hpp"
 #include "graphics/userinterface/propertylist.hpp"
 #include "graphics/userinterface/style/ast/propertylist.hpp"
+#include <glm/glm.hpp>
 #include <unordered_map>
 #include <memory>
 #include <vector>
 #include <string>
+#include <variant>
 
 namespace BlueBear {
   namespace Graphics {
@@ -20,6 +22,7 @@ namespace BlueBear {
         }
 
         class StyleApplier {
+          using CallResult = std::variant< int, double, std::string, bool, Gravity, Requisition, Placement, Orientation, glm::uvec4 >;
           struct AppliedStyle {
             int specificity = -1;
             std::vector< AST::PropertyList > lists;
@@ -29,14 +32,22 @@ namespace BlueBear {
           std::shared_ptr< Element > rootElement;
 
           void paint();
-          void applyLiteral( std::shared_ptr< Element > target, const std::string& key, const AST::Literal& literal );
-          void applyIdentifier( std::shared_ptr< Element > target, const std::string& key, const AST::Identifier& identifier );
+
+          CallResult call( const AST::Call& functionCall );
+          std::variant< Gravity, Requisition, Placement, Orientation > identifier( const AST::Identifier& identifier );
+          CallResult getArgument( const std::variant< AST::Call, AST::Identifier, AST::Literal >& type );
+
+          int getIntSetting( const std::string& key );
+          glm::uvec4 rgbaString( const std::string& format );
+
           void associatePropertyList( const AST::PropertyList& propertyList );
           std::vector< AST::PropertyList > desugar( AST::PropertyList propertyList, std::vector< AST::SelectorQuery > parentQueries = {} );
           bool elementMatchesQuery( const AST::SelectorQuery& query, std::shared_ptr< Element > element );
 
         public:
           EXCEPTION_TYPE( UndefinedSymbolException, "Symbol or function undefined" );
+          EXCEPTION_TYPE( TypeMismatchException, "Type mismatch encountered" );
+          EXCEPTION_TYPE( MalformedFormatException, "Malformed string format" );
 
           StyleApplier( std::shared_ptr< Element > rootElement );
 

@@ -31,17 +31,17 @@
 }
 
 .concordia_debug_text {
-  foreground-color: rgbaString( "#00ff00ff" );
+  foreground-color: rgbaString( "00ff00ff" );
 }
 
 .concordia_info_text {
-  foreground-color: rgbaString( "#0000ffff" );
+  foreground-color: rgbaString( "0000ffff" );
 }
 
 .concordia_warn_text {
-  foreground-color: rgbaString( "#ffff00ff" );
+  foreground-color: rgbaString( "ffff00ff" );
 }
 
 .concordia_error_text {
-  foreground-color: rgbaString( "#ff0000ff" );
+  foreground-color: rgbaString( "ff0000ff" );
 }

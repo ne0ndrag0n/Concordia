@@ -3,8 +3,10 @@
 #include "graphics/userinterface/element.hpp"
 #include "graphics/userinterface/querier.hpp"
 #include "tools/utility.hpp"
+#include "configmanager.hpp"
 #include "log.hpp"
 #include <fstream>
+#include <sstream>
 #include <stack>
 
 namespace BlueBear {
@@ -19,11 +21,21 @@ namespace BlueBear {
             for( const AST::PropertyList& propertyList : pair.second.lists ) {
               for( const AST::Property& property : propertyList.properties ) {
                 if( std::holds_alternative< AST::Call >( property.value ) ) {
+                  CallResult result = call( std::get< AST::Call >( property.value ) );
 
+                  std::visit( [ & ]( auto& data ) {
+                    pair.first->getPropertyList().set( property.name, data, false );
+                  }, result );
                 } else if( std::holds_alternative< AST::Literal >( property.value ) ) {
-                  applyLiteral( pair.first, property.name, std::get< AST::Literal >( property.value ) );
+                  std::visit( [ & ]( auto& data ) {
+                    pair.first->getPropertyList().set( property.name, data, false );
+                  }, std::get< AST::Literal >( property.value ).data );
                 } else if( std::holds_alternative< AST::Identifier >( property.value ) ) {
-                  applyIdentifier( pair.first, property.name, std::get< AST::Identifier >( property.value ) );
+                  std::variant< Gravity, Requisition, Placement, Orientation > variant = identifier( std::get< AST::Identifier >( property.value ) );
+
+                  std::visit( [ & ]( auto& data ) {
+                    pair.first->getPropertyList().set( property.name, data, false );
+                  }, variant );
                 } else {
                   Log::getInstance().error( "StyleApplier::paint", "This should never happen" );
                 }
@@ -32,107 +44,147 @@ namespace BlueBear {
           }
         }
 
-        void StyleApplier::applyLiteral( std::shared_ptr< Element > target, const std::string& key, const AST::Literal& literal ) {
-          if( std::holds_alternative< int >( literal.data ) ) {
-            target->getPropertyList().set( key, std::get< int >( literal.data ), false );
-          } else if( std::holds_alternative< double >( literal.data ) ) {
-            target->getPropertyList().set( key, std::get< double >( literal.data ), false );
-          } else if( std::holds_alternative< std::string >( literal.data ) ) {
-            target->getPropertyList().set( key, std::get< std::string >( literal.data ), false );
-          } else if( std::holds_alternative< bool >( literal.data ) ) {
-            target->getPropertyList().set( key, std::get< bool >( literal.data ), false );
+        StyleApplier::CallResult StyleApplier::getArgument( const std::variant< AST::Call, AST::Identifier, AST::Literal >& type ) {
+          CallResult argument;
+
+          if( std::holds_alternative< AST::Call >( type ) ) {
+            argument = call( std::get< AST::Call >( type ) );
+          } else if( std::holds_alternative< AST::Identifier >( type ) ) {
+            std::variant< Gravity, Requisition, Placement, Orientation > intermediate = identifier( std::get< AST::Identifier >( type ) );
+            std::visit( [ & ]( auto& data ) {
+              argument = data;
+            }, intermediate );
+          } else if( std::holds_alternative< AST::Literal >( type ) ) {
+            std::visit( [ & ]( auto& data ) {
+              argument = data;
+            }, std::get< AST::Literal >( type ).data );
           } else {
-            Log::getInstance().error( "StyleApplier::applyLiteral", "This should never happen" );
+            Log::getInstance().error( "StyleApplier::getArgument", "This should never happen" );
+          }
+
+          return argument;
+        }
+
+        StyleApplier::CallResult StyleApplier::call( const AST::Call& functionCall ) {
+          CallResult result;
+
+          if( functionCall.identifier.scope.size() > 0 ) {
+            throw UndefinedSymbolException();
+          }
+
+          switch( Tools::Utility::hash( functionCall.identifier.value.c_str() ) ) {
+            case Tools::Utility::hash( "getIntSetting" ): {
+              CallResult argument = getArgument( functionCall.arguments.front() );
+
+              if( std::holds_alternative< std::string >( argument ) ) {
+                return getIntSetting( std::get< std::string >( argument ) );
+              } else {
+                throw TypeMismatchException();
+              }
+            }
+            case Tools::Utility::hash( "rgbaString" ): {
+              CallResult argument = getArgument( functionCall.arguments.front() );
+
+              if( std::holds_alternative< std::string >( argument ) ) {
+                return rgbaString( std::get< std::string >( argument ) );
+              } else {
+                throw TypeMismatchException();
+              }
+            }
+            default:
+              throw UndefinedSymbolException();
           }
         }
 
-        void StyleApplier::applyIdentifier( std::shared_ptr< Element > target, const std::string& key, const AST::Identifier& identifier ) {
+        int StyleApplier::getIntSetting( const std::string& key ) {
+          return ConfigManager::getInstance().getIntValue( key );
+        }
+
+        glm::uvec4 StyleApplier::rgbaString( const std::string& format ) {
+          glm::uvec4 result;
+
+          unsigned int len = format.size();
+          unsigned int index = 0;
+          for( unsigned int i = 0; i != len; i += 2 ) {
+            std::istringstream stream( format.substr( i, 2 ) );
+            unsigned int segment;
+            stream >> std::hex >> segment;
+            result[ index++ ] = segment;
+          }
+
+          return result;
+        }
+
+        std::variant< Gravity, Requisition, Placement, Orientation > StyleApplier::identifier( const AST::Identifier& identifier ) {
           if( identifier.scope.size() == 1 ) {
             std::string single = identifier.scope.front();
+
             switch( Tools::Utility::hash( single.c_str() ) ) {
               case Tools::Utility::hash( "Gravity" ): {
                 switch( Tools::Utility::hash( identifier.value.c_str() ) ) {
                   case Tools::Utility::hash( "LEFT" ): {
-                    target->getPropertyList().set( key, Gravity::LEFT, false );
-                    break;
+                    return Gravity::LEFT;
                   }
                   case Tools::Utility::hash( "RIGHT" ): {
-                    target->getPropertyList().set( key, Gravity::RIGHT, false );
-                    break;
+                    return Gravity::RIGHT;
                   }
                   case Tools::Utility::hash( "TOP" ): {
-                    target->getPropertyList().set( key, Gravity::TOP, false );
-                    break;
+                    return Gravity::TOP;
                   }
                   case Tools::Utility::hash( "BOTTOM" ): {
-                    target->getPropertyList().set( key, Gravity::BOTTOM, false );
-                    break;
+                    return Gravity::BOTTOM;
                   }
                   default:
                     throw UndefinedSymbolException();
                 }
-                return;
               }
               case Tools::Utility::hash( "Requisition" ): {
                 switch( Tools::Utility::hash( identifier.value.c_str() ) ) {
                   case Tools::Utility::hash( "AUTO" ): {
-                    target->getPropertyList().set( key, Requisition::AUTO, false );
-                    break;
+                    return Requisition::AUTO;
                   }
                   case Tools::Utility::hash( "NONE" ): {
-                    target->getPropertyList().set( key, Requisition::NONE, false );
-                    break;
+                    return Requisition::NONE;
                   }
                   case Tools::Utility::hash( "FILL_PARENT" ): {
-                    target->getPropertyList().set( key, Requisition::FILL_PARENT, false );
-                    break;
+                    return Requisition::FILL_PARENT;
                   }
                   default:
                     throw UndefinedSymbolException();
                 }
-                return;
               }
               case Tools::Utility::hash( "Placement" ): {
                 switch( Tools::Utility::hash( identifier.value.c_str() ) ) {
                   case Tools::Utility::hash( "FLOW" ): {
-                    target->getPropertyList().set( key, Placement::FLOW, false );
-                    break;
+                    return Placement::FLOW;
                   }
                   case Tools::Utility::hash( "FREE" ): {
-                    target->getPropertyList().set( key, Placement::FREE, false );
-                    break;
+                    return Placement::FREE;
                   }
                   default:
                     throw UndefinedSymbolException();
                 }
-                return;
               }
               case Tools::Utility::hash( "Orientation" ): {
                 switch( Tools::Utility::hash( identifier.value.c_str() ) ) {
                   case Tools::Utility::hash( "TOP" ): {
-                    target->getPropertyList().set( key, Orientation::TOP, false );
-                    break;
+                    return Orientation::TOP;
                   }
                   case Tools::Utility::hash( "MIDDLE" ): {
-                    target->getPropertyList().set( key, Orientation::MIDDLE, false );
-                    break;
+                    return Orientation::MIDDLE;
                   }
                   case Tools::Utility::hash( "BOTTOM" ): {
-                    target->getPropertyList().set( key, Orientation::BOTTOM, false );
-                    break;
+                    return Orientation::BOTTOM;
                   }
                   case Tools::Utility::hash( "LEFT" ): {
-                    target->getPropertyList().set( key, Orientation::LEFT, false );
-                    break;
+                    return Orientation::LEFT;
                   }
                   case Tools::Utility::hash( "RIGHT" ): {
-                    target->getPropertyList().set( key, Orientation::RIGHT, false );
-                    break;
+                    return Orientation::RIGHT;
                   }
                   default:
                     throw UndefinedSymbolException();
                 }
-                return;
               }
               default:
                 throw UndefinedSymbolException();
@@ -238,28 +290,3 @@ namespace BlueBear {
     }
   }
 }
-
-/**
-std::vector< std::shared_ptr< Element > > StyleApplier::getElementsForQuery( std::vector< AST::SelectorQuery > selectorQueries ) {
-  std::vector< std::shared_ptr< Element > > results = { rootElement };
-
-  while( !selectorQueries.empty() ) {
-    AST::SelectorQuery query = selectorQueries.front();
-    selectorQueries.erase( selectorQueries.begin() );
-
-    std::vector< std::shared_ptr< Element > > newResults;
-    for( auto result : results ) {
-      auto children = result->getChildren();
-      for( auto child : children ) {
-        if( elementMatchesQuery( query, child ) ) {
-          newResults.push_back( child );
-        }
-      }
-    }
-
-    results = newResults;
-  }
-
-  return results;
-}
-*/
