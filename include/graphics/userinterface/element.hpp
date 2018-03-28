@@ -30,7 +30,7 @@ namespace BlueBear {
 
       class Element : public std::enable_shared_from_this< Element > {
       protected:
-        const std::string& tag;
+        std::string tag;
         std::string id;
         std::vector< std::string > classes;
 

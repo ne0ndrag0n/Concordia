@@ -40,7 +40,7 @@ namespace BlueBear {
 
           // TODO: remove TEST code
           void GuiComponent::__testadd() {
-            auto text = Graphics::UserInterface::Widgets::Text::create( "text", {}, "This is test text." );
+            auto text = Graphics::UserInterface::Widgets::Text::create( "", {}, "This is test text." );
             text->getPropertyList().set< glm::uvec4 >( "color", glm::uvec4{ 255, 255, 255, 255 } );
             text->getPropertyList().set< glm::uvec4 >( "background-color", glm::uvec4{ 64, 64, 64, 255 } );
 

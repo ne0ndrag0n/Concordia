@@ -206,12 +206,13 @@ namespace BlueBear {
             std::vector< std::shared_ptr< Element > > matches = querier.get( list.selectorQueries );
             unsigned int selectorSpecificity = list.computeSpecificity();
 
-            Log::getInstance().debug( "StyleApplier::associatePropertyList", "Finding elements for " + list.generateSelectorString() );
-
             for( std::shared_ptr< Element > element : matches ) {
               if( selectorSpecificity == associations[ element ].specificity ) {
+                Log::getInstance().debug( "StyleApplier::associatePropertyList", "Associating element with specificity " + std::to_string( selectorSpecificity ) );
                 associations[ element ].lists.push_back( list );
               } else if( selectorSpecificity > associations[ element ].specificity ) {
+                Log::getInstance().debug( "StyleApplier::associatePropertyList", "Associating existing applied style with new specificity " + std::to_string( selectorSpecificity ) );
+
                 associations[ element ] = {
                   ( int ) selectorSpecificity,
                   { list }
@@ -242,30 +243,6 @@ namespace BlueBear {
           }
 
           return desugared;
-        }
-
-        bool StyleApplier::elementMatchesQuery( const AST::SelectorQuery& query, std::shared_ptr< Element > element ) {
-          // Nothing else matters for the "all"/* selector
-          if( query.all ) {
-            return true;
-          }
-
-          if( query.tag.length() && element->getTag() != query.tag ) {
-            return false;
-          }
-
-          if( query.id.length() && element->getId() != query.id ) {
-            return false;
-          }
-
-          for( const std::string& clss : query.classes ) {
-            if( !element->hasClass( clss ) ) {
-              return false;
-            }
-          }
-
-          // All other tests pass
-          return true;
         }
 
         void StyleApplier::applyStyles( std::vector< std::string > paths ) {

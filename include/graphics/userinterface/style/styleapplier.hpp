@@ -42,7 +42,6 @@ namespace BlueBear {
 
           void associatePropertyList( const AST::PropertyList& propertyList );
           std::vector< AST::PropertyList > desugar( AST::PropertyList propertyList, std::vector< AST::SelectorQuery > parentQueries = {} );
-          bool elementMatchesQuery( const AST::SelectorQuery& query, std::shared_ptr< Element > element );
 
         public:
           EXCEPTION_TYPE( UndefinedSymbolException, "Symbol or function undefined" );

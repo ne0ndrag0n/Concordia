@@ -18,6 +18,28 @@ namespace BlueBear {
             std::vector< std::string > classes;
             bool all = false;
 
+            std::string generateSelectorString() const {
+              std::string selectorResult;
+
+              if( all ) {
+                return "*";
+              }
+
+              if( tag.length() ) {
+                selectorResult += tag;
+              }
+
+              if( id.length() ) {
+                selectorResult += ( "#" + id );
+              }
+
+              for( std::string clss : classes ) {
+                selectorResult += ( "." + clss );
+              }
+
+              return selectorResult;
+            }
+
             unsigned int computeSpecificity() const {
               unsigned int specificity = 0;
 

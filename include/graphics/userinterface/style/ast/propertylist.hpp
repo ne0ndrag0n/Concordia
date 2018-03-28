@@ -34,22 +34,7 @@ namespace BlueBear {
               std::string selectorResult = Tools::Utility::generateIndentation( indentation );
 
               for( auto& selectorQuery : selectorQueries ) {
-                if( selectorQuery.all ) {
-                  selectorResult += "* ";
-                  break;
-                }
-
-                if( selectorQuery.tag.length() ) {
-                  selectorResult += selectorQuery.tag + " ";
-                }
-
-                if( selectorQuery.id.length() ) {
-                  selectorResult += ( "#" + selectorQuery.id ) + " ";
-                }
-
-                for( std::string clss : selectorQuery.classes ) {
-                  selectorResult += ( "." + clss ) + " ";
-                }
+                selectorResult += ( selectorQuery.generateSelectorString() + " " );
               }
 
               return selectorResult;

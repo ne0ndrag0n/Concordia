@@ -5,6 +5,8 @@
 #include "graphics/userinterface/drawable.hpp"
 #include <cstdlib>
 
+#include "log.hpp"
+
 namespace BlueBear {
   namespace Graphics {
     namespace UserInterface {
