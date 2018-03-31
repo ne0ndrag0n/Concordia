@@ -41,9 +41,9 @@ namespace BlueBear {
         template < typename VariantType > const VariantType get( const std::string& key ) const {
           if( keyExists( key ) ) {
             try {
-              return std::any_cast< VariantType >( *values.find( key ) );
+              return std::any_cast< VariantType >( values.find( key )->second );
             } catch ( const std::bad_any_cast& e ) {
-              Log::getInstance().error( "PropertyList::get", key + " could not be converted to the requested type. Please check the type with propertyIsType()." );
+              Log::getInstance().error( "PropertyList::get", key + " could not be converted to the requested type." );
               throw e;
             }
           }
