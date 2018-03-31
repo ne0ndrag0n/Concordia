@@ -120,7 +120,6 @@ namespace BlueBear {
           parentWeak = std::weak_ptr< Element >();
 
           parent->reflow();
-          thisElement->reflow();
         }
       }
 
@@ -137,7 +136,7 @@ namespace BlueBear {
           positionAndSizeChildren();
 
           for( std::shared_ptr< Element > child : children ) {
-            child->reflow();
+            child->paint();
           }
         }
       }
