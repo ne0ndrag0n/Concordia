@@ -18,7 +18,6 @@ namespace BlueBear {
       class Querier {
         std::shared_ptr< Element > rootElement;
 
-        bool matches( std::shared_ptr< Element > element, const Style::AST::SelectorQuery& selectorPart );
         std::vector< std::shared_ptr< Element > > getMatchingElements(
           std::shared_ptr< Element > current,
           const Style::AST::SelectorQuery& selectorPart
@@ -26,6 +25,9 @@ namespace BlueBear {
 
       public:
         Querier( std::shared_ptr< Element > element );
+
+        static bool matches( std::shared_ptr< Element > element, const Style::AST::SelectorQuery& selectorPart );
+
         std::vector< std::shared_ptr< Element > > get( std::vector< Style::AST::SelectorQuery > selector );
       };
 

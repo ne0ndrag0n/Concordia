@@ -1,5 +1,6 @@
 #include "graphics/userinterface/element.hpp"
 #include "graphics/userinterface/propertylist.hpp"
+#include "graphics/userinterface/style/styleapplier.hpp"
 #include "device/display/adapter/component/guicomponent.hpp"
 #include <algorithm>
 
@@ -9,9 +10,7 @@ namespace BlueBear {
 
       Device::Display::Adapter::Component::GuiComponent* Element::manager = nullptr;
 
-      Element::Element( const std::string& tag, const std::string& id, const std::vector< std::string >& classes ) : tag( tag ), id( id ), classes( classes ) {
-        localStyle.setParent( this );
-      }
+      Element::Element( const std::string& tag, const std::string& id, const std::vector< std::string >& classes ) : tag( tag ), id( id ), classes( classes ), localStyle( this ) {}
 
       Element::~Element() {}
 
@@ -42,7 +41,7 @@ namespace BlueBear {
         reflow();
       }
 
-      PropertyList& Element::getPropertyList() {
+      Style::Style& Element::getPropertyList() {
         return localStyle;
       }
 
@@ -126,6 +125,11 @@ namespace BlueBear {
       }
 
       void Element::reflow() {
+        manager->getStyleManager().update( shared_from_this() );
+        paint();
+      }
+
+      void Element::paint() {
         // Render myself, since I've already been positioned and sized
         render();
 

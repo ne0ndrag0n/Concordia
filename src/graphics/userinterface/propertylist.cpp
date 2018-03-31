@@ -30,12 +30,6 @@ namespace BlueBear {
         { "visible", true }
       } );
 
-      void PropertyList::reflowParent() {
-        if( parent ) {
-          parent->reflow();
-        }
-      }
-
       const PropertyList& PropertyList::rootPropertyList = _default;
 
     }

@@ -37,6 +37,7 @@ namespace BlueBear {
             void __teststyle();
 
             Graphics::Vector::Renderer& getVectorRenderer();
+            Graphics::UserInterface::Style::StyleApplier& getStyleManager();
 
             std::queue< sf::Event > getEvents();
             GuiComponent( Device::Display::Display& display );

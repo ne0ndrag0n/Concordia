@@ -40,21 +40,29 @@ namespace BlueBear {
 
           // TODO: remove TEST code
           void GuiComponent::__testadd() {
+            /*
             auto text = Graphics::UserInterface::Widgets::Text::create( "", {}, "This is test text." );
             text->getPropertyList().set< glm::uvec4 >( "color", glm::uvec4{ 255, 255, 255, 255 } );
             text->getPropertyList().set< glm::uvec4 >( "background-color", glm::uvec4{ 64, 64, 64, 255 } );
 
             rootElement->addChild( text );
+            */
           }
 
           void GuiComponent::__teststyle() {
+            /*
             styleManager.applyStyles( {
               "system/modpacks/gui-new/console.style"
             } );
+            */
           }
 
           Graphics::Vector::Renderer& GuiComponent::getVectorRenderer() {
             return vector;
+          }
+
+          Graphics::UserInterface::Style::StyleApplier& GuiComponent::getStyleManager() {
+            return styleManager;
           }
 
           /**

@@ -16,68 +16,39 @@ namespace BlueBear {
       class Element;
 
       class PropertyList {
-        unsigned int computedSpecificity = 0;
-        Element* parent = nullptr;
         std::unordered_map< std::string, std::any > values;
 
       public:
-        EXCEPTION_TYPE( InvalidValueException, "Property is not a valid property" );
         static const PropertyList& rootPropertyList;
 
+        EXCEPTION_TYPE( InvalidValueException, "Property is not a valid property" );
+
         PropertyList() = default;
-        PropertyList( unsigned int computedSpecificity ) : computedSpecificity( computedSpecificity ) {}
         PropertyList( const std::unordered_map< std::string, std::any >& map ) : values( map ) {}
-        PropertyList( unsigned int computedSpecificity, const std::unordered_map< std::string, std::any >& map ) :
-          computedSpecificity( computedSpecificity ), values( map ) {}
 
-        void setParent( Element* parent ) {
-          this->parent = parent;
+        void clear() {
+          values.clear();
         };
 
-        void reflowParent();
+        bool keyExists( const std::string& key ) const {
+          return values.find( key ) != values.end();
+        };
 
-        template < typename VariantType > void set( const std::string& key, VariantType value, bool reflow = true ) {
+        template < typename VariantType > void set( const std::string& key, VariantType value ) {
           values[ key ] = value;
-
-          if( reflow ) {
-            reflowParent();
-          }
         };
-
-        // TODO: bulk set where reflow doesn't continuously occur
 
         template < typename VariantType > const VariantType get( const std::string& key ) const {
-          auto it = values.find( key );
-          if( it != values.end() ) {
+          if( keyExists( key ) ) {
             try {
-              return std::any_cast< VariantType >( it->second );
+              return std::any_cast< VariantType >( *values.find( key ) );
             } catch ( const std::bad_any_cast& e ) {
               Log::getInstance().error( "PropertyList::get", key + " could not be converted to the requested type. Please check the type with propertyIsType()." );
               throw e;
             }
           }
 
-          // If we get here, we're about to return a no-value.
-          if( this != &rootPropertyList ) {
-            // Try rootPropertyList before giving up
-            return rootPropertyList.get< VariantType >( key );
-          } else {
-            // We're now in rootPropertyList and the value still wasn't found. We have no choice now but to return nullptr
-            throw InvalidValueException();
-          }
-        };
-
-        bool propertyIsType( const std::string& key, const std::type_info& type ) const {
-          auto it = values.find( key );
-          if( it != values.end() ) {
-            return it->second.type() == type;
-          }
-
-          return false;
-        }
-
-        unsigned int getSpecificity() const {
-          return computedSpecificity;
+          throw InvalidValueException();
         };
 
       };

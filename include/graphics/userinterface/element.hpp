@@ -2,7 +2,7 @@
 #define NEW_GUI_ELEMENT
 
 #include "graphics/userinterface/drawable.hpp"
-#include "graphics/userinterface/propertylist.hpp"
+#include "graphics/userinterface/style/style.hpp"
 #include "log.hpp"
 #include <glm/glm.hpp>
 #include <string>
@@ -34,7 +34,7 @@ namespace BlueBear {
         std::string id;
         std::vector< std::string > classes;
 
-        PropertyList localStyle;
+        Style::Style localStyle;
         glm::uvec2 requisition;
         glm::uvec4 allocation;
         std::unique_ptr< Drawable > drawable;
@@ -66,11 +66,12 @@ namespace BlueBear {
         void addChild( std::shared_ptr< Element > child );
         void detach();
 
-        PropertyList& getPropertyList();
+        Style::Style& getPropertyList();
         glm::uvec2 getRequisition();
 
         void setAllocation( const glm::uvec4& allocation );
         void reflow();
+        void paint();
         void draw();
       };
 

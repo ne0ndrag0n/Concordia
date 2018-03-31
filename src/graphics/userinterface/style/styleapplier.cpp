@@ -8,6 +8,7 @@
 #include <fstream>
 #include <sstream>
 #include <stack>
+#include <any>
 
 namespace BlueBear {
   namespace Graphics {
@@ -16,39 +17,7 @@ namespace BlueBear {
 
         StyleApplier::StyleApplier( std::shared_ptr< Element > rootElement ) : rootElement( rootElement ) {}
 
-        void StyleApplier::paint() {
-          for( auto& pair : associations ) {
-            for( const AST::PropertyList& propertyList : pair.second.lists ) {
-              for( const AST::Property& property : propertyList.properties ) {
-                if( std::holds_alternative< AST::Call >( property.value ) ) {
-                  CallResult result = call( std::get< AST::Call >( property.value ) );
-
-                  std::visit( [ & ]( auto& data ) {
-                    pair.first->getPropertyList().set( property.name, data, false );
-                  }, result );
-                } else if( std::holds_alternative< AST::Literal >( property.value ) ) {
-                  std::visit( [ & ]( auto& data ) {
-                    pair.first->getPropertyList().set( property.name, data, false );
-                  }, std::get< AST::Literal >( property.value ).data );
-                } else if( std::holds_alternative< AST::Identifier >( property.value ) ) {
-                  std::variant< Gravity, Requisition, Placement, Orientation > variant = identifier( std::get< AST::Identifier >( property.value ) );
-
-                  std::visit( [ & ]( auto& data ) {
-                    pair.first->getPropertyList().set( property.name, data, false );
-                  }, variant );
-                } else {
-                  Log::getInstance().error( "StyleApplier::paint", "This should never happen" );
-                }
-              }
-
-              if( propertyList.properties.size() ) {
-                pair.first->getPropertyList().reflowParent();
-              }
-            }
-          }
-        }
-
-        StyleApplier::CallResult StyleApplier::getArgument( const std::variant< AST::Call, AST::Identifier, AST::Literal >& type ) {
+        StyleApplier::CallResult StyleApplier::resolveValue( const std::variant< AST::Call, AST::Identifier, AST::Literal >& type ) {
           CallResult argument;
 
           if( std::holds_alternative< AST::Call >( type ) ) {
@@ -63,7 +32,7 @@ namespace BlueBear {
               argument = data;
             }, std::get< AST::Literal >( type ).data );
           } else {
-            Log::getInstance().error( "StyleApplier::getArgument", "This should never happen" );
+            Log::getInstance().error( "StyleApplier::resolveValue", "This should never happen" );
           }
 
           return argument;
@@ -78,7 +47,7 @@ namespace BlueBear {
 
           switch( Tools::Utility::hash( functionCall.identifier.value.c_str() ) ) {
             case Tools::Utility::hash( "getIntSetting" ): {
-              CallResult argument = getArgument( functionCall.arguments.front() );
+              CallResult argument = resolveValue( functionCall.arguments.front() );
 
               if( std::holds_alternative< std::string >( argument ) ) {
                 return getIntSetting( std::get< std::string >( argument ) );
@@ -87,7 +56,7 @@ namespace BlueBear {
               }
             }
             case Tools::Utility::hash( "rgbaString" ): {
-              CallResult argument = getArgument( functionCall.arguments.front() );
+              CallResult argument = resolveValue( functionCall.arguments.front() );
 
               if( std::holds_alternative< std::string >( argument ) ) {
                 return rgbaString( std::get< std::string >( argument ) );
@@ -198,32 +167,6 @@ namespace BlueBear {
           throw UndefinedSymbolException();
         }
 
-        void StyleApplier::associatePropertyList( const AST::PropertyList& propertyList ) {
-          std::vector< AST::PropertyList > desugared = desugar( propertyList );
-
-          for( const AST::PropertyList& list : desugared ) {
-            Querier querier( rootElement );
-            std::vector< std::shared_ptr< Element > > matches = querier.get( list.selectorQueries );
-            unsigned int selectorSpecificity = list.computeSpecificity();
-
-            for( std::shared_ptr< Element > element : matches ) {
-              if( selectorSpecificity == associations[ element ].specificity ) {
-                Log::getInstance().debug( "StyleApplier::associatePropertyList", "Associating element with specificity " + std::to_string( selectorSpecificity ) );
-                associations[ element ].lists.push_back( list );
-              } else if( selectorSpecificity > associations[ element ].specificity ) {
-                Log::getInstance().debug( "StyleApplier::associatePropertyList", "Associating existing applied style with new specificity " + std::to_string( selectorSpecificity ) );
-
-                associations[ element ] = {
-                  ( int ) selectorSpecificity,
-                  { list }
-                };
-              } else {
-                Log::getInstance().warn( "StyleApplier::associatePropertyList", "Selector " + list.generateSelectorString() + " was not applied as it is not specific enough relative to other property lists." );
-              }
-            }
-          }
-        }
-
         /**
          * Given a set of tree-structured AST::PropertyList objects,
          */
@@ -245,6 +188,68 @@ namespace BlueBear {
           return desugared;
         }
 
+        bool StyleApplier::elementMatches( std::shared_ptr< Element > element, const AST::PropertyList& propertyList ) {
+          for( auto it = propertyList.selectorQueries.rbegin(); it != propertyList.selectorQueries.rend(); ++it ) {
+            if( !element || !Querier::matches( element, *it ) ) {
+              return false;
+            }
+
+            element = element->getParent();
+          }
+
+          return true;
+        }
+
+        void StyleApplier::update( std::shared_ptr< Element > element ) {
+          // Get a list of propertylists that apply to this element
+          std::vector< AST::PropertyList > applicablePropertyLists;
+          for( const AST::PropertyList& list : propertyLists ) {
+            if( elementMatches( element, list ) ) {
+              applicablePropertyLists.push_back( list );
+            }
+          }
+
+          if( applicablePropertyLists.size() ) {
+            // Sort by specificity most to least
+            std::sort( applicablePropertyLists.begin(), applicablePropertyLists.end(), []( const AST::PropertyList& left, const AST::PropertyList& right ) {
+              return left.computeSpecificity() > right.computeSpecificity();
+            } );
+
+            // Apply by increasing specificity
+            // Unoptimised, naive implementation
+            std::unordered_map< std::string, std::any > values;
+            int previousSpecificity = applicablePropertyLists.front().computeSpecificity();
+
+            for( const AST::PropertyList& list : applicablePropertyLists ) {
+              if( list.computeSpecificity() == previousSpecificity ) {
+                // Indiscriminately apply properties
+                for( const AST::Property& property : list.properties ) {
+                  CallResult value = resolveValue( property.value );
+                  std::visit( [ & ]( auto& data ) { values[ property.name ] = data; }, value );
+                }
+              } else {
+                // Do not apply properties that are already applied
+                for( const AST::Property& property : list.properties ) {
+                  if( values.find( property.name ) == values.end() ) {
+                    CallResult value = resolveValue( property.value );
+                    std::visit( [ & ]( auto& data ) { values[ property.name ] = data; }, value );
+                  }
+                }
+              }
+
+              previousSpecificity = list.computeSpecificity();
+            }
+
+            element->getPropertyList().setCalculated( values );
+          }
+
+          // Recurse
+          std::vector< std::shared_ptr< Element > > children = element->getChildren();
+          for( std::shared_ptr< Element > child : children ) {
+            update( child );
+          }
+        }
+
         void StyleApplier::applyStyles( std::vector< std::string > paths ) {
           // * Load from file using an individual Style::Parser
           // * Find elements it applies to using specificity rules
@@ -262,11 +267,12 @@ namespace BlueBear {
             }
 
             for( const AST::PropertyList& propertyList : stylesheet ) {
-              associatePropertyList( propertyList );
+              propertyLists = Tools::Utility::concatArrays( propertyLists, desugar( propertyList ) );
             }
           }
 
-          paint();
+          // Everything needs to be redone
+          update( rootElement );
         }
 
       }

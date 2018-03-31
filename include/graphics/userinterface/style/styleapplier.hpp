@@ -28,20 +28,18 @@ namespace BlueBear {
             std::vector< AST::PropertyList > lists;
           };
 
-          std::unordered_map< std::shared_ptr< Element >, AppliedStyle > associations;
           std::shared_ptr< Element > rootElement;
-
-          void paint();
+          std::vector< AST::PropertyList > propertyLists;
 
           CallResult call( const AST::Call& functionCall );
           std::variant< Gravity, Requisition, Placement, Orientation > identifier( const AST::Identifier& identifier );
-          CallResult getArgument( const std::variant< AST::Call, AST::Identifier, AST::Literal >& type );
+          CallResult resolveValue( const std::variant< AST::Call, AST::Identifier, AST::Literal >& type );
 
           int getIntSetting( const std::string& key );
           glm::uvec4 rgbaString( const std::string& format );
 
-          void associatePropertyList( const AST::PropertyList& propertyList );
           std::vector< AST::PropertyList > desugar( AST::PropertyList propertyList, std::vector< AST::SelectorQuery > parentQueries = {} );
+          bool elementMatches( std::shared_ptr< Element > element, const AST::PropertyList& propertyList );
 
         public:
           EXCEPTION_TYPE( UndefinedSymbolException, "Symbol or function undefined" );
@@ -50,6 +48,7 @@ namespace BlueBear {
 
           StyleApplier( std::shared_ptr< Element > rootElement );
 
+          void update( std::shared_ptr< Element > element );
           void applyStyles( std::vector< std::string > paths );
         };
 

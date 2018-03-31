@@ -18,7 +18,7 @@ namespace BlueBear {
 
           struct Property {
             std::string name;
-            std::variant< Call, Literal, Identifier > value;
+            std::variant< Call, Identifier, Literal > value;
 
             void print( unsigned int indentation = 0 ) const {
               std::string selected;
