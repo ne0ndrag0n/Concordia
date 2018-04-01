@@ -36,9 +36,12 @@ namespace BlueBear {
         return false;
       }
 
-      void Element::setAllocation( const glm::uvec4& allocation ) {
+      void Element::setAllocation( const glm::uvec4& allocation, bool doReflow ) {
         this->allocation = allocation;
-        reflow();
+
+        if( doReflow ) {
+          reflow();
+        }
       }
 
       Style::Style& Element::getPropertyList() {

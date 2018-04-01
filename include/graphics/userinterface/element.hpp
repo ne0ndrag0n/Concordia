@@ -69,7 +69,7 @@ namespace BlueBear {
         Style::Style& getPropertyList();
         glm::uvec2 getRequisition();
 
-        void setAllocation( const glm::uvec4& allocation );
+        void setAllocation( const glm::uvec4& allocation, bool doReflow = true );
         void reflow();
         void paint();
         void draw();

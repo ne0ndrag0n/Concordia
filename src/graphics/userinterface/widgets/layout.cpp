@@ -169,7 +169,7 @@ namespace BlueBear {
             }
 
             // That's everything: compute the allocation
-            child->setAllocation( childAllocation );
+            child->setAllocation( childAllocation, false );
           }
         }
 

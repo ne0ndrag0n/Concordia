@@ -272,7 +272,7 @@ namespace BlueBear {
           }
 
           // Everything needs to be redone
-          update( rootElement );
+          rootElement->reflow();
         }
 
       }

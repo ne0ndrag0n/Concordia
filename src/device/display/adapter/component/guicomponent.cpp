@@ -25,11 +25,11 @@ namespace BlueBear {
             styleManager( rootElement ) {
               Graphics::UserInterface::Element::manager = this;
 
-              rootElement->getPropertyList().set< int >( "top", 0 );
-              rootElement->getPropertyList().set< int >( "left", 0 );
-              rootElement->getPropertyList().set< int >( "width", ConfigManager::getInstance().getIntValue( "viewport_x" ) );
-              rootElement->getPropertyList().set< int >( "height", ConfigManager::getInstance().getIntValue( "viewport_y" ) );
-              rootElement->getPropertyList().set< Graphics::UserInterface::Gravity >( "gravity", Graphics::UserInterface::Gravity::TOP );
+              rootElement->getPropertyList().set< int >( "top", 0, false );
+              rootElement->getPropertyList().set< int >( "left", 0, false );
+              rootElement->getPropertyList().set< int >( "width", ConfigManager::getInstance().getIntValue( "viewport_x" ), false );
+              rootElement->getPropertyList().set< int >( "height", ConfigManager::getInstance().getIntValue( "viewport_y" ), false );
+              rootElement->getPropertyList().set< Graphics::UserInterface::Gravity >( "gravity", Graphics::UserInterface::Gravity::TOP, false );
               rootElement->setAllocation( {
                 0,
                 0,
@@ -41,18 +41,14 @@ namespace BlueBear {
           // TODO: remove TEST code
           void GuiComponent::__testadd() {
             auto text = Graphics::UserInterface::Widgets::Text::create( "", {}, "This is test text." );
-            text->getPropertyList().set< glm::uvec4 >( "color", glm::uvec4{ 255, 255, 255, 255 } );
-            text->getPropertyList().set< glm::uvec4 >( "background-color", glm::uvec4{ 64, 64, 64, 255 } );
 
             rootElement->addChild( text );
           }
 
           void GuiComponent::__teststyle() {
-            /*
             styleManager.applyStyles( {
               "system/modpacks/gui-new/console.style"
             } );
-            */
           }
 
           Graphics::Vector::Renderer& GuiComponent::getVectorRenderer() {

@@ -1,4 +1,4 @@
 Text {
   color: rgbaString( "000000ff" );
-  background-color: rgbaString( "abcdefff" );
+  background-color: rgbaString( "006858ff" );
 }
