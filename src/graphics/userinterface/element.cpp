@@ -4,6 +4,8 @@
 #include "device/display/adapter/component/guicomponent.hpp"
 #include <algorithm>
 
+#include "log.hpp"
+
 namespace BlueBear {
   namespace Graphics {
     namespace UserInterface {
@@ -13,6 +15,35 @@ namespace BlueBear {
       Element::Element( const std::string& tag, const std::string& id, const std::vector< std::string >& classes ) : tag( tag ), id( id ), classes( classes ), localStyle( this ) {}
 
       Element::~Element() {}
+
+      bool Element::isDrawableValid() {
+        // FIXME: Texture reuse is disabled for now.
+        /*
+        if( !drawable ) {
+          return false;
+        }
+
+        glm::uvec2 absolutePosition = getAbsolutePosition();
+        return glm::uvec4{ absolutePosition.x, absolutePosition.y, allocation[ 2 ], allocation[ 3 ] } == drawable->getAllocation();
+        */
+        return false;
+      }
+
+      void Element::generateDrawable( std::function< void( Graphics::Vector::Renderer& ) > functor ) {
+        glm::uvec2 absolutePosition = getAbsolutePosition();
+
+        if( isDrawableValid() ) {
+          manager->getVectorRenderer().updateExistingTexture( drawable->getTexture(), functor );
+        } else {
+          drawable = std::make_unique< UserInterface::Drawable >(
+            manager->getVectorRenderer().createTexture( glm::uvec2{ allocation[ 2 ], allocation[ 3 ] }, functor ),
+            absolutePosition.x,
+            absolutePosition.y,
+            allocation[ 2 ],
+            allocation[ 3 ]
+          );
+        }
+      }
 
       std::vector< std::shared_ptr< Element > > Element::getChildren() const {
         return children;

@@ -9,6 +9,7 @@
 #include <vector>
 #include <memory>
 #include <unordered_map>
+#include <functional>
 
 namespace BlueBear {
   namespace Device {
@@ -49,6 +50,8 @@ namespace BlueBear {
         bool valueIsLiteral( int r );
         glm::uvec2 getAbsolutePosition();
         virtual std::vector< std::shared_ptr< Element > > getSortedElements();
+        virtual bool isDrawableValid();
+        void generateDrawable( std::function< void( Graphics::Vector::Renderer& ) > functor );
 
       public:
         static Device::Display::Adapter::Component::GuiComponent* manager;

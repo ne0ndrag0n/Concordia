@@ -15,14 +15,14 @@ namespace BlueBear {
       };
 
       Drawable::Drawable( std::shared_ptr< Vector::Renderer::Texture > texture, unsigned int x, unsigned int y, unsigned int width, unsigned int height ) :
-        texture( texture ) {
+        allocation( x, y, width, height ), texture( texture ) {
         glGenVertexArrays( 1, &VAO );
         glGenBuffers( 1, &VBO );
         glGenBuffers( 1, &EBO );
 
         glBindVertexArray( VAO );
           glBindBuffer( GL_ARRAY_BUFFER, VBO );
-            std::vector< Drawable::Corner > quad = generateMesh( x, y, width, height );
+            std::vector< Drawable::Corner > quad = generateMesh( width, height );
             glBufferData( GL_ARRAY_BUFFER, quad.size() * sizeof( Drawable::Corner ), &quad[ 0 ], GL_STATIC_DRAW );
               glEnableVertexAttribArray( 0 );
               glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, sizeof( Drawable::Corner ), ( GLvoid* ) 0 );
@@ -43,27 +43,35 @@ namespace BlueBear {
         glDeleteBuffers( 1, &EBO );
       }
 
-      std::vector< Drawable::Corner > Drawable::generateMesh( unsigned int x, unsigned int y, unsigned int width, unsigned int height ) {
+      std::vector< Drawable::Corner > Drawable::generateMesh( unsigned int width, unsigned int height ) {
         std::vector< Drawable::Corner > vertices = {
           {
-            { x, y, 0.0f },
+            { 0.0f, 0.0f, 0.0f },
             { 0.0f, 1.0f }
           },
           {
-            { x + width, y, 0.0f },
+            { width, 0.0f, 0.0f },
             { 1.0f, 1.0f }
           },
           {
-            { x, y + height, 0.0f },
+            { 0.0f, height, 0.0f },
             { 0.0f, 0.0f }
           },
           {
-            { x + width, y + height, 0.0f },
+            { width, height, 0.0f },
             { 1.0f, 0.0f }
           }
         };
 
         return vertices;
+      }
+
+      glm::uvec4 Drawable::getAllocation() {
+        return allocation;
+      }
+
+      std::shared_ptr< Vector::Renderer::Texture > Drawable::getTexture() {
+        return texture;
       }
 
       void Drawable::draw() {
@@ -77,6 +85,8 @@ namespace BlueBear {
         );
 
         Tools::OpenGL::setUniform( "orthoProjection", orthoProjection );
+        glm::mat4 translation = glm::translate( glm::mat4( 1.0f ), glm::vec3{ allocation.x, allocation.y, 0.0f } );
+        Tools::OpenGL::setUniform( "translation", translation );
 
         glActiveTexture( GL_TEXTURE0 );
         glBindTexture( GL_TEXTURE_2D, texture->getTextureId() );

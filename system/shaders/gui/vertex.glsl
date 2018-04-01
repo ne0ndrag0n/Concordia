@@ -5,8 +5,9 @@ layout (location = 1) in vec2 texture;
 out vec2 fragTexture;
 
 uniform mat4 orthoProjection;
+uniform mat4 translation;
 
 void main() {
-  gl_Position = orthoProjection * vec4( position, 1.0f );
+  gl_Position = orthoProjection * translation * vec4( position, 1.0f );
   fragTexture = texture;
 }

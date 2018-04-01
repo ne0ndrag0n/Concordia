@@ -26,6 +26,7 @@ namespace BlueBear {
         unsigned int VAO;
         unsigned int VBO;
         unsigned int EBO;
+        glm::uvec4 allocation;
         std::shared_ptr< Vector::Renderer::Texture > texture;
 
         struct Corner {
@@ -35,12 +36,14 @@ namespace BlueBear {
 
         static std::vector< GLuint > MESH_INDICES;
 
-        std::vector< Corner > generateMesh( unsigned int x, unsigned int y, unsigned int width, unsigned int height );
+        std::vector< Corner > generateMesh( unsigned int width, unsigned int height );
 
       public:
         Drawable( std::shared_ptr< Vector::Renderer::Texture > texture, unsigned int x, unsigned int y, unsigned int width, unsigned int height );
         ~Drawable();
 
+        glm::uvec4 getAllocation();
+        std::shared_ptr< Vector::Renderer::Texture > getTexture();
         void draw();
       };
 
