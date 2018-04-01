@@ -301,6 +301,9 @@ namespace BlueBear {
 
         AST::SelectorQuery Parser::getSelectorQuery() {
           AST::SelectorQuery selectorQuery;
+          // Hack to make up for the fact that adjusting the parser for whitespace without tests
+          // is going to be impossible
+          int expectedColumn = -1;
 
           if( checkToken( TokenType::STAR ) ) {
             selectorQuery.all = true;
@@ -309,19 +312,28 @@ namespace BlueBear {
 
           if( checkToken( TokenType::IDENTIFIER ) ) {
             selectorQuery.tag = std::get< std::string >( tokens.front().metadata );
+            expectedColumn = tokens.front().column + 1;
             increment();
           }
 
           if( checkToken( TokenType::POUND ) ) {
-            increment();
-            selectorQuery.id = std::get< std::string >( getAndExpect( TokenType::IDENTIFIER, "identifier" ).metadata );
+            if( !( expectedColumn != -1 && tokens.front().column != expectedColumn ) ) {
+              increment();
+              Token identifier = getAndExpect( TokenType::IDENTIFIER, "identifier" );
+              selectorQuery.id = std::get< std::string >( identifier.metadata );
+              expectedColumn = identifier.column + 1;
+            }
           }
 
           while( checkToken( TokenType::DOT ) ) {
-            increment();
-            selectorQuery.classes.push_back(
-              std::get< std::string >( getAndExpect( TokenType::IDENTIFIER, "identifier" ).metadata )
-            );
+            if( !( expectedColumn != -1 && tokens.front().column != expectedColumn ) ) {
+              increment();
+              Token identifier = getAndExpect( TokenType::IDENTIFIER, "identifier" );
+              selectorQuery.classes.push_back( std::get< std::string >( identifier.metadata ) );
+              expectedColumn = identifier.column + 1;
+            } else {
+              break;
+            }
           }
 
           return selectorQuery;
