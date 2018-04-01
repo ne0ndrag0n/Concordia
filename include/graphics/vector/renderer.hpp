@@ -50,6 +50,7 @@ namespace BlueBear {
 
         void checkTexture();
         void loadFonts();
+        void renderCurrentTexture( std::function< void( Renderer& ) > functor );
 
       public:
         Renderer( Device::Display::Display& device );
@@ -62,8 +63,11 @@ namespace BlueBear {
 
         std::shared_ptr< Renderer::Texture > createTexture(
           const glm::uvec2& dimensions,
-          std::function< void( Renderer& ) > functor,
-          std::optional< glm::uvec4 > scissor = {}
+          std::function< void( Renderer& ) > functor
+        );
+        void updateExistingTexture(
+          std::shared_ptr< Renderer::Texture > texture,
+          std::function< void( Renderer& ) > functor
         );
       };
 

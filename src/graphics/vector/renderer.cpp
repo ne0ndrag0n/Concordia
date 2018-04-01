@@ -87,31 +87,41 @@ namespace BlueBear {
         nvgText( context, position.x, position.y, text.c_str(), NULL );
       }
 
-      std::shared_ptr< Renderer::Texture > Renderer::createTexture( const glm::uvec2& dimensions, std::function< void( Renderer& ) > functor, std::optional< glm::uvec4 > scissor ) {
+      void Renderer::renderCurrentTexture( std::function< void( Renderer& ) > functor ) {
+        checkTexture();
+
+        glEnable( GL_STENCIL_TEST );
+        glDisable( GL_DEPTH_TEST );
+
+        nvgluBindFramebuffer( currentTexture->framebuffer );
+          glViewport( 0, 0, currentTexture->dimensions.x, currentTexture->dimensions.y );
+          glClearColor( 0, 0, 0, 0 );
+          glClear( GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
+
+          nvgBeginFrame( context, currentTexture->dimensions.x, currentTexture->dimensions.y, 1.0f );
+            functor( *this );
+          nvgEndFrame( context );
+        nvgluBindFramebuffer( nullptr );
+      }
+
+      std::shared_ptr< Renderer::Texture > Renderer::createTexture( const glm::uvec2& dimensions, std::function< void( Renderer& ) > functor ) {
         device.executeOnSecondaryContext( secondaryGLContext, [ & ]() {
           currentTexture = std::make_shared< Renderer::Texture >( *this, dimensions );
-
-          glEnable( GL_STENCIL_TEST );
-          glDisable( GL_DEPTH_TEST );
-
-          nvgluBindFramebuffer( currentTexture->framebuffer );
-            glViewport( 0, 0, dimensions.x, dimensions.y );
-            glClearColor( 0, 0, 0, 0 );
-            glClear( GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
-
-            nvgBeginFrame( context, dimensions.x, dimensions.y, 1.0f );
-              functor( *this );
-              if( scissor ) {
-                glm::uvec4& scissorDims = *scissor;
-                nvgScissor( context, scissorDims[ 0 ], scissorDims[ 1 ], scissorDims[ 2 ], scissorDims[ 3 ] );
-              }
-            nvgEndFrame( context );
-          nvgluBindFramebuffer( nullptr );
+          renderCurrentTexture( functor );
         } );
 
         auto copy = currentTexture;
         currentTexture = nullptr;
         return copy;
+      }
+
+      void Renderer::updateExistingTexture( std::shared_ptr< Renderer::Texture > texture, std::function< void( Renderer& ) > functor ) {
+        device.executeOnSecondaryContext( secondaryGLContext, [ & ]() {
+          currentTexture = texture;
+          renderCurrentTexture( functor );
+        } );
+
+        currentTexture = nullptr;
       }
 
       Renderer::Texture::Texture( Renderer& renderer, const glm::uvec2& dimensions ) : parent( renderer ), dimensions( dimensions ) {
