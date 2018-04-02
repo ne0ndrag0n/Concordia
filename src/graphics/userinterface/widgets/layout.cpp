@@ -56,9 +56,7 @@ namespace BlueBear {
           requisition = total;
         }
 
-        void Layout::render() {
-          // Nothing to render.
-        }
+        void Layout::generateDrawable() { /* Nothing to generate, don't generate. */ }
 
         Layout::Relations Layout::getRelations( Gravity gravity, int padding ) {
           bool xAxis = ( gravity == Gravity::LEFT || gravity == Gravity::RIGHT );

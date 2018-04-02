@@ -8,6 +8,10 @@
 
 namespace BlueBear {
   namespace Graphics {
+    namespace Vector {
+      class Renderer;
+    }
+
     namespace UserInterface {
       namespace Widgets {
 
@@ -19,7 +23,7 @@ namespace BlueBear {
           Text( const std::string& id, const std::vector< std::string >& classes, const std::string& innerText );
 
         public:
-          virtual void render() override;
+          virtual void render( Graphics::Vector::Renderer& renderer ) override;
           virtual void calculate() override;
 
           void setText( const std::string& text );

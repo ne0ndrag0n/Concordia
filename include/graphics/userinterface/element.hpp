@@ -51,13 +51,13 @@ namespace BlueBear {
         glm::uvec2 getAbsolutePosition();
         virtual std::vector< std::shared_ptr< Element > > getSortedElements();
         virtual bool isDrawableValid();
-        void generateDrawable( std::function< void( Graphics::Vector::Renderer& ) > functor );
+        virtual void generateDrawable();
 
       public:
         static Device::Display::Adapter::Component::GuiComponent* manager;
 
         virtual void positionAndSizeChildren();
-        virtual void render() = 0;
+        virtual void render( Graphics::Vector::Renderer& renderer );
         virtual void calculate() = 0;
 
         const std::string& getTag() const;

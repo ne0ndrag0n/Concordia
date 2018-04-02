@@ -25,20 +25,24 @@ namespace BlueBear {
         return glm::uvec4{ absolutePosition.x, absolutePosition.y, allocation[ 2 ], allocation[ 3 ] } == drawable->getAllocation();
       }
 
-      void Element::generateDrawable( std::function< void( Graphics::Vector::Renderer& ) > functor ) {
+      void Element::generateDrawable() {
         glm::uvec2 absolutePosition = getAbsolutePosition();
 
         if( isDrawableValid() ) {
-          manager->getVectorRenderer().updateExistingTexture( drawable->getTexture(), functor );
+          manager->getVectorRenderer().updateExistingTexture( drawable->getTexture(), [ & ]( Graphics::Vector::Renderer& r ) { render( r ); } );
         } else {
           drawable = std::make_unique< UserInterface::Drawable >(
-            manager->getVectorRenderer().createTexture( glm::uvec2{ allocation[ 2 ], allocation[ 3 ] }, functor ),
+            manager->getVectorRenderer().createTexture( glm::uvec2{ allocation[ 2 ], allocation[ 3 ] }, [ & ]( Graphics::Vector::Renderer& r ) { render( r ); } ),
             absolutePosition.x,
             absolutePosition.y,
             allocation[ 2 ],
             allocation[ 3 ]
           );
         }
+      }
+
+      void Element::render( Graphics::Vector::Renderer& renderer ) {
+        // abstract !
       }
 
       std::vector< std::shared_ptr< Element > > Element::getChildren() const {
@@ -160,7 +164,7 @@ namespace BlueBear {
 
       void Element::paint() {
         // Render myself, since I've already been positioned and sized
-        render();
+        generateDrawable();
 
         if( !children.empty() ) {
           positionAndSizeChildren();

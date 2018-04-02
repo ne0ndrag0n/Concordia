@@ -18,23 +18,21 @@ namespace BlueBear {
           return text;
         }
 
-        void Text::render() {
-          generateDrawable( [ & ]( Graphics::Vector::Renderer& renderer ) {
-            double fontSize = localStyle.get< double >( "font-size" );
+        void Text::render( Graphics::Vector::Renderer& renderer ) {
+          double fontSize = localStyle.get< double >( "font-size" );
 
-            renderer.drawRect(
-              glm::uvec4{ 0, 0, allocation[ 2 ], allocation[ 3 ] },
-              localStyle.get< glm::uvec4 >( "background-color" )
-            );
+          renderer.drawRect(
+            glm::uvec4{ 0, 0, allocation[ 2 ], allocation[ 3 ] },
+            localStyle.get< glm::uvec4 >( "background-color" )
+          );
 
-            renderer.drawText(
-              localStyle.get< std::string >( "font" ),
-              innerText,
-              glm::uvec2{ ( allocation[ 2 ] / 2 ) - ( textSpan / 2 ), fontSize / 2 },
-              localStyle.get< glm::uvec4 >( "color" ),
-              fontSize
-            );
-          } );
+          renderer.drawText(
+            localStyle.get< std::string >( "font" ),
+            innerText,
+            glm::uvec2{ ( allocation[ 2 ] / 2 ) - ( textSpan / 2 ), fontSize / 2 },
+            localStyle.get< glm::uvec4 >( "color" ),
+            fontSize
+          );
         }
 
         void Text::calculate() {
