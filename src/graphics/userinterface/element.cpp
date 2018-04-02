@@ -17,16 +17,12 @@ namespace BlueBear {
       Element::~Element() {}
 
       bool Element::isDrawableValid() {
-        // FIXME: Texture reuse is disabled for now.
-        /*
         if( !drawable ) {
           return false;
         }
 
         glm::uvec2 absolutePosition = getAbsolutePosition();
         return glm::uvec4{ absolutePosition.x, absolutePosition.y, allocation[ 2 ], allocation[ 3 ] } == drawable->getAllocation();
-        */
-        return false;
       }
 
       void Element::generateDrawable( std::function< void( Graphics::Vector::Renderer& ) > functor ) {

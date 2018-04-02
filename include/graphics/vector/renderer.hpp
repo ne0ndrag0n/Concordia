@@ -33,7 +33,7 @@ namespace BlueBear {
           friend class Renderer;
           Renderer& parent;
           struct NVGLUframebuffer* framebuffer;
-          const glm::uvec2& dimensions;
+          glm::uvec2 dimensions;
 
         public:
           Texture( Renderer& renderer, const glm::uvec2& dimensions );
