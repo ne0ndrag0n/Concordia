@@ -21,7 +21,7 @@ namespace BlueBear {
             std::vector< PropertyList > children;
 
             unsigned int computeSpecificity() const {
-              unsigned int totalSpecificity;
+              unsigned int totalSpecificity = 0;
 
               for( const AST::SelectorQuery& selectorQuery : selectorQueries ) {
                 totalSpecificity += selectorQuery.computeSpecificity();
