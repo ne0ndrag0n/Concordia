@@ -1,8 +1,3 @@
-Text {
-  color: rgbaString( "000000ff" );
-  background-color: rgbaString( "006858ff" );
-}
-
 #concordia_terminal {
   top: 0;
   left: 0;

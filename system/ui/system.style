@@ -1,0 +1,18 @@
+Text.test {
+  color: rgbaString( "000000ff" );
+  background-color: rgbaString( "006858ff" );
+}
+
+Window {
+  placement: Placement::FREE;
+  color: rgbaString( "5555ffff" );
+  background-color: rgbaString( "3e464cff" );
+}
+
+Window#test {
+  font-size: 26.0;
+  top: 10;
+  left: 10;
+  width: 600;
+  height: 300;
+}

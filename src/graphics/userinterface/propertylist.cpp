@@ -21,6 +21,7 @@ namespace BlueBear {
         { "background-color", glm::uvec4{ 255, 255, 255, 255 } },
         { "color", glm::uvec4{ 0, 0, 0, 255 } },
         { "font", std::string{ "roboto" } },
+        { "font-color", glm::uvec4{ 255, 255, 255, 255 } },
         { "font-size", 16.0 },
         { "font-bold", false },
         { "font-italic", false },

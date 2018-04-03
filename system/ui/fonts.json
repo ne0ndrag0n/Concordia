@@ -1,5 +1,6 @@
 {
   "roboto": "system/ui/Roboto.ttf",
+  "fontawesome": "system/ui/fontawesome.ttf",
   "terminus": "system/ui/terminus.ttf",
   "dosvga": "system/ui/dosvga.ttf"
 }

@@ -9,7 +9,7 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
-#include "graphics/userinterface/widgets/text.hpp"
+#include "graphics/userinterface/widgets/window.hpp"
 
 namespace BlueBear {
   namespace Device {
@@ -36,19 +36,20 @@ namespace BlueBear {
                 ConfigManager::getInstance().getIntValue( "viewport_x" ),
                 ConfigManager::getInstance().getIntValue( "viewport_y" )
               } );
+
+              styleManager.applyStyles( {
+                "system/ui/system.style"
+              } );
             }
 
           // TODO: remove TEST code
           void GuiComponent::__testadd() {
-            auto text = Graphics::UserInterface::Widgets::Text::create( "", {}, "This is test text." );
-
-            rootElement->addChild( text );
+            auto window = Graphics::UserInterface::Widgets::Window::create( "test", {}, "Window Title" );
+            rootElement->addChild( window );
           }
 
           void GuiComponent::__teststyle() {
-            styleManager.applyStyles( {
-              "system/modpacks/gui-new/console.style"
-            } );
+            Log::getInstance().info( "GuiComponent::__teststyle", "Remove this function and callbacks" );
           }
 
           Graphics::Vector::Renderer& GuiComponent::getVectorRenderer() {
