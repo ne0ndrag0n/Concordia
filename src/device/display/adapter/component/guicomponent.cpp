@@ -60,22 +60,6 @@ namespace BlueBear {
             return styleManager;
           }
 
-          /**
-           * Getting the feeling that the only reason we do this is because it's awkward to pass a "renderwindow" to inputmanager
-           * when really it shouldn't be...
-           */
-          std::queue< sf::Event > GuiComponent::getEvents() {
-            sf::RenderWindow& renderWindow = display.getRenderWindow();
-            std::queue< sf::Event > events;
-
-            sf::Event event;
-            while( renderWindow.pollEvent( event ) ) {
-              events.push( event );
-            }
-
-            return events;
-          }
-
           void GuiComponent::nextFrame() {
             glDisable( GL_CULL_FACE );
             glDisable( GL_DEPTH_TEST );

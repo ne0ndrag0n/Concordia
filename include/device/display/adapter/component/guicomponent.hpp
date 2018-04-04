@@ -6,8 +6,6 @@
 #include "graphics/userinterface/propertylist.hpp"
 #include "graphics/userinterface/style/styleapplier.hpp"
 #include "graphics/shader.hpp"
-#include <SFML/Graphics/RenderWindow.hpp>
-#include <SFML/Window/Event.hpp>
 #include <queue>
 #include <memory>
 
@@ -39,7 +37,6 @@ namespace BlueBear {
             Graphics::Vector::Renderer& getVectorRenderer();
             Graphics::UserInterface::Style::StyleApplier& getStyleManager();
 
-            std::queue< sf::Event > getEvents();
             GuiComponent( Device::Display::Display& display );
             void nextFrame() override;
           };

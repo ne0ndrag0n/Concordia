@@ -6,7 +6,7 @@
 
 namespace BlueBear {
 
-  Application::Application() {
+  Application::Application() : input( *this ) {
     Log::getInstance().info( "Application::Application", LocaleManager::getInstance().getString( "BLUEBEAR_WELCOME_MESSAGE" ) );
     sf::err().rdbuf( NULL );
   }

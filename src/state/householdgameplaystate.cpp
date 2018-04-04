@@ -33,7 +33,7 @@ namespace BlueBear {
     }
 
     HouseholdGameplayState::~HouseholdGameplayState() {
-      application.getInputDevice() = Device::Input::Input();
+      application.getInputDevice().reset();
     }
 
     void HouseholdGameplayState::setupEngine() {
@@ -79,7 +79,8 @@ namespace BlueBear {
       sf::Keyboard::Key KEY_ZOOM_OUT = ( sf::Keyboard::Key ) ConfigManager::getInstance().getIntValue( "key_zoom_out" );
 
       Graphics::Camera& camera = application.getDisplayDevice().getAdapterAt( RENDER3D_ADAPTER ).as< Device::Display::Adapter::Component::WorldRenderer >().getCamera();
-      Device::Input::Input& inputManager = ( application.getInputDevice() = Device::Input::Input() );
+      Device::Input::Input& inputManager = application.getInputDevice();
+      inputManager.reset();
       inputManager.listen( KEY_ROTATE_RIGHT, std::bind( &Graphics::Camera::rotateRight, &camera ) );
       inputManager.listen( KEY_ROTATE_LEFT, std::bind( &Graphics::Camera::rotateLeft, &camera ) );
       inputManager.listen( KEY_UP, std::bind( &Graphics::Camera::move, &camera, 0.0f, -0.1f, 0.0f ) );
@@ -143,20 +144,8 @@ namespace BlueBear {
       auto& display = application.getDisplayDevice();
       display.update();
 
-      // pull and use events
-      std::queue< sf::Event > guiEvents = display.getAdapterAt( GUI_ADAPTER ).as< Device::Display::Adapter::Component::GuiComponent >().getEvents();
-      while( !guiEvents.empty() ) {
-        sf::Event& event = guiEvents.front();
-        switch( event.type ) {
-          case sf::Event::Closed:
-            application.close();
-            return;
-          default:
-            application.getInputDevice().handleEvent( event );
-        }
-
-        guiEvents.pop();
-      }
+      auto& input = application.getInputDevice();
+      input.update();
     }
 
   }

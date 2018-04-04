@@ -13,10 +13,13 @@
 #include <sol.hpp>
 
 namespace BlueBear {
+  class Application;
+
   namespace Device {
     namespace Input {
 
       class Input {
+        Application& application;
         std::map< sf::Keyboard::Key, std::function< void() > > keyEvents;
         std::map< sf::Keyboard::Key, std::vector< sol::function > > luaKeyEvents;
         bool eatKeyEvents = false;
@@ -30,14 +33,18 @@ namespace BlueBear {
         static std::string keyToString( sf::Keyboard::Key key );
 
       public:
-        Input();
+        Input( Application& application );
         ~Input();
+
+        void reset();
+
         void listen( sf::Keyboard::Key key, std::function< void() > callback );
         void handleEvent( sf::Event& event );
 
         sol::variadic_results registerScriptKey( sol::this_state L, const std::string& key, sol::function callback );
         void unregisterScriptKey( const std::string& key, int id );
 
+        void update();
       };
 
     }

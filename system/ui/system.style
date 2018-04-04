@@ -15,8 +15,9 @@ Window#test {
 
 Window#test2 {
   local-z-order: 2;
-  top: 100;
-  left: 100;
-  width: 600;
-  height: 300;
+  color: rgbaString( "ff0000ff" );
+  top: 232;
+  left: 332;
+  width: 300;
+  height: 200;
 }

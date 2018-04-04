@@ -5,6 +5,8 @@
 #include "log.hpp"
 #include "scripting/luastate.hpp"
 #include "state/state.hpp"
+#include "application.hpp"
+#include <SFML/Graphics/RenderWindow.hpp>
 #include <algorithm>
 #include <string>
 
@@ -12,7 +14,7 @@ namespace BlueBear {
   namespace Device {
     namespace Input {
 
-      Input::Input() {
+      Input::Input( Application& application ) : application( application ) {
         eventManager.LUA_STATE_READY.listen( this, std::bind( &Input::submitLuaContributions, this, std::placeholders::_1 ) );
       }
 
@@ -24,6 +26,12 @@ namespace BlueBear {
 
       Input::~Input() {
         eventManager.LUA_STATE_READY.stopListening( this );
+      }
+
+      void Input::reset() {
+        keyEvents.clear();
+        luaKeyEvents.clear();
+        eatKeyEvents = eatMouseEvents = false;
       }
 
       void Input::listen( sf::Keyboard::Key key, std::function< void() > callback ) {
@@ -491,6 +499,19 @@ namespace BlueBear {
           std::vector< sol::function >& vector = luaKeyEvents[ sfKey ];
           if( id < vector.size() ) {
             vector[ id ] = sol::function{};
+          }
+        }
+      }
+
+      void Input::update() {
+        sf::Event event;
+        while( application.getDisplayDevice().getRenderWindow().pollEvent( event ) ) {
+          switch( event.type ) {
+            case sf::Event::Closed:
+              application.close();
+              return;
+            default:
+              handleEvent( event );
           }
         }
       }
