@@ -9,7 +9,6 @@
 #include "eventmanager.hpp"
 #include "device/display/adapter/component/worldrenderer.hpp"
 #include "device/display/adapter/component/guicomponent.hpp"
-#include "device/input/input.hpp"
 #include "graphics/scenegraph/animation/animator.hpp"
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Event.hpp>
@@ -79,39 +78,26 @@ namespace BlueBear {
       sf::Keyboard::Key KEY_ZOOM_OUT = ( sf::Keyboard::Key ) ConfigManager::getInstance().getIntValue( "key_zoom_out" );
 
       Graphics::Camera& camera = application.getDisplayDevice().getAdapterAt( RENDER3D_ADAPTER ).as< Device::Display::Adapter::Component::WorldRenderer >().getCamera();
-      Device::Input::Input& inputManager = application.getInputDevice();
-      inputManager.reset();
-      inputManager.listen( KEY_ROTATE_RIGHT, std::bind( &Graphics::Camera::rotateRight, &camera ) );
-      inputManager.listen( KEY_ROTATE_LEFT, std::bind( &Graphics::Camera::rotateLeft, &camera ) );
-      inputManager.listen( KEY_UP, std::bind( &Graphics::Camera::move, &camera, 0.0f, -0.1f, 0.0f ) );
-      inputManager.listen( KEY_DOWN, std::bind( &Graphics::Camera::move, &camera, 0.0f, 0.1f, 0.0f ) );
-      inputManager.listen( KEY_LEFT, std::bind( &Graphics::Camera::move, &camera, 0.1f, 0.0f, 0.0f ) );
-      inputManager.listen( KEY_RIGHT, std::bind( &Graphics::Camera::move, &camera, -0.1f, 0.0f, 0.0f ) );
-      inputManager.listen( KEY_ZOOM_IN, std::bind( &Graphics::Camera::zoomIn, &camera ) );
-      inputManager.listen( KEY_ZOOM_OUT, std::bind( &Graphics::Camera::zoomOut, &camera ) );
+      keyGroup.registerSystemKey( Device::Input::Input::keyToString( KEY_ROTATE_RIGHT ), std::bind( &Graphics::Camera::rotateRight, &camera ) );
+      keyGroup.registerSystemKey( Device::Input::Input::keyToString( KEY_ROTATE_LEFT ), std::bind( &Graphics::Camera::rotateLeft, &camera ) );
+      keyGroup.registerSystemKey( Device::Input::Input::keyToString( KEY_UP ), std::bind( &Graphics::Camera::move, &camera, 0.0f, -0.1f, 0.0f ) );
+      keyGroup.registerSystemKey( Device::Input::Input::keyToString( KEY_DOWN ), std::bind( &Graphics::Camera::move, &camera, 0.0f, 0.1f, 0.0f ) );
+      keyGroup.registerSystemKey( Device::Input::Input::keyToString( KEY_LEFT ), std::bind( &Graphics::Camera::move, &camera, 0.1f, 0.0f, 0.0f ) );
+      keyGroup.registerSystemKey( Device::Input::Input::keyToString( KEY_RIGHT ), std::bind( &Graphics::Camera::move, &camera, -0.1f, 0.0f, 0.0f ) );
+      keyGroup.registerSystemKey( Device::Input::Input::keyToString( KEY_ZOOM_IN ), std::bind( &Graphics::Camera::zoomIn, &camera ) );
+      keyGroup.registerSystemKey( Device::Input::Input::keyToString( KEY_ZOOM_OUT ), std::bind( &Graphics::Camera::zoomOut, &camera ) );
 
-      inputManager.listen( sf::Keyboard::X, [ & ]() {
+      keyGroup.registerSystemKey( Device::Input::Input::keyToString( sf::Keyboard::X ), [ & ]() {
         application.getDisplayDevice().getAdapterAt( RENDER3D_ADAPTER ).as< Device::Display::Adapter::Component::WorldRenderer >().placeObject( "floor", "floor1" );
       } );
-      inputManager.listen( sf::Keyboard::C, [ & ]() {
+      keyGroup.registerSystemKey( Device::Input::Input::keyToString( sf::Keyboard::C ), [ & ]() {
         auto animator = application.getDisplayDevice().getAdapterAt( RENDER3D_ADAPTER ).as< Device::Display::Adapter::Component::WorldRenderer >().getObject( "floor1" )
           ->findNearestAnimator();
 
         animator->setCurrentAnimation( "Armature|ArmatureAction" );
       } );
-      inputManager.listen( sf::Keyboard::V, [ & ]() {
+      keyGroup.registerSystemKey( Device::Input::Input::keyToString( sf::Keyboard::V ), [ & ]() {
         Log::getInstance().debug( "HouseholdGameplayState::setupInputDevice", "Trying this shit..." );
-
-        /*
-        application
-          .getDisplayDevice()
-          .getAdapterAt( GUI_ADAPTER )
-          .as< Device::Display::Adapter::Component::GuiComponent >()
-          .getVectorRenderer()
-          .createTexture( glm::uvec2{ 100, 100 }, [ & ]( Graphics::Vector::Renderer& renderer ) {
-            renderer.drawRect( glm::uvec4{ 10, 10, 10, 10 }, glm::uvec4{ 10, 0, 0, 255 } );
-          } );
-          */
 
         application
           .getDisplayDevice()
@@ -121,7 +107,7 @@ namespace BlueBear {
 
         Log::getInstance().debug( "HouseholdGameplayState::setupInputDevice", "Done" );
       } );
-      inputManager.listen( sf::Keyboard::B, [ & ]() {
+      keyGroup.registerSystemKey( Device::Input::Input::keyToString( sf::Keyboard::B ), [ & ]() {
         Log::getInstance().debug( "HouseholdGameplayState::setupInputDevice", "Applying style..." );
 
         application
@@ -131,6 +117,12 @@ namespace BlueBear {
           .__teststyle();
 
         Log::getInstance().debug( "HouseholdGameplayState::setupInputDevice", "Done" );
+      } );
+
+      Device::Input::Input& inputManager = application.getInputDevice();
+      inputManager.reset();
+      inputManager.registerInputEvent( sf::Event::KeyPressed, [ & ]( Device::Input::Input::Metadata metadata ) {
+        keyGroup.trigger( metadata.keyPressed );
       } );
     }
 

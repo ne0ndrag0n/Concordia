@@ -7,6 +7,7 @@
 #include "state/state.hpp"
 #include "application.hpp"
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Window/Mouse.hpp>
 #include <algorithm>
 #include <string>
 
@@ -14,69 +15,91 @@ namespace BlueBear {
   namespace Device {
     namespace Input {
 
-      Input::Input( Application& application ) : application( application ) {
-        eventManager.LUA_STATE_READY.listen( this, std::bind( &Input::submitLuaContributions, this, std::placeholders::_1 ) );
-      }
+      unsigned int Input::KeyGroup::insertNearest( const std::string& key, sol::function& function ) {
+        auto& collection = luaKeyEvents[ key ];
 
-      void Input::submitLuaContributions( sol::state& lua ) {
-        sol::table event = lua[ "bluebear" ][ "event" ];
-        event.set_function( "register_key", &Input::registerScriptKey, this );
-        event.set_function( "unregister_key", &Input::unregisterScriptKey, this );
-      }
-
-      Input::~Input() {
-        eventManager.LUA_STATE_READY.stopListening( this );
-      }
-
-      void Input::reset() {
-        keyEvents.clear();
-        luaKeyEvents.clear();
-        eatKeyEvents = eatMouseEvents = false;
-      }
-
-      void Input::listen( sf::Keyboard::Key key, std::function< void() > callback ) {
-        keyEvents[ key ] = callback;
-      }
-
-      void Input::handleEvent( sf::Event& event ) {
-        switch( event.type ) {
-          case sf::Event::KeyPressed:
-            {
-              if( eatKeyEvents == false ) {
-                auto it = keyEvents.find( event.key.code );
-                if( it != keyEvents.end() ) {
-                  it->second();
-                } else {
-                  // Lua key events come second-fiddle to key events
-                  auto it2 = luaKeyEvents.find( event.key.code );
-                  if( it2 != luaKeyEvents.end() ) {
-                    fireOff( it2->second );
-                  }
-                }
-              } else {
-                // Only eat the event for this tick
-                eatKeyEvents = false;
-              }
-            }
-            break;
-          case sf::Event::MouseButtonReleased:
-            {
-              if( eatMouseEvents == false ) {
-                // TODO: Remove focus
-                // TODO mouse shit
-              } else {
-                eatMouseEvents = false;
-              }
-            }
-          default:
-            break;
+        for( int i = 0; i != collection.size(); i++ ) {
+          if( !collection[ i ].valid() ) {
+            collection[ i ] = function;
+            return i;
+          }
         }
+
+        collection.push_back( function );
+        return collection.size() - 1;
       }
 
-      void Input::fireOff( std::vector< sol::function >& refs ) {
+      void Input::KeyGroup::fireOff( std::vector< sol::function >& refs ) {
         for( sol::function copy : refs ) {
           if( copy.valid() ) {
             eventManager.UI_ACTION_EVENT.trigger( copy );
+          }
+        }
+      }
+
+      void Input::KeyGroup::submitLuaContributions( sol::state& lua ) {
+        sol::table event = lua[ "bluebear" ][ "event" ];
+        event.set_function( "register_key", &Input::KeyGroup::registerScriptKey, this );
+        event.set_function( "unregister_key", &Input::KeyGroup::unregisterScriptKey, this );
+      }
+
+      Input::KeyGroup::KeyGroup() {
+        eventManager.LUA_STATE_READY.listen( this, std::bind( &Input::KeyGroup::submitLuaContributions, this, std::placeholders::_1 ) );
+      }
+
+      Input::KeyGroup::~KeyGroup () {
+        eventManager.LUA_STATE_READY.stopListening( this );
+      }
+
+      void Input::KeyGroup::registerSystemKey( const std::string& key, std::function< void() > callback ) {
+        keyEvents[ key ] = callback;
+      }
+
+      sol::variadic_results Input::KeyGroup::registerScriptKey( sol::this_state L, const std::string& key, sol::function callback ) {
+        sol::variadic_results result;
+
+        if( callback.valid() ) {
+          auto it = keyEvents.find( key );
+          if( it == keyEvents.end() ) {
+            result.push_back( { L, sol::in_place, insertNearest( key, callback ) } );
+          } else {
+            Log::getInstance().warn( "Input::KeyGroup::registerScriptKey", "This key is reserved by the engine and cannot be registered for an event." );
+          }
+        } else {
+          Log::getInstance().error( "Input::KeyGroup::registerScriptKey", "Invalid function provided to bluebear.event.register_key" );
+        }
+
+        return result;
+      }
+
+      void Input::KeyGroup::unregisterScriptKey( const std::string& key, int id ) {
+        if( luaKeyEvents.find( key ) != luaKeyEvents.end() ) {
+          std::vector< sol::function >& vector = luaKeyEvents[ key ];
+          if( id < vector.size() ) {
+            vector[ id ] = sol::function{};
+          }
+        }
+      }
+
+      void Input::KeyGroup::unregisterSystemKey( const std::string& key ) {
+        if( keyEvents.find( key ) != keyEvents.end() ) {
+          keyEvents.erase( key );
+        }
+      }
+
+      void Input::KeyGroup::trigger( const std::string& key ) {
+        auto it = keyEvents.find( key );
+        if( it != keyEvents.end() ) {
+          it->second();
+        } else {
+          // Lua key events come second-fiddle to key events
+          auto it2 = luaKeyEvents.find( key );
+          if( it2 != luaKeyEvents.end() ) {
+            for( sol::function copy : it2->second ) {
+              if( copy.valid() ) {
+                eventManager.UI_ACTION_EVENT.trigger( copy );
+              }
+            }
           }
         }
       }
@@ -461,46 +484,56 @@ namespace BlueBear {
         }
       }
 
-      unsigned int Input::insertNearest( sf::Keyboard::Key key, sol::function& function ) {
-        auto& collection = luaKeyEvents[ key ];
+      void Input::handleEvent( sf::Event& event ) {
+        Metadata metadata {
+          ( event.type == sf::Event::KeyPressed ) ? keyToString( event.key.code ) : "",
+          sf::Keyboard::isKeyPressed( sf::Keyboard::LAlt ) || sf::Keyboard::isKeyPressed( sf::Keyboard::RAlt ),
+          sf::Keyboard::isKeyPressed( sf::Keyboard::LControl ) || sf::Keyboard::isKeyPressed( sf::Keyboard::RControl ),
+          sf::Keyboard::isKeyPressed( sf::Keyboard::LShift ) || sf::Keyboard::isKeyPressed( sf::Keyboard::RShift ),
+          sf::Keyboard::isKeyPressed( sf::Keyboard::LSystem ) || sf::Keyboard::isKeyPressed( sf::Keyboard::RSystem ),
+
+          glm::uvec2{ sf::Mouse::getPosition().x, sf::Mouse::getPosition().y },
+          sf::Mouse::isButtonPressed( sf::Mouse::Left ),
+          sf::Mouse::isButtonPressed( sf::Mouse::Middle ),
+          sf::Mouse::isButtonPressed( sf::Mouse::Right )
+        };
+
+        auto it = events.find( event.type );
+        if( it != events.end() ) {
+          for( std::function< void( Metadata ) > callback : it->second ) {
+            callback( metadata );
+          }
+        }
+      }
+
+      Input::Input( Application& application ) : application( application ) {}
+
+      unsigned int Input::registerInputEvent( sf::Event::EventType type, std::function< void( Input::Metadata ) > callback ) {
+        auto& collection = events[ type ];
 
         for( int i = 0; i != collection.size(); i++ ) {
-          if( !collection[ i ].valid() ) {
-            collection[ i ] = function;
+          if( !collection[ i ] ) {
+            collection[ i ] = callback;
             return i;
           }
         }
 
-        collection.push_back( function );
+        collection.push_back( callback );
         return collection.size() - 1;
       }
 
-      sol::variadic_results Input::registerScriptKey( sol::this_state L, const std::string& key, sol::function callback ) {
-        sol::variadic_results result;
-
-        if( callback.valid() ) {
-          sf::Keyboard::Key sfKey = stringToKey( key );
-          auto it = keyEvents.find( sfKey );
-          if( it == keyEvents.end() ) {
-            result.push_back( { L, sol::in_place, insertNearest( sfKey, callback ) } );
-          } else {
-            Log::getInstance().warn( "Input::lua_registerScriptKey", "This key is reserved by the engine and cannot be registered for an event." );
+      void Input::unregisterInputEvent( sf::Event::EventType type, int id ) {
+        if( events.find( type ) != events.end() ) {
+          std::vector< std::function< void( Metadata ) > >& vector = events[ type ];
+          if( id < vector.size() ) {
+            vector[ id ] = std::function< void( Metadata ) >();
           }
-        } else {
-          Log::getInstance().error( "Input::registerScriptKey", "Invalid function provided to bluebear.event.register_key" );
         }
-
-        return result;
       }
 
-      void Input::unregisterScriptKey( const std::string& key, int id ) {
-        sf::Keyboard::Key sfKey = stringToKey( key );
-        if( luaKeyEvents.find( sfKey ) != luaKeyEvents.end() ) {
-          std::vector< sol::function >& vector = luaKeyEvents[ sfKey ];
-          if( id < vector.size() ) {
-            vector[ id ] = sol::function{};
-          }
-        }
+      void Input::reset() {
+        events.clear();
+        eatKeyEvents = eatMouseEvents = false;
       }
 
       void Input::update() {
@@ -510,10 +543,17 @@ namespace BlueBear {
             case sf::Event::Closed:
               application.close();
               return;
+            case sf::Event::KeyPressed: {
+              if( eatKeyEvents ) {
+                break;
+              }
+            }
             default:
               handleEvent( event );
           }
         }
+
+        eatKeyEvents = eatMouseEvents = false;
       }
 
     }

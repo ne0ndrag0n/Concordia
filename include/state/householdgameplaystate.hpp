@@ -3,6 +3,7 @@
 
 #include "state/state.hpp"
 #include "exceptions/genexc.hpp"
+#include "device/input/input.hpp"
 #include <memory>
 
 namespace BlueBear {
@@ -21,6 +22,7 @@ namespace BlueBear {
 
       std::unique_ptr< Scripting::Engine > engine;
       std::unique_ptr< Scripting::InfrastructureFactory > infrastructureFactory;
+      Device::Input::Input::KeyGroup keyGroup;
 
       void setupEngine();
       void setupDisplayDevice();
