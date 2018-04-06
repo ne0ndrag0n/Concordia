@@ -3,6 +3,7 @@
 
 #include "graphics/userinterface/drawable.hpp"
 #include "graphics/userinterface/style/style.hpp"
+#include "graphics/userinterface/event/eventbundle.hpp"
 #include "log.hpp"
 #include <glm/glm.hpp>
 #include <string>
@@ -40,6 +41,8 @@ namespace BlueBear {
         glm::uvec4 allocation;
         std::unique_ptr< Drawable > drawable;
 
+        Event::EventBundle eventBundle;
+
         std::weak_ptr< Element > parentWeak;
         std::vector< std::shared_ptr< Element > > children;
 
@@ -71,8 +74,10 @@ namespace BlueBear {
 
         Style::Style& getPropertyList();
         glm::uvec2 getRequisition();
-
         void setAllocation( const glm::uvec4& allocation, bool doReflow = true );
+
+        std::vector< std::shared_ptr< Element > > getLeafNodes();
+
         void reflow();
         void paint();
         void draw();

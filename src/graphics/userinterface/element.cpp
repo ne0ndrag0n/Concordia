@@ -2,6 +2,7 @@
 #include "graphics/userinterface/propertylist.hpp"
 #include "graphics/userinterface/style/styleapplier.hpp"
 #include "device/display/adapter/component/guicomponent.hpp"
+#include "tools/utility.hpp"
 #include <algorithm>
 
 #include "log.hpp"
@@ -155,6 +156,21 @@ namespace BlueBear {
 
           parent->reflow();
         }
+      }
+
+      std::vector< std::shared_ptr< Element > > Element::getLeafNodes() {
+        std::vector< std::shared_ptr< Element > > result;
+        std::vector< std::shared_ptr< Element > > sortedChildren = getSortedElements();
+
+        if( sortedChildren.size() == 0 ) {
+          result.push_back( shared_from_this() );
+        } else {
+          for( std::shared_ptr< Element > child : sortedChildren ) {
+            result = Tools::Utility::concatArrays( result, child->getLeafNodes() );
+          }
+        }
+
+        return result;
       }
 
       void Element::reflow() {
