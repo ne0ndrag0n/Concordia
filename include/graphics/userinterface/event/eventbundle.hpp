@@ -10,14 +10,17 @@
 namespace BlueBear {
   namespace Graphics {
     namespace UserInterface {
+      class Element;
+
       namespace Event {
 
         class EventBundle {
+          Element* parent = nullptr;
           std::unordered_map< std::string, std::vector< std::function< void( Device::Input::Input::Metadata ) > > > inputEvents;
 
           template < typename T >
           unsigned int insertElement(
-            std::unordered_map< std::string, std::vector< std::function< void( T ) > > > map,
+            std::unordered_map< std::string, std::vector< std::function< void( T ) > > >& map,
             const std::string& key,
             std::function< void( T ) > value
           ) {
@@ -36,7 +39,7 @@ namespace BlueBear {
 
           template < typename T >
           void removeElement(
-            std::unordered_map< std::string, std::vector< std::function< void( T ) > > > map,
+            std::unordered_map< std::string, std::vector< std::function< void( T ) > > >& map,
             const std::string& key,
             unsigned int id
           ) {
@@ -48,6 +51,8 @@ namespace BlueBear {
           };
 
         public:
+          EventBundle( Element* parent );
+
           unsigned int registerInputEvent( const std::string& key, std::function< void( Device::Input::Input::Metadata ) > callback );
           void unregisterInputEvent( const std::string& key, unsigned int id );
 

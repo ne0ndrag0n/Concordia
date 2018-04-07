@@ -90,7 +90,9 @@ namespace BlueBear {
       void Input::KeyGroup::trigger( const std::string& key ) {
         auto it = keyEvents.find( key );
         if( it != keyEvents.end() ) {
-          it->second();
+          if( it->second ) {
+            it->second();
+          }
         } else {
           // Lua key events come second-fiddle to key events
           auto it2 = luaKeyEvents.find( key );
@@ -492,7 +494,7 @@ namespace BlueBear {
           sf::Keyboard::isKeyPressed( sf::Keyboard::LShift ) || sf::Keyboard::isKeyPressed( sf::Keyboard::RShift ),
           sf::Keyboard::isKeyPressed( sf::Keyboard::LSystem ) || sf::Keyboard::isKeyPressed( sf::Keyboard::RSystem ),
 
-          glm::uvec2{ sf::Mouse::getPosition().x, sf::Mouse::getPosition().y },
+          glm::uvec2{ sf::Mouse::getPosition( application.getDisplayDevice().getRenderWindow() ).x, sf::Mouse::getPosition( application.getDisplayDevice().getRenderWindow() ).y },
           sf::Mouse::isButtonPressed( sf::Mouse::Left ),
           sf::Mouse::isButtonPressed( sf::Mouse::Middle ),
           sf::Mouse::isButtonPressed( sf::Mouse::Right )
@@ -501,7 +503,9 @@ namespace BlueBear {
         auto it = events.find( event.type );
         if( it != events.end() ) {
           for( std::function< void( Metadata ) > callback : it->second ) {
-            callback( metadata );
+            if( callback ) {
+              callback( metadata );
+            }
           }
         }
       }

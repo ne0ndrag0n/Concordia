@@ -13,7 +13,8 @@ namespace BlueBear {
 
       Device::Display::Adapter::Component::GuiComponent* Element::manager = nullptr;
 
-      Element::Element( const std::string& tag, const std::string& id, const std::vector< std::string >& classes ) : tag( tag ), id( id ), classes( classes ), localStyle( this ) {}
+      Element::Element( const std::string& tag, const std::string& id, const std::vector< std::string >& classes )
+        : tag( tag ), id( id ), classes( classes ), localStyle( this ), eventBundle( this ) {}
 
       Element::~Element() {}
 
@@ -80,8 +81,16 @@ namespace BlueBear {
         return localStyle;
       }
 
+      Event::EventBundle& Element::getEventBundle() {
+        return eventBundle;
+      }
+
       glm::uvec2 Element::getRequisition() {
         return requisition;
+      }
+
+      glm::uvec4 Element::getAllocation() {
+        return allocation;
       }
 
       void Element::positionAndSizeChildren() {

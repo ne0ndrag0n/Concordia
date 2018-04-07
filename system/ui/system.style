@@ -2,7 +2,7 @@ Window {
   font-size: 26.0;
   placement: Placement::FREE;
   color: rgbaString( "5555ffff" );
-  background-color: rgbaString( "3e464cff" );
+  background-color: rgbaString( "36393Eff" );
 }
 
 Window#test {

@@ -51,14 +51,13 @@ namespace BlueBear {
         virtual ~Element();
 
         bool valueIsLiteral( int r );
-        glm::uvec2 getAbsolutePosition();
-        virtual std::vector< std::shared_ptr< Element > > getSortedElements();
         virtual bool isDrawableValid();
         virtual void generateDrawable();
 
       public:
         static Device::Display::Adapter::Component::GuiComponent* manager;
 
+        virtual std::vector< std::shared_ptr< Element > > getSortedElements();
         virtual void positionAndSizeChildren();
         virtual void render( Graphics::Vector::Renderer& renderer );
         virtual void calculate() = 0;
@@ -73,7 +72,10 @@ namespace BlueBear {
         void detach();
 
         Style::Style& getPropertyList();
+        Event::EventBundle& getEventBundle();
         glm::uvec2 getRequisition();
+        glm::uvec4 getAllocation();
+        glm::uvec2 getAbsolutePosition();
         void setAllocation( const glm::uvec4& allocation, bool doReflow = true );
 
         std::vector< std::shared_ptr< Element > > getLeafNodes();

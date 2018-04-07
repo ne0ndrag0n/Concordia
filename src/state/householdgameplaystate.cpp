@@ -124,6 +124,22 @@ namespace BlueBear {
       inputManager.registerInputEvent( sf::Event::KeyPressed, [ & ]( Device::Input::Input::Metadata metadata ) {
         keyGroup.trigger( metadata.keyPressed );
       } );
+      inputManager.registerInputEvent(
+        sf::Event::MouseButtonPressed,
+        std::bind(
+          &Device::Display::Adapter::Component::GuiComponent::mousePressed,
+          &application.getDisplayDevice().getAdapterAt( GUI_ADAPTER ).as< Device::Display::Adapter::Component::GuiComponent >(),
+          std::placeholders::_1
+        )
+      );
+      inputManager.registerInputEvent(
+        sf::Event::MouseButtonReleased,
+        std::bind(
+          &Device::Display::Adapter::Component::GuiComponent::mouseReleased,
+          &application.getDisplayDevice().getAdapterAt( GUI_ADAPTER ).as< Device::Display::Adapter::Component::GuiComponent >(),
+          std::placeholders::_1
+        )
+      );
     }
 
     Scripting::InfrastructureFactory& HouseholdGameplayState::getInfrastructureFactory() {
