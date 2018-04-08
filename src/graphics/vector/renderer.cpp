@@ -71,7 +71,7 @@ namespace BlueBear {
         checkTexture();
 
         nvgBeginPath( context );
-        nvgRect( context, dimensions[ 0 ], dimensions[ 1 ], dimensions[ 2 ], dimensions[ 3 ] );
+        nvgRect( context, dimensions[ 0 ], dimensions[ 1 ], dimensions[ 2 ] - dimensions[ 0 ], dimensions[ 3 ] - dimensions[ 1 ] );
         nvgFillColor( context, nvgRGBA( color[ 0 ], color[ 1 ], color[ 2 ], color[ 3 ] ) );
         nvgFill( context );
       }
@@ -87,19 +87,54 @@ namespace BlueBear {
         nvgText( context, position.x, position.y, text.c_str(), NULL );
       }
 
-      void Renderer::drawLinearGradient( const glm::uvec4& dimensions, const glm::uvec4& begin, const glm::uvec4& end ) {
+      void Renderer::drawLinearGradient( const glm::uvec4& dimensions, const glm::uvec4& line, const glm::uvec4& begin, const glm::uvec4& end ) {
         checkTexture();
 
-        unsigned int centerX = ( dimensions[ 2 ] - dimensions [ 0 ] ) / 2;
-        auto fill = nvgLinearGradient( context, centerX, dimensions[ 1 ], centerX, dimensions[ 3 ],
+        auto fill = nvgLinearGradient( context, line[ 0 ], line[ 1 ], line[ 2 ], line[ 3 ],
           nvgRGBA( begin[ 0 ], begin[ 1 ], begin[ 2 ], begin[ 3 ] ),
           nvgRGBA( end[ 0 ], end[ 1 ], end[ 2 ], end[ 3 ] )
         );
 
         nvgBeginPath( context );
-        nvgRect( context, dimensions[ 0 ], dimensions[ 1 ], dimensions[ 2 ], dimensions[ 3 ] );
+        nvgRect( context, dimensions[ 0 ], dimensions[ 1 ], dimensions[ 2 ] - dimensions[ 0 ], dimensions[ 3 ] - dimensions[ 1 ] );
         nvgFillPaint( context, fill );
         nvgFill( context );
+      }
+
+      void Renderer::drawBoxGradient( const glm::uvec4& dimensions, const glm::uvec4& begin, const glm::uvec4& end, float feather, float borderRadius ) {
+        checkTexture();
+
+        auto fill = nvgBoxGradient( context, dimensions[ 0 ], dimensions[ 1 ], dimensions[ 2 ] - dimensions[ 0 ], dimensions[ 3 ] - dimensions[ 1 ], borderRadius, feather,
+          nvgRGBA( begin[ 0 ], begin[ 1 ], begin[ 2 ], begin[ 3 ] ),
+          nvgRGBA( end[ 0 ], end[ 1 ], end[ 2 ], end[ 3 ] )
+        );
+
+        nvgBeginPath( context );
+        nvgRoundedRect( context, dimensions[ 0 ], dimensions[ 1 ], dimensions[ 2 ] - dimensions[ 0 ], dimensions[ 3 ] - dimensions[ 1 ], borderRadius );
+        nvgFillPaint( context, fill );
+        nvgFill( context );
+      }
+
+      void Renderer::drawRadialGradient( const glm::uvec2& origin, float innerRadius, float outerRadius, const glm::uvec4& innerColor, const glm::uvec4& outerColor ) {
+        checkTexture();
+
+        float totalRadius = innerRadius + outerRadius;
+
+        auto fill = nvgRadialGradient( context, origin.x, origin.y, innerRadius, outerRadius,
+          nvgRGBA( innerColor[ 0 ], innerColor[ 1 ], innerColor[ 2 ], innerColor[ 3 ] ),
+          nvgRGBA( outerColor[ 0 ], outerColor[ 1 ], outerColor[ 2 ], outerColor[ 3 ] )
+        );
+
+        nvgBeginPath( context );
+        nvgRect( context, origin.x - totalRadius, origin.y - totalRadius, origin.x + totalRadius, origin.y + totalRadius );
+        nvgFillPaint( context, fill );
+        nvgFill( context );
+      }
+
+      void Renderer::drawScissored( const glm::uvec4& scissorRegion, std::function< void() > callback ) {
+        nvgScissor( context, scissorRegion[ 0 ], scissorRegion[ 1 ], scissorRegion[ 2 ] - scissorRegion[ 0 ], scissorRegion[ 3 ] - scissorRegion[ 1 ] );
+        callback();
+        nvgResetScissor( context );
       }
 
       void Renderer::renderCurrentTexture( std::function< void( Renderer& ) > functor ) {

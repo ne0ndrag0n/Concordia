@@ -40,6 +40,8 @@ namespace BlueBear {
         glViewport( 0, 0, dimensions.x, dimensions.y );
         glEnable( GL_DEPTH_TEST );
         glEnable( GL_CULL_FACE );
+        glEnable( GL_BLEND );
+        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
       }
 
       Display::~Display() {}
@@ -86,7 +88,7 @@ namespace BlueBear {
       }
 
       void Display::update() {
-        glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+        glClearColor( 0.02f, 0.16f, 0.0f, 1.0f );
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
         for( std::unique_ptr< Adapter::Adapter >& adapter : adapters ) {
