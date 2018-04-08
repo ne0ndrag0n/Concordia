@@ -1,7 +1,6 @@
 #ifndef ADAPTER_COMPONENT_GUI
 #define ADAPTER_COMPONENT_GUI
 
-#include "device/input/input.hpp"
 #include "device/display/adapter/adapter.hpp"
 #include "graphics/vector/renderer.hpp"
 #include "graphics/userinterface/propertylist.hpp"
@@ -12,6 +11,12 @@
 #include <functional>
 
 namespace BlueBear {
+  namespace Device {
+    namespace Input {
+      class Metadata;
+    }
+  }
+
   namespace Graphics {
     namespace UserInterface {
       class Element;
@@ -38,11 +43,11 @@ namespace BlueBear {
 
             std::shared_ptr< Graphics::UserInterface::Element > captureMouseEvent(
               std::shared_ptr< Graphics::UserInterface::Element > element,
-              Device::Input::Input::Metadata event
+              Device::Input::Metadata event
             );
 
-            void mousePressed( Device::Input::Input::Metadata event );
-            void mouseReleased( Device::Input::Input::Metadata event );
+            void mousePressed( Device::Input::Metadata event );
+            void mouseReleased( Device::Input::Metadata event );
 
             Graphics::Vector::Renderer& getVectorRenderer();
             Graphics::UserInterface::Style::StyleApplier& getStyleManager();

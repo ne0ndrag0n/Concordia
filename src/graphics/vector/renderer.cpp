@@ -87,6 +87,21 @@ namespace BlueBear {
         nvgText( context, position.x, position.y, text.c_str(), NULL );
       }
 
+      void Renderer::drawLinearGradient( const glm::uvec4& dimensions, const glm::uvec4& begin, const glm::uvec4& end ) {
+        checkTexture();
+
+        unsigned int centerX = ( dimensions[ 2 ] - dimensions [ 0 ] ) / 2;
+        auto fill = nvgLinearGradient( context, centerX, dimensions[ 1 ], centerX, dimensions[ 3 ],
+          nvgRGBA( begin[ 0 ], begin[ 1 ], begin[ 2 ], begin[ 3 ] ),
+          nvgRGBA( end[ 0 ], end[ 1 ], end[ 2 ], end[ 3 ] )
+        );
+
+        nvgBeginPath( context );
+        nvgRect( context, dimensions[ 0 ], dimensions[ 1 ], dimensions[ 2 ], dimensions[ 3 ] );
+        nvgFillPaint( context, fill );
+        nvgFill( context );
+      }
+
       void Renderer::renderCurrentTexture( std::function< void( Renderer& ) > functor ) {
         checkTexture();
 

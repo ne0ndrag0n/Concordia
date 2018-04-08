@@ -121,7 +121,7 @@ namespace BlueBear {
 
       Device::Input::Input& inputManager = application.getInputDevice();
       inputManager.reset();
-      inputManager.registerInputEvent( sf::Event::KeyPressed, [ & ]( Device::Input::Input::Metadata metadata ) {
+      inputManager.registerInputEvent( sf::Event::KeyPressed, [ & ]( Device::Input::Metadata metadata ) {
         keyGroup.trigger( metadata.keyPressed );
       } );
       inputManager.registerInputEvent(

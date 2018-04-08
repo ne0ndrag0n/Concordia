@@ -1,5 +1,6 @@
 #include "graphics/userinterface/event/eventbundle.hpp"
 #include "graphics/userinterface/element.hpp"
+#include "device/input/input.hpp"
 
 namespace BlueBear {
   namespace Graphics {
@@ -8,7 +9,7 @@ namespace BlueBear {
 
         EventBundle::EventBundle( Element* parent ) : parent( parent ) {}
 
-        unsigned int EventBundle::registerInputEvent( const std::string& key, std::function< void( Device::Input::Input::Metadata ) > callback ) {
+        unsigned int EventBundle::registerInputEvent( const std::string& key, std::function< void( Device::Input::Metadata ) > callback ) {
           return insertElement( inputEvents, key, callback );
         }
 
@@ -16,7 +17,7 @@ namespace BlueBear {
           removeElement( inputEvents, key, id );
         }
 
-        void EventBundle::trigger( const std::string& key, Device::Input::Input::Metadata metadata ) {
+        void EventBundle::trigger( const std::string& key, Device::Input::Metadata metadata ) {
           auto it = inputEvents.find( key );
 
           if( it != inputEvents.end() ) {

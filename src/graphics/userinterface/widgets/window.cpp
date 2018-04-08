@@ -30,6 +30,13 @@ namespace BlueBear {
             localStyle.get< glm::uvec4 >( "color" )
           );
 
+          // Header drop shadow
+          renderer.drawLinearGradient(
+            glm::uvec4{ 0, 60, allocation[ 2 ], 65 },
+            glm::uvec4{ 0, 0, 0, 128 },
+            glm::uvec4{ 0, 0, 0, 0 }
+          );
+
           // Titlebar
           renderer.drawRect(
             glm::uvec4{ 0, 0, allocation[ 2 ], 20 },

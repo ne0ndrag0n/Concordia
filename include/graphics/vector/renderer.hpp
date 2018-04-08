@@ -60,6 +60,7 @@ namespace BlueBear {
 
         void drawRect( const glm::uvec4& dimensions, const glm::uvec4& color );
         void drawText( const std::string& fontFace, const std::string& text, const glm::uvec2& position, const glm::uvec4& color, double points );
+        void drawLinearGradient( const glm::uvec4& dimensions, const glm::uvec4& begin, const glm::uvec4& end );
 
         std::shared_ptr< Renderer::Texture > createTexture(
           const glm::uvec2& dimensions,

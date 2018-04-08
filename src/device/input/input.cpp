@@ -512,7 +512,7 @@ namespace BlueBear {
 
       Input::Input( Application& application ) : application( application ) {}
 
-      unsigned int Input::registerInputEvent( sf::Event::EventType type, std::function< void( Input::Metadata ) > callback ) {
+      unsigned int Input::registerInputEvent( sf::Event::EventType type, std::function< void( Metadata ) > callback ) {
         auto& collection = events[ type ];
 
         for( int i = 0; i != collection.size(); i++ ) {

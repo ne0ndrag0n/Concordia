@@ -1,13 +1,18 @@
 #ifndef EVENT_MANAGER_ELEMENTS
 #define EVENT_MANAGER_ELEMENTS
 
-#include "device/input/input.hpp"
 #include <unordered_map>
 #include <functional>
 #include <vector>
 #include <string>
 
 namespace BlueBear {
+  namespace Device {
+    namespace Input {
+      class Metadata;
+    }
+  }
+
   namespace Graphics {
     namespace UserInterface {
       class Element;
@@ -16,7 +21,7 @@ namespace BlueBear {
 
         class EventBundle {
           Element* parent = nullptr;
-          std::unordered_map< std::string, std::vector< std::function< void( Device::Input::Input::Metadata ) > > > inputEvents;
+          std::unordered_map< std::string, std::vector< std::function< void( Device::Input::Metadata ) > > > inputEvents;
 
           template < typename T >
           unsigned int insertElement(
@@ -53,10 +58,10 @@ namespace BlueBear {
         public:
           EventBundle( Element* parent );
 
-          unsigned int registerInputEvent( const std::string& key, std::function< void( Device::Input::Input::Metadata ) > callback );
+          unsigned int registerInputEvent( const std::string& key, std::function< void( Device::Input::Metadata ) > callback );
           void unregisterInputEvent( const std::string& key, unsigned int id );
 
-          void trigger( const std::string& key, Device::Input::Input::Metadata metadata );
+          void trigger( const std::string& key, Device::Input::Metadata metadata );
         };
 
       }

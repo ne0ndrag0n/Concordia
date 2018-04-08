@@ -21,21 +21,21 @@ namespace BlueBear {
   namespace Device {
     namespace Input {
 
+      struct Metadata {
+        std::string keyPressed;
+        bool altModifier = false;
+        bool ctrlModifier = false;
+        bool shiftModifier = false;
+        bool metaModifier = false;
+
+        glm::uvec2 mouseLocation;
+        bool leftMouse = false;
+        bool middleMouse = false;
+        bool rightMouse = false;
+      };
+
       class Input {
       public:
-        struct Metadata {
-          std::string keyPressed;
-          bool altModifier = false;
-          bool ctrlModifier = false;
-          bool shiftModifier = false;
-          bool metaModifier = false;
-
-          glm::uvec2 mouseLocation;
-          bool leftMouse = false;
-          bool middleMouse = false;
-          bool rightMouse = false;
-        };
-
         class KeyGroup {
           std::unordered_map< std::string, std::function< void() > > keyEvents;
           std::unordered_map< std::string, std::vector< sol::function > > luaKeyEvents;

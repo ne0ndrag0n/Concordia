@@ -1,5 +1,6 @@
 #include "device/display/adapter/component/guicomponent.hpp"
 #include "device/display/display.hpp"
+#include "device/input/input.hpp"
 #include "graphics/userinterface/element.hpp"
 #include "graphics/userinterface/widgets/layout.hpp"
 #include "graphics/userinterface/propertylist.hpp"
@@ -9,6 +10,7 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
+#include "graphics/userinterface/event/eventbundle.hpp"
 #include "graphics/userinterface/widgets/window.hpp"
 #include <glm/gtx/string_cast.hpp>
 #include "tools/utility.hpp"
@@ -52,7 +54,7 @@ namespace BlueBear {
             auto window2 = Graphics::UserInterface::Widgets::Window::create( "test2", {}, "Error" );
             rootElement->addChild( window2 );
 
-            window->getEventBundle().registerInputEvent( "mouse-down", []( Device::Input::Input::Metadata event ) {
+            window2->getEventBundle().registerInputEvent( "mouse-down", []( Device::Input::Metadata event ) {
               Log::getInstance().debug( "assert", "you clicked me" );
             } );
           }
@@ -61,7 +63,7 @@ namespace BlueBear {
             Log::getInstance().info( "GuiComponent::__teststyle", "Remove this function and callbacks" );
           }
 
-          std::shared_ptr< Graphics::UserInterface::Element > GuiComponent::captureMouseEvent( std::shared_ptr< Graphics::UserInterface::Element > element, Device::Input::Input::Metadata event ) {
+          std::shared_ptr< Graphics::UserInterface::Element > GuiComponent::captureMouseEvent( std::shared_ptr< Graphics::UserInterface::Element > element, Device::Input::Metadata event ) {
             glm::uvec2 absolutePosition = element->getAbsolutePosition();
             glm::uvec4 allocation = element->getAllocation();
             glm::uvec4 region{ absolutePosition.x, absolutePosition.y, absolutePosition.x + allocation[ 2 ], absolutePosition.y + allocation[ 3 ] };
@@ -81,13 +83,13 @@ namespace BlueBear {
             return nullptr;
           }
 
-          void GuiComponent::mousePressed( Device::Input::Input::Metadata event ) {
+          void GuiComponent::mousePressed( Device::Input::Metadata event ) {
             std::shared_ptr< Graphics::UserInterface::Element > captured = captureMouseEvent( rootElement, event );
 
             captured->getEventBundle().trigger( "mouse-down", event );
           }
 
-          void GuiComponent::mouseReleased( Device::Input::Input::Metadata event ) {
+          void GuiComponent::mouseReleased( Device::Input::Metadata event ) {
           }
 
           Graphics::Vector::Renderer& GuiComponent::getVectorRenderer() {
