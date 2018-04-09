@@ -1,6 +1,8 @@
 #include "graphics/userinterface/widgets/window.hpp"
 #include "device/display/adapter/component/guicomponent.hpp"
+#include "device/input/input.hpp"
 #include "graphics/vector/renderer.hpp"
+#include "tools/utility.hpp"
 #include "log.hpp"
 #include <GL/glew.h>
 #include <glm/glm.hpp>
@@ -10,7 +12,10 @@ namespace BlueBear {
     namespace UserInterface {
       namespace Widgets {
 
-        Window::Window( const std::string& id, const std::vector< std::string >& classes, const std::string& windowTitle ) : Element::Element( "Window", id, classes ), windowTitle( windowTitle ) {}
+        Window::Window( const std::string& id, const std::vector< std::string >& classes, const std::string& windowTitle ) : Element::Element( "Window", id, classes ), windowTitle( windowTitle ) {
+          eventBundle.registerInputEvent( "mouse-down", [ & ]( Device::Input::Metadata event ) { onMouseDown( event ); } );
+          eventBundle.registerInputEvent( "mouse-up", [ & ]( Device::Input::Metadata event ) { onMouseUp( event ); } );
+        }
 
         std::shared_ptr< Window > Window::create( const std::string& id, const std::vector< std::string >& classes, const std::string& windowTitle ) {
           std::shared_ptr< Window > window( new Window( id, classes, windowTitle ) );
@@ -18,9 +23,53 @@ namespace BlueBear {
           return window;
         }
 
+        void Window::onMouseDown( Device::Input::Metadata event ) {
+          glm::uvec2 absPosition = getAbsolutePosition();
+          glm::uvec2 origin = absPosition + getOrigin();
+          glm::uvec2 corner = origin + getDimensions() - getOrigin();
+
+          if( localStyle.get< bool >( "close-event" ) ) {
+            if( Tools::Utility::intersect( event.mouseLocation, { corner.x - 15, origin.y, corner.x, origin.y + 20 } ) ) {
+              Log::getInstance().debug( "Window::onMouseDown", "You clicked X in " + windowTitle );
+            }
+
+            if( Tools::Utility::intersect( event.mouseLocation, { origin.x, origin.y, corner.x - 15, origin.y + 20 } ) ) {
+              glm::uvec2 differential = event.mouseLocation - origin;
+
+              dragCallback = eventBundle.registerInputEvent( "mouse-moved", [ &, differential ]( Device::Input::Metadata moveEvent ) {
+                localStyle.set< int >( "left", moveEvent.mouseLocation.x - differential.x, false );
+                localStyle.set< int >( "top", moveEvent.mouseLocation.y - differential.y, false );
+
+                if( std::shared_ptr< Element > parent = getParent() ) {
+                  parent->paint();
+                }
+              } );
+            }
+          } else {
+            if( Tools::Utility::intersect( event.mouseLocation, { origin.x, origin.y, corner.x, origin.y + 20 } ) ) {
+              Log::getInstance().debug( "Window::onMouseDown", "You started dragging the window in " + windowTitle );
+            }
+          }
+        }
+
+        void Window::onMouseUp( Device::Input::Metadata event ) {
+          if( dragCallback != -1 ) {
+            eventBundle.unregisterInputEvent( "mouse-moved", dragCallback );
+            dragCallback = -1;
+          }
+        }
+
+        glm::uvec2 Window::getOrigin() {
+          return { 5, 5 };
+        }
+
+        glm::uvec2 Window::getDimensions() {
+          return { allocation[ 2 ] - 5, allocation[ 3 ] - 5 };
+        }
+
         void Window::render( Graphics::Vector::Renderer& renderer ) {
-          glm::uvec2 origin{ 5, 5 };
-          glm::uvec2 dimensions{ allocation[ 2 ] - 5, allocation[ 3 ] - 5 };
+          glm::uvec2 origin = getOrigin();
+          glm::uvec2 dimensions = getDimensions();
 
           // Drop shadow
           // Left segment
@@ -105,7 +154,9 @@ namespace BlueBear {
           );
 
           // Decorations
-          renderer.drawText( "fontawesome", "\uf00d", { dimensions.x - 15, origin.y + 10 }, localStyle.get< glm::uvec4 >( "font-color" ), 12.0 );
+          if( localStyle.get< bool >( "close-event" ) ) {
+            renderer.drawText( "fontawesome", "\uf00d", { dimensions.x - 15, origin.y + 10 }, localStyle.get< glm::uvec4 >( "font-color" ), 12.0 );
+          }
         }
 
         void Window::calculate() {

@@ -1,12 +1,11 @@
 Window {
   font-size: 26.0;
   placement: Placement::FREE;
-  color: rgbaString( "5555ffff" );
+  color: rgbaString( "0D686Bff" );
   background-color: rgbaString( "36393Eff" );
 }
 
 Window#test {
-  local-z-order: 1;
   top: 10;
   left: 10;
   width: 600;
@@ -14,8 +13,8 @@ Window#test {
 }
 
 Window#test2 {
-  local-z-order: 2;
-  color: rgbaString( "ff0000ff" );
+  close-event: true;
+  color: rgbaString( "990000ff" );
   top: 232;
   left: 332;
   width: 300;

@@ -47,6 +47,7 @@ namespace BlueBear {
             );
 
             void mousePressed( Device::Input::Metadata event );
+            void mouseMoved( Device::Input::Metadata event );
             void mouseReleased( Device::Input::Metadata event );
 
             Graphics::Vector::Renderer& getVectorRenderer();

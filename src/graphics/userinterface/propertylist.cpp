@@ -27,6 +27,7 @@ namespace BlueBear {
         { "font-italic", false },
         { "font-underline", false },
         { "font-strikethrough", false },
+        { "close-event", false },
         { "local-z-order", 0 },
         { "visible", true }
       } );

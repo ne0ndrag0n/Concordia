@@ -53,10 +53,6 @@ namespace BlueBear {
 
             auto window2 = Graphics::UserInterface::Widgets::Window::create( "test2", {}, "Error" );
             rootElement->addChild( window2 );
-
-            window2->getEventBundle().registerInputEvent( "mouse-down", []( Device::Input::Metadata event ) {
-              Log::getInstance().debug( "assert", "you clicked me" );
-            } );
           }
 
           void GuiComponent::__teststyle() {
@@ -86,10 +82,25 @@ namespace BlueBear {
           void GuiComponent::mousePressed( Device::Input::Metadata event ) {
             std::shared_ptr< Graphics::UserInterface::Element > captured = captureMouseEvent( rootElement, event );
 
-            captured->getEventBundle().trigger( "mouse-down", event );
+            if( captured ) {
+              captured->getEventBundle().trigger( "mouse-down", event );
+            }
+          }
+
+          void GuiComponent::mouseMoved( Device::Input::Metadata event ) {
+            std::shared_ptr< Graphics::UserInterface::Element > captured = captureMouseEvent( rootElement, event );
+
+            if( captured ) {
+              captured->getEventBundle().trigger( "mouse-moved", event );
+            }
           }
 
           void GuiComponent::mouseReleased( Device::Input::Metadata event ) {
+            std::shared_ptr< Graphics::UserInterface::Element > captured = captureMouseEvent( rootElement, event );
+
+            if( captured ) {
+              captured->getEventBundle().trigger( "mouse-up", event );
+            }
           }
 
           Graphics::Vector::Renderer& GuiComponent::getVectorRenderer() {

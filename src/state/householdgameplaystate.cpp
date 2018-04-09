@@ -140,6 +140,14 @@ namespace BlueBear {
           std::placeholders::_1
         )
       );
+      inputManager.registerInputEvent(
+        sf::Event::MouseMoved,
+        std::bind(
+          &Device::Display::Adapter::Component::GuiComponent::mouseMoved,
+          &application.getDisplayDevice().getAdapterAt( GUI_ADAPTER ).as< Device::Display::Adapter::Component::GuiComponent >(),
+          std::placeholders::_1
+        )
+      );
     }
 
     Scripting::InfrastructureFactory& HouseholdGameplayState::getInfrastructureFactory() {

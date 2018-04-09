@@ -5,8 +5,15 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <functional>
 
 namespace BlueBear {
+  namespace Device {
+    namespace Input {
+      class Metadata;
+    }
+  }
+
   namespace Graphics {
     namespace Vector {
       class Renderer;
@@ -16,10 +23,17 @@ namespace BlueBear {
 
         class Window : public Element {
           std::string windowTitle;
+          int dragCallback = -1;
           double textSpan = 0;
 
         protected:
           Window( const std::string& id, const std::vector< std::string >& classes, const std::string& windowTitle );
+
+          glm::uvec2 getOrigin();
+          glm::uvec2 getDimensions();
+
+          void onMouseDown( Device::Input::Metadata event );
+          void onMouseUp( Device::Input::Metadata event );
 
         public:
           virtual void render( Graphics::Vector::Renderer& renderer ) override;

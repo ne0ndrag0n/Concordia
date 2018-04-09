@@ -14,6 +14,7 @@
 #include <functional>
 #include <memory>
 #include <cparse/shunting-yard.h>
+#include <glm/glm.hpp>
 
 namespace BlueBear {
 	namespace Tools {
@@ -111,6 +112,13 @@ namespace BlueBear {
 					}
 
 					return result;
+				};
+
+				static bool intersect( const glm::uvec2& pointer, const glm::uvec4& target ) {
+					return pointer.x >= target[ 0 ] &&
+								 pointer.y >= target[ 1 ] &&
+								 pointer.x <= target[ 2 ] &&
+								 pointer.y <= target[ 3 ];
 				};
 		};
 	}
