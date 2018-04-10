@@ -5,15 +5,16 @@
 #include "graphics/userinterface/widgets/layout.hpp"
 #include "graphics/userinterface/propertylist.hpp"
 #include "graphics/userinterface/drawable.hpp"
+#include "tools/utility.hpp"
 #include "configmanager.hpp"
 #include "log.hpp"
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
+#include <glm/gtx/string_cast.hpp>
 #include "graphics/userinterface/event/eventbundle.hpp"
 #include "graphics/userinterface/widgets/window.hpp"
 #include <glm/gtx/string_cast.hpp>
-#include "tools/utility.hpp"
 
 namespace BlueBear {
   namespace Device {
@@ -60,11 +61,10 @@ namespace BlueBear {
           }
 
           std::shared_ptr< Graphics::UserInterface::Element > GuiComponent::captureMouseEvent( std::shared_ptr< Graphics::UserInterface::Element > element, Device::Input::Metadata event ) {
-            glm::uvec2 absolutePosition = element->getAbsolutePosition();
-            glm::uvec4 allocation = element->getAllocation();
-            glm::uvec4 region{ absolutePosition.x, absolutePosition.y, absolutePosition.x + allocation[ 2 ], absolutePosition.y + allocation[ 3 ] };
+            glm::ivec2 absolutePosition = element->getAbsolutePosition();
+            glm::ivec4 allocation = element->getAllocation();
 
-            if( event.mouseLocation.x >= region[ 0 ] && event.mouseLocation.y >= region[ 1 ] && event.mouseLocation.x <= region[ 2 ] && event.mouseLocation.y <= region[ 3 ] ) {
+            if( Tools::Utility::intersect( event.mouseLocation, { absolutePosition.x, absolutePosition.y, absolutePosition.x + allocation[ 2 ], absolutePosition.y + allocation[ 3 ] } ) ) {
               std::vector< std::shared_ptr< Graphics::UserInterface::Element > > children = element->getSortedElements();
 
               for( auto it = children.rbegin(); it != children.rend(); ++it ) {

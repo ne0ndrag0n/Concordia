@@ -14,7 +14,7 @@ namespace BlueBear {
         1, 2, 3
       };
 
-      Drawable::Drawable( std::shared_ptr< Vector::Renderer::Texture > texture, unsigned int x, unsigned int y, unsigned int width, unsigned int height ) :
+      Drawable::Drawable( std::shared_ptr< Vector::Renderer::Texture > texture, int x, int y, unsigned int width, unsigned int height ) :
         allocation( x, y, width, height ), texture( texture ) {
         glGenVertexArrays( 1, &VAO );
         glGenBuffers( 1, &VBO );
@@ -66,7 +66,7 @@ namespace BlueBear {
         return vertices;
       }
 
-      glm::uvec4 Drawable::getAllocation() {
+      glm::ivec4 Drawable::getAllocation() {
         return allocation;
       }
 

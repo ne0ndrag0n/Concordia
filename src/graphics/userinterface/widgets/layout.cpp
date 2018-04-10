@@ -123,7 +123,7 @@ namespace BlueBear {
           for( std::shared_ptr< Element > child : children ) {
             child->calculate();
 
-            glm::uvec4 childAllocation;
+            glm::ivec4 childAllocation;
             glm::uvec2 childRequisition = getFinalRequisition( child );
 
             if( child->getPropertyList().get< Placement >( "placement" ) == Placement::FLOW ) {

@@ -24,9 +24,9 @@ namespace BlueBear {
         }
 
         void Window::onMouseDown( Device::Input::Metadata event ) {
-          glm::uvec2 absPosition = getAbsolutePosition();
-          glm::uvec2 origin = absPosition + getOrigin();
-          glm::uvec2 corner = origin + getDimensions() - getOrigin();
+          glm::ivec2 absPosition = getAbsolutePosition();
+          glm::ivec2 origin = absPosition + getOrigin();
+          glm::ivec2 corner = origin + getDimensions() - getOrigin();
 
           if( localStyle.get< bool >( "close-event" ) ) {
             if( Tools::Utility::intersect( event.mouseLocation, { corner.x - 15, origin.y, corner.x, origin.y + 20 } ) ) {
@@ -34,11 +34,11 @@ namespace BlueBear {
             }
 
             if( Tools::Utility::intersect( event.mouseLocation, { origin.x, origin.y, corner.x - 15, origin.y + 20 } ) ) {
-              glm::uvec2 differential = event.mouseLocation - origin;
+              glm::ivec2 differential = glm::ivec2( event.mouseLocation ) - origin;
 
               dragCallback = eventBundle.registerInputEvent( "mouse-moved", [ &, differential ]( Device::Input::Metadata moveEvent ) {
-                localStyle.set< int >( "left", moveEvent.mouseLocation.x - differential.x, false );
-                localStyle.set< int >( "top", moveEvent.mouseLocation.y - differential.y, false );
+                localStyle.set< int >( "left", ( int ) moveEvent.mouseLocation.x - differential.x, false );
+                localStyle.set< int >( "top", ( int ) moveEvent.mouseLocation.y - differential.y, false );
 
                 if( std::shared_ptr< Element > parent = getParent() ) {
                   parent->paint();
@@ -59,17 +59,17 @@ namespace BlueBear {
           }
         }
 
-        glm::uvec2 Window::getOrigin() {
+        glm::ivec2 Window::getOrigin() {
           return { 5, 5 };
         }
 
-        glm::uvec2 Window::getDimensions() {
+        glm::ivec2 Window::getDimensions() {
           return { allocation[ 2 ] - 5, allocation[ 3 ] - 5 };
         }
 
         void Window::render( Graphics::Vector::Renderer& renderer ) {
-          glm::uvec2 origin = getOrigin();
-          glm::uvec2 dimensions = getDimensions();
+          glm::ivec2 origin = getOrigin();
+          glm::ivec2 dimensions = getDimensions();
 
           // Drop shadow
           // Left segment

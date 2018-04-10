@@ -23,12 +23,12 @@ namespace BlueBear {
           return false;
         }
 
-        glm::uvec2 absolutePosition = getAbsolutePosition();
-        return glm::uvec4{ absolutePosition.x, absolutePosition.y, allocation[ 2 ], allocation[ 3 ] } == drawable->getAllocation();
+        glm::ivec2 absolutePosition = getAbsolutePosition();
+        return glm::ivec4{ absolutePosition.x, absolutePosition.y, allocation[ 2 ], allocation[ 3 ] } == drawable->getAllocation();
       }
 
       void Element::generateDrawable() {
-        glm::uvec2 absolutePosition = getAbsolutePosition();
+        glm::ivec2 absolutePosition = getAbsolutePosition();
 
         if( isDrawableValid() ) {
           manager->getVectorRenderer().updateExistingTexture( drawable->getTexture(), [ & ]( Graphics::Vector::Renderer& r ) { render( r ); } );
@@ -89,7 +89,7 @@ namespace BlueBear {
         return requisition;
       }
 
-      glm::uvec4 Element::getAllocation() {
+      glm::ivec4 Element::getAllocation() {
         return allocation;
       }
 
@@ -130,15 +130,15 @@ namespace BlueBear {
           ( Requisition ) r != Requisition::FILL_PARENT;
       }
 
-      glm::uvec2 Element::getAbsolutePosition() {
+      glm::ivec2 Element::getAbsolutePosition() {
         if( std::shared_ptr< Element > parent = getParent() ) {
-          return glm::uvec2{
+          return glm::ivec2{
             allocation.x + parent->getAbsolutePosition().x,
             allocation.y + parent->getAbsolutePosition().y
           };
         }
 
-        return glm::uvec2{ allocation.x, allocation.y };
+        return glm::ivec2{ allocation.x, allocation.y };
       }
 
       std::shared_ptr< Element > Element::getParent() {

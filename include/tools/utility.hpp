@@ -114,7 +114,7 @@ namespace BlueBear {
 					return result;
 				};
 
-				static bool intersect( const glm::uvec2& pointer, const glm::uvec4& target ) {
+				static bool intersect( const glm::ivec2& pointer, const glm::ivec4& target ) {
 					return pointer.x >= target[ 0 ] &&
 								 pointer.y >= target[ 1 ] &&
 								 pointer.x <= target[ 2 ] &&

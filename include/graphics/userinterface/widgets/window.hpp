@@ -29,8 +29,8 @@ namespace BlueBear {
         protected:
           Window( const std::string& id, const std::vector< std::string >& classes, const std::string& windowTitle );
 
-          glm::uvec2 getOrigin();
-          glm::uvec2 getDimensions();
+          glm::ivec2 getOrigin();
+          glm::ivec2 getDimensions();
 
           void onMouseDown( Device::Input::Metadata event );
           void onMouseUp( Device::Input::Metadata event );

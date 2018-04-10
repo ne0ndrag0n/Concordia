@@ -38,7 +38,7 @@ namespace BlueBear {
 
         Style::Style localStyle;
         glm::uvec2 requisition;
-        glm::uvec4 allocation;
+        glm::ivec4 allocation;
         std::unique_ptr< Drawable > drawable;
 
         Event::EventBundle eventBundle;
@@ -74,8 +74,8 @@ namespace BlueBear {
         Style::Style& getPropertyList();
         Event::EventBundle& getEventBundle();
         glm::uvec2 getRequisition();
-        glm::uvec4 getAllocation();
-        glm::uvec2 getAbsolutePosition();
+        glm::ivec4 getAllocation();
+        glm::ivec2 getAbsolutePosition();
         void setAllocation( const glm::uvec4& allocation, bool doReflow = true );
 
         std::vector< std::shared_ptr< Element > > getLeafNodes();
