@@ -494,7 +494,7 @@ namespace BlueBear {
           sf::Keyboard::isKeyPressed( sf::Keyboard::LShift ) || sf::Keyboard::isKeyPressed( sf::Keyboard::RShift ),
           sf::Keyboard::isKeyPressed( sf::Keyboard::LSystem ) || sf::Keyboard::isKeyPressed( sf::Keyboard::RSystem ),
 
-          glm::uvec2{ sf::Mouse::getPosition( application.getDisplayDevice().getRenderWindow() ).x, sf::Mouse::getPosition( application.getDisplayDevice().getRenderWindow() ).y },
+          glm::ivec2{ sf::Mouse::getPosition( application.getDisplayDevice().getRenderWindow() ).x, sf::Mouse::getPosition( application.getDisplayDevice().getRenderWindow() ).y },
           sf::Mouse::isButtonPressed( sf::Mouse::Left ),
           sf::Mouse::isButtonPressed( sf::Mouse::Middle ),
           sf::Mouse::isButtonPressed( sf::Mouse::Right )

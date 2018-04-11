@@ -28,7 +28,7 @@ namespace BlueBear {
         bool shiftModifier = false;
         bool metaModifier = false;
 
-        glm::uvec2 mouseLocation;
+        glm::ivec2 mouseLocation;
         bool leftMouse = false;
         bool middleMouse = false;
         bool rightMouse = false;

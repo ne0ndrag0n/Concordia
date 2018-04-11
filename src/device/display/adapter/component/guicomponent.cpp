@@ -5,6 +5,7 @@
 #include "graphics/userinterface/widgets/layout.hpp"
 #include "graphics/userinterface/propertylist.hpp"
 #include "graphics/userinterface/drawable.hpp"
+#include "graphics/userinterface/draghelper.hpp"
 #include "tools/utility.hpp"
 #include "configmanager.hpp"
 #include "log.hpp"
@@ -47,6 +48,8 @@ namespace BlueBear {
               } );
             }
 
+          GuiComponent::~GuiComponent() = default;
+
           // TODO: remove TEST code
           void GuiComponent::__testadd() {
             auto window = Graphics::UserInterface::Widgets::Window::create( "test", {}, "Window Title" );
@@ -80,26 +83,39 @@ namespace BlueBear {
           }
 
           void GuiComponent::mousePressed( Device::Input::Metadata event ) {
-            std::shared_ptr< Graphics::UserInterface::Element > captured = captureMouseEvent( rootElement, event );
+            // Swallow the event if a drag is in progress (no wheel or right click while dragging)
+            if( !currentDrag ) {
+              std::shared_ptr< Graphics::UserInterface::Element > captured = captureMouseEvent( rootElement, event );
 
-            if( captured ) {
-              captured->getEventBundle().trigger( "mouse-down", event );
+              if( captured ) {
+                captured->getEventBundle().trigger( "mouse-down", event );
+              }
             }
           }
 
           void GuiComponent::mouseMoved( Device::Input::Metadata event ) {
-            std::shared_ptr< Graphics::UserInterface::Element > captured = captureMouseEvent( rootElement, event );
+            // Pass the event if a drag is in progress
+            if( currentDrag ) {
+              return currentDrag->update( event );
+            } else {
+              std::shared_ptr< Graphics::UserInterface::Element > captured = captureMouseEvent( rootElement, event );
 
-            if( captured ) {
-              captured->getEventBundle().trigger( "mouse-moved", event );
+              if( captured ) {
+                captured->getEventBundle().trigger( "mouse-moved", event );
+              }
             }
           }
 
           void GuiComponent::mouseReleased( Device::Input::Metadata event ) {
-            std::shared_ptr< Graphics::UserInterface::Element > captured = captureMouseEvent( rootElement, event );
+            // Destroy the drag helper and swallow the event
+            if( currentDrag ) {
+              currentDrag = nullptr;
+            } else {
+              std::shared_ptr< Graphics::UserInterface::Element > captured = captureMouseEvent( rootElement, event );
 
-            if( captured ) {
-              captured->getEventBundle().trigger( "mouse-up", event );
+              if( captured ) {
+                captured->getEventBundle().trigger( "mouse-up", event );
+              }
             }
           }
 
@@ -109,6 +125,10 @@ namespace BlueBear {
 
           Graphics::UserInterface::Style::StyleApplier& GuiComponent::getStyleManager() {
             return styleManager;
+          }
+
+          void GuiComponent::startDrag( std::shared_ptr< Graphics::UserInterface::Element > target, const glm::ivec2& offset ) {
+            currentDrag = std::make_unique< Graphics::UserInterface::DragHelper >( target, offset );
           }
 
           void GuiComponent::nextFrame() {

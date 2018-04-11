@@ -28,7 +28,8 @@ namespace BlueBear {
         { "font-underline", false },
         { "font-strikethrough", false },
         { "close-event", false },
-        { "local-z-order", 0 },
+        { "draggable", false },
+        { "local-z-order", 1 },
         { "visible", true }
       } );
 

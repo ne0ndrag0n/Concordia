@@ -11,16 +11,13 @@
 #include <functional>
 
 namespace BlueBear {
-  namespace Device {
-    namespace Input {
-      class Metadata;
-    }
+  namespace Device::Input {
+    class Metadata;
   }
 
-  namespace Graphics {
-    namespace UserInterface {
-      class Element;
-    }
+  namespace Graphics::UserInterface {
+    class DragHelper;
+    class Element;
   }
 
   namespace Device {
@@ -33,6 +30,7 @@ namespace BlueBear {
           class GuiComponent : public Adapter {
             Graphics::Vector::Renderer vector;
             Graphics::Shader guiShader;
+            std::unique_ptr< Graphics::UserInterface::DragHelper > currentDrag;
             std::shared_ptr< Graphics::UserInterface::Element > rootElement;
             Graphics::UserInterface::Style::StyleApplier styleManager;
 
@@ -53,7 +51,10 @@ namespace BlueBear {
             Graphics::Vector::Renderer& getVectorRenderer();
             Graphics::UserInterface::Style::StyleApplier& getStyleManager();
 
+            void startDrag( std::shared_ptr< Graphics::UserInterface::Element > target, const glm::ivec2& offset );
+
             GuiComponent( Device::Display::Display& display );
+            ~GuiComponent();
             void nextFrame() override;
           };
 

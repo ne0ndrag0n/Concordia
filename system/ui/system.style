@@ -3,6 +3,7 @@ Window {
   placement: Placement::FREE;
   color: rgbaString( "0D686Bff" );
   background-color: rgbaString( "36393Eff" );
+  draggable: true;
 }
 
 Window#test {

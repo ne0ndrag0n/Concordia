@@ -28,26 +28,45 @@ namespace BlueBear {
           glm::ivec2 origin = absPosition + getOrigin();
           glm::ivec2 corner = origin + getDimensions() - getOrigin();
 
+          // Bring to top before we do anything else
+          if( std::shared_ptr< Element > parent = getParent() ) {
+            std::vector< std::shared_ptr< Element > > sortedChildren = parent->getSortedElements();
+
+            // Sort if not already on top
+            std::shared_ptr< Element > self = shared_from_this();
+            if( sortedChildren.back() != self ) {
+              // Free items only
+              std::vector< std::shared_ptr< Element > > freeOnly;
+              std::copy_if( sortedChildren.begin(), sortedChildren.end(), std::back_inserter( freeOnly ), []( std::shared_ptr< Element > item ){
+                return item->getPropertyList().get< Placement >( "placement" ) == Placement::FREE;
+              } );
+
+              freeOnly.erase( std::remove( freeOnly.begin(), freeOnly.end(), self ), freeOnly.end() );
+              freeOnly.push_back( self );
+
+              // Fix all the local-z-order values
+              unsigned int i = 1;
+              for( std::shared_ptr< Element > item : freeOnly ) {
+                item->getPropertyList().set< int >( "local-z-order", i, false );
+                i++;
+              }
+
+              // Finally, repaint parent
+              parent->paint();
+            }
+          }
+
           if( localStyle.get< bool >( "close-event" ) ) {
             if( Tools::Utility::intersect( event.mouseLocation, { corner.x - 15, origin.y, corner.x, origin.y + 20 } ) ) {
-              Log::getInstance().debug( "Window::onMouseDown", "You clicked X in " + windowTitle );
+              return onCloseClick( event );
             }
 
-            if( Tools::Utility::intersect( event.mouseLocation, { origin.x, origin.y, corner.x - 15, origin.y + 20 } ) ) {
-              glm::ivec2 differential = glm::ivec2( event.mouseLocation ) - origin;
-
-              dragCallback = eventBundle.registerInputEvent( "mouse-moved", [ &, differential ]( Device::Input::Metadata moveEvent ) {
-                localStyle.set< int >( "left", ( int ) moveEvent.mouseLocation.x - differential.x, false );
-                localStyle.set< int >( "top", ( int ) moveEvent.mouseLocation.y - differential.y, false );
-
-                if( std::shared_ptr< Element > parent = getParent() ) {
-                  parent->paint();
-                }
-              } );
+            if( localStyle.get< bool >( "draggable" ) && Tools::Utility::intersect( event.mouseLocation, { origin.x, origin.y, corner.x - 15, origin.y + 20 } ) ) {
+              manager->startDrag( shared_from_this(), event.mouseLocation - glm::ivec2{ localStyle.get< int >( "left" ), localStyle.get< int >( "top" ) } );
             }
           } else {
             if( Tools::Utility::intersect( event.mouseLocation, { origin.x, origin.y, corner.x, origin.y + 20 } ) ) {
-              Log::getInstance().debug( "Window::onMouseDown", "You started dragging the window in " + windowTitle );
+              manager->startDrag( shared_from_this(), event.mouseLocation - glm::ivec2{ localStyle.get< int >( "left" ), localStyle.get< int >( "top" ) } );
             }
           }
         }
@@ -57,6 +76,10 @@ namespace BlueBear {
             eventBundle.unregisterInputEvent( "mouse-moved", dragCallback );
             dragCallback = -1;
           }
+        }
+
+        void Window::onCloseClick( Device::Input::Metadata event ) {
+          // TODO
         }
 
         glm::ivec2 Window::getOrigin() {

@@ -34,6 +34,7 @@ namespace BlueBear {
 
           void onMouseDown( Device::Input::Metadata event );
           void onMouseUp( Device::Input::Metadata event );
+          void onCloseClick( Device::Input::Metadata event );
 
         public:
           virtual void render( Graphics::Vector::Renderer& renderer ) override;
