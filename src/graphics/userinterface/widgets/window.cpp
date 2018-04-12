@@ -72,10 +72,7 @@ namespace BlueBear {
         }
 
         void Window::onMouseUp( Device::Input::Metadata event ) {
-          if( dragCallback != -1 ) {
-            eventBundle.unregisterInputEvent( "mouse-moved", dragCallback );
-            dragCallback = -1;
-          }
+
         }
 
         void Window::onCloseClick( Device::Input::Metadata event ) {

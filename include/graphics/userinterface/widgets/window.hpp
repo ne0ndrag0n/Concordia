@@ -23,7 +23,6 @@ namespace BlueBear {
 
         class Window : public Element {
           std::string windowTitle;
-          int dragCallback = -1;
           double textSpan = 0;
 
         protected:
