@@ -15,6 +15,7 @@
 #include <glm/gtx/string_cast.hpp>
 #include "graphics/userinterface/event/eventbundle.hpp"
 #include "graphics/userinterface/widgets/window.hpp"
+#include "graphics/userinterface/widgets/text.hpp"
 #include <glm/gtx/string_cast.hpp>
 
 namespace BlueBear {

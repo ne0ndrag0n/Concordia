@@ -36,6 +36,7 @@ namespace BlueBear {
           void onCloseClick( Device::Input::Metadata event );
 
         public:
+          void positionAndSizeChildren() override;
           virtual void render( Graphics::Vector::Renderer& renderer ) override;
           void calculate() override;
 

@@ -87,6 +87,21 @@ namespace BlueBear {
           return { allocation[ 2 ] - 5, allocation[ 3 ] - 5 };
         }
 
+        void Window::positionAndSizeChildren() {
+          /*
+          int size = children.size();
+
+          if( size ) {
+            if( size > 1 ) {
+              Log::getInstance().warn( "Window::positionAndSizeChildren", "Window only supports one child element; ignoring other children." );
+            }
+
+            std::shared_ptr< Element > only = children.front();
+            only->setAllocation( { 5, 60, allocation[ 2 ] - 10, allocation[ 3 ] - 65 }, false );
+          }
+          */
+        }
+
         void Window::render( Graphics::Vector::Renderer& renderer ) {
           glm::ivec2 origin = getOrigin();
           glm::ivec2 dimensions = getDimensions();
