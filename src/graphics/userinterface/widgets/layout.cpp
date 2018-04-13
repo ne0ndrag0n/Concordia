@@ -56,6 +56,11 @@ namespace BlueBear {
           requisition = total;
         }
 
+        bool Layout::drawableDirty() {
+          // Never dirty - don't ever draw.
+          return false;
+        }
+
         void Layout::generateDrawable() { /* Nothing to generate, don't generate. */ }
 
         Layout::Relations Layout::getRelations( Gravity gravity, int padding ) {

@@ -49,6 +49,7 @@ namespace BlueBear {
 
         public:
           virtual void positionAndSizeChildren();
+          virtual bool drawableDirty();
           virtual void generateDrawable();
           virtual void calculate() override;
 

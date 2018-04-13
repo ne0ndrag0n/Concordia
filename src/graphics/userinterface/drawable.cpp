@@ -14,8 +14,8 @@ namespace BlueBear {
         1, 2, 3
       };
 
-      Drawable::Drawable( std::shared_ptr< Vector::Renderer::Texture > texture, int x, int y, unsigned int width, unsigned int height ) :
-        allocation( x, y, width, height ), texture( texture ) {
+      Drawable::Drawable( std::shared_ptr< Vector::Renderer::Texture > texture, unsigned int width, unsigned int height ) :
+        dimensions( width, height ), texture( texture ) {
         glGenVertexArrays( 1, &VAO );
         glGenBuffers( 1, &VBO );
         glGenBuffers( 1, &EBO );
@@ -66,15 +66,15 @@ namespace BlueBear {
         return vertices;
       }
 
-      glm::ivec4 Drawable::getAllocation() {
-        return allocation;
+      const glm::ivec2& Drawable::getDimensions() {
+        return dimensions;
       }
 
       std::shared_ptr< Vector::Renderer::Texture > Drawable::getTexture() {
         return texture;
       }
 
-      void Drawable::draw() {
+      void Drawable::draw( const glm::ivec2& position ) {
         glm::mat4 orthoProjection = glm::ortho(
           0.0f,
           ( float ) ConfigManager::getInstance().getIntValue( "viewport_x" ),
@@ -85,7 +85,7 @@ namespace BlueBear {
         );
 
         Tools::OpenGL::setUniform( "orthoProjection", orthoProjection );
-        glm::mat4 translation = glm::translate( glm::mat4( 1.0f ), glm::vec3{ allocation.x, allocation.y, 0.0f } );
+        glm::mat4 translation = glm::translate( glm::mat4( 1.0f ), glm::vec3{ position.x, position.y, 0.0f } );
         Tools::OpenGL::setUniform( "translation", translation );
 
         glActiveTexture( GL_TEXTURE0 );

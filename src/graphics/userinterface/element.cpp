@@ -18,28 +18,50 @@ namespace BlueBear {
 
       Element::~Element() {}
 
-      bool Element::isDrawableValid() {
+      bool Element::reuseDrawableInstance() {
         if( !drawable ) {
           return false;
         }
 
-        glm::ivec2 absolutePosition = getAbsolutePosition();
-        return glm::ivec4{ absolutePosition.x, absolutePosition.y, allocation[ 2 ], allocation[ 3 ] } == drawable->getAllocation();
+        const auto& changedAttributes = localStyle.getChangedAttributes();
+        return !( changedAttributes.count( "width" ) || changedAttributes.count( "height" ) );
+      }
+
+      bool Element::drawableDirty() {
+        const auto& changedAttributes = localStyle.getChangedAttributes();
+
+        // Not dirty if no attributes changed
+        if( changedAttributes.size() == 0 ) {
+          return false;
+        }
+
+        // Not dirty if only top and left changed
+        if( changedAttributes.size() == 2 && changedAttributes.count( "top" ) && changedAttributes.count( "left" ) ) {
+          return false;
+        }
+
+        // Not dirty if only local-z-order changed
+        if( changedAttributes.size() == 1 && changedAttributes.count( "local-z-order" ) ) {
+          return false;
+        }
+
+        // Odds are it's dirty
+        return true;
       }
 
       void Element::generateDrawable() {
-        glm::ivec2 absolutePosition = getAbsolutePosition();
-
-        if( isDrawableValid() ) {
-          manager->getVectorRenderer().updateExistingTexture( drawable->getTexture(), [ & ]( Graphics::Vector::Renderer& r ) { render( r ); } );
-        } else {
-          drawable = std::make_unique< UserInterface::Drawable >(
-            manager->getVectorRenderer().createTexture( glm::uvec2{ allocation[ 2 ], allocation[ 3 ] }, [ & ]( Graphics::Vector::Renderer& r ) { render( r ); } ),
-            absolutePosition.x,
-            absolutePosition.y,
-            allocation[ 2 ],
-            allocation[ 3 ]
-          );
+        if( drawableDirty() ) {
+          // At least one new texture must be re-rendered
+          // Check if the drawable mesh is reusable
+          if( reuseDrawableInstance() ) {
+            manager->getVectorRenderer().updateExistingTexture( drawable->getTexture(), [ & ]( Graphics::Vector::Renderer& r ) { render( r ); } );
+          } else {
+            drawable = std::make_unique< UserInterface::Drawable >(
+              manager->getVectorRenderer().createTexture( glm::uvec2{ allocation[ 2 ], allocation[ 3 ] }, [ & ]( Graphics::Vector::Renderer& r ) { render( r ); } ),
+              allocation[ 2 ],
+              allocation[ 3 ]
+            );
+          }
         }
       }
 
@@ -198,11 +220,14 @@ namespace BlueBear {
             child->paint();
           }
         }
+
+        // Reset changed attributes in property list
+        localStyle.resetChangedAttributes();
       }
 
       void Element::draw() {
         if( drawable ) {
-          drawable->draw();
+          drawable->draw( getAbsolutePosition() );
         }
 
         std::vector< std::shared_ptr< Element > > sortedElements = getSortedElements();

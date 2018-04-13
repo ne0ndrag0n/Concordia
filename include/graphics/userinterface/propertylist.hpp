@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <string>
 #include <typeinfo>
+#include <vector>
 #include <any>
 
 namespace BlueBear {
@@ -25,6 +26,16 @@ namespace BlueBear {
 
         PropertyList() = default;
         PropertyList( const std::unordered_map< std::string, std::any >& map ) : values( map ) {}
+
+        std::vector< std::string > getProperties() const {
+          std::vector< std::string > result;
+
+          for( auto& pair : values ) {
+            result.push_back( pair.first );
+          }
+
+          return result;
+        }
 
         void clear() {
           values.clear();

@@ -51,7 +51,8 @@ namespace BlueBear {
         virtual ~Element();
 
         bool valueIsLiteral( int r );
-        virtual bool isDrawableValid();
+        virtual bool reuseDrawableInstance();
+        virtual bool drawableDirty();
         virtual void generateDrawable();
 
       public:

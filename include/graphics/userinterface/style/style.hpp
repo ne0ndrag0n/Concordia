@@ -3,6 +3,7 @@
 
 #include "graphics/userinterface/propertylist.hpp"
 #include <unordered_map>
+#include <unordered_set>
 #include <string>
 
 namespace BlueBear {
@@ -14,10 +15,13 @@ namespace BlueBear {
           PropertyList calculated;
           PropertyList local;
           Element* parent;
+          std::unordered_set< std::string > changedAttributes;
 
         public:
           Style( Element* parent );
 
+          const std::unordered_set< std::string >& getChangedAttributes();
+          void resetChangedAttributes();
           void reflowParent();
           void setCalculated( const std::unordered_map< std::string, std::any >& map );
 
@@ -33,6 +37,7 @@ namespace BlueBear {
 
           template < typename VariantType > void set( const std::string& key, VariantType value, bool reflow = true ) {
             local.set< VariantType >( key, value );
+            changedAttributes.insert( key );
 
             if( reflow ) {
               reflowParent();
