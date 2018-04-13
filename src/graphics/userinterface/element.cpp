@@ -3,6 +3,8 @@
 #include "graphics/userinterface/style/styleapplier.hpp"
 #include "device/display/adapter/component/guicomponent.hpp"
 #include "tools/utility.hpp"
+#include "configmanager.hpp"
+#include <GL/glew.h>
 #include <algorithm>
 
 #include "log.hpp"
@@ -226,13 +228,17 @@ namespace BlueBear {
       }
 
       void Element::draw() {
+        glm::ivec2 absolutePosition = getAbsolutePosition();
+
         if( drawable ) {
-          drawable->draw( getAbsolutePosition() );
+          drawable->draw( absolutePosition );
         }
 
         std::vector< std::shared_ptr< Element > > sortedElements = getSortedElements();
         for( std::shared_ptr< Element > element : sortedElements ) {
+          glScissor( absolutePosition.x, ConfigManager::getInstance().getIntValue( "viewport_y" ) - absolutePosition.y - allocation[ 3 ], allocation[ 2 ], allocation[ 3 ] );
           element->draw();
+          glScissor( 0, 0, ConfigManager::getInstance().getIntValue( "viewport_x" ), ConfigManager::getInstance().getIntValue( "viewport_y" ) );
         }
       }
 
