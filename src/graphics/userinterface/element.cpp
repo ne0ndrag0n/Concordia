@@ -121,7 +121,7 @@ namespace BlueBear {
         // abstract !!
       }
 
-      std::vector< std::shared_ptr< Element > > Element::getSortedElements() {
+      void Element::sortElements() {
         std::vector< std::shared_ptr< Element > > sorted;
         std::vector< std::shared_ptr< Element > > freeItems;
 
@@ -145,7 +145,11 @@ namespace BlueBear {
           sorted.push_back( freeChild );
         }
 
-        return sorted;
+        children = sorted;
+
+        for( std::shared_ptr< Element > child : children ) {
+          child->sortElements();
+        }
       }
 
       bool Element::valueIsLiteral( int r ) {
@@ -193,12 +197,11 @@ namespace BlueBear {
 
       std::vector< std::shared_ptr< Element > > Element::getLeafNodes() {
         std::vector< std::shared_ptr< Element > > result;
-        std::vector< std::shared_ptr< Element > > sortedChildren = getSortedElements();
 
-        if( sortedChildren.size() == 0 ) {
+        if( children.size() == 0 ) {
           result.push_back( shared_from_this() );
         } else {
-          for( std::shared_ptr< Element > child : sortedChildren ) {
+          for( std::shared_ptr< Element > child : children ) {
             result = Tools::Utility::concatArrays( result, child->getLeafNodes() );
           }
         }
@@ -208,6 +211,7 @@ namespace BlueBear {
 
       void Element::reflow() {
         manager->getStyleManager().update( shared_from_this() );
+        sortElements();
         paint();
       }
 
@@ -234,8 +238,7 @@ namespace BlueBear {
           drawable->draw( absolutePosition );
         }
 
-        std::vector< std::shared_ptr< Element > > sortedElements = getSortedElements();
-        for( std::shared_ptr< Element > element : sortedElements ) {
+        for( std::shared_ptr< Element > element : children ) {
           glScissor( absolutePosition.x, ConfigManager::getInstance().getIntValue( "viewport_y" ) - absolutePosition.y - allocation[ 3 ], allocation[ 2 ], allocation[ 3 ] );
           element->draw();
           glScissor( 0, 0, ConfigManager::getInstance().getIntValue( "viewport_x" ), ConfigManager::getInstance().getIntValue( "viewport_y" ) );

@@ -30,7 +30,7 @@ namespace BlueBear {
 
           // Bring to top before we do anything else
           if( std::shared_ptr< Element > parent = getParent() ) {
-            std::vector< std::shared_ptr< Element > > sortedChildren = parent->getSortedElements();
+            std::vector< std::shared_ptr< Element > > sortedChildren = parent->getChildren();
 
             // Sort if not already on top
             std::shared_ptr< Element > self = shared_from_this();
@@ -51,8 +51,8 @@ namespace BlueBear {
                 i++;
               }
 
-              // Finally, repaint parent
-              parent->paint();
+              // Finally, reflow parent
+              parent->reflow();
             }
           }
 

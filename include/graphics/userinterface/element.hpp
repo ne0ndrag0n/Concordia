@@ -58,7 +58,6 @@ namespace BlueBear {
       public:
         static Device::Display::Adapter::Component::GuiComponent* manager;
 
-        virtual std::vector< std::shared_ptr< Element > > getSortedElements();
         virtual void positionAndSizeChildren();
         virtual void render( Graphics::Vector::Renderer& renderer );
         virtual void calculate() = 0;
@@ -66,6 +65,7 @@ namespace BlueBear {
         const std::string& getTag() const;
         const std::string& getId() const;
         bool hasClass( const std::string& clss ) const;
+        void sortElements();
         std::vector< std::shared_ptr< Element > > getChildren() const;
 
         std::shared_ptr< Element > getParent();

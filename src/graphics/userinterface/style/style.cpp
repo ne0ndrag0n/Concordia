@@ -22,7 +22,7 @@ namespace BlueBear {
         }
 
         void Style::reflowParent() {
-          parent->paint();
+          parent->reflow();
         }
 
         void Style::setCalculated( const std::unordered_map< std::string, std::any >& map ) {

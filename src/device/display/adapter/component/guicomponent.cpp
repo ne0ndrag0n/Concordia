@@ -69,7 +69,7 @@ namespace BlueBear {
             glm::ivec4 allocation = element->getAllocation();
 
             if( Tools::Utility::intersect( event.mouseLocation, { absolutePosition.x, absolutePosition.y, absolutePosition.x + allocation[ 2 ], absolutePosition.y + allocation[ 3 ] } ) ) {
-              std::vector< std::shared_ptr< Graphics::UserInterface::Element > > children = element->getSortedElements();
+              std::vector< std::shared_ptr< Graphics::UserInterface::Element > > children = element->getChildren();
 
               for( auto it = children.rbegin(); it != children.rend(); ++it ) {
                 if( captureMouseEvent( *it, event ) ) {
