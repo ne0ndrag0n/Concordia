@@ -219,7 +219,6 @@ namespace BlueBear {
 
       void Element::reflow() {
         manager->getStyleManager().update( shared_from_this() );
-        sortElements();
         paint();
       }
 
@@ -229,6 +228,7 @@ namespace BlueBear {
 
         if( !children.empty() ) {
           positionAndSizeChildren();
+          sortElements();
 
           for( std::shared_ptr< Element > child : children ) {
             child->paint();

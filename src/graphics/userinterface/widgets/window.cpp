@@ -56,7 +56,7 @@ namespace BlueBear {
               }
 
               // Finally, reflow parent
-              parent->reflow();
+              parent->paint();
             }
           }
 
@@ -99,10 +99,19 @@ namespace BlueBear {
 
           glm::ivec2 origin = getOrigin();
           decoration->setAllocation( { origin.x, origin.y, allocation[ 2 ] - 10, 65 }, false );
+          // Decoration comes above local flow element
+          decoration->getPropertyList().set< int >( "local-z-order", 2, false );
 
-          auto size = children.size();
-          if( size > 1 ) {
-            // TODO
+          for( std::shared_ptr< Element > child : children ) {
+            if( child != decoration ) {
+              if( child->getPropertyList().get< Placement >( "placement" ) == Placement::FLOW ) {
+                // The single element
+                child->setAllocation( { origin.x, origin.y + 60, allocation[ 2 ] - 10, allocation[ 3 ] - 70 } );
+                child->getPropertyList().set< int >( "local-z-order", 1, false );
+              } else {
+                // Floating buttons, etc.
+              }
+            }
           }
         }
 

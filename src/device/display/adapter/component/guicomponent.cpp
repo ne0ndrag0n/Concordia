@@ -58,6 +58,15 @@ namespace BlueBear {
 
             auto window2 = Graphics::UserInterface::Widgets::Window::create( "test2", {}, "Error" );
             rootElement->addChild( window2 );
+
+            auto text = Graphics::UserInterface::Widgets::Text::create( "", {}, "fart" );
+            window2->addChild( text );
+
+            /*
+            text->getEventBundle().registerInputEvent( "mouse-down", [ & ]( Device::Input::Metadata event ) {
+              Log::getInstance().debug( "assert", "fart" );
+            } );
+            */
           }
 
           void GuiComponent::__teststyle() {
