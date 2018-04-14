@@ -35,6 +35,7 @@ namespace BlueBear {
         std::string tag;
         std::string id;
         std::vector< std::string > classes;
+        bool shadow = false;
 
         Style::Style localStyle;
         glm::uvec2 requisition;
@@ -50,6 +51,7 @@ namespace BlueBear {
         Element( const Element& other );
         virtual ~Element();
 
+        void setShadow( bool status );
         bool valueIsLiteral( int r );
         virtual bool reuseDrawableInstance();
         virtual bool drawableDirty();
@@ -69,8 +71,8 @@ namespace BlueBear {
         std::vector< std::shared_ptr< Element > > getChildren() const;
 
         std::shared_ptr< Element > getParent();
-        void addChild( std::shared_ptr< Element > child );
-        void detach();
+        void addChild( std::shared_ptr< Element > child, bool doReflow = true );
+        void detach( bool doReflow = true );
 
         Style::Style& getPropertyList();
         Event::EventBundle& getEventBundle();

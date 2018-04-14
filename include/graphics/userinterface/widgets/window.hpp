@@ -22,8 +22,11 @@ namespace BlueBear {
       namespace Widgets {
 
         class Window : public Element {
+          friend class WindowDecoration;
+          /*
           std::string windowTitle;
           double textSpan = 0;
+          */
 
         protected:
           Window( const std::string& id, const std::vector< std::string >& classes, const std::string& windowTitle );
@@ -41,6 +44,20 @@ namespace BlueBear {
           void calculate() override;
 
           static std::shared_ptr< Window > create( const std::string& id, const std::vector< std::string >& classes, const std::string& windowTitle );
+        };
+
+        class WindowDecoration : public Element {
+          std::string windowTitle;
+          double textSpan = 0;
+
+        protected:
+          WindowDecoration( const std::string& windowTitle );
+
+        public:
+          void calculate() override;
+          virtual void render( Graphics::Vector::Renderer& renderer ) override;
+
+          static std::shared_ptr< WindowDecoration > create( const std::string& windowTitle );
         };
 
       }

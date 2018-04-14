@@ -1,9 +1,12 @@
 Window {
-  font-size: 26.0;
   placement: Placement::FREE;
-  color: rgbaString( "0D686Bff" );
   background-color: rgbaString( "36393Eff" );
   draggable: true;
+
+  .-bb-shadow-windowdecoration {
+    font-size: 26.0;
+    color: rgbaString( "0D686Bff" );
+  }
 }
 
 Window#test {
@@ -15,9 +18,12 @@ Window#test {
 
 Window#test2 {
   close-event: true;
-  color: rgbaString( "990000ff" );
   top: 232;
   left: 332;
   width: 300;
   height: 200;
+
+  .-bb-shadow-windowdecoration {
+    color: rgbaString( "990000ff" );
+  }
 }

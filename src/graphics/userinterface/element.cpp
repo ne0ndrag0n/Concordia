@@ -20,6 +20,10 @@ namespace BlueBear {
 
       Element::~Element() {}
 
+      void Element::setShadow( bool status ) {
+        shadow = status;
+      }
+
       bool Element::reuseDrawableInstance() {
         if( !drawable ) {
           return false;
@@ -173,15 +177,17 @@ namespace BlueBear {
         return parentWeak.lock();
       }
 
-      void Element::addChild( std::shared_ptr< Element > child ) {
-        child->detach();
+      void Element::addChild( std::shared_ptr< Element > child, bool doReflow ) {
+        child->detach( doReflow );
         children.emplace_back( child );
         child->parentWeak = shared_from_this();
 
-        reflow();
+        if( doReflow ) {
+          reflow();
+        }
       }
 
-      void Element::detach() {
+      void Element::detach( bool doReflow ) {
         if( std::shared_ptr< Element > parent = getParent() ) {
           std::shared_ptr< Element > thisElement = shared_from_this();
           parent->children.erase(
@@ -191,7 +197,9 @@ namespace BlueBear {
 
           parentWeak = std::weak_ptr< Element >();
 
-          parent->reflow();
+          if( doReflow ) {
+            parent->reflow();
+          }
         }
       }
 

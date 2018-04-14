@@ -12,13 +12,17 @@ namespace BlueBear {
     namespace UserInterface {
       namespace Widgets {
 
-        Window::Window( const std::string& id, const std::vector< std::string >& classes, const std::string& windowTitle ) : Element::Element( "Window", id, classes ), windowTitle( windowTitle ) {
+        Window::Window( const std::string& id, const std::vector< std::string >& classes, const std::string& windowTitle ) : Element::Element( "Window", id, classes ) /*, windowTitle( windowTitle ) */ {
           eventBundle.registerInputEvent( "mouse-down", [ & ]( Device::Input::Metadata event ) { onMouseDown( event ); } );
           eventBundle.registerInputEvent( "mouse-up", [ & ]( Device::Input::Metadata event ) { onMouseUp( event ); } );
         }
 
         std::shared_ptr< Window > Window::create( const std::string& id, const std::vector< std::string >& classes, const std::string& windowTitle ) {
           std::shared_ptr< Window > window( new Window( id, classes, windowTitle ) );
+
+          // Add shadow element
+          auto decoration = WindowDecoration::create( windowTitle );
+          window->addChild( decoration, false );
 
           return window;
         }
@@ -88,18 +92,18 @@ namespace BlueBear {
         }
 
         void Window::positionAndSizeChildren() {
-          /*
-          int size = children.size();
+          // It better be there or else we're segfaulting
+          std::shared_ptr< Element > decoration = *std::find_if( children.begin(), children.end(), [ & ]( std::shared_ptr< Element > child ) {
+            return child->hasClass( "-bb-shadow-windowdecoration" );
+          } );
 
-          if( size ) {
-            if( size > 1 ) {
-              Log::getInstance().warn( "Window::positionAndSizeChildren", "Window only supports one child element; ignoring other children." );
-            }
+          glm::ivec2 origin = getOrigin();
+          decoration->setAllocation( { origin.x, origin.y, allocation[ 2 ] - 10, 65 }, false );
 
-            std::shared_ptr< Element > only = children.front();
-            only->setAllocation( { 5, 60, allocation[ 2 ] - 10, allocation[ 3 ] - 65 }, false );
+          auto size = children.size();
+          if( size > 1 ) {
+            // TODO
           }
-          */
         }
 
         void Window::render( Graphics::Vector::Renderer& renderer ) {
@@ -157,51 +161,77 @@ namespace BlueBear {
             { origin.x, origin.y, dimensions.x, dimensions.y },
             localStyle.get< glm::uvec4 >( "background-color" )
           );
-
-          // Header
-          renderer.drawRect(
-            glm::uvec4{ origin.x, origin.y, dimensions.x, origin.y + 60 },
-            localStyle.get< glm::uvec4 >( "color" )
-          );
-
-          // Header drop shadow
-          renderer.drawLinearGradient(
-            { origin.x, origin.y + 60, dimensions.x, origin.y + 65 },
-            { ( ( dimensions.x - origin.x ) / 2 ), origin.y + 60, ( ( dimensions.x - origin.x ) / 2 ), origin.y + 65 },
-            { 0, 0, 0, 128 },
-            { 0, 0, 0, 0 }
-          );
-
-          // Titlebar
-          renderer.drawRect(
-            { origin.x, origin.y, dimensions.x, origin.y + 20 },
-            { 0, 0, 0, 128 }
-          );
-
-          // Text
-          double fontSize = localStyle.get< double >( "font-size" );
-          renderer.drawText(
-            localStyle.get< std::string >( "font" ),
-            windowTitle,
-            { origin.x + 10, origin.y + 27 + ( fontSize / 2 ) },
-            localStyle.get< glm::uvec4 >( "font-color" ),
-            fontSize
-          );
-
-          // Decorations
-          if( localStyle.get< bool >( "close-event" ) ) {
-            renderer.drawText( "fontawesome", "\uf00d", { dimensions.x - 15, origin.y + 10 }, localStyle.get< glm::uvec4 >( "font-color" ), 12.0 );
-          }
         }
 
         void Window::calculate() {
-          glm::vec4 size = manager->getVectorRenderer().getTextSizeParams( localStyle.get< std::string >( "font" ), windowTitle, localStyle.get< double >( "font-size" ) );
-          textSpan = size[ 2 ];
-
           requisition = glm::uvec2{
             localStyle.get< int >( "width" ),
             localStyle.get< int >( "height" )
           };
+        }
+
+        // Window decoration shadow element
+
+        WindowDecoration::WindowDecoration( const std::string& windowTitle ) : Element::Element( "WindowDecoration", "", { "-bb-shadow-windowdecoration" } ), windowTitle( windowTitle ) {
+          shadow = true;
+        }
+
+        std::shared_ptr< WindowDecoration > WindowDecoration::create( const std::string& windowTitle ) {
+          std::shared_ptr< WindowDecoration > windowDecoration( new WindowDecoration( windowTitle ) );
+
+          return windowDecoration;
+        }
+
+        void WindowDecoration::calculate() {
+          glm::vec4 size = manager->getVectorRenderer().getTextSizeParams( localStyle.get< std::string >( "font" ), windowTitle, localStyle.get< double >( "font-size" ) );
+          textSpan = size[ 2 ];
+
+          // Nothing else to calculate - width and height are known when positioned.
+          requisition = { 0, 0 };
+        }
+
+        void WindowDecoration::render( Graphics::Vector::Renderer& renderer ) {
+          if( std::shared_ptr< Element > parent = getParent() ) {
+            glm::ivec2 origin = { 0, 0 };
+            glm::ivec2 dimensions = { allocation[ 2 ], 65 };
+
+            // Header
+            renderer.drawRect(
+              glm::uvec4{ origin.x, origin.y, dimensions.x, origin.y + 60 },
+              localStyle.get< glm::uvec4 >( "color" )
+            );
+
+            // Header drop shadow
+            renderer.drawLinearGradient(
+              { origin.x, origin.y + 60, dimensions.x, origin.y + 65 },
+              { ( ( dimensions.x - origin.x ) / 2 ), origin.y + 60, ( ( dimensions.x - origin.x ) / 2 ), origin.y + 65 },
+              { 0, 0, 0, 128 },
+              { 0, 0, 0, 0 }
+            );
+
+            // Titlebar
+            renderer.drawRect(
+              { origin.x, origin.y, dimensions.x, origin.y + 20 },
+              { 0, 0, 0, 128 }
+            );
+
+            // Text
+            double fontSize = localStyle.get< double >( "font-size" );
+            renderer.drawText(
+              localStyle.get< std::string >( "font" ),
+              windowTitle,
+              { origin.x + 10, origin.y + 27 + ( fontSize / 2 ) },
+              localStyle.get< glm::uvec4 >( "font-color" ),
+              fontSize
+            );
+
+            // Decorations
+            if( parent->getPropertyList().get< bool >( "close-event" ) ) {
+              renderer.drawText( "fontawesome", "\uf00d", { dimensions.x - 15, origin.y + 10 }, localStyle.get< glm::uvec4 >( "font-color" ), 12.0 );
+            }
+          } else {
+            Log::getInstance().error( "WindowDecoration::render", "Shadow element <WindowDecoration> should belong to an element but it does not!" );
+          }
         }
 
       }
