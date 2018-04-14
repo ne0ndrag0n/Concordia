@@ -23,10 +23,6 @@ namespace BlueBear {
 
         class Window : public Element {
           friend class WindowDecoration;
-          /*
-          std::string windowTitle;
-          double textSpan = 0;
-          */
 
         protected:
           Window( const std::string& id, const std::vector< std::string >& classes, const std::string& windowTitle );

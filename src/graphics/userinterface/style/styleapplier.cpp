@@ -23,7 +23,7 @@ namespace BlueBear {
           if( std::holds_alternative< AST::Call >( type ) ) {
             argument = call( std::get< AST::Call >( type ) );
           } else if( std::holds_alternative< AST::Identifier >( type ) ) {
-            std::variant< Gravity, Requisition, Placement, Orientation > intermediate = identifier( std::get< AST::Identifier >( type ) );
+            std::variant< Gravity, Requisition, Placement, Orientation, int > intermediate = identifier( std::get< AST::Identifier >( type ) );
             std::visit( [ & ]( auto& data ) {
               argument = data;
             }, intermediate );
@@ -88,7 +88,7 @@ namespace BlueBear {
           return result;
         }
 
-        std::variant< Gravity, Requisition, Placement, Orientation > StyleApplier::identifier( const AST::Identifier& identifier ) {
+        std::variant< Gravity, Requisition, Placement, Orientation, int > StyleApplier::identifier( const AST::Identifier& identifier ) {
           if( identifier.scope.size() == 1 ) {
             std::string single = identifier.scope.front();
 
@@ -114,13 +114,13 @@ namespace BlueBear {
               case Tools::Utility::hash( "Requisition" ): {
                 switch( Tools::Utility::hash( identifier.value.c_str() ) ) {
                   case Tools::Utility::hash( "AUTO" ): {
-                    return Requisition::AUTO;
+                    return ( int ) Requisition::AUTO;
                   }
                   case Tools::Utility::hash( "NONE" ): {
-                    return Requisition::NONE;
+                    return ( int ) Requisition::NONE;
                   }
                   case Tools::Utility::hash( "FILL_PARENT" ): {
-                    return Requisition::FILL_PARENT;
+                    return ( int ) Requisition::FILL_PARENT;
                   }
                   default:
                     throw UndefinedSymbolException();

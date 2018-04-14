@@ -63,6 +63,7 @@ namespace BlueBear {
           currentColumn = 1;
 
           char current;
+          bool negative = false;
           while( file.get( current ) ) {
             switch( current ) {
               case '#':
@@ -116,6 +117,14 @@ namespace BlueBear {
                 tokens.push_back( { currentRow, currentColumn, TokenType::STRING, literal } );
                 break;
               }
+              case '-': {
+                if( isNumeric( ( char ) file.peek() ) ) {
+                  currentColumn++;
+                  negative = true;
+                  file.get( current );
+                  // Fall through to number case; we know it's the next one up.
+                } // else, we fall through to the isAlpha case
+              }
               default: {
                 if( isNumeric( current ) ) {
                   std::string num;
@@ -127,10 +136,10 @@ namespace BlueBear {
                     num += '.';
                     num += getWhile( isNumeric );
 
-                    tokens.push_back( { currentRow, currentColumn, TokenType::DOUBLE, std::stod( num ) } );
+                    tokens.push_back( { currentRow, currentColumn, TokenType::DOUBLE, std::stod( num ) * ( negative ? -1.0 : 1.0 ) } );
                   } else {
                     // Integer literal
-                    tokens.push_back( { currentRow, currentColumn, TokenType::INTEGER, std::stoi( num ) } );
+                    tokens.push_back( { currentRow, currentColumn, TokenType::INTEGER, std::stoi( num ) * ( negative ? -1 : 1 ) } );
                   }
                 } else if( isAlpha( current ) ) {
                   std::string identifier;
@@ -157,6 +166,7 @@ namespace BlueBear {
             }
 
             currentColumn++;
+            negative = false;
           }
         }
 

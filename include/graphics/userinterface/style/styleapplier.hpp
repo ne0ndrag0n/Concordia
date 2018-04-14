@@ -32,7 +32,7 @@ namespace BlueBear {
           std::vector< AST::PropertyList > propertyLists;
 
           CallResult call( const AST::Call& functionCall );
-          std::variant< Gravity, Requisition, Placement, Orientation > identifier( const AST::Identifier& identifier );
+          std::variant< Gravity, Requisition, Placement, Orientation, int > identifier( const AST::Identifier& identifier );
           CallResult resolveValue( const std::variant< AST::Call, AST::Identifier, AST::Literal >& type );
 
           int getIntSetting( const std::string& key );

@@ -27,3 +27,7 @@ Window#test2 {
     color: rgbaString( "990000ff" );
   }
 }
+
+#sublayout1 {
+  height: Requisition::FILL_PARENT;
+}
