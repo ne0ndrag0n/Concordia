@@ -3,8 +3,6 @@
 #include <algorithm>
 #include <functional>
 
-#include "tools/utility.hpp"
-
 namespace BlueBear {
   namespace Graphics {
     namespace UserInterface {
@@ -141,7 +139,6 @@ namespace BlueBear {
                 childRequisition[ relations.rFlowSize ];
 
               // perp size - fill parent or use requisition
-              Log::getInstance().debug( Tools::Utility::pointerToString( child.get() ), std::to_string( child->getPropertyList().get< int >( "height" ) ) );
               childAllocation[ relations.aPerpSize ] = ( ( Requisition ) child->getPropertyList().get< int >( relations.perpProperty ) == Requisition::FILL_PARENT ) ?
                 relations.perpSizeAdjusted :
                 childRequisition[ relations.rPerpSize ];
