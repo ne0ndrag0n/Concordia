@@ -62,11 +62,9 @@ namespace BlueBear {
             auto text = Graphics::UserInterface::Widgets::Text::create( "", {}, "fart" );
             window2->addChild( text );
 
-            /*
             text->getEventBundle().registerInputEvent( "mouse-down", [ & ]( Device::Input::Metadata event ) {
               Log::getInstance().debug( "assert", "fart" );
             } );
-            */
           }
 
           void GuiComponent::__teststyle() {
@@ -81,8 +79,8 @@ namespace BlueBear {
               std::vector< std::shared_ptr< Graphics::UserInterface::Element > > children = element->getChildren();
 
               for( auto it = children.rbegin(); it != children.rend(); ++it ) {
-                if( captureMouseEvent( *it, event ) ) {
-                  return *it;
+                if( std::shared_ptr< Graphics::UserInterface::Element > result = captureMouseEvent( *it, event ) ) {
+                  return result;
                 }
               }
 
