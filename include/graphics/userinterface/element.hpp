@@ -83,7 +83,7 @@ namespace BlueBear {
 
         std::vector< std::shared_ptr< Element > > getLeafNodes();
 
-        void reflow();
+        virtual void reflow();
         void paint();
         void draw();
       };

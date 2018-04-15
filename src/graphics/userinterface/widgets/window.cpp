@@ -106,7 +106,7 @@ namespace BlueBear {
             if( child != decoration ) {
               if( child->getPropertyList().get< Placement >( "placement" ) == Placement::FLOW ) {
                 // The single element
-                child->setAllocation( { origin.x, origin.y + 60, allocation[ 2 ] - 10, allocation[ 3 ] - 70 } );
+                child->setAllocation( { origin.x, origin.y + 60, allocation[ 2 ] - 10, allocation[ 3 ] - 70 }, false );
                 child->getPropertyList().set< int >( "local-z-order", 1, false );
               } else {
                 // Floating buttons, etc.

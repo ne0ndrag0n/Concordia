@@ -16,6 +16,17 @@ namespace BlueBear {
           return layout;
         }
 
+        /**
+         * A layout needs to propagate its reflow up to the nearest non-layout parent (if no parent, then simply reflow one's self)
+         */
+        void Layout::reflow() {
+          if( auto parent = getParent() ) {
+            parent->reflow();
+          } else {
+            Element::reflow();
+          }
+        }
+
         void Layout::calculate() {
           glm::ivec2 total{ 0, 0 };
           int padding = localStyle.get< int >( "padding" );
@@ -135,7 +146,7 @@ namespace BlueBear {
               // flow size - either a proportion derived from layout-weight or the requisition size
               int layoutWeight = child->getPropertyList().get< int >( "layout-weight" );
               childAllocation[ relations.aFlowSize ] = ( layoutWeight >= 1 ) ?
-                ( ( layoutWeight / relations.flowTotalWeight ) * relations.flowTotalSpace ) :
+                ( ( float ) ( ( float ) layoutWeight / ( float ) relations.flowTotalWeight ) * ( float ) relations.flowTotalSpace ) :
                 childRequisition[ relations.rFlowSize ];
 
               // perp size - fill parent or use requisition

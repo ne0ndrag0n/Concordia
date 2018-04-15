@@ -59,14 +59,19 @@ namespace BlueBear {
             auto window2 = Graphics::UserInterface::Widgets::Window::create( "test2", {}, "Error" );
             rootElement->addChild( window2 );
 
-            //auto window2layout = Graphics::UserInterface::Widgets::Layout::create( "", { "error-window-layout" } );
-            //window2->addChild( window2layout );
+            auto window2layout = Graphics::UserInterface::Widgets::Layout::create( "sublayout1", {} );
+            window2->addChild( window2layout );
 
-            //auto sublayout1 = Graphics::UserInterface::Widgets::Layout::create( "sublayout1", {} );
-            //window2layout->addChild( sublayout1 );
+            // Left hand layout with weight 1
+            auto sublayout2 = Graphics::UserInterface::Widgets::Layout::create( "sublayout2", {} );
+            window2layout->addChild( sublayout2 );
 
-            //sublayout1->addChild( Graphics::UserInterface::Widgets::Text::create( "", { "test-text" }, "Test text 1" ) );
-            //window2layout->addChild( Graphics::UserInterface::Widgets::Text::create( "", { "test-text" }, "fart" ) );
+            // Left hand layout with weight 2
+            auto sublayout3 = Graphics::UserInterface::Widgets::Layout::create( "sublayout3", {} );
+            window2layout->addChild( sublayout3 );
+
+            sublayout2->addChild( Graphics::UserInterface::Widgets::Text::create( "testtext1", {}, "Test text 1" ) );
+            sublayout3->addChild( Graphics::UserInterface::Widgets::Text::create( "testtext2", {}, "Test text 2" ) );
           }
 
           void GuiComponent::__teststyle() {

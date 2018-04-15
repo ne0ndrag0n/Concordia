@@ -28,6 +28,10 @@ Window#test2 {
   }
 }
 
-#sublayout1 {
-  height: Requisition::FILL_PARENT;
+#sublayout2 {
+  layout-weight: 1;
+}
+
+#sublayout3 {
+  layout-weight: 3;
 }
