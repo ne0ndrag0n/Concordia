@@ -15,9 +15,7 @@
 
 #include <glm/gtx/string_cast.hpp>
 #include "graphics/userinterface/event/eventbundle.hpp"
-#include "graphics/userinterface/widgets/window.hpp"
-#include "graphics/userinterface/widgets/text.hpp"
-#include <glm/gtx/string_cast.hpp>
+#include "graphics/userinterface/xmlloader.hpp"
 
 namespace BlueBear {
   namespace Device {
@@ -54,10 +52,11 @@ namespace BlueBear {
 
           // TODO: remove TEST code
           void GuiComponent::__testadd() {
+            /*
             auto window = Graphics::UserInterface::Widgets::Window::create( "test", {}, "Window Title" );
             rootElement->addChild( window );
 
-            auto window2 = Graphics::UserInterface::Widgets::Window::create( "test2", {}, "Error" );
+            auto window2 = Graphics::UserInterface::Widgets::Window::create( "test2", { "error" }, "Error" );
             rootElement->addChild( window2 );
 
             auto window2layout = Graphics::UserInterface::Widgets::Layout::create( "sublayout1", {} );
@@ -73,6 +72,12 @@ namespace BlueBear {
 
             sublayout2->addChild( Graphics::UserInterface::Widgets::Text::create( "testtext1", {}, "Test text 1" ) );
             sublayout3->addChild( Graphics::UserInterface::Widgets::Text::create( "testtext2", {}, "Test text 2" ) );
+            */
+            Graphics::UserInterface::XMLLoader loader( "system/ui/example.xml" );
+            std::vector< std::shared_ptr< Graphics::UserInterface::Element > > elements = loader.getElements();
+            for( std::shared_ptr< Graphics::UserInterface::Element > element : elements ) {
+              rootElement->addChild( element );
+            }
           }
 
           void GuiComponent::__teststyle() {

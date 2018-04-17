@@ -30,8 +30,8 @@ Window#test2 {
   #sublayout3 {
     layout-weight: 3;
   }
+}
 
-  .-bb-shadow-windowdecoration {
-    color: rgbaString( "990000ff" );
-  }
+Window.error .-bb-shadow-windowdecoration {
+  color: rgbaString( "990000ff" );
 }

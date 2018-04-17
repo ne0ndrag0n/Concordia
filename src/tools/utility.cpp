@@ -354,7 +354,7 @@ namespace BlueBear {
 			return s.erase( s.find_last_not_of( " \t\f\v\n\r" ) + 1 );
 		}
 
-		std::string Utility::stringTrim( std::string& s ) {
+		std::string Utility::stringTrim( std::string s ) {
 			std::string rTrimmed = Utility::stringRtrim( s );
 
 			return Utility::stringLtrim( rTrimmed );

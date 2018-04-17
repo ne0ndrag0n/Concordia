@@ -65,7 +65,7 @@ namespace BlueBear {
 
 				static std::string stringRtrim( std::string& s );
 
-				static std::string stringTrim( std::string& s );
+				static std::string stringTrim( std::string s );
 
 				static std::string pointerToString( const void* pointer );
 
@@ -112,6 +112,10 @@ namespace BlueBear {
 					}
 
 					return result;
+				};
+
+				static constexpr const char* safeString( const char* cString ) {
+					return cString ? cString : "";
 				};
 
 				static bool intersect( const glm::ivec2& pointer, const glm::ivec4& target ) {
