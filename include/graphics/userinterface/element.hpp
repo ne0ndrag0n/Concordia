@@ -66,6 +66,7 @@ namespace BlueBear {
 
         const std::string& getTag() const;
         const std::string& getId() const;
+        std::string generateSelectorString() const;
         bool hasClass( const std::string& clss ) const;
         void sortElements();
         std::vector< std::shared_ptr< Element > > getChildren() const;

@@ -194,7 +194,19 @@ namespace BlueBear {
               return false;
             }
 
-            element = element->getParent();
+            auto next = it; std::advance( next, 1 );
+            if( next != propertyList.selectorQueries.rend() ) {
+              // Element must have at least one parent in the chain who matches the "next" query part
+              element = element->getParent();
+              while( element ) {
+                if( Querier::matches( element, *next ) ) {
+                  // Stop looking, we found it
+                  break;
+                }
+
+                element = element->getParent();
+              }
+            }
           }
 
           return true;

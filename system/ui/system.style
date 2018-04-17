@@ -23,15 +23,15 @@ Window#test2 {
   width: 300;
   height: 200;
 
+  #sublayout2 {
+    layout-weight: 1;
+  }
+
+  #sublayout3 {
+    layout-weight: 3;
+  }
+
   .-bb-shadow-windowdecoration {
     color: rgbaString( "990000ff" );
   }
-}
-
-#sublayout2 {
-  layout-weight: 1;
-}
-
-#sublayout3 {
-  layout-weight: 3;
 }

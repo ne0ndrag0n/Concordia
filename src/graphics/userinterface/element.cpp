@@ -87,6 +87,21 @@ namespace BlueBear {
         return id;
       }
 
+      std::string Element::generateSelectorString() const {
+        std::string result;
+
+        result += tag;
+        if( id.size() ) {
+          result += "#" + id;
+        }
+
+        for( const std::string& clss : classes ) {
+          result += "." + clss;
+        }
+
+        return result;
+      }
+
       bool Element::hasClass( const std::string& clss ) const {
         for( const std::string& c : classes ) {
           if( c == clss ) {
