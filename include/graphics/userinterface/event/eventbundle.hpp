@@ -61,7 +61,7 @@ namespace BlueBear {
           unsigned int registerInputEvent( const std::string& key, std::function< void( Device::Input::Metadata ) > callback );
           void unregisterInputEvent( const std::string& key, unsigned int id );
 
-          void trigger( const std::string& key, Device::Input::Metadata metadata );
+          void trigger( const std::string& key, Device::Input::Metadata metadata, bool bubble = true );
         };
 
       }

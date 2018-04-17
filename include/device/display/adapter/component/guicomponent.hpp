@@ -8,6 +8,7 @@
 #include "graphics/shader.hpp"
 #include <queue>
 #include <memory>
+#include <set>
 #include <functional>
 
 namespace BlueBear {
@@ -31,8 +32,11 @@ namespace BlueBear {
             Graphics::Vector::Renderer vector;
             Graphics::Shader guiShader;
             std::unique_ptr< Graphics::UserInterface::DragHelper > currentDrag;
+            std::set< std::shared_ptr< Graphics::UserInterface::Element > > previousMove;
             std::shared_ptr< Graphics::UserInterface::Element > rootElement;
             Graphics::UserInterface::Style::StyleApplier styleManager;
+
+            void fireInOutEvents( std::shared_ptr< Graphics::UserInterface::Element > selected, Device::Input::Metadata event );
 
           public:
 

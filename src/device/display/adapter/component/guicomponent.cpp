@@ -11,6 +11,7 @@
 #include "log.hpp"
 #include <GL/glew.h>
 #include <glm/glm.hpp>
+#include <algorithm>
 
 #include <glm/gtx/string_cast.hpp>
 #include "graphics/userinterface/event/eventbundle.hpp"
@@ -78,6 +79,31 @@ namespace BlueBear {
             Log::getInstance().info( "GuiComponent::__teststyle", "Remove this function and callbacks" );
           }
 
+          void GuiComponent::fireInOutEvents( std::shared_ptr< Graphics::UserInterface::Element > selected, Device::Input::Metadata event ) {
+            std::set< std::shared_ptr< Graphics::UserInterface::Element > > currentMove;
+            std::set< std::shared_ptr< Graphics::UserInterface::Element > > symmetricDifference;
+
+            // Unroll
+            while( selected ) {
+              currentMove.insert( selected );
+              selected = selected->getParent();
+            }
+
+            std::set_symmetric_difference( currentMove.begin(), currentMove.end(), previousMove.begin(), previousMove.end(), std::inserter( symmetricDifference, symmetricDifference.end() ) );
+
+            for( std::shared_ptr< Graphics::UserInterface::Element > target : symmetricDifference ) {
+              if( previousMove.count( target ) ) {
+                // target is in the old list, that's a mouse-out event
+                target->getEventBundle().trigger( "mouse-out", event, false );
+              } else {
+                // target is in the new list, that's a mouse-in event
+                target->getEventBundle().trigger( "mouse-in", event, false );
+              }
+            }
+
+            previousMove = currentMove;
+          }
+
           std::shared_ptr< Graphics::UserInterface::Element > GuiComponent::captureMouseEvent( std::shared_ptr< Graphics::UserInterface::Element > element, Device::Input::Metadata event ) {
             glm::ivec2 absolutePosition = element->getAbsolutePosition();
             glm::ivec4 allocation = element->getAllocation();
@@ -116,6 +142,7 @@ namespace BlueBear {
               std::shared_ptr< Graphics::UserInterface::Element > captured = captureMouseEvent( rootElement, event );
 
               if( captured ) {
+                fireInOutEvents( captured, event );
                 captured->getEventBundle().trigger( "mouse-moved", event );
               }
             }

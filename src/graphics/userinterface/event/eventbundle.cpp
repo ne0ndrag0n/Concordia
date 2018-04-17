@@ -17,7 +17,7 @@ namespace BlueBear {
           removeElement( inputEvents, key, id );
         }
 
-        void EventBundle::trigger( const std::string& key, Device::Input::Metadata metadata ) {
+        void EventBundle::trigger( const std::string& key, Device::Input::Metadata metadata, bool bubble ) {
           auto it = inputEvents.find( key );
 
           if( it != inputEvents.end() ) {
@@ -29,9 +29,11 @@ namespace BlueBear {
           }
 
           // Bubble up the event
-          std::shared_ptr< Element > element = parent->getParent();
-          if( element ) {
-            element->getEventBundle().trigger( key, metadata );
+          if( bubble ) {
+            std::shared_ptr< Element > element = parent->getParent();
+            if( element ) {
+              element->getEventBundle().trigger( key, metadata );
+            }
           }
         }
 
