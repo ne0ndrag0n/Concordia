@@ -27,6 +27,14 @@ namespace BlueBear {
           return window;
         }
 
+        void Window::addChild( std::shared_ptr< Element > child, bool doReflow ) {
+          if( children.size() < 2 ) {
+            Element::addChild( child, doReflow );
+          } else {
+            Log::getInstance().warn( "Window::addChild", "Cannot add more than one element to Window" );
+          }
+        }
+
         void Window::onMouseDown( Device::Input::Metadata event ) {
           glm::ivec2 absPosition = getAbsolutePosition();
           glm::ivec2 origin = absPosition + getOrigin();
