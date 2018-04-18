@@ -1,20 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Window id="test" window-title="Window Title"></Window>
-<Window id="test2" class="error" window-title="Error">
-  <Layout id="sublayout1">
-    <Layout id="sublayout2">
-      <Text id="testtext1">
-        Test text 1
-      </Text>
-    </Layout>
-    <Layout id="sublayout3">
-      <Text id="testtext2">
-        Test text 2
-      </Text>
-    </Layout>
-  </Layout>
-</Window>
-<Window id="test3" window-title="Budget">
+<Window class="-bb-budget-window" window-title="Budget">
   <Layout class="budget-panel">
     <Text class="yb-label">Your Budget</Text>
     <Layout class="horiz-container">

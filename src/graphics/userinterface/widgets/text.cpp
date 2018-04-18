@@ -47,8 +47,20 @@ namespace BlueBear {
           };
         }
 
-        void Text::setText( const std::string& text ) {
+        void Text::reflow() {
+          if( auto parent = getParent() ) {
+            parent->reflow();
+          } else {
+            Element::reflow();
+          }
+        }
+
+        void Text::setText( const std::string& text, bool doReflow ) {
           innerText = text;
+
+          if( doReflow ) {
+            reflow();
+          }
         }
 
         std::string Text::getText() {

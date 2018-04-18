@@ -9,30 +9,14 @@ Window {
   }
 }
 
-Window#test {
-  top: 10;
-  left: 10;
-  width: 600;
-  height: 300;
+Window.error {
+  .-bb-shadow-windowdecoration {
+    color: rgbaString( "990000ff" );
+  }
 }
 
-Window#test2 {
+.-bb-budget-window {
   close-event: true;
-  top: 232;
-  left: 332;
-  width: 300;
-  height: 200;
-
-  #sublayout2 {
-    layout-weight: 1;
-  }
-
-  #sublayout3 {
-    layout-weight: 3;
-  }
-}
-
-#test3 {
   width: 500;
   height: 200;
   background-color: rgbaString( "1a3807ff" );
@@ -69,8 +53,4 @@ Window#test2 {
       }
     }
   }
-}
-
-Window.error .-bb-shadow-windowdecoration {
-  color: rgbaString( "990000ff" );
 }

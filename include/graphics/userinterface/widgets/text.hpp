@@ -25,8 +25,9 @@ namespace BlueBear {
         public:
           virtual void render( Graphics::Vector::Renderer& renderer ) override;
           virtual void calculate() override;
+          virtual void reflow() override;
 
-          void setText( const std::string& text );
+          void setText( const std::string& text, bool doReflow = true );
           std::string getText();
 
           static std::shared_ptr< Text > create( const std::string& id, const std::vector< std::string >& classes, const std::string& innerText );

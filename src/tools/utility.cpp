@@ -347,10 +347,18 @@ namespace BlueBear {
 		}
 
 		std::string Utility::stringLtrim( std::string& s ) {
+			if( s.size() == 0 ) {
+				return "";
+			}
+
 			return s.substr( s.find_first_not_of( " \t\f\v\n\r" ) );
 		}
 
 		std::string Utility::stringRtrim( std::string& s ) {
+			if( s.size() == 0 ) {
+				return "";
+			}
+
 			return s.erase( s.find_last_not_of( " \t\f\v\n\r" ) + 1 );
 		}
 
