@@ -6,6 +6,7 @@
 #include "graphics/userinterface/propertylist.hpp"
 #include "graphics/userinterface/drawable.hpp"
 #include "graphics/userinterface/draghelper.hpp"
+#include "graphics/userinterface/querier.hpp"
 #include "tools/utility.hpp"
 #include "configmanager.hpp"
 #include "log.hpp"
@@ -43,6 +44,8 @@ namespace BlueBear {
                 ConfigManager::getInstance().getIntValue( "viewport_y" )
               } );
 
+              currentFocus = rootElement;
+
               styleManager.applyStyles( {
                 "system/ui/system.style"
               } );
@@ -61,6 +64,15 @@ namespace BlueBear {
 
           void GuiComponent::__teststyle() {
             Log::getInstance().info( "GuiComponent::__teststyle", "Remove this function and callbacks" );
+          }
+
+          void GuiComponent::fireFocusEvent( std::shared_ptr< Graphics::UserInterface::Element > selected, Device::Input::Metadata event ) {
+            if( selected != currentFocus ) {
+              currentFocus->getEventBundle().trigger( "blur", event, false );
+              selected->getEventBundle().trigger( "focus", event, false );
+
+              currentFocus = selected;
+            }
           }
 
           void GuiComponent::fireInOutEvents( std::shared_ptr< Graphics::UserInterface::Element > selected, Device::Input::Metadata event ) {
@@ -113,6 +125,7 @@ namespace BlueBear {
               std::shared_ptr< Graphics::UserInterface::Element > captured = captureMouseEvent( rootElement, event );
 
               if( captured ) {
+                fireFocusEvent( captured, event );
                 captured->getEventBundle().trigger( "mouse-down", event );
               }
             }

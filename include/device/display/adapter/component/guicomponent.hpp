@@ -34,8 +34,10 @@ namespace BlueBear {
             std::unique_ptr< Graphics::UserInterface::DragHelper > currentDrag;
             std::set< std::shared_ptr< Graphics::UserInterface::Element > > previousMove;
             std::shared_ptr< Graphics::UserInterface::Element > rootElement;
+            std::shared_ptr< Graphics::UserInterface::Element > currentFocus;
             Graphics::UserInterface::Style::StyleApplier styleManager;
 
+            void fireFocusEvent( std::shared_ptr< Graphics::UserInterface::Element > selected, Device::Input::Metadata event );
             void fireInOutEvents( std::shared_ptr< Graphics::UserInterface::Element > selected, Device::Input::Metadata event );
 
           public:
