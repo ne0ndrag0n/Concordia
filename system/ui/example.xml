@@ -14,3 +14,12 @@
     </Layout>
   </Layout>
 </Window>
+<Window id="test3" window-title="Budget">
+  <Layout class="budget-panel">
+    <Text class="yb-label">Your Budget</Text>
+    <Layout class="horiz-container">
+      <Text class="budget-content">Bread</Text>
+      <Text class="budget-amount">(-$300.00)</Text>
+    </Layout>
+  </Layout>
+</Window>

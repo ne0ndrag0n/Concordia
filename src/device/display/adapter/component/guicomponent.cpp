@@ -52,27 +52,6 @@ namespace BlueBear {
 
           // TODO: remove TEST code
           void GuiComponent::__testadd() {
-            /*
-            auto window = Graphics::UserInterface::Widgets::Window::create( "test", {}, "Window Title" );
-            rootElement->addChild( window );
-
-            auto window2 = Graphics::UserInterface::Widgets::Window::create( "test2", { "error" }, "Error" );
-            rootElement->addChild( window2 );
-
-            auto window2layout = Graphics::UserInterface::Widgets::Layout::create( "sublayout1", {} );
-            window2->addChild( window2layout );
-
-            // Left hand layout with weight 1
-            auto sublayout2 = Graphics::UserInterface::Widgets::Layout::create( "sublayout2", {} );
-            window2layout->addChild( sublayout2 );
-
-            // Left hand layout with weight 2
-            auto sublayout3 = Graphics::UserInterface::Widgets::Layout::create( "sublayout3", {} );
-            window2layout->addChild( sublayout3 );
-
-            sublayout2->addChild( Graphics::UserInterface::Widgets::Text::create( "testtext1", {}, "Test text 1" ) );
-            sublayout3->addChild( Graphics::UserInterface::Widgets::Text::create( "testtext2", {}, "Test text 2" ) );
-            */
             Graphics::UserInterface::XMLLoader loader( "system/ui/example.xml" );
             std::vector< std::shared_ptr< Graphics::UserInterface::Element > > elements = loader.getElements();
             for( std::shared_ptr< Graphics::UserInterface::Element > element : elements ) {

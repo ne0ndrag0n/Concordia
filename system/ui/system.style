@@ -32,6 +32,45 @@ Window#test2 {
   }
 }
 
+#test3 {
+  width: 500;
+  height: 200;
+  background-color: rgbaString( "1a3807ff" );
+
+  .-bb-shadow-windowdecoration {
+    color: rgbaString( "391c07ff" );
+  }
+
+  .budget-panel {
+    gravity: Gravity::TOP;
+    padding: 5;
+
+    Text {
+      font-size: 24.0;
+      color: rgbaString( "FFFFFFFF" );
+      background-color: rgbaString( "00000000" );
+    }
+
+    Text.yb-label {
+      width: Requisition::FILL_PARENT;
+    }
+
+    .horiz-container {
+      width: Requisition::FILL_PARENT;
+
+      .budget-content {
+        color: rgbaString( "00FF00FF" );
+        layout-weight: 1;
+      }
+
+      .budget-amount {
+        layout-weight: 1;
+        color: rgbaString( "FF0000FF" );
+      }
+    }
+  }
+}
+
 Window.error .-bb-shadow-windowdecoration {
   color: rgbaString( "990000ff" );
 }

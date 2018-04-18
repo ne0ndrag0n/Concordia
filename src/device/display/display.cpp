@@ -88,7 +88,7 @@ namespace BlueBear {
       }
 
       void Display::update() {
-        glClearColor( 0.02f, 0.16f, 0.0f, 1.0f );
+        glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
         for( std::unique_ptr< Adapter::Adapter >& adapter : adapters ) {
