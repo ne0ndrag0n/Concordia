@@ -8,11 +8,7 @@ namespace BlueBear {
       namespace Style {
 
         Style::Animation::Animation( Style* parent, std::map< double, Keyframe > keyframes, double fps, double duration, bool suicide )
-          : parent( parent ), keyframes( keyframes ), fps( fps ), duration( duration ), current( -getFPS() ), suicide( suicide ) {
-            if( keyframes.find( duration ) == keyframes.end() ) {
-              throw MalformedKeyframesException();
-            }
-          }
+          : parent( parent ), keyframes( keyframes ), fps( fps ), duration( duration ), current( 0.0 ), suicide( suicide ) {}
 
         double Style::Animation::getFPS() {
           return fps / ConfigManager::getInstance().getIntValue( "fps_overview" );
@@ -23,10 +19,12 @@ namespace BlueBear {
 
           if( next > duration ) {
             if( suicide ) {
+              auto ptr = parent->parent;
               parent->attachAnimation( nullptr );
+              ptr->reflow();
               return;
             } else {
-              next = -getFPS();
+              next = 0.0;
             }
           }
 

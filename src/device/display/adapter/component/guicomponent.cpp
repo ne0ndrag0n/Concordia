@@ -16,6 +16,7 @@
 
 #include <glm/gtx/string_cast.hpp>
 #include "graphics/userinterface/event/eventbundle.hpp"
+#include "graphics/userinterface/style/style.hpp"
 #include "graphics/userinterface/xmlloader.hpp"
 
 namespace BlueBear {
@@ -58,6 +59,40 @@ namespace BlueBear {
             Graphics::UserInterface::XMLLoader loader( "system/ui/example.xml" );
             std::vector< std::shared_ptr< Graphics::UserInterface::Element > > elements = loader.getElements();
             for( std::shared_ptr< Graphics::UserInterface::Element > element : elements ) {
+              if( element->hasClass( "-bb-budget-window" ) ) {
+                Graphics::UserInterface::Querier q( element );
+                auto results = q.get( { { "WindowDecoration", "", {} } } );
+                // Attach animation
+                results[ 0 ]->getPropertyList().attachAnimation( std::make_unique< Graphics::UserInterface::Style::Style::Animation >(
+                  &( results[ 0 ]->getPropertyList() ),
+                  std::map< double, Graphics::UserInterface::Style::Style::Animation::Keyframe >{
+                    {
+                      0.0,
+                      {
+                        Graphics::UserInterface::PropertyList( { { "color", glm::uvec4{ 255, 0, 0, 255 } } } ),
+                        true
+                      }
+                    },
+                    {
+                      150.0,
+                      {
+                        Graphics::UserInterface::PropertyList( { { "color", glm::uvec4{ 0, 0, 0, 255 } } } ),
+                        true
+                      }
+                    },
+                    {
+                      300.0,
+                      {
+                        Graphics::UserInterface::PropertyList( { { "color", glm::uvec4{ 255, 0, 0, 255 } } } ),
+                        true
+                      }
+                    }
+                  },
+                  60.0,
+                  300.0,
+                  false
+                ) );
+              }
               rootElement->addChild( element );
             }
           }
