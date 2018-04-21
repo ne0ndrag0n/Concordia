@@ -60,6 +60,8 @@ namespace BlueBear {
       public:
         static Device::Display::Adapter::Component::GuiComponent* manager;
 
+        void walk( std::function< void( Element& ) > predicate );
+
         virtual void positionAndSizeChildren();
         virtual void render( Graphics::Vector::Renderer& renderer );
         virtual void calculate() = 0;

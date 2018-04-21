@@ -45,6 +45,10 @@ namespace BlueBear {
           return values.find( key ) != values.end();
         };
 
+        void removeProperty( const std::string& key ) {
+          values.erase( key );
+        };
+
         template < typename VariantType > void set( const std::string& key, VariantType value ) {
           values[ key ] = value;
         };

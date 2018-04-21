@@ -124,6 +124,10 @@ namespace BlueBear {
 								 pointer.x <= target[ 2 ] &&
 								 pointer.y <= target[ 3 ];
 				};
+
+				template < typename Numeric > static constexpr Numeric interpolateLinear( Numeric v0, Numeric v1, double alpha ) {
+					return ( 1 - alpha ) * v0 + alpha * v1;
+				};
 		};
 	}
 }

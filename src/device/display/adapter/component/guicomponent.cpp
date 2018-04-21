@@ -177,6 +177,9 @@ namespace BlueBear {
             glEnable( GL_SCISSOR_TEST );
 
             guiShader.use( true );
+            rootElement->walk( []( Graphics::UserInterface::Element& element ) {
+              element.getPropertyList().updateAnimation();
+            } );
             rootElement->draw();
 
             glEnable( GL_CULL_FACE );

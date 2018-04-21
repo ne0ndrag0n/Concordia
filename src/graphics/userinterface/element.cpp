@@ -20,6 +20,14 @@ namespace BlueBear {
 
       Element::~Element() {}
 
+      void Element::walk( std::function< void( Element& ) > predicate ) {
+        predicate( *this );
+
+        for( std::shared_ptr< Element > child : children ) {
+          child->walk( predicate );
+        }
+      }
+
       void Element::setShadow( bool status ) {
         shadow = status;
       }
