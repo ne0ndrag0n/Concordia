@@ -7,28 +7,29 @@ namespace BlueBear {
     namespace UserInterface {
       namespace Style {
 
-        Style::Animation::Animation( Style* parent, std::map< double, Keyframe > keyframes, double fps, double duration, bool suicide )
-          : parent( parent ), keyframes( keyframes ), fps( fps ), duration( duration ), current( 0.0 ), suicide( suicide ) {}
+        Style::Animation::Animation( Style* parent, std::map< double, Keyframe > keyframes, double fps, double duration, bool suicide, bool sticky )
+          : parent( parent ), keyframes( keyframes ), fps( fps ), duration( duration ), current( 0.0 ), suicide( suicide ), sticky( sticky ) {}
 
         double Style::Animation::getFPS() {
           return fps / ConfigManager::getInstance().getIntValue( "fps_overview" );
         }
 
-        void Style::Animation::increment() {
+        bool Style::Animation::increment() {
           double next = current + getFPS();
 
           if( next > duration ) {
             if( suicide ) {
-              auto ptr = parent->parent;
               parent->attachAnimation( nullptr );
-              ptr->reflow();
-              return;
+              return true;
+            } else if ( sticky ) {
+              return false;
             } else {
               next = 0.0;
             }
           }
 
           current = next;
+          return true;
         }
 
         Style::Style( Element* parent ) : parent( parent ) {
@@ -69,8 +70,7 @@ namespace BlueBear {
         }
 
         void Style::updateAnimation() {
-          if( attachedAnimation ) {
-            attachedAnimation->increment();
+          if( attachedAnimation && attachedAnimation->increment() ) {
             parent->reflow();
           }
         }

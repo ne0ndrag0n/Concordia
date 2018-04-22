@@ -36,15 +36,16 @@ namespace BlueBear {
             const double duration;
             double current;
             const bool suicide;
+            const bool sticky;
 
             double getFPS();
 
           public:
             EXCEPTION_TYPE( MalformedKeyframesException, "Keyframes malformed" );
 
-            Animation( Style* parent, std::map< double, Keyframe > keyframes, double fps, double duration, bool suicide );
+            Animation( Style* parent, std::map< double, Keyframe > keyframes, double fps, double duration, bool suicide, bool sticky );
 
-            void increment();
+            bool increment();
 
             template < typename VariantType > const VariantType getKeyed( const std::string& key ) const {
 
