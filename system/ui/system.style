@@ -54,3 +54,21 @@ Window.error {
     }
   }
 }
+
+.-bb-form-demo {
+  top: 100;
+  left: 100;
+  width: 500;
+  height: 120;
+  background-color: rgbaString( "999999ff" );
+
+  Layout {
+    padding: 5;
+  }
+
+  Button {
+    background-color: rgbaString( "0D686Bff" );
+    color: rgbaString( "ffffffff" );
+    padding: 5;
+  }
+}

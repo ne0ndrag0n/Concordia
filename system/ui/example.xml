@@ -8,3 +8,9 @@
     </Layout>
   </Layout>
 </Window>
+<Window class="-bb-form-demo" window-title="Form Demo">
+  <Layout>
+    <Button>TEST 1</Button>
+    <Button>TEST 2</Button>
+  </Layout>
+</Window>

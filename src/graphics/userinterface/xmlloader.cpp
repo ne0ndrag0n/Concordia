@@ -2,6 +2,7 @@
 #include "graphics/userinterface/widgets/layout.hpp"
 #include "graphics/userinterface/widgets/text.hpp"
 #include "graphics/userinterface/widgets/window.hpp"
+#include "graphics/userinterface/widgets/button.hpp"
 #include "tools/utility.hpp"
 #include "log.hpp"
 
@@ -47,7 +48,16 @@ namespace BlueBear::Graphics::UserInterface {
         );
         break;
       }
+      case Tools::Utility::hash( "Button" ): {
+        result = Widgets::Button::create(
+          Tools::Utility::safeString( element->Attribute( "id" ) ),
+          Tools::Utility::split( Tools::Utility::safeString( element->Attribute( "class" ) ), ' ' ),
+          Tools::Utility::stringTrim( Tools::Utility::safeString( element->GetText() ) )
+        );
+        break;
+      }
       default:
+        Log::getInstance().error( "XMLLoader::getElementFromXML", "Unknown element: " + std::string( element->Name() ) );
         throw UnknownElementException();
     }
 
