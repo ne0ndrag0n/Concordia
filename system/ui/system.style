@@ -9,6 +9,14 @@ Window {
   }
 }
 
+Button {
+  background-color: rgbaString( "0D686Bff" );
+  fade-in-color: rgbaString( "149a9fff" );
+  fade-out-color: rgbaString( "084244ff" );
+  color: rgbaString( "ffffffff" );
+  padding: 5;
+}
+
 Window.error {
   .-bb-shadow-windowdecoration {
     color: rgbaString( "990000ff" );
@@ -63,12 +71,6 @@ Window.error {
   background-color: rgbaString( "999999ff" );
 
   Layout {
-    padding: 5;
-  }
-
-  Button {
-    background-color: rgbaString( "0D686Bff" );
-    color: rgbaString( "ffffffff" );
     padding: 5;
   }
 }

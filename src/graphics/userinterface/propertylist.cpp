@@ -22,6 +22,8 @@ namespace BlueBear {
         { "horizontal-orientation", Orientation::LEFT },
         { "background-color", glm::uvec4{ 255, 255, 255, 255 } },
         { "color", glm::uvec4{ 0, 0, 0, 255 } },
+        { "fade-in-color", glm::uvec4{ 255, 255, 255, 255 } },
+        { "fade-out-color", glm::uvec4{ 0, 0, 0, 255 } },
         { "font", std::string{ "roboto" } },
         { "font-color", glm::uvec4{ 255, 255, 255, 255 } },
         { "font-size", 16.0 },

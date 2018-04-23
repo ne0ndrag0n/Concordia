@@ -2,16 +2,146 @@
 #include "graphics/userinterface/style/style.hpp"
 #include "device/display/adapter/component/guicomponent.hpp"
 #include "graphics/vector/renderer.hpp"
+#include "device/input/input.hpp"
+#include "configmanager.hpp"
+#include <functional>
 
 namespace BlueBear::Graphics::UserInterface::Widgets {
 
   Button::Button( const std::string& id, const std::vector< std::string >& classes, const std::string& innerText ) :
-    Element::Element( "Button", id, classes ), label( innerText ) {}
+    Element::Element( "Button", id, classes ), label( innerText ) {
+      eventBundle.registerInputEvent( "mouse-in", std::bind( &Button::onMouseIn, this, std::placeholders::_1 ) );
+      eventBundle.registerInputEvent( "mouse-out", std::bind( &Button::onMouseOut, this, std::placeholders::_1 ) );
+
+      eventBundle.registerInputEvent( "mouse-down", std::bind( &Button::onMouseDown, this, std::placeholders::_1 ) );
+      eventBundle.registerInputEvent( "mouse-up", std::bind( &Button::onMouseUp, this, std::placeholders::_1 ) );
+    }
 
   std::shared_ptr< Button > Button::create( const std::string& id, const std::vector< std::string >& classes, const std::string& innerText ) {
     std::shared_ptr< Button > button( new Button( id, classes, innerText ) );
 
     return button;
+  }
+
+  void Button::onMouseIn( Device::Input::Metadata event ) {
+    double fps = ConfigManager::getInstance().getIntValue( "fps_overview" );
+
+    // Refresh and remove
+    localStyle.attachAnimation( nullptr );
+
+    // Attach animation
+    localStyle.attachAnimation( std::make_unique< Style::Style::Animation >(
+      &localStyle,
+      std::map< double, Style::Style::Animation::Keyframe >{
+        {
+          fps,
+          {
+            PropertyList( { { "background-color", localStyle.get< glm::uvec4 >( "fade-in-color" ) } } ),
+            true
+          }
+        }
+      },
+      fps * 3.0,
+      fps,
+      false,
+      true
+    ) );
+  }
+
+  void Button::onMouseOut( Device::Input::Metadata event ) {
+    double fps = ConfigManager::getInstance().getIntValue( "fps_overview" );
+
+    // Refresh and remove
+    localStyle.attachAnimation( nullptr );
+
+    // Attach animation
+    localStyle.attachAnimation( std::make_unique< Style::Style::Animation >(
+      &localStyle,
+      std::map< double, Style::Style::Animation::Keyframe >{
+        {
+          0.0,
+          {
+            PropertyList( { { "background-color", localStyle.get< glm::uvec4 >( "fade-in-color" ) } } ),
+            true
+          }
+        },
+        {
+          fps,
+          {
+            PropertyList( { { "background-color", localStyle.get< glm::uvec4 >( "background-color" ) } } ),
+            true
+          }
+        }
+      },
+      fps * 3.0,
+      fps,
+      true,
+      false
+    ) );
+  }
+
+  void Button::onMouseDown( Device::Input::Metadata event ) {
+    double fps = ConfigManager::getInstance().getIntValue( "fps_overview" );
+
+    // Refresh and remove
+    localStyle.attachAnimation( nullptr );
+
+    // Attach animation
+    localStyle.attachAnimation( std::make_unique< Style::Style::Animation >(
+      &localStyle,
+      std::map< double, Style::Style::Animation::Keyframe >{
+        {
+          0.0,
+          {
+            PropertyList( { { "background-color", localStyle.get< glm::uvec4 >( "fade-in-color" ) } } ),
+            true
+          }
+        },
+        {
+          fps,
+          {
+            PropertyList( { { "background-color", localStyle.get< glm::uvec4 >( "fade-out-color" ) } } ),
+            true
+          }
+        }
+      },
+      fps * 3.0,
+      fps,
+      false,
+      true
+    ) );
+  }
+
+  void Button::onMouseUp( Device::Input::Metadata event ) {
+    double fps = ConfigManager::getInstance().getIntValue( "fps_overview" );
+
+    // Refresh and remove
+    localStyle.attachAnimation( nullptr );
+
+    // Attach animation
+    localStyle.attachAnimation( std::make_unique< Style::Style::Animation >(
+      &localStyle,
+      std::map< double, Style::Style::Animation::Keyframe >{
+        {
+          0.0,
+          {
+            PropertyList( { { "background-color", localStyle.get< glm::uvec4 >( "fade-out-color" ) } } ),
+            true
+          }
+        },
+        {
+          fps,
+          {
+            PropertyList( { { "background-color", localStyle.get< glm::uvec4 >( "fade-in-color" ) } } ),
+            true
+          }
+        }
+      },
+      fps * 3.0,
+      fps,
+      false,
+      true
+    ) );
   }
 
   void Button::render( Graphics::Vector::Renderer& renderer ) {

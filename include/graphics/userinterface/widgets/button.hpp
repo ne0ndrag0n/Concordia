@@ -5,6 +5,7 @@
 #include <string>
 #include <memory>
 
+namespace BlueBear::Device::Input { class Metadata; }
 namespace BlueBear::Graphics::Vector { class Renderer; }
 namespace BlueBear::Graphics::UserInterface::Widgets {
 
@@ -14,6 +15,11 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 
   protected:
     Button( const std::string& id, const std::vector< std::string >& classes, const std::string& innerText );
+
+    void onMouseIn( Device::Input::Metadata event );
+    void onMouseOut( Device::Input::Metadata event );
+    void onMouseDown( Device::Input::Metadata event );
+    void onMouseUp( Device::Input::Metadata event );
 
   public:
     virtual void render( Graphics::Vector::Renderer& renderer ) override;
