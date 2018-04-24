@@ -8,9 +8,9 @@
     </Layout>
   </Layout>
 </Window>
-<Window class="-bb-form-demo" window-title="Form Demo">
-  <Layout>
-    <Button>TEST 1</Button>
-    <Button>TEST 2</Button>
+<Window class="-bb-form-demo" window-title="Console">
+  <Layout id="tester">
+    <Input class="test-1" hint="Enter Text"></Input>
+    <Button class="test-2">&gt;</Button>
   </Layout>
 </Window>

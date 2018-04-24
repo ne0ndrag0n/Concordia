@@ -3,6 +3,7 @@
 #include "graphics/userinterface/widgets/text.hpp"
 #include "graphics/userinterface/widgets/window.hpp"
 #include "graphics/userinterface/widgets/button.hpp"
+#include "graphics/userinterface/widgets/input.hpp"
 #include "tools/utility.hpp"
 #include "log.hpp"
 
@@ -52,6 +53,15 @@ namespace BlueBear::Graphics::UserInterface {
         result = Widgets::Button::create(
           Tools::Utility::safeString( element->Attribute( "id" ) ),
           Tools::Utility::split( Tools::Utility::safeString( element->Attribute( "class" ) ), ' ' ),
+          Tools::Utility::stringTrim( Tools::Utility::safeString( element->GetText() ) )
+        );
+        break;
+      }
+      case Tools::Utility::hash( "Input" ): {
+        result = Widgets::Input::create(
+          Tools::Utility::safeString( element->Attribute( "id" ) ),
+          Tools::Utility::split( Tools::Utility::safeString( element->Attribute( "class" ) ), ' ' ),
+          Tools::Utility::safeString( element->Attribute( "hint" ) ),
           Tools::Utility::stringTrim( Tools::Utility::safeString( element->GetText() ) )
         );
         break;

@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <functional>
 
+#include "log.hpp"
+
 namespace BlueBear {
   namespace Graphics {
     namespace UserInterface {
@@ -77,7 +79,7 @@ namespace BlueBear {
         Layout::Relations Layout::getRelations( Gravity gravity, int padding ) {
           bool xAxis = ( gravity == Gravity::LEFT || gravity == Gravity::RIGHT );
 
-          int totalSpace = allocation[ xAxis ? 2 : 3 ] - ( 2 * padding );
+          int totalSpace = allocation[ xAxis ? 2 : 3 ] - padding;
           int totalWeight = 0;
           for( std::shared_ptr< Element > child : children ) {
             if( child->getPropertyList().get< Placement >( "placement" ) == Placement::FLOW ) {
@@ -87,7 +89,7 @@ namespace BlueBear {
                 totalWeight += layoutWeight;
               } else {
                 // This child will be sized using its requisition
-                totalSpace -= xAxis ? child->getRequisition().x : child->getRequisition().y;
+                totalSpace -= ( xAxis ? child->getRequisition().x : child->getRequisition().y ) - padding;
               }
             }
           }
@@ -145,9 +147,11 @@ namespace BlueBear {
             if( child->getPropertyList().get< Placement >( "placement" ) == Placement::FLOW ) {
               // flow size - either a proportion derived from layout-weight or the requisition size
               int layoutWeight = child->getPropertyList().get< int >( "layout-weight" );
-              childAllocation[ relations.aFlowSize ] = ( layoutWeight >= 1 ) ?
-                ( ( float ) ( ( float ) layoutWeight / ( float ) relations.flowTotalWeight ) * ( float ) relations.flowTotalSpace ) :
-                childRequisition[ relations.rFlowSize ];
+              if( layoutWeight >= 1 ) {
+                childAllocation[ relations.aFlowSize ] = ( ( float ) ( ( float ) layoutWeight / ( float ) relations.flowTotalWeight ) * ( float ) relations.flowTotalSpace ) - padding;
+              } else {
+                childAllocation[ relations.aFlowSize ] = childRequisition[ relations.rFlowSize ];
+              }
 
               // perp size - fill parent or use requisition
               childAllocation[ relations.aPerpSize ] = ( ( Requisition ) child->getPropertyList().get< int >( relations.perpProperty ) == Requisition::FILL_PARENT ) ?
