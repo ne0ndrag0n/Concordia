@@ -11,6 +11,6 @@
 <Window class="-bb-form-demo" window-title="Console">
   <Layout id="tester">
     <Input class="test-1" hint="Enter Text"></Input>
-    <Button class="test-2">&gt;</Button>
+    <Button class="test-2">EXECUTE</Button>
   </Layout>
 </Window>

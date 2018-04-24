@@ -15,17 +15,12 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 
   void Input::render( Graphics::Vector::Renderer& renderer ) {
 
-    renderer.drawRect(
-      { 0, 0, allocation[ 2 ], allocation[ 3 ] },
-      { 255, 0, 255, 128 }
-    );
-
     // Text
     double fontSize = localStyle.get< double >( "font-size" );
     renderer.drawText(
       localStyle.get< std::string >( "font" ),
       hintText,
-      { 4, allocation[ 3 ] - fontSize - 3 },
+      { 6, allocation[ 3 ] - fontSize - 2 },
       localStyle.get< glm::uvec4 >( "font-hint-color" ),
       fontSize
     );
@@ -34,6 +29,13 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
     renderer.drawRect(
       { 4, allocation[ 3 ] - 12, allocation[ 2 ] - 4, allocation[ 3 ] - 8 },
       localStyle.get< glm::uvec4 >( "color" )
+    );
+
+    // Cursor
+    glm::uvec2 cursorOrigin{ 5, 8 };
+    renderer.drawRect(
+      { cursorOrigin.x, cursorOrigin.y, cursorOrigin.x + 2, allocation[ 3 ] - 16 },
+      localStyle.get< glm::uvec4 >( "fade-in-color" )
     );
   }
 

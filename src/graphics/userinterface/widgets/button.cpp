@@ -146,11 +146,6 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 
   void Button::render( Graphics::Vector::Renderer& renderer ) {
 
-    renderer.drawRect(
-      { 0, 0, allocation[ 2 ], allocation[ 3 ] },
-      { 255, 0, 255, 128 }
-    );
-
     glm::ivec2 origin = { 5, 5 };
     glm::ivec2 dimensions = { allocation[ 2 ] - 5, allocation[ 3 ] - 5 };
 

@@ -89,7 +89,8 @@ namespace BlueBear {
                 totalWeight += layoutWeight;
               } else {
                 // This child will be sized using its requisition
-                totalSpace -= ( xAxis ? child->getRequisition().x : child->getRequisition().y ) - padding;
+                glm::uvec2 finalRequisition = getFinalRequisition( child );
+                totalSpace -= ( ( xAxis ? finalRequisition.x : finalRequisition.y ) + padding );
               }
             }
           }
@@ -134,6 +135,9 @@ namespace BlueBear {
          * Boudnaries already defined by parent element
          */
         void Layout::positionAndSizeChildren() {
+          // Make sure child requisitions are set
+          calculate();
+
           int padding = localStyle.get< int >( "padding" );
           Gravity gravity = localStyle.get< Gravity >( "gravity" );
 

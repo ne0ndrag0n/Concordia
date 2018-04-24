@@ -17,6 +17,11 @@ Button {
   padding: 5;
 }
 
+Input {
+  font-hint-color: rgbaString( "666666ff" );
+  color: rgbaString( "0D686Bff" );
+}
+
 Window.error {
   .-bb-shadow-windowdecoration {
     color: rgbaString( "990000ff" );
@@ -78,8 +83,5 @@ Window.error {
       layout-weight: 1;
     }
 
-    .test-2 {
-      width: 60;
-    }
   }
 }
