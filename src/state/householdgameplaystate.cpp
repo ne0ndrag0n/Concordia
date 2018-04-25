@@ -121,6 +121,23 @@ namespace BlueBear {
 
       Device::Input::Input& inputManager = application.getInputDevice();
       inputManager.reset();
+      // NOTE: GUIComponent must capture events before WorldRenderer does in case it needs to eat the event using event.cancelAll()
+      inputManager.registerInputEvent(
+        sf::Event::KeyPressed,
+        std::bind(
+          &Device::Display::Adapter::Component::GuiComponent::keyPressed,
+          &application.getDisplayDevice().getAdapterAt( GUI_ADAPTER ).as< Device::Display::Adapter::Component::GuiComponent >(),
+          std::placeholders::_1
+        )
+      );
+      inputManager.registerInputEvent(
+        sf::Event::KeyReleased,
+        std::bind(
+          &Device::Display::Adapter::Component::GuiComponent::keyReleased,
+          &application.getDisplayDevice().getAdapterAt( GUI_ADAPTER ).as< Device::Display::Adapter::Component::GuiComponent >(),
+          std::placeholders::_1
+        )
+      );
       inputManager.registerInputEvent( sf::Event::KeyPressed, [ & ]( Device::Input::Metadata metadata ) {
         keyGroup.trigger( metadata.keyPressed );
       } );

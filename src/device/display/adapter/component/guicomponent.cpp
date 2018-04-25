@@ -159,6 +159,18 @@ namespace BlueBear {
             }
           }
 
+          void GuiComponent::keyPressed( Device::Input::Metadata event ) {
+            if( currentFocus ) {
+              currentFocus->getEventBundle().trigger( "key-down", event );
+            }
+          }
+
+          void GuiComponent::keyReleased( Device::Input::Metadata event ) {
+            if( currentFocus ) {
+              currentFocus->getEventBundle().trigger( "key-up", event );
+            }
+          }
+
           Graphics::Vector::Renderer& GuiComponent::getVectorRenderer() {
             return vector;
           }

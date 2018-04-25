@@ -67,6 +67,13 @@ namespace BlueBear {
         return glm::vec4{ local[ 0 ], local[ 1 ], local[ 2 ], local[ 3 ] };
       }
 
+      double Renderer::getHorizontalAdvance( const std::string& fontFace, const std::string& text, double size ) {
+        float garbage[ 4 ];
+        nvgFontSize( context, size );
+        nvgFontFace( context, fontFace.c_str() );
+        return nvgTextBounds( context, 0, 0, text.c_str(), NULL, garbage );
+      }
+
       void Renderer::drawRect( const glm::uvec4& dimensions, const glm::uvec4& color ) {
         checkTexture();
 

@@ -32,6 +32,8 @@ namespace BlueBear {
         bool leftMouse = false;
         bool middleMouse = false;
         bool rightMouse = false;
+
+        std::function< void() > cancelAll;
       };
 
       class Input {

@@ -18,12 +18,16 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
     bool focused = false;
 
     int getSubstringWidth( const std::string& letter );
+    bool isPressable( const std::string& character );
 
   protected:
     Input( const std::string& id, const std::vector< std::string >& classes, const std::string& hintText, const std::string& contents );
 
     void onFocus( Device::Input::Metadata event );
     void onBlur( Device::Input::Metadata event );
+
+    void onKeyDown( Device::Input::Metadata event );
+    void onKeyUp( Device::Input::Metadata event );
 
   public:
     virtual void render( Graphics::Vector::Renderer& renderer ) override;

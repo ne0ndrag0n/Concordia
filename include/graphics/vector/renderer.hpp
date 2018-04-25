@@ -57,6 +57,7 @@ namespace BlueBear {
         ~Renderer();
 
         glm::vec4 getTextSizeParams( const std::string& fontFace, const std::string& text, double size );
+        double getHorizontalAdvance( const std::string& fontFace, const std::string& text, double size );
 
         void drawRect( const glm::uvec4& dimensions, const glm::uvec4& color );
         void drawText( const std::string& fontFace, const std::string& text, const glm::uvec2& position, const glm::uvec4& color, double points );

@@ -195,9 +195,9 @@ namespace BlueBear {
             return sf::Keyboard::Num9;
           case Tools::Utility::hash( "0" ):
             return sf::Keyboard::Num0;
-          case Tools::Utility::hash( "dash" ):
+          case Tools::Utility::hash( "-" ):
             return sf::Keyboard::Dash;
-          case Tools::Utility::hash( "equal" ):
+          case Tools::Utility::hash( "=" ):
             return sf::Keyboard::Equal;
           case Tools::Utility::hash( "bksp" ):
             return sf::Keyboard::BackSpace;
@@ -296,6 +296,9 @@ namespace BlueBear {
           case Tools::Utility::hash( "right" ):
             return sf::Keyboard::Right;
 
+          case Tools::Utility::hash( "space" ):
+            return sf::Keyboard::Space;
+
           case Tools::Utility::hash( "ret" ):
             return sf::Keyboard::Return;
 
@@ -382,9 +385,9 @@ namespace BlueBear {
           case sf::Keyboard::Num0:
             return "0";
           case sf::Keyboard::Dash:
-            return "dash";
+            return "-";
           case sf::Keyboard::Equal:
-            return "equal";
+            return "=";
           case sf::Keyboard::BackSpace:
             return "bksp";
 
@@ -478,6 +481,9 @@ namespace BlueBear {
           case sf::Keyboard::Right:
             return "right";
 
+          case sf::Keyboard::Space:
+            return "space";
+
           case sf::Keyboard::Return:
             return "ret";
 
@@ -487,6 +493,8 @@ namespace BlueBear {
       }
 
       void Input::handleEvent( sf::Event& event ) {
+        bool cancelAll = false;
+
         Metadata metadata {
           ( event.type == sf::Event::KeyPressed ) ? keyToString( event.key.code ) : "",
           sf::Keyboard::isKeyPressed( sf::Keyboard::LAlt ) || sf::Keyboard::isKeyPressed( sf::Keyboard::RAlt ),
@@ -497,7 +505,10 @@ namespace BlueBear {
           glm::ivec2{ sf::Mouse::getPosition( application.getDisplayDevice().getRenderWindow() ).x, sf::Mouse::getPosition( application.getDisplayDevice().getRenderWindow() ).y },
           sf::Mouse::isButtonPressed( sf::Mouse::Left ),
           sf::Mouse::isButtonPressed( sf::Mouse::Middle ),
-          sf::Mouse::isButtonPressed( sf::Mouse::Right )
+          sf::Mouse::isButtonPressed( sf::Mouse::Right ),
+          [ &cancelAll ]() {
+            cancelAll = true;
+          }
         };
 
         auto it = events.find( event.type );
@@ -505,6 +516,11 @@ namespace BlueBear {
           for( std::function< void( Metadata ) > callback : it->second ) {
             if( callback ) {
               callback( metadata );
+
+              if( cancelAll == true ) {
+                // Capture this event and do not allow others of the same type to fire
+                break;
+              }
             }
           }
         }

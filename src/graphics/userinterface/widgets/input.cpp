@@ -3,6 +3,7 @@
 #include "device/display/adapter/component/guicomponent.hpp"
 #include "device/input/input.hpp"
 #include "configmanager.hpp"
+#include "tools/utility.hpp"
 #include <glm/glm.hpp>
 #include <map>
 
@@ -14,6 +15,9 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
     Element::Element( "Input", id, classes ), hintText( hintText ), contents( contents ) {
       eventBundle.registerInputEvent( "focus", std::bind( &Input::onFocus, this, std::placeholders::_1 ) );
       eventBundle.registerInputEvent( "blur", std::bind( &Input::onBlur, this, std::placeholders::_1 ) );
+
+      eventBundle.registerInputEvent( "key-down", std::bind( &Input::onKeyDown, this, std::placeholders::_1 ) );
+      eventBundle.registerInputEvent( "key-up", std::bind( &Input::onKeyUp, this, std::placeholders::_1 ) );
     }
 
   std::shared_ptr< Input > Input::create( const std::string& id, const std::vector< std::string >& classes, const std::string& hintText, const std::string& contents ) {
@@ -66,9 +70,81 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
     reflow();
   }
 
+  bool Input::isPressable( const std::string& character ) {
+    if( character.size() != 1 ) {
+      switch( Tools::Utility::hash( character.c_str() ) ) {
+        case Tools::Utility::hash( "space" ):
+        case Tools::Utility::hash( "left" ):
+        case Tools::Utility::hash( "right" ):
+        case Tools::Utility::hash( "home" ):
+        case Tools::Utility::hash( "end" ):
+        case Tools::Utility::hash( "del" ):
+        case Tools::Utility::hash( "bksp" ):
+          return true;
+        default:
+          return false;
+      }
+    }
+
+    char at = character.at( 0 );
+    return at >= ' ' && at <= '~';
+  }
+
+  void Input::onKeyDown( Device::Input::Metadata event ) {
+    Log::getInstance().debug( "assert", event.keyPressed );
+
+    if( isPressable( event.keyPressed ) ) {
+      event.cancelAll();
+
+      switch( Tools::Utility::hash( event.keyPressed.c_str() ) ) {
+        case Tools::Utility::hash( "left" ): {
+          cursorPosition = std::max( 0, cursorPosition - 1 );
+          break;
+        }
+        case Tools::Utility::hash( "right" ): {
+          cursorPosition = std::min( ( int ) contents.size(), cursorPosition + 1 );
+          break;
+        }
+        case Tools::Utility::hash( "home" ): {
+          cursorPosition = 0;
+          break;
+        }
+        case Tools::Utility::hash( "end" ): {
+          cursorPosition = contents.size();
+          break;
+        }
+        case Tools::Utility::hash( "bksp" ): {
+          if( cursorPosition != 0 ) {
+            cursorPosition--;
+            contents.erase( cursorPosition, 1 );
+          }
+          break;
+        }
+        case Tools::Utility::hash( "del" ): {
+          if( cursorPosition != contents.size() ) {
+            contents.erase( cursorPosition, 1 );
+          }
+          break;
+        }
+        default: {
+          // TODO: We should just get these from the input device, translated as ASCII values (with event.shiftModifier of course)...
+          std::string due = event.keyPressed;
+          if( due == "space" ) {
+            due = " ";
+          }
+
+          contents.insert( cursorPosition++, due );
+        }
+      }
+
+      reflow();
+    }
+  }
+
+  void Input::onKeyUp( Device::Input::Metadata event ) {}
+
   int Input::getSubstringWidth( const std::string& letter ) {
-    glm::vec4 size = manager->getVectorRenderer().getTextSizeParams( localStyle.get< std::string >( "font" ), letter, localStyle.get< double >( "font-size" ) );
-    return size[ 2 ];
+    return manager->getVectorRenderer().getHorizontalAdvance( localStyle.get< std::string >( "font" ), letter, localStyle.get< double >( "font-size" ) );
   }
 
   void Input::render( Graphics::Vector::Renderer& renderer ) {
