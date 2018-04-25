@@ -24,6 +24,7 @@ namespace BlueBear {
         { "color", glm::uvec4{ 0, 0, 0, 255 } },
         { "fade-in-color", glm::uvec4{ 255, 255, 255, 255 } },
         { "fade-out-color", glm::uvec4{ 0, 0, 0, 255 } },
+        { "cursor-color", glm::uvec4{ 0, 0, 0, 255 } },
         { "font", std::string{ "roboto" } },
         { "font-color", glm::uvec4{ 255, 255, 255, 255 } },
         { "font-hint-color", glm::uvec4{ 128, 128, 128, 255 } },

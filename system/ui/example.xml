@@ -10,7 +10,7 @@
 </Window>
 <Window class="-bb-form-demo" window-title="Console">
   <Layout id="tester">
-    <Input class="test-1" hint="Enter Text"></Input>
+    <Input class="test-1" hint="Enter Text">Text</Input>
     <Button class="test-2">EXECUTE</Button>
   </Layout>
 </Window>

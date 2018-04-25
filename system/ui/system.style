@@ -19,6 +19,9 @@ Button {
 
 Input {
   font-hint-color: rgbaString( "666666ff" );
+  fade-out-color: rgbaString( "0D686B00" );
+  fade-in-color: rgbaString( "0D686Bff" );
+  font-color: rgbaString( "000000ff" );
   color: rgbaString( "0D686Bff" );
 }
 
