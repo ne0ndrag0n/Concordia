@@ -17,7 +17,8 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
       eventBundle.registerInputEvent( "blur", std::bind( &Input::onBlur, this, std::placeholders::_1 ) );
 
       eventBundle.registerInputEvent( "key-down", std::bind( &Input::onKeyDown, this, std::placeholders::_1 ) );
-      eventBundle.registerInputEvent( "key-up", std::bind( &Input::onKeyUp, this, std::placeholders::_1 ) );
+
+      eventBundle.registerInputEvent( "mouse-down", std::bind( &Input::onMouseDown, this, std::placeholders::_1 ) );
     }
 
   std::shared_ptr< Input > Input::create( const std::string& id, const std::vector< std::string >& classes, const std::string& hintText, const std::string& contents ) {
@@ -127,10 +128,16 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
           break;
         }
         default: {
-          // TODO: We should just get these from the input device, translated as ASCII values (with event.shiftModifier of course)...
-          std::string due = event.keyPressed;
-          if( due == "space" ) {
+          std::string due;
+          if( event.keyPressed == "space" ) {
             due = " ";
+          } else if( event.shiftModifier ) {
+            due = Device::Input::Input::getShifty( event.keyPressed );
+            if( !isPressable( due ) ) {
+              return;
+            }
+          } else {
+            due = event.keyPressed;
           }
 
           contents.insert( cursorPosition++, due );
@@ -141,7 +148,20 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
     }
   }
 
-  void Input::onKeyUp( Device::Input::Metadata event ) {}
+  void Input::onMouseDown( Device::Input::Metadata event ) {
+    int mouseX = toRelative( event.mouseLocation ).x;
+
+    int i = contents.size();
+    for( ; i != 0; i-- ) {
+      int width = 6 + getSubstringWidth( contents.substr( 0, i ) );
+      if( mouseX > width ) {
+        break;
+      }
+    }
+
+    cursorPosition = i;
+    reflow();
+  }
 
   int Input::getSubstringWidth( const std::string& letter ) {
     return manager->getVectorRenderer().getHorizontalAdvance( localStyle.get< std::string >( "font" ), letter, localStyle.get< double >( "font-size" ) );

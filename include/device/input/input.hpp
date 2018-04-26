@@ -69,6 +69,7 @@ namespace BlueBear {
       public:
         static sf::Keyboard::Key stringToKey( const std::string& key );
         static std::string keyToString( sf::Keyboard::Key key );
+        static std::string getShifty( const std::string& key );
 
         Input( Application& application );
 

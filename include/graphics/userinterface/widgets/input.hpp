@@ -27,7 +27,7 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
     void onBlur( Device::Input::Metadata event );
 
     void onKeyDown( Device::Input::Metadata event );
-    void onKeyUp( Device::Input::Metadata event );
+    void onMouseDown( Device::Input::Metadata event );
 
   public:
     virtual void render( Graphics::Vector::Renderer& renderer ) override;

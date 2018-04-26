@@ -173,7 +173,7 @@ namespace BlueBear {
           case Tools::Utility::hash( "m" ):
             return sf::Keyboard::M;
 
-          case Tools::Utility::hash( "~" ):
+          case Tools::Utility::hash( "`" ):
             return sf::Keyboard::Tilde;
           case Tools::Utility::hash( "1" ):
             return sf::Keyboard::Num1;
@@ -363,7 +363,7 @@ namespace BlueBear {
             return "m";
 
           case sf::Keyboard::Tilde:
-            return "~";
+            return "`";
           case sf::Keyboard::Num1:
             return "1";
           case sf::Keyboard::Num2:
@@ -486,6 +486,110 @@ namespace BlueBear {
 
           case sf::Keyboard::Return:
             return "ret";
+
+          default:
+            return "<unk>";
+        }
+      }
+
+      std::string Input::getShifty( const std::string& key ) {
+        switch( Tools::Utility::hash( key.c_str() ) ) {
+          case Tools::Utility::hash( "q" ):
+            return "Q";
+          case Tools::Utility::hash( "w" ):
+            return "W";
+          case Tools::Utility::hash( "e" ):
+            return "E";
+          case Tools::Utility::hash( "r" ):
+            return "R";
+          case Tools::Utility::hash( "t" ):
+            return "T";
+          case Tools::Utility::hash( "y" ):
+            return "Y";
+          case Tools::Utility::hash( "u" ):
+            return "U";
+          case Tools::Utility::hash( "i" ):
+            return "I";
+          case Tools::Utility::hash( "o" ):
+            return "O";
+          case Tools::Utility::hash( "p" ):
+            return "P";
+          case Tools::Utility::hash( "a" ):
+            return "A";
+          case Tools::Utility::hash( "s" ):
+            return "S";
+          case Tools::Utility::hash( "d" ):
+            return "D";
+          case Tools::Utility::hash( "f" ):
+            return "F";
+          case Tools::Utility::hash( "g" ):
+            return "G";
+          case Tools::Utility::hash( "h" ):
+            return "H";
+          case Tools::Utility::hash( "j" ):
+            return "J";
+          case Tools::Utility::hash( "k" ):
+            return "K";
+          case Tools::Utility::hash( "l" ):
+            return "L";
+          case Tools::Utility::hash( "z" ):
+            return "Z";
+          case Tools::Utility::hash( "x" ):
+            return "X";
+          case Tools::Utility::hash( "c" ):
+            return "C";
+          case Tools::Utility::hash( "v" ):
+            return "V";
+          case Tools::Utility::hash( "b" ):
+            return "B";
+          case Tools::Utility::hash( "n" ):
+            return "N";
+          case Tools::Utility::hash( "m" ):
+            return "M";
+
+          case Tools::Utility::hash( "`" ):
+            return "~";
+          case Tools::Utility::hash( "1" ):
+            return "!";
+          case Tools::Utility::hash( "2" ):
+            return "@";
+          case Tools::Utility::hash( "3" ):
+            return "#";
+          case Tools::Utility::hash( "4" ):
+            return "$";
+          case Tools::Utility::hash( "5" ):
+            return "%";
+          case Tools::Utility::hash( "6" ):
+            return "^";
+          case Tools::Utility::hash( "7" ):
+            return "&";
+          case Tools::Utility::hash( "8" ):
+            return "*";
+          case Tools::Utility::hash( "9" ):
+            return "(";
+          case Tools::Utility::hash( "0" ):
+            return ")";
+          case Tools::Utility::hash( "-" ):
+            return "_";
+          case Tools::Utility::hash( "=" ):
+            return "+";
+
+          case Tools::Utility::hash( "[" ):
+            return "{";
+          case Tools::Utility::hash( "]" ):
+            return "}";
+          case Tools::Utility::hash( "\\" ):
+            return "|";
+          case Tools::Utility::hash( ";" ):
+            return ":";
+          case Tools::Utility::hash( "'" ):
+            return "\"";
+          case Tools::Utility::hash( "," ):
+            return "<";
+          case Tools::Utility::hash( "." ):
+            return ">";
+          case Tools::Utility::hash( "/" ):
+            return "?";
 
           default:
             return "<unk>";

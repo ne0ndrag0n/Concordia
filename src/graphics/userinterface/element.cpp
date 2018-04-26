@@ -28,6 +28,11 @@ namespace BlueBear {
         }
       }
 
+      glm::ivec2 Element::toRelative( const glm::uvec2& location ) {
+        auto absolute = getAbsolutePosition();
+        return { location.x - absolute.x, location.y - absolute.y };
+      }
+
       void Element::setShadow( bool status ) {
         shadow = status;
       }

@@ -51,6 +51,7 @@ namespace BlueBear {
         Element( const Element& other );
         virtual ~Element();
 
+        glm::ivec2 toRelative( const glm::uvec2& location );
         void setShadow( bool status );
         bool valueIsLiteral( int r );
         virtual bool reuseDrawableInstance();
