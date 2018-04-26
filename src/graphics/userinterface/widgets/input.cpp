@@ -92,8 +92,6 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
   }
 
   void Input::onKeyDown( Device::Input::Metadata event ) {
-    Log::getInstance().debug( "assert", event.keyPressed );
-
     if( isPressable( event.keyPressed ) ) {
       event.cancelAll();
 
