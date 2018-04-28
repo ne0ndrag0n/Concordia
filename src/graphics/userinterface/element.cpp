@@ -28,6 +28,14 @@ namespace BlueBear {
         }
       }
 
+      bool Element::getVisible() {
+        return visible;
+      }
+
+      void Element::setVisible( bool status ) {
+        visible = status;
+      }
+
       glm::ivec2 Element::toRelative( const glm::uvec2& location ) {
         auto absolute = getAbsolutePosition();
         return { location.x - absolute.x, location.y - absolute.y };
@@ -268,6 +276,10 @@ namespace BlueBear {
       }
 
       void Element::draw() {
+        if( !visible ) {
+          return;
+        }
+
         glm::ivec2 absolutePosition = getAbsolutePosition();
 
         if( drawable ) {

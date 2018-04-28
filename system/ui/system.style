@@ -25,6 +25,14 @@ Input {
   color: rgbaString( "0D686Bff" );
 }
 
+TabLayout {
+  fade-out-color: rgbaString( "0D686B00" );
+  fade-in-color: rgbaString( "0D686Bff" );
+  font-color: rgbaString( "000000ff" );
+  color: rgbaString( "0D686Bff" );
+  padding: 5;
+}
+
 Window.error {
   .-bb-shadow-windowdecoration {
     color: rgbaString( "990000ff" );
@@ -75,10 +83,35 @@ Window.error {
   top: 100;
   left: 100;
   width: 500;
-  height: 120;
+  height: 300;
   background-color: rgbaString( "999999ff" );
 
-  Layout {
+  #tester {
+    gravity: Gravity::TOP;
+
+    #subtester1 {
+      layout-weight: 1;
+      width: Requisition::FILL_PARENT;
+
+      #subtestertabs {
+        layout-weight: 1;
+        height: Requisition::FILL_PARENT;
+        font-color: rgbaString( "ffffffff" );
+        tab-inactive-accent-color: rgbaString( "0000aaff" );
+
+        #tab1 {
+          tab-title: "SPAM";
+        }
+
+        #tab2 {
+          tab-title: "EGGS";
+        }
+      }
+    }
+  }
+
+  Layout#subtester2 {
+    width: Requisition::FILL_PARENT;
     padding: 5;
 
     .test-1 {

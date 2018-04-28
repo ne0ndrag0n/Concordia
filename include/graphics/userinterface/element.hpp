@@ -36,6 +36,7 @@ namespace BlueBear {
         std::string id;
         std::vector< std::string > classes;
         bool shadow = false;
+        bool visible = true;
 
         Style::Style localStyle;
         glm::uvec2 requisition;
@@ -62,6 +63,9 @@ namespace BlueBear {
         static Device::Display::Adapter::Component::GuiComponent* manager;
 
         void walk( std::function< void( Element& ) > predicate );
+
+        bool getVisible();
+        void setVisible( bool status );
 
         virtual void positionAndSizeChildren();
         virtual void render( Graphics::Vector::Renderer& renderer );
