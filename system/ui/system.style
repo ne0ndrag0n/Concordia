@@ -97,7 +97,8 @@ Window.error {
         layout-weight: 1;
         height: Requisition::FILL_PARENT;
         font-color: rgbaString( "ffffffff" );
-        tab-inactive-accent-color: rgbaString( "0000aaff" );
+        tab-inactive-accent-color: rgbaString( "000077ff" );
+        tab-active-accent-color: rgbaString( "0000ffff" );
 
         #tab1 {
           tab-title: "SPAM";

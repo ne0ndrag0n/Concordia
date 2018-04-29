@@ -1,6 +1,7 @@
 #include "graphics/vector/renderer.hpp"
 #include "device/display/display.hpp"
 #include "configmanager.hpp"
+#include "tools/utility.hpp"
 #include "log.hpp"
 #define NANOVG_GL3_IMPLEMENTATION
 #include <nanovg_gl.h>
@@ -183,6 +184,13 @@ namespace BlueBear {
 
       Renderer::Texture::Texture( Renderer& renderer, const glm::uvec2& dimensions ) : parent( renderer ), dimensions( dimensions ) {
         framebuffer = nvgluCreateFramebuffer( parent.context, dimensions.x, dimensions.y, NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY );
+        if( !framebuffer ) {
+          Log::getInstance().error( "Renderer::Texture::Texture",
+            std::string( "Attempt to create vector renderer framebuffer failed!\n" ) +
+            "\tDimensions: { " + std::to_string( dimensions.x ) + ", " + std::to_string( dimensions.y ) +  " }\n" +
+            "\tContext: " + Tools::Utility::pointerToString( parent.context )
+          );
+        }
       }
 
       Renderer::Texture::~Texture() {
