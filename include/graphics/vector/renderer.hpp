@@ -72,6 +72,8 @@ namespace BlueBear {
         Renderer( Device::Display::Display& device );
         ~Renderer();
 
+        void setAntiAlias( bool status );
+
         glm::vec4 getTextSizeParams( const std::string& fontFace, const std::string& text, double size );
         double getHorizontalAdvance( const std::string& fontFace, const std::string& text, double size );
 

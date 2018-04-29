@@ -10,6 +10,7 @@ namespace BlueBear {
       // Note: if you add a new type here, style.hpp may need to know how to interpolate it for animations
 
       const PropertyList _default( {
+        { "antialias", true },
         { "left", 0 },
         { "top", 0 },
         { "width", ( int ) Requisition::AUTO },

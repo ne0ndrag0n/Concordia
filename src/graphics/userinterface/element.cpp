@@ -34,6 +34,10 @@ namespace BlueBear {
 
       void Element::setVisible( bool status ) {
         visible = status;
+
+        for( std::shared_ptr< Element > child : children ) {
+          child->setVisible( status );
+        }
       }
 
       glm::ivec2 Element::toRelative( const glm::uvec2& location ) {
@@ -79,6 +83,8 @@ namespace BlueBear {
       void Element::generateDrawable() {
         if( visible && drawableDirty() ) {
           // At least one new texture must be re-rendered
+          manager->getVectorRenderer().setAntiAlias( localStyle.get< bool >( "antialias" ) );
+
           // Check if the drawable mesh is reusable
           if( reuseDrawableInstance() ) {
             manager->getVectorRenderer().updateExistingTexture( drawable->getTexture(), [ & ]( Graphics::Vector::Renderer& r ) { render( r ); } );

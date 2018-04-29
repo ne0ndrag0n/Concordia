@@ -32,6 +32,10 @@ namespace BlueBear {
         } );
       }
 
+      void Renderer::setAntiAlias( bool status ) {
+        nvgShapeAntiAlias( context, status ? 1 : 0 );
+      }
+
       void Renderer::checkTexture() {
         if( !currentTexture ) {
           throw UnboundTextureException();

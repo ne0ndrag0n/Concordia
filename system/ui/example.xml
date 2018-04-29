@@ -2,10 +2,18 @@
 <Window class="-bb-debug-panel" window-title="Debug">
   <TabLayout>
     <Layout class="tab-1">
-      <Text>boop</Text>
+      <Layout class="about-text-container">
+        <Text class="concordia-logo">Concordia</Text>
+        <Text>The World of Harmony</Text>
+        <Text class="version-information">0.0.4 "da Vinci"</Text>
+      </Layout>
+      <Layout class="dummy"></Layout>
+      <Text class="copyright">(c) 2015-2018 ne0ndrag0n Games</Text>
     </Layout>
     <Layout class="tab-2">
-      <Text>beep</Text>
+      <Button class="run-gc">RUN GARBAGE COLLECTOR</Button>
+      <Button class="print-ram">PRINT LUA RAM USAGE</Button>
+      <Button class="toggle-console">TOGGLE CONSOLE</Button>
     </Layout>
   </TabLayout>
 </Window>
