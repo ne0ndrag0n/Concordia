@@ -28,8 +28,10 @@ Input {
 TabLayout {
   fade-out-color: rgbaString( "0D686B00" );
   fade-in-color: rgbaString( "0D686Bff" );
-  font-color: rgbaString( "000000ff" );
+  font-color: rgbaString( "ffffffff" );
   color: rgbaString( "0D686Bff" );
+  tab-inactive-accent-color: rgbaString( "803300ff" );
+  tab-active-accent-color: rgbaString( "ff6600ff" );
   padding: 5;
 }
 
@@ -39,86 +41,17 @@ Window.error {
   }
 }
 
-.-bb-budget-window {
-  close-event: true;
-  width: 500;
-  height: 200;
-  background-color: rgbaString( "1a3807ff" );
-
-  .-bb-shadow-windowdecoration {
-    color: rgbaString( "391c07ff" );
-  }
-
-  .budget-panel {
-    gravity: Gravity::TOP;
-    padding: 5;
-
-    Text {
-      font-size: 24.0;
-      color: rgbaString( "FFFFFFFF" );
-      background-color: rgbaString( "00000000" );
-    }
-
-    Text.yb-label {
-      width: Requisition::FILL_PARENT;
-    }
-
-    .horiz-container {
-      width: Requisition::FILL_PARENT;
-
-      .budget-content {
-        color: rgbaString( "00FF00FF" );
-        layout-weight: 1;
-      }
-
-      .budget-amount {
-        layout-weight: 1;
-        color: rgbaString( "FF0000FF" );
-      }
-    }
-  }
-}
-
-.-bb-form-demo {
-  top: 100;
-  left: 100;
-  width: 500;
+.-bb-debug-panel {
+  top: 10;
+  left: 10;
+  width: 300;
   height: 300;
-  background-color: rgbaString( "999999ff" );
 
-  #tester {
-    gravity: Gravity::TOP;
-
-    #subtester1 {
-      layout-weight: 1;
-      width: Requisition::FILL_PARENT;
-
-      #subtestertabs {
-        layout-weight: 1;
-        height: Requisition::FILL_PARENT;
-        font-color: rgbaString( "ffffffff" );
-        tab-inactive-accent-color: rgbaString( "000077ff" );
-        tab-active-accent-color: rgbaString( "0000ffff" );
-
-        #tab1 {
-          tab-title: "SPAM";
-        }
-
-        #tab2 {
-          tab-title: "EGGS";
-        }
-      }
-    }
+  .tab-1 {
+    tab-title: "VERSION";
   }
 
-  Layout#subtester2 {
-    width: Requisition::FILL_PARENT;
-    padding: 5;
-
-    .test-1 {
-      font-size: 24.0;
-      layout-weight: 1;
-    }
-
+  .tab-2 {
+    tab-title: "OPTIONS";
   }
 }

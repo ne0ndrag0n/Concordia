@@ -75,6 +75,20 @@ namespace BlueBear {
         return nvgTextBounds( context, 0, 0, text.c_str(), NULL, garbage );
       }
 
+      void Renderer::drawImage( const Image& image, const glm::uvec2& position ) {
+        checkTexture();
+
+        int handle = image.getImageHandle();
+        glm::uvec2 dimensions = image.getDimensions();
+
+        auto pattern = nvgImagePattern( context, position.x, position.y, dimensions.x, dimensions.y, 0.0f, handle, 1.0f );
+
+        nvgBeginPath( context );
+        nvgRect( context, position.x, position.y, dimensions.x, dimensions.y );
+        nvgFillPaint( context, pattern );
+        nvgFill( context );
+      }
+
       void Renderer::drawRect( const glm::uvec4& dimensions, const glm::uvec4& color ) {
         checkTexture();
 
@@ -201,6 +215,35 @@ namespace BlueBear {
 
       GLuint Renderer::Texture::getTextureId() const {
         return framebuffer->texture;
+      }
+
+      Renderer::Image::Image( Renderer& renderer, const std::string& path ) : parent( renderer ) {
+        parent.device.executeOnSecondaryContext( parent.secondaryGLContext, [ & ]() {
+          imageHandle = nvgCreateImage( parent.context, path.c_str(), 0 );
+          if( imageHandle == -1 ) {
+            Log::getInstance().error( "Renderer::Image::Image", "Failed to load " + path );
+            throw InvalidImageException();
+          }
+
+          int width, height;
+          nvgImageSize( parent.context, imageHandle, &width, &height );
+          dimensions.x = width;
+          dimensions.y = height;
+        } );
+      }
+
+      Renderer::Image::~Image() {
+        parent.device.executeOnSecondaryContext( parent.secondaryGLContext, [ & ]() {
+          nvgDeleteImage( parent.context, imageHandle );
+        } );
+      }
+
+      glm::uvec2 Renderer::Image::getDimensions() const {
+        return dimensions;
+      }
+
+      int Renderer::Image::getImageHandle() const {
+        return imageHandle;
       }
 
     }

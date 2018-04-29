@@ -77,7 +77,7 @@ namespace BlueBear {
       }
 
       void Element::generateDrawable() {
-        if( drawableDirty() ) {
+        if( visible && drawableDirty() ) {
           // At least one new texture must be re-rendered
           // Check if the drawable mesh is reusable
           if( reuseDrawableInstance() ) {
@@ -186,10 +186,6 @@ namespace BlueBear {
         }
 
         children = sorted;
-
-        for( std::shared_ptr< Element > child : children ) {
-          child->sortElements();
-        }
       }
 
       bool Element::valueIsLiteral( int r ) {

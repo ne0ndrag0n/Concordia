@@ -42,6 +42,22 @@ namespace BlueBear {
           GLuint getTextureId() const;
         };
 
+        class Image {
+          friend class Renderer;
+          Renderer& parent;
+          int imageHandle = -1;
+          glm::uvec2 dimensions;
+
+        public:
+          EXCEPTION_TYPE( InvalidImageException, "Invalid image provided to vector renderer" );
+
+          Image( Renderer& renderer, const std::string& path );
+          ~Image();
+
+          glm::uvec2 getDimensions() const;
+          int getImageHandle() const;
+        };
+
       private:
         sf::Context secondaryGLContext;
         NVGcontext* context;
@@ -59,6 +75,7 @@ namespace BlueBear {
         glm::vec4 getTextSizeParams( const std::string& fontFace, const std::string& text, double size );
         double getHorizontalAdvance( const std::string& fontFace, const std::string& text, double size );
 
+        void drawImage( const Image& image, const glm::uvec2& position );
         void drawRect( const glm::uvec4& dimensions, const glm::uvec4& color );
         void drawText( const std::string& fontFace, const std::string& text, const glm::uvec2& position, const glm::uvec4& color, double points );
         void drawLinearGradient( const glm::uvec4& dimensions, const glm::uvec4& line, const glm::uvec4& begin, const glm::uvec4& end );

@@ -5,6 +5,7 @@
 #include "graphics/userinterface/widgets/button.hpp"
 #include "graphics/userinterface/widgets/input.hpp"
 #include "graphics/userinterface/widgets/tablayout.hpp"
+#include "graphics/userinterface/widgets/image.hpp"
 #include "tools/utility.hpp"
 #include "log.hpp"
 
@@ -71,6 +72,14 @@ namespace BlueBear::Graphics::UserInterface {
         result = Widgets::TabLayout::create(
           Tools::Utility::safeString( element->Attribute( "id" ) ),
           Tools::Utility::split( Tools::Utility::safeString( element->Attribute( "class" ) ), ' ' )
+        );
+        break;
+      }
+      case Tools::Utility::hash( "Image" ): {
+        result = Widgets::Image::create(
+          Tools::Utility::safeString( element->Attribute( "id" ) ),
+          Tools::Utility::split( Tools::Utility::safeString( element->Attribute( "class" ) ), ' ' ),
+          Tools::Utility::stringTrim( Tools::Utility::safeString( element->GetText() ) )
         );
         break;
       }

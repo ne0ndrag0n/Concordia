@@ -1,24 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Window class="-bb-budget-window" window-title="Budget">
-  <Layout class="budget-panel">
-    <Text class="yb-label">Your Budget</Text>
-    <Layout class="horiz-container">
-      <Text class="budget-content">Bread</Text>
-      <Text class="budget-amount">(-$300.00)</Text>
+<Window class="-bb-debug-panel" window-title="Debug">
+  <TabLayout>
+    <Layout class="tab-1">
+      <Text>boop</Text>
     </Layout>
-  </Layout>
-</Window>
-<Window class="-bb-form-demo" window-title="Console">
-  <Layout id="tester">
-    <Layout id="subtester1">
-      <TabLayout id="subtestertabs">
-        <Text id="tab1">spam</Text>
-        <Text id="tab2">eggs</Text>
-      </TabLayout>
+    <Layout class="tab-2">
+      <Text>beep</Text>
     </Layout>
-    <Layout id="subtester2">
-      <Input class="test-1" hint="Enter Text">Text</Input>
-      <Button class="test-2">EXECUTE</Button>
-    </Layout>
-  </Layout>
+  </TabLayout>
 </Window>

@@ -37,6 +37,8 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
     glm::uvec2 result{ 0, 5 + ( padding * 2 ) + fontSize };
 
     for( std::shared_ptr< Element > child : children ) {
+      child->calculate();
+
       glm::vec4 textDimensions = manager->getVectorRenderer().getTextSizeParams(
         localStyle.get< std::string >( "font" ),
         child->getPropertyList().get< std::string >( "tab-title" ),
@@ -51,6 +53,8 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
   }
 
   void TabLayout::positionAndSizeChildren() {
+    sortElements();
+
     for( int i = 0; i != children.size(); i++ ) {
       std::shared_ptr< Element > child = children[ i ];
 
@@ -58,10 +62,9 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
         child->setVisible( false );
       } else {
         child->setVisible( true );
+        int y = ( localStyle.get< int >( "padding" ) * 2 ) + localStyle.get< double >( "font-size" ) + 5;
+        child->setAllocation( { 0, y, allocation[ 2 ], allocation[ 3 ] - y }, false );
       }
-
-      int y = ( localStyle.get< int >( "padding" ) * 2 ) + localStyle.get< double >( "font-size" ) + 5;
-      child->setAllocation( { 0, y, allocation[ 2 ], allocation[ 3 ] - y }, false );
     }
   }
 

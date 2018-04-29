@@ -185,6 +185,11 @@ namespace BlueBear {
             localStyle.get< int >( "width" ),
             localStyle.get< int >( "height" )
           };
+
+          // Call calculate on all child elements per parent object's responsibility
+          for( std::shared_ptr< Element > child : children ) {
+            child->calculate();
+          }
         }
 
         // Window decoration shadow element
