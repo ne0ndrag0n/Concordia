@@ -11,6 +11,10 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
     }
 
   void TabLayout::onMouseUp( Device::Input::Metadata event ) {
+    if( !children.size() ) {
+      return;
+    }
+
     auto relative = toRelative( event.mouseLocation );
     int y = ( localStyle.get< int >( "padding" ) * 2 ) + localStyle.get< double >( "font-size" ) + 5;
     int boxWidth = allocation[ 2 ] / children.size();
@@ -71,6 +75,10 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
       { 0, 0, allocation[ 2 ], bottomY },
       localStyle.get< glm::uvec4 >( "color" )
     );
+
+    if( !children.size() ) {
+      return;
+    }
 
     int boxWidth = allocation[ 2 ] / children.size();
     int xPos = 0;
