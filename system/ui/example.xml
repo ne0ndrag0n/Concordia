@@ -2,13 +2,19 @@
 <Window class="-bb-debug-panel" window-title="Debug">
   <TabLayout>
     <Layout class="tab-1">
-      <Layout class="about-text-container">
-        <Text class="concordia-logo">Concordia</Text>
-        <Text>The World of Harmony</Text>
-        <Text class="version-information">0.0.4 "da Vinci"</Text>
+      <Spacer class="buffer-top"></Spacer>
+      <Layout class="about-set middle">
+        <Image>dev/concicon.png</Image>
+        <Spacer class="buffer-inner"></Spacer>
+        <Layout class="logo-text-group middle">
+          <Text class="concordia-logo">Concordia</Text>
+          <Text>The World of Harmony</Text>
+        </Layout>
       </Layout>
-      <Layout class="dummy"></Layout>
-      <Text class="copyright">(c) 2015-2018 ne0ndrag0n Games</Text>
+      <Spacer class="buffer-build-info"></Spacer>
+      <Text class="version middle">v0.0.4 Milestone "da Vinci"</Text>
+      <Text class="build-info middle">BlueBear Engine build xx/xx/xxxx:xxxxxx</Text>
+      <Text class="copyright middle">© 2018 ne0ndrag0n</Text>
     </Layout>
     <Layout class="tab-2">
       <Button class="run-gc">RUN GARBAGE COLLECTOR</Button>
