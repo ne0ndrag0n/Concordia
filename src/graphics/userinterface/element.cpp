@@ -168,30 +168,9 @@ namespace BlueBear {
       }
 
       void Element::sortElements() {
-        std::vector< std::shared_ptr< Element > > sorted;
-        std::vector< std::shared_ptr< Element > > freeItems;
-
-        for( std::shared_ptr< Element > child : children ) {
-          if( child->getPropertyList().get< Placement >( "placement" ) == Placement::FREE ) {
-            freeItems.push_back( child );
-          } else {
-            sorted.push_back( child );
-          }
-        }
-
-        std::sort( sorted.begin(), sorted.end(), []( std::shared_ptr< Element > first, std::shared_ptr< Element > second ) {
+        std::sort( children.begin(), children.end(), []( std::shared_ptr< Element > first, std::shared_ptr< Element > second ) {
           return first->getPropertyList().get< int >( "local-z-order" ) < second->getPropertyList().get< int >( "local-z-order" );
         } );
-
-        std::sort( freeItems.begin(), freeItems.end(), []( std::shared_ptr< Element > first, std::shared_ptr< Element > second ) {
-          return first->getPropertyList().get< int >( "local-z-order" ) < second->getPropertyList().get< int >( "local-z-order" );
-        } );
-
-        for( std::shared_ptr< Element > freeChild : freeItems ) {
-          sorted.push_back( freeChild );
-        }
-
-        children = sorted;
       }
 
       bool Element::valueIsLiteral( int r ) {
