@@ -256,22 +256,58 @@ namespace BlueBear {
         localStyle.resetChangedAttributes();
       }
 
+      glm::vec4 Element::getParentScissor() {
+        float stackBuffer[ 4 ];
+        glGetFloatv( GL_SCISSOR_BOX, stackBuffer );
+
+        return { stackBuffer[ 0 ], stackBuffer[ 1 ], stackBuffer[ 2 ], stackBuffer[ 3 ] };
+      }
+
+      glm::vec4 Element::computeScissor( const glm::vec4& parentScissor, const glm::ivec2& absolutePosition ) {
+        glm::vec2 parentLowerCorner = { parentScissor[ 0 ], parentScissor[ 1 ] };
+        glm::vec2 parentUpperCorner = { parentLowerCorner[ 0 ] + parentScissor[ 2 ], parentLowerCorner[ 1 ] + parentScissor[ 3 ] };
+        glm::vec4 scissor = {
+          absolutePosition.x,
+          ConfigManager::getInstance().getIntValue( "viewport_y" ) - ( absolutePosition.y + allocation[ 3 ] ),
+          allocation[ 2 ],
+          allocation[ 3 ]
+        };
+
+        scissor[ 0 ] = std::max( scissor.x, parentLowerCorner.x );
+        scissor[ 1 ] = std::max( scissor.y, parentLowerCorner.y );
+
+        glm::vec2 upperCorner = { scissor[ 0 ] + scissor[ 2 ], scissor[ 1 ] + scissor[ 3 ] };
+        if( upperCorner.x > parentUpperCorner.x ) {
+          scissor[ 2 ] = parentUpperCorner.x - scissor[ 0 ];
+        }
+
+        if( upperCorner.y > parentUpperCorner.y ) {
+          scissor[ 3 ] = parentUpperCorner.y - scissor[ 1 ];
+        }
+
+        return scissor;
+      }
+
+      void Element::setScissor( const glm::vec4& scissor ) {
+        glScissor( scissor[ 0 ], scissor[ 1 ], scissor[ 2 ], scissor[ 3 ] );
+      }
+
       void Element::draw() {
         if( !visible ) {
           return;
         }
 
         glm::ivec2 absolutePosition = getAbsolutePosition();
-
         if( drawable ) {
           drawable->draw( absolutePosition );
         }
 
+        glm::uvec4 parentScissor = getParentScissor();
+        setScissor( computeScissor( parentScissor, absolutePosition ) );
         for( std::shared_ptr< Element > element : children ) {
-          glScissor( absolutePosition.x, ConfigManager::getInstance().getIntValue( "viewport_y" ) - absolutePosition.y - allocation[ 3 ], allocation[ 2 ], allocation[ 3 ] );
           element->draw();
-          glScissor( 0, 0, ConfigManager::getInstance().getIntValue( "viewport_x" ), ConfigManager::getInstance().getIntValue( "viewport_y" ) );
         }
+        setScissor( parentScissor );
       }
 
     }
