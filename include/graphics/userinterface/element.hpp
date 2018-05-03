@@ -37,6 +37,7 @@ namespace BlueBear {
         std::vector< std::string > classes;
         bool shadow = false;
         bool visible = true;
+        int localZOrder = 1;
 
         Style::Style localStyle;
         glm::uvec2 requisition;
@@ -70,8 +71,11 @@ namespace BlueBear {
 
         bool getVisible();
         void setVisible( bool status );
+        int getLocalZOrder();
+        void setLocalZOrder( int zOrder );
 
         virtual void positionAndSizeChildren();
+        virtual void setChildrenZOrder();
         virtual void render( Graphics::Vector::Renderer& renderer );
         virtual void calculate() = 0;
 

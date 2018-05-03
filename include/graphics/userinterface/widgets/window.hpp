@@ -37,6 +37,7 @@ namespace BlueBear {
         public:
           virtual void addChild( std::shared_ptr< Element > child, bool doReflow = true ) override;
           void positionAndSizeChildren() override;
+          virtual void setChildrenZOrder() override;
           virtual void render( Graphics::Vector::Renderer& renderer ) override;
           void calculate() override;
 

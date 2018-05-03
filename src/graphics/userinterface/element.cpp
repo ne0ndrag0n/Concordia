@@ -40,6 +40,14 @@ namespace BlueBear {
         }
       }
 
+      int Element::getLocalZOrder() {
+        return localZOrder;
+      }
+
+      void Element::setLocalZOrder( int zOrder ) {
+        localZOrder = zOrder;
+      }
+
       glm::ivec2 Element::toRelative( const glm::uvec2& location ) {
         auto absolute = getAbsolutePosition();
         return { location.x - absolute.x, location.y - absolute.y };
@@ -169,7 +177,7 @@ namespace BlueBear {
 
       void Element::sortElements() {
         std::sort( children.begin(), children.end(), []( std::shared_ptr< Element > first, std::shared_ptr< Element > second ) {
-          return first->getPropertyList().get< int >( "local-z-order" ) < second->getPropertyList().get< int >( "local-z-order" );
+          return first->getLocalZOrder() < second->getLocalZOrder();
         } );
       }
 
@@ -234,6 +242,12 @@ namespace BlueBear {
         return result;
       }
 
+      void Element::setChildrenZOrder() {
+        for( std::shared_ptr< Element > child : children ) {
+          child->setLocalZOrder( child->getPropertyList().get< int >( "local-z-order" ) );
+        }
+      }
+
       void Element::reflow() {
         manager->getStyleManager().update( shared_from_this() );
         paint();
@@ -245,6 +259,7 @@ namespace BlueBear {
 
         if( !children.empty() ) {
           positionAndSizeChildren();
+          setChildrenZOrder();
           sortElements();
 
           for( std::shared_ptr< Element > child : children ) {

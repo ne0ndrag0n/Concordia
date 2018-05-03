@@ -99,27 +99,76 @@ namespace BlueBear {
           return { allocation[ 2 ] - 5, allocation[ 3 ] - 5 };
         }
 
-        void Window::positionAndSizeChildren() {
-          // It better be there or else we're segfaulting
-          std::shared_ptr< Element > decoration = *std::find_if( children.begin(), children.end(), [ & ]( std::shared_ptr< Element > child ) {
-            return child->hasClass( "-bb-shadow-windowdecoration" );
+        /**
+         * TODO: Fix so floating children can be properly z-ordered. Also fix so that a pane can slide out under a window as a free item.
+         */
+        void Window::setChildrenZOrder() {
+          std::shared_ptr< Element > decoration = *std::find_if( children.begin(), children.end(), [ & ]( std::shared_ptr< Element > child ) { return child->hasClass( "-bb-shadow-windowdecoration" ); } );
+          auto it = std::find_if( children.begin(), children.end(), [ & ]( std::shared_ptr< Element > child ) {
+            return ( child->getPropertyList().get< Placement >( "placement" ) == Placement::FLOW ) && child != decoration;
+          } );
+          std::vector< std::shared_ptr< Element > > freeElements;
+          std::copy_if( children.begin(), children.end(), std::back_inserter( freeElements ), [ & ]( std::shared_ptr< Element > item ){
+            return ( item->getPropertyList().get< Placement >( "placement" ) == Placement::FREE ) && item != decoration;
           } );
 
-          glm::ivec2 origin = getOrigin();
-          decoration->setAllocation( { origin.x, origin.y, allocation[ 2 ] - 10, 65 }, false );
-          // Decoration comes above local flow element
-          decoration->getPropertyList().set< int >( "local-z-order", 2, false );
+          if( it != children.end() ) {
+            ( *it )->setLocalZOrder( 1 );
+            decoration->setLocalZOrder( 2 );
 
-          for( std::shared_ptr< Element > child : children ) {
-            if( child != decoration ) {
-              if( child->getPropertyList().get< Placement >( "placement" ) == Placement::FLOW ) {
-                // The single element
-                child->setAllocation( { origin.x, origin.y + 60, allocation[ 2 ] - 10, allocation[ 3 ] - 70 }, false );
-                child->getPropertyList().set< int >( "local-z-order", 1, false );
-              } else {
-                // Floating buttons, etc.
-              }
+            for( std::shared_ptr< Element > child : freeElements ) {
+              child->setLocalZOrder( 3 );
             }
+          } else {
+            decoration->setLocalZOrder( 1 );
+
+            for( std::shared_ptr< Element > child : freeElements ) {
+              child->setLocalZOrder( 2 );
+            }
+          }
+        }
+
+        void Window::positionAndSizeChildren() {
+          glm::ivec2 origin = getOrigin();
+
+          // It better be there or else we're segfaulting
+          std::shared_ptr< Element > decoration = *std::find_if( children.begin(), children.end(), [ & ]( std::shared_ptr< Element > child ) { return child->hasClass( "-bb-shadow-windowdecoration" ); } );
+          decoration->setAllocation( { origin.x, origin.y, allocation[ 2 ] - 10, 65 }, false );
+
+          auto it = std::find_if( children.begin(), children.end(), [ & ]( std::shared_ptr< Element > child ) {
+            return ( child->getPropertyList().get< Placement >( "placement" ) == Placement::FLOW ) && child != decoration;
+          } );
+          if( it != children.end() ) {
+            auto single = *it;
+            single->setAllocation( { origin.x, origin.y + 60, allocation[ 2 ] - 10, allocation[ 3 ] - 70 }, false );
+          }
+
+          std::vector< std::shared_ptr< Element > > freeElements;
+          std::copy_if( children.begin(), children.end(), std::back_inserter( freeElements ), [ & ]( std::shared_ptr< Element > item ){
+            return ( item->getPropertyList().get< Placement >( "placement" ) == Placement::FREE ) && item != decoration;
+          } );
+          for( std::shared_ptr< Element > child : freeElements ) {
+            // Floating buttons, etc.
+            int left = child->getPropertyList().get< int >( "left" );
+            int top = child->getPropertyList().get< int >( "top" );
+
+            if( !valueIsLiteral( left ) ) { left = 0; }
+            if( !valueIsLiteral( top ) ) { top = 0; }
+
+            int width = child->getPropertyList().get< int >( "width" );
+            int height = child->getPropertyList().get< int >( "height" );
+
+            glm::uvec2 finalRequisition{
+              valueIsLiteral( width ) ? width : child->getRequisition().x,
+              valueIsLiteral( height ) ? height : child->getRequisition().y
+            };
+
+            child->setAllocation( {
+              left,
+              top,
+              ( ( Requisition ) width ) == Requisition::FILL_PARENT ? allocation[ 2 ] : finalRequisition.x,
+              ( ( Requisition ) height ) == Requisition::FILL_PARENT ? allocation[ 3 ] : finalRequisition.y,
+            }, false );
           }
         }
 

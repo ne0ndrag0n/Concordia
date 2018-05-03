@@ -7,6 +7,7 @@
 #include "graphics/userinterface/widgets/tablayout.hpp"
 #include "graphics/userinterface/widgets/image.hpp"
 #include "graphics/userinterface/widgets/spacer.hpp"
+#include "graphics/userinterface/widgets/pane.hpp"
 #include "tools/utility.hpp"
 #include "log.hpp"
 
@@ -86,6 +87,13 @@ namespace BlueBear::Graphics::UserInterface {
       }
       case Tools::Utility::hash( "Spacer" ): {
         result = Widgets::Spacer::create(
+          Tools::Utility::safeString( element->Attribute( "id" ) ),
+          Tools::Utility::split( Tools::Utility::safeString( element->Attribute( "class" ) ), ' ' )
+        );
+        break;
+      }
+      case Tools::Utility::hash( "Pane" ): {
+        result = Widgets::Pane::create(
           Tools::Utility::safeString( element->Attribute( "id" ) ),
           Tools::Utility::split( Tools::Utility::safeString( element->Attribute( "class" ) ), ' ' )
         );

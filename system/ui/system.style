@@ -47,6 +47,11 @@ Window.error {
   width: 400;
   height: 300;
 
+  TabLayout {
+    layout-weight: 1;
+    height: Requisition::FILL_PARENT;
+  }
+
   .tab-1 {
     gravity: Gravity::TOP;
     tab-title: "VERSION";
@@ -103,5 +108,20 @@ Window.error {
     Button {
       width: Requisition::FILL_PARENT;
     }
+  }
+}
+
+.pane-debug-layout {
+  placement: Placement::FREE;
+  drop-shadow-right: true;
+  top: 0;
+  left: -150;
+  width: 150;
+  height: Requisition::FILL_PARENT;
+  background-color: rgbaString( "777777ff" );
+  local-z-order: 2;
+
+  Text {
+    background-color: rgbaString( "00000000" );
   }
 }

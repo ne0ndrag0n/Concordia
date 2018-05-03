@@ -186,8 +186,8 @@ namespace BlueBear {
 
               childAllocation[ 0 ] = left;
               childAllocation[ 1 ] = top;
-              childAllocation[ 2 ] = childRequisition.x;
-              childAllocation[ 3 ] = childRequisition.y;
+              childAllocation[ 2 ] = ( ( Requisition ) child->getPropertyList().get< int >( "width" ) == Requisition::FILL_PARENT ) ? allocation[ 2 ] : childRequisition.x;
+              childAllocation[ 3 ] = ( ( Requisition ) child->getPropertyList().get< int >( "height" ) == Requisition::FILL_PARENT ) ? allocation[ 3 ] : childRequisition.y;
             }
 
             // That's everything: compute the allocation

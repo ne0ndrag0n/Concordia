@@ -1,25 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Window class="-bb-debug-panel" window-title="Debug">
-  <TabLayout>
-    <Layout class="tab-1">
-      <Spacer class="buffer-top"></Spacer>
-      <Layout class="about-set middle">
-        <Image>dev/concicon.png</Image>
-        <Spacer class="buffer-inner"></Spacer>
-        <Layout class="logo-text-group middle">
-          <Text class="concordia-logo">Concordia</Text>
-          <Text>The World of Harmony</Text>
+  <Layout>
+    <TabLayout>
+      <Layout class="tab-1">
+        <Spacer class="buffer-top"></Spacer>
+        <Layout class="about-set middle">
+          <Image>dev/concicon.png</Image>
+          <Spacer class="buffer-inner"></Spacer>
+          <Layout class="logo-text-group middle">
+            <Text class="concordia-logo">Concordia</Text>
+            <Text>The World of Harmony</Text>
+          </Layout>
         </Layout>
+        <Spacer class="buffer-build-info"></Spacer>
+        <Text class="version middle">v0.0.4 Milestone "da Vinci"</Text>
+        <Text class="build-info middle">BlueBear Engine build xx/xx/xxxx:xxxxxx</Text>
+        <Text class="copyright middle">© 2018 ne0ndrag0n</Text>
       </Layout>
-      <Spacer class="buffer-build-info"></Spacer>
-      <Text class="version middle">v0.0.4 Milestone "da Vinci"</Text>
-      <Text class="build-info middle">BlueBear Engine build xx/xx/xxxx:xxxxxx</Text>
-      <Text class="copyright middle">© 2018 ne0ndrag0n</Text>
-    </Layout>
-    <Layout class="tab-2">
-      <Button class="run-gc">RUN GARBAGE COLLECTOR</Button>
-      <Button class="print-ram">PRINT LUA RAM USAGE</Button>
-      <Button class="toggle-console">TOGGLE CONSOLE</Button>
-    </Layout>
-  </TabLayout>
+      <Layout class="tab-2">
+        <Button class="run-gc">RUN GARBAGE COLLECTOR</Button>
+        <Button class="print-ram">PRINT LUA RAM USAGE</Button>
+        <Button class="toggle-console">TOGGLE CONSOLE</Button>
+      </Layout>
+    </TabLayout>
+    <Pane class="pane-debug-layout">
+      <Layout>
+        <Text>Slideout pane test</Text>
+      </Layout>
+    </Pane>
+  </Layout>
 </Window>
