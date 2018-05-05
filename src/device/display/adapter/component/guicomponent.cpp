@@ -67,6 +67,18 @@ namespace BlueBear {
             Log::getInstance().info( "GuiComponent::__teststyle", "Remove this function and callbacks" );
           }
 
+          void GuiComponent::setupBlockingGlobalEvent( const std::string& eventId, std::function< void( Device::Input::Metadata ) > callback ) {
+            blockingGlobalEvents[ eventId ] = [ callback ]( Device::Input::Metadata event ) {
+              callback( event );
+
+              event.cancelAll();
+            };
+          }
+
+          void GuiComponent::unregisterBlockingGlobalEvent( const std::string& eventId ) {
+            blockingGlobalEvents.erase( eventId );
+          }
+
           void GuiComponent::fireFocusEvent( std::shared_ptr< Graphics::UserInterface::Element > selected, Device::Input::Metadata event ) {
             if( selected != currentFocus ) {
               currentFocus->getEventBundle().trigger( "blur", event, false );
@@ -121,6 +133,13 @@ namespace BlueBear {
           }
 
           void GuiComponent::mousePressed( Device::Input::Metadata event ) {
+            // Swallow an event if it's a blocking global
+            auto it = blockingGlobalEvents.find( "mouse-down" );
+            if( it != blockingGlobalEvents.end() ) {
+              it->second( event );
+              return;
+            }
+
             // Swallow the event if a drag is in progress (no wheel or right click while dragging)
             if( !currentDrag ) {
               std::shared_ptr< Graphics::UserInterface::Element > captured = captureMouseEvent( rootElement, event );
@@ -133,6 +152,13 @@ namespace BlueBear {
           }
 
           void GuiComponent::mouseMoved( Device::Input::Metadata event ) {
+            // Swallow an event if it's a blocking global
+            auto it = blockingGlobalEvents.find( "mouse-moved" );
+            if( it != blockingGlobalEvents.end() ) {
+              it->second( event );
+              return;
+            }
+
             // Pass the event if a drag is in progress
             if( currentDrag ) {
               return currentDrag->update( event );
@@ -147,6 +173,13 @@ namespace BlueBear {
           }
 
           void GuiComponent::mouseReleased( Device::Input::Metadata event ) {
+            // Swallow an event if it's a blocking global
+            auto it = blockingGlobalEvents.find( "mouse-up" );
+            if( it != blockingGlobalEvents.end() ) {
+              it->second( event );
+              return;
+            }
+
             // Destroy the drag helper and swallow the event
             if( currentDrag ) {
               currentDrag = nullptr;

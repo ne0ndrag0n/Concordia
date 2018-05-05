@@ -10,6 +10,7 @@
 #include <memory>
 #include <set>
 #include <functional>
+#include <unordered_map>
 
 namespace BlueBear {
   namespace Device::Input {
@@ -36,11 +37,15 @@ namespace BlueBear {
             std::shared_ptr< Graphics::UserInterface::Element > rootElement;
             std::shared_ptr< Graphics::UserInterface::Element > currentFocus;
             Graphics::UserInterface::Style::StyleApplier styleManager;
+            std::unordered_map< std::string, std::function< void( Device::Input::Metadata ) > > blockingGlobalEvents;
 
             void fireFocusEvent( std::shared_ptr< Graphics::UserInterface::Element > selected, Device::Input::Metadata event );
             void fireInOutEvents( std::shared_ptr< Graphics::UserInterface::Element > selected, Device::Input::Metadata event );
 
           public:
+
+            void setupBlockingGlobalEvent( const std::string& eventId, std::function< void( Device::Input::Metadata ) > callback );
+            void unregisterBlockingGlobalEvent( const std::string& eventId );
 
             void __testadd();
             void __teststyle();

@@ -8,6 +8,7 @@
 #include "graphics/userinterface/widgets/image.hpp"
 #include "graphics/userinterface/widgets/spacer.hpp"
 #include "graphics/userinterface/widgets/pane.hpp"
+#include "graphics/userinterface/widgets/scroll.hpp"
 #include "tools/utility.hpp"
 #include "log.hpp"
 
@@ -94,6 +95,13 @@ namespace BlueBear::Graphics::UserInterface {
       }
       case Tools::Utility::hash( "Pane" ): {
         result = Widgets::Pane::create(
+          Tools::Utility::safeString( element->Attribute( "id" ) ),
+          Tools::Utility::split( Tools::Utility::safeString( element->Attribute( "class" ) ), ' ' )
+        );
+        break;
+      }
+      case Tools::Utility::hash( "Scroll" ): {
+        result = Widgets::Scroll::create(
           Tools::Utility::safeString( element->Attribute( "id" ) ),
           Tools::Utility::split( Tools::Utility::safeString( element->Attribute( "class" ) ), ' ' )
         );

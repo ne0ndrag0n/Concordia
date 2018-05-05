@@ -18,7 +18,7 @@ Button {
 }
 
 Input {
-  font-hint-color: rgbaString( "666666ff" );
+  font-hint-color: rgbaString( "aaaaaaff" );
   fade-out-color: rgbaString( "0D686B00" );
   fade-in-color: rgbaString( "0D686Bff" );
   font-color: rgbaString( "000000ff" );
@@ -111,17 +111,76 @@ Window.error {
   }
 }
 
-.pane-debug-layout {
+.-bb-terminal-pane {
   placement: Placement::FREE;
-  drop-shadow-right: true;
+  drop-shadow-bottom: true;
   top: 0;
-  left: -150;
-  width: 150;
-  height: Requisition::FILL_PARENT;
-  background-color: rgbaString( "777777ff" );
-  local-z-order: 2;
+  left: 0;
+  width: Requisition::FILL_PARENT;
+  height: 450;
+  background-color: rgbaString( "00000066" );
 
-  Text {
-    background-color: rgbaString( "00000000" );
+  .-bb-terminal-root {
+    gravity: Gravity::TOP;
+
+    .-bb-terminal-output {
+      gravity: Gravity::TOP;
+      layout-weight: 1;
+      width: Requisition::FILL_PARENT;
+      padding: 5;
+
+      .-bb-terminal-log-set {
+        .buffer-terminal {
+          width: 10;
+        }
+
+        Text {
+          font: "dosvga";
+          background-color: rgbaString( "00000000" );
+          color: rgbaString( "ffffffff" );
+        }
+      }
+
+      .buffer-logo {
+        height: 50;
+      }
+
+      Image {
+        placement: Placement::FREE;
+        top: 50;
+        left: 426;
+      }
+    }
+
+    .-bb-decorative-pane {
+      width: Requisition::FILL_PARENT;
+      background-color: rgbaString( "36393Eff" );
+    }
+
+    .-bb-terminal-controls {
+      width: Requisition::FILL_PARENT;
+      padding: 5;
+
+      .-bb-terminal-text-input {
+        font-color: rgbaString( "ffffffff" );
+        font-size: 24.0;
+        layout-weight: 8;
+      }
+
+      .-bb-terminal-execute-button {
+        layout-weight: 1;
+      }
+
+      .-bb-terminal-clear-button {
+        layout-weight: 1;
+      }
+    }
   }
+}
+
+.-bb-scroll-test {
+  left: 10;
+  top: 10;
+  width: 300;
+  height: 300;
 }

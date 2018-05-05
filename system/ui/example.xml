@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
 <Window class="-bb-debug-panel" window-title="Debug">
   <Layout>
     <TabLayout>
@@ -23,10 +24,29 @@
         <Button class="toggle-console">TOGGLE CONSOLE</Button>
       </Layout>
     </TabLayout>
-    <Pane class="pane-debug-layout">
-      <Layout>
-        <Text>Slideout pane test</Text>
+  </Layout>
+</Window>
+<Pane class="-bb-terminal-pane">
+  <Layout class="-bb-terminal-root">
+    <Layout class="-bb-terminal-output">
+      <Image>dev/chatbox.png</Image>
+    </Layout>
+    <Pane class="-bb-decorative-pane">
+      <Layout class="-bb-terminal-controls">
+        <Input class="-bb-terminal-text-input" hint="Enter Command"></Input>
+        <Button class="-bb-terminal-clear-button">CLEAR</Button>
+        <Button class="-bb-terminal-execute-button">EXECUTE</Button>
       </Layout>
     </Pane>
   </Layout>
+</Pane>
+-->
+<Window class="-bb-scroll-test" window-title="Scroll Test">
+  <Scroll>
+    <Layout>
+      <Text>111 111 111 111 -</Text>
+      <Text>222 222 222 222 -</Text>
+      <Text>333 333 333 333 -</Text>
+    </Layout>
+  </Scroll>
 </Window>

@@ -42,8 +42,13 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 
   void Pane::calculate() {
     if( children.size() ) {
+      glm::uvec2 differential{
+        ( localStyle.get< bool >( "drop-shadow-left" ) || localStyle.get< bool >( "drop-shadow-right" ) ) ? 5 : 0,
+        ( localStyle.get< bool >( "drop-shadow-top" ) || localStyle.get< bool >( "drop-shadow-bottom" ) ) ? 5 : 0,
+      };
+
       children[ 0 ]->calculate();
-      requisition = children[ 0 ]->getRequisition();
+      requisition = children[ 0 ]->getRequisition() + differential;
     } else {
       requisition = glm::uvec2{ 1, 1 };
     }
