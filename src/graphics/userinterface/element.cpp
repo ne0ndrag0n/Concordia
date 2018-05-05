@@ -317,7 +317,7 @@ namespace BlueBear {
           drawable->draw( absolutePosition );
         }
 
-        glm::uvec4 parentScissor = getParentScissor();
+        glm::vec4 parentScissor = getParentScissor();
         setScissor( computeScissor( parentScissor, absolutePosition ) );
         for( std::shared_ptr< Element > element : children ) {
           element->draw();
