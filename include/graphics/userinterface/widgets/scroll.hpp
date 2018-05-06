@@ -16,6 +16,9 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
     bool forceDirty = false;
 
     float getXRatio();
+    float getYRatio();
+    int getXGutterWidth();
+    int getXSpace();
 
   protected:
     Scroll( const std::string& id, const std::vector< std::string >& classes );

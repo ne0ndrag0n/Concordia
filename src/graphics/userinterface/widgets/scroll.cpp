@@ -21,10 +21,22 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
     return ( ( float ) allocation[ 2 ] / ( float ) getFinalRequisition( children[ 0 ] ).x );
   }
 
+  float Scroll::getYRatio() {
+    return ( ( float ) allocation[ 3 ] / ( float ) getFinalRequisition( children[ 0 ] ).y );
+  }
+
+  int Scroll::getXGutterWidth() {
+    return allocation[ 2 ] - ( ( localStyle.get< bool >( "scrollbar-y" ) && getYRatio() < 1.0f ) ? 10 : 0 );
+  }
+
+  int Scroll::getXSpace() {
+    return getXGutterWidth() - 2;
+  }
+
   void Scroll::onMouseDown( Device::Input::Metadata event ) {
     auto relative = toRelative( event.mouseLocation );
 
-    if( relative.x >= 0 && relative.y >= allocation[ 3 ] - 10 && relative.x <= allocation[ 2 ] && relative.y <= allocation[ 3 ] ) {
+    if( relative.x >= 0 && relative.y >= allocation[ 3 ] - 10 && relative.x <= getXGutterWidth() && relative.y <= allocation[ 3 ] ) {
       updateX( relative.x );
 
       manager->setupBlockingGlobalEvent( "mouse-moved", [ & ]( Device::Input::Metadata e ) {
@@ -40,14 +52,15 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 
   void Scroll::updateX( int x ) {
     if( localStyle.get< bool >( "scrollbar-x" ) ) {
-      int xSpace = allocation[ 2 ] - 2;
+      int xSpace = getXSpace();
       int boxWidth = xSpace * getXRatio();
       int newX = x - ( boxWidth / 2 );
 
       // newX must be >= 1 and <= allocation[ 2 ] - 1
       newX = std::max( newX, 0 );
-      if( ( newX + boxWidth ) > allocation[ 2 ] - 1 ) {
-        newX = allocation[ 2 ] - 2 - boxWidth;
+      int gutterWidth = getXGutterWidth();
+      if( ( newX + boxWidth ) > gutterWidth - 1 ) {
+        newX = gutterWidth - 2 - boxWidth;
       }
 
       // Calculate new scrollX proportion
@@ -100,11 +113,11 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
         if( ratio < 1.0f ) {
           // Gutter
           renderer.drawRect(
-            { 0, allocation[ 3 ] - 10, allocation[ 2 ], allocation[ 3 ] },
+            { 0, allocation[ 3 ] - 10, getXGutterWidth(), allocation[ 3 ] },
             localStyle.get< glm::uvec4 >( "background-color" )
           );
 
-          int xSpace = allocation[ 2 ] - 2;
+          int xSpace = getXSpace();
           int barSize = xSpace * ratio;
 
           // Bar
