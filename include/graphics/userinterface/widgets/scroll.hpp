@@ -17,8 +17,10 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 
     float getXRatio();
     float getYRatio();
-    int getXGutterWidth();
+    int getXGutter();
+    int getYGutter();
     int getXSpace();
+    int getYSpace();
 
   protected:
     Scroll( const std::string& id, const std::vector< std::string >& classes );

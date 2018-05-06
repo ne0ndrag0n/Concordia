@@ -44,9 +44,15 @@
 <Window class="-bb-scroll-test" window-title="Scroll Test">
   <Scroll>
     <Layout>
-      <Text>111 111 111 111 -</Text>
-      <Text>222 222 222 222 -</Text>
-      <Text>333 333 333 333 -</Text>
+      <Text>abc</Text>
+      <Text>def</Text>
+      <Text>ghi</Text>
+      <Text>jkl</Text>
+      <Text>mno</Text>
+      <Text>pqr</Text>
+      <Text>stu</Text>
+      <Text>vwx</Text>
+      <Text>yz0</Text>
     </Layout>
   </Scroll>
 </Window>

@@ -182,5 +182,9 @@ Window.error {
   left: 10;
   top: 10;
   width: 300;
-  height: 300;
+  height: 200;
+
+  Layout {
+    gravity: Gravity::TOP;
+  }
 }

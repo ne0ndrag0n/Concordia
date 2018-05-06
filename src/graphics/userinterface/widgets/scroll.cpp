@@ -25,28 +25,53 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
     return ( ( float ) allocation[ 3 ] / ( float ) getFinalRequisition( children[ 0 ] ).y );
   }
 
-  int Scroll::getXGutterWidth() {
+  int Scroll::getXGutter() {
     return allocation[ 2 ] - ( ( localStyle.get< bool >( "scrollbar-y" ) && getYRatio() < 1.0f ) ? 10 : 0 );
   }
 
+  int Scroll::getYGutter() {
+    return allocation[ 3 ] - ( ( localStyle.get< bool >( "scrollbar-x" ) && getXRatio() < 1.0f ) ? 10 : 0 );
+  }
+
   int Scroll::getXSpace() {
-    return getXGutterWidth() - 2;
+    return getXGutter() - 2;
+  }
+
+  int Scroll::getYSpace() {
+    return getYGutter() - 2;
   }
 
   void Scroll::onMouseDown( Device::Input::Metadata event ) {
     auto relative = toRelative( event.mouseLocation );
 
-    if( relative.x >= 0 && relative.y >= allocation[ 3 ] - 10 && relative.x <= getXGutterWidth() && relative.y <= allocation[ 3 ] ) {
-      updateX( relative.x );
+    if( localStyle.get< bool >( "scrollbar-x" ) && getXRatio() < 1.0f ) {
+      if( relative.x >= 0 && relative.y >= allocation[ 3 ] - 10 && relative.x <= getXGutter() && relative.y <= allocation[ 3 ] ) {
+        updateX( relative.x );
 
-      manager->setupBlockingGlobalEvent( "mouse-moved", [ & ]( Device::Input::Metadata e ) {
-        updateX( toRelative( e.mouseLocation ).x );
-      } );
+        manager->setupBlockingGlobalEvent( "mouse-moved", [ & ]( Device::Input::Metadata e ) {
+          updateX( toRelative( e.mouseLocation ).x );
+        } );
 
-      manager->setupBlockingGlobalEvent( "mouse-up", [ & ]( Device::Input::Metadata e ) {
-        manager->unregisterBlockingGlobalEvent( "mouse-moved" );
-        manager->unregisterBlockingGlobalEvent( "mouse-up" );
-      } );
+        manager->setupBlockingGlobalEvent( "mouse-up", [ & ]( Device::Input::Metadata e ) {
+          manager->unregisterBlockingGlobalEvent( "mouse-moved" );
+          manager->unregisterBlockingGlobalEvent( "mouse-up" );
+        } );
+      }
+    }
+
+    if( localStyle.get< bool >( "scrollbar-y" ) && getYRatio() < 1.0f ) {
+      if( relative.x >= allocation[ 2 ] - 10 && relative.y >= 0 && relative.x <= allocation[ 2 ] && relative.y <= getYGutter() ) {
+        updateY( relative.y );
+
+        manager->setupBlockingGlobalEvent( "mouse-moved", [ & ]( Device::Input::Metadata e ) {
+          updateY( toRelative( e.mouseLocation ).y );
+        } );
+
+        manager->setupBlockingGlobalEvent( "mouse-up", [ & ]( Device::Input::Metadata e ) {
+          manager->unregisterBlockingGlobalEvent( "mouse-moved" );
+          manager->unregisterBlockingGlobalEvent( "mouse-up" );
+        } );
+      }
     }
   }
 
@@ -58,7 +83,7 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 
       // newX must be >= 1 and <= allocation[ 2 ] - 1
       newX = std::max( newX, 0 );
-      int gutterWidth = getXGutterWidth();
+      int gutterWidth = getXGutter();
       if( ( newX + boxWidth ) > gutterWidth - 1 ) {
         newX = gutterWidth - 2 - boxWidth;
       }
@@ -66,6 +91,25 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
       // Calculate new scrollX proportion
       float newScrollX = ( float ) newX / ( float ) xSpace;
       scrollX = newScrollX;
+      forceDirty = true;
+      reflow();
+    }
+  }
+
+  void Scroll::updateY( int y ) {
+    if( localStyle.get< bool >( "scrollbar-y" ) ) {
+      int ySpace = getYSpace();
+      int boxWidth = ySpace * getYRatio();
+      int newY = y - ( boxWidth / 2 );
+
+      newY = std::max( newY, 0 );
+      int gutterWidth = getYGutter();
+      if( ( newY + boxWidth ) > gutterWidth - 1 ) {
+        newY = gutterWidth - 2 - boxWidth;
+      }
+
+      float newScrollY = ( float ) newY / ( float ) ySpace;
+      scrollY = newScrollY;
       forceDirty = true;
       reflow();
     }
@@ -113,7 +157,7 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
         if( ratio < 1.0f ) {
           // Gutter
           renderer.drawRect(
-            { 0, allocation[ 3 ] - 10, getXGutterWidth(), allocation[ 3 ] },
+            { 0, allocation[ 3 ] - 10, getXGutter(), allocation[ 3 ] },
             localStyle.get< glm::uvec4 >( "background-color" )
           );
 
@@ -123,6 +167,26 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
           // Bar
           renderer.drawRect(
             { 1 + ( scrollX * xSpace ), allocation[ 3 ] - 9, 1 + ( scrollX * xSpace ) + barSize, allocation[ 3 ] - 1 },
+            localStyle.get< glm::uvec4 >( "color" )
+          );
+        }
+      }
+
+      if( localStyle.get< bool >( "scrollbar-y" ) ) {
+        float ratio = getYRatio();
+        if( ratio < 1.0f ) {
+          // Gutter
+          renderer.drawRect(
+            { allocation[ 2 ] - 10, 0, allocation[ 2 ], getYGutter() },
+            localStyle.get< glm::uvec4 >( "background-color" )
+          );
+
+          int ySpace = getYSpace();
+          int barSize = ySpace * ratio;
+
+          // Bar
+          renderer.drawRect(
+            { allocation[ 2 ] - 9, 1 + ( scrollY * ySpace ), allocation[ 2 ] - 1, 1 + ( scrollY * ySpace ) + barSize },
             localStyle.get< glm::uvec4 >( "color" )
           );
         }
