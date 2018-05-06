@@ -223,7 +223,7 @@ namespace BlueBear {
 
           if( applicablePropertyLists.size() ) {
             // Sort by specificity most to least
-            std::sort( applicablePropertyLists.begin(), applicablePropertyLists.end(), []( const AST::PropertyList& left, const AST::PropertyList& right ) {
+            std::stable_sort( applicablePropertyLists.begin(), applicablePropertyLists.end(), []( const AST::PropertyList& left, const AST::PropertyList& right ) {
               return left.computeSpecificity() > right.computeSpecificity();
             } );
 

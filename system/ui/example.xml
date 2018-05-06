@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
 <Window class="-bb-debug-panel" window-title="Debug">
   <Layout>
     <TabLayout>
@@ -26,6 +25,7 @@
     </TabLayout>
   </Layout>
 </Window>
+<!--
 <Pane class="-bb-terminal-pane">
   <Layout class="-bb-terminal-root">
     <Layout class="-bb-terminal-output">
@@ -41,18 +41,3 @@
   </Layout>
 </Pane>
 -->
-<Window class="-bb-scroll-test" window-title="Scroll Test">
-  <Scroll>
-    <Layout>
-      <Text>abc</Text>
-      <Text>def</Text>
-      <Text>ghi</Text>
-      <Text>jkl</Text>
-      <Text>mno</Text>
-      <Text>pqr</Text>
-      <Text>stu</Text>
-      <Text>vwx</Text>
-      <Text>yz0</Text>
-    </Layout>
-  </Scroll>
-</Window>

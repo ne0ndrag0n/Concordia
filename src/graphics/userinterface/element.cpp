@@ -176,7 +176,7 @@ namespace BlueBear {
       }
 
       void Element::sortElements() {
-        std::sort( children.begin(), children.end(), []( std::shared_ptr< Element > first, std::shared_ptr< Element > second ) {
+        std::stable_sort( children.begin(), children.end(), []( std::shared_ptr< Element > first, std::shared_ptr< Element > second ) {
           return first->getLocalZOrder() < second->getLocalZOrder();
         } );
       }
