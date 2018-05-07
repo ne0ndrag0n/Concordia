@@ -3,7 +3,6 @@
 #include "tools/utility.hpp"
 #include "eventmanager.hpp"
 #include "log.hpp"
-#include <functional>
 
 namespace BlueBear::Scripting {
 
@@ -54,19 +53,23 @@ namespace BlueBear::Scripting {
   }
 
   bool CoreEngine::update() {
-    queuedCallbacks.each( [ & ]( std::optional< std::pair< int, sol::function > >& optional ) {
+    queuedCallbacks.each( [ & ]( std::optional< std::pair< int,  std::variant< sol::function, std::function< void() > > > >& optional ) {
       if( optional ) {
-        std::pair< int, sol::function >& callback = *optional;
+        std::pair< int, std::variant< sol::function, std::function< void() > > >& callback = *optional;
 
         if( callback.first == 0 ) {
-          // Call method
-          // TODO: The traceback method
-          sol::protected_function call( callback.second );
-          auto result = call();
-          if( !result.valid() ) {
-            sol::error error = result;
-            Log::getInstance().error( "CoreEngine::update", "Exception thrown: " + std::string( error.what() ) );
-          }
+          std::visit( overloaded {
+            [ & ]( sol::function function ) {
+              // TODO: The traceback method
+              sol::protected_function call( function );
+              auto result = call();
+              if( !result.valid() ) {
+                sol::error error = result;
+                Log::getInstance().error( "CoreEngine::update", "Exception thrown: " + std::string( error.what() ) );
+              }
+            },
+            []( std::function< void() > function ) { function(); }
+          }, callback.second );
 
           optional.reset();
         } else {
