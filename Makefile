@@ -1,5 +1,6 @@
 CC = g++
 CFLAGS = -pthread -std=c++17 -g -rdynamic -pipe #-fsanitize=address
+DFLAGS = -DSOL_SAFE_FUNCTION=1
 INCLUDES = -Iinclude -Ilib -Ilib/nanovg
 LIBPATHS = -Llib/nanovg
 LIBS = -lpthread -ltbb -lassimp -lGLEW -lGL -lsfml-graphics -lsfml-window -lsfml-system -ltinyxml2 -ljsoncpp -llua -ldl -lnanovg
@@ -43,7 +44,7 @@ all:    $(MAIN)
 $(MAIN): $(OBJS)
 		$(CC) $(CFLAGS) $(INCLUDES) $(LIBPATHS) -o $(MAIN) $(OBJS) $(LFLAGS) $(LIBS)
 .cpp.o:
-		$(CC) $(CFLAGS) $(INCLUDES) -c $<  -o $@
+		$(CC) $(CFLAGS) $(DFLAGS) $(INCLUDES) -c $<  -o $@
 
 clean:
 		$(RM) *.o *~ $(MAIN)
