@@ -311,7 +311,8 @@ namespace BlueBear {
 					currentTick = engineJSON[ "ticks" ].asInt();
 
 					// Instantiate the lot
-					currentLot = std::make_shared< Lot >( L, state.as< State::HouseholdGameplayState >().getInfrastructureFactory(), lotJSON );
+					// XXX: Disabling calls to functions that must be deprecated. Do not run code in engine.cpp
+					//currentLot = std::make_shared< Lot >( L, state.as< State::HouseholdGameplayState >().getInfrastructureFactory(), lotJSON );
 
 					// Clear the std::map containing all objects
 					objects.clear();

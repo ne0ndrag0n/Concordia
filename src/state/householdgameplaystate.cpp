@@ -2,7 +2,6 @@
 #include "log.hpp"
 #include "application.hpp"
 #include "scripting/lot.hpp"
-#include "scripting/infrastructurefactory.hpp"
 #include "scripting/engine.hpp"
 #include "scripting/luastate.hpp"
 #include "configmanager.hpp"
@@ -24,32 +23,13 @@
 namespace BlueBear {
   namespace State {
 
-    HouseholdGameplayState::HouseholdGameplayState( Application& application ) : State::State( application ) {
-      setupEngine();
+    HouseholdGameplayState::HouseholdGameplayState( Application& application ) : State::State( application ), engine( *this ) {
       setupDisplayDevice();
       setupInputDevice();
-      eventManager.LUA_STATE_READY.trigger( engine->lua );
     }
 
     HouseholdGameplayState::~HouseholdGameplayState() {
       application.getInputDevice().reset();
-    }
-
-    void HouseholdGameplayState::setupEngine() {
-      infrastructureFactory = std::make_unique< Scripting::InfrastructureFactory >();
-
-      engine = std::make_unique< Scripting::Engine >( *this );
-      if( !engine->submitLuaContributions() ) {
-        Log::getInstance().error( "HouseholdGameplayState::HouseholdGameplayState", "Failed to load BlueBear!" );
-        throw EngineLoadFailureException();
-      }
-
-      if( !engine->loadLot( "lots/lot01.json" ) ) {
-        Log::getInstance().error( "HouseholdGameplayState::HouseholdGameplayState", "Failed to load demo lot!" );
-        throw LotNotFoundException();
-      }
-
-      L = engine->L;
     }
 
     void HouseholdGameplayState::setupDisplayDevice() {
@@ -60,7 +40,7 @@ namespace BlueBear {
 
       application.getDisplayDevice().pushAdapter( std::make_unique< Device::Display::Adapter::Component::GuiComponent >( application.getDisplayDevice() ) );
 
-      adapter.getCamera().setRotationDirect( engine->currentLot->currentRotation );
+      adapter.getCamera().setRotationDirect( 0 );
       adapter.loadPathsParallel( {
         { "floor", "dev/box/armaturebox.fbx" }
       } );
@@ -167,12 +147,8 @@ namespace BlueBear {
       );
     }
 
-    Scripting::InfrastructureFactory& HouseholdGameplayState::getInfrastructureFactory() {
-      return *infrastructureFactory;
-    }
-
     void HouseholdGameplayState::update() {
-      engine->update();
+      engine.update();
 
       auto& display = application.getDisplayDevice();
       display.update();

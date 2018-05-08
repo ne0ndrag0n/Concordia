@@ -2,6 +2,7 @@
 #define MAIN_GAME_STATE
 
 #include "state/state.hpp"
+#include "scripting/coreengine.hpp"
 #include "exceptions/genexc.hpp"
 #include "device/input/input.hpp"
 #include <memory>
@@ -20,11 +21,9 @@ namespace BlueBear {
       static const unsigned int RENDER3D_ADAPTER = 0;
       static const unsigned int GUI_ADAPTER = 1;
 
-      std::unique_ptr< Scripting::Engine > engine;
-      std::unique_ptr< Scripting::InfrastructureFactory > infrastructureFactory;
+      Scripting::CoreEngine engine;
       Device::Input::Input::KeyGroup keyGroup;
 
-      void setupEngine();
       void setupDisplayDevice();
       void setupInputDevice();
 
@@ -34,7 +33,6 @@ namespace BlueBear {
       HouseholdGameplayState( Application& application );
       ~HouseholdGameplayState();
 
-      Scripting::InfrastructureFactory& getInfrastructureFactory();
       void update() override;
     };
 

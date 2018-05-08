@@ -21,14 +21,14 @@ namespace BlueBear::Scripting {
     sol::state lua;
     Containers::ReusableObjectVector< std::pair< int, std::variant< sol::function, std::function< void() > > > > queuedCallbacks;
 
-    CoreEngine( State::State& state );
-
     void setupCoreEnvironment();
     int setTimeout( int interval, sol::function f );
 
-    static sol::function bind( sol::function f, sol::variadic_args args );
+    sol::function bind( sol::function f, sol::variadic_args args );
 
   public:
+    CoreEngine( State::State& state );
+
     bool update() override;
   };
 

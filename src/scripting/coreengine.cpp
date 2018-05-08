@@ -24,21 +24,33 @@ namespace BlueBear::Scripting {
   }
 
   void CoreEngine::setupCoreEnvironment() {
-    lua[ "bluebear" ] = sol::table{};
+    lua[ "bluebear" ] = lua.create_table();
 
-    sol::table engine;
-    engine[ "require_modpack" ] = []() {};
+    sol::table engine = lua.create_table();
+    engine.set_function( "require_modpack", []() {} );
     engine.set_function( "queue_callback", &CoreEngine::setTimeout, this );
 
-    sol::table util;
-    util.set_function( "bind", &CoreEngine::bind );
+    sol::table util = lua.create_table();
+    util.set_function( "bind", &CoreEngine::bind, this );
+
+    sol::table event = lua.create_table();
+
+    lua.set_function( "print", sol::overload(
+      [ & ]( const std::string& tag, const std::string& message ) {
+        Log::getInstance().debug( tag, message );
+      },
+      [ & ]( const std::string& message ) {
+        Log::getInstance().debug( "<script>", message );
+      }
+    ) );
 
     lua[ "bluebear" ][ "engine" ] = engine;
     lua[ "bluebear" ][ "util" ] = util;
+    lua[ "bluebear" ][ "event" ] = event;
   }
 
   sol::function CoreEngine::bind( sol::function f, sol::variadic_args args ) {
-    sol::table temp;
+    sol::table temp = lua.create_table();
     temp.set_function( "__closure", [ f, unpacked = std::vector< sol::object >( args.begin(), args.end() ) ]( sol::variadic_args newargs ) {
       std::vector< sol::object > newunpacked( newargs.begin(), newargs.end() );
 
@@ -53,14 +65,16 @@ namespace BlueBear::Scripting {
   }
 
   bool CoreEngine::update() {
-    queuedCallbacks.each( [ & ]( std::optional< std::pair< int,  std::variant< sol::function, std::function< void() > > > >& optional ) {
+    std::vector< int > removalIndices;
+    int i = 0;
+
+    queuedCallbacks.each( [ & ]( std::optional< std::pair< int, std::variant< sol::function, std::function< void() > > > >& optional ) {
       if( optional ) {
         std::pair< int, std::variant< sol::function, std::function< void() > > >& callback = *optional;
 
         if( callback.first == 0 ) {
           std::visit( overloaded {
             [ & ]( sol::function function ) {
-              // TODO: The traceback method
               sol::protected_function call( function );
               auto result = call();
               if( !result.valid() ) {
@@ -68,15 +82,27 @@ namespace BlueBear::Scripting {
                 Log::getInstance().error( "CoreEngine::update", "Exception thrown: " + std::string( error.what() ) );
               }
             },
-            []( std::function< void() > function ) { function(); }
+            []( std::function< void() > function ) {
+              try {
+                function();
+              } catch( std::exception& error ) {
+                Log::getInstance().error( "CoreEngine::update", "Exception thrown: " + std::string( error.what() ) );
+              }
+            }
           }, callback.second );
 
-          optional.reset();
+          removalIndices.push_back( i );
         } else {
           callback.first = std::max( 0, callback.first - 1 );
         }
       }
+
+      i++;
     } );
+
+    for( int removal : removalIndices ) {
+      queuedCallbacks.remove( removal );
+    }
   }
 
 }
