@@ -1,8 +1,10 @@
 #include "scripting/coreengine.hpp"
 #include "scripting/luakit/modpackloader.hpp"
 #include "tools/utility.hpp"
+#include "configmanager.hpp"
 #include "eventmanager.hpp"
 #include "log.hpp"
+#include <cmath>
 
 namespace BlueBear::Scripting {
 
@@ -32,6 +34,7 @@ namespace BlueBear::Scripting {
 
     sol::table util = lua.create_table();
     util.set_function( "bind", &CoreEngine::bind, this );
+    util.set_function( "seconds_to_ticks", &CoreEngine::secondsToTicks );
 
     sol::table event = lua.create_table();
 
@@ -60,8 +63,12 @@ namespace BlueBear::Scripting {
     return temp[ "__closure" ];
   }
 
-  int CoreEngine::setTimeout( int interval, sol::function f ) {
-    return queuedCallbacks.insert( { interval, f } );
+  int CoreEngine::setTimeout( double interval, sol::function f ) {
+    return queuedCallbacks.insert( { std::round( interval ), f } );
+  }
+
+  double CoreEngine::secondsToTicks( double seconds ) {
+    return seconds * ConfigManager::getInstance().getIntValue( "fps_overview" );
   }
 
   bool CoreEngine::update() {
@@ -75,8 +82,7 @@ namespace BlueBear::Scripting {
         if( callback.first == 0 ) {
           std::visit( overloaded {
             [ & ]( sol::function function ) {
-              sol::protected_function call( function );
-              auto result = call();
+              auto result = function();
               if( !result.valid() ) {
                 sol::error error = result;
                 Log::getInstance().error( "CoreEngine::update", "Exception thrown: " + std::string( error.what() ) );

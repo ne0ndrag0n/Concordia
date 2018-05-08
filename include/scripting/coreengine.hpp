@@ -22,9 +22,10 @@ namespace BlueBear::Scripting {
     Containers::ReusableObjectVector< std::pair< int, std::variant< sol::function, std::function< void() > > > > queuedCallbacks;
 
     void setupCoreEnvironment();
-    int setTimeout( int interval, sol::function f );
 
+    int setTimeout( double interval, sol::function f );
     sol::function bind( sol::function f, sol::variadic_args args );
+    static double secondsToTicks( double seconds );
 
   public:
     CoreEngine( State::State& state );
