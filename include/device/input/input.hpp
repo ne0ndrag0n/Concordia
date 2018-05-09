@@ -2,16 +2,12 @@
 #define BB_DEVICE_INPUT
 
 #include "bbtypes.hpp"
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
 #include <unordered_map>
 #include <vector>
 #include <functional>
 #include <memory>
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Event.hpp>
-#include <sol.hpp>
 #include <string>
 #include <glm/glm.hpp>
 
@@ -40,20 +36,9 @@ namespace BlueBear {
       public:
         class KeyGroup {
           std::unordered_map< std::string, std::function< void() > > keyEvents;
-          std::unordered_map< std::string, std::vector< sol::function > > luaKeyEvents;
-
-          unsigned int insertNearest( const std::string& key, sol::function& function );
-          void fireOff( std::vector< sol::function >& refs );
-          void submitLuaContributions( sol::state& lua );
 
         public:
-          KeyGroup();
-          ~KeyGroup();
-
           void registerSystemKey( const std::string& key, std::function< void() > callback );
-          sol::variadic_results registerScriptKey( sol::this_state L, const std::string& key, sol::function callback );
-
-          void unregisterScriptKey( const std::string& key, int id );
           void unregisterSystemKey( const std::string& key );
 
           void trigger( const std::string& key );

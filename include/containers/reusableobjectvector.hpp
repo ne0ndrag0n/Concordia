@@ -32,16 +32,16 @@ namespace BlueBear::Containers {
     };
 
     void each( std::function< void( T& ) > predicate ) {
-      for( std::optional< T >& object : vector ) {
-        if( object ) {
-          predicate( *object );
+      for( int i = 0; i != vector.size(); i++ ) {
+        if( vector[ i ] ) {
+          predicate( *vector[ i ] );
         }
       }
     };
 
     void each( std::function< void( std::optional< T >& ) > predicate ) {
-      for( std::optional< T >& object : vector ) {
-        predicate( object );
+      for( int i = 0; i != vector.size(); i++ ) {
+        predicate( vector[ i ] );
       }
     };
   };

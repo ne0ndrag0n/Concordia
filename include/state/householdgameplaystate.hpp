@@ -3,6 +3,7 @@
 
 #include "state/state.hpp"
 #include "scripting/coreengine.hpp"
+#include "scripting/luakit/eventhelper.hpp"
 #include "exceptions/genexc.hpp"
 #include "device/input/input.hpp"
 #include <memory>
@@ -11,7 +12,6 @@ namespace BlueBear {
   class Application;
 
   namespace Scripting {
-    class Engine;
     class InfrastructureFactory;
   }
 
@@ -22,6 +22,7 @@ namespace BlueBear {
       static const unsigned int GUI_ADAPTER = 1;
 
       Scripting::CoreEngine engine;
+      Scripting::LuaKit::EventHelper luaEventHelper;
       Device::Input::Input::KeyGroup keyGroup;
 
       void setupDisplayDevice();
@@ -33,6 +34,7 @@ namespace BlueBear {
       HouseholdGameplayState( Application& application );
       ~HouseholdGameplayState();
 
+      Scripting::CoreEngine& getEngine();
       void update() override;
     };
 

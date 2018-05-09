@@ -11,18 +11,6 @@ namespace BlueBear::Scripting {
   CoreEngine::CoreEngine( State::State& state ) : State::Substate( state ) {
     luaL_openlibs( lua.lua_state() );
     setupCoreEnvironment();
-
-    {
-      LuaKit::ModpackLoader sys( lua, SYSTEM_MODPACK_DIRECTORY );
-      sys.load();
-    }
-
-    {
-      LuaKit::ModpackLoader user( lua, USER_MODPACK_DIRECTORY );
-      user.load();
-    }
-
-    eventManager.LUA_STATE_READY.trigger( lua );
   }
 
   void CoreEngine::setupCoreEnvironment() {
@@ -36,8 +24,6 @@ namespace BlueBear::Scripting {
     util.set_function( "bind", &CoreEngine::bind, this );
     util.set_function( "seconds_to_ticks", &CoreEngine::secondsToTicks );
 
-    sol::table event = lua.create_table();
-
     lua.set_function( "print", sol::overload(
       [ & ]( const std::string& tag, const std::string& message ) {
         Log::getInstance().debug( tag, message );
@@ -49,7 +35,6 @@ namespace BlueBear::Scripting {
 
     lua[ "bluebear" ][ "engine" ] = engine;
     lua[ "bluebear" ][ "util" ] = util;
-    lua[ "bluebear" ][ "event" ] = event;
   }
 
   sol::function CoreEngine::bind( sol::function f, sol::variadic_args args ) {
@@ -69,6 +54,22 @@ namespace BlueBear::Scripting {
 
   double CoreEngine::secondsToTicks( double seconds ) {
     return seconds * ConfigManager::getInstance().getIntValue( "fps_overview" );
+  }
+
+  void CoreEngine::loadModpacks() {
+    {
+      LuaKit::ModpackLoader sys( lua, SYSTEM_MODPACK_DIRECTORY );
+      sys.load();
+    }
+
+    {
+      LuaKit::ModpackLoader user( lua, USER_MODPACK_DIRECTORY );
+      user.load();
+    }
+  }
+
+  void CoreEngine::broadcastReadyEvent() {
+    eventManager.LUA_STATE_READY.trigger( lua );
   }
 
   bool CoreEngine::update() {

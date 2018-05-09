@@ -1,8 +1,6 @@
 #include "state/householdgameplaystate.hpp"
 #include "log.hpp"
 #include "application.hpp"
-#include "scripting/lot.hpp"
-#include "scripting/engine.hpp"
 #include "scripting/luastate.hpp"
 #include "configmanager.hpp"
 #include "eventmanager.hpp"
@@ -23,9 +21,12 @@
 namespace BlueBear {
   namespace State {
 
-    HouseholdGameplayState::HouseholdGameplayState( Application& application ) : State::State( application ), engine( *this ) {
+    HouseholdGameplayState::HouseholdGameplayState( Application& application ) : State::State( application ), engine( *this ), luaEventHelper( engine ) {
       setupDisplayDevice();
       setupInputDevice();
+
+      engine.broadcastReadyEvent();
+      engine.loadModpacks();
     }
 
     HouseholdGameplayState::~HouseholdGameplayState() {
@@ -145,6 +146,12 @@ namespace BlueBear {
           std::placeholders::_1
         )
       );
+
+      luaEventHelper.connectInputDevice( inputManager );
+    }
+
+    Scripting::CoreEngine& HouseholdGameplayState::getEngine() {
+      return engine;
     }
 
     void HouseholdGameplayState::update() {

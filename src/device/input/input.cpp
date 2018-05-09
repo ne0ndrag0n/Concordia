@@ -1,7 +1,6 @@
 #include "device/input/input.hpp"
 #include "tools/ctvalidators.hpp"
 #include "tools/utility.hpp"
-#include "eventmanager.hpp"
 #include "log.hpp"
 #include "scripting/luastate.hpp"
 #include "state/state.hpp"
@@ -15,76 +14,12 @@ namespace BlueBear {
   namespace Device {
     namespace Input {
 
-      unsigned int Input::KeyGroup::insertNearest( const std::string& key, sol::function& function ) {
-        auto& collection = luaKeyEvents[ key ];
-
-        for( int i = 0; i != collection.size(); i++ ) {
-          if( !collection[ i ].valid() ) {
-            collection[ i ] = function;
-            return i;
-          }
-        }
-
-        collection.push_back( function );
-        return collection.size() - 1;
-      }
-
-      void Input::KeyGroup::fireOff( std::vector< sol::function >& refs ) {
-        for( sol::function copy : refs ) {
-          if( copy.valid() ) {
-            eventManager.UI_ACTION_EVENT.trigger( copy );
-          }
-        }
-      }
-
-      void Input::KeyGroup::submitLuaContributions( sol::state& lua ) {
-        sol::table event = lua[ "bluebear" ][ "event" ];
-        event.set_function( "register_key", &Input::KeyGroup::registerScriptKey, this );
-        event.set_function( "unregister_key", &Input::KeyGroup::unregisterScriptKey, this );
-      }
-
-      Input::KeyGroup::KeyGroup() {
-        eventManager.LUA_STATE_READY.listen( this, std::bind( &Input::KeyGroup::submitLuaContributions, this, std::placeholders::_1 ) );
-      }
-
-      Input::KeyGroup::~KeyGroup () {
-        eventManager.LUA_STATE_READY.stopListening( this );
-      }
-
       void Input::KeyGroup::registerSystemKey( const std::string& key, std::function< void() > callback ) {
         keyEvents[ key ] = callback;
       }
 
-      sol::variadic_results Input::KeyGroup::registerScriptKey( sol::this_state L, const std::string& key, sol::function callback ) {
-        sol::variadic_results result;
-
-        if( callback.valid() ) {
-          auto it = keyEvents.find( key );
-          if( it == keyEvents.end() ) {
-            result.push_back( { L, sol::in_place, insertNearest( key, callback ) } );
-          } else {
-            Log::getInstance().warn( "Input::KeyGroup::registerScriptKey", "This key is reserved by the engine and cannot be registered for an event." );
-          }
-        } else {
-          Log::getInstance().error( "Input::KeyGroup::registerScriptKey", "Invalid function provided to bluebear.event.register_key" );
-        }
-
-        return result;
-      }
-
-      void Input::KeyGroup::unregisterScriptKey( const std::string& key, int id ) {
-        if( luaKeyEvents.find( key ) != luaKeyEvents.end() ) {
-          std::vector< sol::function >& vector = luaKeyEvents[ key ];
-          if( id < vector.size() ) {
-            vector[ id ] = sol::function{};
-          }
-        }
-      }
-
       void Input::KeyGroup::unregisterSystemKey( const std::string& key ) {
-        if( keyEvents.find( key ) != keyEvents.end() ) {
-          keyEvents.erase( key );
-        }
+        keyEvents.erase( key );
       }
 
       void Input::KeyGroup::trigger( const std::string& key ) {
@@ -92,16 +27,6 @@ namespace BlueBear {
         if( it != keyEvents.end() ) {
           if( it->second ) {
             it->second();
-          }
-        } else {
-          // Lua key events come second-fiddle to key events
-          auto it2 = luaKeyEvents.find( key );
-          if( it2 != luaKeyEvents.end() ) {
-            for( sol::function copy : it2->second ) {
-              if( copy.valid() ) {
-                eventManager.UI_ACTION_EVENT.trigger( copy );
-              }
-            }
           }
         }
       }

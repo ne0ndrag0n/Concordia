@@ -23,13 +23,15 @@ namespace BlueBear::Scripting {
 
     void setupCoreEnvironment();
 
-    int setTimeout( double interval, sol::function f );
     sol::function bind( sol::function f, sol::variadic_args args );
     static double secondsToTicks( double seconds );
 
   public:
     CoreEngine( State::State& state );
 
+    int setTimeout( double interval, sol::function f );
+    void loadModpacks();
+    void broadcastReadyEvent();
     bool update() override;
   };
 

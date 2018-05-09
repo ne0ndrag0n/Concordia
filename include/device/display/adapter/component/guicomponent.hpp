@@ -6,6 +6,10 @@
 #include "graphics/userinterface/propertylist.hpp"
 #include "graphics/userinterface/style/styleapplier.hpp"
 #include "graphics/shader.hpp"
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
+#include <sol.hpp>
 #include <queue>
 #include <memory>
 #include <set>
@@ -39,6 +43,7 @@ namespace BlueBear {
             Graphics::UserInterface::Style::StyleApplier styleManager;
             std::unordered_map< std::string, std::function< void( Device::Input::Metadata ) > > blockingGlobalEvents;
 
+            void submitLuaContributions( sol::state& lua );
             void fireFocusEvent( std::shared_ptr< Graphics::UserInterface::Element > selected, Device::Input::Metadata event );
             void fireInOutEvents( std::shared_ptr< Graphics::UserInterface::Element > selected, Device::Input::Metadata event );
 

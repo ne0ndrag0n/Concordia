@@ -9,6 +9,7 @@
 #include "graphics/userinterface/querier.hpp"
 #include "tools/utility.hpp"
 #include "configmanager.hpp"
+#include "eventmanager.hpp"
 #include "log.hpp"
 #include <GL/glew.h>
 #include <glm/glm.hpp>
@@ -50,9 +51,26 @@ namespace BlueBear {
               styleManager.applyStyles( {
                 "system/ui/system.style"
               } );
+
+              eventManager.LUA_STATE_READY.listen( this, std::bind( &GuiComponent::submitLuaContributions, this, std::placeholders::_1 ) );
             }
 
-          GuiComponent::~GuiComponent() = default;
+          GuiComponent::~GuiComponent() {
+            eventManager.LUA_STATE_READY.stopListening( this );
+          }
+
+          void GuiComponent::submitLuaContributions( sol::state& lua ) {
+            sol::table gui = lua.create_table();
+            gui.set_function( "load_xml", [ & ]( const std::string& path ) {
+              Graphics::UserInterface::XMLLoader loader( path );
+              std::vector< std::shared_ptr< Graphics::UserInterface::Element > > elements = loader.getElements();
+              for( std::shared_ptr< Graphics::UserInterface::Element > element : elements ) {
+                rootElement->addChild( element );
+              }
+            } );
+
+            lua[ "bluebear" ][ "gui" ] = gui;
+          }
 
           // TODO: remove TEST code
           void GuiComponent::__testadd() {
