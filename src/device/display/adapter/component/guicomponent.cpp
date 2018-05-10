@@ -7,6 +7,7 @@
 #include "graphics/userinterface/drawable.hpp"
 #include "graphics/userinterface/draghelper.hpp"
 #include "graphics/userinterface/querier.hpp"
+#include "graphics/userinterface/luaregistrant.hpp"
 #include "tools/utility.hpp"
 #include "configmanager.hpp"
 #include "eventmanager.hpp"
@@ -70,6 +71,11 @@ namespace BlueBear {
             } );
 
             lua[ "bluebear" ][ "gui" ] = gui;
+
+            // XXX
+            lua[ "__test" ] = rootElement;
+
+            Graphics::UserInterface::LuaRegistrant::registerWidgets( lua );
           }
 
           // TODO: remove TEST code

@@ -51,7 +51,6 @@ namespace BlueBear {
 
         Element( const std::string& tag, const std::string& id, const std::vector< std::string >& classes );
         Element( const Element& other );
-        virtual ~Element();
 
         glm::ivec2 toRelative( const glm::uvec2& location );
         void setShadow( bool status );
@@ -65,6 +64,8 @@ namespace BlueBear {
         void setScissor( const glm::vec4& scissor );
 
       public:
+        virtual ~Element();
+
         static Device::Display::Adapter::Component::GuiComponent* manager;
 
         void walk( std::function< void( Element& ) > predicate );
