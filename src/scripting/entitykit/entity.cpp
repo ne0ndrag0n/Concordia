@@ -2,7 +2,7 @@
 
 namespace BlueBear::Scripting::EntityKit {
 
-  Entity::Entity( std::unordered_map< std::string, Component > components ) : components( components ) {}
+  Entity::Entity( std::map< std::string, Component > components ) : components( components ) {}
 
   Component& Entity::getComponent( const std::string& componentId ) {
     auto it = components.find( componentId );

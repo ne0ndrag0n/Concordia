@@ -6,15 +6,15 @@
 #include <lauxlib.h>
 #include <sol.hpp>
 #include <string>
-#include <unordered_map>
+#include <map>
 
 namespace BlueBear::Scripting::LuaKit {
 
   class DynamicUsertype {
-    std::unordered_map< std::string, sol::object > types;
+    std::map< std::string, sol::object > types;
 
   public:
-    DynamicUsertype( const std::unordered_map< std::string, sol::object >& types = {} );
+    DynamicUsertype( const std::map< std::string, sol::object >& types = {} );
 
     void set( const std::string& key, sol::object object );
     sol::object get( const std::string& key );

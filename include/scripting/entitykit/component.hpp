@@ -6,7 +6,7 @@
 #include <lualib.h>
 #include <lauxlib.h>
 #include <sol.hpp>
-#include <unordered_map>
+#include <map>
 
 namespace BlueBear::Scripting::EntityKit {
   class Entity;
@@ -15,7 +15,7 @@ namespace BlueBear::Scripting::EntityKit {
     Entity* entity = nullptr;
 
   public:
-    Component( const std::unordered_map< std::string, sol::object >& types = {} );
+    Component( const std::map< std::string, sol::object >& types = {} );
 
     void attach( Entity* entity );
   };

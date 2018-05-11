@@ -2,7 +2,7 @@
 
 namespace BlueBear::Scripting::LuaKit {
 
-  DynamicUsertype::DynamicUsertype( const std::unordered_map< std::string, sol::object >& types ) : types( types ) {}
+  DynamicUsertype::DynamicUsertype( const std::map< std::string, sol::object >& types ) : types( types ) {}
 
   void DynamicUsertype::set( const std::string& key, sol::object object ) {
     types[ key ] = object;
