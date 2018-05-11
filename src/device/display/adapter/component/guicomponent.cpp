@@ -71,10 +71,6 @@ namespace BlueBear {
             } );
 
             lua[ "bluebear" ][ "gui" ] = gui;
-
-            // XXX
-            lua[ "__test" ] = rootElement;
-
             Graphics::UserInterface::LuaRegistrant::registerWidgets( lua );
           }
 

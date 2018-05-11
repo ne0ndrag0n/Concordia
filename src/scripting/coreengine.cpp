@@ -1,5 +1,7 @@
 #include "scripting/coreengine.hpp"
 #include "scripting/luakit/modpackloader.hpp"
+#include "scripting/luakit/dynamicusertype.hpp"
+#include "scripting/entitykit/registry.hpp"
 #include "tools/utility.hpp"
 #include "configmanager.hpp"
 #include "eventmanager.hpp"
@@ -69,6 +71,8 @@ namespace BlueBear::Scripting {
     lua[ "bluebear" ][ "engine" ] = engine;
     lua[ "bluebear" ][ "util" ] = util;
     lua[ "bluebear" ][ "util" ][ "types" ] = types;
+
+    LuaKit::DynamicUsertype::submitLuaContributions( types );
   }
 
   sol::function CoreEngine::bind( sol::function f, sol::variadic_args args ) {

@@ -4,6 +4,7 @@
 #include "state/state.hpp"
 #include "scripting/coreengine.hpp"
 #include "scripting/luakit/eventhelper.hpp"
+#include "scripting/entitykit/registry.hpp"
 #include "exceptions/genexc.hpp"
 #include "device/input/input.hpp"
 #include <memory>
@@ -23,6 +24,7 @@ namespace BlueBear {
 
       Scripting::CoreEngine engine;
       Scripting::LuaKit::EventHelper luaEventHelper;
+      Scripting::EntityKit::Registry entityRegistry;
       Device::Input::Input::KeyGroup keyGroup;
 
       void setupDisplayDevice();
