@@ -45,16 +45,23 @@ namespace BlueBear::Scripting::EntityKit {
     components[ id ] = table;
   }
 
-  void Registry::registerEntity( const std::string& id, const std::vector< std::string >& componentlist ) {
+  void Registry::registerEntity( const std::string& id, sol::table componentlist ) {
+    std::vector< std::string > list;
+
     // Verify all attached components exist and have been registered
-    for( const std::string& component : componentlist ) {
-      if( components.find( component ) == components.end() ) {
-        Log::getInstance().error( "Registry::registerEntity", "Component " + component + " has not been registered!" );
-        return;
+    for( auto& pair : componentlist ) {
+      if( pair.second.is< std::string >() ) {
+        std::string component = pair.second.as< std::string >();
+        if( components.find( component ) == components.end() ) {
+          Log::getInstance().error( "Registry::registerEntity", "Component " + component + " has not been registered!" );
+          return;
+        } else {
+          list.push_back( component );
+        }
       }
     }
 
-    entities[ id ] = componentlist;
+    entities[ id ] = list;
   }
 
   std::map< std::string, sol::object > Registry::tableToMap( sol::table table ) {

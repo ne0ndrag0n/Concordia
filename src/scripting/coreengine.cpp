@@ -1,6 +1,7 @@
 #include "scripting/coreengine.hpp"
 #include "scripting/luakit/modpackloader.hpp"
 #include "scripting/luakit/dynamicusertype.hpp"
+#include "scripting/luakit/utility.hpp"
 #include "scripting/entitykit/registry.hpp"
 #include "tools/utility.hpp"
 #include "configmanager.hpp"
@@ -60,11 +61,11 @@ namespace BlueBear::Scripting {
     );
 
     lua.set_function( "print", sol::overload(
-      [ & ]( const std::string& tag, const std::string& message ) {
-        Log::getInstance().debug( tag, message );
+      [ & ]( sol::object tag, sol::object message ) {
+        Log::getInstance().debug( lua[ "tostring" ]( tag ), lua[ "tostring" ]( message ) );
       },
-      [ & ]( const std::string& message ) {
-        Log::getInstance().debug( "<script>", message );
+      [ & ]( sol::object message ) {
+        Log::getInstance().debug( "<script>", lua[ "tostring" ]( message ) );
       }
     ) );
 
@@ -72,6 +73,7 @@ namespace BlueBear::Scripting {
     lua[ "bluebear" ][ "util" ] = util;
     lua[ "bluebear" ][ "util" ][ "types" ] = types;
 
+    LuaKit::Utility::submitLuaContributions( lua );
     LuaKit::DynamicUsertype::submitLuaContributions( types );
   }
 

@@ -21,7 +21,7 @@ namespace BlueBear::Scripting::EntityKit {
     std::map< std::string, sol::object > tableToMap( sol::table table );
     void submitLuaContributions( sol::state& lua );
     void registerComponent( const std::string& id, sol::table table );
-    void registerEntity( const std::string& id, const std::vector< std::string >& componentlist );
+    void registerEntity( const std::string& id, sol::table componentlist );
 
     Component newComponent( const std::string& id );
     Entity newEntity( const std::string& id, std::map< std::string, sol::table > constructors );
