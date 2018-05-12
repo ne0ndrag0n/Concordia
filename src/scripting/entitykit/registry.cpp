@@ -85,7 +85,7 @@ namespace BlueBear::Scripting::EntityKit {
     return Component( tableToMap( it->second ) );
   }
 
-  Entity Registry::newEntity( const std::string& id, std::map< std::string, sol::table > constructors ) {
+  Entity Registry::newEntity( const std::string& id, sol::table constructors ) {
     auto it = entities.find( id );
     if( it == entities.end() ) {
       Log::getInstance().error( "Registry::newEntity", "Component " + id + " has not been registered!" );
@@ -99,7 +99,7 @@ namespace BlueBear::Scripting::EntityKit {
       // Call its "init" function, should one exist
       sol::object init = components[ component ].get( "init" );
       if( init.is< sol::function >() ) {
-        init.as< sol::function >()( init, constructors[ component ] );
+        init.as< sol::function >()( components[ component ], constructors[ component ] );
       }
     }
 

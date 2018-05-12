@@ -24,7 +24,7 @@ namespace BlueBear::Scripting::EntityKit {
     void registerEntity( const std::string& id, sol::table componentlist );
 
     Component newComponent( const std::string& id );
-    Entity newEntity( const std::string& id, std::map< std::string, sol::table > constructors );
+    Entity newEntity( const std::string& id, sol::table constructors );
 
   public:
     EXCEPTION_TYPE( InvalidIDException, "Invalid ID!" );
