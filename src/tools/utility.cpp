@@ -90,6 +90,11 @@ namespace BlueBear {
 			#ifndef _WIN32
 			DIR *dir = opendir( rootSubDirectory );
 
+			if( !dir ) {
+				Log::getInstance().error( "Utility::getSubdirectoryList", "Directory not found! " + std::string( rootSubDirectory ) );
+				return directories;
+			}
+
 			struct dirent* entry = readdir( dir );
 
 			while ( entry != NULL ) {
