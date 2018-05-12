@@ -10,6 +10,7 @@
 #include <sol.hpp>
 #include <string>
 #include <optional>
+#include <memory>
 #include <map>
 
 namespace BlueBear::Scripting::EntityKit {
@@ -23,8 +24,8 @@ namespace BlueBear::Scripting::EntityKit {
     void registerComponent( const std::string& id, sol::table table );
     void registerEntity( const std::string& id, sol::table componentlist );
 
-    Component newComponent( const std::string& id );
-    Entity newEntity( const std::string& id, sol::table constructors );
+    std::shared_ptr< Component > newComponent( const std::string& id );
+    std::shared_ptr< Entity > newEntity( const std::string& id, sol::table constructors );
 
   public:
     EXCEPTION_TYPE( InvalidIDException, "Invalid ID!" );

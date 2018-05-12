@@ -28,17 +28,8 @@ namespace BlueBear::Scripting::EntityKit {
     entity.set_function( "create_new_entity", &Registry::newEntity, this );
 
     sol::table types = lua[ "bluebear" ][ "entity" ][ "types" ] = lua.create_table();
-    types.new_usertype< EntityKit::Component >( "Component",
-      "new", sol::no_constructor,
-      sol::meta_function::index, &LuaKit::DynamicUsertype::get,
-      sol::meta_function::new_index, &LuaKit::DynamicUsertype::set,
-      sol::meta_function::length, &LuaKit::DynamicUsertype::size,
-      sol::base_classes, sol::bases< LuaKit::DynamicUsertype >()
-    );
-    types.new_usertype< EntityKit::Entity >( "Entity",
-      "new", sol::no_constructor,
-      "get_component", &Entity::getComponent
-    );
+    Component::submitLuaContributions( lua, types );
+    Entity::submitLuaContributions( lua, types );
   }
 
   void Registry::registerComponent( const std::string& id, sol::table table ) {
@@ -76,34 +67,34 @@ namespace BlueBear::Scripting::EntityKit {
     return result;
   }
 
-  Component Registry::newComponent( const std::string& id ) {
+  std::shared_ptr< Component > Registry::newComponent( const std::string& id ) {
     auto it = components.find( id );
     if( it == components.end() ) {
       Log::getInstance().error( "Registry::newComponent", "This should not be happening!" );
     }
 
-    return Component( tableToMap( it->second ) );
+    return std::make_shared< Component >( tableToMap( it->second ) );
   }
 
-  Entity Registry::newEntity( const std::string& id, sol::table constructors ) {
+  std::shared_ptr< Entity > Registry::newEntity( const std::string& id, sol::table constructors ) {
     auto it = entities.find( id );
     if( it == entities.end() ) {
       Log::getInstance().error( "Registry::newEntity", "Component " + id + " has not been registered!" );
       throw InvalidIDException();
     }
 
-    std::map< std::string, Component > components;
+    std::map< std::string, std::shared_ptr< Component > > components;
     for( const std::string& component : it->second ) {
       components[ component ] = newComponent( component );
 
       // Call its "init" function, should one exist
-      sol::object init = components[ component ].get( "init" );
+      sol::object init = components[ component ]->get( "init" );
       if( init.is< sol::function >() ) {
         init.as< sol::function >()( components[ component ], constructors[ component ] );
       }
     }
 
-    return Entity( components );
+    return std::make_shared< Entity >( components );
   }
 
 }
