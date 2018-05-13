@@ -10,7 +10,7 @@
 #include <lualib.h>
 #include <lauxlib.h>
 #include <sol.hpp>
-#include <queue>
+#include <vector>
 #include <memory>
 #include <set>
 #include <functional>
@@ -49,11 +49,10 @@ namespace BlueBear {
 
           public:
 
+            std::vector< std::shared_ptr< Graphics::UserInterface::Element > > addElementsFromXML( const std::string& xmlPath );
+
             void setupBlockingGlobalEvent( const std::string& eventId, std::function< void( Device::Input::Metadata ) > callback );
             void unregisterBlockingGlobalEvent( const std::string& eventId );
-
-            void __testadd();
-            void __teststyle();
 
             std::shared_ptr< Graphics::UserInterface::Element > captureMouseEvent(
               std::shared_ptr< Graphics::UserInterface::Element > element,

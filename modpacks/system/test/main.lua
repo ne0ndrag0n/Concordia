@@ -1,5 +1,10 @@
 print( ..., 'This is a modpack' )
 
+-- Load demo components
+bluebear.event.register_key( 'v', function()
+  bluebear.gui.load_xml( 'system/ui/example.xml' )
+end )
+
 local test = { a = 1, b = "two", c = { three = 3 } }
 function test:fun() print( 'programming is fun '..tostring( self.a ) ) end
 function test:init( arg )
@@ -15,6 +20,3 @@ local entity = bluebear.entity.create_new_entity( 'system.entity.test', {
   [ 'system.component.test' ] = { test = 'boop!' },
   [ 'system.component.model_manager' ] = { 'game.models.flower' },
 } )
-
-local model_manager = entity:get_component( 'system.component.model_manager' )
-print( model_manager:get_potential_models()[ 1 ] == 'game.models.flower' )

@@ -62,29 +62,21 @@ namespace BlueBear {
 
           void GuiComponent::submitLuaContributions( sol::state& lua ) {
             sol::table gui = lua.create_table();
-            gui.set_function( "load_xml", [ & ]( const std::string& path ) {
-              Graphics::UserInterface::XMLLoader loader( path );
-              std::vector< std::shared_ptr< Graphics::UserInterface::Element > > elements = loader.getElements();
-              for( std::shared_ptr< Graphics::UserInterface::Element > element : elements ) {
-                rootElement->addChild( element );
-              }
-            } );
+            gui.set_function( "load_xml", &GuiComponent::addElementsFromXML, this );
 
             lua[ "bluebear" ][ "gui" ] = gui;
             Graphics::UserInterface::LuaRegistrant::registerWidgets( lua );
           }
 
-          // TODO: remove TEST code
-          void GuiComponent::__testadd() {
-            Graphics::UserInterface::XMLLoader loader( "system/ui/example.xml" );
+          std::vector< std::shared_ptr< Graphics::UserInterface::Element > > GuiComponent::addElementsFromXML( const std::string& xmlPath ) {
+            Graphics::UserInterface::XMLLoader loader( xmlPath );
             std::vector< std::shared_ptr< Graphics::UserInterface::Element > > elements = loader.getElements();
+
             for( std::shared_ptr< Graphics::UserInterface::Element > element : elements ) {
               rootElement->addChild( element );
             }
-          }
 
-          void GuiComponent::__teststyle() {
-            Log::getInstance().info( "GuiComponent::__teststyle", "Remove this function and callbacks" );
+            return elements;
           }
 
           void GuiComponent::setupBlockingGlobalEvent( const std::string& eventId, std::function< void( Device::Input::Metadata ) > callback ) {

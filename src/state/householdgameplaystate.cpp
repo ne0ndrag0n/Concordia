@@ -77,28 +77,6 @@ namespace BlueBear {
 
         animator->setCurrentAnimation( "Armature|ArmatureAction" );
       } );
-      keyGroup.registerSystemKey( Device::Input::Input::keyToString( sf::Keyboard::V ), [ & ]() {
-        Log::getInstance().debug( "HouseholdGameplayState::setupInputDevice", "Trying this shit..." );
-
-        application
-          .getDisplayDevice()
-          .getAdapterAt( GUI_ADAPTER )
-          .as< Device::Display::Adapter::Component::GuiComponent >()
-          .__testadd();
-
-        Log::getInstance().debug( "HouseholdGameplayState::setupInputDevice", "Done" );
-      } );
-      keyGroup.registerSystemKey( Device::Input::Input::keyToString( sf::Keyboard::B ), [ & ]() {
-        Log::getInstance().debug( "HouseholdGameplayState::setupInputDevice", "Applying style..." );
-
-        application
-          .getDisplayDevice()
-          .getAdapterAt( GUI_ADAPTER )
-          .as< Device::Display::Adapter::Component::GuiComponent >()
-          .__teststyle();
-
-        Log::getInstance().debug( "HouseholdGameplayState::setupInputDevice", "Done" );
-      } );
 
       Device::Input::Input& inputManager = application.getInputDevice();
       inputManager.reset();
