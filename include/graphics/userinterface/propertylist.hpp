@@ -1,6 +1,7 @@
 #ifndef UI_PROPERTY_LIST
 #define UI_PROPERTY_LIST
 
+#include "containers/visitor.hpp"
 #include "exceptions/genexc.hpp"
 #include "log.hpp"
 #include <glm/glm.hpp>
@@ -93,17 +94,30 @@ namespace BlueBear {
           values[ key ] = value;
         };
 
+        template < typename VariantType > static const VariantType discriminate( PropertyListType variant ) {
+          if( auto value = std::get_if< VariantType >( &variant ) ) {
+            return *value;
+          } else {
+            throw InvalidValueException();
+          }
+        }
+
         template < typename VariantType > const VariantType get( const std::string& key ) const {
-          if( keyExists( key ) ) {
-            if( auto value = std::get_if< VariantType >( &( values.find( key )->second ) ) ) {
-              return *value;
-            } else {
-              Log::getInstance().error( "PropertyList::get", key + " could not be converted to the requested type." );
-            }
+          return discriminate< VariantType >( getVariant( key ) );
+        };
+
+        PropertyListType getVariant( const std::string& key ) const {
+          auto it = values.find( key );
+          if( it == values.end() ) {
+            throw InvalidValueException();
           }
 
-          throw InvalidValueException();
+          return it->second;
         };
+
+        void setVariant( const std::string& key, PropertyListType value ) {
+          values[ key ] = value;
+        }
 
       };
 

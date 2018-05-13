@@ -18,14 +18,6 @@ namespace BlueBear::Graphics::UserInterface {
     sol::table gui = lua[ "bluebear" ][ "gui" ];
     sol::table types = lua.create_table();
 
-    gui.new_usertype< Style::Style >(
-      "Style",
-      "new", sol::no_constructor,
-      "get_property", []( const std::string& key ) {
-        // TODO !!
-      }
-    );
-
     // If constructor is required here then all pure virtual functions must be removed
     gui.new_usertype< Element >(
       "Element",
@@ -35,8 +27,19 @@ namespace BlueBear::Graphics::UserInterface {
       "has_class", &Element::hasClass,
       "get_selector_string", &Element::generateSelectorString,
       "get_children", &Element::getChildren,
-      "get_absolute_position", []( std::shared_ptr< Element > self ) { return glm::vec2{ self->getAbsolutePosition() }; },
-      "get_allocation", []( std::shared_ptr< Element > self ) { return glm::vec4{ self->getAllocation() }; }
+      "get_absolute_position", []( Element& self ) { return glm::vec2{ self.getAbsolutePosition() }; },
+      "get_allocation", []( Element& self ) { return glm::vec4{ self.getAllocation() }; },
+      "get_style_property", []( Element& self, const std::string& id ) -> PropertyListType {
+        PropertyListType type = self.getPropertyList().hierarchy( id );
+        if( auto uvec4 = std::get_if< glm::uvec4 >( &type ) ) {
+          return glm::vec4( *uvec4 );
+        } else {
+          return type;
+        }
+      },
+      "set_style_property", []( Element& self, const std::string& id, PropertyListType value ) {
+        self.getPropertyList().setDirect( id, value );
+      }
     );
 
     gui.new_usertype< Widgets::Layout >(

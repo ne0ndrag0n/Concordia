@@ -140,14 +140,18 @@ namespace BlueBear {
           void attachAnimation( std::unique_ptr< Animation > animation );
           void updateAnimation();
 
-          template < typename VariantType > const VariantType inheritedGet( const std::string& key ) const {
+          PropertyListType hierarchy( const std::string& key ) const {
             if( local.keyExists( key ) ) {
-              return local.get< VariantType >( key );
+              return local.getVariant( key );
             } else if( calculated.keyExists( key ) ) {
-              return calculated.get< VariantType >( key );
+              return calculated.getVariant( key );
             } else {
-              return PropertyList::rootPropertyList.get< VariantType >( key );
+              return PropertyList::rootPropertyList.getVariant( key );
             }
+          };
+
+          template < typename VariantType > const VariantType inheritedGet( const std::string& key ) const {
+            return PropertyList::discriminate< VariantType >( hierarchy( key ) );
           };
 
           template < typename VariantType > const VariantType get( const std::string& key ) const {
@@ -161,6 +165,15 @@ namespace BlueBear {
           template < typename VariantType > void set( const std::string& key, VariantType value, bool reflow = true ) {
             local.set< VariantType >( key, value );
             changedAttributes.insert( key );
+
+            if( reflow ) {
+              reflowParent();
+            }
+          };
+
+          void setDirect( const std::string& id, PropertyListType value, bool reflow = true ) {
+            local.setVariant( id, value );
+            changedAttributes.insert( id );
 
             if( reflow ) {
               reflowParent();
