@@ -8,6 +8,9 @@
 #include "graphics/userinterface/draghelper.hpp"
 #include "graphics/userinterface/querier.hpp"
 #include "graphics/userinterface/luaregistrant.hpp"
+#include "graphics/userinterface/xmlloader.hpp"
+#include "graphics/userinterface/style/ast/selectorquery.hpp"
+#include "scripting/luakit/utility.hpp"
 #include "tools/utility.hpp"
 #include "configmanager.hpp"
 #include "eventmanager.hpp"
@@ -15,11 +18,6 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <algorithm>
-
-#include <glm/gtx/string_cast.hpp>
-#include "graphics/userinterface/event/eventbundle.hpp"
-#include "graphics/userinterface/style/style.hpp"
-#include "graphics/userinterface/xmlloader.hpp"
 
 namespace BlueBear {
   namespace Device {
@@ -63,6 +61,7 @@ namespace BlueBear {
           void GuiComponent::submitLuaContributions( sol::state& lua ) {
             sol::table gui = lua.create_table();
             gui.set_function( "load_xml", &GuiComponent::addElementsFromXML, this );
+            gui.set_function( "get_elements", &GuiComponent::query, this );
 
             lua[ "bluebear" ][ "gui" ] = gui;
             Graphics::UserInterface::LuaRegistrant::registerWidgets( lua );
@@ -77,6 +76,33 @@ namespace BlueBear {
             }
 
             return elements;
+          }
+
+          std::vector< std::shared_ptr< Graphics::UserInterface::Element > > GuiComponent::query( sol::table queries ) {
+            std::vector< std::shared_ptr< Graphics::UserInterface::Element > > results;
+            Graphics::UserInterface::Querier querier( rootElement );
+
+            std::vector< Graphics::UserInterface::Style::AST::SelectorQuery > totalQuery;
+            for( auto& pair : queries ) {
+              sol::table subtable = Scripting::LuaKit::Utility::cast< sol::table >( pair.second );
+              totalQuery.emplace_back( Graphics::UserInterface::Style::AST::SelectorQuery{
+                ( subtable[ "tag" ] == sol::nil ) ? "" : Scripting::LuaKit::Utility::cast< std::string >( subtable[ "tag" ] ),
+                ( subtable[ "id" ] == sol::nil ) ? "" : Scripting::LuaKit::Utility::cast< std::string >( subtable[ "id" ] ),
+                ( subtable[ "classes" ] == sol::nil ) ? std::vector< std::string >{} : ( [ &subtable ]() {
+                  sol::table classList = Scripting::LuaKit::Utility::cast< sol::table >( subtable[ "classes" ] );
+                  std::vector< std::string > result;
+
+                  for( auto& pair : classList ) {
+                    result.push_back( Scripting::LuaKit::Utility::cast< std::string >( pair.second ) );
+                  }
+
+                  return result;
+                } )(),
+                ( subtable[ "all" ] == true )
+              } );
+            }
+
+            return querier.get( totalQuery );
           }
 
           void GuiComponent::setupBlockingGlobalEvent( const std::string& eventId, std::function< void( Device::Input::Metadata ) > callback ) {

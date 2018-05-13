@@ -50,6 +50,7 @@ namespace BlueBear {
           public:
 
             std::vector< std::shared_ptr< Graphics::UserInterface::Element > > addElementsFromXML( const std::string& xmlPath );
+            std::vector< std::shared_ptr< Graphics::UserInterface::Element > > query( sol::table queries );
 
             void setupBlockingGlobalEvent( const std::string& eventId, std::function< void( Device::Input::Metadata ) > callback );
             void unregisterBlockingGlobalEvent( const std::string& eventId );
