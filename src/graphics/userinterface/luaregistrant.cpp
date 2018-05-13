@@ -9,8 +9,8 @@
 #include "graphics/userinterface/widgets/spacer.hpp"
 #include "graphics/userinterface/widgets/pane.hpp"
 #include "graphics/userinterface/widgets/scroll.hpp"
-
-#include "log.hpp"
+#include "graphics/userinterface/style/style.hpp"
+#include "graphics/userinterface/propertylist.hpp"
 
 namespace BlueBear::Graphics::UserInterface {
 
@@ -18,9 +18,18 @@ namespace BlueBear::Graphics::UserInterface {
     sol::table gui = lua[ "bluebear" ][ "gui" ];
     sol::table types = lua.create_table();
 
+    gui.new_usertype< Style::Style >(
+      "Style",
+      "new", sol::no_constructor,
+      "get_property", []( const std::string& key ) {
+        // TODO !!
+      }
+    );
+
     // If constructor is required here then all pure virtual functions must be removed
     gui.new_usertype< Element >(
       "Element",
+      "new", sol::no_constructor,
       "get_tag", &Element::getTag,
       "get_id", &Element::getId,
       "has_class", &Element::hasClass,
@@ -32,11 +41,13 @@ namespace BlueBear::Graphics::UserInterface {
 
     gui.new_usertype< Widgets::Layout >(
       "Layout",
+      "new", sol::no_constructor,
       sol::base_classes, sol::bases< Element >()
     );
 
     gui.new_usertype< Widgets::Text >(
       "Text",
+      "new", sol::no_constructor,
       "set_text", &Widgets::Text::setText,
       "get_text", &Widgets::Text::getText,
       sol::base_classes, sol::bases< Element >()
@@ -44,43 +55,51 @@ namespace BlueBear::Graphics::UserInterface {
 
     gui.new_usertype< Widgets::Window >(
       "Window",
+      "new", sol::no_constructor,
       sol::base_classes, sol::bases< Element >()
     );
 
     gui.new_usertype< Widgets::Button >(
       "Button",
+      "new", sol::no_constructor,
       sol::base_classes, sol::bases< Element >()
     );
 
     gui.new_usertype< Widgets::Input >(
       "Input",
+      "new", sol::no_constructor,
       sol::base_classes, sol::bases< Element >()
     );
 
     gui.new_usertype< Widgets::TabLayout >(
       "TabLayout",
+      "new", sol::no_constructor,
       "set_tab", &Widgets::TabLayout::selectElement,
       sol::base_classes, sol::bases< Element >()
     );
 
     gui.new_usertype< Widgets::Image >(
       "Image",
+      "new", sol::no_constructor,
       "set_image", &Widgets::Image::setImage,
       sol::base_classes, sol::bases< Element >()
     );
 
     gui.new_usertype< Widgets::Spacer >(
       "Spacer",
+      "new", sol::no_constructor,
       sol::base_classes, sol::bases< Element >()
     );
 
     gui.new_usertype< Widgets::Pane >(
       "Pane",
+      "new", sol::no_constructor,
       sol::base_classes, sol::bases< Element >()
     );
 
     gui.new_usertype< Widgets::Scroll >(
       "Scroll",
+      "new", sol::no_constructor,
       sol::base_classes, sol::bases< Element >()
     );
 

@@ -10,6 +10,7 @@
 #include <typeinfo>
 #include <vector>
 #include <any>
+#include <variant>
 
 namespace BlueBear {
   namespace Graphics {
@@ -93,6 +94,19 @@ namespace BlueBear {
         LEFT,
         RIGHT
       };
+
+      using PropertyListType = std::variant<
+        bool,
+        int,
+        double,
+        Gravity,
+        Requisition,
+        Placement,
+        Orientation,
+        std::string,
+        // Lua is the one that primarily uses PropertyListType; this will be constructed from a uvec4
+        glm::vec4
+      >;
 
     }
   }
