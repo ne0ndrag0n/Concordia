@@ -53,7 +53,7 @@ namespace BlueBear {
           parent->reflow();
         }
 
-        void Style::setCalculated( const std::unordered_map< std::string, std::any >& map ) {
+        void Style::setCalculated( const std::unordered_map< std::string, PropertyListType >& map ) {
           calculated = PropertyList( map );
 
           for( const auto& pair : map ) {

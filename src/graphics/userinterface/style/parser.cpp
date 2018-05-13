@@ -1,6 +1,5 @@
 #include "graphics/userinterface/style/parser.hpp"
 #include "log.hpp"
-#include <any>
 
 namespace BlueBear {
   namespace Graphics {

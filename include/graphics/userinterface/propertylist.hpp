@@ -9,65 +9,12 @@
 #include <string>
 #include <typeinfo>
 #include <vector>
-#include <any>
 #include <variant>
 
 namespace BlueBear {
   namespace Graphics {
     namespace UserInterface {
       class Element;
-
-      class PropertyList {
-        std::unordered_map< std::string, std::any > values;
-
-      public:
-        static const PropertyList& rootPropertyList;
-
-        EXCEPTION_TYPE( InvalidValueException, "Property is not a valid property" );
-
-        PropertyList() = default;
-        PropertyList( const std::unordered_map< std::string, std::any >& map ) : values( map ) {}
-
-        std::vector< std::string > getProperties() const {
-          std::vector< std::string > result;
-
-          for( auto& pair : values ) {
-            result.push_back( pair.first );
-          }
-
-          return result;
-        }
-
-        void clear() {
-          values.clear();
-        };
-
-        bool keyExists( const std::string& key ) const {
-          return values.find( key ) != values.end();
-        };
-
-        void removeProperty( const std::string& key ) {
-          values.erase( key );
-        };
-
-        template < typename VariantType > void set( const std::string& key, VariantType value ) {
-          values[ key ] = value;
-        };
-
-        template < typename VariantType > const VariantType get( const std::string& key ) const {
-          if( keyExists( key ) ) {
-            try {
-              return std::any_cast< VariantType >( values.find( key )->second );
-            } catch ( const std::bad_any_cast& e ) {
-              Log::getInstance().error( "PropertyList::get", key + " could not be converted to the requested type." );
-              throw e;
-            }
-          }
-
-          throw InvalidValueException();
-        };
-
-      };
 
       enum class Gravity {
         LEFT,
@@ -105,8 +52,60 @@ namespace BlueBear {
         Orientation,
         std::string,
         // Lua is the one that primarily uses PropertyListType; this will be constructed from a uvec4
-        glm::vec4
+        glm::vec4,
+        glm::uvec4
       >;
+
+      class PropertyList {
+        std::unordered_map< std::string, PropertyListType > values;
+
+      public:
+        static const PropertyList& rootPropertyList;
+
+        EXCEPTION_TYPE( InvalidValueException, "Property is not a valid property" );
+
+        PropertyList() = default;
+        PropertyList( const std::unordered_map< std::string, PropertyListType >& map ) : values( map ) {}
+
+        std::vector< std::string > getProperties() const {
+          std::vector< std::string > result;
+
+          for( auto& pair : values ) {
+            result.push_back( pair.first );
+          }
+
+          return result;
+        }
+
+        void clear() {
+          values.clear();
+        };
+
+        bool keyExists( const std::string& key ) const {
+          return values.find( key ) != values.end();
+        };
+
+        void removeProperty( const std::string& key ) {
+          values.erase( key );
+        };
+
+        template < typename VariantType > void set( const std::string& key, VariantType value ) {
+          values[ key ] = value;
+        };
+
+        template < typename VariantType > const VariantType get( const std::string& key ) const {
+          if( keyExists( key ) ) {
+            if( auto value = std::get_if< VariantType >( &( values.find( key )->second ) ) ) {
+              return *value;
+            } else {
+              Log::getInstance().error( "PropertyList::get", key + " could not be converted to the requested type." );
+            }
+          }
+
+          throw InvalidValueException();
+        };
+
+      };
 
     }
   }

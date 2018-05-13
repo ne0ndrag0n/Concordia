@@ -134,7 +134,7 @@ namespace BlueBear {
           const std::unordered_set< std::string >& getChangedAttributes();
           void resetChangedAttributes();
           void reflowParent();
-          void setCalculated( const std::unordered_map< std::string, std::any >& map );
+          void setCalculated( const std::unordered_map< std::string, PropertyListType >& map );
           void resetProperty( const std::string& key );
 
           void attachAnimation( std::unique_ptr< Animation > animation );

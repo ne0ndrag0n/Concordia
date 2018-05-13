@@ -8,7 +8,6 @@
 #include <fstream>
 #include <sstream>
 #include <stack>
-#include <any>
 
 namespace BlueBear {
   namespace Graphics {
@@ -229,7 +228,7 @@ namespace BlueBear {
 
             // Apply by increasing specificity
             // Unoptimised, naive implementation
-            std::unordered_map< std::string, std::any > values;
+            std::unordered_map< std::string, PropertyListType > values;
             int previousSpecificity = applicablePropertyLists.front().computeSpecificity();
 
             for( const AST::PropertyList& list : applicablePropertyLists ) {
