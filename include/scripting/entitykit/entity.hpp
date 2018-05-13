@@ -3,6 +3,7 @@
 
 #include "exceptions/genexc.hpp"
 #include "scripting/entitykit/component.hpp"
+#include "scripting/entitykit/components/componentcast.hpp"
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -26,7 +27,7 @@ namespace BlueBear::Scripting::EntityKit {
     ~Entity();
     static void submitLuaContributions( sol::state& lua, sol::table types );
 
-    std::shared_ptr< Component > getComponent( const std::string& componentId );
+    Components::ComponentReturn getComponent( const std::string& componentId );
   };
 
 }

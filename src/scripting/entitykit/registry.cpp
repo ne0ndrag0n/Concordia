@@ -1,7 +1,9 @@
 #include "scripting/entitykit/registry.hpp"
 #include "scripting/entitykit/entity.hpp"
+#include "scripting/entitykit/components/modelmanager.hpp"
 #include "scripting/luakit/dynamicusertype.hpp"
 #include "graphics/scenegraph/model.hpp"
+#include "tools/utility.hpp"
 #include "eventmanager.hpp"
 #include "log.hpp"
 #include <functional>
@@ -30,29 +32,51 @@ namespace BlueBear::Scripting::EntityKit {
     sol::table types = lua[ "bluebear" ][ "entity" ][ "types" ] = lua.create_table();
     Component::submitLuaContributions( lua, types );
     Entity::submitLuaContributions( lua, types );
+    Components::ModelManager::submitLuaContributions( lua, types );
   }
 
   void Registry::registerComponent( const std::string& id, sol::table table ) {
-    components[ id ] = table;
+    if( !componentRegistered( id ) ) {
+      components[ id ] = table;
+    } else {
+      Log::getInstance().warn( "Registry::registerComponent", "Component " + id + " already registered!" );
+    }
   }
 
   void Registry::registerEntity( const std::string& id, sol::table componentlist ) {
-    std::vector< std::string > list;
+    if( !entityRegistered( id ) ) {
+      std::vector< std::string > list;
 
-    // Verify all attached components exist and have been registered
-    for( auto& pair : componentlist ) {
-      if( pair.second.is< std::string >() ) {
-        std::string component = pair.second.as< std::string >();
-        if( components.find( component ) == components.end() ) {
-          Log::getInstance().error( "Registry::registerEntity", "Component " + component + " has not been registered!" );
-          return;
-        } else {
-          list.push_back( component );
+      // Verify all attached components exist and have been registered
+      for( auto& pair : componentlist ) {
+        if( pair.second.is< std::string >() ) {
+          std::string component = pair.second.as< std::string >();
+          if( !componentRegistered( component ) ) {
+            Log::getInstance().error( "Registry::registerEntity", "Component " + component + " has not been registered!" );
+            return;
+          } else {
+            list.push_back( component );
+          }
         }
       }
-    }
 
-    entities[ id ] = list;
+      entities[ id ] = list;
+    } else {
+      Log::getInstance().warn( "Registry::registerEntity", "Entity " + id + " already registered!" );
+    }
+  }
+
+  bool Registry::entityRegistered( const std::string& id ) {
+    return entities.find( id ) != entities.end();
+  }
+
+  bool Registry::componentRegistered( const std::string& id ) {
+    switch( Tools::Utility::hash( id.c_str() ) ) {
+      case Tools::Utility::hash( "system.component.model_manager" ):
+        return true;
+      default:
+        return components.find( id ) != components.end();
+    }
   }
 
   std::map< std::string, sol::object > Registry::tableToMap( sol::table table ) {
@@ -68,12 +92,18 @@ namespace BlueBear::Scripting::EntityKit {
   }
 
   std::shared_ptr< Component > Registry::newComponent( const std::string& id ) {
-    auto it = components.find( id );
-    if( it == components.end() ) {
-      Log::getInstance().error( "Registry::newComponent", "This should not be happening!" );
-    }
+    switch( Tools::Utility::hash( id.c_str() ) ) {
+      case Tools::Utility::hash( "system.component.model_manager" ):
+        return std::make_shared< Components::ModelManager >();
+      default: {
+        auto it = components.find( id );
+        if( it == components.end() ) {
+          Log::getInstance().error( "Registry::newComponent", "This should not be happening!" );
+        }
 
-    return std::make_shared< Component >( tableToMap( it->second ) );
+        return std::make_shared< Component >( tableToMap( it->second ) );
+      }
+    }
   }
 
   std::shared_ptr< Entity > Registry::newEntity( const std::string& id, sol::table constructors ) {
@@ -86,12 +116,7 @@ namespace BlueBear::Scripting::EntityKit {
     std::map< std::string, std::shared_ptr< Component > > components;
     for( const std::string& component : it->second ) {
       components[ component ] = newComponent( component );
-
-      // Call its "init" function, should one exist
-      sol::object init = components[ component ]->get( "init" );
-      if( init.is< sol::function >() ) {
-        init.as< sol::function >()( components[ component ], constructors[ component ] );
-      }
+      components[ component ]->init( constructors[ component ] );
     }
 
     return std::make_shared< Entity >( components );

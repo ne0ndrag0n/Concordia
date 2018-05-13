@@ -15,6 +15,7 @@ namespace BlueBear::Scripting::LuaKit {
 
   public:
     DynamicUsertype( const std::map< std::string, sol::object >& typeTable = {} );
+    virtual ~DynamicUsertype() = default;
 
     void set( const std::string& key, sol::object object );
     sol::object get( const std::string& key );

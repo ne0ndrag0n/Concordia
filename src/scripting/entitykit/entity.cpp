@@ -1,7 +1,5 @@
 #include "scripting/entitykit/entity.hpp"
 
-#include "log.hpp"
-
 namespace BlueBear::Scripting::EntityKit {
 
   Entity::Entity( std::map< std::string, std::shared_ptr< Component > > components ) : components( components ) {
@@ -15,7 +13,6 @@ namespace BlueBear::Scripting::EntityKit {
   }
 
   Entity::~Entity() {
-    Log::getInstance().debug( "Entity::~Entity", "Bye!" );
     // These objects should become useless to use by Lua, but not crash the game
     for( auto& pair : components ) {
       pair.second->attach( nullptr );
@@ -35,13 +32,13 @@ namespace BlueBear::Scripting::EntityKit {
     }
   }
 
-  std::shared_ptr< Component > Entity::getComponent( const std::string& componentId ) {
+  Components::ComponentReturn Entity::getComponent( const std::string& componentId ) {
     auto it = components.find( componentId );
     if( it == components.end() ) {
       throw NotFoundException();
     }
 
-    return it->second;
+    return Components::cast( it->second );
   }
 
 }

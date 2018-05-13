@@ -9,18 +9,12 @@ function test:init( arg )
 end
 
 bluebear.entity.register_component( 'system.component.test', test )
-bluebear.entity.register_entity( 'system.entity.test', { 'system.component.test' } )
+bluebear.entity.register_entity( 'system.entity.test', { 'system.component.test', 'system.component.model_manager' } )
 
 local entity = bluebear.entity.create_new_entity( 'system.entity.test', {
-  [ 'system.component.test' ] = { test = 'boop!' }
+  [ 'system.component.test' ] = { test = 'boop!' },
+  [ 'system.component.model_manager' ] = { 'game.models.flower' },
 } )
 
-local component = entity:get_component( "system.component.test" )
-print( entity == component:get_entity() )
-
-entity = nil
-print( 'preparing to trash' )
-collectgarbage()
-
-print( 'now this should throw...' )
-print( entity == component:get_entity() )
+local model_manager = entity:get_component( 'system.component.model_manager' )
+print( model_manager:get_potential_models()[ 1 ] == 'game.models.flower' )

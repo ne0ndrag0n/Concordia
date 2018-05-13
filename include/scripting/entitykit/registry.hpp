@@ -24,6 +24,9 @@ namespace BlueBear::Scripting::EntityKit {
     void registerComponent( const std::string& id, sol::table table );
     void registerEntity( const std::string& id, sol::table componentlist );
 
+    bool entityRegistered( const std::string& id );
+    bool componentRegistered( const std::string& id );
+
     std::shared_ptr< Component > newComponent( const std::string& id );
     std::shared_ptr< Entity > newEntity( const std::string& id, sol::table constructors );
 

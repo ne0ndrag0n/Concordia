@@ -23,6 +23,8 @@ namespace BlueBear::Scripting::EntityKit {
     Component( const std::map< std::string, sol::object >& types = {} );
     static void submitLuaContributions( sol::state& lua, sol::table types );
     void attach( Entity* entity );
+
+    virtual void init( sol::object object );
   };
 
 }

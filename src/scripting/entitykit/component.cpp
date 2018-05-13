@@ -30,4 +30,11 @@ namespace BlueBear::Scripting::EntityKit {
     this->entity = entity;
   }
 
+  void Component::init( sol::object object ) {
+    sol::object init = get( "init" );
+    if( init.is< sol::function >() ) {
+      init.as< sol::function >()( *this, object );
+    }
+  }
+
 }
