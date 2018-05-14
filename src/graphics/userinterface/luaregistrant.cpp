@@ -11,6 +11,7 @@
 #include "graphics/userinterface/widgets/scroll.hpp"
 #include "graphics/userinterface/style/style.hpp"
 #include "graphics/userinterface/propertylist.hpp"
+#include "scripting/luakit/utility.hpp"
 
 namespace BlueBear::Graphics::UserInterface {
 
@@ -45,6 +46,9 @@ namespace BlueBear::Graphics::UserInterface {
     types.new_usertype< Widgets::Layout >(
       "Layout",
       "new", sol::no_constructor,
+      "create", []( const std::string& id, sol::table classes ) {
+        return Widgets::Layout::create( id, Scripting::LuaKit::Utility::tableToVector< std::string >( classes ) );
+      },
       sol::base_classes, sol::bases< Element >()
     );
 
@@ -53,24 +57,36 @@ namespace BlueBear::Graphics::UserInterface {
       "new", sol::no_constructor,
       "set_text", &Widgets::Text::setText,
       "get_text", &Widgets::Text::getText,
+      "create", []( const std::string& id, sol::table classes, const std::string& innerText ) {
+        return Widgets::Text::create( id, Scripting::LuaKit::Utility::tableToVector< std::string >( classes ), innerText );
+      },
       sol::base_classes, sol::bases< Element >()
     );
 
     types.new_usertype< Widgets::Window >(
       "Window",
       "new", sol::no_constructor,
+      "create", []( const std::string& id, sol::table classes, const std::string& windowTitle ) {
+        return Widgets::Window::create( id, Scripting::LuaKit::Utility::tableToVector< std::string >( classes ), windowTitle );
+      },
       sol::base_classes, sol::bases< Element >()
     );
 
     types.new_usertype< Widgets::Button >(
       "Button",
       "new", sol::no_constructor,
+      "create", []( const std::string& id, sol::table classes, const std::string& innerText ) {
+        return Widgets::Button::create( id, Scripting::LuaKit::Utility::tableToVector< std::string >( classes ), innerText );
+      },
       sol::base_classes, sol::bases< Element >()
     );
 
     types.new_usertype< Widgets::Input >(
       "Input",
       "new", sol::no_constructor,
+      "create", []( const std::string& id, sol::table classes, const std::string& hintText, const std::string& contents ) {
+        return Widgets::Input::create( id, Scripting::LuaKit::Utility::tableToVector< std::string >( classes ), hintText, contents );
+      },
       sol::base_classes, sol::bases< Element >()
     );
 
@@ -78,6 +94,9 @@ namespace BlueBear::Graphics::UserInterface {
       "TabLayout",
       "new", sol::no_constructor,
       "set_tab", &Widgets::TabLayout::selectElement,
+      "create", []( const std::string& id, sol::table classes ) {
+        return Widgets::TabLayout::create( id, Scripting::LuaKit::Utility::tableToVector< std::string >( classes ) );
+      },
       sol::base_classes, sol::bases< Element >()
     );
 
@@ -85,24 +104,36 @@ namespace BlueBear::Graphics::UserInterface {
       "Image",
       "new", sol::no_constructor,
       "set_image", &Widgets::Image::setImage,
+      "create", []( const std::string& id, sol::table classes, const std::string& filePath ) {
+        return Widgets::Image::create( id, Scripting::LuaKit::Utility::tableToVector< std::string >( classes ), filePath );
+      },
       sol::base_classes, sol::bases< Element >()
     );
 
     types.new_usertype< Widgets::Spacer >(
       "Spacer",
       "new", sol::no_constructor,
+      "create", []( const std::string& id, sol::table classes ) {
+        return Widgets::Spacer::create( id, Scripting::LuaKit::Utility::tableToVector< std::string >( classes ) );
+      },
       sol::base_classes, sol::bases< Element >()
     );
 
     types.new_usertype< Widgets::Pane >(
       "Pane",
       "new", sol::no_constructor,
+      "create", []( const std::string& id, sol::table classes ) {
+        return Widgets::Pane::create( id, Scripting::LuaKit::Utility::tableToVector< std::string >( classes ) );
+      },
       sol::base_classes, sol::bases< Element >()
     );
 
     types.new_usertype< Widgets::Scroll >(
       "Scroll",
       "new", sol::no_constructor,
+      "create", []( const std::string& id, sol::table classes ) {
+        return Widgets::Scroll::create( id, Scripting::LuaKit::Utility::tableToVector< std::string >( classes ) );
+      },
       sol::base_classes, sol::bases< Element >()
     );
 

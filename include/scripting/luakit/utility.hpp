@@ -7,6 +7,7 @@
 #include <lauxlib.h>
 #include <sol.hpp>
 #include <functional>
+#include <vector>
 
 namespace BlueBear::Scripting::LuaKit {
 
@@ -25,6 +26,17 @@ namespace BlueBear::Scripting::LuaKit {
       }
 
       throw InvalidTypeException();
+    };
+
+    template < typename T >
+    static std::vector< T > tableToVector( sol::table table ) {
+      std::vector< T > result;
+
+      for( auto& pair : table ) {
+        result.emplace_back( cast< T >( pair.second ) );
+      }
+
+      return result;
     };
   };
 
