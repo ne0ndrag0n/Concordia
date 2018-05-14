@@ -12,6 +12,9 @@
 #include "graphics/userinterface/style/style.hpp"
 #include "graphics/userinterface/propertylist.hpp"
 #include "scripting/luakit/utility.hpp"
+#include <unordered_map>
+#include <memory>
+#include <map>
 
 namespace BlueBear::Graphics::UserInterface {
 
@@ -40,6 +43,41 @@ namespace BlueBear::Graphics::UserInterface {
       },
       "set_style_property", []( Element& self, const std::string& id, PropertyListType value ) {
         self.getPropertyList().setDirect( id, value );
+      },
+      "attach_animation", []( Element& self, sol::table options ) {
+        std::map< double, Style::Style::Animation::Keyframe > keyframeMap;
+        sol::table keyframes = Scripting::LuaKit::Utility::cast< sol::table >( options[ "keyframes" ] );
+
+        for( auto& pair : keyframes ) {
+          sol::table keyframe = Scripting::LuaKit::Utility::cast< sol::table >( pair.second );
+
+          sol::table frames = Scripting::LuaKit::Utility::cast< sol::table >( keyframe[ "frames" ] );
+          std::unordered_map< std::string, PropertyListType > properties;
+          for( auto& frame : frames ) {
+            properties[ Scripting::LuaKit::Utility::cast< std::string >( frame.first ) ] = Scripting::LuaKit::Utility::cast< PropertyListType >( frame.second );
+          }
+
+          keyframeMap.emplace(
+            Scripting::LuaKit::Utility::cast< double >( pair.first ),
+            Style::Style::Animation::Keyframe{
+              properties,
+              ( keyframe[ "interpolate" ] == sol::nil ) ? false : Scripting::LuaKit::Utility::cast< bool >( keyframe[ "interpolate" ] )
+            }
+          );
+        }
+
+        auto& style = self.getPropertyList();
+        style.attachAnimation( std::make_unique< Style::Style::Animation >(
+          &style,
+          keyframeMap,
+          Scripting::LuaKit::Utility::cast< double >( options[ "fps" ] ),
+          Scripting::LuaKit::Utility::cast< double >( options[ "duration" ] ),
+          ( options[ "suicide" ] == sol::nil ) ? true : Scripting::LuaKit::Utility::cast< bool >( options[ "suicide" ] ),
+          ( options[ "sticky" ] == sol::nil ) ? false : Scripting::LuaKit::Utility::cast< bool >( options[ "sticky" ] )
+        ) );
+      },
+      "remove_animation", []( Element& self ) {
+        self.getPropertyList().attachAnimation( nullptr );
       }
     );
 
@@ -69,6 +107,12 @@ namespace BlueBear::Graphics::UserInterface {
       "create", []( const std::string& id, sol::table classes, const std::string& windowTitle ) {
         return Widgets::Window::create( id, Scripting::LuaKit::Utility::tableToVector< std::string >( classes ), windowTitle );
       },
+      sol::base_classes, sol::bases< Element >()
+    );
+
+    types.new_usertype< Widgets::WindowDecoration >(
+      "WindowDecoration",
+      "new", sol::no_constructor,
       sol::base_classes, sol::bases< Element >()
     );
 

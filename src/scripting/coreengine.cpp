@@ -1,4 +1,5 @@
 #include "scripting/coreengine.hpp"
+#include "scripting/vectortypes.hpp"
 #include "scripting/luakit/modpackloader.hpp"
 #include "scripting/luakit/dynamicusertype.hpp"
 #include "scripting/luakit/utility.hpp"
@@ -28,38 +29,6 @@ namespace BlueBear::Scripting {
     util.set_function( "bind", &CoreEngine::bind, this );
     util.set_function( "seconds_to_ticks", &CoreEngine::secondsToTicks );
 
-    sol::table types = lua.create_table();
-    types.new_usertype< glm::vec2 >( "Vec2",
-      sol::constructors< glm::vec2(), glm::vec2( double, double ) >(),
-      "x", &glm::vec2::x,
-      "y", &glm::vec2::y,
-      sol::meta_function::addition, []( const glm::vec2& left, const glm::vec2& right ) { return left + right; },
-      sol::meta_function::subtraction, []( const glm::vec2& left, const glm::vec2& right ) { return left - right; },
-      sol::meta_function::multiplication, []( const glm::vec2& left, const glm::vec2& right ) { return left * right; },
-      sol::meta_function::division, []( const glm::vec2& left, const glm::vec2& right ) { return left / right; }
-    );
-    types.new_usertype< glm::vec3 >( "Vec3",
-      sol::constructors< glm::vec3(), glm::vec3( double, double, double ) >(),
-      "x", &glm::vec3::x,
-      "y", &glm::vec3::y,
-      "z", &glm::vec3::z,
-      sol::meta_function::addition, []( const glm::vec3& left, const glm::vec3& right ) { return left + right; },
-      sol::meta_function::subtraction, []( const glm::vec3& left, const glm::vec3& right ) { return left - right; },
-      sol::meta_function::multiplication, []( const glm::vec3& left, const glm::vec3& right ) { return left * right; },
-      sol::meta_function::division, []( const glm::vec3& left, const glm::vec3& right ) { return left / right; }
-    );
-    types.new_usertype< glm::vec4 >( "Vec4",
-      sol::constructors< glm::vec4(), glm::vec4( double, double, double, double ) >(),
-      "x", &glm::vec4::x,
-      "y", &glm::vec4::y,
-      "z", &glm::vec4::z,
-      "w", &glm::vec4::w,
-      sol::meta_function::addition, []( const glm::vec4& left, const glm::vec4& right ) { return left + right; },
-      sol::meta_function::subtraction, []( const glm::vec4& left, const glm::vec4& right ) { return left - right; },
-      sol::meta_function::multiplication, []( const glm::vec4& left, const glm::vec4& right ) { return left * right; },
-      sol::meta_function::division, []( const glm::vec4& left, const glm::vec4& right ) { return left / right; }
-    );
-
     lua.set_function( "print", sol::overload(
       [ & ]( sol::object tag, sol::object message ) {
         Log::getInstance().debug( lua[ "tostring" ]( tag ), lua[ "tostring" ]( message ) );
@@ -71,10 +40,11 @@ namespace BlueBear::Scripting {
 
     lua[ "bluebear" ][ "engine" ] = engine;
     lua[ "bluebear" ][ "util" ] = util;
-    lua[ "bluebear" ][ "util" ][ "types" ] = types;
+    sol::table types = lua[ "bluebear" ][ "util" ][ "types" ] = lua.create_table();
 
-    LuaKit::Utility::submitLuaContributions( lua );
+    VectorTypes::submitLuaContributions( types );
     LuaKit::DynamicUsertype::submitLuaContributions( types );
+    LuaKit::Utility::submitLuaContributions( lua );
   }
 
   sol::function CoreEngine::bind( sol::function f, sol::variadic_args args ) {

@@ -49,6 +49,7 @@ namespace BlueBear {
 
           public:
 
+            void loadStylesheets( const std::vector< std::string >& paths );
             std::vector< std::shared_ptr< Graphics::UserInterface::Element > > addElementsFromXML( const std::string& xmlPath );
             std::vector< std::shared_ptr< Graphics::UserInterface::Element > > query( sol::table queries );
 

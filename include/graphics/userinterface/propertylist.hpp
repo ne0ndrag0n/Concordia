@@ -52,8 +52,6 @@ namespace BlueBear {
         Placement,
         Orientation,
         std::string,
-        // Lua is the one that primarily uses PropertyListType; this will be constructed from a uvec4
-        glm::vec4,
         glm::uvec4
       >;
 
