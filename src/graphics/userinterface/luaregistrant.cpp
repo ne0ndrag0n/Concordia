@@ -19,7 +19,7 @@ namespace BlueBear::Graphics::UserInterface {
     sol::table types = lua.create_table();
 
     // If constructor is required here then all pure virtual functions must be removed
-    gui.new_usertype< Element >(
+    types.new_usertype< Element >(
       "Element",
       "new", sol::no_constructor,
       "get_tag", &Element::getTag,
@@ -42,13 +42,13 @@ namespace BlueBear::Graphics::UserInterface {
       }
     );
 
-    gui.new_usertype< Widgets::Layout >(
+    types.new_usertype< Widgets::Layout >(
       "Layout",
       "new", sol::no_constructor,
       sol::base_classes, sol::bases< Element >()
     );
 
-    gui.new_usertype< Widgets::Text >(
+    types.new_usertype< Widgets::Text >(
       "Text",
       "new", sol::no_constructor,
       "set_text", &Widgets::Text::setText,
@@ -56,51 +56,51 @@ namespace BlueBear::Graphics::UserInterface {
       sol::base_classes, sol::bases< Element >()
     );
 
-    gui.new_usertype< Widgets::Window >(
+    types.new_usertype< Widgets::Window >(
       "Window",
       "new", sol::no_constructor,
       sol::base_classes, sol::bases< Element >()
     );
 
-    gui.new_usertype< Widgets::Button >(
+    types.new_usertype< Widgets::Button >(
       "Button",
       "new", sol::no_constructor,
       sol::base_classes, sol::bases< Element >()
     );
 
-    gui.new_usertype< Widgets::Input >(
+    types.new_usertype< Widgets::Input >(
       "Input",
       "new", sol::no_constructor,
       sol::base_classes, sol::bases< Element >()
     );
 
-    gui.new_usertype< Widgets::TabLayout >(
+    types.new_usertype< Widgets::TabLayout >(
       "TabLayout",
       "new", sol::no_constructor,
       "set_tab", &Widgets::TabLayout::selectElement,
       sol::base_classes, sol::bases< Element >()
     );
 
-    gui.new_usertype< Widgets::Image >(
+    types.new_usertype< Widgets::Image >(
       "Image",
       "new", sol::no_constructor,
       "set_image", &Widgets::Image::setImage,
       sol::base_classes, sol::bases< Element >()
     );
 
-    gui.new_usertype< Widgets::Spacer >(
+    types.new_usertype< Widgets::Spacer >(
       "Spacer",
       "new", sol::no_constructor,
       sol::base_classes, sol::bases< Element >()
     );
 
-    gui.new_usertype< Widgets::Pane >(
+    types.new_usertype< Widgets::Pane >(
       "Pane",
       "new", sol::no_constructor,
       sol::base_classes, sol::bases< Element >()
     );
 
-    gui.new_usertype< Widgets::Scroll >(
+    types.new_usertype< Widgets::Scroll >(
       "Scroll",
       "new", sol::no_constructor,
       sol::base_classes, sol::bases< Element >()

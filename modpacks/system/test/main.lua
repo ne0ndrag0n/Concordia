@@ -4,7 +4,7 @@ print( ..., 'This is a modpack' )
 bluebear.event.register_key( 'v', function()
   bluebear.gui.load_xml( 'system/ui/example.xml' )
 
-  bluebear.gui.get_elements( { { tag = 'Window' } } )
+  print( bluebear.gui.get_elements( { { tag = 'Window' } } )[ 1 ]:get_selector_string() )
 end )
 
 function testcode()
