@@ -34,12 +34,7 @@ namespace BlueBear::Graphics::UserInterface {
       "get_absolute_position", []( Element& self ) { return glm::vec2{ self.getAbsolutePosition() }; },
       "get_allocation", []( Element& self ) { return glm::vec4{ self.getAllocation() }; },
       "get_style_property", []( Element& self, const std::string& id ) -> PropertyListType {
-        PropertyListType type = self.getPropertyList().hierarchy( id );
-        if( auto uvec4 = std::get_if< glm::uvec4 >( &type ) ) {
-          return glm::vec4( *uvec4 );
-        } else {
-          return type;
-        }
+        return self.getPropertyList().hierarchy( id );
       },
       "set_style_property", []( Element& self, const std::string& id, PropertyListType value ) {
         self.getPropertyList().setDirect( id, value );
