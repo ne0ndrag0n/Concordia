@@ -26,6 +26,12 @@ namespace BlueBear::Graphics::UserInterface {
     types.new_usertype< Element >(
       "Element",
       "new", sol::no_constructor,
+      "add_child", []( Element& self, Element& other ) {
+        self.addChild( other.shared_from_this() );
+      },
+      "detach", []( Element& self ) {
+        self.detach();
+      },
       "get_tag", &Element::getTag,
       "get_id", &Element::getId,
       "has_class", &Element::hasClass,

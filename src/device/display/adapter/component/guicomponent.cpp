@@ -68,6 +68,8 @@ namespace BlueBear {
 
             lua[ "bluebear" ][ "gui" ] = gui;
             Graphics::UserInterface::LuaRegistrant::registerWidgets( lua );
+
+            gui[ "root_element" ] = rootElement;
           }
 
           void GuiComponent::loadStylesheets( const std::vector< std::string >& paths ) {
@@ -76,13 +78,7 @@ namespace BlueBear {
 
           std::vector< std::shared_ptr< Graphics::UserInterface::Element > > GuiComponent::addElementsFromXML( const std::string& xmlPath ) {
             Graphics::UserInterface::XMLLoader loader( xmlPath );
-            std::vector< std::shared_ptr< Graphics::UserInterface::Element > > elements = loader.getElements();
-
-            for( std::shared_ptr< Graphics::UserInterface::Element > element : elements ) {
-              rootElement->addChild( element );
-            }
-
-            return elements;
+            return loader.getElements();
           }
 
           std::vector< std::shared_ptr< Graphics::UserInterface::Element > > GuiComponent::query( sol::table queries ) {
