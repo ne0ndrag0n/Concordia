@@ -129,15 +129,26 @@ Window.error {
       width: Requisition::FILL_PARENT;
       padding: 5;
 
-      .-bb-terminal-log-set {
-        .buffer-terminal {
-          width: 10;
-        }
+      .-bb-scrollback {
+        layout-weight: 1;
+        width: Requisition::FILL_PARENT;
 
-        Text {
-          font: "dosvga";
-          background-color: rgbaString( "00000000" );
-          color: rgbaString( "ffffffff" );
+        .-bb-scrollback-bin {
+          gravity: Gravity::TOP;
+
+          .-bb-log-message {
+
+            .buffer-log {
+              width: 10;
+            }
+
+            Text {
+              font: "dosvga";
+              background-color: rgbaString( "00000000" );
+              color: rgbaString( "ffffffff" );
+            }
+
+          }
         }
       }
 
