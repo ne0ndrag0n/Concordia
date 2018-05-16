@@ -1,6 +1,42 @@
 local path = ...
 local Panel = {
   animation_in_progress = false,
+  ANIMATIONS = {
+    OPEN = {
+      fps = 60.0,
+      duration = 15.0,
+      keyframes = {
+        [ 0.0 ] = {
+          frames = {
+            top = -450
+          }
+        },
+        [ 15.0 ] = {
+          interpolate = true,
+          frames = {
+            top = 0
+          }
+        }
+      }
+    },
+    CLOSE = {
+      fps = 60.0,
+      duration = 15.0,
+      keyframes = {
+        [ 0.0 ] = {
+          frames = {
+            top = 0
+          }
+        },
+        [ 15.0 ] = {
+          interpolate = true,
+          frames = {
+            top = -450
+          }
+        }
+      }
+    }
+  },
   pane = nil
 }
 
@@ -14,26 +50,24 @@ function Panel:load()
 end
 
 function Panel:toggle()
-  -- Closed to Open
-  self.pane:attach_animation( {
-    fps = 60.0,
-    duration = 30.0,
-    suicide = false,
-    sticky = true,
-    keyframes = {
-      [ 0.0 ] = {
-        frames = {
-          top = -450
-        }
-      },
-      [ 30.0 ] = {
-        interpolate = true,
-        frames = {
-          top = 0
-        }
-      }
-    }
-  } )
+  if self.animation_in_progress == false then
+    self.animation_in_progress = true
+    local closed = self.pane:get_style_property( 'top' ) == -450
+
+    if closed == true then
+      -- Closed to Open
+      self.pane:attach_animation( self.ANIMATIONS.OPEN, function()
+        self.animation_in_progress = false
+        self.pane:set_style_property( 'top', 0 )
+      end )
+    else
+      -- Open to Closed
+      self.pane:attach_animation( self.ANIMATIONS.CLOSE, function()
+        self.animation_in_progress = false
+        self.pane:set_style_property( 'top', -450 )
+      end )
+    end
+  end
 end
 
 Panel:load()

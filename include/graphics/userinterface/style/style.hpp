@@ -11,6 +11,7 @@
 #include <unordered_set>
 #include <string>
 #include <memory>
+#include <functional>
 #include <type_traits>
 
 #include <glm/gtx/string_cast.hpp>
@@ -31,6 +32,7 @@ namespace BlueBear {
 
           private:
             Style* parent;
+            std::function< void() > callback;
             std::map< double, Keyframe > keyframes;
             const double fps;
             const double duration;
@@ -43,7 +45,7 @@ namespace BlueBear {
           public:
             EXCEPTION_TYPE( MalformedKeyframesException, "Keyframes malformed" );
 
-            Animation( Style* parent, std::map< double, Keyframe > keyframes, double fps, double duration, bool suicide, bool sticky );
+            Animation( Style* parent, std::map< double, Keyframe > keyframes, double fps, double duration, bool suicide, bool sticky, std::function< void() > callback = {} );
 
             bool increment();
 

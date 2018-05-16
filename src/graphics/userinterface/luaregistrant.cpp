@@ -13,10 +13,89 @@
 #include "graphics/userinterface/propertylist.hpp"
 #include "scripting/luakit/utility.hpp"
 #include <unordered_map>
+#include <functional>
 #include <memory>
 #include <map>
 
 namespace BlueBear::Graphics::UserInterface {
+
+  // Let's try file-level scope
+  static std::map< double, Style::Style::Animation::Keyframe > getKeyframeMap( Element& self, sol::table options ) {
+    std::map< double, Style::Style::Animation::Keyframe > keyframeMap;
+    sol::table keyframes = Scripting::LuaKit::Utility::cast< sol::table >( options[ "keyframes" ] );
+
+    for( auto& pair : keyframes ) {
+      sol::table keyframe = Scripting::LuaKit::Utility::cast< sol::table >( pair.second );
+
+      sol::table frames = Scripting::LuaKit::Utility::cast< sol::table >( keyframe[ "frames" ] );
+      std::unordered_map< std::string, PropertyListType > properties;
+
+
+      for( auto& frame : frames ) {
+        std::string key = Scripting::LuaKit::Utility::cast< std::string >( frame.first );
+
+        // Manually disambiguate the variant as sol2 obviously can't do it
+        if( frame.second.is< double >() ) {
+          if( frame.second.is< int >() ) {
+            properties[ Scripting::LuaKit::Utility::cast< std::string >( frame.first ) ] = frame.second.as< int >();
+          } else {
+            properties[ Scripting::LuaKit::Utility::cast< std::string >( frame.first ) ] = frame.second.as< double >();
+          }
+        } else if( frame.second.is< bool >() ) {
+          properties[ Scripting::LuaKit::Utility::cast< std::string >( frame.first ) ] = frame.second.as< bool >();
+        } else if( frame.second.is< Gravity >() ) {
+          properties[ Scripting::LuaKit::Utility::cast< std::string >( frame.first ) ] = frame.second.as< Gravity >();
+        } else if( frame.second.is< Requisition >() ) {
+          properties[ Scripting::LuaKit::Utility::cast< std::string >( frame.first ) ] = frame.second.as< Requisition >();
+        } else if( frame.second.is< Placement >() ) {
+          properties[ Scripting::LuaKit::Utility::cast< std::string >( frame.first ) ] = frame.second.as< Placement >();
+        } else if( frame.second.is< Orientation >() ) {
+          properties[ Scripting::LuaKit::Utility::cast< std::string >( frame.first ) ] = frame.second.as< Orientation >();
+        } else if( frame.second.is< std::string >() ) {
+          properties[ Scripting::LuaKit::Utility::cast< std::string >( frame.first ) ] = frame.second.as< std::string >();
+        } else if( frame.second.is< glm::uvec4 >() ) {
+          properties[ Scripting::LuaKit::Utility::cast< std::string >( frame.first ) ] = frame.second.as< glm::uvec4 >();
+        } else {
+          throw LuaRegistrant::InvalidTypeException();
+        }
+      }
+
+      keyframeMap.emplace(
+        Scripting::LuaKit::Utility::cast< double >( pair.first ),
+        Style::Style::Animation::Keyframe{
+          properties,
+          ( keyframe[ "interpolate" ] == sol::nil ) ? false : Scripting::LuaKit::Utility::cast< bool >( keyframe[ "interpolate" ] )
+        }
+      );
+    }
+
+    return keyframeMap;
+  }
+
+  static void attachAnimation( Element& self, sol::table options ) {
+    auto& style = self.getPropertyList();
+    style.attachAnimation( std::make_unique< Style::Style::Animation >(
+      &style,
+      getKeyframeMap( self, options ),
+      Scripting::LuaKit::Utility::cast< double >( options[ "fps" ] ),
+      Scripting::LuaKit::Utility::cast< double >( options[ "duration" ] ),
+      ( options[ "suicide" ] == sol::nil ) ? true : Scripting::LuaKit::Utility::cast< bool >( options[ "suicide" ] ),
+      ( options[ "sticky" ] == sol::nil ) ? false : Scripting::LuaKit::Utility::cast< bool >( options[ "sticky" ] )
+    ) );
+  }
+
+  static void attachAnimationWithCallback( Element& self, sol::table options, std::function< void() > callback ) {
+    auto& style = self.getPropertyList();
+    style.attachAnimation( std::make_unique< Style::Style::Animation >(
+      &style,
+      getKeyframeMap( self, options ),
+      Scripting::LuaKit::Utility::cast< double >( options[ "fps" ] ),
+      Scripting::LuaKit::Utility::cast< double >( options[ "duration" ] ),
+      ( options[ "suicide" ] == sol::nil ) ? true : Scripting::LuaKit::Utility::cast< bool >( options[ "suicide" ] ),
+      ( options[ "sticky" ] == sol::nil ) ? false : Scripting::LuaKit::Utility::cast< bool >( options[ "sticky" ] ),
+      callback
+    ) );
+  }
 
   void LuaRegistrant::registerWidgets( sol::state& lua ) {
     sol::table gui = lua[ "bluebear" ][ "gui" ];
@@ -56,64 +135,12 @@ namespace BlueBear::Graphics::UserInterface {
           Log::getInstance().error( "LuaRegistrant::registerWidgets", "Invalid type passed to set_style_property" );
         }
       },
-      "attach_animation", []( Element& self, sol::table options ) {
-        std::map< double, Style::Style::Animation::Keyframe > keyframeMap;
-        sol::table keyframes = Scripting::LuaKit::Utility::cast< sol::table >( options[ "keyframes" ] );
-
-        for( auto& pair : keyframes ) {
-          sol::table keyframe = Scripting::LuaKit::Utility::cast< sol::table >( pair.second );
-
-          sol::table frames = Scripting::LuaKit::Utility::cast< sol::table >( keyframe[ "frames" ] );
-          std::unordered_map< std::string, PropertyListType > properties;
-
-
-          for( auto& frame : frames ) {
-            std::string key = Scripting::LuaKit::Utility::cast< std::string >( frame.first );
-            // Manually disambiguate the variant as sol2 obviously can't do it
-            if( frame.second.is< double >() ) {
-              if( frame.second.is< int >() ) {
-                properties[ Scripting::LuaKit::Utility::cast< std::string >( frame.first ) ] = frame.second.as< int >();
-              } else {
-                properties[ Scripting::LuaKit::Utility::cast< std::string >( frame.first ) ] = frame.second.as< double >();
-              }
-            } else if( frame.second.is< bool >() ) {
-              properties[ Scripting::LuaKit::Utility::cast< std::string >( frame.first ) ] = frame.second.as< bool >();
-            } else if( frame.second.is< Gravity >() ) {
-              properties[ Scripting::LuaKit::Utility::cast< std::string >( frame.first ) ] = frame.second.as< Gravity >();
-            } else if( frame.second.is< Requisition >() ) {
-              properties[ Scripting::LuaKit::Utility::cast< std::string >( frame.first ) ] = frame.second.as< Requisition >();
-            } else if( frame.second.is< Placement >() ) {
-              properties[ Scripting::LuaKit::Utility::cast< std::string >( frame.first ) ] = frame.second.as< Placement >();
-            } else if( frame.second.is< Orientation >() ) {
-              properties[ Scripting::LuaKit::Utility::cast< std::string >( frame.first ) ] = frame.second.as< Orientation >();
-            } else if( frame.second.is< std::string >() ) {
-              properties[ Scripting::LuaKit::Utility::cast< std::string >( frame.first ) ] = frame.second.as< std::string >();
-            } else if( frame.second.is< glm::uvec4 >() ) {
-              properties[ Scripting::LuaKit::Utility::cast< std::string >( frame.first ) ] = frame.second.as< glm::uvec4 >();
-            } else {
-              throw InvalidTypeException();
-            }
-          }
-
-          keyframeMap.emplace(
-            Scripting::LuaKit::Utility::cast< double >( pair.first ),
-            Style::Style::Animation::Keyframe{
-              properties,
-              ( keyframe[ "interpolate" ] == sol::nil ) ? false : Scripting::LuaKit::Utility::cast< bool >( keyframe[ "interpolate" ] )
-            }
-          );
+      "attach_animation", sol::overload(
+        &attachAnimation,
+        []( Element& self, sol::table options, sol::function callback ) {
+          attachAnimationWithCallback( self, options, [ callback ]() { callback(); } );
         }
-
-        auto& style = self.getPropertyList();
-        style.attachAnimation( std::make_unique< Style::Style::Animation >(
-          &style,
-          keyframeMap,
-          Scripting::LuaKit::Utility::cast< double >( options[ "fps" ] ),
-          Scripting::LuaKit::Utility::cast< double >( options[ "duration" ] ),
-          ( options[ "suicide" ] == sol::nil ) ? true : Scripting::LuaKit::Utility::cast< bool >( options[ "suicide" ] ),
-          ( options[ "sticky" ] == sol::nil ) ? false : Scripting::LuaKit::Utility::cast< bool >( options[ "sticky" ] )
-        ) );
-      },
+      ),
       "remove_animation", []( Element& self ) {
         self.getPropertyList().attachAnimation( nullptr );
       }

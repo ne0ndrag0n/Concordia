@@ -7,8 +7,8 @@ namespace BlueBear {
     namespace UserInterface {
       namespace Style {
 
-        Style::Animation::Animation( Style* parent, std::map< double, Keyframe > keyframes, double fps, double duration, bool suicide, bool sticky )
-          : parent( parent ), keyframes( keyframes ), fps( fps ), duration( duration ), current( 0.0 ), suicide( suicide ), sticky( sticky ) {}
+        Style::Animation::Animation( Style* parent, std::map< double, Keyframe > keyframes, double fps, double duration, bool suicide, bool sticky, std::function< void() > callback )
+          : parent( parent ), keyframes( keyframes ), fps( fps ), duration( duration ), current( 0.0 ), suicide( suicide ), sticky( sticky ), callback( callback ) {}
 
         double Style::Animation::getFPS() {
           return fps / ConfigManager::getInstance().getIntValue( "fps_overview" );
@@ -19,11 +19,14 @@ namespace BlueBear {
 
           if( next > duration ) {
             if( suicide ) {
+              if( callback ) { callback(); callback = {}; }
               parent->attachAnimation( nullptr );
               return true;
             } else if ( sticky ) {
+              if( callback ) { callback(); callback = {}; }
               return false;
             } else {
+              if( callback ) { callback(); }
               next = 0.0;
             }
           }
