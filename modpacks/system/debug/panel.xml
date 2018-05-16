@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Pane class="-bb-terminal-pane">
+  <Layout class="-bb-terminal-root">
+    <Layout class="-bb-terminal-output">
+      <Image>dev/chatbox.png</Image>
+      <Scroll class="-bb-scrollback">
+        <Layout class="-bb-scrollback-bin">
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date">(d) 2018-05-14 21:17:44:</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">[Application::Application] Concordia v0.0.4</Text>
+          </Layout>
+        </Layout>
+      </Scroll>
+    </Layout>
+    <Pane class="-bb-decorative-pane">
+      <Layout class="-bb-terminal-controls">
+        <Input class="-bb-terminal-text-input" hint="Enter Command"></Input>
+        <Button class="-bb-terminal-clear-button">CLEAR</Button>
+        <Button class="-bb-terminal-execute-button">EXECUTE</Button>
+      </Layout>
+    </Pane>
+  </Layout>
+</Pane>

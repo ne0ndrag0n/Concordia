@@ -1,0 +1,77 @@
+.-bb-terminal-pane {
+  placement: Placement::FREE;
+  drop-shadow-bottom: true;
+  top: 0;
+  left: 0;
+  width: Requisition::FILL_PARENT;
+  height: 450;
+  background-color: rgbaString( "00000066" );
+
+  .-bb-terminal-root {
+    gravity: Gravity::TOP;
+
+    .-bb-terminal-output {
+      gravity: Gravity::TOP;
+      layout-weight: 1;
+      width: Requisition::FILL_PARENT;
+      padding: 5;
+
+      .-bb-scrollback {
+        layout-weight: 1;
+        width: Requisition::FILL_PARENT;
+
+        .-bb-scrollback-bin {
+          gravity: Gravity::TOP;
+
+          .-bb-log-message {
+
+            .buffer-log {
+              width: 10;
+            }
+
+            Text {
+              font: "dosvga";
+              background-color: rgbaString( "00000000" );
+              color: rgbaString( "ffffffff" );
+            }
+
+          }
+        }
+      }
+
+      .buffer-logo {
+        height: 50;
+      }
+
+      Image {
+        placement: Placement::FREE;
+        top: 50;
+        left: 426;
+      }
+    }
+
+    .-bb-decorative-pane {
+      width: Requisition::FILL_PARENT;
+      background-color: rgbaString( "36393Eff" );
+    }
+
+    .-bb-terminal-controls {
+      width: Requisition::FILL_PARENT;
+      padding: 5;
+
+      .-bb-terminal-text-input {
+        font-color: rgbaString( "ffffffff" );
+        font-size: 24.0;
+        layout-weight: 8;
+      }
+
+      .-bb-terminal-execute-button {
+        layout-weight: 1;
+      }
+
+      .-bb-terminal-clear-button {
+        layout-weight: 1;
+      }
+    }
+  }
+}

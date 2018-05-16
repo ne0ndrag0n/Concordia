@@ -43,6 +43,7 @@ namespace BlueBear {
         RIGHT
       };
 
+      // luaregistrant.cpp manually enumerates these due to a sol2 bug
       using PropertyListType = std::variant<
         bool,
         int,

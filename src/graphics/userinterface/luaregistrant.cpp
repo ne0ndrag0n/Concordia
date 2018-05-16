@@ -42,8 +42,19 @@ namespace BlueBear::Graphics::UserInterface {
       "get_style_property", []( Element& self, const std::string& id ) -> PropertyListType {
         return self.getPropertyList().hierarchy( id );
       },
-      "set_style_property", []( Element& self, const std::string& id, PropertyListType value ) {
-        self.getPropertyList().setDirect( id, value );
+      "set_style_property", []( Element& self, const std::string& id, sol::object value ) {
+        if( value.is< PropertyListType >() ) {
+          // Discriminate between double and int
+          if( value.is< double >() && value.is< int >() ) {
+            // It's an int, not a double
+            self.getPropertyList().setDirect( id, value.as< int >() );
+          } else {
+            // Use the type direct
+            self.getPropertyList().setDirect( id, value.as< PropertyListType >() );
+          }
+        } else {
+          Log::getInstance().error( "LuaRegistrant::registerWidgets", "Invalid type passed to set_style_property" );
+        }
       },
       "attach_animation", []( Element& self, sol::table options ) {
         std::map< double, Style::Style::Animation::Keyframe > keyframeMap;
@@ -54,8 +65,34 @@ namespace BlueBear::Graphics::UserInterface {
 
           sol::table frames = Scripting::LuaKit::Utility::cast< sol::table >( keyframe[ "frames" ] );
           std::unordered_map< std::string, PropertyListType > properties;
+
+
           for( auto& frame : frames ) {
-            properties[ Scripting::LuaKit::Utility::cast< std::string >( frame.first ) ] = Scripting::LuaKit::Utility::cast< PropertyListType >( frame.second );
+            std::string key = Scripting::LuaKit::Utility::cast< std::string >( frame.first );
+            // Manually disambiguate the variant as sol2 obviously can't do it
+            if( frame.second.is< double >() ) {
+              if( frame.second.is< int >() ) {
+                properties[ Scripting::LuaKit::Utility::cast< std::string >( frame.first ) ] = frame.second.as< int >();
+              } else {
+                properties[ Scripting::LuaKit::Utility::cast< std::string >( frame.first ) ] = frame.second.as< double >();
+              }
+            } else if( frame.second.is< bool >() ) {
+              properties[ Scripting::LuaKit::Utility::cast< std::string >( frame.first ) ] = frame.second.as< bool >();
+            } else if( frame.second.is< Gravity >() ) {
+              properties[ Scripting::LuaKit::Utility::cast< std::string >( frame.first ) ] = frame.second.as< Gravity >();
+            } else if( frame.second.is< Requisition >() ) {
+              properties[ Scripting::LuaKit::Utility::cast< std::string >( frame.first ) ] = frame.second.as< Requisition >();
+            } else if( frame.second.is< Placement >() ) {
+              properties[ Scripting::LuaKit::Utility::cast< std::string >( frame.first ) ] = frame.second.as< Placement >();
+            } else if( frame.second.is< Orientation >() ) {
+              properties[ Scripting::LuaKit::Utility::cast< std::string >( frame.first ) ] = frame.second.as< Orientation >();
+            } else if( frame.second.is< std::string >() ) {
+              properties[ Scripting::LuaKit::Utility::cast< std::string >( frame.first ) ] = frame.second.as< std::string >();
+            } else if( frame.second.is< glm::uvec4 >() ) {
+              properties[ Scripting::LuaKit::Utility::cast< std::string >( frame.first ) ] = frame.second.as< glm::uvec4 >();
+            } else {
+              throw InvalidTypeException();
+            }
           }
 
           keyframeMap.emplace(

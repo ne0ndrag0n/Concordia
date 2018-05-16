@@ -60,7 +60,14 @@ namespace BlueBear {
 
           void GuiComponent::submitLuaContributions( sol::state& lua ) {
             sol::table gui = lua.create_table();
-            gui.set_function( "load_xml", &GuiComponent::addElementsFromXML, this );
+            gui.set_function( "load_xml", sol::overload(
+              [ & ]( const std::string& xmlPath ) {
+                return addElementsFromXML( xmlPath );
+              },
+              [ & ]( const std::string& xmlPath, bool asString ) {
+                return addElementsFromXML( xmlPath, asString );
+              }
+            ) );
             gui.set_function( "load_stylesheet", [ & ]( sol::table table ) {
               loadStylesheets( Scripting::LuaKit::Utility::tableToVector< std::string >( table ) );
             } );
@@ -76,8 +83,8 @@ namespace BlueBear {
             styleManager.applyStyles( paths );
           }
 
-          std::vector< std::shared_ptr< Graphics::UserInterface::Element > > GuiComponent::addElementsFromXML( const std::string& xmlPath ) {
-            Graphics::UserInterface::XMLLoader loader( xmlPath );
+          std::vector< std::shared_ptr< Graphics::UserInterface::Element > > GuiComponent::addElementsFromXML( const std::string& xmlPath, bool file ) {
+            Graphics::UserInterface::XMLLoader loader( xmlPath, file );
             return loader.getElements();
           }
 
