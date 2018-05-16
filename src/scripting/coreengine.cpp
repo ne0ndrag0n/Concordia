@@ -58,7 +58,7 @@ namespace BlueBear::Scripting {
     return temp[ "__closure" ];
   }
 
-  int CoreEngine::setTimeout( double interval, sol::function f ) {
+  int CoreEngine::setTimeout( double interval, Callback f ) {
     return queuedCallbacks.insert( { std::round( interval ), f } );
   }
 

@@ -9,7 +9,7 @@
 
 namespace BlueBear::Scripting::LuaKit {
 
-  EventHelper::EventHelper( CoreEngine& engine ) : engine( engine ) {
+  EventHelper::EventHelper( CoreEngine& engine ) : engine( engine ), bridge( engine ) {
     eventManager.LUA_STATE_READY.listen( this, std::bind( &EventHelper::submitLuaContributions, this, std::placeholders::_1 ) );
   }
 
@@ -25,6 +25,8 @@ namespace BlueBear::Scripting::LuaKit {
     sol::table event = lua[ "bluebear" ][ "event" ];
     event.set_function( "register_key", &EventHelper::registerKey, this );
     event.set_function( "unregister_key", &EventHelper::unregisterKey, this );
+
+    bridge.submitLuaContributions( event );
   }
 
   int EventHelper::registerKey( const std::string& key, sol::function f ) {

@@ -15,11 +15,15 @@
 namespace BlueBear::Scripting {
 
   class CoreEngine : public State::Substate {
+  public:
+    using Callback = std::variant< sol::function, std::function< void() > >;
+
+  private:
     static constexpr const char* USER_MODPACK_DIRECTORY = "modpacks/user/";
     static constexpr const char* SYSTEM_MODPACK_DIRECTORY = "modpacks/system/";
 
     sol::state lua;
-    Containers::ReusableObjectVector< std::pair< int, std::variant< sol::function, std::function< void() > > > > queuedCallbacks;
+    Containers::ReusableObjectVector< std::pair< int, Callback > > queuedCallbacks;
 
     void setupCoreEnvironment();
 
@@ -29,7 +33,7 @@ namespace BlueBear::Scripting {
   public:
     CoreEngine( State::State& state );
 
-    int setTimeout( double interval, sol::function f );
+    int setTimeout( double interval, Callback f );
     void loadModpacks();
     void broadcastReadyEvent();
     bool update() override;

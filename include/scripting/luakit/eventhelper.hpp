@@ -2,6 +2,7 @@
 #define NEW_EVENT_HELPER
 
 #include "containers/reusableobjectvector.hpp"
+#include "scripting/luakit/eventbridge.hpp"
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -15,6 +16,7 @@ namespace BlueBear::Scripting::LuaKit {
 
   class EventHelper {
     CoreEngine& engine;
+    EventBridge bridge;
     std::unordered_map< std::string, Containers::ReusableObjectVector< sol::function > > keyEvents;
 
     void submitLuaContributions( sol::state& lua );

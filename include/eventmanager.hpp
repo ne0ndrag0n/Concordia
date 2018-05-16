@@ -65,10 +65,6 @@ namespace BlueBear {
    };
 
   struct EventManager {
-    BasicEvent< void*, LuaReference > UI_ACTION_EVENT_LEGACY;
-    BasicEvent< void*, sol::function& > UI_ACTION_EVENT;
-    BasicEvent< void*, void*, int > ITEM_ADDED;
-    BasicEvent< void*, void*, int > ITEM_REMOVED;
     BasicEvent< void*, std::string > MESSAGE_LOGGED;
     BasicEvent< void* > SHADER_CHANGE;
     BasicEvent< void*, sol::state& > LUA_STATE_READY;
