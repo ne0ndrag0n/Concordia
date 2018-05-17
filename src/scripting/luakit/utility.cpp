@@ -1,4 +1,5 @@
 #include "scripting/luakit/utility.hpp"
+#include "configmanager.hpp"
 #include <functional>
 
 namespace BlueBear::Scripting::LuaKit {
@@ -27,6 +28,10 @@ namespace BlueBear::Scripting::LuaKit {
     sol::table util = lua[ "bluebear" ][ "util" ];
     copy = [ &lua ]( sol::table original, bool deep ) { return copyTable( lua, original, deep ); };
     util[ "copy_table" ] = copy;
+
+    util[ "get_fps" ] = []() -> double {
+      return ConfigManager::getInstance().getIntValue( "fps_overview" );
+    };
   }
 
 }

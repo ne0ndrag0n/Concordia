@@ -1,17 +1,19 @@
 local path = ...
+local fps = bluebear.util.get_fps()
+
 local Panel = {
   animation_in_progress = false,
   ANIMATIONS = {
     OPEN = {
-      fps = 60.0,
-      duration = 15.0,
+      fps = fps,
+      duration = fps / 4,
       keyframes = {
         [ 0.0 ] = {
           frames = {
             top = -450
           }
         },
-        [ 15.0 ] = {
+        [ fps / 4 ] = {
           interpolate = true,
           frames = {
             top = 0
@@ -20,15 +22,15 @@ local Panel = {
       }
     },
     CLOSE = {
-      fps = 60.0,
-      duration = 15.0,
+      fps = fps,
+      duration = fps / 4,
       keyframes = {
         [ 0.0 ] = {
           frames = {
             top = 0
           }
         },
-        [ 15.0 ] = {
+        [ fps / 4 ] = {
           interpolate = true,
           frames = {
             top = -450

@@ -1,3 +1,0 @@
-local modpack_path = ...
-
-class = require( modpack_path.."/middleclass" )

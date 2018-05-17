@@ -1,6 +1,0 @@
-<Alignment class="bb_chatline" scale_x="0" scale_y="0">
-  <Box>
-    %s
-    <Label>%s</Label>
-  </Box>
-</Alignment>

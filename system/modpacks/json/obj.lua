@@ -1,3 +1,0 @@
-local modpack_path = ...
-
-JSON = require( modpack_path.."/json" )
