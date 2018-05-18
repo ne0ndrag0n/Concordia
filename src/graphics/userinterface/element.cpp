@@ -20,6 +20,60 @@ namespace BlueBear {
 
       Element::~Element() {}
 
+      std::vector< std::shared_ptr< Element > > Element::getElementsByTag( const std::string& tag ) {
+        std::vector< std::shared_ptr< Element > > result;
+
+        for( std::shared_ptr< Element > child : children ) {
+          if( child->getTag() == tag ) {
+            result.push_back( child );
+          }
+
+          result = Tools::Utility::concatArrays( result, child->getElementsByTag( tag ) );
+        }
+
+        return result;
+      }
+
+      std::vector< std::shared_ptr< Element > > Element::getElementsByClass( const std::vector< std::string >& classes ) {
+        std::vector< std::shared_ptr< Element > > result;
+
+        for( std::shared_ptr< Element > child : children ) {
+          bool add = false;
+          for( const std::string& clas : classes ) {
+            add = child->hasClass( clas );
+            if( !add ) {
+              break;
+            }
+          }
+
+          if( add ) {
+            result.push_back( child );
+          }
+
+          result = Tools::Utility::concatArrays( result, child->getElementsByClass( classes ) );
+        }
+
+        return result;
+      }
+
+      std::shared_ptr< Element > Element::getElementById( const std::string& id ) {
+        std::shared_ptr< Element > result = nullptr;
+
+        for( std::shared_ptr< Element > child : children ) {
+          if( child->getId() == id ) {
+            result = child;
+          } else {
+            result = child->getElementById( id );
+          }
+
+          if( result ) {
+            break;
+          }
+        }
+
+        return result;
+      }
+
       void Element::walk( std::function< void( Element& ) > predicate ) {
         predicate( *this );
 

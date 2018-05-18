@@ -35,6 +35,22 @@
               color: rgbaString( "ffffffff" );
             }
 
+            Text.debug {
+              color: rgbaString( "00AA00FF" );
+            }
+
+            Text.info {
+              color: rgbaString( "5555FFFF" );
+            }
+
+            Text.warning {
+              color: rgbaString( "AA5500FF" );
+            }
+
+            Text.error {
+              color: rgbaString( "AA0000FF" );
+            }
+
           }
         }
       }

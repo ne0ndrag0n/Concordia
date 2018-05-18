@@ -39,7 +39,22 @@ local Panel = {
       }
     }
   },
-  pane = nil
+  LOG_MESSAGE_TEMPLATE = [[
+  <Layout class="-bb-log-message">
+    <Text class="-bb-date %s">%s</Text>
+    <Spacer class="buffer-log"></Spacer>
+    <Text class="-bb-message">%s</Text>
+  </Layout>
+  ]],
+  LEVEL_CLASSES = {
+    [ 'd' ] = 'debug',
+    [ 'i' ] = 'info',
+    [ 'w' ] = 'warning',
+    [ 'e' ] = 'error'
+  },
+  pane = nil,
+  scrollback_bin = nil,
+  system_event = nil
 }
 
 function Panel:load()
@@ -49,6 +64,29 @@ function Panel:load()
 
   bluebear.event.register_key( '`', bluebear.util.bind( self.toggle, self ) )
   self.pane:set_style_property( 'top', -450 )
+
+  self.scrollback_bin = self.pane:get_elements_by_class( { '-bb-scrollback-bin' } )[ 1 ]
+  self.system_event = bluebear.event.register_system_event( 'message-logged', bluebear.util.bind( self.on_log, self ) )
+end
+
+function Panel:on_log( message )
+  -- Prevent loopback
+  bluebear.event.unregister_system_event( 'message-logged', self.system_event )
+
+  local segment = bluebear.util.split( message, '[' )
+  self.scrollback_bin:add_child(
+    bluebear.gui.load_xml(
+      string.format(
+        self.LOG_MESSAGE_TEMPLATE,
+        self.LEVEL_CLASSES[ string.sub( segment[ 1 ], 2, 2 ) ],
+        segment[ 1 ],
+        '['..segment[ 2 ]
+      )
+    , false )[ 1 ]
+  )
+
+  -- Restore
+  self.system_event = bluebear.event.register_system_event( 'message-logged', bluebear.util.bind( self.on_log, self ) )
 end
 
 function Panel:toggle()

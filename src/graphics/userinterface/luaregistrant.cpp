@@ -116,6 +116,11 @@ namespace BlueBear::Graphics::UserInterface {
       "has_class", &Element::hasClass,
       "get_selector_string", &Element::generateSelectorString,
       "get_children", &Element::getChildren,
+      "get_elements_by_tag", &Element::getElementsByTag,
+      "get_element_by_id", &Element::getElementById,
+      "get_elements_by_class", []( Element& self, sol::table t ) {
+        return self.getElementsByClass( Scripting::LuaKit::Utility::tableToVector< std::string >( t ) );
+      },
       "get_absolute_position", []( Element& self ) { return glm::vec2{ self.getAbsolutePosition() }; },
       "get_allocation", []( Element& self ) { return glm::vec4{ self.getAllocation() }; },
       "get_style_property", []( Element& self, const std::string& id ) -> PropertyListType {

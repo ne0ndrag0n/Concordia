@@ -5,11 +5,6 @@
       <Image>dev/chatbox.png</Image>
       <Scroll class="-bb-scrollback">
         <Layout class="-bb-scrollback-bin">
-          <Layout class="-bb-log-message">
-            <Text class="-bb-date">(d) 2018-05-14 21:17:44:</Text>
-            <Spacer class="buffer-log"></Spacer>
-            <Text class="-bb-message">[Application::Application] Concordia v0.0.4</Text>
-          </Layout>
         </Layout>
       </Scroll>
     </Layout>

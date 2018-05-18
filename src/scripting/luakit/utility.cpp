@@ -1,6 +1,9 @@
 #include "scripting/luakit/utility.hpp"
+#include "tools/utility.hpp"
 #include "configmanager.hpp"
 #include <functional>
+
+#include "log.hpp"
 
 namespace BlueBear::Scripting::LuaKit {
 
@@ -31,6 +34,16 @@ namespace BlueBear::Scripting::LuaKit {
 
     util[ "get_fps" ] = []() -> double {
       return ConfigManager::getInstance().getIntValue( "fps_overview" );
+    };
+
+    util[ "split" ] = []( const std::string& string, const std::string& delim ) {
+      std::vector< std::string > split;
+
+      if( delim.size() ) {
+        split = Tools::Utility::split( string, delim[ 0 ] );
+      }
+
+      return split;
     };
   }
 

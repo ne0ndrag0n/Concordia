@@ -99,6 +99,9 @@ namespace BlueBear {
         void setAllocation( const glm::uvec4& allocation, bool doReflow = true );
 
         std::vector< std::shared_ptr< Element > > getLeafNodes();
+        std::vector< std::shared_ptr< Element > > getElementsByTag( const std::string& tag );
+        std::vector< std::shared_ptr< Element > > getElementsByClass( const std::vector< std::string >& classes );
+        std::shared_ptr< Element > getElementById( const std::string& id );
 
         virtual void reflow();
         void paint();
