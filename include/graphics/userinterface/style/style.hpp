@@ -142,6 +142,7 @@ namespace BlueBear {
           void resetProperty( const std::string& key );
 
           void attachAnimation( std::unique_ptr< Animation > animation );
+          bool animationAttached();
           void updateAnimation();
 
           PropertyListType hierarchy( const std::string& key ) const {

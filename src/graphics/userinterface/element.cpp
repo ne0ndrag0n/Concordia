@@ -307,7 +307,7 @@ namespace BlueBear {
         paint();
       }
 
-      void Element::paint() {
+      void Element::paint( bool propagate ) {
         // Render myself, since I've already been positioned and sized
         generateDrawable();
 
@@ -316,8 +316,10 @@ namespace BlueBear {
           setChildrenZOrder();
           sortElements();
 
-          for( std::shared_ptr< Element > child : children ) {
-            child->paint();
+          if( propagate ) {
+            for( std::shared_ptr< Element > child : children ) {
+              child->paint();
+            }
           }
         }
 

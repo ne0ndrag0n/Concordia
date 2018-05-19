@@ -83,6 +83,10 @@ namespace BlueBear {
           attachedAnimation = std::move( animation );
         }
 
+        bool Style::animationAttached() {
+          return !( attachedAnimation == nullptr );
+        }
+
         void Style::updateAnimation() {
           if( attachedAnimation ) {
             changedAttributes = attachedAnimation->getChangedForFrame();

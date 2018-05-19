@@ -104,7 +104,7 @@ namespace BlueBear {
         std::shared_ptr< Element > getElementById( const std::string& id );
 
         virtual void reflow();
-        void paint();
+        void paint( bool propagate = true );
         void draw();
       };
 
