@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
 <Window class="-bb-debug-panel" window-title="Debug">
   <Layout>
     <TabLayout>
@@ -26,4 +25,6 @@
     </TabLayout>
   </Layout>
 </Window>
--->
+<Window class="-bb-other-test" window-title="oof">
+
+</Window>

@@ -1,0 +1,77 @@
+.-bb-debug-panel {
+  top: 10;
+  left: 10;
+  width: 400;
+  height: 300;
+
+  TabLayout {
+    layout-weight: 1;
+    height: Requisition::FILL_PARENT;
+  }
+
+  .tab-1 {
+    gravity: Gravity::TOP;
+    tab-title: "VERSION";
+
+    .buffer-top {
+      height: 10;
+    }
+
+    .middle {
+      horizontal-orientation: Orientation::MIDDLE;
+    }
+
+    Text {
+      color: rgbaString( "ffffffff" );
+      background-color: rgbaString( "00000000" );
+      font-size: 24.0;
+    }
+
+    .buffer-build-info {
+      height: 10;
+    }
+
+    .build-info {
+      font-size: 22.0;
+    }
+
+    .copyright {
+      font-size: 20.0;
+    }
+
+    .about-set {
+
+      .buffer-inner {
+        width: 10;
+      }
+
+      .logo-text-group {
+        gravity: Gravity::TOP;
+        vertical-orientation: Orientation::MIDDLE;
+
+        .concordia-logo {
+          font-size: 48.0;
+          font: "purisa";
+        }
+      }
+    }
+  }
+
+  .tab-2 {
+    gravity: Gravity::TOP;
+    tab-title: "OPTIONS";
+    padding: 10;
+
+    Button {
+      width: Requisition::FILL_PARENT;
+    }
+  }
+}
+
+.-bb-other-test {
+  top: 50;
+  left: 50;
+  width: 400;
+  height: 300;
+
+}
