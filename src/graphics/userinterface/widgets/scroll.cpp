@@ -91,8 +91,7 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
       // Calculate new scrollX proportion
       float newScrollX = ( float ) newX / ( float ) xSpace;
       scrollX = newScrollX;
-      forceDirty = true;
-      reflow();
+      partialReflow();
     }
   }
 
@@ -110,9 +109,18 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 
       float newScrollY = ( float ) newY / ( float ) ySpace;
       scrollY = newScrollY;
-      forceDirty = true;
-      reflow();
+      partialReflow();
     }
+  }
+
+  /**
+   * Reflow that re-renders local element and only repositions child elements - king-size reflow is way too slow. Only the scrollbars
+   * need to be updated and the *immediate* children repositioned.
+   */
+  void Scroll::partialReflow() {
+    positionAndSizeChildren();
+    forceDirty = true;
+    generateDrawable();
   }
 
   glm::uvec2 Scroll::getFinalRequisition( std::shared_ptr< Element > prospect ) {

@@ -30,6 +30,8 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
     void updateY( int y );
     glm::uvec2 getFinalRequisition( std::shared_ptr< Element > prospect );
 
+    void partialReflow();
+
   public:
     virtual bool drawableDirty() override;
     virtual void positionAndSizeChildren() override;
