@@ -1,14 +1,5 @@
 #include "graphics/userinterface/luaregistrant.hpp"
-#include "graphics/userinterface/widgets/layout.hpp"
-#include "graphics/userinterface/widgets/text.hpp"
-#include "graphics/userinterface/widgets/window.hpp"
-#include "graphics/userinterface/widgets/button.hpp"
-#include "graphics/userinterface/widgets/input.hpp"
-#include "graphics/userinterface/widgets/tablayout.hpp"
-#include "graphics/userinterface/widgets/image.hpp"
-#include "graphics/userinterface/widgets/spacer.hpp"
-#include "graphics/userinterface/widgets/pane.hpp"
-#include "graphics/userinterface/widgets/scroll.hpp"
+#include "graphics/userinterface/types.hpp"
 #include "graphics/userinterface/style/style.hpp"
 #include "graphics/userinterface/propertylist.hpp"
 #include "graphics/userinterface/event/eventbundle.hpp"
@@ -99,6 +90,46 @@ namespace BlueBear::Graphics::UserInterface {
     ) );
   }
 
+  static UIType downcast( std::shared_ptr< Element > self ) {
+    // *inhales deeply*....
+    if( auto newPointer = std::dynamic_pointer_cast< Widgets::Layout >( self ) ) {
+      return newPointer;
+    } else if( auto newPointer = std::dynamic_pointer_cast< Widgets::Text >( self ) ) {
+      return newPointer;
+    } else if( auto newPointer = std::dynamic_pointer_cast< Widgets::Window >( self ) ) {
+      return newPointer;
+    } else if( auto newPointer = std::dynamic_pointer_cast< Widgets::WindowDecoration >( self ) ) {
+      return newPointer;
+    } else if( auto newPointer = std::dynamic_pointer_cast< Widgets::Button >( self ) ) {
+      return newPointer;
+    } else if( auto newPointer = std::dynamic_pointer_cast< Widgets::Input >( self ) ) {
+      return newPointer;
+    } else if( auto newPointer = std::dynamic_pointer_cast< Widgets::TabLayout >( self ) ) {
+      return newPointer;
+    } else if( auto newPointer = std::dynamic_pointer_cast< Widgets::Image >( self ) ) {
+      return newPointer;
+    } else if( auto newPointer = std::dynamic_pointer_cast< Widgets::Spacer >( self ) ) {
+      return newPointer;
+    } else if( auto newPointer = std::dynamic_pointer_cast< Widgets::Pane >( self ) ) {
+      return newPointer;
+    } else if( auto newPointer = std::dynamic_pointer_cast< Widgets::Scroll >( self ) ) {
+      return newPointer;
+    } else {
+      // You tried and failed
+      return std::shared_ptr< Element >( nullptr );
+    }
+  }
+
+  static std::vector< UIType > downcastAll( const std::vector< std::shared_ptr< Element > >& elements ) {
+    std::vector< UIType > result;
+
+    for( const auto& element : elements ) {
+      result.push_back( downcast( element ) );
+    }
+
+    return result;
+  }
+
   void LuaRegistrant::registerWidgets( sol::state& lua ) {
     sol::table gui = lua[ "bluebear" ][ "gui" ];
     sol::table types = lua.create_table();
@@ -130,11 +161,13 @@ namespace BlueBear::Graphics::UserInterface {
       "get_id", &Element::getId,
       "has_class", &Element::hasClass,
       "get_selector_string", &Element::generateSelectorString,
-      "get_children", &Element::getChildren,
+      "get_children", []( Element& self ) -> std::vector< UIType > {
+        return downcastAll( self.getChildren() );
+      },
       "get_elements_by_tag", &Element::getElementsByTag,
       "get_element_by_id", &Element::getElementById,
-      "get_elements_by_class", []( Element& self, sol::table t ) {
-        return self.getElementsByClass( Scripting::LuaKit::Utility::tableToVector< std::string >( t ) );
+      "get_elements_by_class", []( Element& self, sol::table t ) -> std::vector< UIType > {
+        return downcastAll( self.getElementsByClass( Scripting::LuaKit::Utility::tableToVector< std::string >( t ) ) );
       },
       "get_absolute_position", []( Element& self ) { return glm::vec2{ self.getAbsolutePosition() }; },
       "get_allocation", []( Element& self ) { return glm::vec4{ self.getAllocation() }; },

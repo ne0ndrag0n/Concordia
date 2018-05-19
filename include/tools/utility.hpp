@@ -128,6 +128,8 @@ namespace BlueBear {
 				template < typename Numeric > static constexpr Numeric interpolateLinear( Numeric v0, Numeric v1, double alpha ) {
 					return ( 1 - alpha ) * v0 + alpha * v1;
 				};
+
+				static std::string sanitizeXML( const std::string& input );
 		};
 	}
 }

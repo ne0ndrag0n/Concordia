@@ -45,6 +45,10 @@ namespace BlueBear::Scripting::LuaKit {
 
       return split;
     };
+
+    util[ "sanitize_xml" ] = []( const std::string& input ) {
+      return Tools::Utility::sanitizeXML( input );
+    };
   }
 
 }

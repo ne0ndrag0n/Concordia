@@ -89,7 +89,10 @@ function Panel:load()
 end
 
 function Panel:execute( event )
-  --print( 'Panel:execute', self.input_field:get_contents() )
+  local contents = self.input_field:get_contents()
+  self.input_field:set_contents( "" )
+
+  assert( load( contents ) )()
 end
 
 function Panel:clear( event )
@@ -109,8 +112,8 @@ function Panel:on_log( message )
       string.format(
         self.LOG_MESSAGE_TEMPLATE,
         self.LEVEL_CLASSES[ string.sub( segment[ 1 ], 2, 2 ) ],
-        segment[ 1 ],
-        '['..segment[ 2 ]
+        bluebear.util.sanitize_xml( segment[ 1 ] ),
+        bluebear.util.sanitize_xml( '['..segment[ 2 ] )
       )
     , false )[ 1 ]
   )

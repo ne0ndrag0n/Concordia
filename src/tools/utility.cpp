@@ -474,5 +474,34 @@ namespace BlueBear {
 
 			return indentation;
 		}
+
+		std::string Utility::sanitizeXML( const std::string& input ) {
+			std::string result;
+			result.reserve( input.size() );
+
+			for( const char c : input ) {
+				switch( c ) {
+					case '<':
+						result.append( "&lt;" );
+						break;
+					case '>':
+						result.append( "&gt;" );
+						break;
+					case '\"':
+						result.append( "&quot;" );
+						break;
+					case '\'':
+						result.append( "&apos;" );
+						break;
+					case '&':
+						result.append( "&amp;" );
+						break;
+					default:
+						result.append( &c, 1 );
+				}
+			}
+
+			return result;
+		}
 	}
 }
