@@ -212,14 +212,8 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
   }
 
   void Input::reflow() {
-    // Do not ask parent to reflow if width/height were not changed
-    std::unordered_set< std::string > changedInFrame = localStyle.getChangedAttributes();
-    if( changedInFrame.count( "width" ) || changedInFrame.count( "height" ) ) {
-      if( auto parent = getParent() ) {
-        parent->reflow();
-      } else {
-        Element::reflow();
-      }
+    if( auto parent = getParent() ) {
+      parent->reflow();
     } else {
       Element::reflow();
     }

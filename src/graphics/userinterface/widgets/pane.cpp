@@ -118,22 +118,6 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
   }
 
   void Pane::reflow() {
-    if( localStyle.animationAttached() ) {
-      std::unordered_set< std::string > set = localStyle.getChangedAttributes();
-      const std::unordered_set< std::string > slide = { "top", "left" };
-      const std::unordered_set< std::string > slideLeft = { "left" };
-      const std::unordered_set< std::string > slideTop = { "top" };
-
-      if( set == slide || set == slideLeft || set == slideTop ) {
-        // We're animating a pullin/pullout. The only thing we need to do, is ask the parent to resize its children
-        if( auto parent = getParent() ) {
-          parent->paint( false );
-        }
-
-        return;
-      }
-    }
-
     if( auto parent = getParent() ) {
       parent->reflow();
     } else {
