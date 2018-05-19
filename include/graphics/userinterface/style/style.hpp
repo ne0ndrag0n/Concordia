@@ -34,6 +34,7 @@ namespace BlueBear {
             Style* parent;
             std::function< void() > callback;
             std::map< double, Keyframe > keyframes;
+            std::unordered_set< std::string > frameChangedAttributes;
             const double fps;
             const double duration;
             double current;
@@ -48,6 +49,7 @@ namespace BlueBear {
             Animation( Style* parent, std::map< double, Keyframe > keyframes, double fps, double duration, bool suicide, bool sticky, std::function< void() > callback = {} );
 
             bool increment();
+            std::unordered_set< std::string > getChangedForFrame();
 
             template < typename VariantType > const VariantType getKeyed( const std::string& key ) const {
 

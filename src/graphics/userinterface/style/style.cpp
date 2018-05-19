@@ -8,7 +8,14 @@ namespace BlueBear {
       namespace Style {
 
         Style::Animation::Animation( Style* parent, std::map< double, Keyframe > keyframes, double fps, double duration, bool suicide, bool sticky, std::function< void() > callback )
-          : parent( parent ), keyframes( keyframes ), fps( fps ), duration( duration ), current( 0.0 ), suicide( suicide ), sticky( sticky ), callback( callback ) {}
+          : parent( parent ), keyframes( keyframes ), fps( fps ), duration( duration ), current( 0.0 ), suicide( suicide ), sticky( sticky ), callback( callback ) {
+            for( auto& pair : keyframes ) {
+              auto properties = pair.second.properties.getProperties();
+              for( const std::string& prop : properties ) {
+                frameChangedAttributes.insert( prop );
+              }
+            }
+          }
 
         double Style::Animation::getFPS() {
           return fps / ConfigManager::getInstance().getIntValue( "fps_overview" );
@@ -33,6 +40,10 @@ namespace BlueBear {
 
           current = next;
           return true;
+        }
+
+        std::unordered_set< std::string > Style::Animation::getChangedForFrame() {
+          return frameChangedAttributes;
         }
 
         Style::Style( Element* parent ) : parent( parent ) {
@@ -73,8 +84,12 @@ namespace BlueBear {
         }
 
         void Style::updateAnimation() {
-          if( attachedAnimation && attachedAnimation->increment() ) {
-            parent->reflow();
+          if( attachedAnimation ) {
+            changedAttributes = attachedAnimation->getChangedForFrame();
+
+            if( attachedAnimation->increment() ) {
+              reflowParent();
+            }
           }
         }
 
