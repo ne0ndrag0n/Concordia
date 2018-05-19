@@ -6,16 +6,21 @@
 #include "scripting/entitykit/registry.hpp"
 #include "tools/utility.hpp"
 #include "configmanager.hpp"
-#include "eventmanager.hpp"
 #include "log.hpp"
 #include <cmath>
 #include <glm/glm.hpp>
 
 namespace BlueBear::Scripting {
 
+  BasicEvent< void* > CoreEngine::LUA_STATE_CLOSE;
+
   CoreEngine::CoreEngine( State::State& state ) : State::Substate( state ) {
     luaL_openlibs( lua.lua_state() );
     setupCoreEnvironment();
+  }
+
+  CoreEngine::~CoreEngine() {
+    LUA_STATE_CLOSE.trigger();
   }
 
   void CoreEngine::setupCoreEnvironment() {

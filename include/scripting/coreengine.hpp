@@ -3,6 +3,7 @@
 
 #include "containers/reusableobjectvector.hpp"
 #include "containers/visitor.hpp"
+#include "eventmanager.hpp"
 #include "state/substate.hpp"
 #include <lua.h>
 #include <lualib.h>
@@ -31,7 +32,11 @@ namespace BlueBear::Scripting {
     static double secondsToTicks( double seconds );
 
   public:
+    // TODO: Refactor to hold LUA_STATE_READY
+    static BasicEvent< void* > LUA_STATE_CLOSE;
+
     CoreEngine( State::State& state );
+    ~CoreEngine();
 
     int setTimeout( double interval, Callback f );
     void loadModpacks();

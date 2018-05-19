@@ -55,8 +55,11 @@ namespace BlueBear {
             }
           };
 
+          void dumpEvents();
+
         public:
           EventBundle( Element* parent );
+          ~EventBundle();
 
           unsigned int registerInputEvent( const std::string& key, std::function< void( Device::Input::Metadata ) > callback );
           void unregisterInputEvent( const std::string& key, unsigned int id );

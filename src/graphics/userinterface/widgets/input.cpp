@@ -219,4 +219,13 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
     }
   }
 
+  std::string Input::getContents() {
+    return contents;
+  }
+
+  void Input::setContents( const std::string& contents ) {
+    this->contents = contents;
+  }
+
+
 }

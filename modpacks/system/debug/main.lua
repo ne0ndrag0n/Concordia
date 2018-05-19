@@ -54,6 +54,7 @@ local Panel = {
   },
   pane = nil,
   scrollback_bin = nil,
+  input_field = nil,
   system_event = nil
 }
 
@@ -66,7 +67,36 @@ function Panel:load()
   self.pane:set_style_property( 'top', -450 )
 
   self.scrollback_bin = self.pane:get_elements_by_class( { '-bb-scrollback-bin' } )[ 1 ]
-  self.system_event = bluebear.event.register_system_event( 'message-logged', bluebear.util.bind( self.on_log, self ) )
+  self.input_field = self.pane:get_elements_by_class( { '-bb-terminal-text-input' } )[ 1 ]
+  self.system_event = bluebear.event.register_system_event(
+    'message-logged',
+    bluebear.util.bind( self.on_log, self )
+  )
+
+  self.pane
+    :get_elements_by_class( { '-bb-terminal-clear-button' } )[ 1 ]
+    :register_input_event(
+      'mouse-up',
+      bluebear.util.bind( self.clear, self )
+    )
+
+  self.pane
+    :get_elements_by_class( { '-bb-terminal-execute-button' } )[ 1 ]
+    :register_input_event(
+      'mouse-up',
+      bluebear.util.bind( self.execute, self )
+    )
+end
+
+function Panel:execute( event )
+  --print( 'Panel:execute', self.input_field:get_contents() )
+end
+
+function Panel:clear( event )
+  local children = self.scrollback_bin:get_children()
+  for index, child in ipairs( children ) do
+    child:detach()
+  end
 end
 
 function Panel:on_log( message )
@@ -86,7 +116,10 @@ function Panel:on_log( message )
   )
 
   -- Restore
-  self.system_event = bluebear.event.register_system_event( 'message-logged', bluebear.util.bind( self.on_log, self ) )
+  self.system_event = bluebear.event.register_system_event(
+    'message-logged',
+    bluebear.util.bind( self.on_log, self )
+  )
 end
 
 function Panel:toggle()

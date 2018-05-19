@@ -11,6 +11,8 @@
 #include "graphics/userinterface/widgets/scroll.hpp"
 #include "graphics/userinterface/style/style.hpp"
 #include "graphics/userinterface/propertylist.hpp"
+#include "graphics/userinterface/event/eventbundle.hpp"
+#include "device/input/input.hpp"
 #include "scripting/luakit/utility.hpp"
 #include <unordered_map>
 #include <functional>
@@ -101,6 +103,19 @@ namespace BlueBear::Graphics::UserInterface {
     sol::table gui = lua[ "bluebear" ][ "gui" ];
     sol::table types = lua.create_table();
 
+    types.new_usertype< Device::Input::Metadata >( "InputEvent",
+      "new", sol::no_constructor,
+      "key_pressed", &Device::Input::Metadata::keyPressed,
+      "alt_modifier", &Device::Input::Metadata::altModifier,
+      "ctrl_modifier", &Device::Input::Metadata::ctrlModifier,
+      "shift_modifier", &Device::Input::Metadata::shiftModifier,
+      "meta_modifier", &Device::Input::Metadata::metaModifier,
+      "mouse_location", &Device::Input::Metadata::mouseLocation,
+      "left_mouse", &Device::Input::Metadata::leftMouse,
+      "middle_mouse", &Device::Input::Metadata::middleMouse,
+      "right_mouse", &Device::Input::Metadata::rightMouse
+    );
+
     // If constructor is required here then all pure virtual functions must be removed
     types.new_usertype< Element >(
       "Element",
@@ -148,6 +163,15 @@ namespace BlueBear::Graphics::UserInterface {
       ),
       "remove_animation", []( Element& self ) {
         self.getPropertyList().attachAnimation( nullptr );
+      },
+      "register_input_event", []( Element& self, const std::string& id, sol::function f ) {
+        return self.getEventBundle().registerInputEvent( id, [ f ]( Device::Input::Metadata event ) {
+          f( event );
+        } );
+      },
+      // segfault will occur if these events are not deregistered before destruction of lua
+      "unregister_input_event", []( Element& self, const std::string& key, unsigned int id ) {
+        self.getEventBundle().unregisterInputEvent( key, id );
       }
     );
 
@@ -201,6 +225,8 @@ namespace BlueBear::Graphics::UserInterface {
       "create", []( const std::string& id, sol::table classes, const std::string& hintText, const std::string& contents ) {
         return Widgets::Input::create( id, Scripting::LuaKit::Utility::tableToVector< std::string >( classes ), hintText, contents );
       },
+      "get_contents", &Widgets::Input::getContents,
+      "set_contents", &Widgets::Input::setContents,
       sol::base_classes, sol::bases< Element >()
     );
 

@@ -65,6 +65,37 @@ namespace BlueBear::Scripting {
       sol::meta_function::multiplication, []( const glm::uvec4& left, const glm::uvec4& right ) { return left * right; },
       sol::meta_function::division, []( const glm::uvec4& left, const glm::uvec4& right ) { return left / right; }
     );
+
+    types.new_usertype< glm::ivec2 >( "Ivec2",
+      sol::constructors< glm::ivec2(), glm::ivec2( double, double ) >(),
+      "x", &glm::ivec2::x,
+      "y", &glm::ivec2::y,
+      sol::meta_function::addition, []( const glm::ivec2& left, const glm::ivec2& right ) { return left + right; },
+      sol::meta_function::subtraction, []( const glm::ivec2& left, const glm::ivec2& right ) { return left - right; },
+      sol::meta_function::multiplication, []( const glm::ivec2& left, const glm::ivec2& right ) { return left * right; },
+      sol::meta_function::division, []( const glm::ivec2& left, const glm::ivec2& right ) { return left / right; }
+    );
+    types.new_usertype< glm::ivec3 >( "Ivec3",
+      sol::constructors< glm::ivec3(), glm::ivec3( double, double, double ) >(),
+      "x", &glm::ivec3::x,
+      "y", &glm::ivec3::y,
+      "z", &glm::ivec3::z,
+      sol::meta_function::addition, []( const glm::ivec3& left, const glm::ivec3& right ) { return left + right; },
+      sol::meta_function::subtraction, []( const glm::ivec3& left, const glm::ivec3& right ) { return left - right; },
+      sol::meta_function::multiplication, []( const glm::ivec3& left, const glm::ivec3& right ) { return left * right; },
+      sol::meta_function::division, []( const glm::ivec3& left, const glm::ivec3& right ) { return left / right; }
+    );
+    types.new_usertype< glm::ivec4 >( "Ivec4",
+      sol::constructors< glm::ivec4(), glm::ivec4( double, double, double, double ) >(),
+      "x", &glm::ivec4::x,
+      "y", &glm::ivec4::y,
+      "z", &glm::ivec4::z,
+      "w", &glm::ivec4::w,
+      sol::meta_function::addition, []( const glm::ivec4& left, const glm::ivec4& right ) { return left + right; },
+      sol::meta_function::subtraction, []( const glm::ivec4& left, const glm::ivec4& right ) { return left - right; },
+      sol::meta_function::multiplication, []( const glm::ivec4& left, const glm::ivec4& right ) { return left * right; },
+      sol::meta_function::division, []( const glm::ivec4& left, const glm::ivec4& right ) { return left / right; }
+    );
   }
 
 }

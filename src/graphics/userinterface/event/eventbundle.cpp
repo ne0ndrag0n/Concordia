@@ -1,5 +1,6 @@
 #include "graphics/userinterface/event/eventbundle.hpp"
 #include "graphics/userinterface/element.hpp"
+#include "scripting/coreengine.hpp"
 #include "device/input/input.hpp"
 
 namespace BlueBear {
@@ -7,7 +8,18 @@ namespace BlueBear {
     namespace UserInterface {
       namespace Event {
 
-        EventBundle::EventBundle( Element* parent ) : parent( parent ) {}
+        EventBundle::EventBundle( Element* parent ) : parent( parent ) {
+          // Dump all events when Lua closes
+          Scripting::CoreEngine::LUA_STATE_CLOSE.listen( this, std::bind( &EventBundle::dumpEvents, this ) );
+        }
+
+        EventBundle::~EventBundle() {
+          Scripting::CoreEngine::LUA_STATE_CLOSE.stopListening( this );
+        }
+
+        void EventBundle::dumpEvents() {
+          inputEvents.clear();
+        }
 
         unsigned int EventBundle::registerInputEvent( const std::string& key, std::function< void( Device::Input::Metadata ) > callback ) {
           return insertElement( inputEvents, key, callback );

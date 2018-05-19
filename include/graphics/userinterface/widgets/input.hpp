@@ -34,6 +34,9 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
     virtual void calculate() override;
     virtual void reflow() override;
 
+    std::string getContents();
+    void setContents( const std::string& contents );
+
     static std::shared_ptr< Input > create( const std::string& id, const std::vector< std::string >& classes, const std::string& hintText, const std::string& contents );
   };
 
