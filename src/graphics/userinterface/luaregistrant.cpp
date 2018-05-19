@@ -191,16 +191,14 @@ namespace BlueBear::Graphics::UserInterface {
       "attach_animation", sol::overload(
         &attachAnimation,
         []( Element& self, sol::table options, sol::function callback ) {
-          attachAnimationWithCallback( self, options, [ callback ]() { callback(); } );
+          attachAnimationWithCallback( self, options, Scripting::LuaKit::Utility::bagFunction( callback ) );
         }
       ),
       "remove_animation", []( Element& self ) {
         self.getPropertyList().attachAnimation( nullptr );
       },
       "register_input_event", []( Element& self, const std::string& id, sol::function f ) {
-        return self.getEventBundle().registerInputEvent( id, [ f ]( Device::Input::Metadata event ) {
-          f( event );
-        } );
+        return self.getEventBundle().registerInputEvent( id, Scripting::LuaKit::Utility::bagFunction< Device::Input::Metadata >( f ) );
       },
       // segfault will occur if these events are not deregistered before destruction of lua
       "unregister_input_event", []( Element& self, const std::string& key, unsigned int id ) {
