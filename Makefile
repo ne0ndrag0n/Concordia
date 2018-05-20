@@ -33,8 +33,6 @@ SRCS += $(wildcard src/threading/*.cpp)
 SRCS += $(wildcard src/tools/*.cpp)
 
 OBJS = $(SRCS:.cpp=.o)
-OBJS += lib/cparse/builtin-features.o
-OBJS += lib/cparse/core-shunting-yard.o
 
 MAIN = bbexec
 

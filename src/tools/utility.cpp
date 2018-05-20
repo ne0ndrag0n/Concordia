@@ -15,7 +15,6 @@
 #include <fstream>
 #include <vector>
 #include <sstream>
-#include <cparse/shunting-yard-exceptions.h>
 
 // Not X-Platform
 #ifndef _WIN32
@@ -440,29 +439,6 @@ namespace BlueBear {
 			}
 
 			return element;
-		}
-
-		void Utility::queryFloatExpression( tinyxml2::XMLElement* element, const std::string& attribute, TokenMap& tokenMap, float* destination ) {
-			if( const char* expression = element->Attribute( attribute.c_str() ) ) {
-				try {
-					*destination = calculator::calculate( expression, &tokenMap ).asDouble();
-				} catch( msg_exception e ) {
-					std::string message( "Could not parse expression in element" );
-
-					const char* id = element->Attribute( "id" );
-					const char* clss = element->Attribute( "class" );
-
-					if( id ) {
-						message = message + " #" + id;
-					}
-
-					if( clss ) {
-						message = message + " ." + clss;
-					}
-
-					Log::getInstance().warn( "Utility::queryFloatExpression", message + ": " + e.what() );
-				}
-			}
 		}
 
 		std::string Utility::generateIndentation( unsigned int amount ) {

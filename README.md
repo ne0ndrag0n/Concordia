@@ -3,7 +3,7 @@ Concordia
 
 <img src="http://i.imgur.com/3xK1zDE.png">
 
-## Version 0.0.3 - Milestone "Picasso"
+## Version 0.0.4 - Milestone "da Vinci"
 
 # Introduction
 
@@ -32,6 +32,5 @@ Concordia
 * GLM
 * GLEW
 * Assimp
-* cparser f465747
 * Intel Threading Building Blocks (TBB) 4.4
 * Sol Lua bindings

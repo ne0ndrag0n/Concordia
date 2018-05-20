@@ -13,7 +13,6 @@
 #include <string>
 #include <functional>
 #include <memory>
-#include <cparse/shunting-yard.h>
 #include <glm/glm.hpp>
 
 namespace BlueBear {
@@ -91,8 +90,6 @@ namespace BlueBear {
 				static std::string xmlToString( tinyxml2::XMLElement* element );
 
 				static tinyxml2::XMLElement* getRootNode( tinyxml2::XMLDocument& document, const std::string& xmlString );
-
-				static void queryFloatExpression( tinyxml2::XMLElement* element, const std::string& attribute, TokenMap& tokenMap, float* destination );
 
 				// released under boost licence
 				template < class T >
