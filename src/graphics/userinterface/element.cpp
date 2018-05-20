@@ -282,6 +282,21 @@ namespace BlueBear {
         }
       }
 
+      void Element::remove( const std::vector< std::shared_ptr< Element > >& elements, bool doReflow ) {
+        for( const auto& element : elements ) {
+          children.erase(
+            std::remove( children.begin(), children.end(), element ),
+            children.end()
+          );
+
+          element->parentWeak = std::weak_ptr< Element >();
+        }
+
+        if( doReflow ) {
+          reflow();
+        }
+      }
+
       std::vector< std::shared_ptr< Element > > Element::getLeafNodes() {
         std::vector< std::shared_ptr< Element > > result;
 

@@ -157,6 +157,17 @@ namespace BlueBear::Graphics::UserInterface {
       "detach", []( Element& self ) {
         self.detach();
       },
+      "remove", []( Element& self, sol::table elements ) {
+        std::vector< std::shared_ptr< Graphics::UserInterface::Element > > pointers;
+
+        for( auto& pair : elements ) {
+          pointers.push_back(
+            Scripting::LuaKit::Utility::cast< Element& >( pair.second ).shared_from_this()
+          );
+        }
+
+        self.remove( pointers );
+      },
       "get_tag", &Element::getTag,
       "get_id", &Element::getId,
       "has_class", &Element::hasClass,

@@ -101,9 +101,13 @@ end
 
 function Panel:clear( event )
   local children = self.scrollback_bin:get_children()
-  for index, child in ipairs( children ) do
-    child:detach()
+  local tab = {}
+
+  for i, v in ipairs( children ) do
+    table.insert( tab, v )
   end
+
+  self.scrollback_bin:remove( tab )
 end
 
 function Panel:on_log( message )

@@ -57,7 +57,13 @@ namespace BlueBear::Scripting {
     temp.set_function( "__closure", [ f, unpacked = std::vector< sol::object >( args.begin(), args.end() ) ]( sol::variadic_args newargs ) {
       std::vector< sol::object > newunpacked( newargs.begin(), newargs.end() );
 
-      return f( sol::as_args( Tools::Utility::concatArrays( unpacked, newunpacked ) ) );
+      auto result = f( sol::as_args( Tools::Utility::concatArrays( unpacked, newunpacked ) ) );
+      if( result.valid() ) {
+        return result;
+      } else {
+        sol::error error = result;
+        Log::getInstance().error( "CoreEngine::bind", error.what() );
+      }
     } );
 
     return temp[ "__closure" ];

@@ -90,6 +90,7 @@ namespace BlueBear {
         std::shared_ptr< Element > getParent();
         virtual void addChild( std::shared_ptr< Element > child, bool doReflow = true );
         virtual void detach( bool doReflow = true );
+        virtual void remove( const std::vector< std::shared_ptr< Element > >& elements, bool doReflow = true );
 
         Style::Style& getPropertyList();
         Event::EventBundle& getEventBundle();
