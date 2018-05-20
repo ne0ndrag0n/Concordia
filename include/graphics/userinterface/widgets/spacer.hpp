@@ -16,7 +16,7 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
   public:
     virtual bool drawableDirty() override;
     virtual void calculate() override;
-    virtual void reflow() override;
+    virtual void reflow( bool selectorsInvalidated = true ) override;
 
     static std::shared_ptr< Spacer > create( const std::string& id, const std::vector< std::string >& classes );
   };

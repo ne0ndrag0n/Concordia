@@ -37,7 +37,7 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
     virtual void positionAndSizeChildren() override;
     virtual void render( Graphics::Vector::Renderer& renderer ) override;
     virtual void calculate() override;
-    virtual void reflow() override;
+    virtual void reflow( bool selectorsInvalidated = true ) override;
 
     static std::shared_ptr< Scroll > create( const std::string& id, const std::vector< std::string >& classes );
   };

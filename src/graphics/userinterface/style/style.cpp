@@ -64,7 +64,8 @@ namespace BlueBear {
         }
 
         void Style::reflowParent() {
-          parent->reflow();
+          // selectors will not be invalidated by something changing on a local stylesheet
+          parent->reflow( false );
         }
 
         void Style::setCalculated( const std::unordered_map< std::string, PropertyListType >& map ) {

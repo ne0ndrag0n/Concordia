@@ -25,7 +25,7 @@ namespace BlueBear {
         public:
           virtual void render( Graphics::Vector::Renderer& renderer ) override;
           virtual void calculate() override;
-          virtual void reflow() override;
+          virtual void reflow( bool selectorsInvalidated = true ) override;
 
           void setText( const std::string& text, bool doReflow = true );
           std::string getText();

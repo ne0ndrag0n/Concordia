@@ -224,11 +224,11 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
     };
   }
 
-  void Button::reflow() {
+  void Button::reflow( bool selectorsInvalidated ) {
     if( auto parent = getParent() ) {
-      parent->reflow();
+      parent->reflow( selectorsInvalidated );
     } else {
-      Element::reflow();
+      Element::reflow( selectorsInvalidated );
     }
   }
 

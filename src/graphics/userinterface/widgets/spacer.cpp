@@ -22,11 +22,11 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
     requisition = glm::uvec2{ 1, 1 };
   }
 
-  void Spacer::reflow() {
+  void Spacer::reflow( bool selectorsInvalidated ) {
     if( auto parent = getParent() ) {
-      parent->reflow();
+      parent->reflow( selectorsInvalidated );
     } else {
-      Element::reflow();
+      Element::reflow( selectorsInvalidated );
     }
   }
 }

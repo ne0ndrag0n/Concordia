@@ -16,7 +16,7 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
   public:
     virtual void positionAndSizeChildren() override;
     virtual void calculate() override;
-    virtual void reflow() override;
+    virtual void reflow( bool selectorsInvalidated = true ) override;
     virtual void render( Graphics::Vector::Renderer& renderer ) override;
 
     static std::shared_ptr< Pane > create( const std::string& id, const std::vector< std::string >& classes );

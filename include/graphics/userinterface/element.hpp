@@ -103,7 +103,7 @@ namespace BlueBear {
         std::vector< std::shared_ptr< Element > > getElementsByClass( const std::vector< std::string >& classes );
         std::shared_ptr< Element > getElementById( const std::string& id );
 
-        virtual void reflow();
+        virtual void reflow( bool selectorsInvalidated = true );
         void paint();
         void draw();
       };

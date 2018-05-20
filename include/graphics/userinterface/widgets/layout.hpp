@@ -48,7 +48,7 @@ namespace BlueBear {
           glm::uvec2 getFinalRequisition( std::shared_ptr< Element > prospect );
 
         public:
-          virtual void reflow() override;
+          virtual void reflow( bool selectorsInvalidated = true ) override;
           virtual void positionAndSizeChildren();
           virtual bool drawableDirty();
           virtual void generateDrawable();

@@ -32,7 +32,7 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
   public:
     virtual void render( Graphics::Vector::Renderer& renderer ) override;
     virtual void calculate() override;
-    virtual void reflow() override;
+    virtual void reflow( bool selectorsInvalidated = true ) override;
 
     std::string getContents();
     void setContents( const std::string& contents );

@@ -21,11 +21,11 @@ namespace BlueBear {
         /**
          * A layout needs to propagate its reflow up to the nearest non-layout parent (if no parent, then simply reflow one's self)
          */
-        void Layout::reflow() {
+        void Layout::reflow( bool selectorsInvalidated ) {
           if( auto parent = getParent() ) {
-            parent->reflow();
+            parent->reflow( selectorsInvalidated );
           } else {
-            Element::reflow();
+            Element::reflow( selectorsInvalidated );
           }
         }
 

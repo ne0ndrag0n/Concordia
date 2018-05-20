@@ -211,11 +211,11 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
     requisition = glm::uvec2{ textSpan + 16, fontSize + 20 };
   }
 
-  void Input::reflow() {
+  void Input::reflow( bool selectorsInvalidated ) {
     if( auto parent = getParent() ) {
-      parent->reflow();
+      parent->reflow( selectorsInvalidated );
     } else {
-      Element::reflow();
+      Element::reflow( selectorsInvalidated );
     }
   }
 

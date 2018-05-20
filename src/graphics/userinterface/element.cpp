@@ -302,8 +302,11 @@ namespace BlueBear {
         }
       }
 
-      void Element::reflow() {
-        manager->getStyleManager().update( shared_from_this() );
+      void Element::reflow( bool selectorsInvalidated ) {
+        if( selectorsInvalidated ) {
+          manager->getStyleManager().update( shared_from_this() );
+        }
+
         paint();
       }
 

@@ -117,11 +117,11 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
     }
   }
 
-  void Pane::reflow() {
+  void Pane::reflow( bool selectorsInvalidated ) {
     if( auto parent = getParent() ) {
-      parent->reflow();
+      parent->reflow( selectorsInvalidated );
     } else {
-      Element::reflow();
+      Element::reflow( selectorsInvalidated );
     }
   }
 }
