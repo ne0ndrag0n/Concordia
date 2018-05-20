@@ -89,7 +89,7 @@ namespace BlueBear {
                 totalWeight += layoutWeight;
               } else {
                 // This child will be sized using its requisition
-                glm::uvec2 finalRequisition = getFinalRequisition( child );
+                glm::uvec2 finalRequisition = cachedRequisitions[ child ];
                 totalSpace -= ( ( xAxis ? finalRequisition.x : finalRequisition.y ) + padding );
               }
             }
