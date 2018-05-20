@@ -63,11 +63,13 @@ function Panel:load()
   self.pane = bluebear.gui.load_xml( path..'/panel.xml' )[ 1 ]
   bluebear.gui.root_element:add_child( self.pane )
 
+  --[[
   bluebear.gui.load_stylesheet( { path..'/window.style' } )
   local els = bluebear.gui.load_xml( path..'/window.xml' )
   for index, element in ipairs( els ) do
     bluebear.gui.root_element:add_child( element )
   end
+  ]]
 
   bluebear.event.register_key( '`', bluebear.util.bind( self.toggle, self ) )
   self.pane:set_style_property( 'top', -450 )
