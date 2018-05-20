@@ -105,7 +105,7 @@ namespace BlueBear {
 
         virtual void reflow( bool selectorsInvalidated = true );
         void paint();
-        void draw();
+        void draw( glm::ivec2 parentAllocation = { 0, 0 } );
       };
 
     }

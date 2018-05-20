@@ -36,33 +36,33 @@ namespace BlueBear {
           bool horizontal = ( gravity == Gravity::LEFT || gravity == Gravity::RIGHT );
 
           // Do all children first
-          std::vector< glm::uvec2 > requisitions;
+          cachedRequisitions.clear();
           for( std::shared_ptr< Element > child : children ) {
             child->calculate();
-            requisitions.push_back( getFinalRequisition( child ) );
+            cachedRequisitions[ child ] = getFinalRequisition( child );
           }
 
           if( horizontal ) {
             total.x = padding;
-            for( glm::uvec2& requisition : requisitions ) {
-              total.x += requisition.x + padding;
+            for( auto& requisition : cachedRequisitions ) {
+              total.x += requisition.second.x + padding;
             }
 
             unsigned maxHeight = 0;
-            for( glm::uvec2& requisition : requisitions ) {
-              maxHeight = std::max( maxHeight, requisition.y );
+            for( auto& requisition : cachedRequisitions ) {
+              maxHeight = std::max( maxHeight, requisition.second.y );
             }
             total.y = maxHeight + ( padding * 2 );
           } else {
             unsigned int maxWidth = 0;
-            for( glm::uvec2& requisition : requisitions ) {
-              maxWidth = std::max( maxWidth, requisition.x );
+            for( auto& requisition : cachedRequisitions ) {
+              maxWidth = std::max( maxWidth, requisition.second.x );
             }
             total.x = maxWidth + ( padding * 2 );
 
             total.y = padding;
-            for( glm::uvec2& requisition : requisitions ) {
-              total.y += requisition.y + padding;
+            for( auto& requisition : cachedRequisitions ) {
+              total.y += requisition.second.y + padding;
             }
           }
 
@@ -135,18 +135,17 @@ namespace BlueBear {
          * Boudnaries already defined by parent element
          */
         void Layout::positionAndSizeChildren() {
-          // Make sure child requisitions are set
-          calculate();
+          if( getParent() == nullptr ) {
+            calculate();
+          }
 
           int padding = localStyle.get< int >( "padding" );
           Gravity gravity = localStyle.get< Gravity >( "gravity" );
 
           Layout::Relations relations = getRelations( gravity, padding );
           for( std::shared_ptr< Element > child : children ) {
-            child->calculate();
-
             glm::ivec4 childAllocation;
-            glm::uvec2 childRequisition = getFinalRequisition( child );
+            glm::uvec2 childRequisition = cachedRequisitions[ child ];
 
             if( child->getPropertyList().get< Placement >( "placement" ) == Placement::FLOW ) {
               // flow size - either a proportion derived from layout-weight or the requisition size

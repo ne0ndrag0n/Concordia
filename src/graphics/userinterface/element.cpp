@@ -364,12 +364,12 @@ namespace BlueBear {
         glScissor( scissor[ 0 ], scissor[ 1 ], scissor[ 2 ], scissor[ 3 ] );
       }
 
-      void Element::draw() {
+      void Element::draw( glm::ivec2 parentAllocation ) {
         if( !visible ) {
           return;
         }
 
-        glm::ivec2 absolutePosition = getAbsolutePosition();
+        glm::ivec2 absolutePosition = parentAllocation + glm::ivec2{ allocation.x, allocation.y };
         if( drawable ) {
           drawable->draw( absolutePosition );
         }
@@ -377,7 +377,7 @@ namespace BlueBear {
         glm::vec4 parentScissor = getParentScissor();
         setScissor( computeScissor( parentScissor, absolutePosition ) );
         for( std::shared_ptr< Element > element : children ) {
-          element->draw();
+          element->draw( absolutePosition );
         }
         setScissor( parentScissor );
       }

@@ -7,6 +7,7 @@
 #include <vector>
 #include <memory>
 #include <utility>
+#include <unordered_map>
 
 namespace BlueBear {
   namespace Device {
@@ -40,6 +41,8 @@ namespace BlueBear {
             const int flowTotalWeight;
             const int perpSizeAdjusted;
           };
+
+          std::unordered_map< std::shared_ptr< Element >, glm::uvec2 > cachedRequisitions;
 
         protected:
           Layout( const std::string& id, const std::vector< std::string >& classes );

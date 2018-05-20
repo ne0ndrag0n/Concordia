@@ -63,24 +63,18 @@ function Panel:load()
   self.pane = bluebear.gui.load_xml( path..'/panel.xml' )[ 1 ]
   bluebear.gui.root_element:add_child( self.pane )
 
-  --[[
   bluebear.gui.load_stylesheet( { path..'/window.style' } )
   local els = bluebear.gui.load_xml( path..'/window.xml' )
   for index, element in ipairs( els ) do
     bluebear.gui.root_element:add_child( element )
   end
-  ]]
 
   bluebear.event.register_key( '`', bluebear.util.bind( self.toggle, self ) )
   self.pane:set_style_property( 'top', -450 )
 
   self.scrollback_bin = self.pane:get_elements_by_class( { '-bb-scrollback-bin' } )[ 1 ]
   self.input_field = self.pane:get_elements_by_class( { '-bb-terminal-text-input' } )[ 1 ]
-  self.system_event = bluebear.event.register_system_event(
-    'message-logged',
-    bluebear.util.bind( self.on_log, self )
-  )
-
+  self.system_event = bluebear.event.register_system_event( 'message-logged', bluebear.util.bind( self.on_log, self ) )
   self.pane
     :get_elements_by_class( { '-bb-terminal-clear-button' } )[ 1 ]
     :register_input_event(
