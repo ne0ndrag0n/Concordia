@@ -12,6 +12,257 @@
             <Text class="-bb-message">%s</Text>
           </Layout>
           -->
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+          <Layout class="-bb-log-message">
+            <Text class="-bb-date %s">%s</Text>
+            <Spacer class="buffer-log"></Spacer>
+            <Text class="-bb-message">%s</Text>
+          </Layout>
+
         </Layout>
       </Scroll>
     </Layout>

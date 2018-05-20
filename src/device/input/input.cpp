@@ -523,6 +523,7 @@ namespace BlueBear {
 
       void Input::handleEvent( sf::Event& event ) {
         bool cancelAll = false;
+        auto sfmouse = sf::Mouse::getPosition( application.getDisplayDevice().getRenderWindow() );
 
         Metadata metadata {
           ( event.type == sf::Event::KeyPressed ) ? keyToString( event.key.code ) : "",
@@ -531,7 +532,7 @@ namespace BlueBear {
           sf::Keyboard::isKeyPressed( sf::Keyboard::LShift ) || sf::Keyboard::isKeyPressed( sf::Keyboard::RShift ),
           sf::Keyboard::isKeyPressed( sf::Keyboard::LSystem ) || sf::Keyboard::isKeyPressed( sf::Keyboard::RSystem ),
 
-          glm::ivec2{ sf::Mouse::getPosition( application.getDisplayDevice().getRenderWindow() ).x, sf::Mouse::getPosition( application.getDisplayDevice().getRenderWindow() ).y },
+          glm::ivec2{ sfmouse.x, sfmouse.y },
           sf::Mouse::isButtonPressed( sf::Mouse::Left ),
           sf::Mouse::isButtonPressed( sf::Mouse::Middle ),
           sf::Mouse::isButtonPressed( sf::Mouse::Right ),
@@ -542,7 +543,7 @@ namespace BlueBear {
 
         auto it = events.find( event.type );
         if( it != events.end() ) {
-          for( std::function< void( Metadata ) > callback : it->second ) {
+          for( std::function< void( Metadata ) >& callback : it->second ) {
             if( callback ) {
               callback( metadata );
 
