@@ -3,6 +3,7 @@
 #include "scripting/entitykit/components/modelmanager.hpp"
 #include "scripting/luakit/dynamicusertype.hpp"
 #include "graphics/scenegraph/model.hpp"
+#include "containers/visitor.hpp"
 #include "tools/utility.hpp"
 #include "eventmanager.hpp"
 #include "log.hpp"
@@ -28,6 +29,7 @@ namespace BlueBear::Scripting::EntityKit {
     entity.set_function( "register_component", &Registry::registerComponent, this );
     entity.set_function( "register_entity", &Registry::registerEntity, this );
     entity.set_function( "create_new_entity", &Registry::newEntity, this );
+    entity.set_function( "forget", &Registry::forget, this );
 
     sol::table types = lua[ "bluebear" ][ "entity" ][ "types" ] = lua.create_table();
     Component::submitLuaContributions( lua, types );
@@ -38,6 +40,7 @@ namespace BlueBear::Scripting::EntityKit {
   void Registry::registerComponent( const std::string& id, sol::table table ) {
     if( !componentRegistered( id ) ) {
       components[ id ] = table;
+      Log::getInstance().debug( "Registry::registerComponent", "Registered component " + id );
     } else {
       Log::getInstance().warn( "Registry::registerComponent", "Component " + id + " already registered!" );
     }
@@ -61,6 +64,7 @@ namespace BlueBear::Scripting::EntityKit {
       }
 
       entities[ id ] = list;
+      Log::getInstance().debug( "Registry::registerEntity", "Registered entity " + id );
     } else {
       Log::getInstance().warn( "Registry::registerEntity", "Entity " + id + " already registered!" );
     }
@@ -106,7 +110,7 @@ namespace BlueBear::Scripting::EntityKit {
     }
   }
 
-  std::shared_ptr< Entity > Registry::newEntity( const std::string& id, sol::table constructors ) {
+  std::shared_ptr< Entity > Registry::newEntity( const std::string& id, std::variant< sol::nil_t, sol::table > constructors ) {
     auto it = entities.find( id );
     if( it == entities.end() ) {
       Log::getInstance().error( "Registry::newEntity", "Component " + id + " has not been registered!" );
@@ -116,10 +120,23 @@ namespace BlueBear::Scripting::EntityKit {
     std::map< std::string, std::shared_ptr< Component > > components;
     for( const std::string& component : it->second ) {
       components[ component ] = newComponent( component );
-      components[ component ]->init( constructors[ component ] );
+      std::visit( overloaded {
+        [ & ]( sol::nil_t object ) {
+          components[ component ]->init( sol::nil );
+        },
+        [ & ]( sol::table object ) {
+          components[ component ]->init( object[ component ] );
+        }
+      }, constructors );
     }
 
-    return std::make_shared< Entity >( components );
+    auto instance = std::make_shared< Entity >( components );
+    instances.insert( instance );
+    return instance;
+  }
+
+  void Registry::forget( std::shared_ptr< Entity > entity ) {
+    instances.remove( entity );
   }
 
 }

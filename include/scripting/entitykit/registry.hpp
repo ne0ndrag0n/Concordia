@@ -1,6 +1,7 @@
 #ifndef ENTITY_REGISTRANT
 #define ENTITY_REGISTRANT
 
+#include "containers/reusableobjectvector.hpp"
 #include "exceptions/genexc.hpp"
 #include "scripting/entitykit/entity.hpp"
 #include "scripting/entitykit/component.hpp"
@@ -10,6 +11,7 @@
 #include <sol.hpp>
 #include <string>
 #include <optional>
+#include <variant>
 #include <memory>
 #include <map>
 
@@ -18,6 +20,8 @@ namespace BlueBear::Scripting::EntityKit {
   class Registry {
     std::map< std::string, sol::table > components;
     std::map< std::string, std::vector< std::string > > entities;
+
+    Containers::ReusableObjectVector< std::shared_ptr< Entity > > instances;
 
     std::map< std::string, sol::object > tableToMap( sol::table table );
     void submitLuaContributions( sol::state& lua );
@@ -28,7 +32,9 @@ namespace BlueBear::Scripting::EntityKit {
     bool componentRegistered( const std::string& id );
 
     std::shared_ptr< Component > newComponent( const std::string& id );
-    std::shared_ptr< Entity > newEntity( const std::string& id, sol::table constructors );
+    std::shared_ptr< Entity > newEntity( const std::string& id, std::variant< sol::nil_t, sol::table > constructors );
+
+    void forget( std::shared_ptr< Entity > entity );
 
   public:
     EXCEPTION_TYPE( InvalidIDException, "Invalid ID!" );

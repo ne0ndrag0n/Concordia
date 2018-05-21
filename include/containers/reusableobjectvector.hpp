@@ -27,6 +27,14 @@ namespace BlueBear::Containers {
       vector[ index ].reset();
     };
 
+    void remove( T object ) {
+      for( int i = 0; i != vector.size(); i++ ) {
+        if( vector[ i ] && *vector[ i ] == object ) {
+          return remove( i );
+        }
+      }
+    };
+
     T get( int index ) {
       return *vector[ index ];
     };

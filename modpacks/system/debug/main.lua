@@ -58,18 +58,10 @@ local Panel = {
   system_event = nil
 }
 
-function Panel:load()
+function Panel:init()
   bluebear.gui.load_stylesheet( { path..'/panel.style' } )
   self.pane = bluebear.gui.load_xml( path..'/panel.xml' )[ 1 ]
   bluebear.gui.root_element:add_child( self.pane )
-
-  --[[
-  bluebear.gui.load_stylesheet( { path..'/window.style' } )
-  local els = bluebear.gui.load_xml( path..'/window.xml' )
-  for index, element in ipairs( els ) do
-    bluebear.gui.root_element:add_child( element )
-  end
-  ]]
 
   bluebear.event.register_key( '`', bluebear.util.bind( self.toggle, self ) )
   self.pane:set_style_property( 'top', -450 )
@@ -154,4 +146,6 @@ function Panel:toggle()
   end
 end
 
-Panel:load()
+bluebear.entity.register_component( 'system.debug.terminal', Panel )
+bluebear.entity.register_entity( 'system.debug.debugger', { 'system.debug.terminal' } )
+bluebear.entity.create_new_entity( 'system.debug.debugger' )
