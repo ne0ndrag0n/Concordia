@@ -1,4 +1,5 @@
 #include "scripting/luakit/utility.hpp"
+#include "scripting/luakit/library/json.hpp"
 #include "tools/utility.hpp"
 #include "configmanager.hpp"
 #include <functional>
@@ -8,6 +9,7 @@
 namespace BlueBear::Scripting::LuaKit {
 
   std::function< sol::table( sol::table, bool ) > Utility::copy;
+  std::function< sol::state&() > Utility::getCurrentState;
 
   sol::table Utility::copyTable( sol::state& lua, sol::table original, bool deep ) {
     sol::table newTable = lua.create_table();
@@ -29,7 +31,10 @@ namespace BlueBear::Scripting::LuaKit {
     }
 
     sol::table util = lua[ "bluebear" ][ "util" ];
+    util[ "json" ] = lua.script( Library::JSON );
+
     copy = [ &lua ]( sol::table original, bool deep ) { return copyTable( lua, original, deep ); };
+    getCurrentState = [ &lua ]() -> sol::state& { return lua; };
     util[ "copy_table" ] = copy;
 
     util[ "get_fps" ] = []() -> double {

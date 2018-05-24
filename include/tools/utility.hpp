@@ -1,6 +1,7 @@
 #ifndef UTILITY
 #define UTILITY
 
+#include "exceptions/genexc.hpp"
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -29,6 +30,8 @@ namespace BlueBear {
 					FilesystemType type;
 					std::string name;
 				};
+
+				EXCEPTION_TYPE( InvalidJSONException, "Invalid JSON string!" );
 
 				static void stackDump( lua_State* L );
 
@@ -127,6 +130,14 @@ namespace BlueBear {
 				};
 
 				static std::string sanitizeXML( const std::string& input );
+
+				static Json::Value stringToJson( const std::string& string );
+
+				static std::string jsonToString( const Json::Value& json );
+
+				static std::pair< std::string, std::reference_wrapper< const Json::Value > > jsonIteratorToPair( Json::Value::const_iterator it );
+
+				static Json::Value fileToJson( const std::string& path );
 		};
 	}
 }

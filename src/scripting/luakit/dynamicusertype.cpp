@@ -1,5 +1,6 @@
 #include "scripting/luakit/dynamicusertype.hpp"
 #include "scripting/luakit/utility.hpp"
+#include "tools/utility.hpp"
 
 namespace BlueBear::Scripting::LuaKit {
 
@@ -12,6 +13,32 @@ namespace BlueBear::Scripting::LuaKit {
         types[ pair.first ] = pair.second;
       }
     }
+  }
+
+  Json::Value DynamicUsertype::save() {
+    sol::object object = get( "save" );
+
+    if( object.is< sol::function >() ) {
+      std::function< std::string( DynamicUsertype& ) > saveFunction = Utility::cast< sol::function >( object );
+      return Tools::Utility::stringToJson( saveFunction( *this ) );
+    } else {
+      // Nothing to serialise or return
+      return {};
+    }
+  }
+
+  void DynamicUsertype::load( const Json::Value& data ) {
+    if( data != Json::Value::null ) {
+      sol::object object = get( "load" );
+
+      if( object.is< sol::function >() ) {
+        Utility::cast< sol::function >( object )( *this, Tools::Utility::jsonToString( data ) );
+      }
+    }
+  }
+
+  sol::object DynamicUsertype::operator[]( const std::string& key ) {
+    return get( key );
   }
 
   void DynamicUsertype::set( const std::string& key, sol::object object ) {

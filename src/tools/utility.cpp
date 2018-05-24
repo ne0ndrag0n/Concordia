@@ -479,5 +479,38 @@ namespace BlueBear {
 
 			return result;
 		}
+
+		Json::Value Utility::stringToJson( const std::string& string ) {
+			Json::Value root;
+			Json::Reader reader;
+
+			if( !reader.parse( string.c_str(), root ) ) {
+				throw InvalidJSONException();
+			}
+
+			return root;
+		}
+
+		std::string Utility::jsonToString( const Json::Value& json ) {
+			Json::StreamWriterBuilder builder;
+			return Json::writeString( builder, json );
+		}
+
+		std::pair< std::string, std::reference_wrapper< const Json::Value > > Utility::jsonIteratorToPair( Json::Value::const_iterator it ) {
+			return std::make_pair( it.key().asString(), std::ref( *it ) );
+		}
+
+		Json::Value Utility::fileToJson( const std::string& path ) {
+			std::ifstream file( path );
+			Json::Value json;
+			Json::Reader reader;
+
+			if( reader.parse( file, json ) ) {
+				return json;
+			} else {
+				Log::getInstance().error( "Utility::fileToJson", "Failed to open JSON file: " + path );
+				return {};
+			}
+		}
 	}
 }

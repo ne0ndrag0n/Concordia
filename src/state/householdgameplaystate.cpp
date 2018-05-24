@@ -7,6 +7,7 @@
 #include "device/display/adapter/component/worldrenderer.hpp"
 #include "device/display/adapter/component/guicomponent.hpp"
 #include "graphics/scenegraph/animation/animator.hpp"
+#include "tools/utility.hpp"
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Event.hpp>
 #include <functional>
@@ -21,16 +22,31 @@
 namespace BlueBear {
   namespace State {
 
-    HouseholdGameplayState::HouseholdGameplayState( Application& application ) : State::State( application ), engine( *this ), luaEventHelper( engine ) {
+    HouseholdGameplayState::HouseholdGameplayState( Application& application, const std::string& path ) : State::State( application ), engine( *this ), luaEventHelper( engine ) {
       setupDisplayDevice();
       setupInputDevice();
 
       engine.broadcastReadyEvent();
       engine.loadModpacks();
+
+      // Load given lot from serialisation
+      if( path != "" ) {
+        load( Tools::Utility::fileToJson( path ) );
+      }
     }
 
     HouseholdGameplayState::~HouseholdGameplayState() {
       application.getInputDevice().reset();
+    }
+
+    Json::Value HouseholdGameplayState::save() {
+      return {};
+    }
+
+    void HouseholdGameplayState::load( const Json::Value& data ) {
+      if( data != Json::Value::null ) {
+        entityRegistry.load( data[ "registry" ] );
+      }
     }
 
     void HouseholdGameplayState::setupDisplayDevice() {

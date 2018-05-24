@@ -32,6 +32,7 @@ namespace BlueBear::Scripting::LuaKit {
     static void submitLuaContributions( sol::state& lua );
 
     static std::function< sol::table( sol::table, bool ) > copy;
+    static std::function< sol::state&() > getCurrentState;
 
     template< typename T >
     static T cast( sol::object o ) {

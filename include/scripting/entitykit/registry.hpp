@@ -5,6 +5,7 @@
 #include "exceptions/genexc.hpp"
 #include "scripting/entitykit/entity.hpp"
 #include "scripting/entitykit/component.hpp"
+#include "serializable.hpp"
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -17,7 +18,7 @@
 
 namespace BlueBear::Scripting::EntityKit {
 
-  class Registry {
+  class Registry : public Serializable {
     std::map< std::string, sol::table > components;
     std::map< std::string, std::vector< std::string > > entities;
 
@@ -38,6 +39,9 @@ namespace BlueBear::Scripting::EntityKit {
 
   public:
     EXCEPTION_TYPE( InvalidIDException, "Invalid ID!" );
+
+    Json::Value save() override;
+    void load( const Json::Value& data ) override;
 
     Registry();
     ~Registry();

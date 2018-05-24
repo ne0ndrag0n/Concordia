@@ -1,0 +1,12 @@
+{
+  "registry": {
+    "entities": [
+      {
+        "id": "system.debug.debugger",
+        "components": {
+          "system.debug.terminal": null
+        }
+      }
+    ]
+  }
+}

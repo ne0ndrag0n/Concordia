@@ -84,6 +84,16 @@ function Panel:init()
     )
 end
 
+function Panel:close()
+end
+
+function Panel:load( jsonString )
+  local x = bluebear.util.json.decode( jsonString )
+end
+
+function Panel:save()
+end
+
 function Panel:execute( event )
   local contents = self.input_field:get_contents()
   self.input_field:set_contents( "" )
@@ -148,4 +158,3 @@ end
 
 bluebear.entity.register_component( 'system.debug.terminal', Panel )
 bluebear.entity.register_entity( 'system.debug.debugger', { 'system.debug.terminal' } )
-bluebear.entity.create_new_entity( 'system.debug.debugger' )

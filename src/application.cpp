@@ -17,7 +17,7 @@ namespace BlueBear {
   }
 
   void Application::setupMainState() {
-    currentState = std::make_unique< State::HouseholdGameplayState >( *this );
+    currentState = std::make_unique< State::HouseholdGameplayState >( *this, "lots/01.json" );
   }
 
   Device::Display::Display& Application::getDisplayDevice() {

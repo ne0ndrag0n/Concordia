@@ -1,4 +1,6 @@
 #include "scripting/entitykit/entity.hpp"
+#include "tools/utility.hpp"
+#include "log.hpp"
 
 namespace BlueBear::Scripting::EntityKit {
 
@@ -16,6 +18,27 @@ namespace BlueBear::Scripting::EntityKit {
     // These objects should become useless to use by Lua, but not crash the game
     for( auto& pair : components ) {
       pair.second->attach( nullptr );
+    }
+  }
+
+  Json::Value Entity::save() {
+    return {};
+  }
+
+  void Entity::load( const Json::Value& data ) {
+    if( data != Json::Value::null ) {
+      const Json::Value& componentsJson = data[ "components" ];
+      if( componentsJson != Json::Value::null && componentsJson.isObject() ) {
+        for( auto it = componentsJson.begin(); it != componentsJson.end(); ++it ) {
+          auto pair = Tools::Utility::jsonIteratorToPair( it );
+          auto instance = components.find( pair.first );
+          if( instance != components.end() ) {
+            instance->second->load( pair.second );
+          } else {
+            Log::getInstance().error( "Entity::load", "Did not find component " + pair.first + " attached to this entity" );
+          }
+        }
+      }
     }
   }
 

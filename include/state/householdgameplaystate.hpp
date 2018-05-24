@@ -7,7 +7,9 @@
 #include "scripting/entitykit/registry.hpp"
 #include "exceptions/genexc.hpp"
 #include "device/input/input.hpp"
+#include "serializable.hpp"
 #include <memory>
+#include <string>
 
 namespace BlueBear {
   class Application;
@@ -18,7 +20,7 @@ namespace BlueBear {
 
   namespace State {
 
-    class HouseholdGameplayState : public State {
+    class HouseholdGameplayState : public State, public Serializable {
       static const unsigned int RENDER3D_ADAPTER = 0;
       static const unsigned int GUI_ADAPTER = 1;
 
@@ -33,8 +35,11 @@ namespace BlueBear {
     public:
       EXCEPTION_TYPE( LotNotFoundException, "Lot not found!" );
       EXCEPTION_TYPE( EngineLoadFailureException, "Failed to load BlueBear!" );
-      HouseholdGameplayState( Application& application );
+      HouseholdGameplayState( Application& application, const std::string& path = "" );
       ~HouseholdGameplayState();
+
+      Json::Value save() override;
+      void load( const Json::Value& data ) override;
 
       Scripting::CoreEngine& getEngine();
       void update() override;

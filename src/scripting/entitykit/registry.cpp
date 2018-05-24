@@ -9,7 +9,7 @@
 #include "log.hpp"
 #include <functional>
 
-namespace BlueBear::Scripting::EntityKit {
+namespace BlueBear::Scripting::EntityKit {\
 
   Registry::Registry() {
     eventManager.LUA_STATE_READY.listen( this, std::bind( &Registry::submitLuaContributions, this, std::placeholders::_1 ) );
@@ -17,6 +17,23 @@ namespace BlueBear::Scripting::EntityKit {
 
   Registry::~Registry() {
     eventManager.LUA_STATE_READY.stopListening( this );
+  }
+
+  Json::Value Registry::save() {
+    return {};
+  }
+
+  void Registry::load( const Json::Value& data ) {
+    if( data != Json::Value::null ) {
+      const Json::Value& entities = data[ "entities" ];
+      if( entities.isArray() ) {
+        for( Json::Value::const_iterator it = entities.begin(); it != entities.end(); ++it ) {
+          const Json::Value& value = *it;
+          std::shared_ptr< Entity > entity = newEntity( value[ "id" ].asString(), sol::nil );
+          entity->load( value );
+        }
+      }
+    }
   }
 
   void Registry::submitLuaContributions( sol::state& lua ) {
