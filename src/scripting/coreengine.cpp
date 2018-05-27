@@ -29,6 +29,7 @@ namespace BlueBear::Scripting {
     sol::table engine = lua.create_table();
     engine.set_function( "require_modpack", []() {} );
     engine.set_function( "queue_callback", &CoreEngine::setTimeout, this );
+    engine.set_function( "cancel_callback", &CoreEngine::cancelTimeout, this );
 
     sol::table util = lua.create_table();
     util.set_function( "bind", &CoreEngine::bind, this );
@@ -71,6 +72,10 @@ namespace BlueBear::Scripting {
 
   int CoreEngine::setTimeout( double interval, Callback f ) {
     return queuedCallbacks.insert( { std::round( interval ), f } );
+  }
+
+  void CoreEngine::cancelTimeout( int index ) {
+    queuedCallbacks.remove( index );
   }
 
   double CoreEngine::secondsToTicks( double seconds ) {

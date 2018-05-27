@@ -18,7 +18,7 @@ namespace BlueBear::Scripting::EntityKit {
   class Entity : public Serializable {
     std::map< std::string, std::shared_ptr< Component > > components;
 
-    void associate();
+    void associate( Entity* pointer );
 
   public:
     EXCEPTION_TYPE( NotFoundException, "Object not found in entity" );
@@ -29,6 +29,8 @@ namespace BlueBear::Scripting::EntityKit {
 
     Json::Value save() override;
     void load( const Json::Value& data ) override;
+
+    void close();
 
     static void submitLuaContributions( sol::state& lua, sol::table types );
 

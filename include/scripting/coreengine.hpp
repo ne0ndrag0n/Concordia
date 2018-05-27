@@ -39,6 +39,7 @@ namespace BlueBear::Scripting {
     ~CoreEngine();
 
     int setTimeout( double interval, Callback f );
+    void cancelTimeout( int index );
     void loadModpacks();
     void broadcastReadyEvent();
     bool update() override;
