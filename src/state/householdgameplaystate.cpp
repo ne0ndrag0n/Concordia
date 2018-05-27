@@ -58,6 +58,9 @@ namespace BlueBear {
       application.getDisplayDevice().pushAdapter( std::make_unique< Device::Display::Adapter::Component::GuiComponent >( application.getDisplayDevice() ) );
 
       adapter.getCamera().setRotationDirect( 0 );
+      adapter.loadPathsParallel( {
+        { "floor", "dev/box/armaturebox.fbx" }
+      } );
     }
 
     void HouseholdGameplayState::setupInputDevice() {
