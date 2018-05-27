@@ -6,3 +6,8 @@ bluebear.entity.register_entity( 'game.entity.plant',
     'game.component.plant.water_level'
   }
 )
+
+-- TEST code
+bluebear.world.register_models( {
+  floor = 'dev/box/armaturebox.fbx'
+} )

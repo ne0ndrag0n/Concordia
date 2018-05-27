@@ -6,6 +6,10 @@
 #include "graphics/camera.hpp"
 #include "graphics/scenegraph/resourcebank.hpp"
 #include <tbb/concurrent_unordered_map.h>
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
+#include <sol.hpp>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -37,7 +41,7 @@ namespace BlueBear {
             Graphics::Camera camera;
 
             Graphics::SceneGraph::ResourceBank cache;
-            tbb::concurrent_unordered_map< std::string, std::shared_ptr< Graphics::SceneGraph::Model > > originals;
+            std::unordered_map< std::string, std::shared_ptr< Graphics::SceneGraph::Model > > originals;
 
             // TODO: Walls and floor which both consist of one generated model
             std::unordered_map< std::string, std::shared_ptr< Graphics::SceneGraph::Light > > lights;
@@ -47,7 +51,9 @@ namespace BlueBear {
 
           public:
             WorldRenderer( Display& display );
-            virtual ~WorldRenderer() = default;
+            virtual ~WorldRenderer();
+
+            void submitLuaContributions( sol::state& lua );
 
             std::shared_ptr< Graphics::SceneGraph::Model > placeObject( const std::string& objectId, const std::string& newId );
             std::shared_ptr< Graphics::SceneGraph::Model > getObject( const std::string& instanceId );
