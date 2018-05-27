@@ -1,8 +1,8 @@
 CC = g++
 CFLAGS = -pthread -std=c++17 -g -rdynamic -pipe #-fsanitize=address
-DFLAGS = -DSOL_SAFE_FUNCTION=1 -DGLM_ENABLE_EXPERIMENTAL -DGLM_FORCE_CTOR_INIT
+DFLAGS = -DSOL_SAFE_FUNCTION=1
 INCLUDES = -Iinclude -Ilib -Ilib/nanovg
-LIBPATHS = -Llib/nanovg
+LIBPATHS = -Llib -Llib/nanovg
 LIBS = -lpthread -ltbb -lassimp -lGLEW -lGL -lsfml-graphics -lsfml-window -lsfml-system -ltinyxml2 -ljsoncpp -llua -ldl -lnanovg
 
 SRCS = $(wildcard src/*.cpp)
