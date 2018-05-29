@@ -9,7 +9,7 @@
 #include "log.hpp"
 #include <functional>
 
-namespace BlueBear::Scripting::EntityKit {\
+namespace BlueBear::Scripting::EntityKit {
 
   Registry::Registry() {
     eventManager.LUA_STATE_READY.listen( this, std::bind( &Registry::submitLuaContributions, this, std::placeholders::_1 ) );

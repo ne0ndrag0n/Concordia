@@ -2,6 +2,10 @@
 #define SG_MODEL
 
 #include "graphics/scenegraph/transform.hpp"
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
+#include <sol.hpp>
 #include <string>
 #include <vector>
 #include <memory>
@@ -43,6 +47,8 @@ namespace BlueBear {
 
       public:
         virtual ~Model() = default;
+
+        static void submitLuaContributions( sol::state& lua );
 
         static std::shared_ptr< Model > create(
           std::string id,

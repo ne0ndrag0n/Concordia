@@ -4,7 +4,10 @@
 #include "graphics/scenegraph/modelloader/assimpmodelloader.hpp"
 #include "tools/objectpool.hpp"
 #include "tools/utility.hpp"
+#include "scripting/entitykit/components/modelmanager.hpp"
+#include "scripting/luakit/utility.hpp"
 #include "configmanager.hpp"
+#include "eventmanager.hpp"
 #include "log.hpp"
 #include <tbb/task_group.h>
 #include <tbb/concurrent_queue.h>
@@ -18,30 +21,95 @@ namespace BlueBear {
 
           WorldRenderer::WorldRenderer( Device::Display::Display& display ) :
             Adapter::Adapter( display ),
-            camera( Graphics::Camera( ConfigManager::getInstance().getIntValue( "viewport_x" ), ConfigManager::getInstance().getIntValue( "viewport_y" ) ) ) {}
-
-          std::shared_ptr< Graphics::SceneGraph::Model > WorldRenderer::placeObject( const std::string& objectId, const std::string& newId ) {
-            auto it = originals.find( objectId );
-            if( it == originals.end() ) {
-              Log::getInstance().warn( "WorldRenderer::placeObject", std::string( "Warning: Object " ) + objectId + " not loaded or registered!" );
-              return nullptr;
+            camera( Graphics::Camera( ConfigManager::getInstance().getIntValue( "viewport_x" ), ConfigManager::getInstance().getIntValue( "viewport_y" ) ) ) {
+              Scripting::EntityKit::Components::ModelManager::worldRenderer = this;
+              eventManager.LUA_STATE_READY.listen( this, std::bind( &WorldRenderer::submitLuaContributions, this, std::placeholders::_1 ) );
             }
 
-            if( models.find( newId ) != models.end() ) {
-              Log::getInstance().warn( "WorldRenderer::placeObject", std::string( "Warning: Object with ID " ) + objectId + " already exists; it will be replaced." );
-            }
-
-            return models[ newId ] = originals.at( objectId )->copy();
+          WorldRenderer::~WorldRenderer() {
+            eventManager.LUA_STATE_READY.stopListening( this );
           }
 
-          std::shared_ptr< Graphics::SceneGraph::Model > WorldRenderer::getObject( const std::string& instanceId ) {
-            auto it = models.find( instanceId );
-            if( it == models.end() ) {
-              Log::getInstance().warn( "WorldRenderer::getObject", std::string( "Warning: Instance with ID " ) + instanceId + " doesn't exist!" );
-              return nullptr;
+          void WorldRenderer::submitLuaContributions( sol::state& lua ) {
+            sol::table world;
+            if( lua[ "bluebear" ][ "world" ] == sol::nil ) {
+              world = lua[ "bluebear" ][ "world" ] = lua.create_table();
+            } else {
+              world = lua[ "bluebear" ][ "world" ];
             }
 
-            return it->second;
+            world.set_function( "register_models", [ & ]( sol::table table ) {
+              std::vector< std::pair< std::string, std::string > > models;
+
+              for( std::pair< sol::object, sol::object >& pair : table ) {
+                try {
+                  models.emplace_back(
+                    Scripting::LuaKit::Utility::cast< std::string >( pair.first ),
+                    Scripting::LuaKit::Utility::cast< std::string >( pair.second )
+                  );
+                } catch( Scripting::LuaKit::Utility::InvalidTypeException invalidTypeException ) {
+                  Log::getInstance().error( "WorldRenderer::submitLuaContributions", "Argument in table must have format (string id) = (string path)" );
+                }
+              }
+
+              loadPathsParallel( models );
+            } );
+
+            world.set_function( "place_object", [ & ]( const std::string& objectId, sol::table classes ) {
+              std::set< std::string > classesSet;
+              for( std::pair< sol::object, sol::object >& pair : classes ) {
+                classesSet.insert( Scripting::LuaKit::Utility::cast< std::string >( pair.second ) );
+              }
+
+              return placeObject( objectId, classesSet );
+            } );
+
+            Graphics::SceneGraph::Model::submitLuaContributions( lua );
+          }
+
+          std::shared_ptr< Graphics::SceneGraph::Model > WorldRenderer::placeObject( const std::string& objectId, const std::set< std::string >& classes ) {
+            auto it = originals.find( objectId );
+
+            if( it != originals.end() ) {
+              std::shared_ptr< Graphics::SceneGraph::Model > copy = it->second->copy();
+              models.insert( { objectId, classes, copy } );
+              return copy;
+            } else {
+              Log::getInstance().warn( "WorldRenderer::placeObject", "Could not add object of id " + objectId + ": ID not registered!" );
+              throw ObjectIDNotRegisteredException();
+            }
+          }
+
+          std::vector< std::shared_ptr< Graphics::SceneGraph::Model > > WorldRenderer::findObjectsByType( const std::string& instanceId ) {
+            std::vector< std::shared_ptr< Graphics::SceneGraph::Model > > result;
+
+            std::for_each( models.begin(), models.end(), [ & ]( const ModelRegistration& item ) {
+              if( item.originalId == instanceId ) {
+                result.push_back( item.instance );
+              }
+            } );
+
+            return result;
+          }
+
+          std::vector< std::shared_ptr< Graphics::SceneGraph::Model > > WorldRenderer::findObjectsByClass( const std::set< std::string >& classes ) {
+            std::vector< std::shared_ptr< Graphics::SceneGraph::Model > > result;
+
+            std::for_each( models.begin(), models.end(), [ & ]( const ModelRegistration& item ) {
+              std::set< std::string > difference;
+
+              std::set_symmetric_difference(
+                classes.begin(), classes.end(),
+                item.instanceClasses.begin(), item.instanceClasses.end(),
+                std::inserter( difference, difference.end() )
+              );
+
+              if( difference.size() == 0 ) {
+                result.push_back( item.instance );
+              }
+            } );
+
+            return result;
           }
 
           Graphics::Camera& WorldRenderer::getCamera() {
@@ -59,16 +127,17 @@ namespace BlueBear {
           }
 
           void WorldRenderer::loadPathsParallel( const std::vector< std::pair< std::string, std::string > >& paths ) {
+            tbb::concurrent_unordered_map< std::string, std::shared_ptr< Graphics::SceneGraph::Model > > concurrentOriginals;
             tbb::task_group group;
             Tools::ObjectPool< Graphics::SceneGraph::ModelLoader::FileModelLoader > pool( std::bind( &WorldRenderer::getFileModelLoader, this, true ) );
 
             for( auto& path : paths ) {
               group.run( [ & ]() {
-                if( originals.find( path.first ) == originals.end() ) {
+                if( concurrentOriginals.find( path.first ) == concurrentOriginals.end() ) {
                   pool.acquire( [ & ]( Graphics::SceneGraph::ModelLoader::FileModelLoader& loader ) {
                     try {
                       if( std::shared_ptr< Graphics::SceneGraph::Model > model = loader.get( path.second ) ) {
-                        originals[ path.first ] = model;
+                        concurrentOriginals[ path.first ] = model;
                       }
                     } catch( std::exception& e ) {
                       Log::getInstance().error( "WorldRenderer::loadPathsParallel", std::string( "Could not load model " ) + path.second + ": " + e.what() );
@@ -83,10 +152,15 @@ namespace BlueBear {
             group.wait();
 
             for( auto& path : paths ) {
-              auto pair = originals.find( path.first );
-              if( pair != originals.end() ) {
+              auto pair = concurrentOriginals.find( path.first );
+              if( pair != concurrentOriginals.end() ) {
                 pair->second->sendDeferredObjects();
               }
+            }
+
+            // Copy concurrent map to originals
+            for( auto& pair : concurrentOriginals ) {
+              originals.emplace( pair.first, pair.second );
             }
           }
 
@@ -111,11 +185,8 @@ namespace BlueBear {
             // Position camera
             camera.position();
 
-            // TODO: Position lights
-            // TODO: Draw floor and walls
-            // Draw models
-            for( auto& pair : models ) {
-              pair.second->draw();
+            for( auto& registration : models ) {
+              registration.instance->draw();
             }
           }
 

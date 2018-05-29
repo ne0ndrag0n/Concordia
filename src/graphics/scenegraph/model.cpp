@@ -4,6 +4,7 @@
 #include "graphics/scenegraph/mesh/mesh.hpp"
 #include "graphics/scenegraph/material.hpp"
 #include "graphics/shader.hpp"
+#include "log.hpp"
 #include <glm/glm.hpp>
 #include <algorithm>
 
@@ -16,6 +17,23 @@ namespace BlueBear {
 
       std::shared_ptr< Model > Model::create( std::string id, std::shared_ptr< Mesh::Mesh > mesh, std::shared_ptr< Shader > shader, std::shared_ptr< Material > material ) {
         return std::shared_ptr< Model >( new Model( id, mesh, shader, material ) );
+      }
+
+      void Model::submitLuaContributions( sol::state& lua ) {
+        sol::table types = lua[ "bluebear" ][ "util" ][ "types" ];
+
+        types.new_usertype< Model >( "GFXModel",
+          "new", sol::no_constructor,
+          "set_current_animation", []( Model& self, const std::string& animation ) {
+            auto animator = self.findNearestAnimator();
+
+            if( animator ) {
+              animator->setCurrentAnimation( animation );
+            } else {
+              Log::getInstance().warn( "Model::submitLuaContributions", "No animator is attached to this model" );
+            }
+          }
+        );
       }
 
       std::shared_ptr< Model > Model::copy() {

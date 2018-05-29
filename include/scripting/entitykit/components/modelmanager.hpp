@@ -12,21 +12,22 @@
 #include <vector>
 #include <unordered_map>
 
+namespace BlueBear::Device::Display::Adapter::Component{ class WorldRenderer; }
 namespace BlueBear::Graphics::SceneGraph{ class Model; }
 namespace BlueBear::Scripting::EntityKit::Components {
 
   class ModelManager : public Component {
     std::vector< std::string > potentialModels;
-    std::unordered_map< std::string, std::shared_ptr< Graphics::SceneGraph::Model > > instances;
 
   public:
     EXCEPTION_TYPE( ModelNotFoundException, "Local ID not found in ModelManager!" );
 
+    static BlueBear::Device::Display::Adapter::Component::WorldRenderer* worldRenderer;
     static void submitLuaContributions( sol::state& lua, sol::table types );
 
     void init( sol::object incoming ) override;
+    void load( const Json::Value& data ) override;
     std::vector< std::string > getPotentialModels();
-    std::shared_ptr< Graphics::SceneGraph::Model > getInstance( const std::string& id );
   };
 
 }

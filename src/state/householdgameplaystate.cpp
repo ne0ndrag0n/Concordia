@@ -58,9 +58,6 @@ namespace BlueBear {
       application.getDisplayDevice().pushAdapter( std::make_unique< Device::Display::Adapter::Component::GuiComponent >( application.getDisplayDevice() ) );
 
       adapter.getCamera().setRotationDirect( 0 );
-      adapter.loadPathsParallel( {
-        { "floor", "dev/box/armaturebox.fbx" }
-      } );
     }
 
     void HouseholdGameplayState::setupInputDevice() {
@@ -83,16 +80,6 @@ namespace BlueBear {
       keyGroup.registerSystemKey( Device::Input::Input::keyToString( KEY_RIGHT ), std::bind( &Graphics::Camera::move, &camera, -0.1f, 0.0f, 0.0f ) );
       keyGroup.registerSystemKey( Device::Input::Input::keyToString( KEY_ZOOM_IN ), std::bind( &Graphics::Camera::zoomIn, &camera ) );
       keyGroup.registerSystemKey( Device::Input::Input::keyToString( KEY_ZOOM_OUT ), std::bind( &Graphics::Camera::zoomOut, &camera ) );
-
-      keyGroup.registerSystemKey( Device::Input::Input::keyToString( sf::Keyboard::X ), [ & ]() {
-        application.getDisplayDevice().getAdapterAt( RENDER3D_ADAPTER ).as< Device::Display::Adapter::Component::WorldRenderer >().placeObject( "floor", "floor1" );
-      } );
-      keyGroup.registerSystemKey( Device::Input::Input::keyToString( sf::Keyboard::C ), [ & ]() {
-        auto animator = application.getDisplayDevice().getAdapterAt( RENDER3D_ADAPTER ).as< Device::Display::Adapter::Component::WorldRenderer >().getObject( "floor1" )
-          ->findNearestAnimator();
-
-        animator->setCurrentAnimation( "Armature|ArmatureAction" );
-      } );
 
       Device::Input::Input& inputManager = application.getInputDevice();
       inputManager.reset();

@@ -2,7 +2,14 @@
   "registry": {
     "entities": [
       { "id": "system.debug.debugger" },
-      { "id": "game.entity.plant" }
+      {
+        "id": "game.entity.plant",
+        "components": {
+          "system.component.model_manager": {
+            "floor": "dev/box/armaturebox.fbx"
+          }
+        }
+      }
     ]
   }
 }
