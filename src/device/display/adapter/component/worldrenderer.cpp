@@ -55,15 +55,6 @@ namespace BlueBear {
               loadPathsParallel( models );
             } );
 
-            world.set_function( "place_object", [ & ]( const std::string& objectId, sol::table classes ) {
-              std::set< std::string > classesSet;
-              for( std::pair< sol::object, sol::object >& pair : classes ) {
-                classesSet.insert( Scripting::LuaKit::Utility::cast< std::string >( pair.second ) );
-              }
-
-              return placeObject( objectId, classesSet );
-            } );
-
             Graphics::SceneGraph::Model::submitLuaContributions( lua );
           }
 
@@ -110,6 +101,17 @@ namespace BlueBear {
             } );
 
             return result;
+          }
+
+          void WorldRenderer::removeObject( std::shared_ptr< Graphics::SceneGraph::Model > model ) {
+            for( auto it = models.begin(); it != models.end(); ) {
+              if( it->instance == model ) {
+                models.erase( it );
+                return;
+              } else {
+                ++it;
+              }
+            }
           }
 
           Graphics::Camera& WorldRenderer::getCamera() {

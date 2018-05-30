@@ -7,9 +7,11 @@
 #include "scripting/entitykit/registry.hpp"
 #include "exceptions/genexc.hpp"
 #include "device/input/input.hpp"
+#include "models/world.hpp"
 #include "serializable.hpp"
 #include <memory>
 #include <string>
+#include <optional>
 
 namespace BlueBear {
   class Application;
@@ -28,6 +30,7 @@ namespace BlueBear {
       Scripting::LuaKit::EventHelper luaEventHelper;
       Scripting::EntityKit::Registry entityRegistry;
       Device::Input::Input::KeyGroup keyGroup;
+      std::optional< Models::World > world;
 
       void setupDisplayDevice();
       void setupInputDevice();

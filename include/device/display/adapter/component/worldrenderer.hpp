@@ -2,7 +2,6 @@
 #define WORLD_RENDERER
 
 #include "device/display/adapter/adapter.hpp"
-#include "containers/vec3map.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/scenegraph/resourcebank.hpp"
 #include "exceptions/genexc.hpp"
@@ -67,6 +66,7 @@ namespace BlueBear {
             std::shared_ptr< Graphics::SceneGraph::Model > placeObject( const std::string& objectId, const std::set< std::string >& classes = {} );
             std::vector< std::shared_ptr< Graphics::SceneGraph::Model > > findObjectsByType( const std::string& instanceId );
             std::vector< std::shared_ptr< Graphics::SceneGraph::Model > > findObjectsByClass( const std::set< std::string >& classes );
+            void removeObject( std::shared_ptr< Graphics::SceneGraph::Model > model );
 
             Graphics::Camera& getCamera();
             void loadPathsParallel( const std::vector< std::pair< std::string, std::string > >& paths );

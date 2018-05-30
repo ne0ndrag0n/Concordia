@@ -55,6 +55,8 @@ namespace BlueBear {
         .pushAdapter( std::make_unique< Device::Display::Adapter::Component::WorldRenderer >( application.getDisplayDevice() ) )
         .as< Device::Display::Adapter::Component::WorldRenderer >();
 
+      world.emplace( adapter );
+
       application.getDisplayDevice().pushAdapter( std::make_unique< Device::Display::Adapter::Component::GuiComponent >( application.getDisplayDevice() ) );
 
       adapter.getCamera().setRotationDirect( 0 );

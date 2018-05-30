@@ -7,12 +7,21 @@ local Demo = {
 
 function Demo:init()
   bluebear.event.register_key( 'x', function()
-    self.instance = bluebear.world.place_object( 'floor', {} )
+    if not self.instance then
+      self.instance = bluebear.world.place_object( self:get_entity(), 'floor', {} )
+    end
   end )
 
   bluebear.event.register_key( 'c', function()
     if self.instance then
       self.instance:set_current_animation( 'Armature|ArmatureAction' )
+    end
+  end )
+
+  bluebear.event.register_key( 'v', function()
+    if self.instance then
+      bluebear.world.remove_object( self.instance )
+      self.instance = nil
     end
   end )
 end

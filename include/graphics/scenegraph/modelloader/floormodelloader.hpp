@@ -2,7 +2,6 @@
 #define BB_FLOOR_MODEL_LOADER
 
 #include "graphics/scenegraph/modelloader/proceduralmodelloader.hpp"
-#include "containers/collection3d.hpp"
 #include "exceptions/genexc.hpp"
 #include <memory>
 

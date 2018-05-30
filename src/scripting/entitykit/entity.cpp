@@ -4,6 +4,8 @@
 
 namespace BlueBear::Scripting::EntityKit {
 
+  BasicEvent< void*, std::shared_ptr< Entity > > Entity::ENTITY_CLOSING;
+
   Entity::Entity( std::map< std::string, std::shared_ptr< Component > > components ) : components( components ) {
     associate( this );
   }
@@ -63,6 +65,8 @@ namespace BlueBear::Scripting::EntityKit {
   }
 
   void Entity::close() {
+    ENTITY_CLOSING.trigger( shared_from_this() );
+
     for( auto& pair : components ) {
       auto& component = *( pair.second );
       sol::object potentialFunction = component[ "close" ];

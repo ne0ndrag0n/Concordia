@@ -4,6 +4,7 @@
 #include "exceptions/genexc.hpp"
 #include "scripting/entitykit/component.hpp"
 #include "scripting/entitykit/components/componentcast.hpp"
+#include "eventmanager.hpp"
 #include "serializable.hpp"
 #include <lua.h>
 #include <lualib.h>
@@ -15,12 +16,13 @@
 
 namespace BlueBear::Scripting::EntityKit {
 
-  class Entity : public Serializable {
+  class Entity : public Serializable, public std::enable_shared_from_this< Entity > {
     std::map< std::string, std::shared_ptr< Component > > components;
 
     void associate( Entity* pointer );
 
   public:
+    static BasicEvent< void*, std::shared_ptr< Entity > > ENTITY_CLOSING;
     EXCEPTION_TYPE( NotFoundException, "Object not found in entity" );
 
     Entity( std::map< std::string, std::shared_ptr< Component > > components );
