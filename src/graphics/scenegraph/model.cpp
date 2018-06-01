@@ -22,8 +22,11 @@ namespace BlueBear {
       void Model::submitLuaContributions( sol::state& lua ) {
         sol::table types = lua[ "bluebear" ][ "util" ][ "types" ];
 
+        Transform::submitLuaContributions( lua );
+
         types.new_usertype< Model >( "GFXModel",
           "new", sol::no_constructor,
+          "get_transform", &Model::getLocalTransform,
           "set_current_animation", []( Model& self, const std::string& animation ) {
             auto animator = self.findNearestAnimator();
 

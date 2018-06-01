@@ -21,6 +21,25 @@ namespace BlueBear {
 
       Transform::Transform( const Transform& transform ) : position( transform.position ), rotation( transform.rotation ), scale( transform.scale ), result( transform.result ), dirty( transform.dirty ) {}
 
+      void Transform::submitLuaContributions( sol::state& lua ) {
+        sol::table types = lua[ "bluebear" ][ "util" ][ "types" ];
+
+        types.new_usertype< Transform >( "Transform",
+          "new", sol::no_constructor,
+          "get_position", &Transform::getPosition,
+          "get_scale", &Transform::getScale,
+          "get_rotation", []( Transform& self ) -> std::tuple< float, glm::vec3 > {
+            glm::quat quat = self.getRotation();
+            return { glm::angle( quat ), glm::axis( quat ) };
+          },
+          "set_position", &Transform::setPosition,
+          "set_scale", &Transform::setRotation,
+          "set_rotation", []( Transform& self, float angle, const glm::vec3& axis ) {
+            self.setRotation( glm::angleAxis( glm::radians( angle ), axis ) );
+          }
+        );
+      }
+
       Transform& Transform::operator=( const Transform& rhs ) {
         position = rhs.position;
         scale = rhs.scale;

@@ -24,6 +24,12 @@ function Demo:init()
       self.instance = nil
     end
   end )
+
+  bluebear.event.register_key( 'b', function()
+    if self.instance then
+      self.instance:get_transform():set_position( bluebear.util.types.Vec3.new( 0.0, 1.0, 0.0 ) )
+    end
+  end )
 end
 
 bluebear.entity.register_component( 'game.component.plant_keys', Demo )

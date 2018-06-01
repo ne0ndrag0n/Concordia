@@ -1,6 +1,10 @@
 #ifndef SG_TRANSFORM
 #define SG_TRANSFORM
 
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
+#include <sol.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
@@ -20,6 +24,8 @@ namespace BlueBear {
         void decompose();
 
       public:
+        static void submitLuaContributions( sol::state& lua );
+
         Transform();
         Transform( const Transform& transform );
         Transform( const glm::vec3& position, const glm::quat& rotation, const glm::vec3& scale );
