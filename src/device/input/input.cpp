@@ -227,6 +227,11 @@ namespace BlueBear {
           case Tools::Utility::hash( "ret" ):
             return sf::Keyboard::Return;
 
+          case Tools::Utility::hash( "add" ):
+            return sf::Keyboard::Add;
+          case Tools::Utility::hash( "sub" ):
+            return sf::Keyboard::Subtract;
+
           default:
             return sf::Keyboard::Unknown;
         }
@@ -411,6 +416,11 @@ namespace BlueBear {
 
           case sf::Keyboard::Return:
             return "ret";
+
+          case sf::Keyboard::Add:
+            return "add";
+          case sf::Keyboard::Subtract:
+            return "sub";
 
           default:
             return "<unk>";
