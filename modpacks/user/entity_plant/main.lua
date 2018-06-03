@@ -27,7 +27,7 @@ function Demo:init()
 
   bluebear.event.register_key( 'b', function()
     if self.instance then
-      self.instance:get_transform():set_position( bluebear.util.types.Vec3.new( 0.0, 1.0, 0.0 ) )
+      self.instance:get_transform():set_position( bluebear.util.types.Vec3.new( 0.0, 10.0, 0.0 ) )
     end
   end )
 end

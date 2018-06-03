@@ -4,7 +4,7 @@
 namespace BlueBear {
   namespace Tools {
 
-    glm::mat4 AssimpTools::aiToGLMmat4( aiMatrix4x4& matrix ) {
+    glm::mat4 AssimpTools::aiToGLMmat4( const aiMatrix4x4& matrix ) {
       glm::mat4 result;
 
       result[ 0 ] = glm::vec4( matrix[ 0 ][ 0 ], matrix[ 1 ][ 0 ], matrix[ 2 ][ 0 ], matrix[ 3 ][ 0 ] );
@@ -15,7 +15,7 @@ namespace BlueBear {
       return result;
     }
 
-    glm::vec4 AssimpTools::aiToGLMvec4( aiVector3D& vector ) {
+    glm::vec4 AssimpTools::aiToGLMvec4( const aiVector3D& vector ) {
       glm::vec4 result;
 
       result.x = vector.x;
@@ -26,7 +26,7 @@ namespace BlueBear {
       return result;
     }
 
-    glm::vec3 AssimpTools::aiToGLMvec3( aiVector3D& vector ) {
+    glm::vec3 AssimpTools::aiToGLMvec3( const aiVector3D& vector ) {
       glm::vec3 result;
 
       result.x = vector.x;
@@ -36,7 +36,7 @@ namespace BlueBear {
       return result;
     }
 
-    glm::dquat AssimpTools::aiToGLMquat( aiQuaternion& quaternion ) {
+    glm::dquat AssimpTools::aiToGLMquat( const aiQuaternion& quaternion ) {
       glm::dquat result;
 
       result.x = quaternion.x;

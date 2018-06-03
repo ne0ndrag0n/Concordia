@@ -23,7 +23,7 @@ void main()
     ( bones[ boneIDs[ 2 ] ] * boneWeights[ 2 ] ) +
     ( bones[ boneIDs[ 3 ] ] * boneWeights[ 3 ] );
 
-  gl_Position = projection * view * boneTransform * model * vec4( position, 1.0f );
+  gl_Position = projection * view * model * boneTransform * vec4( position, 1.0f );
   fragTexture = texture;
   fragNormal = normal;
   fragPos = vec3( model * vec4( position, 1.0 ) );

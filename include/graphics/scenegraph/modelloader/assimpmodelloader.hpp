@@ -52,11 +52,11 @@ namespace BlueBear {
           std::vector< GLuint > getIndices( aiMesh* mesh );
           std::vector< std::shared_ptr< Texture > > getTextureList( aiMaterial* material, aiTextureType type );
           std::vector< std::string > getBoneIds( aiBone** bones, unsigned int numBones );
-          template < typename VertexType > VertexType getVertex( aiVector3D& vertex, aiVector3D& normal );
+          template < typename VertexType > VertexType getVertex( const aiVector3D& vertex, const aiVector3D& normal );
           template < typename VertexType > void assignBonesToVertex( VertexType& vertex, unsigned int vertexIndex, aiBone** bones, unsigned int numBones );
-          std::shared_ptr< Mesh::Mesh > getMesh( aiNode* node );
+          std::shared_ptr< Mesh::Mesh > getMesh( aiNode* node, aiMatrix4x4 transform );
           std::shared_ptr< Material > getMaterial( aiMaterial* material );
-          std::shared_ptr< Model > getNode( aiNode* node );
+          std::shared_ptr< Model > getNode( aiNode* node, aiMatrix4x4 parentTransform = {} );
           std::map< double, glm::mat4 > getKeyframes( aiNodeAnim* nodeAnim );
           std::shared_ptr< Animation::Bone::AnimationMap > getAnimationMapForBone( const std::string& boneId );
           Animation::Bone getBoneFromNode( aiNode* node );

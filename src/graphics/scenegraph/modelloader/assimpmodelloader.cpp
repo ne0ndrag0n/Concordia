@@ -98,16 +98,16 @@ namespace BlueBear {
         }
 
         template < typename VertexType >
-        VertexType AssimpModelLoader::getVertex( aiVector3D& vertex, aiVector3D& normal ) {
+        VertexType AssimpModelLoader::getVertex( const aiVector3D& vertex, const aiVector3D& normal ) {
           VertexType result;
           result.position = Tools::AssimpTools::aiToGLMvec3( vertex );
           result.normal = Tools::AssimpTools::aiToGLMvec3( normal );
           return result;
         }
-        template Mesh::TexturedRiggedVertex AssimpModelLoader::getVertex( aiVector3D&, aiVector3D& );
-        template Mesh::RiggedVertex AssimpModelLoader::getVertex( aiVector3D&, aiVector3D& );
-        template Mesh::TexturedVertex AssimpModelLoader::getVertex( aiVector3D&, aiVector3D& );
-        template Mesh::BasicVertex AssimpModelLoader::getVertex( aiVector3D&, aiVector3D& );
+        template Mesh::TexturedRiggedVertex AssimpModelLoader::getVertex( const aiVector3D&, const aiVector3D& );
+        template Mesh::RiggedVertex AssimpModelLoader::getVertex( const aiVector3D&, const aiVector3D& );
+        template Mesh::TexturedVertex AssimpModelLoader::getVertex( const aiVector3D&, const aiVector3D& );
+        template Mesh::BasicVertex AssimpModelLoader::getVertex( const aiVector3D&, const aiVector3D& );
 
         template < typename VertexType >
         void AssimpModelLoader::assignBonesToVertex( VertexType& vertex, unsigned int vertexIndex, aiBone** bones, unsigned int numBones ) {
@@ -138,7 +138,7 @@ namespace BlueBear {
         template void AssimpModelLoader::assignBonesToVertex( Mesh::TexturedRiggedVertex&, unsigned int, aiBone**, unsigned int );
         template void AssimpModelLoader::assignBonesToVertex( Mesh::RiggedVertex&, unsigned int, aiBone**, unsigned int );
 
-        std::shared_ptr< Mesh::Mesh > AssimpModelLoader::getMesh( aiNode* node ) {
+        std::shared_ptr< Mesh::Mesh > AssimpModelLoader::getMesh( aiNode* node, aiMatrix4x4 transform ) {
           if( node->mNumMeshes ) {
             aiMesh* mesh = context.scene->mMeshes[ node->mMeshes[ 0 ] ];
             bool usesBones = useBones && mesh->HasBones();
@@ -160,7 +160,7 @@ namespace BlueBear {
                 // usesBones && usesTextures - TexturedRiggedVertex (textured material, bones)
                 std::vector< Mesh::TexturedRiggedVertex > vertices;
                 for( int i = 0; i < mesh->mNumVertices; i++ ) {
-                  Mesh::TexturedRiggedVertex vertex = getVertex< Mesh::TexturedRiggedVertex >( mesh->mVertices[ i ], mesh->mNormals[ i ] );
+                  Mesh::TexturedRiggedVertex vertex = getVertex< Mesh::TexturedRiggedVertex >( transform * mesh->mVertices[ i ], transform * mesh->mNormals[ i ] );
                   vertex.textureCoordinates = glm::vec2( mesh->mTextureCoords[ 0 ][ i ].x, mesh->mTextureCoords[ 0 ][ i ].y );
                   assignBonesToVertex( vertex, i, mesh->mBones, mesh->mNumBones );
                   vertices.push_back( vertex );
@@ -177,7 +177,7 @@ namespace BlueBear {
                 // usesBones && !usesTextures - RiggedVertex (solid material, bones)
                 std::vector< Mesh::RiggedVertex > vertices;
                 for( int i = 0; i < mesh->mNumVertices; i++ ) {
-                  Mesh::RiggedVertex vertex = getVertex< Mesh::RiggedVertex >( mesh->mVertices[ i ], mesh->mNormals[ i ] );
+                  Mesh::RiggedVertex vertex = getVertex< Mesh::RiggedVertex >( transform * mesh->mVertices[ i ], transform * mesh->mNormals[ i ] );
                   assignBonesToVertex( vertex, i, mesh->mBones, mesh->mNumBones );
                   vertices.push_back( vertex );
                 }
@@ -195,7 +195,7 @@ namespace BlueBear {
                 // !usesBones && usesTextures - TexturedVertex (textured material, no bones)
                 std::vector< Mesh::TexturedVertex > vertices;
                 for( int i = 0; i < mesh->mNumVertices; i++ ) {
-                  Mesh::TexturedVertex vertex = getVertex< Mesh::TexturedVertex >( mesh->mVertices[ i ], mesh->mNormals[ i ] );
+                  Mesh::TexturedVertex vertex = getVertex< Mesh::TexturedVertex >( transform * mesh->mVertices[ i ], transform * mesh->mNormals[ i ] );
                   vertex.textureCoordinates = glm::vec2( mesh->mTextureCoords[ 0 ][ i ].x, mesh->mTextureCoords[ 0 ][ i ].y );
                   vertices.push_back( vertex );
                 }
@@ -208,7 +208,7 @@ namespace BlueBear {
                 // !usesBones && !usesTextures - BasicVertex (solid material, no bones)
                 std::vector< Mesh::BasicVertex > vertices;
                 for( int i = 0; i < mesh->mNumVertices; i++ ) {
-                  vertices.push_back( getVertex< Mesh::BasicVertex >( mesh->mVertices[ i ], mesh->mNormals[ i ] ) );
+                  vertices.push_back( getVertex< Mesh::BasicVertex >( transform * mesh->mVertices[ i ], transform * mesh->mNormals[ i ] ) );
                 }
 
                 result = usesIndices ?
@@ -410,11 +410,13 @@ namespace BlueBear {
           ) );
         }
 
-        std::shared_ptr< Model > AssimpModelLoader::getNode( aiNode* node ) {
+        std::shared_ptr< Model > AssimpModelLoader::getNode( aiNode* node, aiMatrix4x4 parentTransform ) {
           log( "AssimpModelLoader::getNode", std::string( "Node " ) + node->mName.C_Str() + " {" );
           context.logIndentation++;
 
-          std::shared_ptr< Mesh::Mesh > mesh = getMesh( node );
+          aiMatrix4x4 transform = parentTransform * node->mTransformation;
+
+          std::shared_ptr< Mesh::Mesh > mesh = getMesh( node, transform );
           std::shared_ptr< Shader > shader;
           if( mesh ) {
             std::pair< std::string, std::string > shaderPair = mesh->getDefaultShader();
@@ -432,7 +434,6 @@ namespace BlueBear {
           }
 
           std::shared_ptr< Model > model = Model::create( node->mName.C_Str(), mesh, shader, material );
-          model->setLocalTransform( Transform( Tools::AssimpTools::aiToGLMmat4( node->mTransformation ) ) );
 
           for( int i = 0; i < node->mNumChildren; i++ ) {
             aiNode* assimpChild = node->mChildren[ i ];
@@ -441,7 +442,7 @@ namespace BlueBear {
               log( "AssimpModelLoader::getNode", "Adding animator skeleton" );
               model->setAnimator( getAnimator( assimpChild->mChildren[ 0 ] ) );
             } else {
-              model->addChild( getNode( assimpChild ) );
+              model->addChild( getNode( assimpChild, transform ) );
             }
           }
 

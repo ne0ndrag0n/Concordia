@@ -11,10 +11,10 @@ namespace BlueBear {
   namespace Tools {
 
     struct AssimpTools {
-      static glm::mat4 aiToGLMmat4( aiMatrix4x4& matrix );
-      static glm::vec4 aiToGLMvec4( aiVector3D& vector );
-      static glm::vec3 aiToGLMvec3( aiVector3D& vector );
-      static glm::dquat aiToGLMquat( aiQuaternion& quaternion );
+      static glm::mat4 aiToGLMmat4( const aiMatrix4x4& matrix );
+      static glm::vec4 aiToGLMvec4( const aiVector3D& vector );
+      static glm::vec3 aiToGLMvec3( const aiVector3D& vector );
+      static glm::dquat aiToGLMquat( const aiQuaternion& quaternion );
     };
 
   }
