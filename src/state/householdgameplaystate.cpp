@@ -56,6 +56,7 @@ namespace BlueBear {
         .as< Device::Display::Adapter::Component::WorldRenderer >();
 
       world.emplace( adapter );
+      infrastructure.emplace( adapter );
 
       application.getDisplayDevice().pushAdapter( std::make_unique< Device::Display::Adapter::Component::GuiComponent >( application.getDisplayDevice() ) );
 

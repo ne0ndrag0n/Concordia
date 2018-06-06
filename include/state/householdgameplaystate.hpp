@@ -7,6 +7,7 @@
 #include "scripting/entitykit/registry.hpp"
 #include "exceptions/genexc.hpp"
 #include "device/input/input.hpp"
+#include "models/infrastructure.hpp"
 #include "models/world.hpp"
 #include "serializable.hpp"
 #include <memory>
@@ -31,6 +32,7 @@ namespace BlueBear {
       Scripting::EntityKit::Registry entityRegistry;
       Device::Input::Input::KeyGroup keyGroup;
       std::optional< Models::World > world;
+      std::optional< Models::Infrastructure > infrastructure;
 
       void setupDisplayDevice();
       void setupInputDevice();
