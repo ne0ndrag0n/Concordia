@@ -20,13 +20,14 @@ namespace BlueBear {
         void send();
 
       public:
+        static void sendLightCount();
+
         Light(
           glm::vec3 position,
           glm::vec3 ambientComponent,
           glm::vec3 diffuseComponent,
           glm::vec3 specularComponent
         );
-
         ~Light();
 
         glm::vec3 getPosition();

@@ -1,6 +1,6 @@
 #version 330 core
-layout (location = 0) in vec3 position; // The position variable has attribute position 0
-layout (location = 1) in vec3 normal; // This is currently unused
+layout (location = 0) in vec3 position;
+layout (location = 1) in vec3 normal;
 layout (location = 2) in vec2 texture;
 layout (location = 3) in ivec4 boneIDs;
 layout (location = 4) in vec4 boneWeights;
@@ -25,6 +25,6 @@ void main()
 
   gl_Position = projection * view * model * boneTransform * vec4( position, 1.0f );
   fragTexture = texture;
-  fragNormal = normal;
+  fragNormal = mat3( transpose( inverse( model ) ) ) * mat3( boneTransform ) * normal;
   fragPos = vec3( model * vec4( position, 1.0 ) );
 }

@@ -52,6 +52,7 @@ namespace BlueBear {
             Graphics::Camera camera;
             Graphics::SceneGraph::ResourceBank cache;
             std::unordered_map< std::string, std::shared_ptr< Graphics::SceneGraph::Model > > originals;
+            std::unordered_map< std::string, std::shared_ptr< Graphics::SceneGraph::Light > > lights;
             std::set< ModelRegistration > models;
 
             std::unique_ptr< Graphics::SceneGraph::ModelLoader::FileModelLoader > getFileModelLoader( bool deferGLOperations );
@@ -71,6 +72,7 @@ namespace BlueBear {
             Graphics::Camera& getCamera();
             void loadPathsParallel( const std::vector< std::pair< std::string, std::string > >& paths );
             void loadPaths( const std::vector< std::pair< std::string, std::string > >& paths );
+            void onShaderChange();
             void nextFrame() override;
           };
 

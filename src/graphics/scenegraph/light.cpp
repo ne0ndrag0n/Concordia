@@ -2,6 +2,7 @@
 #include "tools/opengl.hpp"
 #include "eventmanager.hpp"
 #include <GL/glew.h>
+#include "log.hpp"
 
 namespace BlueBear {
   namespace Graphics {
@@ -11,14 +12,24 @@ namespace BlueBear {
 
       Light::Light( glm::vec3 position, glm::vec3 ambientComponent, glm::vec3 diffuseComponent, glm::vec3 specularComponent ) :
         position( position ), ambientComponent( ambientComponent ), diffuseComponent( diffuseComponent ), specularComponent( specularComponent ) {
-          Light::counter++;
           id = counter.load();
+          Light::counter++;
 
           eventManager.SHADER_CHANGE.listen( this, std::bind( &Light::send, this ) );
         }
 
       Light::~Light() {
         Light::counter--;
+
+        eventManager.SHADER_CHANGE.stopListening( this );
+      }
+
+      void Light::sendLightCount() {
+        auto location = Tools::OpenGL::getUniformLocation( "numLights" );
+
+        if( location != -1 ) {
+          glUniform1ui( location, counter.load() );
+        }
       }
 
       glm::vec3 Light::getPosition() {
@@ -60,25 +71,10 @@ namespace BlueBear {
         std::string preamble( "lights[" );
         preamble += std::to_string( id ) + "].";
 
-        glUniform3f(
-          Tools::OpenGL::getUniformLocation( preamble + "position" ),
-          position[ 0 ], position[ 1 ], position[ 2 ]
-        );
-
-        glUniform3f(
-          Tools::OpenGL::getUniformLocation( preamble + "ambient" ),
-          ambientComponent[ 0 ], ambientComponent[ 1 ], ambientComponent[ 2 ]
-        );
-
-        glUniform3f(
-          Tools::OpenGL::getUniformLocation( preamble + "diffuse" ),
-          diffuseComponent[ 0 ], diffuseComponent[ 1 ], diffuseComponent[ 2 ]
-        );
-
-        glUniform3f(
-          Tools::OpenGL::getUniformLocation( preamble + "specular" ),
-          specularComponent[ 0 ], specularComponent[ 1 ], specularComponent[ 2 ]
-        );
+        Tools::OpenGL::setUniform( preamble + "position", position );
+        Tools::OpenGL::setUniform( preamble + "ambient", ambientComponent );
+        Tools::OpenGL::setUniform( preamble + "diffuse", diffuseComponent );
+        Tools::OpenGL::setUniform( preamble + "specular", specularComponent );
       }
 
     }

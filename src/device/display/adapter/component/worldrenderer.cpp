@@ -1,4 +1,5 @@
 #include "device/display/adapter/component/worldrenderer.hpp"
+#include "graphics/scenegraph/light.hpp"
 #include "graphics/scenegraph/model.hpp"
 #include "graphics/scenegraph/modelloader/filemodelloader.hpp"
 #include "graphics/scenegraph/modelloader/assimpmodelloader.hpp"
@@ -24,10 +25,19 @@ namespace BlueBear {
             camera( Graphics::Camera( ConfigManager::getInstance().getIntValue( "viewport_x" ), ConfigManager::getInstance().getIntValue( "viewport_y" ) ) ) {
               Scripting::EntityKit::Components::ModelManager::worldRenderer = this;
               eventManager.LUA_STATE_READY.listen( this, std::bind( &WorldRenderer::submitLuaContributions, this, std::placeholders::_1 ) );
+              eventManager.SHADER_CHANGE.listen( this, std::bind( &WorldRenderer::onShaderChange, this ) );
+
+              lights[ "__test" ] = std::make_shared< Graphics::SceneGraph::Light >(
+                glm::vec3{ -10.0, -10.0, 10.0 },
+                glm::vec3{ 1.0, 1.0, 1.0 },
+                glm::vec3{ 1.0, 1.0, 1.0 },
+                glm::vec3{ 0.0, 0.0, 0.0 }
+              );
             }
 
           WorldRenderer::~WorldRenderer() {
             eventManager.LUA_STATE_READY.stopListening( this );
+            eventManager.SHADER_CHANGE.stopListening( this );
           }
 
           void WorldRenderer::submitLuaContributions( sol::state& lua ) {
@@ -178,6 +188,10 @@ namespace BlueBear {
                 Log::getInstance().error( "WorldRenderer::loadPathsParallel", std::string( "Could not load model " ) + path.second + ": " + e.what() );
               }
             }
+          }
+
+          void WorldRenderer::onShaderChange() {
+            Graphics::SceneGraph::Light::sendLightCount();
           }
 
           /**

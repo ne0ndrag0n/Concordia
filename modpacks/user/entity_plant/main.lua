@@ -8,7 +8,7 @@ local Demo = {
 function Demo:init()
   bluebear.event.register_key( 'x', function()
     if not self.instance then
-      self.instance = bluebear.world.place_object( self:get_entity(), 'floor', {} )
+      self.instance = bluebear.world.place_object( self:get_entity(), 'armaturebox', {} )
     end
   end )
 
@@ -27,7 +27,7 @@ function Demo:init()
 
   bluebear.event.register_key( 'b', function()
     if self.instance then
-      self.instance:get_transform():set_position( bluebear.util.types.Vec3.new( 0.0, 10.0, 0.0 ) )
+      self.instance:get_transform():set_position( bluebear.util.types.Vec3.new( 0.0, 5.0, 0.0 ) )
     end
   end )
 end

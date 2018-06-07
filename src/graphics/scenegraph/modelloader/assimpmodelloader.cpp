@@ -65,7 +65,7 @@ namespace BlueBear {
         template std::shared_ptr< Material > AssimpModelLoader::getMaterial( const glm::vec3&, const glm::vec3&, const glm::vec3&, float );
 
         unsigned int AssimpModelLoader::getFlags() {
-          unsigned int result = aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals;
+          unsigned int result = aiProcess_Triangulate | aiProcess_FlipUVs;
 
           if( useIndices ) {
             result |= aiProcess_JoinIdenticalVertices;

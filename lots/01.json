@@ -6,7 +6,7 @@
         "id": "game.entity.plant",
         "components": {
           "system.component.model_manager": {
-            "floor": "dev/box/armaturebox.fbx"
+            "armaturebox": "dev/box/armaturebox.fbx"
           }
         }
       }
