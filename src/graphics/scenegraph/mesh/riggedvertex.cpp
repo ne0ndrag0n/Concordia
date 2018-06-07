@@ -23,8 +23,8 @@ namespace BlueBear {
 
         std::pair< std::string, std::string > RiggedVertex::getDefaultShader() {
           return std::pair< std::string, std::string >(
-            "system/shaders/rigged_vertex_nolight/vertex.glsl",
-            "system/shaders/rigged_vertex_nolight/fragment.glsl"
+            "system/shaders/rigged_vertex/vertex.glsl",
+            "system/shaders/rigged_vertex/fragment.glsl"
           );
         }
 

@@ -5,9 +5,7 @@ in vec3 fragPos;
 out vec4 color;
 
 struct Material {
-  vec3 ambient;
   sampler2D diffuse0;
-  vec3 specular;
   float shininess;
 };
 
@@ -24,10 +22,10 @@ uniform uint numLights;
 uniform Light lights[ 16 ];
 
 void main() {
+  vec3 texResult = texture( material.diffuse0, fragTexture ).xyz;
   vec3 result = vec3( 0.0, 0.0, 0.0 );
 
   for( uint i = 0u; i != numLights; i++ ) {
-    vec3 texResult = texture( material.diffuse0, fragTexture ).xyz;
     vec3 ambient = lights[ i ].ambient * texResult;
 
     vec3 normal = normalize( fragNormal );
@@ -43,5 +41,5 @@ void main() {
     result += ambient + diffuse + specular;
   }
 
-  color = vec4( result, 1.0 );//texture( material.diffuse0, fragTexture );
+  color = vec4( result, 1.0 );
 }

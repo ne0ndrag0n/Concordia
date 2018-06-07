@@ -20,8 +20,8 @@ namespace BlueBear {
 
         std::pair< std::string, std::string > TexturedVertex::getDefaultShader() {
           return std::pair< std::string, std::string >(
-            "system/shaders/textured_vertex_nolight/vertex.glsl",
-            "system/shaders/textured_vertex_nolight/fragment.glsl"
+            "system/shaders/textured_vertex/vertex.glsl",
+            "system/shaders/textured_vertex/fragment.glsl"
           );
         }
 
