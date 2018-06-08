@@ -36,6 +36,16 @@ namespace BlueBear {
       return result;
     }
 
+    glm::vec3 AssimpTools::aiColorToGLMvec3( const aiColor3D& color ) {
+      glm::vec3 result;
+
+      result.r = color.r;
+      result.g = color.g;
+      result.b = color.b;
+
+      return result;
+    }
+
     glm::dquat AssimpTools::aiToGLMquat( const aiQuaternion& quaternion ) {
       glm::dquat result;
 

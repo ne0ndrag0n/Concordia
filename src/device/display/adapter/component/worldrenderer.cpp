@@ -31,7 +31,7 @@ namespace BlueBear {
                 glm::vec3{ -10.0, -10.0, 10.0 },
                 glm::vec3{ 1.0, 1.0, 1.0 },
                 glm::vec3{ 1.0, 1.0, 1.0 },
-                glm::vec3{ 0.0, 0.0, 0.0 }
+                glm::vec3{ 1.0, 1.0, 1.0 }
               );
             }
 

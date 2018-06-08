@@ -6,6 +6,7 @@
 #include <assimp/matrix4x4.h>
 #include <assimp/vector3.h>
 #include <assimp/quaternion.h>
+#include <assimp/types.h>
 
 namespace BlueBear {
   namespace Tools {
@@ -14,6 +15,7 @@ namespace BlueBear {
       static glm::mat4 aiToGLMmat4( const aiMatrix4x4& matrix );
       static glm::vec4 aiToGLMvec4( const aiVector3D& vector );
       static glm::vec3 aiToGLMvec3( const aiVector3D& vector );
+      static glm::vec3 aiColorToGLMvec3( const aiColor3D& color );
       static glm::dquat aiToGLMquat( const aiQuaternion& quaternion );
     };
 

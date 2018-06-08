@@ -15,8 +15,7 @@ uniform mat4 projection;
 
 uniform mat4 bones[ 16 ];
 
-void main()
-{
+void main() {
   mat4 boneTransform =
     ( bones[ boneIDs[ 0 ] ] * boneWeights[ 0 ] ) +
     ( bones[ boneIDs[ 1 ] ] * boneWeights[ 1 ] ) +

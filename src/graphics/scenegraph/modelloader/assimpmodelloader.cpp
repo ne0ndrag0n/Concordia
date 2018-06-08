@@ -244,42 +244,42 @@ namespace BlueBear {
           unsigned int specularTextures = material->GetTextureCount( aiTextureType_SPECULAR );
 
           // Defaults
-          aiVector3D ambient( 0.f, 0.f, 0.f );
+          aiColor3D ambient( 0.f, 0.f, 0.f );
           material->Get( AI_MATKEY_COLOR_AMBIENT, ambient );
-          aiVector3D diffuse( 0.f, 0.f, 0.f );
+          aiColor3D diffuse( 0.f, 0.f, 0.f );
           material->Get( AI_MATKEY_COLOR_DIFFUSE, diffuse );
-          aiVector3D specular( 0.f, 0.f, 0.f );
+          aiColor3D specular( 0.f, 0.f, 0.f );
           material->Get( AI_MATKEY_COLOR_SPECULAR, specular );
           float shininess = 0.0f;
           material->Get( AI_MATKEY_SHININESS, shininess );
 
           if( diffuseTextures && specularTextures ) {
             result = getMaterial(
-              Tools::AssimpTools::aiToGLMvec3( ambient ),
+              Tools::AssimpTools::aiColorToGLMvec3( ambient ),
               getTextureList( material, aiTextureType_DIFFUSE ),
               getTextureList( material, aiTextureType_SPECULAR ),
               shininess
             );
           } else if ( diffuseTextures ) {
             result = getMaterial(
-              Tools::AssimpTools::aiToGLMvec3( ambient ),
+              Tools::AssimpTools::aiColorToGLMvec3( ambient ),
               getTextureList( material, aiTextureType_DIFFUSE ),
-              Tools::AssimpTools::aiToGLMvec3( specular ),
+              Tools::AssimpTools::aiColorToGLMvec3( specular ),
               shininess
             );
           } else if ( specularTextures ) {
             result = getMaterial(
-              Tools::AssimpTools::aiToGLMvec3( ambient ),
-              Tools::AssimpTools::aiToGLMvec3( diffuse ),
+              Tools::AssimpTools::aiColorToGLMvec3( ambient ),
+              Tools::AssimpTools::aiColorToGLMvec3( diffuse ),
               getTextureList( material, aiTextureType_SPECULAR ),
               shininess
             );
           } else {
             // Solid colours only
             result = getMaterial(
-              Tools::AssimpTools::aiToGLMvec3( ambient ),
-              Tools::AssimpTools::aiToGLMvec3( diffuse ),
-              Tools::AssimpTools::aiToGLMvec3( specular ),
+              Tools::AssimpTools::aiColorToGLMvec3( ambient ),
+              Tools::AssimpTools::aiColorToGLMvec3( diffuse ),
+              Tools::AssimpTools::aiColorToGLMvec3( specular ),
               shininess
             );
           }
