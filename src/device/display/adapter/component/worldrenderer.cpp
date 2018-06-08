@@ -28,10 +28,10 @@ namespace BlueBear {
               eventManager.SHADER_CHANGE.listen( this, std::bind( &WorldRenderer::onShaderChange, this ) );
 
               lights[ "__test" ] = std::make_shared< Graphics::SceneGraph::Light >(
-                glm::vec3{ -10.0, -10.0, 10.0 },
-                glm::vec3{ 1.0, 1.0, 1.0 },
-                glm::vec3{ 1.0, 1.0, 1.0 },
-                glm::vec3{ 1.0, 1.0, 1.0 }
+                glm::vec3{ 0.0, 0.0, 10.0 },
+                glm::vec3{ 0.0, 0.0, 0.0 },
+                glm::vec3{ 1, 1, 1 },
+                glm::vec3{ 1, 1, 1 }
               );
             }
 

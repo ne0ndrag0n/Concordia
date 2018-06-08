@@ -276,6 +276,10 @@ namespace BlueBear {
             );
           } else {
             // Solid colours only
+            log( "assert", "colours" );
+            log( "ambient", std::to_string( ambient.r ) + " " + std::to_string( ambient.g ) + " " + std::to_string( ambient.b ) );
+            log( "diffuse", std::to_string( diffuse.r ) + " " + std::to_string( diffuse.g ) + " " + std::to_string( diffuse.b ) );
+            log( "specular", std::to_string( specular.r ) + " " + std::to_string( specular.g ) + " " + std::to_string( specular.b ) );
             result = getMaterial(
               Tools::AssimpTools::aiColorToGLMvec3( ambient ),
               Tools::AssimpTools::aiColorToGLMvec3( diffuse ),

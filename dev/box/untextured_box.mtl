@@ -1,0 +1,12 @@
+# Blender MTL File: 'untextured_box.blend'
+# Material Count: 1
+
+newmtl Material.001
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.184746 0.276243 0.640000
+Ks 0.500000 0.228990 0.014865
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
