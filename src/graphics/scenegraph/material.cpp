@@ -7,30 +7,30 @@ namespace BlueBear {
   namespace Graphics {
     namespace SceneGraph {
 
-      Material::Material( glm::vec3 ambientColor, glm::vec3 diffuseColor, glm::vec3 specularColor, float shininess ) :
-        ambientColor( ambientColor ), diffuseColor( diffuseColor ), specularColor( specularColor ), shininess( shininess ), useAmbient( true ) {}
+      Material::Material( glm::vec3 ambientColor, glm::vec3 diffuseColor, glm::vec3 specularColor, float shininess, float opacity ) :
+        ambientColor( ambientColor ), diffuseColor( diffuseColor ), specularColor( specularColor ), shininess( shininess ), opacity( opacity ), useAmbient( true ) {}
 
-      Material::Material( glm::vec3 diffuseColor, glm::vec3 specularColor, float shininess ) :
-        diffuseColor( diffuseColor ), specularColor( specularColor ), shininess( shininess ) {}
+      Material::Material( glm::vec3 diffuseColor, glm::vec3 specularColor, float shininess, float opacity ) :
+        diffuseColor( diffuseColor ), specularColor( specularColor ), shininess( shininess ), opacity( opacity ) {}
 
-      Material::Material( glm::vec3 ambientColor, TextureList diffuseTextures, TextureList specularTextures, float shininess ) :
-        ambientColor( ambientColor ), diffuseTextures( diffuseTextures ), specularTextures( specularTextures ), shininess( shininess ),
+      Material::Material( glm::vec3 ambientColor, TextureList diffuseTextures, TextureList specularTextures, float shininess, float opacity ) :
+        ambientColor( ambientColor ), diffuseTextures( diffuseTextures ), specularTextures( specularTextures ), shininess( shininess ), opacity( opacity ),
         useAmbient( true ) {
           checkTextureUnits();
         }
 
-      Material::Material( TextureList diffuseTextures, TextureList specularTextures, float shininess ) :
-        diffuseTextures( diffuseTextures ), specularTextures( specularTextures ), shininess( shininess ) {
+      Material::Material( TextureList diffuseTextures, TextureList specularTextures, float shininess, float opacity ) :
+        diffuseTextures( diffuseTextures ), specularTextures( specularTextures ), shininess( shininess ), opacity( opacity ) {
           checkTextureUnits();
         }
 
-      Material::Material( glm::vec3 ambientColor, TextureList diffuseTextures, glm::vec3 specularColor, float shininess ) :
-        ambientColor( ambientColor ), diffuseTextures( diffuseTextures ), specularColor( specularColor ), shininess( shininess ), useAmbient( true ) {
+      Material::Material( glm::vec3 ambientColor, TextureList diffuseTextures, glm::vec3 specularColor, float shininess, float opacity ) :
+        ambientColor( ambientColor ), diffuseTextures( diffuseTextures ), specularColor( specularColor ), shininess( shininess ), opacity( opacity ), useAmbient( true ) {
           checkTextureUnits();
         }
 
-      Material::Material( glm::vec3 ambientColor, glm::vec3 diffuseColor, TextureList specularTextures, float shininess ) :
-        ambientColor( ambientColor ), diffuseColor( diffuseColor ), specularTextures( specularTextures ), shininess( shininess ), useAmbient( true ) {
+      Material::Material( glm::vec3 ambientColor, glm::vec3 diffuseColor, TextureList specularTextures, float shininess, float opacity ) :
+        ambientColor( ambientColor ), diffuseColor( diffuseColor ), specularTextures( specularTextures ), shininess( shininess ), opacity( opacity ), useAmbient( true ) {
           checkTextureUnits();
         }
 
@@ -64,6 +64,10 @@ namespace BlueBear {
 
       float Material::getShininess() const {
         return shininess;
+      }
+
+      float Material::getOpacity() const {
+        return opacity;
       }
 
       void Material::sendDeferredTextures() {
@@ -105,6 +109,7 @@ namespace BlueBear {
         }
 
         Tools::OpenGL::setUniform( "material.shininess", shininess );
+        Tools::OpenGL::setUniform( "material.opacity", opacity );
       }
 
     }

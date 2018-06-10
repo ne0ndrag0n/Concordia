@@ -42,7 +42,7 @@ namespace BlueBear {
         }
       }
 
-      std::shared_ptr< Material > ResourceBank::getOrCreateMaterial( const glm::vec3& ambient, const TextureList& diffuse, const TextureList& specular, float shininess ) {
+      std::shared_ptr< Material > ResourceBank::getOrCreateMaterial( const glm::vec3& ambient, const TextureList& diffuse, const TextureList& specular, float shininess, float opacity ) {
         for( auto it = materials.begin(); it != materials.end(); ++it ) {
           std::shared_ptr< Material > sample;
           {
@@ -50,14 +50,14 @@ namespace BlueBear {
             sample = *it;
           }
 
-          if( sample->getShininess() == shininess && sample->getAmbientColor() == ambient ) {
+          if( sample->getShininess() == shininess && sample->getOpacity() == opacity && sample->getAmbientColor() == ambient ) {
             if( listsCongruent( diffuse, sample->getDiffuseTextureList() ) && listsCongruent( specular, sample->getSpecularTextureList() ) ) {
               return sample;
             }
           }
         }
 
-        std::shared_ptr< Material > result = std::make_shared< Material >( ambient, diffuse, specular, shininess );
+        std::shared_ptr< Material > result = std::make_shared< Material >( ambient, diffuse, specular, shininess, opacity );
         {
           std::lock_guard< std::mutex > lock( materialsMutex );
           materials.push_back( result );
@@ -65,7 +65,7 @@ namespace BlueBear {
         return result;
       }
 
-      std::shared_ptr< Material > ResourceBank::getOrCreateMaterial( const glm::vec3& ambient, const TextureList& diffuse, const glm::vec3& specular, float shininess ) {
+      std::shared_ptr< Material > ResourceBank::getOrCreateMaterial( const glm::vec3& ambient, const TextureList& diffuse, const glm::vec3& specular, float shininess, float opacity ) {
         for( auto it = materials.begin(); it != materials.end(); ++it ) {
           std::shared_ptr< Material > sample;
           {
@@ -73,14 +73,14 @@ namespace BlueBear {
             sample = *it;
           }
 
-          if( sample->getShininess() == shininess && sample->getAmbientColor() == ambient && sample->getSpecularColor() == specular ) {
+          if( sample->getShininess() == shininess && sample->getOpacity() == opacity && sample->getAmbientColor() == ambient && sample->getSpecularColor() == specular ) {
             if( listsCongruent( diffuse, sample->getDiffuseTextureList() ) ) {
               return sample;
             }
           }
         }
 
-        std::shared_ptr< Material > result = std::make_shared< Material >( ambient, diffuse, specular, shininess );
+        std::shared_ptr< Material > result = std::make_shared< Material >( ambient, diffuse, specular, shininess, opacity );
         {
           std::lock_guard< std::mutex > lock( materialsMutex );
           materials.push_back( result );
@@ -88,7 +88,7 @@ namespace BlueBear {
         return result;
       }
 
-      std::shared_ptr< Material > ResourceBank::getOrCreateMaterial( const glm::vec3& ambient, const glm::vec3& diffuse, const TextureList& specular, float shininess ) {
+      std::shared_ptr< Material > ResourceBank::getOrCreateMaterial( const glm::vec3& ambient, const glm::vec3& diffuse, const TextureList& specular, float shininess, float opacity ) {
         for( auto it = materials.begin(); it != materials.end(); ++it ) {
           std::shared_ptr< Material > sample;
           {
@@ -96,14 +96,14 @@ namespace BlueBear {
             sample = *it;
           }
 
-          if( sample->getShininess() == shininess && sample->getAmbientColor() == ambient && sample->getDiffuseColor() == diffuse ) {
+          if( sample->getShininess() == shininess && sample->getOpacity() == opacity && sample->getAmbientColor() == ambient && sample->getDiffuseColor() == diffuse ) {
             if( listsCongruent( specular, sample->getSpecularTextureList() ) ) {
               return sample;
             }
           }
         }
 
-        std::shared_ptr< Material > result = std::make_shared< Material >( ambient, diffuse, specular, shininess );
+        std::shared_ptr< Material > result = std::make_shared< Material >( ambient, diffuse, specular, shininess, opacity );
         {
           std::lock_guard< std::mutex > lock( materialsMutex );
           materials.push_back( result );
@@ -111,7 +111,7 @@ namespace BlueBear {
         return result;
       }
 
-      std::shared_ptr< Material > ResourceBank::getOrCreateMaterial( const glm::vec3& ambient, const glm::vec3& diffuse, const glm::vec3& specular, float shininess ) {
+      std::shared_ptr< Material > ResourceBank::getOrCreateMaterial( const glm::vec3& ambient, const glm::vec3& diffuse, const glm::vec3& specular, float shininess, float opacity ) {
         for( auto it = materials.begin(); it != materials.end(); ++it ) {
           std::shared_ptr< Material > sample;
           {
@@ -119,12 +119,12 @@ namespace BlueBear {
             sample = *it;
           }
 
-          if( sample->getShininess() == shininess && sample->getAmbientColor() == ambient && sample->getDiffuseColor() == diffuse && sample->getSpecularColor() == specular ) {
+          if( sample->getShininess() == shininess && sample->getOpacity() == opacity && sample->getAmbientColor() == ambient && sample->getDiffuseColor() == diffuse && sample->getSpecularColor() == specular ) {
             return sample;
           }
         }
 
-        std::shared_ptr< Material > result = std::make_shared< Material >( ambient, diffuse, specular, shininess );
+        std::shared_ptr< Material > result = std::make_shared< Material >( ambient, diffuse, specular, shininess, opacity );
         {
           std::lock_guard< std::mutex > lock( materialsMutex );
           materials.push_back( result );

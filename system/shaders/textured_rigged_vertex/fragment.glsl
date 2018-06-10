@@ -7,6 +7,7 @@ out vec4 color;
 struct Material {
   sampler2D diffuse0;
   float shininess;
+  float opacity;
 };
 
 struct Light {
@@ -41,5 +42,5 @@ void main() {
     result += ambient + diffuse + specular;
   }
 
-  color = vec4( result, 1.0 );
+  color = vec4( result, material.opacity );
 }

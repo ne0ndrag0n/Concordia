@@ -23,6 +23,7 @@ namespace BlueBear {
         TextureList diffuseTextures;
         TextureList specularTextures;
         float shininess = 0.0f;
+        float opacity = 1.0f;
         bool useAmbient = false;
 
         void checkTextureUnits();
@@ -30,14 +31,14 @@ namespace BlueBear {
       public:
         EXCEPTION_TYPE( ExceededTextureUnitsException, "Exceeded the maximum texture units for this hardware." );
 
-        Material( glm::vec3 ambientColor, glm::vec3 diffuseColor, glm::vec3 specularColor, float shininess );
-        Material( glm::vec3 diffuseColor, glm::vec3 specularColor, float shininess );
+        Material( glm::vec3 ambientColor, glm::vec3 diffuseColor, glm::vec3 specularColor, float shininess, float opacity );
+        Material( glm::vec3 diffuseColor, glm::vec3 specularColor, float shininess, float opacity );
 
-        Material( glm::vec3 ambientColor, TextureList diffuseTextures, TextureList specularTextures, float shininess );
-        Material( TextureList diffuseTextures, TextureList specularTextures, float shininess );
+        Material( glm::vec3 ambientColor, TextureList diffuseTextures, TextureList specularTextures, float shininess, float opacity );
+        Material( TextureList diffuseTextures, TextureList specularTextures, float shininess, float opacity );
 
-        Material( glm::vec3 ambientColor, TextureList diffuseTextures, glm::vec3 specularColor, float shininess );
-        Material( glm::vec3 ambientColor, glm::vec3 diffuseColor, TextureList specularTextures, float shininess );
+        Material( glm::vec3 ambientColor, TextureList diffuseTextures, glm::vec3 specularColor, float shininess, float opacity );
+        Material( glm::vec3 ambientColor, glm::vec3 diffuseColor, TextureList specularTextures, float shininess, float opacity );
 
         virtual ~Material() = default;
 
@@ -49,6 +50,7 @@ namespace BlueBear {
         const TextureList& getSpecularTextureList() const;
 
         float getShininess() const;
+        float getOpacity() const;
 
         void sendDeferredTextures();
 

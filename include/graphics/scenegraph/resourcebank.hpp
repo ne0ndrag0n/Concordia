@@ -33,10 +33,10 @@ namespace BlueBear {
 
         std::shared_ptr< Texture > getOrCreateTexture( const std::string& path, bool defer );
 
-        std::shared_ptr< Material > getOrCreateMaterial( const glm::vec3& ambient, const TextureList& diffuse, const TextureList& specular, float shininess );
-        std::shared_ptr< Material > getOrCreateMaterial( const glm::vec3& ambient, const TextureList& diffuse, const glm::vec3& specular, float shininess );
-        std::shared_ptr< Material > getOrCreateMaterial( const glm::vec3& ambient, const glm::vec3& diffuse, const TextureList& specular, float shininess );
-        std::shared_ptr< Material > getOrCreateMaterial( const glm::vec3& ambient, const glm::vec3& diffuse, const glm::vec3& specular, float shininess );
+        std::shared_ptr< Material > getOrCreateMaterial( const glm::vec3& ambient, const TextureList& diffuse, const TextureList& specular, float shininess, float opacity );
+        std::shared_ptr< Material > getOrCreateMaterial( const glm::vec3& ambient, const TextureList& diffuse, const glm::vec3& specular, float shininess, float opacity );
+        std::shared_ptr< Material > getOrCreateMaterial( const glm::vec3& ambient, const glm::vec3& diffuse, const TextureList& specular, float shininess, float opacity );
+        std::shared_ptr< Material > getOrCreateMaterial( const glm::vec3& ambient, const glm::vec3& diffuse, const glm::vec3& specular, float shininess, float opacity );
       };
 
     }

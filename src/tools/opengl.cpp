@@ -1,7 +1,7 @@
 #include "tools/opengl.hpp"
 #include "graphics/shader.hpp"
 #include "log.hpp"
-#include <glm/gtc/type_ptr.hpp> 
+#include <glm/gtc/type_ptr.hpp>
 
 namespace BlueBear {
   namespace Tools {
@@ -24,8 +24,6 @@ namespace BlueBear {
       GLint uniformLocation = OpenGL::getUniformID( id );
       if( uniformLocation != -1 ) {
         glUniform3f( uniformLocation, value[ 0 ], value[ 1 ], value[ 2 ] );
-      } else {
-        //Log::getInstance().warn( "OpenGL::setUniform", id + " undefined or unused in current shader; not setting uniform." );
       }
     }
 
@@ -33,8 +31,6 @@ namespace BlueBear {
       GLint uniformLocation = OpenGL::getUniformID( id );
       if( uniformLocation != -1 ) {
         glUniform1i( uniformLocation, value );
-      } else {
-        //Log::getInstance().warn( "OpenGL::setUniform", id + " undefined or unused in current shader; not setting uniform." );
       }
     }
 
@@ -42,8 +38,6 @@ namespace BlueBear {
       GLint uniformLocation = OpenGL::getUniformID( id );
       if( uniformLocation != -1 ) {
         glUniform1f( uniformLocation, value );
-      } else {
-        //Log::getInstance().warn( "OpenGL::setUniform", id + " undefined or unused in current shader; not setting uniform." );
       }
     }
 
@@ -51,8 +45,6 @@ namespace BlueBear {
       GLint uniformLocation = OpenGL::getUniformID( id );
       if( uniformLocation != -1 ) {
         glUniformMatrix4fv( uniformLocation, 1, GL_FALSE, glm::value_ptr( value ) );
-      } else {
-        //Log::getInstance().warn( "OpenGL::setUniform", id + " undefined or unused in current shader; not setting uniform." );
       }
     }
 

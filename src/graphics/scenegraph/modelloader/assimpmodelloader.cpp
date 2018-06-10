@@ -59,10 +59,10 @@ namespace BlueBear {
 
           return std::make_shared< Material >( params... );
         }
-        template std::shared_ptr< Material > AssimpModelLoader::getMaterial( const glm::vec3&, const TextureList&, const TextureList&, float );
-        template std::shared_ptr< Material > AssimpModelLoader::getMaterial( const glm::vec3&, const TextureList&, const glm::vec3&, float );
-        template std::shared_ptr< Material > AssimpModelLoader::getMaterial( const glm::vec3&, const glm::vec3&, const TextureList&, float );
-        template std::shared_ptr< Material > AssimpModelLoader::getMaterial( const glm::vec3&, const glm::vec3&, const glm::vec3&, float );
+        template std::shared_ptr< Material > AssimpModelLoader::getMaterial( const glm::vec3&, const TextureList&, const TextureList&, float, float );
+        template std::shared_ptr< Material > AssimpModelLoader::getMaterial( const glm::vec3&, const TextureList&, const glm::vec3&, float, float );
+        template std::shared_ptr< Material > AssimpModelLoader::getMaterial( const glm::vec3&, const glm::vec3&, const TextureList&, float, float );
+        template std::shared_ptr< Material > AssimpModelLoader::getMaterial( const glm::vec3&, const glm::vec3&, const glm::vec3&, float, float );
 
         unsigned int AssimpModelLoader::getFlags() {
           unsigned int result = aiProcess_Triangulate | aiProcess_FlipUVs;
@@ -252,27 +252,32 @@ namespace BlueBear {
           material->Get( AI_MATKEY_COLOR_SPECULAR, specular );
           float shininess = 0.0f;
           material->Get( AI_MATKEY_SHININESS, shininess );
+          float opacity = 1.0f;
+          material->Get( AI_MATKEY_OPACITY, opacity );
 
           if( diffuseTextures && specularTextures ) {
             result = getMaterial(
               Tools::AssimpTools::aiColorToGLMvec3( ambient ),
               getTextureList( material, aiTextureType_DIFFUSE ),
               getTextureList( material, aiTextureType_SPECULAR ),
-              shininess
+              shininess,
+              opacity
             );
           } else if ( diffuseTextures ) {
             result = getMaterial(
               Tools::AssimpTools::aiColorToGLMvec3( ambient ),
               getTextureList( material, aiTextureType_DIFFUSE ),
               Tools::AssimpTools::aiColorToGLMvec3( specular ),
-              shininess
+              shininess,
+              opacity
             );
           } else if ( specularTextures ) {
             result = getMaterial(
               Tools::AssimpTools::aiColorToGLMvec3( ambient ),
               Tools::AssimpTools::aiColorToGLMvec3( diffuse ),
               getTextureList( material, aiTextureType_SPECULAR ),
-              shininess
+              shininess,
+              opacity
             );
           } else {
             // Solid colours only
@@ -280,11 +285,13 @@ namespace BlueBear {
             log( "ambient", std::to_string( ambient.r ) + " " + std::to_string( ambient.g ) + " " + std::to_string( ambient.b ) );
             log( "diffuse", std::to_string( diffuse.r ) + " " + std::to_string( diffuse.g ) + " " + std::to_string( diffuse.b ) );
             log( "specular", std::to_string( specular.r ) + " " + std::to_string( specular.g ) + " " + std::to_string( specular.b ) );
+            log( "opacity", std::to_string( opacity ) );
             result = getMaterial(
               Tools::AssimpTools::aiColorToGLMvec3( ambient ),
               Tools::AssimpTools::aiColorToGLMvec3( diffuse ),
               Tools::AssimpTools::aiColorToGLMvec3( specular ),
-              shininess
+              shininess,
+              opacity
             );
           }
 
