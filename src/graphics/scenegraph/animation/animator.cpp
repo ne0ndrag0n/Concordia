@@ -1,5 +1,4 @@
 #include "graphics/scenegraph/animation/animator.hpp"
-#include "graphics/scenegraph/animation/animation.hpp"
 #include "configmanager.hpp"
 #include "log.hpp"
 
@@ -8,7 +7,7 @@ namespace BlueBear {
     namespace SceneGraph {
       namespace Animation {
 
-        Animator::Animator( const Bone& bindSkeleton, const Bone& currentSkeleton, const std::map< std::string, std::shared_ptr< Animation > >& animationList ) :
+        Animator::Animator( const Bone& bindSkeleton, const Bone& currentSkeleton, const std::map< std::string, Animation >& animationList ) :
           bindSkeleton( bindSkeleton ), currentSkeleton( currentSkeleton ), animationList( animationList ) {}
 
         Animator::Animator( const Animator& animator ) {
@@ -52,7 +51,7 @@ namespace BlueBear {
         }
 
         void Animator::reset() {
-          animation = nullptr;
+          animation.reset();
           frame = 0.0f;
           paused = false;
           currentSkeleton = bindSkeleton;

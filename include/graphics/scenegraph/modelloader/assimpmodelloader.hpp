@@ -2,6 +2,7 @@
 #define SG_MODEL_LOADER_ASSIMP
 
 #include "exceptions/genexc.hpp"
+#include "graphics/scenegraph/animation/animation.hpp"
 #include "graphics/scenegraph/modelloader/filemodelloader.hpp"
 #include "graphics/scenegraph/animation/bone.hpp"
 #include <glm/glm.hpp>
@@ -28,7 +29,6 @@ namespace BlueBear {
       }
 
       namespace Animation {
-        class Animation;
         class Animator;
       }
 
@@ -60,7 +60,7 @@ namespace BlueBear {
           std::map< double, glm::mat4 > getKeyframes( aiNodeAnim* nodeAnim );
           std::shared_ptr< Animation::Bone::AnimationMap > getAnimationMapForBone( const std::string& boneId );
           Animation::Bone getBoneFromNode( aiNode* node );
-          std::map< std::string, std::shared_ptr< Animation::Animation > > getAnimationList();
+          std::map< std::string, Animation::Animation > getAnimationList();
           std::shared_ptr< Animation::Animator > getAnimator( aiNode* node );
 
         public:

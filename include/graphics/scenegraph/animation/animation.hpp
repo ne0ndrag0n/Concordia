@@ -1,6 +1,8 @@
 #ifndef SG_ANIMATION_ANIMATION
 #define SG_ANIMATION_ANIMATION
 
+#include <string>
+
 namespace BlueBear {
   namespace Graphics {
     namespace SceneGraph {

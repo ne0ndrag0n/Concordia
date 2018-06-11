@@ -1,5 +1,4 @@
 #include "graphics/scenegraph/modelloader/assimpmodelloader.hpp"
-#include "graphics/scenegraph/animation/animation.hpp"
 #include "graphics/scenegraph/animation/animator.hpp"
 #include "graphics/scenegraph/mesh/meshdefinition.hpp"
 #include "graphics/scenegraph/mesh/basicvertex.hpp"
@@ -385,8 +384,8 @@ namespace BlueBear {
           return result;
         }
 
-        std::map< std::string, std::shared_ptr< Animation::Animation > > AssimpModelLoader::getAnimationList() {
-          std::map< std::string, std::shared_ptr< Animation::Animation > > animList;
+        std::map< std::string, Animation::Animation > AssimpModelLoader::getAnimationList() {
+          std::map< std::string, Animation::Animation > animList;
 
           for( int i = 0; i < context.scene->mNumAnimations; i++ ) {
             aiAnimation* animation = context.scene->mAnimations[ i ];
@@ -399,13 +398,11 @@ namespace BlueBear {
               std::to_string( animation->mDuration )
             );
 
-            animList[ animation->mName.C_Str() ] = std::make_shared< Animation::Animation >(
-              Animation::Animation{
-                animation->mName.C_Str(),
-                animation->mTicksPerSecond,
-                animation->mDuration
-              }
-            );
+            animList[ animation->mName.C_Str() ] = Animation::Animation{
+              animation->mName.C_Str(),
+              animation->mTicksPerSecond,
+              animation->mDuration
+            };
           }
 
           return animList;
@@ -414,11 +411,11 @@ namespace BlueBear {
         std::shared_ptr< Animation::Animator > AssimpModelLoader::getAnimator( aiNode* node ) {
           Animation::Bone rootSkeleton = getBoneFromNode( node );
 
-          return std::shared_ptr< Animation::Animator >( std::make_shared< Animation::Animator >(
+          return std::make_shared< Animation::Animator >(
             rootSkeleton,
             rootSkeleton,
             getAnimationList()
-          ) );
+          );
         }
 
         std::shared_ptr< Model > AssimpModelLoader::getNode( aiNode* node, aiMatrix4x4 parentTransform ) {
