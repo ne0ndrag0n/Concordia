@@ -160,7 +160,7 @@ namespace BlueBear {
             animator->update();
 
             Mesh::BoneUniform* boneUniform = ( Mesh::BoneUniform* ) it->second.get();
-            boneUniform->configure( animator, shared_from_this() );
+            boneUniform->configure( animator );
             boneUniform->send();
           }
         }
