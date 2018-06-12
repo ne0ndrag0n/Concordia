@@ -27,6 +27,10 @@ namespace BlueBear {
           return currentSkeleton;
         }
 
+        BonePackage Animator::getBonePackage() {
+          return { bindSkeleton, currentSkeleton };
+        }
+
         void Animator::setCurrentAnimation( const std::string& animationId ) {
           auto it = animationList.find( animationId );
           if( it != animationList.end() ) {

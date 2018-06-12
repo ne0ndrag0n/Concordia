@@ -13,7 +13,7 @@ namespace BlueBear {
       class Model;
 
       namespace Animation {
-        class Animator;
+        class BonePackage;
       }
 
       namespace Mesh {
@@ -24,7 +24,7 @@ namespace BlueBear {
 
         public:
           BoneUniform( const std::vector< std::string >& boneIDs );
-          void configure( std::shared_ptr< Animation::Animator > animator );
+          void configure( const Animation::BonePackage& bonePackage );
           void send() override;
         };
 

@@ -2,6 +2,7 @@
 #define SG_MODEL
 
 #include "graphics/scenegraph/transform.hpp"
+#include "graphics/scenegraph/animation/bonepackage.hpp"
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -9,6 +10,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <optional>
 
 namespace BlueBear {
   namespace Graphics {
@@ -43,7 +45,7 @@ namespace BlueBear {
         );
         Model( const Model& other );
 
-        void computeAnimation();
+        void sendBones( const Animation::BonePackage& bonePackage );
 
       public:
         virtual ~Model() = default;
@@ -76,14 +78,14 @@ namespace BlueBear {
         Transform& getLocalTransform();
         void setLocalTransform( Transform transform );
 
-        std::shared_ptr< Animation::Animator > findNearestAnimator() const;
+        std::shared_ptr< Animation::Animator > getAnimator() const;
         void setAnimator( std::shared_ptr< Animation::Animator > animator );
 
         std::shared_ptr< Model > findChildById( const std::string& id ) const;
 
         void sendDeferredObjects();
 
-        void draw();
+        void draw( std::optional< Animation::BonePackage > bonePackage = {} );
       };
 
     }

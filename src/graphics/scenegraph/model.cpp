@@ -28,7 +28,7 @@ namespace BlueBear {
           "new", sol::no_constructor,
           "get_transform", &Model::getLocalTransform,
           "set_current_animation", []( Model& self, const std::string& animation ) {
-            auto animator = self.findNearestAnimator();
+            auto animator = self.getAnimator();
 
             if( animator ) {
               animator->setCurrentAnimation( animation );
@@ -125,14 +125,8 @@ namespace BlueBear {
         this->transform = transform;
       }
 
-      std::shared_ptr< Animation::Animator > Model::findNearestAnimator() const {
-        if( animator ) {
-          return animator;
-        } else if( std::shared_ptr< Model > realParent = parent.lock() ) {
-          return realParent->findNearestAnimator();
-        } else {
-          return nullptr;
-        }
+      std::shared_ptr< Animation::Animator > Model::getAnimator() const {
+        return animator;
       }
 
       void Model::setAnimator( std::shared_ptr< Animation::Animator > animator ) {
@@ -153,16 +147,12 @@ namespace BlueBear {
         return std::shared_ptr< Model >();
       }
 
-      void Model::computeAnimation() {
-        if( std::shared_ptr< Animation::Animator > animator = findNearestAnimator() ) {
-          auto it = mesh->meshUniforms.find( "bone" );
-          if( it != mesh->meshUniforms.end() ) {
-            animator->update();
-
-            Mesh::BoneUniform* boneUniform = ( Mesh::BoneUniform* ) it->second.get();
-            boneUniform->configure( animator );
-            boneUniform->send();
-          }
+      void Model::sendBones( const Animation::BonePackage& bonePackage ) {
+        auto it = mesh->meshUniforms.find( "bone" );
+        if( it != mesh->meshUniforms.end() ) {
+          Mesh::BoneUniform* boneUniform = ( Mesh::BoneUniform* ) it->second.get();
+          boneUniform->configure( bonePackage );
+          boneUniform->send();
         }
       }
 
@@ -184,19 +174,26 @@ namespace BlueBear {
         }
       }
 
-      void Model::draw() {
+      void Model::draw( std::optional< Animation::BonePackage > bonePackage ) {
+
+        if( animator ) {
+          animator->update();
+          bonePackage.emplace( animator->getBonePackage() );
+        }
 
         // Models can have empty nodes which do not draw any mesh
         if( mesh ) {
           findNearestShader()->use();
+          if( bonePackage ) {
+            sendBones( *bonePackage );
+          }
           getComputedTransform().send();
           material->send();
-          computeAnimation();
           mesh->drawElements();
         }
 
         for( std::shared_ptr< Model >& model : submodels ) {
-          model->draw();
+          model->draw( bonePackage );
         }
       }
 
