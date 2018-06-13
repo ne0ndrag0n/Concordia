@@ -12,11 +12,11 @@ namespace BlueBear {
   namespace Graphics {
     namespace SceneGraph {
 
-      Model::Model( std::string id, std::shared_ptr< Mesh::Mesh > mesh, std::shared_ptr< Shader > shader, std::shared_ptr< Material > material ) :
-        id( id ), mesh( mesh ), shader( shader ), material( material ) {}
+      Model::Model( const std::string& id, const std::vector< Drawable >& drawables ) :
+        id( id ), drawables( drawables ) {}
 
-      std::shared_ptr< Model > Model::create( std::string id, std::shared_ptr< Mesh::Mesh > mesh, std::shared_ptr< Shader > shader, std::shared_ptr< Material > material ) {
-        return std::shared_ptr< Model >( new Model( id, mesh, shader, material ) );
+      std::shared_ptr< Model > Model::create( const std::string& id, const std::vector< Drawable >& drawables ) {
+        return std::shared_ptr< Model >( new Model( id, drawables ) );
       }
 
       void Model::submitLuaContributions( sol::state& lua ) {
@@ -43,9 +43,7 @@ namespace BlueBear {
         std::shared_ptr< Model > copy( new Model() );
 
         copy->id = id;
-        copy->mesh = mesh;
-        copy->shader = shader;
-        copy->material = material;
+        copy->drawables = drawables;
         copy->transform = transform;
         if( animator ) {
           copy->animator = std::make_shared< Animation::Animator >( *animator );
@@ -87,26 +85,8 @@ namespace BlueBear {
         child->parent = shared_from_this();
       }
 
-      std::shared_ptr< Shader > Model::findNearestShader() const {
-        if( shader ) {
-          return shader;
-        } else if( std::shared_ptr< Model > realParent = parent.lock() ) {
-          return realParent->findNearestShader();
-        } else {
-          return nullptr;
-        }
-      }
-
-      void Model::setShader( std::shared_ptr< Shader > shader ) {
-        this->shader = shader;
-      }
-
-      std::shared_ptr< Material > Model::getMaterial() const {
-        return material;
-      }
-
-      void Model::setMaterial( std::shared_ptr< Material > material ) {
-        this->material = material;
+      Drawable& Model::getDrawable( unsigned int index ) {
+        return drawables.at( index );
       }
 
       Transform Model::getComputedTransform() const {
@@ -157,16 +137,19 @@ namespace BlueBear {
       }
 
       void Model::sendDeferredObjects() {
-        if( shader ) {
-          shader->sendDeferred();
-        }
 
-        if( mesh ) {
-          mesh->sendDeferred();
-        }
+        for( const Drawable& drawable : drawables ) {
+          if( drawable.shader ) {
+            drawable.shader->sendDeferred();
+          }
 
-        if( material ) {
-          material->sendDeferredTextures();
+          if( drawable.mesh ) {
+            drawable.mesh->sendDeferred();
+          }
+
+          if( drawable.material ) {
+            drawable.material->sendDeferredTextures();
+          }
         }
 
         for( std::shared_ptr< Model > child : submodels ) {
@@ -181,15 +164,16 @@ namespace BlueBear {
           parentAnimator = animator.get();
         }
 
-        // Models can have empty nodes which do not draw any mesh
-        if( mesh ) {
-          findNearestShader()->use();
-          if( parentAnimator ) {
-            sendBones( *mesh, parentAnimator->getComputedMatrices() );
+        for( const Drawable& drawable : drawables ) {
+          if( drawable ) {
+            drawable.shader->use();
+            if( parentAnimator ) {
+              sendBones( *drawable.mesh, parentAnimator->getComputedMatrices() );
+            }
+            getComputedTransform().send();
+            drawable.material->send();
+            drawable.mesh->drawElements();
           }
-          getComputedTransform().send();
-          material->send();
-          mesh->drawElements();
         }
 
         for( std::shared_ptr< Model >& model : submodels ) {

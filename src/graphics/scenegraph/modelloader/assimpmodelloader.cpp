@@ -1,4 +1,5 @@
 #include "graphics/scenegraph/modelloader/assimpmodelloader.hpp"
+#include "graphics/scenegraph/drawable.hpp"
 #include "graphics/scenegraph/animation/animator.hpp"
 #include "graphics/scenegraph/mesh/meshdefinition.hpp"
 #include "graphics/scenegraph/mesh/basicvertex.hpp"
@@ -137,89 +138,84 @@ namespace BlueBear {
         template void AssimpModelLoader::assignBonesToVertex( Mesh::TexturedRiggedVertex&, unsigned int, aiBone**, unsigned int );
         template void AssimpModelLoader::assignBonesToVertex( Mesh::RiggedVertex&, unsigned int, aiBone**, unsigned int );
 
-        std::shared_ptr< Mesh::Mesh > AssimpModelLoader::getMesh( aiNode* node, aiMatrix4x4 transform ) {
-          if( node->mNumMeshes ) {
-            aiMesh* mesh = context.scene->mMeshes[ node->mMeshes[ 0 ] ];
-            bool usesBones = useBones && mesh->HasBones();
-            bool usesTextures = (
-              mesh->mMaterialIndex >= 0 && (
-                context.scene->mMaterials[ mesh->mMaterialIndex ]->GetTextureCount( aiTextureType_DIFFUSE ) > 0 ||
-                context.scene->mMaterials[ mesh->mMaterialIndex ]->GetTextureCount( aiTextureType_SPECULAR ) > 0
-              )
-            );
-            bool usesIndices = useIndices || mesh->mNumFaces;
+        std::shared_ptr< Mesh::Mesh > AssimpModelLoader::getMesh( aiMesh* mesh, aiMatrix4x4 transform ) {
+          bool usesBones = useBones && mesh->HasBones();
+          bool usesTextures = (
+            mesh->mMaterialIndex >= 0 && (
+              context.scene->mMaterials[ mesh->mMaterialIndex ]->GetTextureCount( aiTextureType_DIFFUSE ) > 0 ||
+              context.scene->mMaterials[ mesh->mMaterialIndex ]->GetTextureCount( aiTextureType_SPECULAR ) > 0
+            )
+          );
+          bool usesIndices = useIndices || mesh->mNumFaces;
 
-            log( "AssimpModelLoader::getMesh", usesIndices ? "Uses indices" : "Doesn't use indices" );
-            log( "AssimpModelLoader::getMesh", std::to_string( mesh->mNumVertices ) + " vertices" );
+          log( "AssimpModelLoader::getMesh", usesIndices ? "Uses indices" : "Doesn't use indices" );
+          log( "AssimpModelLoader::getMesh", std::to_string( mesh->mNumVertices ) + " vertices" );
 
-            std::shared_ptr< Mesh::Mesh > result;
+          std::shared_ptr< Mesh::Mesh > result;
 
-            if( usesBones ) {
-              if( usesTextures ) {
-                // usesBones && usesTextures - TexturedRiggedVertex (textured material, bones)
-                std::vector< Mesh::TexturedRiggedVertex > vertices;
-                for( int i = 0; i < mesh->mNumVertices; i++ ) {
-                  Mesh::TexturedRiggedVertex vertex = getVertex< Mesh::TexturedRiggedVertex >( transform * mesh->mVertices[ i ], transform * mesh->mNormals[ i ] );
-                  vertex.textureCoordinates = glm::vec2( mesh->mTextureCoords[ 0 ][ i ].x, mesh->mTextureCoords[ 0 ][ i ].y );
-                  assignBonesToVertex( vertex, i, mesh->mBones, mesh->mNumBones );
-                  vertices.push_back( vertex );
-                }
-
-                auto md = usesIndices ?
-                  std::make_shared< Mesh::MeshDefinition< Mesh::TexturedRiggedVertex > >( vertices, getIndices( mesh ), deferGLOperations ) :
-                  std::make_shared< Mesh::MeshDefinition< Mesh::TexturedRiggedVertex > >( vertices, deferGLOperations );
-
-                md->meshUniforms.emplace( "bone", std::make_unique< Mesh::BoneUniform >( getBoneIds( mesh->mBones, mesh->mNumBones ) ) );
-                result = md;
-
-              } else {
-                // usesBones && !usesTextures - RiggedVertex (solid material, bones)
-                std::vector< Mesh::RiggedVertex > vertices;
-                for( int i = 0; i < mesh->mNumVertices; i++ ) {
-                  Mesh::RiggedVertex vertex = getVertex< Mesh::RiggedVertex >( transform * mesh->mVertices[ i ], transform * mesh->mNormals[ i ] );
-                  assignBonesToVertex( vertex, i, mesh->mBones, mesh->mNumBones );
-                  vertices.push_back( vertex );
-                }
-
-                auto md = usesIndices ?
-                  std::make_shared< Mesh::MeshDefinition< Mesh::RiggedVertex > >( vertices, getIndices( mesh ), deferGLOperations ) :
-                  std::make_shared< Mesh::MeshDefinition< Mesh::RiggedVertex > >( vertices, deferGLOperations );
-
-                md->meshUniforms.emplace( "bone", std::make_unique< Mesh::BoneUniform >( getBoneIds( mesh->mBones, mesh->mNumBones ) ) );
-                result = md;
-
+          if( usesBones ) {
+            if( usesTextures ) {
+              // usesBones && usesTextures - TexturedRiggedVertex (textured material, bones)
+              std::vector< Mesh::TexturedRiggedVertex > vertices;
+              for( int i = 0; i < mesh->mNumVertices; i++ ) {
+                Mesh::TexturedRiggedVertex vertex = getVertex< Mesh::TexturedRiggedVertex >( transform * mesh->mVertices[ i ], transform * mesh->mNormals[ i ] );
+                vertex.textureCoordinates = glm::vec2( mesh->mTextureCoords[ 0 ][ i ].x, mesh->mTextureCoords[ 0 ][ i ].y );
+                assignBonesToVertex( vertex, i, mesh->mBones, mesh->mNumBones );
+                vertices.push_back( vertex );
               }
+
+              auto md = usesIndices ?
+                std::make_shared< Mesh::MeshDefinition< Mesh::TexturedRiggedVertex > >( vertices, getIndices( mesh ), deferGLOperations ) :
+                std::make_shared< Mesh::MeshDefinition< Mesh::TexturedRiggedVertex > >( vertices, deferGLOperations );
+
+              md->meshUniforms.emplace( "bone", std::make_unique< Mesh::BoneUniform >( getBoneIds( mesh->mBones, mesh->mNumBones ) ) );
+              result = md;
+
             } else {
-              if( usesTextures ) {
-                // !usesBones && usesTextures - TexturedVertex (textured material, no bones)
-                std::vector< Mesh::TexturedVertex > vertices;
-                for( int i = 0; i < mesh->mNumVertices; i++ ) {
-                  Mesh::TexturedVertex vertex = getVertex< Mesh::TexturedVertex >( transform * mesh->mVertices[ i ], transform * mesh->mNormals[ i ] );
-                  vertex.textureCoordinates = glm::vec2( mesh->mTextureCoords[ 0 ][ i ].x, mesh->mTextureCoords[ 0 ][ i ].y );
-                  vertices.push_back( vertex );
-                }
-
-                result = usesIndices ?
-                  std::make_shared< Mesh::MeshDefinition< Mesh::TexturedVertex > >( vertices, getIndices( mesh ), deferGLOperations ) :
-                  std::make_shared< Mesh::MeshDefinition< Mesh::TexturedVertex > >( vertices, deferGLOperations );
-
-              } else {
-                // !usesBones && !usesTextures - BasicVertex (solid material, no bones)
-                std::vector< Mesh::BasicVertex > vertices;
-                for( int i = 0; i < mesh->mNumVertices; i++ ) {
-                  vertices.push_back( getVertex< Mesh::BasicVertex >( transform * mesh->mVertices[ i ], transform * mesh->mNormals[ i ] ) );
-                }
-
-                result = usesIndices ?
-                  std::make_shared< Mesh::MeshDefinition< Mesh::BasicVertex > >( vertices, getIndices( mesh ), deferGLOperations ) :
-                  std::make_shared< Mesh::MeshDefinition< Mesh::BasicVertex > >( vertices, deferGLOperations );
+              // usesBones && !usesTextures - RiggedVertex (solid material, bones)
+              std::vector< Mesh::RiggedVertex > vertices;
+              for( int i = 0; i < mesh->mNumVertices; i++ ) {
+                Mesh::RiggedVertex vertex = getVertex< Mesh::RiggedVertex >( transform * mesh->mVertices[ i ], transform * mesh->mNormals[ i ] );
+                assignBonesToVertex( vertex, i, mesh->mBones, mesh->mNumBones );
+                vertices.push_back( vertex );
               }
-            }
 
-            return result;
+              auto md = usesIndices ?
+                std::make_shared< Mesh::MeshDefinition< Mesh::RiggedVertex > >( vertices, getIndices( mesh ), deferGLOperations ) :
+                std::make_shared< Mesh::MeshDefinition< Mesh::RiggedVertex > >( vertices, deferGLOperations );
+
+              md->meshUniforms.emplace( "bone", std::make_unique< Mesh::BoneUniform >( getBoneIds( mesh->mBones, mesh->mNumBones ) ) );
+              result = md;
+
+            }
           } else {
-            return std::shared_ptr< Mesh::Mesh >( nullptr );
+            if( usesTextures ) {
+              // !usesBones && usesTextures - TexturedVertex (textured material, no bones)
+              std::vector< Mesh::TexturedVertex > vertices;
+              for( int i = 0; i < mesh->mNumVertices; i++ ) {
+                Mesh::TexturedVertex vertex = getVertex< Mesh::TexturedVertex >( transform * mesh->mVertices[ i ], transform * mesh->mNormals[ i ] );
+                vertex.textureCoordinates = glm::vec2( mesh->mTextureCoords[ 0 ][ i ].x, mesh->mTextureCoords[ 0 ][ i ].y );
+                vertices.push_back( vertex );
+              }
+
+              result = usesIndices ?
+                std::make_shared< Mesh::MeshDefinition< Mesh::TexturedVertex > >( vertices, getIndices( mesh ), deferGLOperations ) :
+                std::make_shared< Mesh::MeshDefinition< Mesh::TexturedVertex > >( vertices, deferGLOperations );
+
+            } else {
+              // !usesBones && !usesTextures - BasicVertex (solid material, no bones)
+              std::vector< Mesh::BasicVertex > vertices;
+              for( int i = 0; i < mesh->mNumVertices; i++ ) {
+                vertices.push_back( getVertex< Mesh::BasicVertex >( transform * mesh->mVertices[ i ], transform * mesh->mNormals[ i ] ) );
+              }
+
+              result = usesIndices ?
+                std::make_shared< Mesh::MeshDefinition< Mesh::BasicVertex > >( vertices, getIndices( mesh ), deferGLOperations ) :
+                std::make_shared< Mesh::MeshDefinition< Mesh::BasicVertex > >( vertices, deferGLOperations );
+            }
           }
+
+          return result;
         }
 
         std::vector< std::shared_ptr< Texture > > AssimpModelLoader::getTextureList( aiMaterial* material, aiTextureType type ) {
@@ -424,24 +420,27 @@ namespace BlueBear {
 
           aiMatrix4x4 transform = parentTransform * node->mTransformation;
 
-          std::shared_ptr< Mesh::Mesh > mesh = getMesh( node, transform );
-          std::shared_ptr< Shader > shader;
-          if( mesh ) {
+          std::vector< Drawable > drawables;
+          for( unsigned int i = 0; i != node->mNumMeshes; i++ ) {
+            aiMesh* rawMesh = context.scene->mMeshes[ node->mMeshes[ i ] ];
+
+            std::shared_ptr< Mesh::Mesh > mesh = getMesh( rawMesh, transform );
+
+            std::shared_ptr< Shader > shader;
             std::pair< std::string, std::string > shaderPair = mesh->getDefaultShader();
             log( "AssimpModelLoader::getNode", std::string( "Attaching default shader " ) + shaderPair.first + ";" + shaderPair.second );
             shader = getShader( shaderPair.first, shaderPair.second );
-          }
-          std::shared_ptr< Material > material = nullptr;
 
-          // Try to load the material
-          if( node->mNumMeshes ) {
-            unsigned int materialIndex = context.scene->mMeshes[ node->mMeshes[ 0 ] ]->mMaterialIndex;
+            std::shared_ptr< Material > material;
+            unsigned int materialIndex = rawMesh->mMaterialIndex;
             if( materialIndex >= 0 ) {
               material = getMaterial( context.scene->mMaterials[ materialIndex ] );
             }
+
+            drawables.push_back( Drawable{ mesh, shader, material } );
           }
 
-          std::shared_ptr< Model > model = Model::create( node->mName.C_Str(), mesh, shader, material );
+          std::shared_ptr< Model > model = Model::create( node->mName.C_Str(), drawables );
 
           for( int i = 0; i < node->mNumChildren; i++ ) {
             aiNode* assimpChild = node->mChildren[ i ];
