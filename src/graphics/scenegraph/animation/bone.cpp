@@ -1,5 +1,6 @@
 #include "graphics/scenegraph/animation/bone.hpp"
 #include "graphics/scenegraph/transform.hpp"
+#include "tools/utility.hpp"
 #include "log.hpp"
 
 namespace BlueBear {
@@ -64,6 +65,17 @@ namespace BlueBear {
           for( Bone& child : children ) {
             child.setToAnimation( animationId, animationTick );
           }
+        }
+
+        std::vector< std::string > Bone::getAllIds() const {
+          std::vector< std::string > result;
+
+          result.push_back( id );
+          for( const Bone& bone : children ) {
+            result = Tools::Utility::concatArrays( result, bone.getAllIds() );
+          }
+
+          return result;
         }
 
         void Bone::printToLog() {

@@ -19,16 +19,24 @@ namespace BlueBear {
           return animation->fps / ConfigManager::getInstance().getIntValue( "fps_overview" );
         }
 
+        void Animator::computeMatrices() {
+          std::vector< std::string > boneIDs = bindSkeleton.getAllIds();
+
+          for( const std::string& id : boneIDs ) {
+            computedMatrices[ id ] = currentSkeleton.getMatrixById( id ) * glm::inverse( bindSkeleton.getMatrixById( id ) );
+          }
+        }
+
+        const std::map< std::string, glm::mat4 >& Animator::getComputedMatrices() {
+          return computedMatrices;
+        }
+
         Bone& Animator::getBindSkeletonRef() {
           return bindSkeleton;
         }
 
         Bone& Animator::getCurrentSkeletonRef() {
           return currentSkeleton;
-        }
-
-        BonePackage Animator::getBonePackage() {
-          return { bindSkeleton, currentSkeleton };
         }
 
         void Animator::setCurrentAnimation( const std::string& animationId ) {
@@ -73,6 +81,8 @@ namespace BlueBear {
               reset();
             }
           }
+
+          computeMatrices();
         }
 
       }

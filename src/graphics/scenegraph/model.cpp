@@ -147,11 +147,11 @@ namespace BlueBear {
         return std::shared_ptr< Model >();
       }
 
-      void Model::sendBones( const Animation::BonePackage& bonePackage ) {
-        auto it = mesh->meshUniforms.find( "bone" );
-        if( it != mesh->meshUniforms.end() ) {
+      void Model::sendBones( const Mesh::Mesh& mesh, const std::map< std::string, glm::mat4 >& bones ) {
+        auto it = mesh.meshUniforms.find( "bone" );
+        if( it != mesh.meshUniforms.end() ) {
           Mesh::BoneUniform* boneUniform = ( Mesh::BoneUniform* ) it->second.get();
-          boneUniform->configure( bonePackage );
+          boneUniform->configure( bones );
           boneUniform->send();
         }
       }
@@ -174,18 +174,18 @@ namespace BlueBear {
         }
       }
 
-      void Model::draw( std::optional< Animation::BonePackage > bonePackage ) {
+      void Model::draw( Animation::Animator* parentAnimator ) {
 
         if( animator ) {
           animator->update();
-          bonePackage.emplace( animator->getBonePackage() );
+          parentAnimator = animator.get();
         }
 
         // Models can have empty nodes which do not draw any mesh
         if( mesh ) {
           findNearestShader()->use();
-          if( bonePackage ) {
-            sendBones( *bonePackage );
+          if( parentAnimator ) {
+            sendBones( *mesh, parentAnimator->getComputedMatrices() );
           }
           getComputedTransform().send();
           material->send();
@@ -193,7 +193,7 @@ namespace BlueBear {
         }
 
         for( std::shared_ptr< Model >& model : submodels ) {
-          model->draw( bonePackage );
+          model->draw( parentAnimator );
         }
       }
 

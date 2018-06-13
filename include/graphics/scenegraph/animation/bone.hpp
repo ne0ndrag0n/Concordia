@@ -36,6 +36,7 @@ namespace BlueBear {
           Bone( const Bone& other );
           Bone& operator=( const Bone& other );
 
+          std::vector< std::string > getAllIds() const;
           Bone getAnimationCopy( const std::string& animationId, double animationTick ) const;
           void addChild( const Bone& bone );
           const Bone* getChildById( const std::string& id ) const;

@@ -2,7 +2,6 @@
 #define SG_ANIMATION_ANIMATOR
 
 #include "graphics/scenegraph/animation/animation.hpp"
-#include "graphics/scenegraph/animation/bonepackage.hpp"
 #include "graphics/scenegraph/animation/bone.hpp"
 #include <memory>
 #include <string>
@@ -23,10 +22,13 @@ namespace BlueBear {
           std::optional< Animation > animation;
           std::map< std::string, Animation > animationList;
 
+          std::map< std::string, glm::mat4 > computedMatrices;
+
           double frame = 0.0f;
           bool paused = false;
 
           double getFPS();
+          void computeMatrices();
 
         public:
           EXCEPTION_TYPE( AnimationNotFoundException, "Animation ID not found!" );
@@ -37,9 +39,10 @@ namespace BlueBear {
             const std::map< std::string, Animation >& animationList
           );
 
+          const std::map< std::string, glm::mat4 >& getComputedMatrices();
+
           Bone& getBindSkeletonRef();
           Bone& getCurrentSkeletonRef();
-          BonePackage getBonePackage();
 
           void setCurrentAnimation( const std::string& animationId );
           void setPause( bool status );

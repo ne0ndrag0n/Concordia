@@ -4,6 +4,7 @@
 #include "graphics/scenegraph/uniform.hpp"
 #include <glm/glm.hpp>
 #include <vector>
+#include <map>
 #include <string>
 #include <memory>
 
@@ -24,7 +25,7 @@ namespace BlueBear {
 
         public:
           BoneUniform( const std::vector< std::string >& boneIDs );
-          void configure( const Animation::BonePackage& bonePackage );
+          void configure( const std::map< std::string, glm::mat4 >& computedBones );
           void send() override;
         };
 
