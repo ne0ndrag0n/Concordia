@@ -1,5 +1,6 @@
 #include "device/display/adapter/component/worldrenderer.hpp"
-#include "graphics/scenegraph/light.hpp"
+#include "graphics/scenegraph/light/pointlight.hpp"
+#include "graphics/scenegraph/light/directionallight.hpp"
 #include "graphics/scenegraph/model.hpp"
 #include "graphics/scenegraph/modelloader/filemodelloader.hpp"
 #include "graphics/scenegraph/modelloader/assimpmodelloader.hpp"
@@ -27,11 +28,11 @@ namespace BlueBear {
               eventManager.LUA_STATE_READY.listen( this, std::bind( &WorldRenderer::submitLuaContributions, this, std::placeholders::_1 ) );
               eventManager.SHADER_CHANGE.listen( this, std::bind( &WorldRenderer::onShaderChange, this ) );
 
-              lights[ "__test" ] = std::make_shared< Graphics::SceneGraph::Light >(
-                glm::vec3{ 0.0, 0.0, 10.0 },
-                glm::vec3{ 0.0, 0.0, 0.0 },
-                glm::vec3{ 1, 1, 1 },
-                glm::vec3{ 1, 1, 1 }
+              lights[ "sun" ] = std::make_shared< Graphics::SceneGraph::Light::DirectionalLight >(
+                glm::vec3{ -1.0, 0.0, 0.0 },
+                glm::vec3{ 1.0, 1.0, 1.0 },
+                glm::vec3{ 0.1, 0.1, 0.1 },
+                glm::vec3{ 0.1, 0.1, 0.1 }
               );
             }
 
@@ -191,7 +192,7 @@ namespace BlueBear {
           }
 
           void WorldRenderer::onShaderChange() {
-            Graphics::SceneGraph::Light::sendLightCount();
+            Graphics::SceneGraph::Light::PointLight::sendLightCount();
           }
 
           /**

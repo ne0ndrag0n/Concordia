@@ -19,6 +19,7 @@ namespace BlueBear {
 
       static void setUniform( const std::string& id, const glm::vec3& value );
       static void setUniform( const std::string& id, const int value );
+      static void setUniform( const std::string& id, const unsigned int value );
       static void setUniform( const std::string& id, const float value );
       static void setUniform( const std::string& id, const glm::mat4& value );
       static void setUniform( const std::string& id, unsigned int size, const GLfloat* value );

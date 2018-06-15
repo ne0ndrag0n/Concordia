@@ -23,7 +23,10 @@ namespace BlueBear {
 
     namespace SceneGraph {
       class Model;
-      class Light;
+
+      namespace Light {
+        class Light;
+      }
 
       namespace ModelLoader {
         class FileModelLoader;
@@ -52,7 +55,7 @@ namespace BlueBear {
             Graphics::Camera camera;
             Graphics::SceneGraph::ResourceBank cache;
             std::unordered_map< std::string, std::shared_ptr< Graphics::SceneGraph::Model > > originals;
-            std::unordered_map< std::string, std::shared_ptr< Graphics::SceneGraph::Light > > lights;
+            std::unordered_map< std::string, std::shared_ptr< Graphics::SceneGraph::Light::Light > > lights;
             std::set< ModelRegistration > models;
 
             std::unique_ptr< Graphics::SceneGraph::ModelLoader::FileModelLoader > getFileModelLoader( bool deferGLOperations );

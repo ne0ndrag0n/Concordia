@@ -34,6 +34,13 @@ namespace BlueBear {
       }
     }
 
+    void OpenGL::setUniform( const std::string& id, const unsigned int value ) {
+      GLint uniformLocation = OpenGL::getUniformID( id );
+      if( uniformLocation != -1 ) {
+        glUniform1ui( uniformLocation, value );
+      }
+    }
+
     void OpenGL::setUniform( const std::string& id, const float value ) {
       GLint uniformLocation = OpenGL::getUniformID( id );
       if( uniformLocation != -1 ) {
