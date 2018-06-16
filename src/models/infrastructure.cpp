@@ -1,7 +1,6 @@
 #include "models/infrastructure.hpp"
 #include "tools/utility.hpp"
 #include <vector>
-
 #include "log.hpp"
 
 namespace BlueBear::Models {
@@ -54,6 +53,21 @@ namespace BlueBear::Models {
   }
 
   void Infrastructure::load( const Json::Value& data ) {
+    if( data != Json::Value::null ) {
+      floorDimensions = {
+        data[ "dimensions" ][ 0 ].asUInt(),
+        data[ "dimensions" ][ 1 ].asUInt(),
+        data[ "dimensions" ][ 2 ].asUInt()
+      };
 
+      for( unsigned int z = 0; z != floorDimensions.z; z++ ) {
+        for( unsigned int y = 0; y != floorDimensions.y; y++ ) {
+          for( unsigned int x = 0; x != floorDimensions.x; x++ ) {
+            const Json::Value& tile = data[ "tiles" ][ z ][ y ][ x ];
+            
+          }
+        }
+      }
+    }
   }
 }

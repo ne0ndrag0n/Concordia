@@ -11,5 +11,22 @@
         }
       }
     ]
+  },
+  "infrastructure": {
+    "dimensions": [ 3, 3, 1 ],
+    "tiles": [
+      [
+        [ "hardwood1", "hardwood1", "hardwood1" ],
+        [ "hardwood1", "hardwood1", "hardwood1" ],
+        [ "hardwood1", "hardwood1", "hardwood1" ]
+      ]
+    ],
+    "elevations": [
+      [
+        [ 0.0, 0.0, 0.0, 0.0 ],
+        [ 0.0, 0.0, 0.0, 0.0 ],
+        [ 0.0, 0.0, 0.0, 0.0 ]
+      ]
+    ]
   }
 }

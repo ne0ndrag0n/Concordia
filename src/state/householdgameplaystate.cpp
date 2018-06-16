@@ -46,6 +46,7 @@ namespace BlueBear {
     void HouseholdGameplayState::load( const Json::Value& data ) {
       if( data != Json::Value::null ) {
         entityRegistry.load( data[ "registry" ] );
+        infrastructure->load( data[ "infrastructure" ] );
       }
     }
 

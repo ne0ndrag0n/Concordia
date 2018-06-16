@@ -6,6 +6,7 @@
 #include "serializable.hpp"
 #include <SFML/Graphics/Image.hpp>
 #include <jsoncpp/json/json.h>
+#include <glm/glm.hpp>
 #include <memory>
 #include <optional>
 #include <string>
@@ -19,7 +20,8 @@ namespace BlueBear::Models {
     EXCEPTION_TYPE( InvalidImageException, "Invalid image path!" );
 
     Device::Display::Adapter::Component::WorldRenderer& worldRenderer;
-    std::map< double, std::map< double, std::map< double, std::optional< FloorTile > > > > floorSurface;
+    glm::uvec3 floorDimensions;
+    std::map< unsigned int, std::map< unsigned int, std::map< unsigned int, std::optional< FloorTile > > > > floorSurface;
     std::map< std::string, FloorTile > originalTiles;
     std::map< std::string, std::shared_ptr< sf::Image > > images;
 
