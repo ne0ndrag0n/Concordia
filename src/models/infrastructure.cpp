@@ -54,19 +54,42 @@ namespace BlueBear::Models {
 
   void Infrastructure::load( const Json::Value& data ) {
     if( data != Json::Value::null ) {
-      floorDimensions = {
-        data[ "dimensions" ][ 0 ].asUInt(),
-        data[ "dimensions" ][ 1 ].asUInt(),
-        data[ "dimensions" ][ 2 ].asUInt()
-      };
+      const Json::Value& tiles = data[ "tiles" ];
+      for( auto it = tiles.begin(); it != tiles.end(); ++it ) {
+        const Json::Value& level = *it;
+        FloorLevel current;
+        current.dimensions = { level[ "dimensions" ][ 0 ].asUInt(), level[ "dimensions" ][ 1 ].asUInt() };
 
-      for( unsigned int z = 0; z != floorDimensions.z; z++ ) {
-        for( unsigned int y = 0; y != floorDimensions.y; y++ ) {
-          for( unsigned int x = 0; x != floorDimensions.x; x++ ) {
-            const Json::Value& tile = data[ "tiles" ][ z ][ y ][ x ];
-            
+        const Json::Value& innerTiles = level[ "tiles" ];
+        for( auto it = innerTiles.begin(); it != innerTiles.end(); ++it ) {
+          const Json::Value& set = *it;
+          std::vector< std::optional< FloorTile > > tileSet;
+          for( auto it = set.begin(); it != set.end(); ++it ) {
+            std::string desiredTile = it->asString();
+            if( desiredTile != "" ) {
+              auto originalTile = originalTiles.find( desiredTile );
+              if( originalTile != originalTiles.end() ) {
+                tileSet.push_back( originalTile->second );
+              } else {
+                Log::getInstance().error( "Infrastructure::load", "Tile found in lot but not registered: " + desiredTile );
+              }
+            }
           }
+
+          current.tiles.emplace_back( std::move( tileSet ) );
         }
+
+        const Json::Value& vertices = data[ "vertices" ];
+        for( auto it = vertices.begin(); it != vertices.end(); ++it ) {
+          const Json::Value& jsonVertices = *it;
+          std::vector< float > vertexSet;
+          for( auto it = jsonVertices.begin(); it != jsonVertices.end(); ++it ) {
+            vertexSet.push_back( it->asFloat() );
+          }
+          current.vertices.emplace_back( std::move( vertexSet ) );
+        }
+
+        levels.emplace_back( std::move( current ) );
       }
     }
   }

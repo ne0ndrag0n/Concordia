@@ -10,6 +10,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <vector>
 #include <map>
 
 namespace BlueBear::Device::Display::Adapter::Component{ class WorldRenderer; }
@@ -17,11 +18,18 @@ namespace BlueBear::Graphics::SceneGraph{ class Model; }
 namespace BlueBear::Models {
 
   class Infrastructure : public Serializable {
+  public:
+    struct FloorLevel {
+      glm::uvec2 dimensions;
+      std::vector< std::vector< std::optional< FloorTile > > > tiles;
+      std::vector< std::vector< float > > vertices;
+    };
+
+  private:
     EXCEPTION_TYPE( InvalidImageException, "Invalid image path!" );
 
     Device::Display::Adapter::Component::WorldRenderer& worldRenderer;
-    glm::uvec3 floorDimensions;
-    std::map< unsigned int, std::map< unsigned int, std::map< unsigned int, std::optional< FloorTile > > > > floorSurface;
+    std::vector< FloorLevel > levels;
     std::map< std::string, FloorTile > originalTiles;
     std::map< std::string, std::shared_ptr< sf::Image > > images;
 
