@@ -2,6 +2,7 @@
 #define BB_FLOOR_MODEL_LOADER
 
 #include "graphics/scenegraph/modelloader/proceduralmodelloader.hpp"
+#include "models/infrastructure.hpp"
 #include "exceptions/genexc.hpp"
 #include <memory>
 
@@ -15,15 +16,15 @@ namespace BlueBear {
       class Model;
 
       namespace ModelLoader {
-
         class FloorModelLoader : public ProceduralModelLoader {
+          const std::vector< Models::Infrastructure::FloorLevel >& levels;
+          unsigned int currentLevel = 0;
 
-          std::shared_ptr< Model > generateTerrain();
+          sf::Image generateRootTexture( const glm::uvec2& dimensions );
 
         public:
-          EXCEPTION_TYPE( CollectionNotSetException, "Collection not set on FloorModelLoader" );
-
-          FloorModelLoader();
+          FloorModelLoader( const std::vector< Models::Infrastructure::FloorLevel >& levels );
+          void setCurrentLevel( unsigned int level );
 
           virtual std::shared_ptr< Model > get();
         };
