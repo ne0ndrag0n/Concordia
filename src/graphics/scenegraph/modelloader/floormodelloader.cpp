@@ -16,8 +16,7 @@ namespace BlueBear {
 
         sf::Image FloorModelLoader::generateRootTexture( const glm::uvec2& dimensions ) {
           sf::Image image;
-
-          image.create( dimensions.x, dimensions.y );
+          image.create( dimensions.x * 48, dimensions.y * 48 );
 
           return image;
         }
@@ -27,12 +26,16 @@ namespace BlueBear {
           std::set< glm::vec3 > vertices;
 
           // Create parent texture
+          sf::Image rootTexture = generateRootTexture( floorLevel.dimensions );
 
           for( int y = 0; y != floorLevel.dimensions.y - 1; y++ ) {
             for( int x = 0; x != floorLevel.dimensions.x - 1; x++ ) {
               if( floorLevel.tiles[ y ][ x ] ) {
-                // Floor tile is present, add this to the mesh
+                // Floor tile is present, add this to the texture
                 // Floor images should be 48x48 images
+                rootTexture.copy( *( floorLevel.tiles[ y ][ x ]->surface ), x * 48, y * 48 );
+
+                // Create vertices
               } else {
                 // Floor tile is not present
               }
