@@ -89,6 +89,10 @@ namespace BlueBear {
         return drawables.at( index );
       }
 
+      std::vector< Drawable >& Model::getDrawableList() {
+        return drawables;
+      }
+
       Transform Model::getComputedTransform() const {
         if( std::shared_ptr< Model > realParent = parent.lock() ) {
           return realParent->getComputedTransform() * transform;

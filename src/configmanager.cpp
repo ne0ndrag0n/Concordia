@@ -35,11 +35,7 @@ namespace BlueBear {
     configRoot[ "key_rotate_left" ] = sf::Keyboard::Q;
     configRoot[ "key_zoom_in" ] = sf::Keyboard::Add;
     configRoot[ "key_zoom_out" ] = sf::Keyboard::Subtract;
-    configRoot[ "disable_image_cache" ] = false;
-    configRoot[ "disable_texture_cache" ] = false;
-    configRoot[ "ui_theme" ] = "system/ui/default.theme";
-    configRoot[ "max_ingame_terminal_scrollback" ] = 100;
-    configRoot[ "hud_zorder_max" ] = 1000;
+    configRoot[ "floor_texture_size" ] = 48;
 
     // Load settings.json from file
     std::ifstream settingsFile( SETTINGS_PATH );

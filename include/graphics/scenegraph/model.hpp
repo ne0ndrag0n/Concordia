@@ -58,6 +58,7 @@ namespace BlueBear {
         void detach();
 
         Drawable& getDrawable( unsigned int index );
+        std::vector< Drawable >& getDrawableList();
 
         Transform getComputedTransform() const;
         Transform& getLocalTransform();
