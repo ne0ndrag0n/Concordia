@@ -51,14 +51,15 @@ namespace BlueBear {
                 if( floorLevel.tiles[ y ][ x ] ) {
                   meshTexture.copy( *floorLevel.tiles[ y ][ x ]->surface, x * side, y * side );
 
+                  // Clockwise winding direction
                   generator.addTriangle(
+                    { { floats.x - 0.5, floats.y - 0.5, baseElevation + floorLevel.vertices[ y + 1 ][ x ] }, { 0.0, 0.0, 1.0 }, getTextureCoords( { x, y + 1 }, vertexCount ) },
                     { { floats.x - 0.5, floats.y + 0.5, baseElevation + floorLevel.vertices[ y ][ x ] },     { 0.0, 0.0, 1.0 }, getTextureCoords( { x, y }, vertexCount ) },
-                    { { floats.x + 0.5, floats.y + 0.5, baseElevation + floorLevel.vertices[ y ][ x + 1 ] }, { 0.0, 0.0, 1.0 }, getTextureCoords( { x + 1, y }, vertexCount ) },
-                    { { floats.x - 0.5, floats.y - 0.5, baseElevation + floorLevel.vertices[ y + 1 ][ x ] }, { 0.0, 0.0, 1.0 }, getTextureCoords( { x, y + 1 }, vertexCount ) }
+                    { { floats.x + 0.5, floats.y + 0.5, baseElevation + floorLevel.vertices[ y ][ x + 1 ] }, { 0.0, 0.0, 1.0 }, getTextureCoords( { x + 1, y }, vertexCount ) }
                   );
                   generator.addTriangle(
-                    { { floats.x + 0.5, floats.y + 0.5, baseElevation + floorLevel.vertices[ y ][ x + 1 ] },     { 0.0, 0.0, 1.0 }, getTextureCoords( { x + 1, y }, vertexCount ) },
                     { { floats.x - 0.5, floats.y - 0.5, baseElevation + floorLevel.vertices[ y + 1 ][ x ] },     { 0.0, 0.0, 1.0 }, getTextureCoords( { x, y + 1 }, vertexCount ) },
+                    { { floats.x + 0.5, floats.y + 0.5, baseElevation + floorLevel.vertices[ y ][ x + 1 ] },     { 0.0, 0.0, 1.0 }, getTextureCoords( { x + 1, y }, vertexCount ) },
                     { { floats.x + 0.5, floats.y - 0.5, baseElevation + floorLevel.vertices[ y + 1 ][ x + 1 ] }, { 0.0, 0.0, 1.0 }, getTextureCoords( { x + 1, y + 1 }, vertexCount ) }
                   );
                 }
