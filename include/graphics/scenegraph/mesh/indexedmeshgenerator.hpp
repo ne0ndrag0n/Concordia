@@ -75,7 +75,15 @@ namespace BlueBear::Graphics::SceneGraph::Mesh {
     };
 
     std::shared_ptr< MeshDefinition< VertexType > > generateMesh() {
-      return nullptr;
+      // Unroll triangles
+      std::vector< unsigned int > unrolledIndices;
+      for( const auto& triangle : triangles ) {
+        unrolledIndices.push_back( triangle[ 0 ] );
+        unrolledIndices.push_back( triangle[ 1 ] );
+        unrolledIndices.push_back( triangle[ 2 ] );
+      }
+
+      return std::make_shared< MeshDefinition< VertexType > >( vertices, unrolledIndices );
     };
   };
 
