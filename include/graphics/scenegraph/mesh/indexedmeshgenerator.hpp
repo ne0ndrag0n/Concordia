@@ -36,7 +36,42 @@ namespace BlueBear::Graphics::SceneGraph::Mesh {
     };
 
     void generateNormals() {
-      // TODO !!
+      std::vector< glm::vec3 > triangleNormals;
+
+      // Generate the normals for each triangle
+      for( const auto& triangle : triangles ) {
+        triangleNormals.emplace_back(
+          glm::cross(
+            vertices[ triangle[ 1 ] ].position - vertices[ triangle[ 0 ] ].position,
+            vertices[ triangle[ 2 ] ].position - vertices[ triangle[ 0 ] ].position
+          )
+        );
+      }
+
+      // For each vertex, determine what triangles it belongs to and average all their normals
+      for( unsigned int vertexIndex = 0; vertexIndex != vertices.size(); vertexIndex++ ) {
+        std::vector< unsigned int > triangleIndices;
+
+        // Find indices for each triangle this vertex belongs to
+        for( unsigned int triangleIndex = 0; triangleIndex != triangles.size(); triangleIndex++ ) {
+          const auto& triangle = triangles.at( triangleIndex );
+          for( unsigned int triangleVertexIndex : triangle ) {
+            if ( triangleVertexIndex == vertexIndex ) {
+              triangleIndices.emplace_back( triangleIndex );
+              break;
+            }
+          }
+        }
+
+        // Take the normal average of every triangle this vertex belongs to
+        glm::vec3 normalTotal;
+        for( unsigned int triangleIndex : triangleIndices ) {
+          normalTotal += triangleNormals[ triangleIndex ];
+        }
+
+        float numTriangles = triangleIndices.size();
+        vertices.at( vertexIndex ).normal = glm::normalize( normalTotal / numTriangles );
+      }
     };
 
     std::shared_ptr< MeshDefinition< VertexType > > generateMesh() {
