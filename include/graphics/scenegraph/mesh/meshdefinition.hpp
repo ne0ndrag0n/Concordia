@@ -8,6 +8,8 @@
 #include <map>
 #include <functional>
 
+//#include "log.hpp"
+
 namespace BlueBear {
   namespace Graphics {
     class Shader;
@@ -75,6 +77,20 @@ namespace BlueBear {
           MeshDefinition( const std::vector< VertexType >& vertices, const std::vector< GLuint >& indices, bool defer = false ) :
             size( indices.size() ), indexed( true ), drawMethod( std::bind( &MeshDefinition::drawIndexed, this ) ) {
             getDefaultShader = VertexType::getDefaultShader;
+
+            /*
+            for( const auto& vertex : vertices ) {
+              Log::getInstance().debug( "vertex",
+                std::to_string( vertex.position.x ) + " " +
+                std::to_string( vertex.position.y ) + " " +
+                std::to_string( vertex.position.z )
+              );
+            }
+
+            for( unsigned int index : indices ) {
+              Log::getInstance().debug( "index", std::to_string( index ) );
+            }
+            */
 
             if( defer ) {
               deferredVertices = std::make_unique< const std::vector< VertexType > >( vertices );

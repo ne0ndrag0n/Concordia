@@ -43,7 +43,7 @@ namespace BlueBear {
             Mesh::IndexedMeshGenerator< Mesh::TexturedVertex > generator;
             sf::Image meshTexture = generateTexture( floorLevel );
 
-            glm::vec2 vertexCount = { floorLevel.dimensions.x + 1.0, floorLevel.dimensions.y + 1.0 };
+            glm::vec2 vertexCount = { floorLevel.dimensions.x, floorLevel.dimensions.y };
             for( int y = 0; y != floorLevel.dimensions.y; y++ ) {
               for( int x = 0; x != floorLevel.dimensions.x; x++ ) {
                 glm::vec2 floats = { x, y };
@@ -54,13 +54,13 @@ namespace BlueBear {
                   // Clockwise winding direction
                   generator.addTriangle(
                     { { floats.x - 0.5, floats.y - 0.5, baseElevation + floorLevel.vertices[ y + 1 ][ x ] }, { 0.0, 0.0, 1.0 }, getTextureCoords( { x, y + 1 }, vertexCount ) },
-                    { { floats.x - 0.5, floats.y + 0.5, baseElevation + floorLevel.vertices[ y ][ x ] },     { 0.0, 0.0, 1.0 }, getTextureCoords( { x, y }, vertexCount ) },
-                    { { floats.x + 0.5, floats.y + 0.5, baseElevation + floorLevel.vertices[ y ][ x + 1 ] }, { 0.0, 0.0, 1.0 }, getTextureCoords( { x + 1, y }, vertexCount ) }
+                    { { floats.x + 0.5, floats.y + 0.5, baseElevation + floorLevel.vertices[ y ][ x + 1 ] }, { 0.0, 0.0, 1.0 }, getTextureCoords( { x + 1, y }, vertexCount ) },
+                    { { floats.x - 0.5, floats.y + 0.5, baseElevation + floorLevel.vertices[ y ][ x ] },     { 0.0, 0.0, 1.0 }, getTextureCoords( { x, y }, vertexCount ) }
                   );
                   generator.addTriangle(
                     { { floats.x - 0.5, floats.y - 0.5, baseElevation + floorLevel.vertices[ y + 1 ][ x ] },     { 0.0, 0.0, 1.0 }, getTextureCoords( { x, y + 1 }, vertexCount ) },
-                    { { floats.x + 0.5, floats.y + 0.5, baseElevation + floorLevel.vertices[ y ][ x + 1 ] },     { 0.0, 0.0, 1.0 }, getTextureCoords( { x + 1, y }, vertexCount ) },
-                    { { floats.x + 0.5, floats.y - 0.5, baseElevation + floorLevel.vertices[ y + 1 ][ x + 1 ] }, { 0.0, 0.0, 1.0 }, getTextureCoords( { x + 1, y + 1 }, vertexCount ) }
+                    { { floats.x + 0.5, floats.y - 0.5, baseElevation + floorLevel.vertices[ y + 1 ][ x + 1 ] }, { 0.0, 0.0, 1.0 }, getTextureCoords( { x + 1, y + 1 }, vertexCount ) },
+                    { { floats.x + 0.5, floats.y + 0.5, baseElevation + floorLevel.vertices[ y ][ x + 1 ] },     { 0.0, 0.0, 1.0 }, getTextureCoords( { x + 1, y }, vertexCount ) }
                   );
                 }
               }
@@ -74,8 +74,6 @@ namespace BlueBear {
               std::make_shared< Material >( std::vector< std::shared_ptr< Texture > >{ std::make_shared< Texture >( meshTexture ) }, std::vector< std::shared_ptr< Texture > >{}, 0.0f, 1.0f )
             } } );
 
-            glm::vec2 asFloat = { floorLevel.dimensions.x, floorLevel.dimensions.y };
-            result->getLocalTransform().setPosition( { -( asFloat.x / 2.0 ), asFloat.y / 2.0, 0.0 } );
             finalResult->addChild( result );
 
             baseElevation += 10.0f;

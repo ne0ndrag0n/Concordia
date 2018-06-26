@@ -75,6 +75,7 @@ namespace BlueBear {
             Graphics::Camera& getCamera();
             void loadPathsParallel( const std::vector< std::pair< std::string, std::string > >& paths );
             void loadPaths( const std::vector< std::pair< std::string, std::string > >& paths );
+            void insertDirect( const std::shared_ptr< Graphics::SceneGraph::Model >& model );
             void onShaderChange();
             void nextFrame() override;
           };

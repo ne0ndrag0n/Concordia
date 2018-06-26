@@ -1,5 +1,7 @@
 #include "models/infrastructure.hpp"
 #include "tools/utility.hpp"
+#include "graphics/scenegraph/modelloader/floormodelloader.hpp"
+#include "device/display/adapter/component/worldrenderer.hpp"
 #include <vector>
 #include "log.hpp"
 
@@ -79,7 +81,7 @@ namespace BlueBear::Models {
           current.tiles.emplace_back( std::move( tileSet ) );
         }
 
-        const Json::Value& vertices = data[ "vertices" ];
+        const Json::Value& vertices = level[ "vertices" ];
         for( auto it = vertices.begin(); it != vertices.end(); ++it ) {
           const Json::Value& jsonVertices = *it;
           std::vector< float > vertexSet;
@@ -91,6 +93,9 @@ namespace BlueBear::Models {
 
         levels.emplace_back( std::move( current ) );
       }
+
+      Graphics::SceneGraph::ModelLoader::FloorModelLoader floorModelLoader( levels );
+      worldRenderer.insertDirect( floorModelLoader.get() );
     }
   }
 }

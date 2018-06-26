@@ -195,6 +195,10 @@ namespace BlueBear {
             Graphics::SceneGraph::Light::PointLight::sendLightCount();
           }
 
+          void WorldRenderer::insertDirect( const std::shared_ptr< Graphics::SceneGraph::Model >& model ) {
+            models.emplace( ModelRegistration{ "", {}, model } );
+          }
+
           /**
            * TODO: Optimized renderer that sorts by shader to minimize shader changes
            */

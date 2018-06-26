@@ -37,5 +37,6 @@ void main() {
   vec3 diffuse = directionalLight.diffuse * diffTheta * texResult;
   vec3 specular = directionalLight.specular * specTheta * texResult;
 
-  color = vec4( ambient + diffuse + specular, material.opacity );
+  // Very temporary!
+  color = vec4( texResult, material.opacity );
 }
