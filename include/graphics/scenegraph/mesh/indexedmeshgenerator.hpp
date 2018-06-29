@@ -1,6 +1,7 @@
 #ifndef INDEXED_MESH_GENERATOR
 #define INDEXED_MESH_GENERATOR
 
+#include "graphics/scenegraph/mesh/texturemapper/squaretexturemapper.hpp"
 #include "graphics/scenegraph/mesh/meshdefinition.hpp"
 #include <memory>
 #include <vector>
@@ -33,6 +34,12 @@ namespace BlueBear::Graphics::SceneGraph::Mesh {
         insertVertex( v2 ),
         insertVertex( v3 )
       } ) );
+    };
+
+    void generateTextureCoordinates() {
+      TextureMapper::SquareTextureMapper< VertexType > texMapper( vertices );
+
+      texMapper.map();
     };
 
     void generateNormals() {

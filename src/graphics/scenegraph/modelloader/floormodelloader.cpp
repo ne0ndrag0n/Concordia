@@ -53,19 +53,20 @@ namespace BlueBear {
 
                   // Clockwise winding direction
                   generator.addTriangle(
-                    { { floats.x - 0.5, floats.y - 0.5, baseElevation + floorLevel.vertices[ y + 1 ][ x ] }, { 0.0, 0.0, 1.0 }, getTextureCoords( { x, y + 1 }, vertexCount ) },
-                    { { floats.x + 0.5, floats.y + 0.5, baseElevation + floorLevel.vertices[ y ][ x + 1 ] }, { 0.0, 0.0, 1.0 }, getTextureCoords( { x + 1, y }, vertexCount ) },
-                    { { floats.x - 0.5, floats.y + 0.5, baseElevation + floorLevel.vertices[ y ][ x ] },     { 0.0, 0.0, 1.0 }, getTextureCoords( { x, y }, vertexCount ) }
+                    { { floats.x - 0.5, floats.y - 0.5, baseElevation + floorLevel.vertices[ y + 1 ][ x ] }, { 0.0, 0.0, 0.0 }, { 0.0, 0.0 } },
+                    { { floats.x + 0.5, floats.y + 0.5, baseElevation + floorLevel.vertices[ y ][ x + 1 ] }, { 0.0, 0.0, 0.0 }, { 0.0, 0.0 } },
+                    { { floats.x - 0.5, floats.y + 0.5, baseElevation + floorLevel.vertices[ y ][ x ] },     { 0.0, 0.0, 0.0 }, { 0.0, 0.0 } }
                   );
                   generator.addTriangle(
-                    { { floats.x - 0.5, floats.y - 0.5, baseElevation + floorLevel.vertices[ y + 1 ][ x ] },     { 0.0, 0.0, 1.0 }, getTextureCoords( { x, y + 1 }, vertexCount ) },
-                    { { floats.x + 0.5, floats.y - 0.5, baseElevation + floorLevel.vertices[ y + 1 ][ x + 1 ] }, { 0.0, 0.0, 1.0 }, getTextureCoords( { x + 1, y + 1 }, vertexCount ) },
-                    { { floats.x + 0.5, floats.y + 0.5, baseElevation + floorLevel.vertices[ y ][ x + 1 ] },     { 0.0, 0.0, 1.0 }, getTextureCoords( { x + 1, y }, vertexCount ) }
+                    { { floats.x - 0.5, floats.y - 0.5, baseElevation + floorLevel.vertices[ y + 1 ][ x ] },     { 0.0, 0.0, 0.0 }, { 0.0, 0.0 } },
+                    { { floats.x + 0.5, floats.y - 0.5, baseElevation + floorLevel.vertices[ y + 1 ][ x + 1 ] }, { 0.0, 0.0, 0.0 }, { 0.0, 0.0 } },
+                    { { floats.x + 0.5, floats.y + 0.5, baseElevation + floorLevel.vertices[ y ][ x + 1 ] },     { 0.0, 0.0, 0.0 }, { 0.0, 0.0 } }
                   );
                 }
               }
             }
 
+            generator.generateTextureCoordinates();
             generator.generateNormals();
 
             std::shared_ptr< Model > result = Model::create( "__floorlevel", { {
