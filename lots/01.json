@@ -15,17 +15,15 @@
   "infrastructure": {
     "tiles": [
       {
-        "dimensions": [ 3, 3 ],
+        "dimensions": [ 2, 2 ],
         "tiles": [
-          [ "hardwood1", "hardwood1", "hardwood1" ],
-          [ "hardwood1", "hardwood1", "hardwood1" ],
-          [ "hardwood1", "hardwood1", "hardwood1" ]
+          [ "hardwood1", "hardwood1" ],
+          [ "hardwood1", "hardwood2" ]
         ],
         "vertices": [
-          [ 0.0, 0.0, 0.0, 0.0 ],
-          [ 0.0, 0.0, 0.0, 0.0 ],
-          [ 0.0, 0.0, 0.0, 0.0 ],
-          [ 0.0, 0.0, 0.0, 0.0 ]
+          [ 1.0, 0.0, 0.0 ],
+          [ 0.0, 0.0, 0.0 ],
+          [ 0.0, 0.0, 0.0 ]
         ]
       }
     ]

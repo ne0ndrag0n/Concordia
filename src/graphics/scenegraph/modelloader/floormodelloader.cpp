@@ -9,6 +9,8 @@
 #include "configmanager.hpp"
 #include "log.hpp"
 
+#include <glm/gtx/string_cast.hpp>
+
 namespace BlueBear {
   namespace Graphics {
     namespace SceneGraph {
@@ -50,6 +52,21 @@ namespace BlueBear {
 
                 if( floorLevel.tiles[ y ][ x ] ) {
                   meshTexture.copy( *floorLevel.tiles[ y ][ x ]->surface, x * side, y * side );
+
+                  // DEBUG
+                  Log::getInstance().debug(
+                    std::to_string( x ) + " " + std::to_string( y ),
+                    glm::to_string( glm::vec3{ floats.x - 0.5, floats.y - 0.5, baseElevation + floorLevel.vertices[ y + 1 ][ x ] } ) + " " +
+                    glm::to_string( glm::vec3{ floats.x + 0.5, floats.y + 0.5, baseElevation + floorLevel.vertices[ y ][ x + 1 ] } ) + " " +
+                    glm::to_string( glm::vec3{ floats.x - 0.5, floats.y + 0.5, baseElevation + floorLevel.vertices[ y ][ x ] } )
+                  );
+                  Log::getInstance().debug(
+                    std::to_string( x ) + " " + std::to_string( y ),
+                    glm::to_string( glm::vec3{ floats.x - 0.5, floats.y - 0.5, baseElevation + floorLevel.vertices[ y + 1 ][ x ] } ) + " " +
+                    glm::to_string( glm::vec3{ floats.x + 0.5, floats.y - 0.5, baseElevation + floorLevel.vertices[ y + 1 ][ x + 1 ] } ) + " " +
+                    glm::to_string( glm::vec3{ floats.x + 0.5, floats.y + 0.5, baseElevation + floorLevel.vertices[ y ][ x + 1 ] } )
+                  );
+                  // DEBUG
 
                   // Clockwise winding direction
                   generator.addTriangle(
