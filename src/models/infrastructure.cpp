@@ -74,7 +74,10 @@ namespace BlueBear::Models {
                 tileSet.push_back( originalTile->second );
               } else {
                 Log::getInstance().error( "Infrastructure::load", "Tile found in lot but not registered: " + desiredTile );
+                tileSet.emplace_back();
               }
+            } else {
+              tileSet.emplace_back();
             }
           }
 

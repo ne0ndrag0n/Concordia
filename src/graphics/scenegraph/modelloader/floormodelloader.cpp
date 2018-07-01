@@ -9,8 +9,6 @@
 #include "configmanager.hpp"
 #include "log.hpp"
 
-#include <glm/gtx/string_cast.hpp>
-
 namespace BlueBear {
   namespace Graphics {
     namespace SceneGraph {

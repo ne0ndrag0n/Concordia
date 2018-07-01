@@ -15,6 +15,7 @@
 #include <functional>
 #include <memory>
 #include <glm/glm.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 namespace BlueBear {
 	namespace Tools {
@@ -138,6 +139,10 @@ namespace BlueBear {
 				static std::pair< std::string, std::reference_wrapper< const Json::Value > > jsonIteratorToPair( Json::Value::const_iterator it );
 
 				static Json::Value fileToJson( const std::string& path );
+
+				template < typename GLMType > static inline std::string glmToString( const GLMType& type ) {
+					return glm::to_string( type );
+				};
 		};
 	}
 }
