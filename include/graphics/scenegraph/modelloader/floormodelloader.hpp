@@ -30,6 +30,11 @@ namespace BlueBear {
 
           sf::Image generateTexture( const Models::Infrastructure::FloorLevel& currentLevel );
           glm::vec2 getTextureCoords( const glm::vec2& vertexCoord, const glm::vec2& boundaries );
+          float getElevation(
+            const glm::vec2& position,
+            const glm::vec2& max,
+            const std::vector< std::vector< float > >& vertices
+          );
 
         public:
           FloorModelLoader( const std::vector< Models::Infrastructure::FloorLevel >& levels );

@@ -35,6 +35,18 @@ namespace BlueBear {
           };
         }
 
+        float FloorModelLoader::getElevation(
+          const glm::vec2& position,
+          const glm::vec2& max,
+          const std::vector< std::vector< float > >& vertices
+        ) {
+          // min + index = position
+          // -min          -min
+          // index = position - min
+          glm::ivec2 index = ( position - glm::vec2{ -0.5, max.y } ) * glm::vec2{ 1.0, -1.0 };
+          return vertices[ index.y ][ index.x ];
+        }
+
         std::shared_ptr< Model > FloorModelLoader::get() {
           int side = ConfigManager::getInstance().getIntValue( "floor_texture_size" );
           std::shared_ptr< Model > finalResult = Model::create( "__floorrig", {} );
@@ -45,7 +57,7 @@ namespace BlueBear {
             Mesh::IndexedMeshGenerator< Mesh::TexturedVertex > generator;
             sf::Image meshTexture = generateTexture( floorLevel );
 
-            glm::vec2 vertexCount = { floorLevel.dimensions.x, floorLevel.dimensions.y };
+            glm::vec2 max = ( glm::vec2{ floorLevel.dimensions.x - 1, floorLevel.dimensions.y - 1 } + glm::vec2{ 0.5, 0.5 } ) * glm::vec2{ 1.0, 1.0 };
             for( int y = 0; y != floorLevel.dimensions.y; y++ ) {
               for( int x = 0; x != floorLevel.dimensions.x; x++ ) {
                 glm::vec2 floats = { x, y };
@@ -53,31 +65,16 @@ namespace BlueBear {
                 if( floorLevel.tiles[ y ][ x ] ) {
                   meshTexture.copy( *floorLevel.tiles[ y ][ x ]->surface, x * side, y * side );
 
-                  // DEBUG
-                  Log::getInstance().debug(
-                    std::to_string( x ) + " " + std::to_string( y ),
-                    glm::to_string( glm::vec3{ floats.x - 0.5, floats.y - 0.5, baseElevation + floorLevel.vertices[ y + 1 ][ x ] } ) + " " +
-                    glm::to_string( glm::vec3{ floats.x + 0.5, floats.y + 0.5, baseElevation + floorLevel.vertices[ y ][ x + 1 ] } ) + " " +
-                    glm::to_string( glm::vec3{ floats.x - 0.5, floats.y + 0.5, baseElevation + floorLevel.vertices[ y ][ x ] } )
-                  );
-                  Log::getInstance().debug(
-                    std::to_string( x ) + " " + std::to_string( y ),
-                    glm::to_string( glm::vec3{ floats.x - 0.5, floats.y - 0.5, baseElevation + floorLevel.vertices[ y + 1 ][ x ] } ) + " " +
-                    glm::to_string( glm::vec3{ floats.x + 0.5, floats.y - 0.5, baseElevation + floorLevel.vertices[ y + 1 ][ x + 1 ] } ) + " " +
-                    glm::to_string( glm::vec3{ floats.x + 0.5, floats.y + 0.5, baseElevation + floorLevel.vertices[ y ][ x + 1 ] } )
-                  );
-                  // DEBUG
-
                   // Clockwise winding direction
                   generator.addTriangle(
-                    { { floats.x - 0.5, floats.y - 0.5, baseElevation + floorLevel.vertices[ y + 1 ][ x ] }, { 0.0, 0.0, 0.0 }, { 0.0, 0.0 } },
-                    { { floats.x + 0.5, floats.y + 0.5, baseElevation + floorLevel.vertices[ y ][ x + 1 ] }, { 0.0, 0.0, 0.0 }, { 0.0, 0.0 } },
-                    { { floats.x - 0.5, floats.y + 0.5, baseElevation + floorLevel.vertices[ y ][ x ] },     { 0.0, 0.0, 0.0 }, { 0.0, 0.0 } }
+                    { { floats.x - 0.5, floats.y - 0.5, baseElevation + getElevation( { floats.x - 0.5, floats.y - 0.5 }, max, floorLevel.vertices ) }, { 0.0, 0.0, 0.0 }, { 0.0, 0.0 } },
+                    { { floats.x + 0.5, floats.y + 0.5, baseElevation + getElevation( { floats.x + 0.5, floats.y + 0.5 }, max, floorLevel.vertices ) }, { 0.0, 0.0, 0.0 }, { 0.0, 0.0 } },
+                    { { floats.x - 0.5, floats.y + 0.5, baseElevation + getElevation( { floats.x - 0.5, floats.y + 0.5 }, max, floorLevel.vertices ) }, { 0.0, 0.0, 0.0 }, { 0.0, 0.0 } }
                   );
                   generator.addTriangle(
-                    { { floats.x - 0.5, floats.y - 0.5, baseElevation + floorLevel.vertices[ y + 1 ][ x ] },     { 0.0, 0.0, 0.0 }, { 0.0, 0.0 } },
-                    { { floats.x + 0.5, floats.y - 0.5, baseElevation + floorLevel.vertices[ y + 1 ][ x + 1 ] }, { 0.0, 0.0, 0.0 }, { 0.0, 0.0 } },
-                    { { floats.x + 0.5, floats.y + 0.5, baseElevation + floorLevel.vertices[ y ][ x + 1 ] },     { 0.0, 0.0, 0.0 }, { 0.0, 0.0 } }
+                    { { floats.x - 0.5, floats.y - 0.5, baseElevation + getElevation( { floats.x - 0.5, floats.y - 0.5 }, max, floorLevel.vertices ) }, { 0.0, 0.0, 0.0 }, { 0.0, 0.0 } },
+                    { { floats.x + 0.5, floats.y - 0.5, baseElevation + getElevation( { floats.x + 0.5, floats.y - 0.5 }, max, floorLevel.vertices ) }, { 0.0, 0.0, 0.0 }, { 0.0, 0.0 } },
+                    { { floats.x + 0.5, floats.y + 0.5, baseElevation + getElevation( { floats.x + 0.5, floats.y + 0.5 }, max, floorLevel.vertices ) }, { 0.0, 0.0, 0.0 }, { 0.0, 0.0 } }
                   );
                 }
               }
