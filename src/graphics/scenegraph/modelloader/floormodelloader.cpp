@@ -39,7 +39,6 @@ namespace BlueBear {
             glm::vec2 dims = floorLevel.dimensions;
             glm::vec2 origin = { -( dims.x * 0.5 ), dims.y * 0.5 };
             glm::vec2 last = { floorLevel.dimensions.x, floorLevel.dimensions.y };
-            Log::getInstance().debug( "origin", Tools::Utility::glmToString( origin ) );
             for( int y = 0; y != floorLevel.dimensions.y; y++ ) {
               for( int x = 0; x != floorLevel.dimensions.x; x++ ) {
                 glm::vec2 current = { x, y };

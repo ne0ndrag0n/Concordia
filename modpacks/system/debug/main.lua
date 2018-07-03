@@ -59,11 +59,15 @@ local Panel = {
 }
 
 function Panel:init()
-  bluebear.gui.load_stylesheet( { path..'/panel.style' } )
+  bluebear.gui.load_stylesheet( { path..'/panel.style', path..'/window.style' } )
   self.pane = bluebear.gui.load_xml( path..'/panel.xml' )[ 1 ]
   bluebear.gui.root_element:add_child( self.pane )
 
   bluebear.event.register_key( '`', bluebear.util.bind( self.toggle, self ) )
+  bluebear.event.register_key( 'w', function()
+    self.window = bluebear.gui.load_xml( path..'/window.xml' )[ 1 ]
+    bluebear.gui.root_element:add_child( self.window )
+  end )
   self.pane:set_style_property( 'top', -450 )
 
   self.scrollback_bin = self.pane:get_elements_by_class( { '-bb-scrollback-bin' } )[ 1 ]

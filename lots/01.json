@@ -1,6 +1,7 @@
 {
   "registry": {
     "entities": [
+      { "id": "system.debug.debugger" },
       {
         "id": "game.entity.plant",
         "components": {
@@ -14,17 +15,31 @@
   "infrastructure": {
     "tiles": [
       {
-        "dimensions": [ 3, 3 ],
+        "dimensions": [ 10, 10 ],
         "tiles": [
-          [ "hardwood1", "hardwood1", "hardwood1" ],
-          [ "hardwood1", "hardwood1", "hardwood1" ],
-          [ "hardwood1", "hardwood1", "hardwood1" ]
+          [ "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1" ],
+          [ "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1" ],
+          [ "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1" ],
+          [ "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1" ],
+          [ "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1" ],
+          [ "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1" ],
+          [ "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1" ],
+          [ "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1" ],
+          [ "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1" ],
+          [ "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1" ]
         ],
         "vertices": [
-          [ 0.0, 0.0, 0.0, 0.0 ],
-          [ 0.0, 0.0, 0.0, 0.0 ],
-          [ 0.0, 0.0, 0.0, 0.0 ],
-          [ 0.0, 0.0, 0.0, 0.0 ]
+          [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.5 ],
+          [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.5 ],
+          [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.5 ],
+          [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+          [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+          [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+          [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+          [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+          [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+          [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+          [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ]
         ]
       }
     ]
