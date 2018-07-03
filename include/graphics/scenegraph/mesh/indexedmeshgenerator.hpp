@@ -7,6 +7,9 @@
 #include <vector>
 #include <array>
 
+#include "log.hpp"
+#include "tools/utility.hpp"
+
 namespace BlueBear::Graphics::SceneGraph::Mesh {
 
   template< typename VertexType >
