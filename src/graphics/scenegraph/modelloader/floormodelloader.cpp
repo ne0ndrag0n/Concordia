@@ -67,7 +67,6 @@ namespace BlueBear {
               }
             }
 
-            meshTexture.flipHorizontally();
             meshTexture.flipVertically();
             generator.generateNormals();
 
