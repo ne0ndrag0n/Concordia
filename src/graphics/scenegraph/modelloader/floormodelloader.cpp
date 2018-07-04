@@ -29,7 +29,7 @@ namespace BlueBear {
         std::shared_ptr< Model > FloorModelLoader::get() {
           int side = ConfigManager::getInstance().getIntValue( "floor_texture_size" );
           std::shared_ptr< Model > finalResult = Model::create( "__floorrig", {} );
-          std::shared_ptr< Shader > shader = std::make_shared< Shader >( Mesh::TexturedVertex::getDefaultShader().first, Mesh::TexturedVertex::getDefaultShader().second );
+          std::shared_ptr< Shader > shader = std::make_shared< Shader >( "system/shaders/infr/vertex.glsl", "system/shaders/infr/fragment.glsl" );
 
           float baseElevation = 0.0f;
           for( const Models::Infrastructure::FloorLevel& floorLevel : levels ) {

@@ -16,9 +16,9 @@
     "lights": {
       "__sun": {
         "type": "directionalLight",
-        "direction": [ -1.0, 0.0, -0.5 ],
-        "ambient": [ 1.0, 1.0, 1.0 ],
-        "diffuse": [ 0.5, 0.5, 0.5 ],
+        "direction": [ -0.5, 0.0, -0.5 ],
+        "ambient": [ 0.3, 0.3, 0.3 ],
+        "diffuse": [ 1.0, 1.0, 1.0 ],
         "specular": [ 0.1, 0.1, 0.1 ]
       }
     }
