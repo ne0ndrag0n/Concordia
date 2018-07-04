@@ -5,6 +5,7 @@
 #include "graphics/camera.hpp"
 #include "graphics/scenegraph/resourcebank.hpp"
 #include "exceptions/genexc.hpp"
+#include "serializable.hpp"
 #include <tbb/concurrent_unordered_map.h>
 #include <lua.h>
 #include <lualib.h>
@@ -41,7 +42,7 @@ namespace BlueBear {
       namespace Adapter {
         namespace Component {
 
-          class WorldRenderer : public Adapter {
+          class WorldRenderer : public Adapter, public Serializable {
             struct ModelRegistration {
               const std::string originalId;
               const std::set< std::string > instanceClasses;
@@ -64,6 +65,9 @@ namespace BlueBear {
             EXCEPTION_TYPE( ObjectIDNotRegisteredException, "Object ID not registered!" );
             WorldRenderer( Display& display );
             virtual ~WorldRenderer();
+
+            Json::Value save() override;
+            void load( const Json::Value& data ) override;
 
             void submitLuaContributions( sol::state& lua );
 

@@ -12,21 +12,32 @@
       }
     ]
   },
+  "renderer": {
+    "lights": {
+      "__sun": {
+        "type": "directionalLight",
+        "direction": [ -1.0, 0.0, -0.5 ],
+        "ambient": [ 1.0, 1.0, 1.0 ],
+        "diffuse": [ 0.5, 0.5, 0.5 ],
+        "specular": [ 0.1, 0.1, 0.1 ]
+      }
+    }
+  },
   "infrastructure": {
     "tiles": [
       {
         "dimensions": [ 10, 10 ],
         "tiles": [
-          [ "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1" ],
-          [ "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1" ],
-          [ "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1" ],
-          [ "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1" ],
-          [ "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1" ],
-          [ "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1" ],
-          [ "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1" ],
-          [ "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1" ],
-          [ "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1" ],
-          [ "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1", "hardwood1" ]
+          [ "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "hardwood2", "hardwood2" ],
+          [ "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "hardwood2", "hardwood2" ],
+          [ "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass" ],
+          [ "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass" ],
+          [ "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass" ],
+          [ "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass" ],
+          [ "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass" ],
+          [ "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass" ],
+          [ "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass" ],
+          [ "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass" ]
         ],
         "vertices": [
           [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.5 ],
@@ -34,9 +45,9 @@
           [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.5 ],
           [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
           [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
-          [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
-          [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
-          [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+          [ -0.5, -0.5, -0.5, -0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+          [ -0.5, -0.5, -0.5, -0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+          [ -0.5, -0.5, -0.5, -0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
           [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
           [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
           [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ]

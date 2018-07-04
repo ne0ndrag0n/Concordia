@@ -27,18 +27,41 @@ namespace BlueBear {
               Scripting::EntityKit::Components::ModelManager::worldRenderer = this;
               eventManager.LUA_STATE_READY.listen( this, std::bind( &WorldRenderer::submitLuaContributions, this, std::placeholders::_1 ) );
               eventManager.SHADER_CHANGE.listen( this, std::bind( &WorldRenderer::onShaderChange, this ) );
-
-              lights[ "sun" ] = std::make_shared< Graphics::SceneGraph::Light::DirectionalLight >(
-                glm::vec3{ -1.0, 0.0, 0.0 },
-                glm::vec3{ 1.0, 1.0, 1.0 },
-                glm::vec3{ 0.1, 0.1, 0.1 },
-                glm::vec3{ 0.1, 0.1, 0.1 }
-              );
             }
 
           WorldRenderer::~WorldRenderer() {
             eventManager.LUA_STATE_READY.stopListening( this );
             eventManager.SHADER_CHANGE.stopListening( this );
+          }
+
+          Json::Value WorldRenderer::save() {
+
+          }
+
+          void WorldRenderer::load( const Json::Value& data ) {
+            if( data != Json::Value::null ) {
+              // Load lights
+              const Json::Value& savedLights = data[ "lights" ];
+
+              for( auto it = savedLights.begin(); it != savedLights.end(); ++it ) {
+                auto pair = Tools::Utility::jsonIteratorToPair( it );
+                const Json::Value& lightDefinition = pair.second.get();
+
+                switch( Tools::Utility::hash( lightDefinition[ "type" ].asCString() ) ) {
+                  case Tools::Utility::hash( "directionalLight" ): {
+                    lights[ pair.first ] = std::make_shared< Graphics::SceneGraph::Light::DirectionalLight >(
+                      glm::vec3{ lightDefinition[ "direction" ][ 0 ].asDouble(), lightDefinition[ "direction" ][ 1 ].asDouble(), lightDefinition[ "direction" ][ 2 ].asDouble() },
+                      glm::vec3{ lightDefinition[ "ambient" ][ 0 ].asDouble(), lightDefinition[ "ambient" ][ 1 ].asDouble(), lightDefinition[ "ambient" ][ 2 ].asDouble() },
+                      glm::vec3{ lightDefinition[ "diffuse" ][ 0 ].asDouble(), lightDefinition[ "diffuse" ][ 1 ].asDouble(), lightDefinition[ "diffuse" ][ 2 ].asDouble() },
+                      glm::vec3{ lightDefinition[ "specular" ][ 0 ].asDouble(), lightDefinition[ "specular" ][ 1 ].asDouble(), lightDefinition[ "specular" ][ 2 ].asDouble() }
+                    );
+                    break;
+                  }
+                  default:
+                    Log::getInstance().error( "WorldRenderer::load", "Invalid light type specified: " + lightDefinition[ "type" ].asString() + " (valid types are: directionalLight)" );
+                }
+              }
+            }
           }
 
           void WorldRenderer::submitLuaContributions( sol::state& lua ) {

@@ -47,6 +47,7 @@ namespace BlueBear {
       if( data != Json::Value::null ) {
         entityRegistry.load( data[ "registry" ] );
         infrastructure->load( data[ "infrastructure" ] );
+        application.getDisplayDevice().getAdapterAt( RENDER3D_ADAPTER ).as< Device::Display::Adapter::Component::WorldRenderer >().load( data[ "renderer" ] );
       }
     }
 

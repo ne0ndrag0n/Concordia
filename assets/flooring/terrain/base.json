@@ -1,0 +1,7 @@
+{
+  "grass": {
+    "sound": "foliage",
+    "image": "grass.png",
+    "price": 0
+  }
+}
