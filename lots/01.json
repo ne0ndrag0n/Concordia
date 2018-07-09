@@ -51,6 +51,19 @@
           [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
           [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
           [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ]
+        ],
+        "walljoints": [
+          [ null, null, null, null, null, null, null, null, null, null, null ],
+          [ null, { "e": true }, { "w": true }, null, null, null, null, null, null, null, null ],
+          [ null, null, null, null, null, null, null, null, null, null, null ],
+          [ null, null, null, null, null, null, null, null, null, null, null ],
+          [ null, null, null, null, null, null, null, null, null, null, null ],
+          [ null, null, null, null, null, null, null, null, null, null, null ],
+          [ null, null, null, null, null, null, null, null, null, null, null ],
+          [ null, null, null, null, null, null, null, null, null, null, null ],
+          [ null, null, null, null, null, null, null, null, null, null, null ],
+          [ null, null, null, null, null, null, null, null, null, null, null ],
+          [ null, null, null, null, null, null, null, null, null, null, null ]
         ]
       }
     ]

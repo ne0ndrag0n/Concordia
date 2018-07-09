@@ -3,6 +3,7 @@
 
 #include "exceptions/genexc.hpp"
 #include "models/floortile.hpp"
+#include "models/walljoint.hpp"
 #include "serializable.hpp"
 #include <SFML/Graphics/Image.hpp>
 #include <jsoncpp/json/json.h>
@@ -23,6 +24,7 @@ namespace BlueBear::Models {
       glm::uvec2 dimensions;
       std::vector< std::vector< std::optional< FloorTile > > > tiles;
       std::vector< std::vector< float > > vertices;
+      std::vector< std::vector< std::optional< WallJoint > > > wallJoints;
     };
 
   private:
