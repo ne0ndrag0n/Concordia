@@ -2,10 +2,10 @@
 #define INFRASTRUCTURE
 
 #include "exceptions/genexc.hpp"
+#include "models/utilities/worldcache.hpp"
 #include "models/floortile.hpp"
 #include "models/walljoint.hpp"
 #include "serializable.hpp"
-#include <SFML/Graphics/Image.hpp>
 #include <jsoncpp/json/json.h>
 #include <glm/glm.hpp>
 #include <memory>
@@ -31,14 +31,14 @@ namespace BlueBear::Models {
     EXCEPTION_TYPE( InvalidImageException, "Invalid image path!" );
 
     Device::Display::Adapter::Component::WorldRenderer& worldRenderer;
+    Utilities::WorldCache& worldCache;
     std::vector< FloorLevel > levels;
-    std::map< std::string, FloorTile > originalTiles;
-    std::map< std::string, std::shared_ptr< sf::Image > > images;
-
-    std::shared_ptr< sf::Image > loadImage( const std::string& path );
 
   public:
-    Infrastructure( Device::Display::Adapter::Component::WorldRenderer& worldRenderer );
+    Infrastructure(
+      Device::Display::Adapter::Component::WorldRenderer& worldRenderer,
+      Utilities::WorldCache& worldCache
+    );
 
     Json::Value save() override;
     void load( const Json::Value& data ) override;
