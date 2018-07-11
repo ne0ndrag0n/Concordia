@@ -64,6 +64,18 @@
           [ null, null, null, null, null, null, null, null, null, null, null ],
           [ null, null, null, null, null, null, null, null, null, null, null ],
           [ null, null, null, null, null, null, null, null, null, null, null ]
+        ],
+        "wallpaper": [
+          [ null, null, null, null, null, null, null, null, null, null ],
+          [ null, null, null, null, null, null, null, null, null, null ],
+          [ null, null, null, null, null, null, null, null, null, null ],
+          [ null, null, null, null, null, null, null, null, null, null ],
+          [ null, null, null, null, null, null, null, null, null, null ],
+          [ null, null, null, null, null, null, null, null, null, null ],
+          [ null, null, null, null, null, null, null, null, null, null ],
+          [ null, null, null, null, null, null, null, null, null, null ],
+          [ null, null, null, null, null, null, null, null, null, null ],
+          [ null, null, null, null, null, null, null, null, null, null ]
         ]
       }
     ]

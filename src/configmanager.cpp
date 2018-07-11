@@ -36,6 +36,7 @@ namespace BlueBear {
     configRoot[ "key_zoom_in" ] = sf::Keyboard::Add;
     configRoot[ "key_zoom_out" ] = sf::Keyboard::Subtract;
     configRoot[ "floor_texture_size" ] = 48;
+    configRoot[ "wall_texture_size" ] = 48;
 
     // Load settings.json from file
     std::ifstream settingsFile( SETTINGS_PATH );

@@ -1,14 +1,18 @@
 {
   "basic_white": {
     "image": "basic_white.png",
-    "price": 10
+    "price": 10.0
   },
   "star_test": {
     "image": "leftnright.png",
-    "price": 10
+    "price": 10.0
   },
   "fancy": {
-	"image": "fancy.png",
-	"price": 10
+    "image": "fancy.png",
+    "price": 10.0
+  },
+  "drywall": {
+    "image": "drywall.png",
+    "price": 0.0
   }
 }
