@@ -24,7 +24,7 @@ namespace BlueBear::Models {
       glm::uvec2 dimensions;
       std::vector< std::vector< std::optional< FloorTile > > > tiles;
       std::vector< std::vector< float > > vertices;
-      std::vector< std::vector< std::optional< WallJoint > > > wallJoints;
+      std::vector< std::pair< glm::uvec2, glm::uvec2 > > corners;
     };
 
   private:

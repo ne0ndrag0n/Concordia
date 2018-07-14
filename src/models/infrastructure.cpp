@@ -51,25 +51,13 @@ namespace BlueBear::Models {
           current.vertices.emplace_back( std::move( vertexSet ) );
         }
 
-        const Json::Value& joints = level[ "walljoints" ];
-        for( auto it = joints.begin(); it != joints.end(); ++it ) {
-          const Json::Value& jointList = *it;
-          std::vector< std::optional< WallJoint > > jointSet;
-
-          for( auto it = jointList.begin(); it != jointList.end(); ++it ) {
-            if( *it != Json::Value::null ) {
-              jointSet.emplace_back( WallJoint{
-                ( *it )[ "n" ].isBool() && ( *it )[ "n" ].asBool(),
-                ( *it )[ "e" ].isBool() && ( *it )[ "e" ].asBool(),
-                ( *it )[ "s" ].isBool() && ( *it )[ "s" ].asBool(),
-                ( *it )[ "w" ].isBool() && ( *it )[ "w" ].asBool()
-              } );
-            } else {
-              jointSet.emplace_back();
-            }
-          }
-
-          current.wallJoints.emplace_back( std::move( jointSet ) );
+        const Json::Value& corners = level[ "corners" ];
+        for( auto it = corners.begin(); it != corners.end(); ++it ) {
+          const Json::Value& corner = *it;
+          current.corners.emplace_back(
+            glm::uvec2{ corner[ "start" ][ 0 ].asUInt(), corner[ "start" ][ 1 ].asUInt() },
+            glm::uvec2{ corner[ "end"   ][ 0 ].asUInt(), corner[ "end"   ][ 1 ].asUInt() }
+          );
         }
 
         levels.emplace_back( std::move( current ) );

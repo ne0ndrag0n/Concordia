@@ -52,22 +52,12 @@
           [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
           [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ]
         ],
-        "walljoints": [
-          [ null, null, null, null, null, null, null, null, null, null, null ],
-          [ null, { "e": true }, { "w": true }, null, null, null, null, null, null, null, null ],
-          [ null, null, null, null, null, null, null, null, null, null, null ],
-          [ null, null, null, null, null, null, null, null, null, null, null ],
-          [ null, null, null, null, null, null, null, null, null, null, null ],
-          [ null, null, null, null, null, null, null, null, null, null, null ],
-          [ null, null, null, null, null, null, null, null, null, null, null ],
-          [ null, null, null, null, null, null, null, null, null, null, null ],
-          [ null, null, null, null, null, null, null, null, null, null, null ],
-          [ null, null, null, null, null, null, null, null, null, null, null ],
-          [ null, null, null, null, null, null, null, null, null, null, null ]
+        "corners": [
+          { "start": [ 1, 1 ], "end": [ 2, 1 ] }
         ],
         "wallpaper": [
           [ null, null, null, null, null, null, null, null, null, null ],
-          [ null, null, null, null, null, null, null, null, null, null ],
+          [ null, { "h": { "front": "drywall", "back": "drywall" } }, null, null, null, null, null, null, null, null ],
           [ null, null, null, null, null, null, null, null, null, null ],
           [ null, null, null, null, null, null, null, null, null, null ],
           [ null, null, null, null, null, null, null, null, null, null ],

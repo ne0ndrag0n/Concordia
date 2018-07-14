@@ -4,6 +4,7 @@
 #include "graphics/scenegraph/modelloader/proceduralmodelloader.hpp"
 #include "models/infrastructure.hpp"
 #include <SFML/Graphics/Image.hpp>
+#include <glm/glm.hpp>
 #include <vector>
 #include <memory>
 
@@ -14,6 +15,10 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     const std::vector< Models::Infrastructure::FloorLevel >& levels;
 
     sf::Image generateTexture( const Models::Infrastructure::FloorLevel& currentLevel );
+    std::vector< std::vector< Models::WallJoint > > getJointMap(
+      const glm::uvec2& dimensions,
+      const std::vector< std::pair< glm::uvec2, glm::uvec2 > >& corners
+    );
 
   public:
     WallModelLoader( const std::vector< Models::Infrastructure::FloorLevel >& levels );
