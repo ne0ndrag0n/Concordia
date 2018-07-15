@@ -9,10 +9,10 @@ namespace BlueBear::Models {
     bool west = false;
     bool south = false;
 
-    bool isSingleAxis();
-    bool isElbow();
-    bool isCross();
-    bool isFull();
+    bool isSingleAxis() const;
+    bool isElbow() const;
+    bool isCross() const;
+    bool isFull() const;
   };
 
 }
