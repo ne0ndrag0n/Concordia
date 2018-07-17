@@ -17,6 +17,8 @@ namespace BlueBear {
           glm::vec3 normal;
           glm::vec2 textureCoordinates;
 
+          bool operator==( const TexturedVertex& rhs ) const;
+
           static void setupShaderAttributes();
           static std::pair< std::string, std::string > getDefaultShader();
         };

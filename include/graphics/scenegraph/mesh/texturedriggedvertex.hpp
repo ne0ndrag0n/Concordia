@@ -19,6 +19,8 @@ namespace BlueBear {
           glm::ivec4 boneIDs = glm::ivec4( 0, 0, 0, 0 );
           glm::vec4 boneWeights = glm::vec4( 1.0f, 0.0f, 0.0f, 0.0f );
 
+          bool operator==( const TexturedRiggedVertex& rhs ) const;
+
           static void setupShaderAttributes();
           static std::pair< std::string, std::string > getDefaultShader();
         };

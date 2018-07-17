@@ -1,11 +1,20 @@
 #include "graphics/scenegraph/mesh/texturedriggedvertex.hpp"
 #include "graphics/shader.hpp"
+#include "tools/utility.hpp"
 #include <GL/glew.h>
 
 namespace BlueBear {
   namespace Graphics {
     namespace SceneGraph {
       namespace Mesh {
+
+        bool TexturedRiggedVertex::operator==( const TexturedRiggedVertex& rhs ) const {
+          return Tools::Utility::equalEpsilon( position, rhs.position ) &&
+            Tools::Utility::equalEpsilon( normal, rhs.normal ) &&
+            Tools::Utility::equalEpsilon( textureCoordinates, rhs.textureCoordinates ) &&
+            boneIDs == rhs.boneIDs &&
+            Tools::Utility::equalEpsilon( boneWeights, rhs.boneWeights );
+        }
 
         void TexturedRiggedVertex::setupShaderAttributes() {
           glEnableVertexAttribArray( 0 );

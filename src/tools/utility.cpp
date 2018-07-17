@@ -15,6 +15,7 @@
 #include <fstream>
 #include <vector>
 #include <sstream>
+#include <limits>
 
 // Not X-Platform
 #ifndef _WIN32
@@ -512,5 +513,37 @@ namespace BlueBear {
 				return {};
 			}
 		}
+
+		/**
+		 * Shitty, over-complicated floating point comparison that is completely unnecessary for what a game needs
+		 * Original code CC-BY 3.0 from https://floating-point-gui.de/errors/comparison/
+		 * Changes made by ne0ndrag0n
+		 */
+		bool compareFloat( float a, float b, float epsilon = 0.0001f ) {
+			float absA = std::abs( a );
+			float absB = std::abs( b );
+			float diff = std::abs( a - b );
+
+			if( a == b ) {
+				return true;
+			} else if( a == 0.0f || b == 0.0f || diff < std::numeric_limits< float >::min() ) {
+				return diff < ( epsilon * std::numeric_limits< float >::min() );
+			} else {
+				return diff / std::min( ( absA + absB ), std::numeric_limits< float >::max() ) < epsilon;
+			}
+		}
+
+		bool Utility::equalEpsilon( const glm::vec2& a, const glm::vec2& b ) {
+			return compareFloat( a.x, b.x ) && compareFloat( a.y, b.y );
+		}
+
+		bool Utility::equalEpsilon( const glm::vec3& a, const glm::vec3& b ) {
+			return compareFloat( a.x, b.x ) && compareFloat( a.y, b.y ) && compareFloat( a.z, b.z );
+		}
+
+		bool Utility::equalEpsilon( const glm::vec4& a, const glm::vec4& b ) {
+			return compareFloat( a.x, b.x ) && compareFloat( a.y, b.y ) && compareFloat( a.z, b.z ) && compareFloat( a.w, b.w );
+		}
+
 	}
 }

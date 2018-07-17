@@ -1,11 +1,17 @@
 #include "graphics/scenegraph/mesh/basicvertex.hpp"
 #include "graphics/shader.hpp"
+#include "tools/utility.hpp"
 #include <GL/glew.h>
 
 namespace BlueBear {
   namespace Graphics {
     namespace SceneGraph {
       namespace Mesh {
+
+        bool BasicVertex::operator==( const BasicVertex& rhs ) const {
+          return Tools::Utility::equalEpsilon( position, rhs.position ) &&
+            Tools::Utility::equalEpsilon( normal, rhs.normal );
+        }
 
         void BasicVertex::setupShaderAttributes() {
           glEnableVertexAttribArray( 0 );

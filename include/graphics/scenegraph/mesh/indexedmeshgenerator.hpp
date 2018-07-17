@@ -20,7 +20,7 @@ namespace BlueBear::Graphics::SceneGraph::Mesh {
       for( unsigned int i = 0; i != vertices.size(); i++ ) {
         const VertexType& indexedVertex = vertices[ i ];
 
-        if( vertex.position == indexedVertex.position ) {
+        if( vertex == indexedVertex ) {
           return i;
         }
       }

@@ -1,11 +1,19 @@
 #include "graphics/scenegraph/mesh/riggedvertex.hpp"
 #include "graphics/shader.hpp"
+#include "tools/utility.hpp"
 #include <GL/glew.h>
 
 namespace BlueBear {
   namespace Graphics {
     namespace SceneGraph {
       namespace Mesh {
+
+        bool RiggedVertex::operator==( const RiggedVertex& rhs ) const {
+          return Tools::Utility::equalEpsilon( position, rhs.position ) &&
+            Tools::Utility::equalEpsilon( normal, rhs.normal ) &&
+            boneIDs == rhs.boneIDs &&
+            Tools::Utility::equalEpsilon( boneWeights, rhs.boneWeights );
+        }
 
         void RiggedVertex::setupShaderAttributes() {
           glEnableVertexAttribArray( 0 );
