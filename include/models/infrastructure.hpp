@@ -5,6 +5,7 @@
 #include "models/utilities/worldcache.hpp"
 #include "models/floortile.hpp"
 #include "models/walljoint.hpp"
+#include "models/wallpaperregion.hpp"
 #include "serializable.hpp"
 #include <jsoncpp/json/json.h>
 #include <glm/glm.hpp>
@@ -25,6 +26,7 @@ namespace BlueBear::Models {
       std::vector< std::vector< std::optional< FloorTile > > > tiles;
       std::vector< std::vector< float > > vertices;
       std::vector< std::pair< glm::uvec2, glm::uvec2 > > corners;
+      std::vector< std::vector< WallpaperRegion > > wallpapers;
     };
 
   private:

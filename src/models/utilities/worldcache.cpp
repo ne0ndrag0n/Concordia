@@ -87,4 +87,15 @@ namespace BlueBear::Models::Utilities {
     }
   }
 
+  std::optional< Wallpaper > WorldCache::getWallpaper( const std::string& id ) {
+    auto originalWallpaper = originalWallpapers.find( id );
+    if( originalWallpaper != originalWallpapers.end() ) {
+      return originalWallpaper->second;
+    } else {
+      return {};
+    }
+  }
+
+
+
 }

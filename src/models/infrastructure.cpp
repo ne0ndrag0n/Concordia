@@ -60,6 +60,27 @@ namespace BlueBear::Models {
           );
         }
 
+        const Json::Value& wallpaper = level[ "wallpaper" ];
+        for( auto it = wallpaper.begin(); it != wallpaper.end(); ++it ) {
+          const Json::Value& wallpaperArray = *it;
+          std::vector< WallpaperRegion > regionSet;
+
+          for( auto it = wallpaperArray.begin(); it != wallpaperArray.end(); ++it ) {
+            const Json::Value& wallpaperRegion = *it;
+
+            if( wallpaperRegion == Json::Value::null ) {
+              regionSet.emplace_back();
+            } else {
+              WallpaperRegion region;
+              if( wallpaperRegion[ "north" ] != Json::Value::null ) { region.north = worldCache.getWallpaper( wallpaperRegion[ "north" ].asString() ); }
+              if( wallpaperRegion[ "east" ] != Json::Value::null ) { region.east = worldCache.getWallpaper( wallpaperRegion[ "east" ].asString() ); }
+              if( wallpaperRegion[ "west" ] != Json::Value::null ) { region.west = worldCache.getWallpaper( wallpaperRegion[ "west" ].asString() ); }
+              if( wallpaperRegion[ "south" ] != Json::Value::null ) { region.south = worldCache.getWallpaper( wallpaperRegion[ "south" ].asString() ); }
+              regionSet.emplace_back( std::move( region ) );
+            }
+          }
+        }
+
         levels.emplace_back( std::move( current ) );
       }
 
