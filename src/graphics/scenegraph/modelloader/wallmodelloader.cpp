@@ -61,70 +61,78 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     return result;
   }
 
-  WallModelLoader::Face WallModelLoader::generateFace( const glm::vec3& lowerLeftCorner, const glm::vec2& dimensions ) {
-    Face results;
-
-    results[ 0 ] = { { lowerLeftCorner.x,                lowerLeftCorner.y,                 lowerLeftCorner.z                }, { 0.0, 0.0, 0.0 }, { 0.0, 0.0 } };
-    results[ 1 ] = { { lowerLeftCorner.x + dimensions.x, lowerLeftCorner.y + dimensions.y,  lowerLeftCorner.z                }, { 0.0, 0.0, 0.0 }, { 0.0, 0.0 } };
-    results[ 2 ] = { { lowerLeftCorner.x,                lowerLeftCorner.y,                 lowerLeftCorner.z + 4.0          }, { 0.0, 0.0, 0.0 }, { 0.0, 0.0 } };
-
-    results[ 3 ] = { { lowerLeftCorner.x + dimensions.x, lowerLeftCorner.y + dimensions.y,  lowerLeftCorner.z                }, { 0.0, 0.0, 0.0 }, { 0.0, 0.0 } };
-    results[ 4 ] = { { lowerLeftCorner.x + dimensions.x, lowerLeftCorner.y + dimensions.y,  lowerLeftCorner.z + 4.0          }, { 0.0, 0.0, 0.0 }, { 0.0, 0.0 } };
-    results[ 5 ] = { { lowerLeftCorner.x,                lowerLeftCorner.y,                 lowerLeftCorner.z + 4.0          }, { 0.0, 0.0, 0.0 }, { 0.0, 0.0 } };
-
-    return results;
+  WallModelLoader::FaceSet WallModelLoader::getSingleAxisFaceSet( const Models::WallJoint& joint, const glm::vec2& position, WallModelLoader::WallpaperNeighborhood wallpapers, WallModelLoader::VertexNeighborhood vertices ) {
+    if( joint.north ) {
+      // TODO
+    }
   }
 
-  void WallModelLoader::addTrianglesForJoint(
-    Mesh::IndexedMeshGenerator< Mesh::TexturedVertex >& generator,
-    const Models::WallJoint& wallJoint,
-    const glm::vec3& origin
-  ) {
-    if( wallJoint.isSingleAxis() ) {
-      if( wallJoint.east ) {
-        Face southFace = generateFace( { origin.x, origin.y - 0.05f, origin.z }, { 0.5, 0.0 } );
-        generator.addTriangle( southFace[ 0 ], southFace[ 1 ], southFace[ 2 ] );
-        generator.addTriangle( southFace[ 3 ], southFace[ 4 ], southFace[ 5 ] );
+  WallModelLoader::FaceSet WallModelLoader::getFaceSet( const glm::uvec2& position, const Models::Infrastructure::FloorLevel& floorLevel, const JointMap& jointMap ) {
+    const Models::WallJoint& joint = jointMap[ position.y ][ position.x ];
+    const glm::vec2 origin = { ( ( float ) floorLevel.dimensions.x ) * -0.5, ( ( float ) floorLevel.dimensions.y ) * 0.5 };
 
-        Face eastFace = generateFace( { origin.x + 0.5, origin.y - 0.05f, origin.z }, { 0.0, 0.1 } );
-        generator.addTriangle( eastFace[ 0 ], eastFace[ 1 ], eastFace[ 2 ] );
-        generator.addTriangle( eastFace[ 3 ], eastFace[ 4 ], eastFace[ 5 ] );
-
-        Face northFace = generateFace( { origin.x + 0.5, origin.y + 0.05f, origin.z }, { -0.5, 0.0 } );
-        generator.addTriangle( northFace[ 0 ], northFace[ 1 ], northFace[ 2 ] );
-        generator.addTriangle( northFace[ 3 ], northFace[ 4 ], northFace[ 5 ] );
-
-        Face westFace = generateFace( { origin.x, origin.y + 0.05f, origin.z }, { 0.0, -0.1 } );
-        generator.addTriangle( westFace[ 0 ], westFace[ 1 ], westFace[ 2 ] );
-        generator.addTriangle( westFace[ 3 ], westFace[ 4 ], westFace[ 5 ] );
-      }
-
-      if( wallJoint.west ) {
-        Face southFace = generateFace( { origin.x - 0.5f, origin.y - 0.05f, origin.z }, { 0.5, 0.0 } );
-        generator.addTriangle( southFace[ 0 ], southFace[ 1 ], southFace[ 2 ] );
-        generator.addTriangle( southFace[ 3 ], southFace[ 4 ], southFace[ 5 ] );
-
-        Face eastFace = generateFace( { origin.x, origin.y - 0.05f, origin.z }, { 0.0, 0.1 } );
-        generator.addTriangle( eastFace[ 0 ], eastFace[ 1 ], eastFace[ 2 ] );
-        generator.addTriangle( eastFace[ 3 ], eastFace[ 4 ], eastFace[ 5 ] );
-
-        Face northFace = generateFace( { origin.x, origin.y + 0.05f, origin.z }, { -0.5, 0.0 } );
-        generator.addTriangle( northFace[ 0 ], northFace[ 1 ], northFace[ 2 ] );
-        generator.addTriangle( northFace[ 3 ], northFace[ 4 ], northFace[ 5 ] );
-
-        Face westFace = generateFace( { origin.x - 0.5f, origin.y + 0.05f, origin.z }, { 0.0, -0.1 } );
-        generator.addTriangle( westFace[ 0 ], westFace[ 1 ], westFace[ 2 ] );
-        generator.addTriangle( westFace[ 3 ], westFace[ 4 ], westFace[ 5 ] );
-      }
-    } else if( wallJoint.isElbow() ) {
-      Log::getInstance().error( "WallModelLoader::addTrianglesForJoint", "Elbow not yet implemented." );
-    } else if( wallJoint.isCross() ) {
-      Log::getInstance().error( "WallModelLoader::addTrianglesForJoint", "Cross not yet implemented." );
-    } else if( wallJoint.isFull() ){
-      Log::getInstance().error( "WallModelLoader::addTrianglesForJoint", "Full not yet implemented." );
-    } else {
-      // There is nothing to generate
+    if( joint.isSingleAxis() ) {
+      return getSingleAxisFaceSet(
+        joint,
+        glm::vec2{ origin.x + position.x, -( origin.y + position.y ) },
+        getWallpaperNeighborhood( position, floorLevel ),
+        getVertexNeighborhood( position, floorLevel )
+      );
     }
+
+    // TODO
+  }
+
+  static inline bool isValidCoordinate( const glm::ivec2& position, const glm::uvec2& boundary ) {
+    return ( position.x >= 0 && position.y >= 0 ) &&
+      ( position.x < boundary.x && position.y < boundary.y );
+  }
+
+  WallModelLoader::WallpaperNeighborhood WallModelLoader::getWallpaperNeighborhood( glm::ivec2 position, const Models::Infrastructure::FloorLevel& floorLevel ) {
+    WallModelLoader::WallpaperNeighborhood neighborhood;
+
+    // Lower right corner
+    if( isValidCoordinate( position, floorLevel.dimensions ) ) {
+      neighborhood[ 0 ] = floorLevel.wallpapers[ position.y ][ position.x ];
+    }
+    // Lower left corner
+    if( isValidCoordinate( position - glm::ivec2{ 1, 0 }, floorLevel.dimensions ) ) {
+      neighborhood[ 1 ] = floorLevel.wallpapers[ position.y ][ position.x - 1 ];
+    }
+    // Upper left corner
+    if( isValidCoordinate( position - glm::ivec2{ 1, 1 }, floorLevel.dimensions ) ) {
+      neighborhood[ 2 ] = floorLevel.wallpapers[ position.y - 1 ][ position.x - 1 ];
+    }
+    // Upper right corner
+    if( isValidCoordinate( position - glm::ivec2{ 0, 1 }, floorLevel.dimensions ) ) {
+      neighborhood[ 3 ] = floorLevel.wallpapers[ position.y - 1 ][ position.x ];
+    }
+
+    return neighborhood;
+  }
+
+  WallModelLoader::VertexNeighborhood WallModelLoader::getVertexNeighborhood( glm::ivec2 position, const Models::Infrastructure::FloorLevel& floorLevel ) {
+    WallModelLoader::VertexNeighborhood neighborhood;
+
+    glm::uvec2 dimensions = floorLevel.dimensions + glm::uvec2{ 1, 1 };
+    // Lower right corner
+    if( isValidCoordinate( position, dimensions ) ) {
+      neighborhood[ 0 ] = floorLevel.vertices[ position.y ][ position.x ];
+    }
+    // Lower left corner
+    if( isValidCoordinate( position - glm::ivec2{ 1, 0 }, dimensions ) ) {
+      neighborhood[ 1 ] = floorLevel.vertices[ position.y ][ position.x - 1 ];
+    }
+    // Upper left corner
+    if( isValidCoordinate( position - glm::ivec2{ 1, 1 }, dimensions ) ) {
+      neighborhood[ 2 ] = floorLevel.vertices[ position.y - 1 ][ position.x - 1 ];
+    }
+    // Upper right corner
+    if( isValidCoordinate( position - glm::ivec2{ 0, 1 }, dimensions ) ) {
+      neighborhood[ 3 ] = floorLevel.vertices[ position.y - 1 ][ position.x ];
+    }
+
+    return neighborhood;
   }
 
   std::shared_ptr< Model > WallModelLoader::get() {
@@ -133,17 +141,14 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
 
     float baseElevation = 0.0f;
     for( const Models::Infrastructure::FloorLevel& floorLevel : levels ) {
-      std::vector< std::vector< Models::WallJoint > > jointMap = getJointMap( floorLevel.dimensions, floorLevel.corners );
+      JointMap jointMap = getJointMap( floorLevel.dimensions, floorLevel.corners );
 
       Mesh::IndexedMeshGenerator< Mesh::TexturedVertex > generator;
       const glm::uvec2 boundaries = floorLevel.dimensions + glm::uvec2{ 1, 1 };
-      const glm::vec2 origin = {
-        ( ( float ) floorLevel.dimensions.x ) * -0.5,
-        ( ( float ) floorLevel.dimensions.y ) * 0.5
-      };
       for( unsigned int y = 0; y != boundaries.y; y++ ) {
         for( unsigned int x = 0; x != boundaries.x; x++ ) {
-          addTrianglesForJoint( generator, jointMap[ y ][ x ], { origin.x + x, origin.y + y, baseElevation } );
+          FaceSet faceSet = getFaceSet( { x, y }, floorLevel, jointMap );
+          // TODO
         }
       }
     }
