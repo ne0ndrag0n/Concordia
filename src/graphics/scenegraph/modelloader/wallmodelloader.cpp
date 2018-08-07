@@ -61,10 +61,8 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     return result;
   }
 
-  WallModelLoader::FaceSet WallModelLoader::getSingleAxisFaceSet( const Models::WallJoint& joint, const glm::vec2& position, WallModelLoader::WallpaperNeighborhood wallpapers, WallModelLoader::VertexNeighborhood vertices ) {
-    if( joint.north ) {
-      // TODO
-    }
+  WallModelLoader::FaceSet WallModelLoader::getSingleAxisFaceSet( const Models::WallJoint& joint, const glm::vec3& position, WallModelLoader::WallpaperNeighborhood wallpapers, WallModelLoader::VertexNeighborhood vertices ) {
+    // TODO
   }
 
   WallModelLoader::FaceSet WallModelLoader::getFaceSet( const glm::uvec2& position, const Models::Infrastructure::FloorLevel& floorLevel, const JointMap& jointMap ) {
@@ -74,7 +72,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     if( joint.isSingleAxis() ) {
       return getSingleAxisFaceSet(
         joint,
-        glm::vec2{ origin.x + position.x, -( origin.y + position.y ) },
+        glm::vec3{ origin.x + position.x, origin.y + position.y, floorLevel.vertices[ position.y ][ position.x ] },
         getWallpaperNeighborhood( position, floorLevel ),
         getVertexNeighborhood( position, floorLevel )
       );
@@ -115,19 +113,20 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     WallModelLoader::VertexNeighborhood neighborhood;
 
     glm::uvec2 dimensions = floorLevel.dimensions + glm::uvec2{ 1, 1 };
-    // Lower right corner
-    if( isValidCoordinate( position, dimensions ) ) {
-      neighborhood[ 0 ] = floorLevel.vertices[ position.y ][ position.x ];
+
+    // Right
+    if( isValidCoordinate( position + glm::ivec2{ 1, 0 }, dimensions ) ) {
+      neighborhood[ 0 ] = floorLevel.vertices[ position.y ][ position.x + 1 ];
     }
-    // Lower left corner
+    // Bottom
+    if( isValidCoordinate( position + glm::ivec2{ 0, 1 }, dimensions ) ) {
+      neighborhood[ 1 ] = floorLevel.vertices[ position.y + 1 ][ position.x ];
+    }
+    // Left
     if( isValidCoordinate( position - glm::ivec2{ 1, 0 }, dimensions ) ) {
-      neighborhood[ 1 ] = floorLevel.vertices[ position.y ][ position.x - 1 ];
+      neighborhood[ 2 ] = floorLevel.vertices[ position.y ][ position.x - 1 ];
     }
-    // Upper left corner
-    if( isValidCoordinate( position - glm::ivec2{ 1, 1 }, dimensions ) ) {
-      neighborhood[ 2 ] = floorLevel.vertices[ position.y - 1 ][ position.x - 1 ];
-    }
-    // Upper right corner
+    // Top
     if( isValidCoordinate( position - glm::ivec2{ 0, 1 }, dimensions ) ) {
       neighborhood[ 3 ] = floorLevel.vertices[ position.y - 1 ][ position.x ];
     }
@@ -148,7 +147,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
       for( unsigned int y = 0; y != boundaries.y; y++ ) {
         for( unsigned int x = 0; x != boundaries.x; x++ ) {
           FaceSet faceSet = getFaceSet( { x, y }, floorLevel, jointMap );
-          // TODO
+          // TODO: Unroll faces into generator
         }
       }
     }
