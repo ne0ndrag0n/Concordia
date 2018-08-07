@@ -27,7 +27,7 @@ namespace BlueBear::Graphics::Utilities {
 
   void TextureAtlas::addTexture( const std::string& id, std::shared_ptr< sf::Image > image ) {
     if( getPairById( id ) ) {
-      Log::getInstance().warn( "TextureAtlas::addTexture", "Texture with id " + id + " already belongs to this texture atlas." );
+      Log::getInstance().debug( "TextureAtlas::addTexture", "Texture with id " + id + " already belongs to this texture atlas." );
       return;
     }
 

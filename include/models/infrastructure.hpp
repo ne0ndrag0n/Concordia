@@ -1,6 +1,7 @@
 #ifndef INFRASTRUCTURE
 #define INFRASTRUCTURE
 
+#include "graphics/utilities/textureatlas.hpp"
 #include "exceptions/genexc.hpp"
 #include "models/utilities/worldcache.hpp"
 #include "models/floortile.hpp"
@@ -27,6 +28,7 @@ namespace BlueBear::Models {
       std::vector< std::vector< float > > vertices;
       std::vector< std::pair< glm::uvec2, glm::uvec2 > > corners;
       std::vector< std::vector< WallpaperRegion > > wallpapers;
+      Graphics::Utilities::TextureAtlas textureAtlas;
     };
 
   private:

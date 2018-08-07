@@ -57,7 +57,7 @@
         ],
         "wallpaper": [
           [ null, null, null, null, null, null, null, null, null, null ],
-          [ null, { "north": "drywall", "south": "drywall" }, null, null, null, null, null, null, null, null ],
+          [ null, { "north": "fancy", "south": "drywall" }, null, null, null, null, null, null, null, null ],
           [ null, null, null, null, null, null, null, null, null, null ],
           [ null, null, null, null, null, null, null, null, null, null ],
           [ null, null, null, null, null, null, null, null, null, null ],

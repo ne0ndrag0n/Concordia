@@ -72,10 +72,26 @@ namespace BlueBear::Models {
               regionSet.emplace_back();
             } else {
               WallpaperRegion region;
-              if( wallpaperRegion[ "north" ] != Json::Value::null ) { region.north = worldCache.getWallpaper( wallpaperRegion[ "north" ].asString() ); }
-              if( wallpaperRegion[ "east" ] != Json::Value::null ) { region.east = worldCache.getWallpaper( wallpaperRegion[ "east" ].asString() ); }
-              if( wallpaperRegion[ "west" ] != Json::Value::null ) { region.west = worldCache.getWallpaper( wallpaperRegion[ "west" ].asString() ); }
-              if( wallpaperRegion[ "south" ] != Json::Value::null ) { region.south = worldCache.getWallpaper( wallpaperRegion[ "south" ].asString() ); }
+              if( wallpaperRegion[ "north" ] != Json::Value::null ) {
+                const std::string& title = wallpaperRegion[ "north" ].asString();
+                region.north = worldCache.getWallpaper( title );
+                current.textureAtlas.addTexture( title, region.north->surface );
+              }
+              if( wallpaperRegion[ "east" ] != Json::Value::null ) {
+                const std::string& title = wallpaperRegion[ "east" ].asString();
+                region.east = worldCache.getWallpaper( title );
+                current.textureAtlas.addTexture( title, region.east->surface );
+              }
+              if( wallpaperRegion[ "west" ] != Json::Value::null ) {
+                const std::string& title = wallpaperRegion[ "west" ].asString();
+                region.west = worldCache.getWallpaper( title );
+                current.textureAtlas.addTexture( title, region.west->surface );
+              }
+              if( wallpaperRegion[ "south" ] != Json::Value::null ) {
+                const std::string& title = wallpaperRegion[ "south" ].asString();
+                region.south = worldCache.getWallpaper( title );
+                current.textureAtlas.addTexture( title, region.south->surface );
+              }
               regionSet.emplace_back( std::move( region ) );
             }
           }
