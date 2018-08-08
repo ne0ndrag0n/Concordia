@@ -1,6 +1,7 @@
 #ifndef TEXTURE_ATLAS
 #define TEXTURE_ATLAS
 
+#include "exceptions/genexc.hpp"
 #include <SFML/Graphics/Image.hpp>
 #include <glm/glm.hpp>
 #include <optional>
@@ -18,6 +19,8 @@ namespace BlueBear::Graphics::Utilities {
     glm::uvec2 computeTotalDimensions();
 
   public:
+    EXCEPTION_TYPE( IdNotFoundException, "Texture id not found in atlas!" );
+
     struct TextureData {
       glm::vec2 lowerCorner;
       glm::vec2 upperCorner;

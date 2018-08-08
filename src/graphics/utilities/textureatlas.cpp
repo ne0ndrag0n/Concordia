@@ -37,7 +37,7 @@ namespace BlueBear::Graphics::Utilities {
   TextureAtlas::TextureData TextureAtlas::getTextureData( const std::string& id ) {
     if( !getPairById( id ) ) {
       Log::getInstance().warn( "TextureAtlas::getTextureData", "Could not find texture id " + id + " in this atlas!" );
-      return {};
+      throw IdNotFoundException();
     }
 
     glm::uvec2 totalDimensions = computeTotalDimensions();
