@@ -163,7 +163,7 @@ namespace BlueBear {
         nvgResetScissor( context );
       }
 
-      void Renderer::renderCurrentTexture( std::function< void( Renderer& ) > functor ) {
+      void Renderer::render( std::function< void( Renderer& ) > frameFunctor, std::function< void() > postFunctor ) {
         checkTexture();
 
         glEnable( GL_STENCIL_TEST );
@@ -175,15 +175,19 @@ namespace BlueBear {
           glClear( GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
 
           nvgBeginFrame( context, currentTexture->dimensions.x, currentTexture->dimensions.y, 1.0f );
-            functor( *this );
+            frameFunctor( *this );
           nvgEndFrame( context );
+
+          if( postFunctor ) {
+            postFunctor();
+          }
         nvgluBindFramebuffer( nullptr );
       }
 
       std::shared_ptr< Renderer::Texture > Renderer::createTexture( const glm::uvec2& dimensions, std::function< void( Renderer& ) > functor ) {
         device.executeOnSecondaryContext( secondaryGLContext, [ & ]() {
           currentTexture = std::make_shared< Renderer::Texture >( *this, dimensions );
-          renderCurrentTexture( functor );
+          render( functor );
         } );
 
         auto copy = currentTexture;
@@ -194,10 +198,24 @@ namespace BlueBear {
       void Renderer::updateExistingTexture( std::shared_ptr< Renderer::Texture > texture, std::function< void( Renderer& ) > functor ) {
         device.executeOnSecondaryContext( secondaryGLContext, [ & ]() {
           currentTexture = texture;
-          renderCurrentTexture( functor );
+          render( functor );
         } );
 
         currentTexture = nullptr;
+      }
+
+      std::shared_ptr< unsigned char[] > Renderer::generateBitmap( const glm::uvec2& dimensions, std::function< void( Renderer& ) > functor ) {
+        unsigned char* array = new unsigned char[ ( dimensions.x * dimensions.y ) * 4 ];
+
+        device.executeOnSecondaryContext( secondaryGLContext, [ & ]() {
+          currentTexture = std::make_shared< Renderer::Texture >( *this, dimensions );
+          render( functor, [ & ]() {
+            glReadBuffer( GL_COLOR_ATTACHMENT0 );
+            glReadPixels( 0, 0, dimensions.x, dimensions.y, GL_RGBA, GL_UNSIGNED_BYTE, array );
+          } );
+        } );
+
+        return std::shared_ptr< unsigned char[] >( array );
       }
 
       Renderer::Texture::Texture( Renderer& renderer, const glm::uvec2& dimensions ) : parent( renderer ), dimensions( dimensions ) {

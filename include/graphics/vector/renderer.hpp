@@ -66,7 +66,7 @@ namespace BlueBear {
 
         void checkTexture();
         void loadFonts();
-        void renderCurrentTexture( std::function< void( Renderer& ) > functor );
+        void render( std::function< void( Renderer& ) > frameFunctor, std::function< void() > postFunctor = {} );
 
       public:
         Renderer( Device::Display::Display& device );
@@ -85,14 +85,9 @@ namespace BlueBear {
         void drawRadialGradient( const glm::uvec2& origin, float innerRadius, float outerRadius, const glm::uvec4& innerColor, const glm::uvec4& outerColor );
         void drawScissored( const glm::uvec4& scissorRegion, std::function< void() > callback );
 
-        std::shared_ptr< Renderer::Texture > createTexture(
-          const glm::uvec2& dimensions,
-          std::function< void( Renderer& ) > functor
-        );
-        void updateExistingTexture(
-          std::shared_ptr< Renderer::Texture > texture,
-          std::function< void( Renderer& ) > functor
-        );
+        std::shared_ptr< Renderer::Texture > createTexture( const glm::uvec2& dimensions, std::function< void( Renderer& ) > functor );
+        void updateExistingTexture( std::shared_ptr< Renderer::Texture > texture, std::function< void( Renderer& ) > functor );
+        std::shared_ptr< unsigned char[] > generateBitmap( const glm::uvec2& dimensions, std::function< void( Renderer& ) > functor );
       };
 
     }
