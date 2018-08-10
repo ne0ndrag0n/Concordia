@@ -58,8 +58,8 @@ namespace BlueBear {
         return dimensions;
       }
 
-      Adapter::Adapter& Display::pushAdapter( std::unique_ptr< Adapter::Adapter > adapter ) {
-        return *adapters.emplace_back( std::move( adapter ) );
+      Adapter::Adapter& Display::pushAdapter( Adapter::Adapter* adapter ) {
+        return *adapters.emplace_back( adapter );
       }
 
       Adapter::Adapter& Display::getAdapterAt( unsigned int index ) {
@@ -91,7 +91,7 @@ namespace BlueBear {
         glClearColor( 0.1f, 0.1f, 0.1f, 1.0f );
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-        for( std::unique_ptr< Adapter::Adapter >& adapter : adapters ) {
+        for( Adapter::Adapter* adapter : adapters ) {
           if( adapter ) {
             adapter->nextFrame();
           }

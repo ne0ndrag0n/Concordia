@@ -2,6 +2,8 @@
 #define MAIN_GAME_STATE
 
 #include "state/state.hpp"
+#include "device/display/adapter/component/worldrenderer.hpp"
+#include "device/display/adapter/component/guicomponent.hpp"
 #include "scripting/coreengine.hpp"
 #include "scripting/luakit/eventhelper.hpp"
 #include "scripting/entitykit/registry.hpp"
@@ -25,16 +27,15 @@ namespace BlueBear {
   namespace State {
 
     class HouseholdGameplayState : public State, public Serializable {
-      static const unsigned int RENDER3D_ADAPTER = 0;
-      static const unsigned int GUI_ADAPTER = 1;
-
+      Device::Display::Adapter::Component::WorldRenderer worldRenderer;
+      Device::Display::Adapter::Component::GuiComponent guiComponent;
       Scripting::CoreEngine engine;
       Scripting::LuaKit::EventHelper luaEventHelper;
       Scripting::EntityKit::Registry entityRegistry;
       Device::Input::Input::KeyGroup keyGroup;
       Models::Utilities::WorldCache worldCache;
-      std::optional< Models::World > world;
-      std::optional< Models::Infrastructure > infrastructure;
+      Models::World world;
+      Models::Infrastructure infrastructure;
 
       void setupDisplayDevice();
       void setupInputDevice();

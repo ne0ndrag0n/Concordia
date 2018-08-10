@@ -19,7 +19,9 @@ namespace BlueBear {
       class Display {
         sf::RenderWindow window;
         const glm::uvec2 dimensions;
-        std::vector< std::unique_ptr< Adapter::Adapter > > adapters;
+        // Device::Display::Display doesn't own the adapters!!
+        // These objects are owned by the associated state objects
+        std::vector< Adapter::Adapter* > adapters;
 
       public:
         Display();
@@ -28,7 +30,7 @@ namespace BlueBear {
         sf::ContextSettings getDefaultContextSettings() const;
         sf::RenderWindow& getRenderWindow();
         const glm::uvec2& getDimensions() const;
-        Adapter::Adapter& pushAdapter( std::unique_ptr< Adapter::Adapter > adapter );
+        Adapter::Adapter& pushAdapter( Adapter::Adapter* adapter );
         Adapter::Adapter& getAdapterAt( unsigned int index );
         void executeOnSecondaryContext( std::function< void() > closure );
         void executeOnSecondaryContext( sf::Context& context, std::function< void() > closure );

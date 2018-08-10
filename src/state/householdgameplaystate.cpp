@@ -4,8 +4,6 @@
 #include "scripting/luastate.hpp"
 #include "configmanager.hpp"
 #include "eventmanager.hpp"
-#include "device/display/adapter/component/worldrenderer.hpp"
-#include "device/display/adapter/component/guicomponent.hpp"
 #include "graphics/scenegraph/animation/animator.hpp"
 #include "tools/utility.hpp"
 #include <SFML/Window/Keyboard.hpp>
@@ -22,7 +20,15 @@
 namespace BlueBear {
   namespace State {
 
-    HouseholdGameplayState::HouseholdGameplayState( Application& application, const std::string& path ) : State::State( application ), engine( *this ), luaEventHelper( engine ) {
+    HouseholdGameplayState::HouseholdGameplayState( Application& application, const std::string& path ) :
+      State::State( application ),
+      worldRenderer( application.getDisplayDevice() ),
+      guiComponent( application.getDisplayDevice() ),
+      engine( *this ),
+      luaEventHelper( engine ),
+      world( worldRenderer ),
+      infrastructure( worldRenderer, worldCache )
+    {
       setupDisplayDevice();
       setupInputDevice();
 
@@ -46,23 +52,16 @@ namespace BlueBear {
     void HouseholdGameplayState::load( const Json::Value& data ) {
       if( data != Json::Value::null ) {
         entityRegistry.load( data[ "registry" ] );
-        infrastructure->load( data[ "infrastructure" ] );
-        application.getDisplayDevice().getAdapterAt( RENDER3D_ADAPTER ).as< Device::Display::Adapter::Component::WorldRenderer >().load( data[ "renderer" ] );
+        infrastructure.load( data[ "infrastructure" ] );
+        worldRenderer.load( data[ "renderer" ] );
       }
     }
 
     void HouseholdGameplayState::setupDisplayDevice() {
-      Device::Display::Adapter::Component::WorldRenderer& adapter = application
-        .getDisplayDevice()
-        .pushAdapter( std::make_unique< Device::Display::Adapter::Component::WorldRenderer >( application.getDisplayDevice() ) )
-        .as< Device::Display::Adapter::Component::WorldRenderer >();
+      application.getDisplayDevice().pushAdapter( &worldRenderer );
+      application.getDisplayDevice().pushAdapter( &guiComponent );
 
-      world.emplace( adapter );
-      infrastructure.emplace( adapter, worldCache );
-
-      application.getDisplayDevice().pushAdapter( std::make_unique< Device::Display::Adapter::Component::GuiComponent >( application.getDisplayDevice() ) );
-
-      adapter.getCamera().setRotationDirect( 0 );
+      worldRenderer.getCamera().setRotationDirect( 0 );
     }
 
     void HouseholdGameplayState::setupInputDevice() {
@@ -76,7 +75,7 @@ namespace BlueBear {
       sf::Keyboard::Key KEY_ZOOM_IN = ( sf::Keyboard::Key ) ConfigManager::getInstance().getIntValue( "key_zoom_in" );
       sf::Keyboard::Key KEY_ZOOM_OUT = ( sf::Keyboard::Key ) ConfigManager::getInstance().getIntValue( "key_zoom_out" );
 
-      Graphics::Camera& camera = application.getDisplayDevice().getAdapterAt( RENDER3D_ADAPTER ).as< Device::Display::Adapter::Component::WorldRenderer >().getCamera();
+      Graphics::Camera& camera = worldRenderer.getCamera();
       keyGroup.registerSystemKey( Device::Input::Input::keyToString( KEY_ROTATE_RIGHT ), std::bind( &Graphics::Camera::rotateRight, &camera ) );
       keyGroup.registerSystemKey( Device::Input::Input::keyToString( KEY_ROTATE_LEFT ), std::bind( &Graphics::Camera::rotateLeft, &camera ) );
       keyGroup.registerSystemKey( Device::Input::Input::keyToString( KEY_UP ), std::bind( &Graphics::Camera::move, &camera, 0.0f, -0.1f, 0.0f ) );
@@ -91,46 +90,26 @@ namespace BlueBear {
       // NOTE: GUIComponent must capture events before WorldRenderer does in case it needs to eat the event using event.cancelAll()
       inputManager.registerInputEvent(
         sf::Event::KeyPressed,
-        std::bind(
-          &Device::Display::Adapter::Component::GuiComponent::keyPressed,
-          &application.getDisplayDevice().getAdapterAt( GUI_ADAPTER ).as< Device::Display::Adapter::Component::GuiComponent >(),
-          std::placeholders::_1
-        )
+        std::bind( &Device::Display::Adapter::Component::GuiComponent::keyPressed, &guiComponent, std::placeholders::_1 )
       );
       inputManager.registerInputEvent(
         sf::Event::KeyReleased,
-        std::bind(
-          &Device::Display::Adapter::Component::GuiComponent::keyReleased,
-          &application.getDisplayDevice().getAdapterAt( GUI_ADAPTER ).as< Device::Display::Adapter::Component::GuiComponent >(),
-          std::placeholders::_1
-        )
+        std::bind( &Device::Display::Adapter::Component::GuiComponent::keyReleased, &guiComponent, std::placeholders::_1 )
       );
       inputManager.registerInputEvent( sf::Event::KeyPressed, [ & ]( Device::Input::Metadata metadata ) {
         keyGroup.trigger( metadata.keyPressed );
       } );
       inputManager.registerInputEvent(
         sf::Event::MouseButtonPressed,
-        std::bind(
-          &Device::Display::Adapter::Component::GuiComponent::mousePressed,
-          &application.getDisplayDevice().getAdapterAt( GUI_ADAPTER ).as< Device::Display::Adapter::Component::GuiComponent >(),
-          std::placeholders::_1
-        )
+        std::bind( &Device::Display::Adapter::Component::GuiComponent::mousePressed, &guiComponent, std::placeholders::_1 )
       );
       inputManager.registerInputEvent(
         sf::Event::MouseButtonReleased,
-        std::bind(
-          &Device::Display::Adapter::Component::GuiComponent::mouseReleased,
-          &application.getDisplayDevice().getAdapterAt( GUI_ADAPTER ).as< Device::Display::Adapter::Component::GuiComponent >(),
-          std::placeholders::_1
-        )
+        std::bind( &Device::Display::Adapter::Component::GuiComponent::mouseReleased, &guiComponent, std::placeholders::_1 )
       );
       inputManager.registerInputEvent(
         sf::Event::MouseMoved,
-        std::bind(
-          &Device::Display::Adapter::Component::GuiComponent::mouseMoved,
-          &application.getDisplayDevice().getAdapterAt( GUI_ADAPTER ).as< Device::Display::Adapter::Component::GuiComponent >(),
-          std::placeholders::_1
-        )
+        std::bind( &Device::Display::Adapter::Component::GuiComponent::mouseMoved, &guiComponent, std::placeholders::_1 )
       );
 
       luaEventHelper.connectInputDevice( inputManager );
