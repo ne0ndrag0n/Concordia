@@ -2,15 +2,17 @@
 #define WALLPAPER_REGION
 
 #include "models/wallpaper.hpp"
+#include <utility>
+#include <string>
 #include <optional>
 
 namespace BlueBear::Models {
 
   struct WallpaperRegion {
-    std::optional< Wallpaper > north;
-    std::optional< Wallpaper > east;
-    std::optional< Wallpaper > west;
-    std::optional< Wallpaper > south;
+    std::pair< std::string, std::optional< Wallpaper > > north;
+    std::pair< std::string, std::optional< Wallpaper > > east;
+    std::pair< std::string, std::optional< Wallpaper > > west;
+    std::pair< std::string, std::optional< Wallpaper > > south;
   };
 
 }

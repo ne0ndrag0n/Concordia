@@ -29,10 +29,13 @@ namespace BlueBear {
     class HouseholdGameplayState : public State, public Serializable {
       Device::Display::Adapter::Component::WorldRenderer worldRenderer;
       Device::Display::Adapter::Component::GuiComponent guiComponent;
+
       Scripting::CoreEngine engine;
       Scripting::LuaKit::EventHelper luaEventHelper;
       Scripting::EntityKit::Registry entityRegistry;
+
       Device::Input::Input::KeyGroup keyGroup;
+
       Models::Utilities::WorldCache worldCache;
       Models::World world;
       Models::Infrastructure infrastructure;

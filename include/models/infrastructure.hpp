@@ -17,6 +17,7 @@
 #include <map>
 
 namespace BlueBear::Device::Display::Adapter::Component{ class WorldRenderer; }
+namespace BlueBear::Graphics::Vector{ class Renderer; }
 namespace BlueBear::Graphics::SceneGraph{ class Model; }
 namespace BlueBear::Models {
 
@@ -34,18 +35,17 @@ namespace BlueBear::Models {
   private:
     EXCEPTION_TYPE( InvalidImageException, "Invalid image path!" );
 
-    Device::Display::Adapter::Component::WorldRenderer& worldRenderer;
-    Utilities::WorldCache& worldCache;
     std::vector< FloorLevel > levels;
 
   public:
-    Infrastructure(
-      Device::Display::Adapter::Component::WorldRenderer& worldRenderer,
-      Utilities::WorldCache& worldCache
-    );
-
     Json::Value save() override;
     void load( const Json::Value& data ) override;
+    void load(
+      const Json::Value& data,
+      Device::Display::Adapter::Component::WorldRenderer& worldRenderer,
+      Graphics::Vector::Renderer& renderer,
+      Utilities::WorldCache& worldCache
+    );
   };
 
 }
