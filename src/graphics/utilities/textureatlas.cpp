@@ -53,7 +53,7 @@ namespace BlueBear::Graphics::Utilities {
         textureData.lowerCorner = glm::vec2{ ( ( float ) currentIndex ) / totalDimensions.x, 0.0f };
         textureData.upperCorner = glm::vec2{
           ( ( ( float ) currentIndex ) + size.x ) / totalDimensions.x,
-          ( size.y / totalDimensions.y )
+          ( ( float ) size.y / totalDimensions.y )
         };
 
         return textureData;

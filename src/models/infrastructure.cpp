@@ -109,22 +109,6 @@ namespace BlueBear::Models {
           }
         }
 
-        /*
-        current.textureAtlas.generateAtlas()->saveToFile( "test.png" );
-        {
-          auto data = current.textureAtlas.getTextureData( "__inside_wall" );
-          Log::getInstance().debug( "__inside_wall", Tools::Utility::glmToString( data.lowerCorner ) + ", " + Tools::Utility::glmToString( data.upperCorner ) );
-        }
-        {
-          auto data = current.textureAtlas.getTextureData( "fancy" );
-          Log::getInstance().debug( "fancy", Tools::Utility::glmToString( data.lowerCorner ) + ", " + Tools::Utility::glmToString( data.upperCorner ) );
-        }
-        {
-          auto data = current.textureAtlas.getTextureData( "drywall" );
-          Log::getInstance().debug( "drywall", Tools::Utility::glmToString( data.lowerCorner ) + ", " + Tools::Utility::glmToString( data.upperCorner ) );
-        }
-        */
-
         levels.emplace_back( std::move( current ) );
       }
 
