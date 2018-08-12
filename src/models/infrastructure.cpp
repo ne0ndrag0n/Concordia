@@ -8,6 +8,17 @@
 
 namespace BlueBear::Models {
 
+  std::shared_ptr< sf::Image > getDefaults( Graphics::Vector::Renderer& renderer ) {
+    std::shared_ptr< sf::Image > result = std::make_shared< sf::Image >();
+    std::shared_ptr< unsigned char[] > bitmap = renderer.generateBitmap( { 1, 10 }, [ & ]( Graphics::Vector::Renderer& renderer ) {
+      renderer.drawRect( { 0, 0, 1, 10 }, { 128, 64, 0, 255 } );
+    } );
+
+    result->create( 1, 10, bitmap.get() );
+
+    return result;
+  }
+
   Json::Value Infrastructure::save() {
 
   }
@@ -19,6 +30,8 @@ namespace BlueBear::Models {
         const Json::Value& level = *it;
         FloorLevel current;
         current.dimensions = { level[ "dimensions" ][ 0 ].asUInt(), level[ "dimensions" ][ 1 ].asUInt() };
+        // Get rendering for the inside of walls
+        current.textureAtlas.addTexture( "__inside_wall", getDefaults( renderer ) );
 
         const Json::Value& innerTiles = level[ "tiles" ];
         for( auto it = innerTiles.begin(); it != innerTiles.end(); ++it ) {
@@ -95,6 +108,22 @@ namespace BlueBear::Models {
             }
           }
         }
+
+        /*
+        current.textureAtlas.generateAtlas()->saveToFile( "test.png" );
+        {
+          auto data = current.textureAtlas.getTextureData( "__inside_wall" );
+          Log::getInstance().debug( "__inside_wall", Tools::Utility::glmToString( data.lowerCorner ) + ", " + Tools::Utility::glmToString( data.upperCorner ) );
+        }
+        {
+          auto data = current.textureAtlas.getTextureData( "fancy" );
+          Log::getInstance().debug( "fancy", Tools::Utility::glmToString( data.lowerCorner ) + ", " + Tools::Utility::glmToString( data.upperCorner ) );
+        }
+        {
+          auto data = current.textureAtlas.getTextureData( "drywall" );
+          Log::getInstance().debug( "drywall", Tools::Utility::glmToString( data.lowerCorner ) + ", " + Tools::Utility::glmToString( data.upperCorner ) );
+        }
+        */
 
         levels.emplace_back( std::move( current ) );
       }

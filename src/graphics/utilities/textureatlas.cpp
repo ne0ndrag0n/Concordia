@@ -50,7 +50,6 @@ namespace BlueBear::Graphics::Utilities {
         TextureAtlas::TextureData textureData;
 
         // found the lower-left corner...
-        // TODO verify
         textureData.lowerCorner = glm::vec2{ ( ( float ) currentIndex ) / totalDimensions.x, 0.0f };
         textureData.upperCorner = glm::vec2{
           ( ( ( float ) currentIndex ) + size.x ) / totalDimensions.x,
