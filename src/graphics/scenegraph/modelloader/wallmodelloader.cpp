@@ -61,16 +61,16 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     return result;
   }
 
-  WallModelLoader::Face WallModelLoader::generateFace( const glm::vec3& origin, const glm::vec3& horizontalDirection, const glm::vec3& verticalDirection ) {
+  WallModelLoader::Face WallModelLoader::generateFace( const glm::vec3& origin, const glm::vec3& horizontalDirection, const glm::vec3& verticalDirection, const std::pair< glm::vec2, glm::vec2 >& textureCorners ) {
     Face face;
 
-    face[ 0 ] = { origin, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } };
-    face[ 1 ] = { origin + horizontalDirection, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } };
-    face[ 2 ] = { origin + verticalDirection, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } };
+    face[ 0 ] = { origin, { 0.0f, 0.0f, 0.0f }, { textureCorners.first.x, textureCorners.first.y } };
+    face[ 1 ] = { origin + horizontalDirection, { 0.0f, 0.0f, 0.0f }, { textureCorners.second.x, textureCorners.first.y } };
+    face[ 2 ] = { origin + verticalDirection, { 0.0f, 0.0f, 0.0f }, { textureCorners.first.x, textureCorners.second.y } };
 
-    face[ 3 ] = { origin + horizontalDirection, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } };
-    face[ 4 ] = { origin + horizontalDirection + verticalDirection, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } };
-    face[ 5 ] = { origin + verticalDirection, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } };
+    face[ 3 ] = { origin + horizontalDirection, { 0.0f, 0.0f, 0.0f }, { textureCorners.second.x, textureCorners.first.y } };
+    face[ 4 ] = { origin + horizontalDirection + verticalDirection, { 0.0f, 0.0f, 0.0f }, { textureCorners.second.x, textureCorners.second.y } };
+    face[ 5 ] = { origin + verticalDirection, { 0.0f, 0.0f, 0.0f }, { textureCorners.first.x, textureCorners.second.y } };
 
     return face;
   }
@@ -79,11 +79,14 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
   WallModelLoader::FaceSet WallModelLoader::getSingleAxisFaceSet( const Models::WallJoint& joint, const glm::vec3& position, WallModelLoader::WallpaperNeighborhood wallpapers, WallModelLoader::VertexNeighborhood vertices ) {
     FaceSet faces;
 
+    // much TODO here
+
     if( joint.north || joint.south ) {
       // y-axis
       if( joint.north ) {
         {
-          Face face = generateFace( position + glm::vec3{ 0.0f, -0.05f, 0.0f }, { 0.5f, 0.0f, 0.0f }, { 0.0f, 0.0f, 4.0f } );
+          Graphics::Utilities::TextureAtlas::TextureData textureData = wallpapers.atlas.getTextureData( "__inside_wall" );
+          Face face = generateFace( position + glm::vec3{ -0.05f, 0.0f, 0.0f }, { 0.0f, 0.1f, 0.0f }, { 0.0f, 0.0f, 4.0f }, { textureData.lowerCorner, textureData.upperCorner } );
         }
       }
 
@@ -130,23 +133,23 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
   }
 
   WallModelLoader::WallpaperNeighborhood WallModelLoader::getWallpaperNeighborhood( glm::ivec2 position, const Models::Infrastructure::FloorLevel& floorLevel ) {
-    WallModelLoader::WallpaperNeighborhood neighborhood;
+    WallModelLoader::WallpaperNeighborhood neighborhood{ {}, floorLevel.textureAtlas };
 
     // Lower right corner
     if( isValidCoordinate( position, floorLevel.dimensions ) ) {
-      neighborhood[ 0 ] = floorLevel.wallpapers[ position.y ][ position.x ];
+      neighborhood.segments[ 0 ] = floorLevel.wallpapers[ position.y ][ position.x ];
     }
     // Lower left corner
     if( isValidCoordinate( position - glm::ivec2{ 1, 0 }, floorLevel.dimensions ) ) {
-      neighborhood[ 1 ] = floorLevel.wallpapers[ position.y ][ position.x - 1 ];
+      neighborhood.segments[ 1 ] = floorLevel.wallpapers[ position.y ][ position.x - 1 ];
     }
     // Upper left corner
     if( isValidCoordinate( position - glm::ivec2{ 1, 1 }, floorLevel.dimensions ) ) {
-      neighborhood[ 2 ] = floorLevel.wallpapers[ position.y - 1 ][ position.x - 1 ];
+      neighborhood.segments[ 2 ] = floorLevel.wallpapers[ position.y - 1 ][ position.x - 1 ];
     }
     // Upper right corner
     if( isValidCoordinate( position - glm::ivec2{ 0, 1 }, floorLevel.dimensions ) ) {
-      neighborhood[ 3 ] = floorLevel.wallpapers[ position.y - 1 ][ position.x ];
+      neighborhood.segments[ 3 ] = floorLevel.wallpapers[ position.y - 1 ][ position.x ];
     }
 
     return neighborhood;

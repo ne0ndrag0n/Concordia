@@ -3,7 +3,7 @@
 
 namespace BlueBear::Graphics::Utilities {
 
-  std::optional< std::pair< std::string, std::shared_ptr< sf::Image > > > TextureAtlas::getPairById( const std::string& id ) {
+  std::optional< std::pair< std::string, std::shared_ptr< sf::Image > > > TextureAtlas::getPairById( const std::string& id ) const {
     for( const auto& pair : stored ) {
       if( pair.first == id ) {
         return pair;
@@ -13,7 +13,7 @@ namespace BlueBear::Graphics::Utilities {
     return {};
   }
 
-  glm::uvec2 TextureAtlas::computeTotalDimensions() {
+  glm::uvec2 TextureAtlas::computeTotalDimensions() const {
     glm::uvec2 totalDimensions;
 
     for( const auto& pair : stored ) {
@@ -34,7 +34,7 @@ namespace BlueBear::Graphics::Utilities {
     stored.emplace_back( id, image );
   }
 
-  TextureAtlas::TextureData TextureAtlas::getTextureData( const std::string& id ) {
+  TextureAtlas::TextureData TextureAtlas::getTextureData( const std::string& id ) const {
     if( !getPairById( id ) ) {
       Log::getInstance().warn( "TextureAtlas::getTextureData", "Could not find texture id " + id + " in this atlas!" );
       throw IdNotFoundException();

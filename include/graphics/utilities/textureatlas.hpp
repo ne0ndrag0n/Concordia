@@ -15,8 +15,8 @@ namespace BlueBear::Graphics::Utilities {
   class TextureAtlas {
     std::vector< std::pair< std::string, std::shared_ptr< sf::Image > > > stored;
 
-    std::optional< std::pair< std::string, std::shared_ptr< sf::Image > > > getPairById( const std::string& id );
-    glm::uvec2 computeTotalDimensions();
+    std::optional< std::pair< std::string, std::shared_ptr< sf::Image > > > getPairById( const std::string& id ) const;
+    glm::uvec2 computeTotalDimensions() const;
 
   public:
     EXCEPTION_TYPE( IdNotFoundException, "Texture id not found in atlas!" );
@@ -27,7 +27,7 @@ namespace BlueBear::Graphics::Utilities {
     };
 
     void addTexture( const std::string& id, std::shared_ptr< sf::Image > image );
-    TextureData getTextureData( const std::string& id );
+    TextureData getTextureData( const std::string& id ) const;
     std::shared_ptr< sf::Image > generateAtlas();
   };
 

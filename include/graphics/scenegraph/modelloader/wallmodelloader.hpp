@@ -4,6 +4,7 @@
 #include "graphics/scenegraph/modelloader/proceduralmodelloader.hpp"
 #include "graphics/scenegraph/mesh/indexedmeshgenerator.hpp"
 #include "graphics/scenegraph/mesh/texturedvertex.hpp"
+#include "graphics/utilities/textureatlas.hpp"
 #include "models/wallpaperregion.hpp"
 #include "models/infrastructure.hpp"
 #include "models/walljoint.hpp"
@@ -22,8 +23,11 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     using Face = std::array< Mesh::TexturedVertex, 6 >;
     using FaceSet = std::vector< Face >;
     // Clockwise from lower right
-    using WallpaperNeighborhood = std::array< std::optional< Models::WallpaperRegion >, 4 >;
     using VertexNeighborhood = std::array< std::optional< float >, 4 >;
+    struct WallpaperNeighborhood {
+      std::array< Models::WallpaperRegion, 4 > segments;
+      const Graphics::Utilities::TextureAtlas& atlas;
+    };
 
     const std::vector< Models::Infrastructure::FloorLevel >& levels;
 
@@ -33,7 +37,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
       const std::vector< std::pair< glm::uvec2, glm::uvec2 > >& corners
     );
 
-    Face generateFace( const glm::vec3& origin, const glm::vec3& horizontalDirection, const glm::vec3& verticalDirection );
+    Face generateFace( const glm::vec3& origin, const glm::vec3& horizontalDirection, const glm::vec3& verticalDirection, const std::pair< glm::vec2, glm::vec2 >& textureCorners );
     FaceSet getSingleAxisFaceSet( const Models::WallJoint& joint, const glm::vec3& position, WallpaperNeighborhood wallpapers, VertexNeighborhood vertices );
     FaceSet getFaceSet( const glm::uvec2& position, const Models::Infrastructure::FloorLevel& floorLevel, const JointMap& jointMap );
     WallpaperNeighborhood getWallpaperNeighborhood( glm::ivec2 position, const Models::Infrastructure::FloorLevel& floorLevel );
