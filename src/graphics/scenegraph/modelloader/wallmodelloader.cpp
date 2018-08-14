@@ -61,8 +61,51 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     return result;
   }
 
+  WallModelLoader::Face WallModelLoader::generateFace( const glm::vec3& origin, const glm::vec3& horizontalDirection, const glm::vec3& verticalDirection ) {
+    Face face;
+
+    face[ 0 ] = { origin, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } };
+    face[ 1 ] = { origin + horizontalDirection, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } };
+    face[ 2 ] = { origin + verticalDirection, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } };
+
+    face[ 3 ] = { origin + horizontalDirection, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } };
+    face[ 4 ] = { origin + horizontalDirection + verticalDirection, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } };
+    face[ 5 ] = { origin + verticalDirection, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } };
+
+    return face;
+  }
+
+  // All faces of a facecet start clockwise from the bottom
   WallModelLoader::FaceSet WallModelLoader::getSingleAxisFaceSet( const Models::WallJoint& joint, const glm::vec3& position, WallModelLoader::WallpaperNeighborhood wallpapers, WallModelLoader::VertexNeighborhood vertices ) {
-    // TODO
+    FaceSet faces;
+
+    if( joint.north || joint.south ) {
+      // y-axis
+      if( joint.north ) {
+        {
+          Face face = generateFace( position + glm::vec3{ 0.0f, -0.05f, 0.0f }, { 0.5f, 0.0f, 0.0f }, { 0.0f, 0.0f, 4.0f } );
+        }
+      }
+
+      if( joint.south ) {
+
+      }
+    } else {
+      // x-axis
+      if( joint.east ) {
+
+      }
+
+      if( joint.west ) {
+
+      }
+    }
+
+    if( faces.empty() ) {
+      Log::getInstance().warn( "WallModelLoader::getSingleAxisFaceSet", "No faces generated for single axis face set" );
+    }
+
+    return faces;
   }
 
   WallModelLoader::FaceSet WallModelLoader::getFaceSet( const glm::uvec2& position, const Models::Infrastructure::FloorLevel& floorLevel, const JointMap& jointMap ) {

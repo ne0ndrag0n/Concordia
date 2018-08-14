@@ -33,6 +33,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
       const std::vector< std::pair< glm::uvec2, glm::uvec2 > >& corners
     );
 
+    Face generateFace( const glm::vec3& origin, const glm::vec3& horizontalDirection, const glm::vec3& verticalDirection );
     FaceSet getSingleAxisFaceSet( const Models::WallJoint& joint, const glm::vec3& position, WallpaperNeighborhood wallpapers, VertexNeighborhood vertices );
     FaceSet getFaceSet( const glm::uvec2& position, const Models::Infrastructure::FloorLevel& floorLevel, const JointMap& jointMap );
     WallpaperNeighborhood getWallpaperNeighborhood( glm::ivec2 position, const Models::Infrastructure::FloorLevel& floorLevel );
