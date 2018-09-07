@@ -75,7 +75,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     return face;
   }
 
-  // All faces of a facecet start clockwise from the bottom
+  // All faces of a facecet start counterclockwise from the bottom
   WallModelLoader::FaceSet WallModelLoader::getSingleAxisFaceSet( const Models::WallJoint& joint, const glm::vec3& position, WallModelLoader::WallpaperNeighborhood wallpapers, WallModelLoader::VertexNeighborhood vertices ) {
     FaceSet faces;
 
@@ -87,6 +87,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
         {
           Graphics::Utilities::TextureAtlas::TextureData textureData = wallpapers.atlas.getTextureData( "__inside_wall" );
           Face face = generateFace( position + glm::vec3{ -0.05f, 0.0f, 0.0f }, { 0.0f, 0.1f, 0.0f }, { 0.0f, 0.0f, 4.0f }, { textureData.lowerCorner, textureData.upperCorner } );
+          faces.emplace_back( std::move( face ) );
         }
       }
 
