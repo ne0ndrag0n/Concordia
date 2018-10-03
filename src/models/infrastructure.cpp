@@ -61,6 +61,40 @@ namespace BlueBear::Models {
           current.vertices.emplace_back( std::move( vertexSet ) );
         }
 
+        const Json::Value& wallpapers = level[ "wallpaper" ];
+        for( const Json::Value& wallpaperRow : wallpapers ) {
+          std::vector< WallpaperRegion > regionSet;
+
+          for( const Json::Value& wallpaperRegion : wallpaperRow ) {
+            if( wallpaperRegion == Json::Value::null ) {
+              regionSet.emplace_back();
+            } else {
+              WallpaperRegion region;
+
+              if( wallpaperRegion[ "north" ] != Json::Value::null ) {
+                const std::string& title = wallpaperRegion[ "north" ].asString();
+                region.north = { title, worldCache.getWallpaper( title ) };
+              }
+              if( wallpaperRegion[ "east" ] != Json::Value::null ) {
+                const std::string& title = wallpaperRegion[ "east" ].asString();
+                region.east = { title, worldCache.getWallpaper( title ) };
+              }
+              if( wallpaperRegion[ "west" ] != Json::Value::null ) {
+                const std::string& title = wallpaperRegion[ "west" ].asString();
+                region.west = { title, worldCache.getWallpaper( title ) };
+              }
+              if( wallpaperRegion[ "south" ] != Json::Value::null ) {
+                const std::string& title = wallpaperRegion[ "south" ].asString();
+                region.south = { title, worldCache.getWallpaper( title ) };
+              }
+
+              regionSet.emplace_back( std::move( region ) );
+            }
+          }
+
+          current.wallpapers.emplace_back( std::move( regionSet ) );
+        }
+
         levels.emplace_back( std::move( current ) );
       }
 

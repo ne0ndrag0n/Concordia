@@ -25,6 +25,7 @@ namespace BlueBear::Models {
     struct FloorLevel {
       glm::uvec2 dimensions;
       std::vector< std::vector< std::optional< FloorTile > > > tiles;
+      std::vector< std::vector< WallpaperRegion > > wallpapers;
       std::vector< std::vector< float > > vertices;
     };
 
