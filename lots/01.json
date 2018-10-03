@@ -51,21 +51,6 @@
           [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
           [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
           [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ]
-        ],
-        "corners": [
-          { "start": [ 1, 1 ], "end": [ 2, 1 ] }
-        ],
-        "wallpaper": [
-          [ null, null, null, null, null, null, null, null, null, null ],
-          [ null, { "north": "fancy", "south": "drywall" }, null, null, null, null, null, null, null, null ],
-          [ null, null, null, null, null, null, null, null, null, null ],
-          [ null, null, null, null, null, null, null, null, null, null ],
-          [ null, null, null, null, null, null, null, null, null, null ],
-          [ null, null, null, null, null, null, null, null, null, null ],
-          [ null, null, null, null, null, null, null, null, null, null ],
-          [ null, null, null, null, null, null, null, null, null, null ],
-          [ null, null, null, null, null, null, null, null, null, null ],
-          [ null, null, null, null, null, null, null, null, null, null ]
         ]
       }
     ]

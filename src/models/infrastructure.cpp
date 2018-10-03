@@ -30,8 +30,6 @@ namespace BlueBear::Models {
         const Json::Value& level = *it;
         FloorLevel current;
         current.dimensions = { level[ "dimensions" ][ 0 ].asUInt(), level[ "dimensions" ][ 1 ].asUInt() };
-        // Get rendering for the inside of walls
-        current.textureAtlas.addTexture( "__inside_wall", getDefaults( renderer ) );
 
         const Json::Value& innerTiles = level[ "tiles" ];
         for( auto it = innerTiles.begin(); it != innerTiles.end(); ++it ) {
@@ -61,52 +59,6 @@ namespace BlueBear::Models {
             vertexSet.push_back( it->asFloat() );
           }
           current.vertices.emplace_back( std::move( vertexSet ) );
-        }
-
-        const Json::Value& corners = level[ "corners" ];
-        for( auto it = corners.begin(); it != corners.end(); ++it ) {
-          const Json::Value& corner = *it;
-          current.corners.emplace_back(
-            glm::uvec2{ corner[ "start" ][ 0 ].asUInt(), corner[ "start" ][ 1 ].asUInt() },
-            glm::uvec2{ corner[ "end"   ][ 0 ].asUInt(), corner[ "end"   ][ 1 ].asUInt() }
-          );
-        }
-
-        const Json::Value& wallpaper = level[ "wallpaper" ];
-        for( auto it = wallpaper.begin(); it != wallpaper.end(); ++it ) {
-          const Json::Value& wallpaperArray = *it;
-          std::vector< WallpaperRegion > regionSet;
-
-          for( auto it = wallpaperArray.begin(); it != wallpaperArray.end(); ++it ) {
-            const Json::Value& wallpaperRegion = *it;
-
-            if( wallpaperRegion == Json::Value::null ) {
-              regionSet.emplace_back();
-            } else {
-              WallpaperRegion region;
-              if( wallpaperRegion[ "north" ] != Json::Value::null ) {
-                const std::string& title = wallpaperRegion[ "north" ].asString();
-                region.north = { title, worldCache.getWallpaper( title ) };
-                current.textureAtlas.addTexture( title, region.north.second->surface );
-              }
-              if( wallpaperRegion[ "east" ] != Json::Value::null ) {
-                const std::string& title = wallpaperRegion[ "east" ].asString();
-                region.east = { title, worldCache.getWallpaper( title ) };
-                current.textureAtlas.addTexture( title, region.east.second->surface );
-              }
-              if( wallpaperRegion[ "west" ] != Json::Value::null ) {
-                const std::string& title = wallpaperRegion[ "west" ].asString();
-                region.west = { title, worldCache.getWallpaper( title ) };
-                current.textureAtlas.addTexture( title, region.west.second->surface );
-              }
-              if( wallpaperRegion[ "south" ] != Json::Value::null ) {
-                const std::string& title = wallpaperRegion[ "south" ].asString();
-                region.south = { title, worldCache.getWallpaper( title ) };
-                current.textureAtlas.addTexture( title, region.south.second->surface );
-              }
-              regionSet.emplace_back( std::move( region ) );
-            }
-          }
         }
 
         levels.emplace_back( std::move( current ) );
