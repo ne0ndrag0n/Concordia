@@ -5,7 +5,7 @@
 namespace BlueBear {
   namespace Graphics {
 
-    Texture::Texture( sf::Image& texture ) {
+    Texture::Texture( const sf::Image& texture ) {
       prepareTextureFromImage( texture );
     }
 
@@ -26,7 +26,7 @@ namespace BlueBear {
       }
     }
 
-    void Texture::prepareTextureFromImage( sf::Image& texture ) {
+    void Texture::prepareTextureFromImage( const sf::Image& texture ) {
       glGenTextures( 1, &id );
       glBindTexture( GL_TEXTURE_2D, id );
         glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );

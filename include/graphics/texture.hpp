@@ -17,13 +17,13 @@ namespace BlueBear {
         Texture( const Texture& );
         Texture& operator=( const Texture& );
 
-        void prepareTextureFromImage( sf::Image& texture );
+        void prepareTextureFromImage( const sf::Image& texture );
 
       public:
         EXCEPTION_TYPE( ImageLoadFailureException, "Image could not be loaded!" );
         GLuint id;
 
-        Texture( sf::Image& texture );
+        Texture( const sf::Image& texture );
         Texture( const std::string& texFromFile, bool defer = false );
         ~Texture();
 
