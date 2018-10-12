@@ -69,26 +69,7 @@ namespace BlueBear::Models {
             if( wallpaperRegion == Json::Value::null ) {
               regionSet.emplace_back();
             } else {
-              WallpaperRegion region;
-
-              if( wallpaperRegion[ "north" ] != Json::Value::null ) {
-                const std::string& title = wallpaperRegion[ "north" ].asString();
-                region.north = { title, worldCache.getWallpaper( title ) };
-              }
-              if( wallpaperRegion[ "east" ] != Json::Value::null ) {
-                const std::string& title = wallpaperRegion[ "east" ].asString();
-                region.east = { title, worldCache.getWallpaper( title ) };
-              }
-              if( wallpaperRegion[ "west" ] != Json::Value::null ) {
-                const std::string& title = wallpaperRegion[ "west" ].asString();
-                region.west = { title, worldCache.getWallpaper( title ) };
-              }
-              if( wallpaperRegion[ "south" ] != Json::Value::null ) {
-                const std::string& title = wallpaperRegion[ "south" ].asString();
-                region.south = { title, worldCache.getWallpaper( title ) };
-              }
-
-              regionSet.emplace_back( std::move( region ) );
+              regionSet.emplace_back( wallpaperRegion, worldCache );
             }
           }
 
