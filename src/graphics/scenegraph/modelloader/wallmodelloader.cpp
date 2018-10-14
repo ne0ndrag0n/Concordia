@@ -23,29 +23,69 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
       return {};
     }
 
-    if( x > grid[ 0 ].size() || y > grid.size() ) {
+    if( x >= grid[ 0 ].size() || y >= grid.size() ) {
       return {};
     }
 
     return grid[ y ][ x ];
   }
 
+  std::array< Mesh::TexturedVertex, 6 > WallModelLoader::getPlane( const glm::vec3& origin, const glm::vec3& horizontalDirection, const glm::vec3& verticalDirection ) {
+    std::array< Mesh::TexturedVertex, 6 > plane;
+
+    plane[ 0 ] = { origin,                                           { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f } };
+    plane[ 1 ] = { origin + horizontalDirection,                     { 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f } };
+    plane[ 2 ] = { origin + verticalDirection,                       { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f } };
+
+    plane[ 3 ] = { origin + horizontalDirection,                     { 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f } };
+    plane[ 4 ] = { origin + horizontalDirection + verticalDirection, { 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f } };
+    plane[ 5 ] = { origin + verticalDirection,                       { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f } };
+
+    return plane;
+  }
+
+  Tools::SegmentedCube< Mesh::TexturedVertex > WallModelLoader::getSegmentedCubeRegular( const glm::vec3& origin, const glm::vec3& dimensions ) {
+    Tools::SegmentedCube< Mesh::TexturedVertex > result;
+
+    result.south = { getPlane( origin,                                                  { dimensions.x, 0.0f, 0.0f  }, { 0.0f, 0.0f, dimensions.z  } ), nullptr };
+    result.east  = { getPlane( origin + glm::vec3{ dimensions.x, 0.0f, 0.0f },          { 0.0f, -dimensions.y, 0.0f }, { 0.0f, 0.0f, dimensions.z  } ), nullptr };
+    result.north = { getPlane( origin + glm::vec3{ dimensions.x, -dimensions.y, 0.0f }, { -dimensions.x, 0.0f, 0.0f }, { 0.0f, 0.0f, dimensions.z  } ), nullptr };
+    result.west  = { getPlane( origin + glm::vec3{ 0.0f, -dimensions.y, 0.0f },         { 0.0f, dimensions.y, 0.0f  }, { 0.0f, 0.0f, dimensions.z  } ), nullptr };
+    result.top   = { getPlane( origin + glm::vec3{ 0.0f, 0.0f, dimensions.z },          { dimensions.x, 0.0f, 0.0f  }, { 0.0f, -dimensions.y, 0.0f } ), nullptr };
+
+    return result;
+  }
 
   WallModelLoader::CubeSegmentGrid WallModelLoader::regionsToSegments( const WallModelLoader::RegionModelGrid& wallpaperGrid ) {
     CubeSegmentGrid result;
 
     result.resize( wallpaperGrid.size() );
-    for( std::vector< Tools::SegmentedCube< Mesh::TexturedVertex > >& array : result ) {
+    for( auto& array : result ) {
       array.resize( wallpaperGrid[ 0 ].size() );
     }
 
     for( int y = 0; y != wallpaperGrid.size(); y++ ) {
       // No irregular regions!
       for( int x = 0; x != wallpaperGrid[ 0 ].size(); x++ ) {
-        // TODO:
-        // * Check to see if a corner needs to be created (x - 1 and y + 1)
-        // * Check to see if a special "R" piece needs to be created
-        // * Check other corners to see what texture replacements are necessary
+        const Models::WallpaperRegion& wallpaperRegion = wallpaperGrid[ y ][ x ];
+
+        if( wallpaperRegion.isEmpty() ) {
+          // Check to see if a corner needs to be created (x - 1 and y - 1)
+          std::optional< Models::WallpaperRegion > left = getWallpaperRegion( x - 1, y, wallpaperGrid );
+          std::optional< Models::WallpaperRegion > top = getWallpaperRegion( x, y - 1, wallpaperGrid );
+
+          if( left && top && left->isX() && top->isY() ) {
+            // Corner needs to be created
+            // Texture coordinates of neighbours need to be extended
+          }
+        }
+
+
+        if( wallpaperRegion.isCorner() ) {
+          // Check to see if a special "R" piece needs to be created
+        }
+
+        // Check other corners to see what texture replacements are necessary
       }
     }
 

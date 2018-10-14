@@ -38,11 +38,19 @@ namespace BlueBear::Models {
   }
 
   bool WallpaperRegion::isEmpty() const {
-    return false;
+    return !x.north && !y.east;
   }
 
   bool WallpaperRegion::isCorner() const {
-    return false;
+    return x.north && y.east;
+  }
+
+  bool WallpaperRegion::isX() const {
+    return x.north && x.south;
+  }
+
+  bool WallpaperRegion::isY() const {
+    return y.east && y.west;
   }
 
 }

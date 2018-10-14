@@ -1,3 +1,6 @@
+#ifndef SEGMENTEDCUBE
+#define SEGMENTEDCUBE
+
 #include "graphics/scenegraph/tools/plane.hpp"
 #include <optional>
 
@@ -10,6 +13,12 @@ namespace BlueBear::Graphics::SceneGraph::Tools {
     std::optional< Plane< Vertex > > east;
     std::optional< Plane< Vertex > > west;
     std::optional< Plane< Vertex > > south;
+
+    bool isEmpty() const {
+      return !top && !north && !east && !west && !south;
+    }
   };
 
 }
+
+#endif

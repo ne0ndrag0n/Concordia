@@ -26,6 +26,8 @@ namespace BlueBear::Models {
 
     bool isEmpty() const;
     bool isCorner() const;
+    bool isX() const;
+    bool isY() const;
   };
 
 }
