@@ -56,8 +56,8 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     return result;
   }
 
-  Tools::SegmentedCube< Mesh::TexturedVertex > WallModelLoader::getCornerCube( const glm::vec3& origin, const glm::vec3& dimensions ) {
-    Tools::SegmentedCube< Mesh::TexturedVertex > result;
+  Tools::CornerCap< Mesh::TexturedVertex > WallModelLoader::getCornerCube( const glm::vec3& origin, const glm::vec3& dimensions ) {
+    Tools::CornerCap< Mesh::TexturedVertex > result;
 
     result.south = { getPlane( origin,                                                  { dimensions.x, 0.0f, 0.0f  }, { 0.0f, 0.0f, dimensions.z  } ), nullptr };
     result.east  = { getPlane( origin + glm::vec3{ dimensions.x, 0.0f, 0.0f },          { 0.0f, dimensions.y, 0.0f  }, { 0.0f, 0.0f, dimensions.z  } ), nullptr };
@@ -70,7 +70,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     std::optional< Models::WallpaperRegion > left = getWallpaperRegion( x - 1, y, wallpaperGrid );
     std::optional< Models::WallpaperRegion > top = getWallpaperRegion( x, y - 1, wallpaperGrid );
 
-    return left && top && left->isX() && top->isY();
+    return left && top && left->isExclusiveX() && top->isExclusiveY();
   }
 
   /**
@@ -79,9 +79,9 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
    * This function is not to be called unless the conditions have been verified
    */
   void WallModelLoader::joinCorner( int x, int y, WallModelLoader::CubeSegmentGrid& cubeSegmentGrid ) {
-    Tools::SegmentedCube< Mesh::TexturedVertex >& subject = *cubeSegmentGrid[ y ][ x ];
-    Tools::SegmentedCube< Mesh::TexturedVertex >& left = *cubeSegmentGrid[ y ][ x - 1 ];
-    Tools::SegmentedCube< Mesh::TexturedVertex >& top = *cubeSegmentGrid[ y - 1 ][ x ];
+    Tools::SegmentedCube< Mesh::TexturedVertex >& subject = *( static_cast< Tools::SegmentedCube< Mesh::TexturedVertex >* >( cubeSegmentGrid[ y ][ x ].get() ) );
+    Tools::SegmentedCube< Mesh::TexturedVertex >& left = *( static_cast< Tools::SegmentedCube< Mesh::TexturedVertex >* >( cubeSegmentGrid[ y ][ x - 1 ].get() ) );
+    Tools::SegmentedCube< Mesh::TexturedVertex >& top = *( static_cast< Tools::SegmentedCube< Mesh::TexturedVertex >* >( cubeSegmentGrid[ y - 1 ][ x ].get() ) );
 
     // -----------------------------------------------------------------------------------------------
 
@@ -126,7 +126,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
 
         if( wallpaperRegion.isEmpty() && isCornerFillRequired( x, y, wallpaperGrid ) ) {
           // Corner needs to be created
-          result[ y ][ x ] = getCornerCube( { -0.5f, 0.9f, 0.0f }, { 0.1f, 0.1f, 4.0f } );
+          result[ y ][ x ] = std::make_unique< Tools::CornerCap< Mesh::TexturedVertex > >( std::move( getCornerCube( { -0.5f, 0.9f, 0.0f }, { 0.1f, 0.1f, 4.0f } ) ) );
 
           // Texture coordinates of neighbours and self need to be corrected
           // Textures of neighbours need to be stolen

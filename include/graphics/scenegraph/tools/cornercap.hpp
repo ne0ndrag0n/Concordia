@@ -1,5 +1,5 @@
-#ifndef SEGMENTEDCUBE
-#define SEGMENTEDCUBE
+#ifndef CORNER_CAP
+#define CORNER_CAP
 
 #include "graphics/scenegraph/tools/geometricsegment.hpp"
 #include "graphics/scenegraph/tools/plane.hpp"
@@ -8,15 +8,13 @@
 namespace BlueBear::Graphics::SceneGraph::Tools {
 
   template< typename Vertex >
-  struct SegmentedCube : public GeometricSegment {
+  struct CornerCap : public GeometricSegment {
     std::optional< Plane< Vertex > > top;
-    std::optional< Plane< Vertex > > north;
     std::optional< Plane< Vertex > > east;
-    std::optional< Plane< Vertex > > west;
     std::optional< Plane< Vertex > > south;
 
     bool isEmpty() const {
-      return !top && !north && !east && !west && !south;
+      return !top && !east && !south;
     }
 
     std::shared_ptr< Model > generateModel() override {

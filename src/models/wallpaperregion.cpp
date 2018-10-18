@@ -53,4 +53,12 @@ namespace BlueBear::Models {
     return y.east && y.west;
   }
 
+  bool WallpaperRegion::isExclusiveX() const {
+    return isX() && !isY();
+  }
+
+  bool WallpaperRegion::isExclusiveY() const {
+    return !isX() && isY();
+  }
+
 }

@@ -28,6 +28,8 @@ namespace BlueBear::Models {
     bool isCorner() const;
     bool isX() const;
     bool isY() const;
+    bool isExclusiveX() const;
+    bool isExclusiveY() const;
   };
 
 }

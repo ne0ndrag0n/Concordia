@@ -2,8 +2,10 @@
 #define BB_WALL_MODEL_LOADER
 
 #include "graphics/scenegraph/modelloader/proceduralmodelloader.hpp"
+#include "graphics/scenegraph/tools/geometricsegment.hpp"
 #include "graphics/scenegraph/tools/segmentedcube.hpp"
 #include "graphics/scenegraph/mesh/texturedvertex.hpp"
+#include "graphics/scenegraph/tools/cornercap.hpp"
 #include "graphics/scenegraph/tools/plane.hpp"
 #include "models/wallpaperregion.hpp"
 #include "models/infrastructure.hpp"
@@ -20,7 +22,7 @@ namespace BlueBear::Graphics::SceneGraph { class Model; }
 namespace BlueBear::Graphics::SceneGraph::ModelLoader {
 
   class WallModelLoader : public ProceduralModelLoader {
-    using CubeSegmentGrid = std::vector< std::vector< std::optional< Tools::SegmentedCube< Mesh::TexturedVertex > > > >;
+    using CubeSegmentGrid = std::vector< std::vector< std::unique_ptr< Tools::GeometricSegment > > >;
     using RegionModelGrid = std::vector< std::vector< Models::WallpaperRegion > >;
 
     const std::vector< Models::Infrastructure::FloorLevel >& levels;
@@ -29,7 +31,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
 
     std::array< Mesh::TexturedVertex, 6 > getPlane( const glm::vec3& origin, const glm::vec3& horizontalDirection, const glm::vec3& verticalDirection );
     Tools::SegmentedCube< Mesh::TexturedVertex > getSegmentedCubeRegular( const glm::vec3& origin, const glm::vec3& dimensions );
-    Tools::SegmentedCube< Mesh::TexturedVertex > getCornerCube( const glm::vec3& origin, const glm::vec3& dimensions );
+    Tools::CornerCap< Mesh::TexturedVertex > getCornerCube( const glm::vec3& origin, const glm::vec3& dimensions );
     bool isCornerFillRequired( int x, int y, const RegionModelGrid& wallpaperGrid );
     void joinCorner( int x, int y, CubeSegmentGrid& cubeSegmentGrid );
     std::optional< Models::WallpaperRegion > getWallpaperRegion( int x, int y, const RegionModelGrid& grid );
