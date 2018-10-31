@@ -53,16 +53,7 @@
           [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ]
         ],
         "wallpaper": [
-          [ null, null, null, null, null, null, null, null, null, null ],
-          [ null, { "north": "fancy", "south": "drywall" }, null, null, null, null, null, null, null, null ],
-          [ null, null, null, null, null, null, null, null, null, null ],
-          [ null, null, null, null, null, null, null, null, null, null ],
-          [ null, null, null, null, null, null, null, null, null, null ],
-          [ null, null, null, null, null, null, null, null, null, null ],
-          [ null, null, null, null, null, null, null, null, null, null ],
-          [ null, null, null, null, null, null, null, null, null, null ],
-          [ null, null, null, null, null, null, null, null, null, null ],
-          [ null, null, null, null, null, null, null, null, null, null ]
+
         ]
       }
     ]

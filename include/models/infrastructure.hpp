@@ -5,7 +5,6 @@
 #include "models/utilities/worldcache.hpp"
 #include "models/floortile.hpp"
 #include "models/walljoint.hpp"
-#include "models/wallpaperregion.hpp"
 #include "serializable.hpp"
 #include <jsoncpp/json/json.h>
 #include <glm/glm.hpp>
@@ -25,7 +24,6 @@ namespace BlueBear::Models {
     struct FloorLevel {
       glm::uvec2 dimensions;
       std::vector< std::vector< std::optional< FloorTile > > > tiles;
-      std::vector< std::vector< WallpaperRegion > > wallpapers;
       std::vector< std::vector< float > > vertices;
     };
 

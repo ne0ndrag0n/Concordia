@@ -61,21 +61,6 @@ namespace BlueBear::Models {
           current.vertices.emplace_back( std::move( vertexSet ) );
         }
 
-        const Json::Value& wallpapers = level[ "wallpaper" ];
-        for( const Json::Value& wallpaperRow : wallpapers ) {
-          std::vector< WallpaperRegion > regionSet;
-
-          for( const Json::Value& wallpaperRegion : wallpaperRow ) {
-            if( wallpaperRegion == Json::Value::null ) {
-              regionSet.emplace_back();
-            } else {
-              regionSet.emplace_back( wallpaperRegion, worldCache );
-            }
-          }
-
-          current.wallpapers.emplace_back( std::move( regionSet ) );
-        }
-
         levels.emplace_back( std::move( current ) );
       }
 
