@@ -545,5 +545,16 @@ namespace BlueBear {
 			return compareFloat( a.x, b.x ) && compareFloat( a.y, b.y ) && compareFloat( a.z, b.z ) && compareFloat( a.w, b.w );
 		}
 
+		glm::ivec2 Utility::normalize( const glm::ivec2& candidate ) {
+			return glm::ivec2{
+				candidate.x == 0 ? 0 : ( candidate.x < 0 ? -1 : 1 ),
+				candidate.y == 0 ? 0 : ( candidate.y < 0 ? -1 : 1 ),
+			};
+		}
+
+		int Utility::distance( const glm::ivec2& start, const glm::ivec2& end ) {
+			return glm::distance( glm::vec2{ start.x, start.y }, glm::vec2{ end.x, end.y } );
+		}
+
 	}
 }

@@ -53,7 +53,20 @@
           [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ]
         ],
         "wallpaper": [
-
+          {
+            "start": [ 1, 1 ],
+            "end": [ 3, 1 ],
+            "faces": [
+              {
+                "front": "drywall",
+                "back": "drywall"
+              },
+              {
+                "front": "drywall",
+                "back": "drywall"
+              }
+            ]
+          }
         ]
       }
     ]
