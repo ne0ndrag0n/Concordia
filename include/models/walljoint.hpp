@@ -21,10 +21,7 @@ namespace BlueBear::Models {
 
     void setByCardinalDirection( const Tools::CardinalDirection& direction );
 
-    bool isSingleAxis() const;
     bool isElbow() const;
-    bool isCross() const;
-    bool isFull() const;
 
     EXCEPTION_TYPE( InvalidTypeException, "Expected array type" );
 

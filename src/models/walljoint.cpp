@@ -43,25 +43,8 @@ namespace BlueBear::Models {
     }
   }
 
-  bool WallJoint::isSingleAxis() const {
-    return ( ( north || south ) && !( east || west ) ) ||
-           ( ( east || west ) && !( north || south ) );
-  }
-
   bool WallJoint::isElbow() const {
     return ( north || south ) && ( east || west );
-  }
-
-  bool WallJoint::isCross() const {
-    return
-      ( ( north && south ) && ( east && !west ) ) ||
-      ( ( north && south ) && ( !east && west ) ) ||
-      ( ( east && west ) && ( north && !south ) ) ||
-      ( ( east && west ) && ( !north && south ) );
-  }
-
-  bool WallJoint::isFull() const {
-    return north && south && east && west;
   }
 
   struct Directional {
@@ -72,45 +55,9 @@ namespace BlueBear::Models {
     CardinalDirection cardinal;
   };
 
-  CardinalDirection getCardinalDirection( const glm::ivec2& direction ) {
-
-    if( direction.x == 0 && direction.y < 0 ) {
-      return CardinalDirection::North;
-    }
-
-    if( direction.x == 0 && direction.y > 0 ) {
-      return CardinalDirection::South;
-    }
-
-    if( direction.x > 0 && direction.y == 0 ) {
-      return CardinalDirection::East;
-    }
-
-    if( direction.x < 0 && direction.y == 0 ) {
-      return CardinalDirection::West;
-    }
-
-    if( direction.x > 0 && direction.y < 0 ) {
-      return CardinalDirection::Northeast;
-    }
-
-    if( direction.x > 0 && direction.y > 0 ) {
-      return CardinalDirection::Southeast;
-    }
-
-    if( direction.x < 0 && direction.y > 0 ) {
-      return CardinalDirection::Southwest;
-    }
-
-    if( direction.x < 0 && direction.y < 0 ) {
-      return CardinalDirection::Northwest;
-    }
-
-  }
-
   Directional getDirectional( const glm::ivec2& start, const glm::ivec2& end ) {
     glm::ivec2 direction = Tools::Utility::normalize( end - start );
-    CardinalDirection cardinal = getCardinalDirection( direction );
+    CardinalDirection cardinal = Tools::getCardinalDirection( direction );
 
     if( cardinal == CardinalDirection::West ) {
       return { start - end, { 1, 0 }, end, start, CardinalDirection::East };

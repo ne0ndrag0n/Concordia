@@ -1,6 +1,8 @@
 #ifndef CARDINAL_DIRECTION
 #define CARDINAL_DIRECTION
 
+#include <glm/glm.hpp>
+
 namespace BlueBear::Tools {
 
   enum class CardinalDirection {
@@ -15,6 +17,7 @@ namespace BlueBear::Tools {
   };
 
   extern CardinalDirection getOpposingDirection( const CardinalDirection& direction );
+  extern CardinalDirection getCardinalDirection( const glm::ivec2& direction );
 
 }
 

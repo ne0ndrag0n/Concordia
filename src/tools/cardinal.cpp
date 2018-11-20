@@ -30,4 +30,40 @@ namespace BlueBear::Tools {
     }
   }
 
+  CardinalDirection getCardinalDirection( const glm::ivec2& direction ) {
+
+    if( direction.x == 0 && direction.y < 0 ) {
+      return CardinalDirection::North;
+    }
+
+    if( direction.x == 0 && direction.y > 0 ) {
+      return CardinalDirection::South;
+    }
+
+    if( direction.x > 0 && direction.y == 0 ) {
+      return CardinalDirection::East;
+    }
+
+    if( direction.x < 0 && direction.y == 0 ) {
+      return CardinalDirection::West;
+    }
+
+    if( direction.x > 0 && direction.y < 0 ) {
+      return CardinalDirection::Northeast;
+    }
+
+    if( direction.x > 0 && direction.y > 0 ) {
+      return CardinalDirection::Southeast;
+    }
+
+    if( direction.x < 0 && direction.y > 0 ) {
+      return CardinalDirection::Southwest;
+    }
+
+    if( direction.x < 0 && direction.y < 0 ) {
+      return CardinalDirection::Northwest;
+    }
+
+  }
+
 }
