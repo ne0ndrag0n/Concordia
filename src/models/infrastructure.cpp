@@ -61,6 +61,11 @@ namespace BlueBear::Models {
           current.vertices.emplace_back( std::move( vertexSet ) );
         }
 
+        const Json::Value& wallSegments = level[ "wallpaper" ];
+        for( const Json::Value& wallSegment : wallSegments ) {
+          current.wallSegments.emplace_back( wallSegment, worldCache );
+        }
+
         levels.emplace_back( std::move( current ) );
       }
 
