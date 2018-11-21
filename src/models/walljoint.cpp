@@ -78,22 +78,15 @@ namespace BlueBear::Models {
     return { end - start, direction, start, end, cardinal };
   }
 
-  std::vector< std::vector< WallJoint > > WallJoint::createFromList( unsigned int x, unsigned int y, const Json::Value& array ) {
-    if ( !array.isArray() ) {
-      throw InvalidTypeException();
-    }
-
+  std::vector< std::vector< WallJoint > > WallJoint::createFromList( unsigned int x, unsigned int y, const std::vector< WallSegment >& array ) {
     std::vector< std::vector< WallJoint > > result;
     result.resize( y );
     for( auto& subarray : result ) {
       subarray.resize( x );
     }
 
-    for( const Json::Value& wallDescriptor : array ) {
-      Directional directional = getDirectional(
-        { wallDescriptor[ "start" ][ 0 ].asInt(), wallDescriptor[ "start" ][ 1 ].asInt() },
-        { wallDescriptor[ "end" ][ 0 ].asInt(), wallDescriptor[ "end" ][ 1 ].asInt() }
-      );
+    for( const WallSegment& segment : array ) {
+      Directional directional = getDirectional( segment.start, segment.end );
 
       glm::ivec2 cursor = directional.start;
       int originalDistance = Tools::Utility::distance( directional.start, directional.end );

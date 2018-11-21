@@ -1,9 +1,9 @@
 #ifndef WALLJOINT
 #define WALLJOINT
 
+#include "models/wallsegment.hpp"
 #include "exceptions/genexc.hpp"
 #include "tools/cardinal.hpp"
-#include <jsoncpp/json/json.h>
 #include <vector>
 
 namespace BlueBear::Models {
@@ -25,7 +25,7 @@ namespace BlueBear::Models {
 
     EXCEPTION_TYPE( InvalidTypeException, "Expected array type" );
 
-    static std::vector< std::vector< WallJoint > > createFromList( unsigned int x, unsigned int y, const Json::Value& array );
+    static std::vector< std::vector< WallJoint > > createFromList( unsigned int x, unsigned int y, const std::vector< WallSegment >& array );
   };
 
 }
