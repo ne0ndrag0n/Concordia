@@ -1,4 +1,5 @@
 #include "graphics/scenegraph/modelloader/wallmodelloader.hpp"
+#include "graphics/scenegraph/mesh/facemeshgenerator.hpp"
 
 namespace BlueBear::Graphics::SceneGraph::ModelLoader {
 
