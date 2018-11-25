@@ -2,6 +2,8 @@
 #define WALL_MODEL_LOADER
 
 #include "graphics/scenegraph/modelloader/proceduralmodelloader.hpp"
+#include "graphics/scenegraph/mesh/facemeshgenerator.hpp"
+#include "graphics/scenegraph/mesh/texturedvertex.hpp"
 #include "models/wallsegment.hpp"
 #include "models/walljoint.hpp"
 #include <vector>
