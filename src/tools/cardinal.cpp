@@ -1,4 +1,5 @@
 #include "tools/cardinal.hpp"
+#include "tools/utility.hpp"
 
 namespace BlueBear::Tools {
 
@@ -64,6 +65,29 @@ namespace BlueBear::Tools {
       return CardinalDirection::Northwest;
     }
 
+  }
+
+  Directional getDirectional( const glm::ivec2& start, const glm::ivec2& end ) {
+    glm::ivec2 direction = Tools::Utility::normalize( end - start );
+    CardinalDirection cardinal = Tools::getCardinalDirection( direction );
+
+    if( cardinal == CardinalDirection::West ) {
+      return { start - end, { 1, 0 }, end, start, CardinalDirection::East };
+    }
+
+    if( cardinal == CardinalDirection::South ) {
+      return { start - end, { 0, -1 }, end, start, CardinalDirection::North };
+    }
+
+    if( cardinal == CardinalDirection::Northwest ) {
+      return { start - end, { 1, 1 }, end, start, CardinalDirection::Southeast };
+    }
+
+    if( cardinal == CardinalDirection::Southwest ) {
+      return { start - end, { 1, -1 }, end, start, CardinalDirection::Northeast };
+    }
+
+    return { end - start, direction, start, end, cardinal };
   }
 
 }
