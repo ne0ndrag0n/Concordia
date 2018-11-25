@@ -24,7 +24,7 @@
     }
   },
   "infrastructure": {
-    "tiles": [
+    "levels": [
       {
         "dimensions": [ 10, 10 ],
         "tiles": [

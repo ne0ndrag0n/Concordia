@@ -4,21 +4,24 @@
 namespace BlueBear::Models {
 
   Sides::Sides( const Json::Value& sides, Utilities::WorldCache& worldCache ) {
-    auto frontOptional = worldCache.getWallpaper( sides[ "front" ].asString() );
-    auto backOptional = worldCache.getWallpaper( sides[ "back" ].asString() );
+    std::string frontId = sides[ "front" ].asString();
+    std::string backId = sides[ "back" ].asString();
+
+    auto frontOptional = worldCache.getWallpaper( frontId );
+    auto backOptional = worldCache.getWallpaper( backId );
 
     if( !frontOptional ) {
-      Log::getInstance().error( "Sides::Sides", "Invalid wallpaper: " + sides[ "front" ].asString() );
+      Log::getInstance().error( "Sides::Sides", "Invalid wallpaper: " + frontId );
       throw InvalidWallpaperException();
     }
 
     if( !backOptional ) {
-      Log::getInstance().error( "Sides::Sides", "Invalid wallpaper: " + sides[ "back" ].asString() );
+      Log::getInstance().error( "Sides::Sides", "Invalid wallpaper: " + backId );
       throw InvalidWallpaperException();
     }
 
-    front = *frontOptional;
-    back = *backOptional;
+    front = { frontId, *frontOptional };
+    back = { backId, *backOptional };
   }
 
   WallSegment::WallSegment( const Json::Value& segment, Utilities::WorldCache& worldCache ) {

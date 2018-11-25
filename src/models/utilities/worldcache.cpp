@@ -78,7 +78,7 @@ namespace BlueBear::Models::Utilities {
     }
   }
 
-  std::optional< FloorTile > WorldCache::getFloorTile( const std::string& id ) {
+  std::optional< FloorTile > WorldCache::getFloorTile( const std::string& id ) const {
     auto originalTile = originalTiles.find( id );
     if( originalTile != originalTiles.end() ) {
       return originalTile->second;
@@ -87,7 +87,7 @@ namespace BlueBear::Models::Utilities {
     }
   }
 
-  std::optional< Wallpaper > WorldCache::getWallpaper( const std::string& id ) {
+  std::optional< Wallpaper > WorldCache::getWallpaper( const std::string& id ) const {
     auto originalWallpaper = originalWallpapers.find( id );
     if( originalWallpaper != originalWallpapers.end() ) {
       return originalWallpaper->second;

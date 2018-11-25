@@ -26,8 +26,8 @@ namespace BlueBear::Models::Utilities {
 
     WorldCache();
 
-    std::optional< FloorTile > getFloorTile( const std::string& id );
-    std::optional< Wallpaper > getWallpaper( const std::string& id );
+    std::optional< FloorTile > getFloorTile( const std::string& id ) const;
+    std::optional< Wallpaper > getWallpaper( const std::string& id ) const;
   };
 
 }

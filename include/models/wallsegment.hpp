@@ -7,12 +7,13 @@
 #include <jsoncpp/json/json.h>
 #include <glm/glm.hpp>
 #include <vector>
+#include <utility>
 
 namespace BlueBear::Models {
 
   struct Sides {
-    Wallpaper front;
-    Wallpaper back;
+    std::pair< std::string, Wallpaper > front;
+    std::pair< std::string, Wallpaper > back;
 
     EXCEPTION_TYPE( InvalidWallpaperException, "Wallpaper not found" );
 

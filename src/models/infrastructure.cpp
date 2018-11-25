@@ -25,8 +25,8 @@ namespace BlueBear::Models {
 
   void Infrastructure::load( const Json::Value& data, Device::Display::Adapter::Component::WorldRenderer& worldRenderer, Graphics::Vector::Renderer& renderer, Utilities::WorldCache& worldCache ) {
     if( data != Json::Value::null ) {
-      const Json::Value& tiles = data[ "tiles" ];
-      for( auto it = tiles.begin(); it != tiles.end(); ++it ) {
+      const Json::Value& levelsJson = data[ "levels" ];
+      for( auto it = levelsJson.begin(); it != levelsJson.end(); ++it ) {
         const Json::Value& level = *it;
         FloorLevel current;
         current.dimensions = { level[ "dimensions" ][ 0 ].asUInt(), level[ "dimensions" ][ 1 ].asUInt() };
