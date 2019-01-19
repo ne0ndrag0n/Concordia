@@ -4,7 +4,6 @@
 #include "exceptions/genexc.hpp"
 #include "models/utilities/worldcache.hpp"
 #include "models/floortile.hpp"
-#include "models/walljoint.hpp"
 #include "models/wallsegment.hpp"
 #include "serializable.hpp"
 #include <jsoncpp/json/json.h>
