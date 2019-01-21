@@ -1,5 +1,5 @@
 #include "graphics/scenegraph/modelloader/wallmodelloader.hpp"
-#include "graphics/utilities/textureatlas.hpp"
+#include "graphics/scenegraph/model.hpp"
 #include "tools/utility.hpp"
 
 namespace BlueBear::Graphics::SceneGraph::ModelLoader {
@@ -147,10 +147,6 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
       }
     }
 
-    
-  }
-
-  void WallModelLoader::fixCorners() {
 
   }
 
@@ -164,10 +160,36 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     }
   }
 
-  std::shared_ptr< Model > WallModelLoader::get() {
-    Utilities::TextureAtlas atlas;
-    Mesh::FaceMeshGenerator< Mesh::TexturedVertex > generator;
+  std::array< Mesh::TexturedVertex, 6 > WallModelLoader::getPlane( const glm::vec3& origin, const glm::vec3& horizontalDirection, const glm::vec3& verticalDirection, const std::string& wallpaperId ) {
+    std::array< Mesh::TexturedVertex, 6 > plane;
+    auto textureData = atlas.getTextureData( wallpaperId );
 
+    plane[ 0 ] = { origin,                                           { 0.0f, 0.0f, 0.0f }, textureData.lowerCorner };
+    plane[ 1 ] = { origin + horizontalDirection,                     { 0.0f, 0.0f, 0.0f }, { textureData.upperCorner.x, textureData.lowerCorner.y } };
+    plane[ 2 ] = { origin + verticalDirection,                       { 0.0f, 0.0f, 0.0f }, { textureData.lowerCorner.x, textureData.upperCorner.y } };
+
+    plane[ 3 ] = { origin + horizontalDirection,                     { 0.0f, 0.0f, 0.0f }, { textureData.upperCorner.x, textureData.lowerCorner.y } };
+    plane[ 4 ] = { origin + horizontalDirection + verticalDirection, { 0.0f, 0.0f, 0.0f }, textureData.upperCorner };
+    plane[ 5 ] = { origin + verticalDirection,                       { 0.0f, 0.0f, 0.0f }, { textureData.lowerCorner.x, textureData.upperCorner.y } };
+
+    return plane;
+  }
+
+  std::shared_ptr< Model > WallModelLoader::sideToModel( const Models::Sides& sides, const glm::vec3& lowerLeft ) {
+    Mesh::FaceMeshGenerator< Mesh::TexturedVertex > generator;
+  }
+
+  std::shared_ptr< Model > WallModelLoader::cornerToModel( const Corner& corner ) {
+    std::shared_ptr< Model > result = Model::create( "__wallrig", {} );
+
+    return result;
+  }
+
+  std::shared_ptr< Model > WallModelLoader::generateModel() {
+    // TODO !!
+  }
+
+  std::shared_ptr< Model > WallModelLoader::get() {
     // Walk each line then check joint map to see if vertices need to be stretched to close corners
     for( const auto& segment : segments ) {
       // Add texture for front and back to cache
@@ -177,11 +199,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
       insertCornerMapSegment( segment );
     }
 
-    fixCorners();
-
-    // TODO: Generate geometry from cornermap
-
-    return nullptr;
+    return generateModel();
   }
 
 }

@@ -4,6 +4,7 @@
 #include "graphics/scenegraph/modelloader/proceduralmodelloader.hpp"
 #include "graphics/scenegraph/mesh/facemeshgenerator.hpp"
 #include "graphics/scenegraph/mesh/texturedvertex.hpp"
+#include "graphics/utilities/textureatlas.hpp"
 #include "models/wallsegment.hpp"
 #include <vector>
 #include <optional>
@@ -22,13 +23,17 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     const glm::uvec2& dimensions;
     const std::vector< Models::WallSegment >& segments;
     std::vector< std::vector< Corner > > cornerMap;
+    Utilities::TextureAtlas atlas;
 
     Corner* getCorner( const glm::ivec2& location );
 
     void initCornerMap();
     void insertCornerMapSegment( const Models::WallSegment& segment );
-    void fixCorners();
     void insertIntoAtlas( const std::vector< Models::Sides >& sides, Utilities::TextureAtlas& atlas );
+    std::array< Mesh::TexturedVertex, 6 > getPlane( const glm::vec3& origin, const glm::vec3& horizontalDirection, const glm::vec3& verticalDirection, const std::string& wallpaperId );
+    std::shared_ptr< Model > sideToModel( const Models::Sides& sides, const glm::vec3& lowerLeft );
+    std::shared_ptr< Model > cornerToModel( const Corner& corner );
+    std::shared_ptr< Model > generateModel();
 
   public:
     WallModelLoader( const glm::uvec2& dimensions, const std::vector< Models::WallSegment >& segments );
