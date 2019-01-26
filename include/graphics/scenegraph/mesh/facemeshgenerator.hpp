@@ -21,9 +21,9 @@ namespace BlueBear::Graphics::SceneGraph::Mesh {
       // add triangles
       for( const auto& triangle : collection ) {
         faceCollection[ faceId ].push_back( &this->triangles.emplace_back( std::move( Triangle{
-          insertVertex( triangle[ 0 ] ),
-          insertVertex( triangle[ 1 ] ),
-          insertVertex( triangle[ 2 ] )
+          this->insertVertex( triangle[ 0 ] ),
+          this->insertVertex( triangle[ 1 ] ),
+          this->insertVertex( triangle[ 2 ] )
         } ) ) );
       }
     }

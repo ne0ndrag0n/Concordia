@@ -1,13 +1,31 @@
 #include "graphics/scenegraph/modelloader/wallmodelloader.hpp"
 #include "graphics/scenegraph/model.hpp"
+#include "graphics/vector/renderer.hpp"
+#include "graphics/texture.hpp"
 #include "tools/utility.hpp"
+#include <glm/gtx/rotate_vector.hpp>
 
 namespace BlueBear::Graphics::SceneGraph::ModelLoader {
 
-  WallModelLoader::WallModelLoader( const glm::uvec2& dimension, const std::vector< Models::WallSegment >& segments )
-    : dimensions( dimensions ), segments( segments ) {
+  WallModelLoader::WallModelLoader( const glm::uvec2& dimension, const std::vector< Models::WallSegment >& segments, Vector::Renderer& renderer )
+    : dimensions( dimensions ), segments( segments ), renderer( renderer ) {
       initCornerMap();
+      initTopTexture();
     }
+
+  void WallModelLoader::initTopTexture() {
+    std::shared_ptr< unsigned char[] > rawBitmap = renderer.generateBitmap(
+      { 10, 10 },
+      []( Vector::Renderer& renderer ) {
+        renderer.drawRect( { 0, 0, 10, 10 }, { 143, 89, 2, 255 } );
+      }
+    );
+
+    std::shared_ptr< sf::Image > sfmlImage = std::make_shared< sf::Image >();
+    sfmlImage->create( 10, 10, rawBitmap.get() );
+
+    atlas.addTexture( "__top_side", sfmlImage );
+  }
 
   void WallModelLoader::initCornerMap() {
     cornerMap.reserve( dimensions.y );
@@ -146,8 +164,6 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
         }
       }
     }
-
-
   }
 
   void WallModelLoader::insertIntoAtlas( const std::vector< Models::Sides >& sides, Utilities::TextureAtlas& atlas ) {
@@ -175,12 +191,29 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     return plane;
   }
 
-  std::shared_ptr< Model > WallModelLoader::sideToModel( const Models::Sides& sides, const glm::vec3& lowerLeft ) {
+  std::shared_ptr< Model > WallModelLoader::sideToModel( const Models::Sides& sides, const glm::vec3& origin, const glm::vec3& horizontalDirection ) {
     Mesh::FaceMeshGenerator< Mesh::TexturedVertex > generator;
+
+    auto back = getPlane( origin, horizontalDirection, { 0.0f, 0.0f, 4.0f }, sides.back.first );
+    generator.addFace( "back", {
+      { back[ 0 ], back[ 1 ], back[ 2 ] },
+      { back[ 3 ], back[ 4 ], back[ 5 ] }
+    } );
+
   }
 
-  std::shared_ptr< Model > WallModelLoader::cornerToModel( const Corner& corner ) {
+  std::shared_ptr< Model > WallModelLoader::cornerToModel( const Corner& corner, const glm::vec3& topLeftCorner ) {
     std::shared_ptr< Model > result = Model::create( "__wallrig", {} );
+
+    if( corner.horizontal ) {
+      result->addChild( sideToModel( *corner.horizontal, topLeftCorner + glm::vec3{ 0.0f, -0.05f, 0.0f }, { 1.0f, 0.0f, 0.0f } ) );
+    }
+
+    if( corner.vertical ) {
+      result->addChild( sideToModel( *corner.vertical, topLeftCorner + glm::vec3{ -0.05f, 0.0f, 0.0f }, { 0.0f, -1.0f, 0.0f } ) );
+    }
+
+    // TODO: Diagonal pieces, non-trivial
 
     return result;
   }
@@ -198,6 +231,9 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
       // Insert line segment into cornermap
       insertCornerMapSegment( segment );
     }
+
+    // Generate the texture
+    generatedTexture = std::make_shared< Texture >( *atlas.generateAtlas() );
 
     return generateModel();
   }
