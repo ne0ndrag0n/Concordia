@@ -176,28 +176,37 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     }
   }
 
-  std::array< Mesh::TexturedVertex, 6 > WallModelLoader::getPlane( const glm::vec3& origin, const glm::vec3& horizontalDirection, const glm::vec3& verticalDirection, const std::string& wallpaperId ) {
+  std::array< Mesh::TexturedVertex, 6 > WallModelLoader::getPlane( const glm::vec3& origin, const glm::vec3& width, const glm::vec3& height, const std::string& wallpaperId ) {
     std::array< Mesh::TexturedVertex, 6 > plane;
     auto textureData = atlas.getTextureData( wallpaperId );
 
-    plane[ 0 ] = { origin,                                           { 0.0f, 0.0f, 0.0f }, textureData.lowerCorner };
-    plane[ 1 ] = { origin + horizontalDirection,                     { 0.0f, 0.0f, 0.0f }, { textureData.upperCorner.x, textureData.lowerCorner.y } };
-    plane[ 2 ] = { origin + verticalDirection,                       { 0.0f, 0.0f, 0.0f }, { textureData.lowerCorner.x, textureData.upperCorner.y } };
+    plane[ 0 ] = { origin,                             { 0.0f, 0.0f, 0.0f }, textureData.lowerCorner };
+    plane[ 1 ] = { origin + width,                     { 0.0f, 0.0f, 0.0f }, { textureData.upperCorner.x, textureData.lowerCorner.y } };
+    plane[ 2 ] = { origin + height,                    { 0.0f, 0.0f, 0.0f }, { textureData.lowerCorner.x, textureData.upperCorner.y } };
 
-    plane[ 3 ] = { origin + horizontalDirection,                     { 0.0f, 0.0f, 0.0f }, { textureData.upperCorner.x, textureData.lowerCorner.y } };
-    plane[ 4 ] = { origin + horizontalDirection + verticalDirection, { 0.0f, 0.0f, 0.0f }, textureData.upperCorner };
-    plane[ 5 ] = { origin + verticalDirection,                       { 0.0f, 0.0f, 0.0f }, { textureData.lowerCorner.x, textureData.upperCorner.y } };
+    plane[ 3 ] = { origin + width,                     { 0.0f, 0.0f, 0.0f }, { textureData.upperCorner.x, textureData.lowerCorner.y } };
+    plane[ 4 ] = { origin + width + height,            { 0.0f, 0.0f, 0.0f }, textureData.upperCorner };
+    plane[ 5 ] = { origin + height,                    { 0.0f, 0.0f, 0.0f }, { textureData.lowerCorner.x, textureData.upperCorner.y } };
 
     return plane;
   }
 
-  std::shared_ptr< Model > WallModelLoader::sideToModel( const Models::Sides& sides, const glm::vec3& origin, const glm::vec3& horizontalDirection ) {
+  std::shared_ptr< Model > WallModelLoader::sideToModel( const Models::Sides& sides, const glm::vec3& origin, const glm::vec3& width ) {
     Mesh::FaceMeshGenerator< Mesh::TexturedVertex > generator;
+    glm::vec3 bottomRight = origin + width;
+    glm::vec3 wallDirection = glm::normalize( bottomRight - origin );
+    glm::vec3 wallPerpDirection = glm::rotateZ( wallDirection, glm::radians( 90.0f ) );
 
-    auto back = getPlane( origin, horizontalDirection, { 0.0f, 0.0f, 4.0f }, sides.back.first );
+    auto back = getPlane( origin, width, { 0.0f, 0.0f, 4.0f }, sides.back.first );
     generator.addFace( "back", {
       { back[ 0 ], back[ 1 ], back[ 2 ] },
       { back[ 3 ], back[ 4 ], back[ 5 ] }
+    } );
+
+    auto side = getPlane( bottomRight, -0.1f * wallPerpDirection, { 0.0f, 0.0f, 4.0f }, "__top_side" );
+    generator.addFace( "side", {
+      { side[ 0 ], side[ 1 ], side[ 2 ] },
+      { side[ 3 ], side[ 4 ], side[ 5 ] }
     } );
 
   }

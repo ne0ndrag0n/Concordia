@@ -35,8 +35,8 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     void initCornerMap();
     void insertCornerMapSegment( const Models::WallSegment& segment );
     void insertIntoAtlas( const std::vector< Models::Sides >& sides, Utilities::TextureAtlas& atlas );
-    std::array< Mesh::TexturedVertex, 6 > getPlane( const glm::vec3& origin, const glm::vec3& horizontalDirection, const glm::vec3& verticalDirection, const std::string& wallpaperId );
-    std::shared_ptr< Model > sideToModel( const Models::Sides& sides, const glm::vec3& origin, const glm::vec3& horizontalDirection );
+    std::array< Mesh::TexturedVertex, 6 > getPlane( const glm::vec3& origin, const glm::vec3& width, const glm::vec3& height, const std::string& wallpaperId );
+    std::shared_ptr< Model > sideToModel( const Models::Sides& sides, const glm::vec3& origin, const glm::vec3& width );
     std::shared_ptr< Model > cornerToModel( const Corner& corner, const glm::vec3& topLeftCorner );
     std::shared_ptr< Model > generateModel();
 
