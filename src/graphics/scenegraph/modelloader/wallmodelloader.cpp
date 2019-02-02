@@ -34,6 +34,82 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     }
   }
 
+  WallModelLoader::ModifierMap WallModelLoader::getModifiers( const glm::ivec2& cornerIndex ) {
+    ModifierMap map;
+
+    // TODO
+
+    return map;
+  }
+
+  bool WallModelLoader::adjustTopLeft( const glm::ivec2& index ) {
+    Corner* corner = getCorner( index );
+    if( !corner ) {
+      return false;
+    }
+
+    bool isElbow = corner->horizontal.model && corner->vertical.model;
+
+    Corner* upper = getCorner( index + glm::ivec2{ 0, -1 } );
+    bool upperClear = !upper || !upper->vertical.model;
+
+    Corner* left = getCorner( index + glm::ivec2{ -1, 0 } );
+    bool leftClear = !left || !left->horizontal.model;
+
+    return isElbow && upperClear && leftClear;
+  }
+
+  bool WallModelLoader::adjustTopRight( const glm::ivec2& index ) {
+    Corner* corner = getCorner( index );
+    if( !corner ) {
+      return false;
+    }
+
+    bool isSingleVertical = corner->vertical.model && !corner->horizontal.model;
+
+    Corner* left = getCorner( index + glm::ivec2{ -1, 0 } );
+    bool leftHorizontal = left && left->horizontal.model;
+
+    Corner* upper = getCorner( index + glm::ivec2{ 0, -1 } );
+    bool upperClear = !upper || !upper->vertical.model;
+
+    return isSingleVertical && leftHorizontal && upperClear;
+  }
+
+  bool WallModelLoader::adjustBottomLeft( const glm::ivec2& index ) {
+    Corner* corner = getCorner( index );
+    if( !corner ) {
+      return false;
+    }
+
+    bool isSingleHorizontal = !corner->vertical.model && corner->horizontal.model;
+
+    Corner* left = getCorner( index + glm::ivec2{ -1, 0 } );
+    bool leftClear = !left || !left->horizontal.model;
+
+    Corner* upper = getCorner( index + glm::ivec2{ 0, -1 } );
+    bool upperVertical = upper && upper->vertical.model;
+
+    return isSingleHorizontal && leftClear && upperVertical;
+  }
+
+  bool WallModelLoader::adjustBottomRight( const glm::ivec2& index ) {
+    Corner* corner = getCorner( index );
+    if( !corner ) {
+      return false;
+    }
+
+    bool isSingleHorizontal = !corner->vertical.model && corner->horizontal.model;
+
+    Corner* right = getCorner( index + glm::ivec2{ 1, 0 } );
+    bool rightClear = !right || ( !right->horizontal.model && !right->vertical.model );
+
+    Corner* upperRight = getCorner( index + glm::ivec2{ 1, 1 } );
+    bool upperRightVertical = upperRight && upperRight->vertical.model;
+
+    return isSingleHorizontal && rightClear && upperRightVertical;
+  }
+
   WallModelLoader::Corner* WallModelLoader::getCorner( const glm::ivec2& location ) {
     if( location.x < 0 || location.y < 0 ) {
       return nullptr;
@@ -58,7 +134,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
             case -1: {
               //( -1, -1 ) case
               if( Corner* corner = getCorner( cursor - glm::ivec2{ -1, -1 } ) ) {
-                corner->diagonal = segment.faces[ i ];
+                corner->diagonal.model = segment.faces[ i ];
               } else {
                 // Advance to termination event
                 i = distance;
@@ -70,7 +146,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
             case 0: {
               //( -1, 0 ) case
               if( Corner* corner = getCorner( cursor - glm::ivec2{ -1, 0 } ) ) {
-                corner->horizontal = segment.faces[ i ];
+                corner->horizontal.model = segment.faces[ i ];
               } else {
                 // Advance to termination event
                 i = distance;
@@ -83,7 +159,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
               //( -1, 1 ) case
               // This is not a mistake! We need to reuse the cell to the left and use its reverseDiagonal
               if( Corner* corner = getCorner( cursor - glm::ivec2{ -1, 0 } ) ) {
-                corner->reverseDiagonal = segment.faces[ i ];
+                corner->reverseDiagonal.model = segment.faces[ i ];
               } else {
                 // Advance to termination event
                 i = distance;
@@ -99,7 +175,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
             case -1: {
               //( 0, -1 ) case
               if( Corner* corner = getCorner( cursor - glm::ivec2{ 0, -1 } ) ) {
-                corner->vertical = segment.faces[ i ];
+                corner->vertical.model = segment.faces[ i ];
               } else {
                 // Advance to termination event
                 i = distance;
@@ -111,7 +187,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
             case 1: {
               //( 0, 1 ) case
               if( Corner* corner = getCorner( cursor ) ) {
-                corner->vertical = segment.faces[ i ];
+                corner->vertical.model = segment.faces[ i ];
               } else {
                 // Advance to termination event
                 i = distance;
@@ -127,7 +203,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
             case -1: {
               //( 1, -1 ) case
               if( Corner* corner = getCorner( cursor - glm::ivec2{ 0, -1 } ) ) {
-                corner->reverseDiagonal = segment.faces[ i ];
+                corner->reverseDiagonal.model = segment.faces[ i ];
               } else {
                 // Advance to termination event
                 i = distance;
@@ -139,7 +215,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
             case 0: {
               //( 1, 0 ) case
               if( Corner* corner = getCorner( cursor ) ) {
-                corner->horizontal = segment.faces[ i ];
+                corner->horizontal.model = segment.faces[ i ];
               } else {
                 // Advance to termination event
                 i = distance;
@@ -151,7 +227,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
             case 1: {
               //( 1, 1 ) case
               if( Corner* corner = getCorner( cursor ) ) {
-                corner->diagonal = segment.faces[ i ];
+                corner->diagonal.model = segment.faces[ i ];
               } else {
                 // Advance to termination event
                 i = distance;
@@ -191,35 +267,38 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     return plane;
   }
 
-  std::shared_ptr< Model > WallModelLoader::sideToModel( const Models::Sides& sides, const glm::vec3& origin, const glm::vec3& width ) {
-    Mesh::FaceMeshGenerator< Mesh::TexturedVertex > generator;
+  WallModelLoader::PlaneGroup WallModelLoader::sideToStagedMesh( const Models::Sides& sides, const glm::vec3& origin, const glm::vec3& width ) {
     glm::vec3 bottomRight = origin + width;
     glm::vec3 wallDirection = glm::normalize( bottomRight - origin );
     glm::vec3 wallPerpDirection = glm::rotateZ( wallDirection, glm::radians( 90.0f ) );
+    glm::vec3 inverseWallDirection = -1.0f * wallDirection;
+    glm::vec3 inverseWallPerpDirection = -1.0f * wallPerpDirection;
+    glm::vec3 topRight = bottomRight + ( 0.1f * wallPerpDirection );
+    glm::vec3 topLeft = origin + ( 0.1f * wallPerpDirection );
+    glm::vec3 upperOrigin = origin + glm::vec3{ 0.0f, 0.0f, 4.0f };
 
-    auto back = getPlane( origin, width, { 0.0f, 0.0f, 4.0f }, sides.back.first );
-    generator.addFace( "back", {
-      { back[ 0 ], back[ 1 ], back[ 2 ] },
-      { back[ 3 ], back[ 4 ], back[ 5 ] }
-    } );
-
-    auto side = getPlane( bottomRight, -0.1f * wallPerpDirection, { 0.0f, 0.0f, 4.0f }, "__top_side" );
-    generator.addFace( "side", {
-      { side[ 0 ], side[ 1 ], side[ 2 ] },
-      { side[ 3 ], side[ 4 ], side[ 5 ] }
-    } );
-
+    PlaneGroup planeGroup;
+    planeGroup.emplace( "back", getPlane( origin, width, { 0.0f, 0.0f, 4.0f }, sides.back.first ) );
+    planeGroup.emplace( "right", getPlane( bottomRight, 0.1f * wallPerpDirection, { 0.0f, 0.0f, 4.0f }, "__top_side" ) );
+    planeGroup.emplace( "front", getPlane( topRight, 1.0f * inverseWallDirection, { 0.0f, 0.0f, 4.0f }, sides.front.first ) );
+    planeGroup.emplace( "left", getPlane( topLeft, 0.1f * inverseWallPerpDirection, { 0.0f, 0.0f, 4.0f }, "__top_side" ) );
+    planeGroup.emplace( "top", getPlane( upperOrigin, wallDirection, 0.1f * wallPerpDirection, "__top_side" ) );
+    return planeGroup;
   }
 
-  std::shared_ptr< Model > WallModelLoader::cornerToModel( const Corner& corner, const glm::vec3& topLeftCorner ) {
+  std::shared_ptr< Model > WallModelLoader::cornerToModel( Corner& corner, const glm::ivec2& position ) {
+    // TODO: Elevation per vertex
+    glm::vec3 topLeftCorner{ -( dimensions.x * 0.5f ) + position.x, ( dimensions.y * 0.5f ) + position.y, 0.0f };
+    Mesh::FaceMeshGenerator< Mesh::TexturedVertex > generator;
+
     std::shared_ptr< Model > result = Model::create( "__wallrig", {} );
 
-    if( corner.horizontal ) {
-      result->addChild( sideToModel( *corner.horizontal, topLeftCorner + glm::vec3{ 0.0f, -0.05f, 0.0f }, { 1.0f, 0.0f, 0.0f } ) );
+    if( corner.horizontal.model ) {
+      corner.horizontal.stagedMesh = sideToStagedMesh( *corner.horizontal.model, topLeftCorner + glm::vec3{ 0.0f, -0.05f, 0.0f }, { 1.0f, 0.0f, 0.0f } );
     }
 
-    if( corner.vertical ) {
-      result->addChild( sideToModel( *corner.vertical, topLeftCorner + glm::vec3{ -0.05f, 0.0f, 0.0f }, { 0.0f, -1.0f, 0.0f } ) );
+    if( corner.vertical.model ) {
+      corner.vertical.stagedMesh = sideToStagedMesh( *corner.vertical.model, topLeftCorner + glm::vec3{ -0.05f, 0.0f, 0.0f }, { 0.0f, -1.0f, 0.0f } );
     }
 
     // TODO: Diagonal pieces, non-trivial
