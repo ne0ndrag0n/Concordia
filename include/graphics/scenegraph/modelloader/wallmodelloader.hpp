@@ -15,7 +15,6 @@ namespace BlueBear::Graphics::Vector{ class Renderer; }
 namespace BlueBear::Graphics::SceneGraph::ModelLoader {
 
   class WallModelLoader : public ProceduralModelLoader {
-    using ModifierMap = std::map< std::string, std::function< void( std::array< Mesh::TexturedVertex, 6 >& ) > >;
     using PlaneGroup = std::map< std::string, std::array< Mesh::TexturedVertex, 6 > >;
 
     struct Corner {
@@ -49,12 +48,12 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
 
     Corner* getCorner( const glm::ivec2& location );
 
-    ModifierMap getModifiers( const glm::ivec2& cornerIndex );
     bool adjustTopLeft( const glm::ivec2& index );
     bool adjustTopRight( const glm::ivec2& index );
     bool adjustBottomLeft( const glm::ivec2& index );
     bool adjustBottomRight( const glm::ivec2& index );
 
+    void fixCorners( const glm::ivec2& startingIndex );
     void initTopTexture();
     void initCornerMap();
     void insertCornerMapSegment( const Models::WallSegment& segment );

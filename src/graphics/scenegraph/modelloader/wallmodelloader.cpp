@@ -2,6 +2,7 @@
 #include "graphics/scenegraph/model.hpp"
 #include "graphics/vector/renderer.hpp"
 #include "graphics/texture.hpp"
+#include "exceptions/nullpointerexception.hpp"
 #include "tools/utility.hpp"
 #include <glm/gtx/rotate_vector.hpp>
 
@@ -32,14 +33,6 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     for( auto& xLevel : cornerMap ) {
       xLevel.reserve( dimensions.x );
     }
-  }
-
-  WallModelLoader::ModifierMap WallModelLoader::getModifiers( const glm::ivec2& cornerIndex ) {
-    ModifierMap map;
-
-    // TODO
-
-    return map;
   }
 
   bool WallModelLoader::adjustTopLeft( const glm::ivec2& index ) {
@@ -108,6 +101,32 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     bool upperRightVertical = upperRight && upperRight->vertical.model;
 
     return isSingleHorizontal && rightClear && upperRightVertical;
+  }
+
+  void WallModelLoader::fixCorners( const glm::ivec2& startingIndex ) {
+    /*
+      5    4
+           3
+      2
+      0    1
+    */
+
+    if( adjustTopLeft( startingIndex ) ) {
+      Corner* corner;
+      Exceptions::NullPointerException::check( "WallModelLoader::fixCorners", corner = getCorner( startingIndex ) );
+      corner->horizontal.stagedMesh[ "front" ][ 1 ].position += glm::vec3{ -0.05f, 0.0f, 0.0f };
+      corner->horizontal.stagedMesh[ "front" ][ 3 ].position += glm::vec3{ -0.05f, 0.0f, 0.0f };
+      corner->horizontal.stagedMesh[ "front" ][ 4 ].position += glm::vec3{ -0.05f, 0.0f, 0.0f };
+
+      corner->horizontal.stagedMesh[ "top" ][ 2 ].position += glm::vec3{ 0.0f, 0.05f, 0.0f };
+      corner->horizontal.stagedMesh[ "top" ][ 5 ].position += glm::vec3{ 0.0f, 0.05f, 0.0f };
+
+      corner->vertical.stagedMesh[ "back" ][ 0 ].position += glm::vec3{ 0.0f, 0.05f, 0.0f };
+      corner->vertical.stagedMesh[ "back" ][ 2 ].position += glm::vec3{ 0.0f, 0.05f, 0.0f };
+      corner->vertical.stagedMesh[ "back" ][ 5 ].position += glm::vec3{ 0.0f, 0.05f, 0.0f };
+
+      corner->vertical.stagedMesh[ "top" ][ 0 ].position += glm::vec3{ 0.0f, 0.05f, 0.0f };
+    }
   }
 
   WallModelLoader::Corner* WallModelLoader::getCorner( const glm::ivec2& location ) {
@@ -289,7 +308,6 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
   std::shared_ptr< Model > WallModelLoader::cornerToModel( Corner& corner, const glm::ivec2& position ) {
     // TODO: Elevation per vertex
     glm::vec3 topLeftCorner{ -( dimensions.x * 0.5f ) + position.x, ( dimensions.y * 0.5f ) + position.y, 0.0f };
-    Mesh::FaceMeshGenerator< Mesh::TexturedVertex > generator;
 
     std::shared_ptr< Model > result = Model::create( "__wallrig", {} );
 
