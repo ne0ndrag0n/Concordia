@@ -2,23 +2,23 @@
 #include "graphics/scenegraph/model.hpp"
 #include "graphics/vector/renderer.hpp"
 #include "graphics/texture.hpp"
+#include "graphics/shader.hpp"
 #include "exceptions/nullpointerexception.hpp"
 #include "tools/utility.hpp"
 #include <glm/gtx/rotate_vector.hpp>
 
 namespace BlueBear::Graphics::SceneGraph::ModelLoader {
 
-  WallModelLoader::WallModelLoader( const glm::uvec2& dimension, const std::vector< Models::WallSegment >& segments, Vector::Renderer& renderer )
-    : dimensions( dimensions ), segments( segments ), renderer( renderer ) {
-      initCornerMap();
-      initTopTexture();
+  WallModelLoader::WallModelLoader( const std::vector< Models::Infrastructure::FloorLevel >& floorLevels, Vector::Renderer& renderer )
+    : floorLevels( floorLevels ) {
+      initTopTexture( renderer );
     }
 
-  void WallModelLoader::initTopTexture() {
+  void WallModelLoader::initTopTexture( Vector::Renderer& renderer ) {
     std::shared_ptr< unsigned char[] > rawBitmap = renderer.generateBitmap(
       { 10, 10 },
-      []( Vector::Renderer& renderer ) {
-        renderer.drawRect( { 0, 0, 10, 10 }, { 143, 89, 2, 255 } );
+      []( Vector::Renderer& r ) {
+        r.drawRect( { 0, 0, 10, 10 }, { 143, 89, 2, 255 } );
       }
     );
 
@@ -29,6 +29,8 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
   }
 
   void WallModelLoader::initCornerMap() {
+    cornerMap.clear();
+
     cornerMap.reserve( dimensions.y );
     for( auto& xLevel : cornerMap ) {
       xLevel.reserve( dimensions.x );
@@ -372,31 +374,75 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     }
   }
 
+  void WallModelLoader::addToGenerator( Mesh::IndexedMeshGenerator< Mesh::TexturedVertex >& generator, const PlaneGroup& planeGroup ) {
+    for( const auto& pair : planeGroup ) {
+      generator.addTriangle( pair.second[ 0 ], pair.second[ 1 ], pair.second[ 2 ] );
+      generator.addTriangle( pair.second[ 3 ], pair.second[ 4 ], pair.second[ 5 ] );
+    }
+  }
+
   /**
    * All the meshes are ready and corners fixed
    */
   std::shared_ptr< Model > WallModelLoader::generateModel() {
     std::shared_ptr< Texture > generatedTexture = std::make_shared< Texture >( *atlas.generateAtlas() );
-    std::shared_ptr< Model > result = Model::create( "__wallrig", {} );
+    std::shared_ptr< Model > result = Model::create( "__wall_level", {} );
 
-    
+    // Result will be a single model with a single mesh built using a mesh generator
+    Mesh::IndexedMeshGenerator< Mesh::TexturedVertex > generator;
+    for( const auto& row : cornerMap ) {
+      for( const auto& corner : row ) {
+        if( corner.horizontal.model ) { addToGenerator( generator, corner.horizontal.stagedMesh ); }
+        if( corner.vertical.model ) { addToGenerator( generator, corner.vertical.stagedMesh ); }
+        if( corner.diagonal.model ) { addToGenerator( generator, corner.diagonal.stagedMesh ); }
+        if( corner.reverseDiagonal.model ) { addToGenerator( generator, corner.reverseDiagonal.stagedMesh ); }
+      }
+    }
+
+    generator.generateNormals();
+
+    /**
+    std::shared_ptr< Model > result = Model::create( "__floorlevel", { {
+      generator.generateMesh(),
+      shader,
+      std::make_shared< Material >( std::vector< std::shared_ptr< Texture > >{ std::make_shared< Texture >( meshTexture ) }, std::vector< std::shared_ptr< Texture > >{}, 0.0f, 1.0f )
+    } } );
+    */
 
     return result;
   }
 
   std::shared_ptr< Model > WallModelLoader::get() {
-    // Walk each line then check joint map to see if vertices need to be stretched to close corners
-    for( const auto& segment : segments ) {
-      // Add texture for front and back to cache
-      insertIntoAtlas( segment.faces, atlas );
+    std::shared_ptr< Model > result = Model::create( "__wallrig", {} );
+    std::shared_ptr< Shader > shader = std::make_shared< Shader >( "system/shaders/infr/vertex.glsl", "system/shaders/infr/fragment.glsl" );
 
-      // Insert line segment into cornermap
-      insertCornerMapSegment( segment );
+    for( const auto& level : floorLevels ) {
+      // Set state of WallModelLoader for current level
+      dimensions = level.dimensions;
+      initCornerMap();
+
+      // If there are no segments, return null pointer and don't waste any time
+      if( level.wallSegments.empty() ) {
+        continue;
+      }
+
+      // Walk each line then check joint map to see if vertices need to be stretched to close corners
+      for( const auto& segment : level.wallSegments ) {
+        // Add texture for front and back to cache
+        insertIntoAtlas( segment.faces, atlas );
+
+        // Insert line segment into cornermap
+        insertCornerMapSegment( segment );
+      }
+
+      generateDeferredMeshes();
+
+      if( std::shared_ptr< Model > levelModel = generateModel() ) {
+        result->addChild( levelModel );
+      }
     }
 
-    generateDeferredMeshes();
-
-    return generateModel();
+    return result;
   }
 
 }

@@ -2,9 +2,10 @@
 #define WALL_MODEL_LOADER
 
 #include "graphics/scenegraph/modelloader/proceduralmodelloader.hpp"
-#include "graphics/scenegraph/mesh/facemeshgenerator.hpp"
+#include "graphics/scenegraph/mesh/indexedmeshgenerator.hpp"
 #include "graphics/scenegraph/mesh/texturedvertex.hpp"
 #include "graphics/utilities/textureatlas.hpp"
+#include "models/infrastructure.hpp"
 #include "models/wallsegment.hpp"
 #include <vector>
 #include <optional>
@@ -39,9 +40,8 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
       } reverseDiagonal;
     };
 
-    Vector::Renderer& renderer;
-    const glm::uvec2& dimensions;
-    const std::vector< Models::WallSegment >& segments;
+    glm::uvec2 dimensions;
+    const std::vector< Models::Infrastructure::FloorLevel >& floorLevels;
     std::vector< std::vector< Corner > > cornerMap;
     Utilities::TextureAtlas atlas;
 
@@ -55,7 +55,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     bool adjustBottomRight( const glm::ivec2& index );
 
     void fixCorners( const glm::ivec2& startingIndex );
-    void initTopTexture();
+    void initTopTexture( Vector::Renderer& renderer );
     void initCornerMap();
 
     void insertCornerMapSegment( const Models::WallSegment& segment );
@@ -64,10 +64,11 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     std::array< Mesh::TexturedVertex, 6 > getPlane( const glm::vec3& origin, const glm::vec3& width, const glm::vec3& height, const std::string& wallpaperId );
     PlaneGroup sideToStagedMesh( const Models::Sides& sides, const glm::vec3& origin, const glm::vec3& width );
     void generateDeferredMeshes();
+    void addToGenerator( Mesh::IndexedMeshGenerator< Mesh::TexturedVertex >& generator, const PlaneGroup& planeGroup );
     std::shared_ptr< Model > generateModel();
 
   public:
-    WallModelLoader( const glm::uvec2& dimensions, const std::vector< Models::WallSegment >& segments, Vector::Renderer& renderer );
+    WallModelLoader( const std::vector< Models::Infrastructure::FloorLevel >& floorLevels, Vector::Renderer& renderer );
 
     std::shared_ptr< Model > get() override;
   };

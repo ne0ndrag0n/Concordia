@@ -79,6 +79,11 @@ namespace BlueBear::Graphics::SceneGraph::Mesh {
     };
 
     std::shared_ptr< MeshDefinition< VertexType > > generateMesh() {
+      // For safety - Don't think we can create meshes with no vertices
+      if( vertices.empty() ) {
+        return nullptr;
+      }
+
       // Unroll triangles
       std::vector< unsigned int > unrolledIndices;
       for( const auto& triangle : triangles ) {
