@@ -103,29 +103,61 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     return isSingleHorizontal && rightClear && upperRightVertical;
   }
 
+  glm::vec3 WallModelLoader::indexToLocation( const glm::ivec2& position ) {
+    // TODO: Elevation per vertex
+    return { -( dimensions.x * 0.5f ) + position.x, ( dimensions.y * 0.5f ) + position.y, 0.0f };
+  }
+
   void WallModelLoader::fixCorners( const glm::ivec2& startingIndex ) {
-    /*
-      5    4
-           3
-      2
-      0    1
-    */
+    // TODO: Elevation per vertex
 
     if( adjustTopLeft( startingIndex ) ) {
       Corner* corner;
       Exceptions::NullPointerException::check( "WallModelLoader::fixCorners", corner = getCorner( startingIndex ) );
-      corner->horizontal.stagedMesh[ "front" ][ 1 ].position += glm::vec3{ -0.05f, 0.0f, 0.0f };
-      corner->horizontal.stagedMesh[ "front" ][ 3 ].position += glm::vec3{ -0.05f, 0.0f, 0.0f };
-      corner->horizontal.stagedMesh[ "front" ][ 4 ].position += glm::vec3{ -0.05f, 0.0f, 0.0f };
+      updateStagedMesh( corner->horizontal.stagedMesh, indexToLocation( startingIndex ) + glm::vec3{ 0.0f, 0.05f, 0.0f }, { -0.05f, 0.0f, 0.0f } );
+      updateStagedMesh( corner->horizontal.stagedMesh, indexToLocation( startingIndex ) + glm::vec3{ 0.0f, 0.05f, 4.0f }, { -0.05f, 0.0f, 0.0f } );
 
-      corner->horizontal.stagedMesh[ "top" ][ 2 ].position += glm::vec3{ 0.0f, 0.05f, 0.0f };
-      corner->horizontal.stagedMesh[ "top" ][ 5 ].position += glm::vec3{ 0.0f, 0.05f, 0.0f };
+      updateStagedMesh( corner->vertical.stagedMesh, indexToLocation( startingIndex ) + glm::vec3{ -0.05f, 0.0f, 0.0f }, { 0.0f, 0.05f, 0.0f } );
+      updateStagedMesh( corner->vertical.stagedMesh, indexToLocation( startingIndex ) + glm::vec3{ -0.05f, 0.0f, 4.0f }, { 0.0f, 0.05f, 0.0f } );
+    }
 
-      corner->vertical.stagedMesh[ "back" ][ 0 ].position += glm::vec3{ 0.0f, 0.05f, 0.0f };
-      corner->vertical.stagedMesh[ "back" ][ 2 ].position += glm::vec3{ 0.0f, 0.05f, 0.0f };
-      corner->vertical.stagedMesh[ "back" ][ 5 ].position += glm::vec3{ 0.0f, 0.05f, 0.0f };
+    if( adjustTopRight( startingIndex ) ) {
+      Corner* corner;
+      Corner* left;
+      Exceptions::NullPointerException::check( "WallModelLoader::fixCorners", corner = getCorner( startingIndex ) );
+      Exceptions::NullPointerException::check( "WallModelLoader::fixCorners", left = getCorner( startingIndex + glm::ivec2{ -1, 0 } ) );
 
-      corner->vertical.stagedMesh[ "top" ][ 0 ].position += glm::vec3{ 0.0f, 0.05f, 0.0f };
+      updateStagedMesh( corner->vertical.stagedMesh, indexToLocation( startingIndex ) + glm::vec3{ 0.05f, 0.0f, 0.0f }, { 0.0f, 0.05f, 0.0f } );
+      updateStagedMesh( corner->vertical.stagedMesh, indexToLocation( startingIndex ) + glm::vec3{ 0.05f, 0.0f, 4.0f }, { 0.0f, 0.05f, 0.0f } );
+
+      updateStagedMesh( left->horizontal.stagedMesh, indexToLocation( startingIndex + glm::ivec2{ -1, 0 } ) + glm::vec3{ 1.0f, 0.05f, 0.0f }, { 0.05f, 0.0f, 0.0f } );
+      updateStagedMesh( left->horizontal.stagedMesh, indexToLocation( startingIndex + glm::ivec2{ -1, 0 } ) + glm::vec3{ 1.0f, 0.05f, 4.0f }, { 0.05f, 0.0f, 0.0f } );
+    }
+
+    if( adjustBottomLeft( startingIndex ) ) {
+      Corner* corner;
+      Corner* top;
+      Exceptions::NullPointerException::check( "WallModelLoader::fixCorners", corner = getCorner( startingIndex ) );
+      Exceptions::NullPointerException::check( "WallModelLoader::fixCorners", top = getCorner( startingIndex + glm::ivec2{ 0, -1 } ) );
+
+      updateStagedMesh( corner->horizontal.stagedMesh, indexToLocation( startingIndex ) + glm::vec3{ 0.0f, -0.05f, 0.0f }, { -0.05f, 0.0f, 0.0f } );
+      updateStagedMesh( corner->horizontal.stagedMesh, indexToLocation( startingIndex ) + glm::vec3{ 0.0f, -0.05f, 4.0f }, { -0.05f, 0.0f, 0.0f } );
+
+      updateStagedMesh( top->vertical.stagedMesh, indexToLocation( startingIndex + glm::ivec2{ 0, -1 } ) + glm::vec3{ -0.05f, -1.0f, 0.0f }, { 0.0f, -0.05f, 0.0f } );
+      updateStagedMesh( top->vertical.stagedMesh, indexToLocation( startingIndex + glm::ivec2{ 0, -1 } ) + glm::vec3{ -0.05f, -1.0f, 4.0f }, { 0.0f, -0.05f, 0.0f } );
+    }
+
+    if( adjustBottomRight( startingIndex ) ) {
+      Corner* corner;
+      Corner* upperRight;
+      Exceptions::NullPointerException::check( "WallModelLoader::fixCorners", corner = getCorner( startingIndex ) );
+      Exceptions::NullPointerException::check( "WallModelLoader::fixCorners", upperRight = getCorner( startingIndex + glm::ivec2{ 1, -1 } ) );
+
+      updateStagedMesh( corner->horizontal.stagedMesh, indexToLocation( startingIndex ) + glm::vec3{ 1.0f, -0.05f, 0.0f }, { 0.05f, 0.0f, 0.0f } );
+      updateStagedMesh( corner->horizontal.stagedMesh, indexToLocation( startingIndex ) + glm::vec3{ 1.0f, -0.05f, 4.0f }, { 0.05f, 0.0f, 0.0f } );
+
+      updateStagedMesh( upperRight->vertical.stagedMesh, indexToLocation( startingIndex + glm::ivec2{ 1, -1 } ) + glm::vec3{ 0.05f, -1.0f, 0.0f }, { 0.0f, -0.05f, 0.0f } );
+      updateStagedMesh( upperRight->vertical.stagedMesh, indexToLocation( startingIndex + glm::ivec2{ 1, -1 } ) + glm::vec3{ 0.05f, -1.0f, 4.0f }, { 0.0f, -0.05f, 0.0f } );
     }
   }
 
@@ -139,6 +171,16 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     }
 
     return &cornerMap[ location.y ][ location.x ];
+  }
+
+  void WallModelLoader::updateStagedMesh( PlaneGroup& group, const glm::vec3& position, const glm::vec3& addValue ) {
+    for( auto& pair : group ) {
+      for( auto& vertex : pair.second ) {
+        if( Tools::Utility::equalEpsilon( vertex.position, position ) ) {
+          vertex.position += addValue;
+        }
+      }
+    }
   }
 
   void WallModelLoader::insertCornerMapSegment( const Models::WallSegment& segment ) {
@@ -305,27 +347,41 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     return planeGroup;
   }
 
-  std::shared_ptr< Model > WallModelLoader::cornerToModel( Corner& corner, const glm::ivec2& position ) {
-    // TODO: Elevation per vertex
-    glm::vec3 topLeftCorner{ -( dimensions.x * 0.5f ) + position.x, ( dimensions.y * 0.5f ) + position.y, 0.0f };
+  void WallModelLoader::generateDeferredMeshes() {
+    // Generate deferred meshes
+    glm::ivec2 cursor{ 0, 0 };
+    for( ; cursor.y != dimensions.y; cursor.y++ ) {
+      for( ; cursor.x != dimensions.x; cursor.x++ ) {
+        Corner& corner = cornerMap[ cursor.y ][ cursor.x ];
 
-    std::shared_ptr< Model > result = Model::create( "__wallrig", {} );
+        // TODO: Elevation per vertex
+        glm::vec3 topLeftCorner = indexToLocation( cursor );
 
-    if( corner.horizontal.model ) {
-      corner.horizontal.stagedMesh = sideToStagedMesh( *corner.horizontal.model, topLeftCorner + glm::vec3{ 0.0f, -0.05f, 0.0f }, { 1.0f, 0.0f, 0.0f } );
+        if( corner.horizontal.model ) {
+          corner.horizontal.stagedMesh = sideToStagedMesh( *corner.horizontal.model, topLeftCorner + glm::vec3{ 0.0f, -0.05f, 0.0f }, { 1.0f, 0.0f, 0.0f } );
+        }
+
+        if( corner.vertical.model ) {
+          corner.vertical.stagedMesh = sideToStagedMesh( *corner.vertical.model, topLeftCorner + glm::vec3{ -0.05f, 0.0f, 0.0f }, { 0.0f, -1.0f, 0.0f } );
+        }
+
+        // TODO: Diagonal pieces, non-trivial
+
+        fixCorners( cursor );
+      }
     }
-
-    if( corner.vertical.model ) {
-      corner.vertical.stagedMesh = sideToStagedMesh( *corner.vertical.model, topLeftCorner + glm::vec3{ -0.05f, 0.0f, 0.0f }, { 0.0f, -1.0f, 0.0f } );
-    }
-
-    // TODO: Diagonal pieces, non-trivial
-
-    return result;
   }
 
+  /**
+   * All the meshes are ready and corners fixed
+   */
   std::shared_ptr< Model > WallModelLoader::generateModel() {
-    // TODO !!
+    std::shared_ptr< Texture > generatedTexture = std::make_shared< Texture >( *atlas.generateAtlas() );
+    std::shared_ptr< Model > result = Model::create( "__wallrig", {} );
+
+    
+
+    return result;
   }
 
   std::shared_ptr< Model > WallModelLoader::get() {
@@ -338,8 +394,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
       insertCornerMapSegment( segment );
     }
 
-    // Generate the texture
-    generatedTexture = std::make_shared< Texture >( *atlas.generateAtlas() );
+    generateDeferredMeshes();
 
     return generateModel();
   }

@@ -43,10 +43,11 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     const glm::uvec2& dimensions;
     const std::vector< Models::WallSegment >& segments;
     std::vector< std::vector< Corner > > cornerMap;
-    std::shared_ptr< Texture > generatedTexture;
     Utilities::TextureAtlas atlas;
 
     Corner* getCorner( const glm::ivec2& location );
+    void updateStagedMesh( PlaneGroup& group, const glm::vec3& position, const glm::vec3& addValue );
+    glm::vec3 indexToLocation( const glm::ivec2& position );
 
     bool adjustTopLeft( const glm::ivec2& index );
     bool adjustTopRight( const glm::ivec2& index );
@@ -56,11 +57,13 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     void fixCorners( const glm::ivec2& startingIndex );
     void initTopTexture();
     void initCornerMap();
+
     void insertCornerMapSegment( const Models::WallSegment& segment );
     void insertIntoAtlas( const std::vector< Models::Sides >& sides, Utilities::TextureAtlas& atlas );
+
     std::array< Mesh::TexturedVertex, 6 > getPlane( const glm::vec3& origin, const glm::vec3& width, const glm::vec3& height, const std::string& wallpaperId );
     PlaneGroup sideToStagedMesh( const Models::Sides& sides, const glm::vec3& origin, const glm::vec3& width );
-    std::shared_ptr< Model > cornerToModel( Corner& corner, const glm::ivec2& position );
+    void generateDeferredMeshes();
     std::shared_ptr< Model > generateModel();
 
   public:
