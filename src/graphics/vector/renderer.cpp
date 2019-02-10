@@ -204,9 +204,13 @@ namespace BlueBear {
         currentTexture = nullptr;
       }
 
-      std::shared_ptr< unsigned char[] > Renderer::generateBitmap( const glm::uvec2& dimensions, std::function< void( Renderer& ) > functor ) {
-        unsigned char* array = new unsigned char[ ( dimensions.x * dimensions.y ) * 4 ];
+      void Renderer::generateBitmap( const glm::uvec2& dimensions, std::function< void( Renderer& ) > functor, std::function< void( unsigned char* ) > resultOperation ) {
+        unsigned long size = ( dimensions.x * dimensions.y ) * 4;
+        if( size > 1000000 ) {
+          Log::getInstance().warn( "Renderer::generateBitmap", "Stack size allocated to this bitmap will exceed 1MB" );
+        }
 
+        unsigned char array[ size ] = { 0 };
         device.executeOnSecondaryContext( secondaryGLContext, [ & ]() {
           currentTexture = std::make_shared< Renderer::Texture >( *this, dimensions );
           render( functor, [ & ]() {
@@ -215,7 +219,9 @@ namespace BlueBear {
           } );
         } );
 
-        return std::shared_ptr< unsigned char[] >( array );
+        resultOperation( array );
+
+        currentTexture = nullptr;
       }
 
       Renderer::Texture::Texture( Renderer& renderer, const glm::uvec2& dimensions ) : parent( renderer ), dimensions( dimensions ) {

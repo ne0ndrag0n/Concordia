@@ -9,17 +9,6 @@
 
 namespace BlueBear::Models {
 
-  std::shared_ptr< sf::Image > getDefaults( Graphics::Vector::Renderer& renderer ) {
-    std::shared_ptr< sf::Image > result = std::make_shared< sf::Image >();
-    std::shared_ptr< unsigned char[] > bitmap = renderer.generateBitmap( { 1, 10 }, [ & ]( Graphics::Vector::Renderer& renderer ) {
-      renderer.drawRect( { 0, 0, 1, 10 }, { 128, 64, 0, 255 } );
-    } );
-
-    result->create( 1, 10, bitmap.get() );
-
-    return result;
-  }
-
   Json::Value Infrastructure::save() {
 
   }
@@ -73,7 +62,7 @@ namespace BlueBear::Models {
       Graphics::SceneGraph::ModelLoader::FloorModelLoader floorModelLoader( levels );
       worldRenderer.insertDirect( floorModelLoader.get() );
 
-      //Graphics::SceneGraph::ModelLoader::WallModelLoader wallModelLoader( levels, renderer );
+      Graphics::SceneGraph::ModelLoader::WallModelLoader wallModelLoader( levels, renderer );
     }
   }
 

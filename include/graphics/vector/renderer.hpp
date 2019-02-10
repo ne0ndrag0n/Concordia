@@ -87,7 +87,7 @@ namespace BlueBear {
 
         std::shared_ptr< Renderer::Texture > createTexture( const glm::uvec2& dimensions, std::function< void( Renderer& ) > functor );
         void updateExistingTexture( std::shared_ptr< Renderer::Texture > texture, std::function< void( Renderer& ) > functor );
-        std::shared_ptr< unsigned char[] > generateBitmap( const glm::uvec2& dimensions, std::function< void( Renderer& ) > functor );
+        void generateBitmap( const glm::uvec2& dimensions, std::function< void( Renderer& ) > functor, std::function< void( unsigned char* ) > resultOperation );
       };
 
     }

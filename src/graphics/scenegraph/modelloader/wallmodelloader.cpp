@@ -16,17 +16,18 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     }
 
   void WallModelLoader::initTopTexture( Vector::Renderer& renderer ) {
-    std::shared_ptr< unsigned char[] > rawBitmap = renderer.generateBitmap(
+    renderer.generateBitmap(
       { 10, 10 },
       []( Vector::Renderer& r ) {
         r.drawRect( { 0, 0, 10, 10 }, { 143, 89, 2, 255 } );
+      },
+      [ & ]( unsigned char* bitmap ) {
+        std::shared_ptr< sf::Image > sfmlImage = std::make_shared< sf::Image >();
+        sfmlImage->create( 10, 10, bitmap );
+
+        atlas.addTexture( "__top_side", sfmlImage );
       }
     );
-
-    std::shared_ptr< sf::Image > sfmlImage = std::make_shared< sf::Image >();
-    sfmlImage->create( 10, 10, rawBitmap.get() );
-
-    atlas.addTexture( "__top_side", sfmlImage );
   }
 
   void WallModelLoader::initCornerMap() {
