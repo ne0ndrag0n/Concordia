@@ -21,7 +21,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
       []( Vector::Renderer& r ) {
         r.drawRect( { 0, 0, 10, 10 }, { 143, 89, 2, 255 } );
       },
-      [ & ]( unsigned char* bitmap ) {
+      [ & ]( const unsigned char* bitmap ) {
         std::shared_ptr< sf::Image > sfmlImage = std::make_shared< sf::Image >();
         sfmlImage->create( 10, 10, bitmap );
 

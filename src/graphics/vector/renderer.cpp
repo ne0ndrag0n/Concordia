@@ -204,7 +204,7 @@ namespace BlueBear {
         currentTexture = nullptr;
       }
 
-      void Renderer::generateBitmap( const glm::uvec2& dimensions, std::function< void( Renderer& ) > functor, std::function< void( unsigned char* ) > resultOperation ) {
+      void Renderer::generateBitmap( const glm::uvec2& dimensions, std::function< void( Renderer& ) > functor, std::function< void( const unsigned char* ) > resultOperation ) {
         unsigned long size = ( dimensions.x * dimensions.y ) * 4;
         if( size > 1000000 ) {
           Log::getInstance().warn( "Renderer::generateBitmap", "Stack size allocated to this bitmap will exceed 1MB" );
