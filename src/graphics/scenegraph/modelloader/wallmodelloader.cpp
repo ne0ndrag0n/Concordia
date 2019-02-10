@@ -355,7 +355,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     // Generate deferred meshes
     glm::ivec2 cursor{ 0, 0 };
     for( ; cursor.y != dimensions.y; cursor.y++ ) {
-      for( ; cursor.x != dimensions.x; cursor.x++ ) {
+      for( cursor.x = 0; cursor.x != dimensions.x; cursor.x++ ) {
         Corner& corner = cornerMap[ cursor.y ][ cursor.x ];
 
         // TODO: Elevation per vertex
