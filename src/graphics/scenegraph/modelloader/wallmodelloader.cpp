@@ -1,5 +1,6 @@
 #include "graphics/scenegraph/modelloader/wallmodelloader.hpp"
 #include "graphics/scenegraph/model.hpp"
+#include "graphics/scenegraph/material.hpp"
 #include "graphics/vector/renderer.hpp"
 #include "graphics/texture.hpp"
 #include "graphics/shader.hpp"
@@ -384,9 +385,8 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
   /**
    * All the meshes are ready and corners fixed
    */
-  std::shared_ptr< Model > WallModelLoader::generateModel() {
+  Drawable WallModelLoader::generateDrawable() {
     std::shared_ptr< Texture > generatedTexture = std::make_shared< Texture >( *atlas.generateAtlas() );
-    std::shared_ptr< Model > result = Model::create( "__wall_level", {} );
 
     // Result will be a single model with a single mesh built using a mesh generator
     Mesh::IndexedMeshGenerator< Mesh::TexturedVertex > generator;
@@ -401,15 +401,11 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
 
     generator.generateNormals();
 
-    /**
-    std::shared_ptr< Model > result = Model::create( "__floorlevel", { {
+    return {
       generator.generateMesh(),
-      shader,
-      std::make_shared< Material >( std::vector< std::shared_ptr< Texture > >{ std::make_shared< Texture >( meshTexture ) }, std::vector< std::shared_ptr< Texture > >{}, 0.0f, 1.0f )
-    } } );
-    */
-
-    return result;
+      nullptr,
+      std::make_shared< Material >( std::vector< std::shared_ptr< Texture > >{ generatedTexture }, std::vector< std::shared_ptr< Texture > >{}, 0.0f, 1.0f )
+    };
   }
 
   std::shared_ptr< Model > WallModelLoader::get() {
@@ -417,14 +413,14 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     std::shared_ptr< Shader > shader = std::make_shared< Shader >( "system/shaders/infr/vertex.glsl", "system/shaders/infr/fragment.glsl" );
 
     for( const auto& level : floorLevels ) {
-      // Set state of WallModelLoader for current level
-      dimensions = level.dimensions;
-      initCornerMap();
-
       // If there are no segments, return null pointer and don't waste any time
       if( level.wallSegments.empty() ) {
         continue;
       }
+
+      // Set state of WallModelLoader for current level
+      dimensions = level.dimensions;
+      initCornerMap();
 
       // Walk each line then check joint map to see if vertices need to be stretched to close corners
       for( const auto& segment : level.wallSegments ) {
@@ -437,9 +433,9 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
 
       generateDeferredMeshes();
 
-      if( std::shared_ptr< Model > levelModel = generateModel() ) {
-        result->addChild( levelModel );
-      }
+      Drawable drawable = generateDrawable();
+      drawable.shader = shader;
+      result->addChild( Model::create( "__wall_level", { drawable } ) );
     }
 
     return result;

@@ -5,6 +5,7 @@
 #include "graphics/scenegraph/mesh/indexedmeshgenerator.hpp"
 #include "graphics/scenegraph/mesh/texturedvertex.hpp"
 #include "graphics/utilities/textureatlas.hpp"
+#include "graphics/scenegraph/drawable.hpp"
 #include "models/infrastructure.hpp"
 #include "models/wallsegment.hpp"
 #include <vector>
@@ -65,7 +66,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     PlaneGroup sideToStagedMesh( const Models::Sides& sides, const glm::vec3& origin, const glm::vec3& width );
     void generateDeferredMeshes();
     void addToGenerator( Mesh::IndexedMeshGenerator< Mesh::TexturedVertex >& generator, const PlaneGroup& planeGroup );
-    std::shared_ptr< Model > generateModel();
+    Drawable generateDrawable();
 
   public:
     WallModelLoader( const std::vector< Models::Infrastructure::FloorLevel >& floorLevels, Vector::Renderer& renderer );
