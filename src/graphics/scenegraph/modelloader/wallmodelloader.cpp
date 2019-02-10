@@ -32,9 +32,9 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
   void WallModelLoader::initCornerMap() {
     cornerMap.clear();
 
-    cornerMap.reserve( dimensions.y );
+    cornerMap.resize( dimensions.y );
     for( auto& xLevel : cornerMap ) {
-      xLevel.reserve( dimensions.x );
+      xLevel.resize( dimensions.x );
     }
   }
 
@@ -410,7 +410,6 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
 
   std::shared_ptr< Model > WallModelLoader::get() {
     std::shared_ptr< Model > result = Model::create( "__wallrig", {} );
-    std::shared_ptr< Shader > shader = std::make_shared< Shader >( "system/shaders/infr/vertex.glsl", "system/shaders/infr/fragment.glsl" );
 
     for( const auto& level : floorLevels ) {
       // If there are no segments, return null pointer and don't waste any time

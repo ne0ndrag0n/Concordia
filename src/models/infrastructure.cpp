@@ -1,6 +1,7 @@
 #include "models/infrastructure.hpp"
 #include "tools/utility.hpp"
 #include "graphics/scenegraph/modelloader/floormodelloader.hpp"
+#include "graphics/scenegraph/modelloader/wallmodelloader.hpp"
 #include "device/display/adapter/component/worldrenderer.hpp"
 #include "graphics/vector/renderer.hpp"
 #include <vector>
@@ -71,6 +72,8 @@ namespace BlueBear::Models {
 
       Graphics::SceneGraph::ModelLoader::FloorModelLoader floorModelLoader( levels );
       worldRenderer.insertDirect( floorModelLoader.get() );
+
+      //Graphics::SceneGraph::ModelLoader::WallModelLoader wallModelLoader( levels, renderer );
     }
   }
 
