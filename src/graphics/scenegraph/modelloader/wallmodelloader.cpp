@@ -11,7 +11,7 @@
 namespace BlueBear::Graphics::SceneGraph::ModelLoader {
 
   WallModelLoader::WallModelLoader( const std::vector< Models::Infrastructure::FloorLevel >& floorLevels, Vector::Renderer& renderer )
-    : floorLevels( floorLevels ) {
+    : floorLevels( floorLevels ), shader( std::make_shared< Shader >( "system/shaders/infr/vertex.glsl", "system/shaders/infr/fragment.glsl" ) ) {
       initTopTexture( renderer );
     }
 
@@ -403,7 +403,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
 
     return {
       generator.generateMesh(),
-      nullptr,
+      shader,
       std::make_shared< Material >( std::vector< std::shared_ptr< Texture > >{ generatedTexture }, std::vector< std::shared_ptr< Texture > >{}, 0.0f, 1.0f )
     };
   }
@@ -433,9 +433,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
 
       generateDeferredMeshes();
 
-      Drawable drawable = generateDrawable();
-      drawable.shader = shader;
-      result->addChild( Model::create( "__wall_level", { drawable } ) );
+      result->addChild( Model::create( "__wall_level", { generateDrawable() } ) );
     }
 
     return result;
