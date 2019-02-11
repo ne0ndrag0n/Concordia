@@ -21,7 +21,8 @@
 		{
 			"command": "make -j8 run",
 			"type": "shell",
-			"label": "Build and Run"
+			"label": "Build and Run",
+			"problemMatcher": []
 		}
 	]
 }

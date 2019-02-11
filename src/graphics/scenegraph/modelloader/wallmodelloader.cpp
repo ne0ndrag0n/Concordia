@@ -6,7 +6,6 @@
 #include "graphics/shader.hpp"
 #include "exceptions/nullpointerexception.hpp"
 #include "tools/utility.hpp"
-#include <glm/gtx/rotate_vector.hpp>
 
 namespace BlueBear::Graphics::SceneGraph::ModelLoader {
 
@@ -17,13 +16,13 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
 
   void WallModelLoader::initTopTexture( Vector::Renderer& renderer ) {
     renderer.generateBitmap(
-      { 10, 10 },
+      { 48, 192 },
       []( Vector::Renderer& r ) {
-        r.drawRect( { 0, 0, 10, 10 }, { 143, 89, 2, 255 } );
+        r.drawRect( { 0, 0, 48, 192 }, { 143, 89, 2, 255 } );
       },
       [ & ]( const unsigned char* bitmap ) {
         std::shared_ptr< sf::Image > sfmlImage = std::make_shared< sf::Image >();
-        sfmlImage->create( 10, 10, bitmap );
+        sfmlImage->create( 48, 192, bitmap );
 
         atlas.addTexture( "__top_side", sfmlImage );
       }
@@ -335,7 +334,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
   WallModelLoader::PlaneGroup WallModelLoader::sideToStagedMesh( const Models::Sides& sides, const glm::vec3& origin, const glm::vec3& width ) {
     glm::vec3 bottomRight = origin + width;
     glm::vec3 wallDirection = glm::normalize( bottomRight - origin );
-    glm::vec3 wallPerpDirection = glm::rotateZ( wallDirection, glm::radians( 90.0f ) );
+    glm::vec3 wallPerpDirection = { -wallDirection.y, wallDirection.x, 0.0f };
     glm::vec3 inverseWallDirection = -1.0f * wallDirection;
     glm::vec3 inverseWallPerpDirection = -1.0f * wallPerpDirection;
     glm::vec3 topRight = bottomRight + ( 0.1f * wallPerpDirection );

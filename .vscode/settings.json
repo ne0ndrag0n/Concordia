@@ -55,5 +55,6 @@
 		"valarray": "cpp",
 		"fstream": "cpp",
 		"variant": "cpp"
-	}
+	},
+	"C_Cpp.errorSquiggles": "Disabled"
 }

@@ -63,6 +63,7 @@ namespace BlueBear::Models {
       worldRenderer.insertDirect( floorModelLoader.get() );
 
       Graphics::SceneGraph::ModelLoader::WallModelLoader wallModelLoader( levels, renderer );
+      worldRenderer.insertDirect( wallModelLoader.get() );
     }
   }
 
