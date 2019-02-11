@@ -100,7 +100,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     Corner* right = getCorner( index + glm::ivec2{ 1, 0 } );
     bool rightClear = !right || ( !right->horizontal.model && !right->vertical.model );
 
-    Corner* upperRight = getCorner( index + glm::ivec2{ 1, 1 } );
+    Corner* upperRight = getCorner( index + glm::ivec2{ 1, -1 } );
     bool upperRightVertical = upperRight && upperRight->vertical.model;
 
     return isSingleHorizontal && rightClear && upperRightVertical;
