@@ -108,7 +108,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
 
   glm::vec3 WallModelLoader::indexToLocation( const glm::ivec2& position ) {
     // TODO: Elevation per vertex
-    return { -( dimensions.x * 0.5f ) + position.x, ( dimensions.y * 0.5f ) + position.y, 0.0f };
+    return { -( dimensions.x * 0.5f ) + position.x, ( dimensions.y * 0.5f ) - position.y, 0.0f };
   }
 
   void WallModelLoader::fixCorners( const glm::ivec2& startingIndex ) {

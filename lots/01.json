@@ -66,6 +66,30 @@
                 "back": "drywall"
               }
             ]
+          },
+          {
+            "start": [ 1, 1 ],
+            "end": [ 1, 2 ],
+            "faces": [
+              {
+                "front": "drywall",
+                "back": "drywall"
+              }
+            ]
+          },
+          {
+            "start": [ 3, 1 ],
+            "end": [ 3, 3 ],
+            "faces": [
+              {
+                "front": "drywall",
+                "back": "drywall"
+              },
+              {
+                "front": "drywall",
+                "back": "drywall"
+              }
+            ]
           }
         ]
       }
