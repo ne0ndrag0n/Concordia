@@ -22,11 +22,9 @@ uniform Material material;
 uniform DirectionalLight directionalLight;
 
 void main() {
-  vec3 texResult = texture( material.diffuse0, fragTexture ).xyz;
+  vec3 texResult = texture( material.diffuse0, fragTexture ).rgb;
 
   vec3 norm = normalize( fragNormal );
-  vec3 viewDirection = normalize( cameraPos - fragPos );
-
   vec3 lightDirection = normalize( -directionalLight.direction );
   float diffTheta = max( dot( norm, lightDirection ), 0.0 );
 

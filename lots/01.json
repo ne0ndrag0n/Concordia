@@ -16,8 +16,8 @@
     "lights": {
       "__sun": {
         "type": "directionalLight",
-        "direction": [ -0.5, 0.0, -0.5 ],
-        "ambient": [ 0.3, 0.3, 0.3 ],
+        "direction": [ 0.5, 0.5, -0.3 ],
+        "ambient": [ 0.5, 0.5, 0.5 ],
         "diffuse": [ 1.0, 1.0, 1.0 ],
         "specular": [ 0.1, 0.1, 0.1 ]
       }
@@ -29,8 +29,8 @@
         "dimensions": [ 10, 10 ],
         "tiles": [
           [ "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "hardwood2", "hardwood2" ],
-          [ "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "hardwood2", "hardwood2" ],
-          [ "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass" ],
+          [ "grass", "hardwood1", "hardwood1", "grass", "grass", "grass", "grass", "grass", "hardwood2", "hardwood2" ],
+          [ "grass", "hardwood1", "hardwood1", "grass", "grass", "grass", "grass", "grass", "grass", "grass" ],
           [ "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass" ],
           [ "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass" ],
           [ "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass" ],
@@ -56,6 +56,20 @@
           {
             "start": [ 1, 1 ],
             "end": [ 3, 1 ],
+            "faces": [
+              {
+                "front": "drywall",
+                "back": "drywall"
+              },
+              {
+                "front": "drywall",
+                "back": "drywall"
+              }
+            ]
+          },
+          {
+            "start": [ 1, 1 ],
+            "end": [ 1, 3 ],
             "faces": [
               {
                 "front": "drywall",

@@ -316,17 +316,17 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     }
   }
 
-  std::array< Mesh::TexturedVertex, 6 > WallModelLoader::getPlane( const glm::vec3& origin, const glm::vec3& width, const glm::vec3& height, const std::string& wallpaperId ) {
+  std::array< Mesh::TexturedVertex, 6 > WallModelLoader::getPlane( const glm::vec3& origin, const glm::vec3& width, const glm::vec3& height, const glm::vec3& normal, const std::string& wallpaperId ) {
     std::array< Mesh::TexturedVertex, 6 > plane;
     auto textureData = atlas.getTextureData( wallpaperId );
 
-    plane[ 0 ] = { origin,                             { 0.0f, 0.0f, 0.0f }, textureData.lowerCorner };
-    plane[ 1 ] = { origin + width,                     { 0.0f, 0.0f, 0.0f }, { textureData.upperCorner.x, textureData.lowerCorner.y } };
-    plane[ 2 ] = { origin + height,                    { 0.0f, 0.0f, 0.0f }, { textureData.lowerCorner.x, textureData.upperCorner.y } };
+    plane[ 0 ] = { origin,                   normal, textureData.lowerCorner };
+    plane[ 1 ] = { origin + width,           normal, { textureData.upperCorner.x, textureData.lowerCorner.y } };
+    plane[ 2 ] = { origin + height,          normal, { textureData.lowerCorner.x, textureData.upperCorner.y } };
 
-    plane[ 3 ] = { origin + width,                     { 0.0f, 0.0f, 0.0f }, { textureData.upperCorner.x, textureData.lowerCorner.y } };
-    plane[ 4 ] = { origin + width + height,            { 0.0f, 0.0f, 0.0f }, textureData.upperCorner };
-    plane[ 5 ] = { origin + height,                    { 0.0f, 0.0f, 0.0f }, { textureData.lowerCorner.x, textureData.upperCorner.y } };
+    plane[ 3 ] = { origin + width,           normal, { textureData.upperCorner.x, textureData.lowerCorner.y } };
+    plane[ 4 ] = { origin + width + height,  normal, textureData.upperCorner };
+    plane[ 5 ] = { origin + height,          normal, { textureData.lowerCorner.x, textureData.upperCorner.y } };
 
     return plane;
   }
@@ -342,11 +342,11 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     glm::vec3 upperOrigin = origin + glm::vec3{ 0.0f, 0.0f, 4.0f };
 
     PlaneGroup planeGroup;
-    planeGroup.emplace( "back", getPlane( origin, width, { 0.0f, 0.0f, 4.0f }, sides.back.first ) );
-    planeGroup.emplace( "right", getPlane( bottomRight, 0.1f * wallPerpDirection, { 0.0f, 0.0f, 4.0f }, "__top_side" ) );
-    planeGroup.emplace( "front", getPlane( topRight, 1.0f * inverseWallDirection, { 0.0f, 0.0f, 4.0f }, sides.front.first ) );
-    planeGroup.emplace( "left", getPlane( topLeft, 0.1f * inverseWallPerpDirection, { 0.0f, 0.0f, 4.0f }, "__top_side" ) );
-    planeGroup.emplace( "top", getPlane( upperOrigin, wallDirection, 0.1f * wallPerpDirection, "__top_side" ) );
+    planeGroup.emplace( "back", getPlane( origin, width, { 0.0f, 0.0f, 4.0f }, -wallPerpDirection, sides.back.first ) );
+    planeGroup.emplace( "right", getPlane( bottomRight, 0.1f * wallPerpDirection, { 0.0f, 0.0f, 4.0f }, wallDirection, "__top_side" ) );
+    planeGroup.emplace( "front", getPlane( topRight, 1.0f * inverseWallDirection, { 0.0f, 0.0f, 4.0f }, wallPerpDirection, sides.front.first ) );
+    planeGroup.emplace( "left", getPlane( topLeft, 0.1f * inverseWallPerpDirection, { 0.0f, 0.0f, 4.0f }, -wallDirection, "__top_side" ) );
+    planeGroup.emplace( "top", getPlane( upperOrigin, wallDirection, 0.1f * wallPerpDirection, { 0.0f, 0.0f, 1.0f }, "__top_side" ) );
     return planeGroup;
   }
 
@@ -398,8 +398,6 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
         if( corner.reverseDiagonal.model ) { addToGenerator( generator, corner.reverseDiagonal.stagedMesh ); }
       }
     }
-
-    generator.generateNormals();
 
     return {
       generator.generateMesh(),
