@@ -137,6 +137,18 @@ namespace BlueBear {
             return result;
           }
 
+          std::vector< std::shared_ptr< Graphics::SceneGraph::Light::Light > > WorldRenderer::findLightsByRegex( const std::regex& regex ) {
+            std::vector< std::shared_ptr< Graphics::SceneGraph::Light::Light > > result;
+
+            for( const auto& pair : lights ) {
+              if( std::regex_match( pair.first, regex ) ) {
+                result.push_back( pair.second );
+              }
+            }
+
+            return result;
+          }
+
           void WorldRenderer::removeObject( std::shared_ptr< Graphics::SceneGraph::Model > model ) {
             for( auto it = models.begin(); it != models.end(); ) {
               if( it->instance == model ) {

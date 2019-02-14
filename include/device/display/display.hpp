@@ -23,6 +23,8 @@ namespace BlueBear {
         // These objects are owned by the associated state objects
         std::vector< Adapter::Adapter* > adapters;
 
+        void printWelcomeMessage();
+
       public:
         Display();
         ~Display();

@@ -17,6 +17,7 @@
 #include <set>
 #include <vector>
 #include <utility>
+#include <regex>
 
 namespace BlueBear {
   namespace Graphics {
@@ -75,6 +76,8 @@ namespace BlueBear {
             std::vector< std::shared_ptr< Graphics::SceneGraph::Model > > findObjectsByType( const std::string& instanceId );
             std::vector< std::shared_ptr< Graphics::SceneGraph::Model > > findObjectsByClass( const std::set< std::string >& classes );
             void removeObject( std::shared_ptr< Graphics::SceneGraph::Model > model );
+
+            std::vector< std::shared_ptr< Graphics::SceneGraph::Light::Light > > findLightsByRegex( const std::regex& regex );
 
             Graphics::Camera& getCamera();
             void loadPathsParallel( const std::vector< std::pair< std::string, std::string > >& paths );

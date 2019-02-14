@@ -17,9 +17,21 @@ struct DirectionalLight {
   vec3 specular;
 };
 
+struct SectorDirectionalLight {
+  vec3 boxBottomLeft;
+  vec3 boxTopRight;
+  vec3 direction;
+  vec3 ambient;
+  vec3 diffuse;
+  vec3 specular;
+};
+
 uniform vec3 cameraPos;
 uniform Material material;
 uniform DirectionalLight directionalLight;
+
+uniform uint numSectorDirectionalLights;
+uniform SectorDirectionalLight sectorDirectionalLights[ 128 ];
 
 void main() {
   vec3 texResult = texture( material.diffuse0, fragTexture ).rgb;

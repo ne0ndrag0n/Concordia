@@ -42,9 +42,20 @@ namespace BlueBear {
         glEnable( GL_CULL_FACE );
         glEnable( GL_BLEND );
         glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+
+        printWelcomeMessage();
       }
 
       Display::~Display() {}
+
+      void Display::printWelcomeMessage() {
+        // Log some opengl parameter checks in debug mode
+        int maxUniformVertexComponents;
+        glGetIntegerv( GL_MAX_VERTEX_UNIFORM_COMPONENTS, &maxUniformVertexComponents );
+        int maxUniformFragmentComponents;
+        glGetIntegerv( GL_MAX_FRAGMENT_UNIFORM_COMPONENTS, &maxUniformFragmentComponents );
+        Log::getInstance().debug( "Display::Display", "Created OpenGL 3.3 Context (" + std::to_string( maxUniformVertexComponents ) + "V/" + std::to_string( maxUniformFragmentComponents ) + "F)" );
+      }
 
       sf::ContextSettings Display::getDefaultContextSettings() const {
         return sf::ContextSettings( 24, 8, 0, 3, 3, sf::ContextSettings::Core );

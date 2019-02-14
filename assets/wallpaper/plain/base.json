@@ -14,5 +14,9 @@
   "drywall": {
     "image": "drywall.png",
     "price": 0.0
+  },
+  "bricks": {
+    "image": "bricks.png",
+    "price": 0.0
   }
 }

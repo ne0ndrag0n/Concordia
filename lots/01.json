@@ -16,8 +16,8 @@
     "lights": {
       "__sun": {
         "type": "directionalLight",
-        "direction": [ 0.5, 0.5, -0.3 ],
-        "ambient": [ 0.5, 0.5, 0.5 ],
+        "direction": [ 0.5, 0.5, -0.1 ],
+        "ambient": [ 0.6, 0.6, 0.6 ],
         "diffuse": [ 1.0, 1.0, 1.0 ],
         "specular": [ 0.1, 0.1, 0.1 ]
       }
@@ -58,11 +58,11 @@
             "end": [ 3, 1 ],
             "faces": [
               {
-                "front": "drywall",
+                "front": "bricks",
                 "back": "drywall"
               },
               {
-                "front": "drywall",
+                "front": "bricks",
                 "back": "drywall"
               }
             ]
@@ -73,11 +73,11 @@
             "faces": [
               {
                 "front": "drywall",
-                "back": "drywall"
+                "back": "bricks"
               },
               {
                 "front": "drywall",
-                "back": "drywall"
+                "back": "bricks"
               }
             ]
           }
