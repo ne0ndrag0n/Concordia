@@ -5,7 +5,6 @@
 #include "configmanager.hpp"
 #include "eventmanager.hpp"
 #include "graphics/scenegraph/animation/animator.hpp"
-#include "graphics/vector/renderer.hpp"
 #include "tools/utility.hpp"
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Event.hpp>
@@ -27,7 +26,8 @@ namespace BlueBear {
       guiComponent( application.getDisplayDevice() ),
       engine( *this ),
       luaEventHelper( engine ),
-      world( worldRenderer )
+      world( worldRenderer ),
+      infrastructureManager( *this )
     {
       setupDisplayDevice();
       setupInputDevice();
@@ -51,10 +51,8 @@ namespace BlueBear {
 
     void HouseholdGameplayState::load( const Json::Value& data ) {
       if( data != Json::Value::null ) {
-        Graphics::Vector::Renderer vectorRenderer( application.getDisplayDevice() );
-
         entityRegistry.load( data[ "registry" ] );
-        infrastructure.load( data[ "infrastructure" ], worldRenderer, vectorRenderer, worldCache );
+        infrastructureManager.loadInfrastructure( data[ "infrastructure" ] );
         worldRenderer.load( data[ "renderer" ] );
       }
     }
@@ -119,6 +117,14 @@ namespace BlueBear {
 
     Scripting::CoreEngine& HouseholdGameplayState::getEngine() {
       return engine;
+    }
+
+    Device::Display::Adapter::Component::WorldRenderer& HouseholdGameplayState::getWorldRenderer() {
+      return worldRenderer;
+    }
+
+    Models::Utilities::WorldCache& HouseholdGameplayState::getWorldCache() {
+      return worldCache;
     }
 
     void HouseholdGameplayState::update() {

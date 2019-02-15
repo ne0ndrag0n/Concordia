@@ -1,9 +1,5 @@
 #include "models/infrastructure.hpp"
 #include "tools/utility.hpp"
-#include "graphics/scenegraph/modelloader/floormodelloader.hpp"
-#include "graphics/scenegraph/modelloader/wallmodelloader.hpp"
-#include "device/display/adapter/component/worldrenderer.hpp"
-#include "graphics/vector/renderer.hpp"
 #include <vector>
 #include "log.hpp"
 
@@ -13,7 +9,7 @@ namespace BlueBear::Models {
 
   }
 
-  void Infrastructure::load( const Json::Value& data, Device::Display::Adapter::Component::WorldRenderer& worldRenderer, Graphics::Vector::Renderer& renderer, Utilities::WorldCache& worldCache ) {
+  void Infrastructure::load( const Json::Value& data, Utilities::WorldCache& worldCache ) {
     if( data != Json::Value::null ) {
       const Json::Value& levelsJson = data[ "levels" ];
       for( auto it = levelsJson.begin(); it != levelsJson.end(); ++it ) {
@@ -58,16 +54,14 @@ namespace BlueBear::Models {
 
         levels.emplace_back( std::move( current ) );
       }
-
-      Graphics::SceneGraph::ModelLoader::FloorModelLoader floorModelLoader( levels );
-      worldRenderer.insertDirect( floorModelLoader.get() );
-
-      Graphics::SceneGraph::ModelLoader::WallModelLoader wallModelLoader( levels, renderer );
-      worldRenderer.insertDirect( wallModelLoader.get() );
     }
   }
 
   void Infrastructure::load( const Json::Value& data ) {
     Log::getInstance().error( "Infrastructure::load", "Called the wrong load method. This is probably a bug." );
+  }
+
+  std::vector< Infrastructure::FloorLevel >& Infrastructure::getLevels() {
+    return levels;
   }
 }

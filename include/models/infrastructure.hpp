@@ -36,12 +36,9 @@ namespace BlueBear::Models {
   public:
     Json::Value save() override;
     void load( const Json::Value& data ) override;
-    void load(
-      const Json::Value& data,
-      Device::Display::Adapter::Component::WorldRenderer& worldRenderer,
-      Graphics::Vector::Renderer& renderer,
-      Utilities::WorldCache& worldCache
-    );
+    void load( const Json::Value& data, Utilities::WorldCache& worldCache );
+
+    std::vector< FloorLevel >& getLevels();
   };
 
 }

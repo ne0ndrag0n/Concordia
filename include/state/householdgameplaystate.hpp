@@ -11,6 +11,7 @@
 #include "device/input/input.hpp"
 #include "models/utilities/worldcache.hpp"
 #include "models/infrastructure.hpp"
+#include "gameplay/infrastructuremanager.hpp"
 #include "models/world.hpp"
 #include "serializable.hpp"
 #include <memory>
@@ -38,7 +39,7 @@ namespace BlueBear {
 
       Models::Utilities::WorldCache worldCache;
       Models::World world;
-      Models::Infrastructure infrastructure;
+      Gameplay::InfrastructureManager infrastructureManager;
 
       void setupDisplayDevice();
       void setupInputDevice();
@@ -53,6 +54,9 @@ namespace BlueBear {
       void load( const Json::Value& data ) override;
 
       Scripting::CoreEngine& getEngine();
+      Device::Display::Adapter::Component::WorldRenderer& getWorldRenderer();
+      Models::Utilities::WorldCache& getWorldCache();
+
       void update() override;
     };
 
