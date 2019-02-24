@@ -51,7 +51,7 @@ namespace BlueBear::Tools::Intersection {
 					// Create new line segment ranging from old.start to pair.first
 					IntersectionLineSegment newLineSegment{ lineSegment->start, pair.first };
 					// Set old segment's new start to pair.first
-					lineSegment->end = pair.first;
+					lineSegment->start = pair.first;
 					// Insert new line segment
 					lineSegments.emplace_back( std::move( newLineSegment ) );
 				}
