@@ -3,6 +3,7 @@
 #include "graphics/scenegraph/modelloader/wallmodelloader.hpp"
 #include "graphics/vector/renderer.hpp"
 #include "state/householdgameplaystate.hpp"
+#include "tools/intersection_map.hpp"
 #include "application.hpp"
 
 namespace BlueBear::Gameplay {
@@ -24,24 +25,24 @@ namespace BlueBear::Gameplay {
 		generateRooms();
 	}
 
+	/**
+	 * Heavy TODO
+	 */
 	void InfrastructureManager::generateRooms() {
 		for( const auto& level : model.getLevels() ) {
-			Tools::SectorDiscovery::SectorDiscoveryGraph graph;
-
+			// Generate intersection map from existing intersections/crossovers
+			Tools::Intersection::IntersectionList intersectionList;
 			for( const auto& wallSegment : level.wallSegments ) {
-				Tools::SectorDiscovery::addEdge( graph, wallSegment.start, wallSegment.end );
+				Log::getInstance().debug( "test 1", glm::to_string( wallSegment.start ) + " - " + glm::to_string( wallSegment.end ) );
+				intersectionList.emplace_back( Tools::Intersection::IntersectionLineSegment{ wallSegment.start, wallSegment.end } );
 			}
+			intersectionList = Tools::Intersection::generateIntersectionalList( std::move( intersectionList ) );
 
-			sectors.emplace_back();
-			Tools::SectorDiscovery::findSectors( &graph.begin()->second, nullptr, sectors[ sectors.size() - 1 ] );
-		}
+			Log::getInstance().debug( "---", "---" );
 
-		// debug shit
-		for( const auto& sectorLevel : sectors ) {
-			for( const auto& sectorList : sectorLevel ) {
-				for( const auto& node : sectorList ) {
-					Log::getInstance().debug( "test", Tools::Utility::glmToString( node ) );
-				}
+			// remove this debugging stuff
+			for( const auto& intersection : intersectionList ) {
+				Log::getInstance().debug( "test 2", glm::to_string( intersection.start ) + " - " + glm::to_string( intersection.end ) );
 			}
 		}
 	}

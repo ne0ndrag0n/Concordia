@@ -2,14 +2,41 @@
 #include <unordered_set>
 #include <map>
 
+#include "log.hpp"
+#include <glm/gtx/string_cast.hpp>
+
 namespace BlueBear::Tools::Intersection {
+
+	// cheap hack to get comparator to take direction into account
+	static float getDirectionFactor( const glm::ivec2 direction ) {
+		if( direction == glm::ivec2{ 0, -1 } ) {
+			return 1.0f;
+		} else if( direction == glm::ivec2{ 1, -1 } ) {
+			return 2.0f;
+		} else if( direction == glm::ivec2{ 1, 0 } ) {
+			return 3.0f;
+		} else if( direction == glm::ivec2{ 1, 1 } ) {
+			return 4.0f;
+		} else if( direction == glm::ivec2{ 0, 1 } ) {
+			return 5.0f;
+		} else if( direction == glm::ivec2{ -1, 1 } ) {
+			return 6.0f;
+		} else if( direction == glm::ivec2{ -1, 0 } ) {
+			return 7.0f;
+		} else if( direction == glm::ivec2{ -1, -1 } ) {
+			return 8.0f;
+		}
+	}
 
 	IntersectionList generateIntersectionalList( IntersectionList lineSegments ) {
 
 		// Step 1: Get all intersections for each line segment
 		struct comparator {
 			bool operator()( const glm::ivec2& left, const glm::ivec2& right ) const {
-				return glm::distance( glm::vec2{ 0,0 }, glm::vec2( left ) ) < glm::distance( glm::vec2{ 0, 0 }, glm::vec2( right ) );
+				return
+					glm::distance( glm::vec2{ 0, 0 }, glm::vec2( left ) ) + getDirectionFactor( glm::normalize( glm::vec2( left ) ) )
+						<
+					glm::distance( glm::vec2{ 0, 0 }, glm::vec2( right ) ) + getDirectionFactor( glm::normalize( glm::vec2( right ) ) );
 			}
 		};
 		std::map< glm::ivec2, std::unordered_set< IntersectionLineSegment* >, comparator > crossedVertices;
