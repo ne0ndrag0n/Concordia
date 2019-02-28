@@ -40,9 +40,27 @@ namespace BlueBear::Gameplay {
 
 			Log::getInstance().debug( "---", "---" );
 
-			// remove this debugging stuff
-			for( const auto& intersection : intersectionList ) {
-				Log::getInstance().debug( "test 2", glm::to_string( intersection.start ) + " - " + glm::to_string( intersection.end ) );
+			Tools::SectorDiscovery::SectorDiscoveryGraph graph;
+			for( const auto& computedSegment : intersectionList ) {
+				Log::getInstance().debug( "test 2", glm::to_string( computedSegment.start ) + " - " + glm::to_string( computedSegment.end ) );
+				Tools::SectorDiscovery::addEdge( graph, computedSegment.start, computedSegment.end );
+			}
+
+			sectors.emplace_back();
+			Tools::SectorDiscovery::findSectors( &graph.begin()->second, nullptr, sectors[ sectors.size() - 1 ] );
+
+			Log::getInstance().debug( "---", "---" );
+
+			// debug shit
+			int i = 0;
+			for( const auto& sectorLevel : sectors ) {
+				for( const auto& sectorList : sectorLevel ) {
+					for( const auto& node : sectorList ) {
+						Log::getInstance().debug( "test " + std::to_string( i ), Tools::Utility::glmToString( node ) );
+					}
+
+					i++;
+				}
 			}
 		}
 	}

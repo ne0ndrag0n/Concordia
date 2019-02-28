@@ -107,7 +107,7 @@ namespace BlueBear {
       GLfloat scaledWidthHalf = ( widthHalf * zoom ) / 100.0f;
       GLfloat scaledHeightHalf = ( heightHalf * zoom ) / 100.0f;
 
-      ortho = glm::ortho( -scaledWidthHalf, scaledWidthHalf, -scaledHeightHalf, scaledHeightHalf, -20.0f, 50.0f );
+      ortho = glm::ortho( -scaledWidthHalf, scaledWidthHalf, -scaledHeightHalf, scaledHeightHalf, -70.0f, 100.0f );
 
       return ortho;
     }
