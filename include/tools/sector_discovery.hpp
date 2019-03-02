@@ -7,7 +7,7 @@
 #include <set>
 #include <list>
 
-namespace BlueBear::Tools::SectorDiscovery {
+namespace BlueBear::Tools {
 
 	struct SectorDiscoveryNode {
 		glm::ivec2 position;
@@ -16,11 +16,22 @@ namespace BlueBear::Tools::SectorDiscovery {
 	};
 
 	using SectorDiscoveryGraph = std::unordered_map< glm::ivec2, SectorDiscoveryNode >;
-	using Sector = std::set< const SectorDiscoveryNode* >;
+	using Sector = std::vector< const SectorDiscoveryNode* >;
 
-	void addEdge( SectorDiscoveryGraph& graph, const glm::ivec2& origin, const glm::ivec2& destination );
-	std::set< Sector > getSectors( const SectorDiscoveryNode* node, const SectorDiscoveryNode* parent, std::list< const SectorDiscoveryNode* > discovered = {} );
+	class SectorIdentifier {
+		SectorDiscoveryGraph graph;
+		std::unordered_map< const void*, std::set< const SectorDiscoveryNode* > > cached;
 
+		const std::set< const SectorDiscoveryNode* >& getGeneratedSet( const Sector& sector );
+		void addSectorToList( std::set< Sector >& targetSet, const Sector& newSector );
+		std::set< Sector > getSectors( const SectorDiscoveryNode* node, const SectorDiscoveryNode* parent, std::list< const SectorDiscoveryNode* > discovered = {} );
+
+
+	public:
+		void addEdge( const glm::ivec2& origin, const glm::ivec2& destination );
+
+		std::set< Sector > getSectors();
+	};
 }
 
 #endif

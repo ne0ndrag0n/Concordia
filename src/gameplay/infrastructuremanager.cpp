@@ -40,19 +40,20 @@ namespace BlueBear::Gameplay {
 
 			Log::getInstance().debug( "---", "---" );
 
-			Tools::SectorDiscovery::SectorDiscoveryGraph graph;
+			Tools::SectorIdentifier sectorIdentifier;
 			for( const auto& computedSegment : intersectionList ) {
 				Log::getInstance().debug( "test 2", glm::to_string( computedSegment.start ) + " - " + glm::to_string( computedSegment.end ) );
-				Tools::SectorDiscovery::addEdge( graph, computedSegment.start, computedSegment.end );
+				sectorIdentifier.addEdge( computedSegment.start, computedSegment.end );
 			}
 
-			auto sectors = Tools::SectorDiscovery::getSectors( &graph.begin()->second, nullptr );
+			auto sectors = sectorIdentifier.getSectors();
 
 			Log::getInstance().debug( "---", "---" );
-			for( const Tools::SectorDiscovery::Sector& sector : sectors ) {
+
+			for( const Tools::Sector& sector : sectors ) {
 				Log::getInstance().debug( "test 3", "Identified sector:" );
 
-				for( const Tools::SectorDiscovery::SectorDiscoveryNode* node : sector ) {
+				for( const Tools::SectorDiscoveryNode* node : sector ) {
 					Log::getInstance().debug( "test 3", glm::to_string( node->position ) );
 				}
 			}

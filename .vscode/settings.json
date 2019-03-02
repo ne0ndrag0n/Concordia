@@ -55,7 +55,8 @@
 		"valarray": "cpp",
 		"fstream": "cpp",
 		"variant": "cpp",
-		"algorithm": "cpp"
+		"algorithm": "cpp",
+		"unordered_set": "cpp"
 	},
 	"C_Cpp.errorSquiggles": "Disabled"
 }
