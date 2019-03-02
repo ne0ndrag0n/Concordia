@@ -10,37 +10,37 @@ namespace BlueBear::Tools::SectorDiscovery {
 		graph[ destination ].position = destination;
 	}
 
-	void findSectors( SectorDiscoveryNode* current, SectorDiscoveryNode* previous, SectorList& list ) {
-		if( current->visitStatus == SectorDiscoveryNode::VisitStatus::COMPLETELY_VISITED ) {
-			return;
-		}
+	std::set< Sector > getSectors( const SectorDiscoveryNode* node, const SectorDiscoveryNode* parent, std::list< const SectorDiscoveryNode* > discovered ) {
+		std::set< Sector > result;
 
-		if( current->visitStatus == SectorDiscoveryNode::VisitStatus::PARTIALLY_VISITED ) {
-			Sector cycle;
-			cycle.emplace_back( current->position );
+		discovered.push_back( node );
 
-			SectorDiscoveryNode* backtrackStep = previous;
-			while( backtrackStep != current ) {
-				cycle.emplace_back( backtrackStep->position );
-				backtrackStep = backtrackStep->visitParent;
+		for( const SectorDiscoveryNode* link : node->links ) {
+			if( link != parent ) {
+				Sector potentialSector;
+				bool seen = false;
+
+				// Have we already seen this item?
+				for( auto iterator = discovered.rbegin(); iterator != discovered.rend(); ++iterator ) {
+					potentialSector.insert( *iterator );
+
+					if( seen = ( *iterator == link ) ) {
+						break;
+					}
+				}
+
+				if( seen ) {
+					// Item seen
+					result.emplace( std::move( potentialSector ) );
+				} else {
+					// Item not seen and isn't parent. Go through it.
+					std::set< Sector > linkResult = getSectors( link, node, discovered );
+					result.insert( linkResult.begin(), linkResult.end() );
+				}
 			}
-
-			list.emplace_back( std::move( cycle ) );
-			return;
 		}
 
-		current->visitParent = previous;
-		current->visitStatus = SectorDiscoveryNode::VisitStatus::PARTIALLY_VISITED;
-
-		for( SectorDiscoveryNode* linkage : current->links ) {
-			if( linkage == previous ) {
-				continue;
-			}
-
-			findSectors( linkage, current, list );
-		}
-
-		current->visitStatus = SectorDiscoveryNode::VisitStatus::COMPLETELY_VISITED;
+		return result;
 	}
 
 }

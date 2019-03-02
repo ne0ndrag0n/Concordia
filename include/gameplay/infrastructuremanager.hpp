@@ -14,7 +14,6 @@ namespace BlueBear::Gameplay {
 
 	class InfrastructureManager : public State::Substate {
 		Models::Infrastructure model;
-		std::vector< Tools::SectorDiscovery::SectorList > sectors;
 
 	public:
 		InfrastructureManager( State::State& state );

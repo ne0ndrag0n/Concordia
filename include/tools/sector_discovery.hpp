@@ -3,28 +3,23 @@
 
 #include "tools/vector_hash.hpp"
 #include <glm/glm.hpp>
-#include <list>
 #include <unordered_map>
-#include <unordered_set>
-#include <vector>
+#include <set>
+#include <list>
 
 namespace BlueBear::Tools::SectorDiscovery {
 
 	struct SectorDiscoveryNode {
-		enum class VisitStatus { UNVISITED, PARTIALLY_VISITED, COMPLETELY_VISITED };
-
 		glm::ivec2 position;
-		VisitStatus visitStatus = VisitStatus::UNVISITED;
 		struct SectorDiscoveryNode* visitParent = nullptr;
 		std::list< struct SectorDiscoveryNode* > links;
 	};
 
 	using SectorDiscoveryGraph = std::unordered_map< glm::ivec2, SectorDiscoveryNode >;
-	using Sector = std::vector< glm::ivec2 >;
-	using SectorList = std::list< Sector >;
+	using Sector = std::set< const SectorDiscoveryNode* >;
 
 	void addEdge( SectorDiscoveryGraph& graph, const glm::ivec2& origin, const glm::ivec2& destination );
-	void findSectors( SectorDiscoveryNode* current, SectorDiscoveryNode* previous, SectorList& list );
+	std::set< Sector > getSectors( const SectorDiscoveryNode* node, const SectorDiscoveryNode* parent, std::list< const SectorDiscoveryNode* > discovered = {} );
 
 }
 
