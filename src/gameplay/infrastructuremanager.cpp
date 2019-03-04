@@ -1,6 +1,7 @@
 #include "gameplay/infrastructuremanager.hpp"
 #include "graphics/scenegraph/modelloader/floormodelloader.hpp"
 #include "graphics/scenegraph/modelloader/wallmodelloader.hpp"
+#include "graphics/scenegraph/light/sector_illuminator.hpp"
 #include "graphics/vector/renderer.hpp"
 #include "state/householdgameplaystate.hpp"
 #include "tools/intersection_map.hpp"
@@ -8,7 +9,9 @@
 
 namespace BlueBear::Gameplay {
 
-	InfrastructureManager::InfrastructureManager( State::State& state ) : State::Substate( state ) {}
+	InfrastructureManager::InfrastructureManager( State::State& state ) : State::Substate( state ) {
+
+	}
 
 	void InfrastructureManager::loadInfrastructure( const Json::Value& infrastructure ) {
 		model.load( infrastructure, state.as< State::HouseholdGameplayState >().getWorldCache() );

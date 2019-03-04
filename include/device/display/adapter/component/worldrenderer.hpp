@@ -75,6 +75,9 @@ namespace BlueBear {
             void removeObject( std::shared_ptr< Graphics::SceneGraph::Model > model );
 
             std::vector< std::shared_ptr< Graphics::SceneGraph::Illuminator > > findIlluminators( const std::regex& regex );
+            std::shared_ptr< Graphics::SceneGraph::Illuminator > getIlluminator( const std::string& id );
+            void addIlluminator( const std::string& id, std::shared_ptr< Graphics::SceneGraph::Illuminator > illuminator );
+            void removeIlluminator( const std::string& id );
 
             Graphics::Camera& getCamera();
             void loadPathsParallel( const std::vector< std::pair< std::string, std::string > >& paths );

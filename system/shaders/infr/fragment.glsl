@@ -21,9 +21,8 @@ struct DirectionalLight {
 };
 
 struct LineSegment {
-  vec2 from;
-  vec2 to;
-  float level;
+  vec3 from;
+  vec3 to;
 };
 
 struct SectorPolygon {
@@ -36,12 +35,16 @@ struct LightSector {
   SectorPolygon polygon;
 };
 
+struct SectorIlluminator {
+  LineSegment lineSegments[ 128 ];
+  LightSector sectors[ 64 ];
+  uint numSectors;
+};
+
 uniform vec3 cameraPos;
 uniform Material material;
 uniform DirectionalLight directionalLight;
-uniform LineSegment lineSegments[ 128 ];
-uniform LightSector sectors[ 64 ];
-uniform int numSectors;
+uniform SectorIlluminator sectorIlluminator;
 
 float segmentsIntersect( LineSegment line1, LineSegment line2 ) {
   // ta = (y3−y4)(x1−x3)+(x4−x3)(y1−y3)
@@ -81,8 +84,8 @@ float segmentsIntersect( LineSegment line1, LineSegment line2 ) {
   }
 }
 
-float pointInPolygon( vec2 point ) {
-  LineSegment needle = LineSegment( point, vec2( 0.0, 0.0 ), 0.0f );
+float pointInPolygon( vec2 point, SectorPolygon polygon ) {
+  //LineSegment needle = LineSegment( point, vec3( 0.0, 0.0 ) );
   return 0.0f;
 }
 
@@ -90,6 +93,9 @@ float pointInPolygon( vec2 point ) {
  * Turn fragpos into a position in a sector (or lack thereof) and then return its according directional light
  */
 DirectionalLight getDirectionalLightBySector() {
+  // Check each sector and determine if fragPos lays within a sector
+
+
   return directionalLight;
 }
 

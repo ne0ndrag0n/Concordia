@@ -7,13 +7,16 @@
 #include "tools/sector_discovery.hpp"
 #include <jsoncpp/json/json.h>
 #include <glm/glm.hpp>
+#include <memory>
 #include <vector>
 
 namespace BlueBear::State { class HouseholdGameplayState; }
+namespace BlueBear::Graphics::SceneGraph::Light { class SectorIlluminator; }
 namespace BlueBear::Gameplay {
 
 	class InfrastructureManager : public State::Substate {
 		Models::Infrastructure model;
+		std::shared_ptr< Graphics::SceneGraph::Light::SectorIlluminator > sectorLights;
 
 	public:
 		InfrastructureManager( State::State& state );

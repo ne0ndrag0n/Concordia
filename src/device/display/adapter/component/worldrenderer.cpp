@@ -149,6 +149,23 @@ namespace BlueBear {
             return result;
           }
 
+          std::shared_ptr< Graphics::SceneGraph::Illuminator > WorldRenderer::getIlluminator( const std::string& id ) {
+            auto it = illuminators.find( id );
+            if( it != illuminators.end() ) {
+              return it->second;
+            }
+
+            return nullptr;
+          }
+
+          void WorldRenderer::addIlluminator( const std::string& id, std::shared_ptr< Graphics::SceneGraph::Illuminator > illuminator ) {
+            illuminators.emplace( id, illuminator );
+          }
+
+          void WorldRenderer::removeIlluminator( const std::string& id ) {
+            illuminators.erase( id );
+          }
+
           void WorldRenderer::removeObject( std::shared_ptr< Graphics::SceneGraph::Model > model ) {
             for( auto it = models.begin(); it != models.end(); ) {
               if( it->instance == model ) {
