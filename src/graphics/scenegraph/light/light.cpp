@@ -7,13 +7,7 @@
 namespace BlueBear::Graphics::SceneGraph::Light {
 
     Light::Light( glm::vec3 ambientComponent, glm::vec3 diffuseComponent, glm::vec3 specularComponent ) :
-      ambientComponent( ambientComponent ), diffuseComponent( diffuseComponent ), specularComponent( specularComponent ) {
-        eventManager.SHADER_CHANGE.listen( this, std::bind( &Light::send, this ) );
-      }
-
-    Light::~Light() {
-      eventManager.SHADER_CHANGE.stopListening( this );
-    }
+      ambientComponent( ambientComponent ), diffuseComponent( diffuseComponent ), specularComponent( specularComponent ) {}
 
     glm::vec3 Light::getAmbient() {
       return ambientComponent;

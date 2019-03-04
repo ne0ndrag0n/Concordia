@@ -25,10 +25,7 @@ namespace BlueBear {
 
     namespace SceneGraph {
       class Model;
-
-      namespace Light {
-        class Light;
-      }
+      class Illuminator;
 
       namespace ModelLoader {
         class FileModelLoader;
@@ -57,7 +54,7 @@ namespace BlueBear {
             Graphics::Camera camera;
             Graphics::SceneGraph::ResourceBank cache;
             std::unordered_map< std::string, std::shared_ptr< Graphics::SceneGraph::Model > > originals;
-            std::unordered_map< std::string, std::shared_ptr< Graphics::SceneGraph::Light::Light > > lights;
+            std::unordered_map< std::string, std::shared_ptr< Graphics::SceneGraph::Illuminator > > illuminators;
             std::set< ModelRegistration > models;
 
             std::unique_ptr< Graphics::SceneGraph::ModelLoader::FileModelLoader > getFileModelLoader( bool deferGLOperations );
@@ -77,7 +74,7 @@ namespace BlueBear {
             std::vector< std::shared_ptr< Graphics::SceneGraph::Model > > findObjectsByClass( const std::set< std::string >& classes );
             void removeObject( std::shared_ptr< Graphics::SceneGraph::Model > model );
 
-            std::vector< std::shared_ptr< Graphics::SceneGraph::Light::Light > > findLightsByRegex( const std::regex& regex );
+            std::vector< std::shared_ptr< Graphics::SceneGraph::Illuminator > > findIlluminators( const std::regex& regex );
 
             Graphics::Camera& getCamera();
             void loadPathsParallel( const std::vector< std::pair< std::string, std::string > >& paths );

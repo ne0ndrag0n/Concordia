@@ -26,10 +26,14 @@ struct LineSegment {
   float level;
 };
 
+struct SectorPolygon {
+  int numSides;
+  int lineSegmentIndices[ 32 ];
+};
+
 struct LightSector {
   DirectionalLight light;
-  int numSides;
-  int polygon[ 32 ];
+  SectorPolygon polygon;
 };
 
 uniform vec3 cameraPos;
@@ -37,6 +41,7 @@ uniform Material material;
 uniform DirectionalLight directionalLight;
 uniform LineSegment lineSegments[ 128 ];
 uniform LightSector sectors[ 64 ];
+uniform int numSectors;
 
 float segmentsIntersect( LineSegment line1, LineSegment line2 ) {
   // ta = (y3−y4)(x1−x3)+(x4−x3)(y1−y3)
@@ -77,11 +82,20 @@ float segmentsIntersect( LineSegment line1, LineSegment line2 ) {
 }
 
 float pointInPolygon( vec2 point ) {
-  // TODO
+  LineSegment needle = LineSegment( point, vec2( 0.0, 0.0 ), 0.0f );
   return 0.0f;
 }
 
+/**
+ * Turn fragpos into a position in a sector (or lack thereof) and then return its according directional light
+ */
+DirectionalLight getDirectionalLightBySector() {
+  return directionalLight;
+}
+
 void main() {
+  DirectionalLight directionalLight = getDirectionalLightBySector();
+
   vec3 texResult = texture( material.diffuse0, fragTexture ).rgb;
 
   vec3 norm = normalize( fragNormal );

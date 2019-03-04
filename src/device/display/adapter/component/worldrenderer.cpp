@@ -40,8 +40,8 @@ namespace BlueBear {
 
           void WorldRenderer::load( const Json::Value& data ) {
             if( data != Json::Value::null ) {
-              // Load lights
-              const Json::Value& savedLights = data[ "lights" ];
+              // Load illuminators
+              const Json::Value& savedLights = data[ "illuminators" ];
 
               for( auto it = savedLights.begin(); it != savedLights.end(); ++it ) {
                 auto pair = Tools::Utility::jsonIteratorToPair( it );
@@ -49,7 +49,7 @@ namespace BlueBear {
 
                 switch( Tools::Utility::hash( lightDefinition[ "type" ].asCString() ) ) {
                   case Tools::Utility::hash( "directionalLight" ): {
-                    lights[ pair.first ] = std::make_shared< Graphics::SceneGraph::Light::DirectionalLight >(
+                    illuminators[ pair.first ] = std::make_shared< Graphics::SceneGraph::Light::DirectionalLight >(
                       glm::vec3{ lightDefinition[ "direction" ][ 0 ].asDouble(), lightDefinition[ "direction" ][ 1 ].asDouble(), lightDefinition[ "direction" ][ 2 ].asDouble() },
                       glm::vec3{ lightDefinition[ "ambient" ][ 0 ].asDouble(), lightDefinition[ "ambient" ][ 1 ].asDouble(), lightDefinition[ "ambient" ][ 2 ].asDouble() },
                       glm::vec3{ lightDefinition[ "diffuse" ][ 0 ].asDouble(), lightDefinition[ "diffuse" ][ 1 ].asDouble(), lightDefinition[ "diffuse" ][ 2 ].asDouble() },
@@ -137,10 +137,10 @@ namespace BlueBear {
             return result;
           }
 
-          std::vector< std::shared_ptr< Graphics::SceneGraph::Light::Light > > WorldRenderer::findLightsByRegex( const std::regex& regex ) {
-            std::vector< std::shared_ptr< Graphics::SceneGraph::Light::Light > > result;
+          std::vector< std::shared_ptr< Graphics::SceneGraph::Illuminator > > WorldRenderer::findIlluminators( const std::regex& regex ) {
+            std::vector< std::shared_ptr< Graphics::SceneGraph::Illuminator > > result;
 
-            for( const auto& pair : lights ) {
+            for( const auto& pair : illuminators ) {
               if( std::regex_match( pair.first, regex ) ) {
                 result.push_back( pair.second );
               }
