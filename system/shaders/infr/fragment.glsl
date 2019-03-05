@@ -25,19 +25,19 @@ struct LineSegment {
   vec3 to;
 };
 
-struct SectorPolygon {
-  int numSides;
-  int lineSegmentIndices[ 32 ];
+struct Polygon {
+  uint numSides;
+  uint sides[ 16 ];
 };
 
-struct LightSector {
+struct Sector {
   DirectionalLight light;
-  SectorPolygon polygon;
+  Polygon polygon;
 };
 
 struct SectorIlluminator {
-  LineSegment lineSegments[ 128 ];
-  LightSector sectors[ 64 ];
+  LineSegment lineSegments[ 64 ];
+  Sector sectors[ 32 ];
   uint numSectors;
 };
 
@@ -66,7 +66,6 @@ float segmentsIntersect( LineSegment line1, LineSegment line2 ) {
     return NO;
   }
 
-  // TODO: Check these with equation above
   float ta_numerator = ( ( line2.from.y - line2.to.y ) * ( line1.from.x - line2.from.x ) ) +
                        ( ( line2.to.x - line2.from.x ) * ( line1.from.y - line2.from.y ) );
 
@@ -84,9 +83,20 @@ float segmentsIntersect( LineSegment line1, LineSegment line2 ) {
   }
 }
 
-float pointInPolygon( vec2 point, SectorPolygon polygon ) {
-  //LineSegment needle = LineSegment( point, vec3( 0.0, 0.0 ) );
-  return 0.0f;
+float getPolygonMaxX( Polygon polygon ) {
+  float maxX = 1.175494351e-38;
+
+  for( uint i = uint( 0 ); i != polygon.numSides; i++ ) {
+    maxX = max(
+      maxX,
+      max(
+        sectorIlluminator.lineSegments[ polygon.sides[ i ] ].from.x,
+        sectorIlluminator.lineSegments[ polygon.sides[ i ] ].to.x
+      )
+    );
+  }
+
+  return maxX;
 }
 
 /**
@@ -94,7 +104,30 @@ float pointInPolygon( vec2 point, SectorPolygon polygon ) {
  */
 DirectionalLight getDirectionalLightBySector() {
   // Check each sector and determine if fragPos lays within a sector
+  for( uint i = uint( 0 ); i != sectorIlluminator.numSectors; i++ ) {
+    // For each sector, create a line from fragPos to ( MAX( sectorX ) + 1.0f )
+    // Test line against each edge of the sector
+    // Point is in polygon if number of intersections is odd - use this polygon's directional light
+    Sector sector = sectorIlluminator.sectors[ i ];
+    LineSegment needle = LineSegment( fragPos, vec3( getPolygonMaxX( sector.polygon ) + 1.0f, fragPos.y, fragPos.z ) );
+    int fragLevel = int( fragPos.z / 4 );
 
+    uint intersectionCount = uint( 0 );
+    for( uint j = uint( 0 ); j != sector.polygon.numSides; j++ ) {
+      // test intersection along infinite z (x & y only)
+      LineSegment value = sectorIlluminator.lineSegments[ sector.polygon.sides[ j ] ];
+      if( segmentsIntersect( needle, value ) == YES && fragLevel == int( value.from.z / 4 ) ) {
+        // Must intersect within +- 4.0f
+        // Two line segments in a polygon side are guaranteed to be at identical levels
+        intersectionCount++;
+      }
+    }
+
+    if( mod( intersectionCount, 2 ) != 0 ) {
+      // odd means IN!
+      return sector.light;
+    }
+  }
 
   return directionalLight;
 }

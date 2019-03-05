@@ -11,6 +11,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 	class SectorIlluminator : public Illuminator {
 	public:
 		using Sector = std::vector< std::pair< glm::vec3, glm::vec3 > >;
+		SectorIlluminator() = default;
 		SectorIlluminator( const std::vector< Sector >& sectors );
 
 	private:

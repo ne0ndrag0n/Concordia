@@ -1,4 +1,5 @@
 #include "gameplay/infrastructuremanager.hpp"
+#include "device/display/adapter/component/worldrenderer.hpp"
 #include "graphics/scenegraph/modelloader/floormodelloader.hpp"
 #include "graphics/scenegraph/modelloader/wallmodelloader.hpp"
 #include "graphics/scenegraph/light/sector_illuminator.hpp"
@@ -10,7 +11,7 @@
 namespace BlueBear::Gameplay {
 
 	InfrastructureManager::InfrastructureManager( State::State& state ) : State::Substate( state ) {
-
+		sectorLights = std::make_shared< Graphics::SceneGraph::Light::SectorIlluminator >();
 	}
 
 	void InfrastructureManager::loadInfrastructure( const Json::Value& infrastructure ) {
@@ -61,6 +62,9 @@ namespace BlueBear::Gameplay {
 				}
 			}
 		}
+
+		// Falls through if already added
+		state.as< State::HouseholdGameplayState >().getWorldRenderer().addIlluminator( "__sector_illuminator", sectorLights );
 	}
 
 	bool InfrastructureManager::update() {
