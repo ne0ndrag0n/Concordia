@@ -33,6 +33,8 @@ namespace BlueBear::Gameplay {
 	 * Heavy TODO
 	 */
 	void InfrastructureManager::generateRooms() {
+		float currentLevel = 0.0f;
+
 		for( const auto& level : model.getLevels() ) {
 			// Generate intersection map from existing intersections/crossovers
 			Tools::Intersection::IntersectionList intersectionList;
@@ -57,14 +59,43 @@ namespace BlueBear::Gameplay {
 			for( const Tools::Sector& sector : sectors ) {
 				Log::getInstance().debug( "test 3", "Identified sector:" );
 
+				const Tools::SectorDiscoveryNode* from = nullptr;
+				const Tools::SectorDiscoveryNode* to = nullptr;
+				std::vector< std::pair< glm::vec3, glm::vec3 > > sides;
 				for( const Tools::SectorDiscoveryNode* node : sector ) {
 					Log::getInstance().debug( "test 3", glm::to_string( node->position ) );
+
+					if( from == nullptr ) {
+						from = node;
+					} else {
+						to = node;
+					}
+
+					if( to ) {
+						sides.emplace_back( glm::vec3{ from->position.x, from->position.y, currentLevel }, glm::vec3{ to->position.x, to->position.y, currentLevel } );
+						from = to;
+					}
 				}
+				sides.emplace_back( glm::vec3{ sector.back()->position.x, sector.back()->position.y, currentLevel }, glm::vec3{ sector.front()->position.x, sector.front()->position.y, currentLevel } );
+
+				// TODO: actual lighting in sectors
+				sectorLights->insert( {
+					{ 0.5, 0.5, -0.1 },
+					{ 0.1, 0.1, 0.1 },
+					{ 1.0, 1.0, 1.0 },
+					{ 0.1, 0.1, 0.1 },
+					sides
+				} );
 			}
+
+			glm::ivec2 dimensions = level.dimensions;
+			sectorLights->setOrigin( currentLevel, glm::vec3{ -( dimensions.x * 0.5f ), dimensions.y * 0.5f, 0.0f } );
+			currentLevel += 4.0f;
 		}
 
 		// Falls through if already added
 		state.as< State::HouseholdGameplayState >().getWorldRenderer().addIlluminator( "__sector_illuminator", sectorLights );
+		sectorLights->send();
 	}
 
 	bool InfrastructureManager::update() {
