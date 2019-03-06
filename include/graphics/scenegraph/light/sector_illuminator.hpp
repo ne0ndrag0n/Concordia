@@ -6,6 +6,7 @@
 #include <utility>
 #include <map>
 #include <vector>
+#include <tuple>
 
 namespace BlueBear::Graphics::SceneGraph::Light {
 
@@ -26,11 +27,19 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		std::vector< Sector > sectors;
 		std::map< float, glm::vec3 > origins;
 
+		struct {
+			bool dirty = true;
+			std::vector< std::pair< glm::vec3, glm::vec3 > > lineSegments;
+			std::vector< std::tuple< int, int, unsigned int > > polygonSides;
+		} memo;
+
+		void refresh();
+		void sendMemoized();
+
 	public:
 		void updateSectors( const std::vector< Sector >& sectors );
 		void insert( const Sector& value );
 		void setOrigin( float level, const glm::vec3& topLeft );
-		Sector* getSector();
 		void send() override;
 	};
 
