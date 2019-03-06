@@ -10,11 +10,11 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		updateSectors( sectors );
 	}
 
-	void SectorIlluminator::send() {
-		// Major TODO
-		//Tools::OpenGL::setUniform( "sectorIlluminator.numSectors", ( unsigned int ) 0 );
-		//return;
+	static glm::vec3 correctByOrigin( const glm::vec3& value, const glm::vec3& origin ) {
+		return { origin.x + value.x, origin.y - value.y, value.z };
+	}
 
+	void SectorIlluminator::send() {
 		std::vector< std::pair< glm::vec3, glm::vec3 > > lineSegments;
 
 		Tools::OpenGL::setUniform( "sectorIlluminator.numSectors", ( unsigned int ) sectors.size() );
@@ -28,11 +28,9 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 			Tools::OpenGL::setUniform( "sectorIlluminator.sectors[" + std::to_string( sectorIndex ) + "].polygon.numSides", ( unsigned int ) sector.sides.size() );
 			int sidesIndex = 0;
 			for( auto lineSegment : sector.sides ) {
-				//const glm::vec3& origin = origins[ lineSegment.first.z ];
-				lineSegment.first += glm::vec3{ -10.0f, -2.0f, 0.0f };
-				lineSegment.second += glm::vec3{ -10.0f, -2.0f, 0.0f };
-
-				//Log::getInstance().debug( "SectorIlluminator::send", "Implanting a line segment of " + glm::to_string( lineSegment.first ) + "-" + glm::to_string( lineSegment.second ) );
+				const glm::vec3& origin = origins[ lineSegment.first.z ];
+				lineSegment.first = correctByOrigin( lineSegment.first, origin );
+				lineSegment.second = correctByOrigin( lineSegment.second, origin );
 
 				auto it = std::find_if( lineSegments.begin(), lineSegments.end(), [ &lineSegment ]( const std::pair< glm::vec3, glm::vec3 >& value ) {
 					return lineSegment.first == value.first &&
