@@ -79,6 +79,10 @@ namespace BlueBear::Tools {
 	std::set< Sector > SectorIdentifier::getSectors() {
 		cached.clear();
 
+		if( graph.empty() ) {
+			return {};
+		}
+
 		std::set< Sector > result = getSectors( &graph.begin()->second, nullptr );
 
 		// Remove sectors that contain other sectors
