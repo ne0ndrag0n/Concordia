@@ -11,6 +11,7 @@ namespace BlueBear::Tools {
 
 	struct SectorDiscoveryNode {
 		glm::ivec2 position;
+		bool visited = false;
 		struct SectorDiscoveryNode* visitParent = nullptr;
 		std::list< struct SectorDiscoveryNode* > links;
 	};
@@ -24,7 +25,7 @@ namespace BlueBear::Tools {
 
 		const std::set< const SectorDiscoveryNode* >& getGeneratedSet( const Sector& sector );
 		void addSectorToList( std::set< Sector >& targetSet, const Sector& newSector );
-		std::set< Sector > getSectors( const SectorDiscoveryNode* node, const SectorDiscoveryNode* parent, std::list< const SectorDiscoveryNode* > discovered = {} );
+		std::set< Sector > getSectors( SectorDiscoveryNode* node, const SectorDiscoveryNode* parent, std::list< const SectorDiscoveryNode* > discovered = {} );
 
 
 	public:

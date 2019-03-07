@@ -41,12 +41,13 @@ namespace BlueBear::Tools {
 		targetSet.insert( newSector );
 	}
 
-	std::set< Sector > SectorIdentifier::getSectors( const SectorDiscoveryNode* node, const SectorDiscoveryNode* parent, std::list< const SectorDiscoveryNode* > discovered ) {
+	std::set< Sector > SectorIdentifier::getSectors( SectorDiscoveryNode* node, const SectorDiscoveryNode* parent, std::list< const SectorDiscoveryNode* > discovered ) {
 		std::set< Sector > result;
 
+		node->visited = true;
 		discovered.push_back( node );
 
-		for( const SectorDiscoveryNode* link : node->links ) {
+		for( SectorDiscoveryNode* link : node->links ) {
 			if( link != parent ) {
 				Sector potentialSector;
 				bool seen = false;
@@ -77,35 +78,42 @@ namespace BlueBear::Tools {
 	}
 
 	std::set< Sector > SectorIdentifier::getSectors() {
-		cached.clear();
-
 		if( graph.empty() ) {
 			return {};
 		}
 
-		std::set< Sector > result = getSectors( &graph.begin()->second, nullptr );
+		cached.clear();
 
-		// Remove sectors that contain other sectors
-		std::set< Sector > finalSet;
-		for( const Sector& needle : result ) {
-			auto needleSet = getGeneratedSet( needle );
-			bool isSuperset = false;
-
-			// Does needle set contain any of the other sets?
-			for( const Sector& value : result ) {
-				if( &needle != &value ) {
-					auto valueSet = getGeneratedSet( value );
-					if( isSuperset = std::includes( needleSet.begin(), needleSet.end(), valueSet.begin(), valueSet.end() ) ) {
-						break;
-					}
-				}
-			}
-
-			if( !isSuperset ) {
-				finalSet.insert( needle );
+		std::vector< std::set< Sector > > sectorGroups;
+		for( auto& pair : graph ) {
+			if( !pair.second.visited ) {
+				sectorGroups.emplace_back( getSectors( &pair.second, nullptr ) );
 			}
 		}
 
+		// Remove sectors that contain other sectors
+		std::set< Sector > finalSet;
+
+		for( const auto& result : sectorGroups ) {
+			for( const Sector& needle : result ) {
+				auto needleSet = getGeneratedSet( needle );
+				bool isSuperset = false;
+
+				// Does needle set contain any of the other sets?
+				for( const Sector& value : result ) {
+					if( &needle != &value ) {
+						auto valueSet = getGeneratedSet( value );
+						if( isSuperset = std::includes( needleSet.begin(), needleSet.end(), valueSet.begin(), valueSet.end() ) ) {
+							break;
+						}
+					}
+				}
+
+				if( !isSuperset ) {
+					finalSet.insert( needle );
+				}
+			}
+		}
 
 		return finalSet;
 	}
