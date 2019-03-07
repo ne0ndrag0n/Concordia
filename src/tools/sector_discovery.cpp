@@ -11,38 +11,40 @@ namespace BlueBear::Tools {
 		graph[ destination ].position = destination;
 	}
 
-	const std::set< const SectorDiscoveryNode* >& SectorIdentifier::getGeneratedSet( const Sector& sector ) {
-		if( cached.find( &sector ) == cached.end() ) {
-			auto& set = cached[ &sector ];
-			for( const auto& vertex : sector ) {
-				set.insert( vertex );
+	static bool sectorsEquivalent( const Sector& needle, const Sector& value ) {
+		// All nodes in needle must be in value
+		for( const auto& node : needle ) {
+			if( std::find( value.begin(), value.end(), node ) == value.end() ) {
+				return false;
 			}
 		}
 
-		return cached[ &sector ];
+		return needle.size() == value.size();
 	}
 
-	void SectorIdentifier::addSectorToList( std::set< Sector >& targetSet, const Sector& newSector ) {
-		// Convert sector to set
-		std::set< const SectorDiscoveryNode* > needle;
-		for( const auto& vertex : newSector ) {
-			needle.insert( vertex );
+	static bool isSuperset( const Sector& superset, const Sector& set ) {
+		// Every node in set must be in superset
+		for( const auto& node : set ) {
+			if( std::find( superset.begin(), superset.end(), node ) == superset.end() ) {
+				return false;
+			}
 		}
 
-		// If there is no difference between this and other sectors, we already added it
-		for( const Sector& sector : targetSet ) {
-			// No intersection = this sector was already added, don't add it
-			if( needle == getGeneratedSet( sector ) ) {
-				// Don't add it
+		return true;
+	}
+
+	void SectorIdentifier::addSectorToList( SectorBundle& targetSet, const Sector& newSector ) {
+		for( const auto& sector : targetSet ) {
+			if( sectorsEquivalent( sector, newSector ) ) {
 				return;
 			}
 		}
 
-		targetSet.insert( newSector );
+		targetSet.push_back( newSector );
 	}
 
-	std::set< Sector > SectorIdentifier::getSectors( SectorDiscoveryNode* node, const SectorDiscoveryNode* parent, std::list< const SectorDiscoveryNode* > discovered ) {
-		std::set< Sector > result;
+	SectorBundle SectorIdentifier::getSectors( SectorDiscoveryNode* node, const SectorDiscoveryNode* parent, std::list< const SectorDiscoveryNode* > discovered ) {
+		SectorBundle result;
 
 		node->visited = true;
 		discovered.push_back( node );
@@ -66,7 +68,7 @@ namespace BlueBear::Tools {
 					addSectorToList( result, potentialSector );
 				} else {
 					// Item not seen and isn't parent. Go through it.
-					std::set< Sector > linkResult = getSectors( link, node, discovered );
+					SectorBundle linkResult = getSectors( link, node, discovered );
 					for( const Sector& sector : linkResult ) {
 						addSectorToList( result, sector );
 					}
@@ -77,14 +79,12 @@ namespace BlueBear::Tools {
 		return result;
 	}
 
-	std::set< Sector > SectorIdentifier::getSectors() {
+	SectorBundle SectorIdentifier::getSectors() {
 		if( graph.empty() ) {
 			return {};
 		}
 
-		cached.clear();
-
-		std::vector< std::set< Sector > > sectorGroups;
+		std::vector< SectorBundle > sectorGroups;
 		for( auto& pair : graph ) {
 			if( !pair.second.visited ) {
 				sectorGroups.emplace_back( getSectors( &pair.second, nullptr ) );
@@ -92,25 +92,23 @@ namespace BlueBear::Tools {
 		}
 
 		// Remove sectors that contain other sectors
-		std::set< Sector > finalSet;
+		SectorBundle finalSet;
 
 		for( const auto& result : sectorGroups ) {
 			for( const Sector& needle : result ) {
-				auto needleSet = getGeneratedSet( needle );
-				bool isSuperset = false;
+				bool superset = false;
 
 				// Does needle set contain any of the other sets?
 				for( const Sector& value : result ) {
 					if( &needle != &value ) {
-						auto valueSet = getGeneratedSet( value );
-						if( isSuperset = std::includes( needleSet.begin(), needleSet.end(), valueSet.begin(), valueSet.end() ) ) {
+						if( superset = isSuperset( needle, value ) ) {
 							break;
 						}
 					}
 				}
 
-				if( !isSuperset ) {
-					finalSet.insert( needle );
+				if( !superset ) {
+					addSectorToList( finalSet, needle );
 				}
 			}
 		}

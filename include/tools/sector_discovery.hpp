@@ -18,20 +18,19 @@ namespace BlueBear::Tools {
 
 	using SectorDiscoveryGraph = std::unordered_map< glm::ivec2, SectorDiscoveryNode >;
 	using Sector = std::vector< const SectorDiscoveryNode* >;
+	using SectorBundle = std::vector< Sector >;
 
 	class SectorIdentifier {
 		SectorDiscoveryGraph graph;
-		std::unordered_map< const void*, std::set< const SectorDiscoveryNode* > > cached;
 
-		const std::set< const SectorDiscoveryNode* >& getGeneratedSet( const Sector& sector );
-		void addSectorToList( std::set< Sector >& targetSet, const Sector& newSector );
-		std::set< Sector > getSectors( SectorDiscoveryNode* node, const SectorDiscoveryNode* parent, std::list< const SectorDiscoveryNode* > discovered = {} );
+		void addSectorToList( SectorBundle& targetSet, const Sector& newSector );
+		SectorBundle getSectors( SectorDiscoveryNode* node, const SectorDiscoveryNode* parent, std::list< const SectorDiscoveryNode* > discovered = {} );
 
 
 	public:
 		void addEdge( const glm::ivec2& origin, const glm::ivec2& destination );
 
-		std::set< Sector > getSectors();
+		SectorBundle getSectors();
 	};
 }
 
