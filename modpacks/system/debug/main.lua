@@ -55,7 +55,8 @@ local Panel = {
   pane = nil,
   scrollback_bin = nil,
   input_field = nil,
-  system_event = nil
+  system_event = nil,
+  message_interval = nil
 }
 
 function Panel:init()
@@ -72,7 +73,8 @@ function Panel:init()
 
   self.scrollback_bin = self.pane:get_elements_by_class( { '-bb-scrollback-bin' } )[ 1 ]
   self.input_field = self.pane:get_elements_by_class( { '-bb-terminal-text-input' } )[ 1 ]
-  self.system_event = bluebear.event.register_system_event( 'message-logged', bluebear.util.bind( self.on_log, self ) )
+  self.message_interval = 1
+  self.system_event = bluebear.event.register_system_event( 'message-logged', bluebear.util.bind( self.receive_message, self ) )
   self.pane
     :get_elements_by_class( { '-bb-terminal-clear-button' } )[ 1 ]
     :register_input_event(
@@ -116,6 +118,12 @@ function Panel:clear( event )
   self.scrollback_bin:remove( tab )
 end
 
+function Panel:receive_message( message )
+  bluebear.engine.queue_callback( self.message_interval, bluebear.util.bind( self.on_log, self, message ) )
+
+  self.message_interval = self.message_interval + 1
+end
+
 function Panel:on_log( message )
   -- Prevent loopback
   bluebear.event.unregister_system_event( 'message-logged', self.system_event )
@@ -137,6 +145,8 @@ function Panel:on_log( message )
     'message-logged',
     bluebear.util.bind( self.on_log, self )
   )
+
+  self.message_interval = self.message_interval - 1
 end
 
 function Panel:toggle()

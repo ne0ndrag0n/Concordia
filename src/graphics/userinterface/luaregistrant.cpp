@@ -151,9 +151,15 @@ namespace BlueBear::Graphics::UserInterface {
     types.new_usertype< Element >(
       "Element",
       "new", sol::no_constructor,
-      "add_child", []( Element& self, Element& other ) {
-        self.addChild( other.shared_from_this() );
-      },
+      "add_child", sol::overload(
+        []( Element& self, Element& other ) {
+          self.addChild( other.shared_from_this() );
+        },
+        []( Element& self, Element& other, sol::function callback ) {
+          self.addChild( other.shared_from_this() );
+          Scripting::LuaKit::Utility::bagFunction( callback )();
+        }
+      ),
       "detach", []( Element& self ) {
         self.detach();
       },
