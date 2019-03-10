@@ -158,6 +158,20 @@ namespace BlueBear::Graphics::UserInterface {
         []( Element& self, Element& other, sol::function callback ) {
           self.addChild( other.shared_from_this() );
           Scripting::LuaKit::Utility::bagFunction( callback )();
+        },
+        []( Element& self, std::vector< std::shared_ptr< Element > > elements ) {
+          for( auto& item : elements ) {
+            self.addChild( item, false );
+          }
+
+          self.reflow();
+        },
+        []( Element& self, sol::table elements ) {
+          for( auto& pair : elements ) {
+            self.addChild( Scripting::LuaKit::Utility::cast< Element& >( pair.second ).shared_from_this(), false );
+          }
+
+          self.reflow();
         }
       ),
       "detach", []( Element& self ) {

@@ -56,7 +56,8 @@ local Panel = {
   scrollback_bin = nil,
   input_field = nil,
   system_event = nil,
-  message_interval = nil
+  message_queue = nil,
+  queue_waiting = false
 }
 
 function Panel:init()
@@ -73,7 +74,8 @@ function Panel:init()
 
   self.scrollback_bin = self.pane:get_elements_by_class( { '-bb-scrollback-bin' } )[ 1 ]
   self.input_field = self.pane:get_elements_by_class( { '-bb-terminal-text-input' } )[ 1 ]
-  self.message_interval = 1
+  self.message_queue = {}
+  self.queue_waiting = false
   self.system_event = bluebear.event.register_system_event( 'message-logged', bluebear.util.bind( self.receive_message, self ) )
   self.pane
     :get_elements_by_class( { '-bb-terminal-clear-button' } )[ 1 ]
@@ -119,17 +121,10 @@ function Panel:clear( event )
 end
 
 function Panel:receive_message( message )
-  bluebear.engine.queue_callback( self.message_interval, bluebear.util.bind( self.on_log, self, message ) )
-
-  self.message_interval = self.message_interval + 1
-end
-
-function Panel:on_log( message )
-  -- Prevent loopback
   bluebear.event.unregister_system_event( 'message-logged', self.system_event )
 
   local segment = bluebear.util.split( message, '[' )
-  self.scrollback_bin:add_child(
+  table.insert( self.message_queue,
     bluebear.gui.load_xml(
       string.format(
         self.LOG_MESSAGE_TEMPLATE,
@@ -140,13 +135,31 @@ function Panel:on_log( message )
     , false )[ 1 ]
   )
 
+  -- Insert at the next frame
+  if self.queue_waiting == false then
+    self.queue_waiting = true
+    bluebear.engine.queue_callback( 1, bluebear.util.bind( self.insert_queue, self ) )
+  end
+
+  self.system_event = bluebear.event.register_system_event(
+    'message-logged',
+    bluebear.util.bind( self.receive_message, self )
+  )
+end
+
+function Panel:insert_queue()
+  -- Prevent loopback
+  bluebear.event.unregister_system_event( 'message-logged', self.system_event )
+
+  self.queue_waiting = false
+  self.scrollback_bin:add_child( self.message_queue )
+  self.message_queue = {}
+
   -- Restore
   self.system_event = bluebear.event.register_system_event(
     'message-logged',
-    bluebear.util.bind( self.on_log, self )
+    bluebear.util.bind( self.receive_message, self )
   )
-
-  self.message_interval = self.message_interval - 1
 end
 
 function Panel:toggle()

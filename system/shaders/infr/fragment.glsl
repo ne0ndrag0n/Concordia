@@ -133,7 +133,7 @@ DirectionalLight getDirectionalLightBySector() {
 }
 
 void main() {
-  DirectionalLight directionalLight = getDirectionalLightBySector();
+  //DirectionalLight directionalLight = getDirectionalLightBySector();
 
   vec3 texResult = texture( material.diffuse0, fragTexture ).rgb;
 
