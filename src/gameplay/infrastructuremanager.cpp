@@ -89,7 +89,7 @@ namespace BlueBear::Gameplay {
 			}
 
 			glm::ivec2 dimensions = level.dimensions;
-			sectorLights->setOrigin( currentLevel, glm::vec3{ -( dimensions.x * 0.5f ), dimensions.y * 0.5f, 0.0f } );
+			sectorLights->setLevelData( glm::vec3{ -( dimensions.x * 0.5f ), dimensions.y * 0.5f, currentLevel }, dimensions );
 			currentLevel += 4.0f;
 		}
 

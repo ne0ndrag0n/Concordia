@@ -81,8 +81,6 @@ namespace BlueBear {
       }
 
       void Material::send() {
-        unsigned int counter = 0;
-
         if( useAmbient ) {
           Tools::OpenGL::setUniform( "material.ambient", ambientColor );
         }
@@ -91,9 +89,15 @@ namespace BlueBear {
           Tools::OpenGL::setUniform( "material.diffuse", diffuseColor );
         } else {
           for( int i = 0; i != diffuseTextures.size(); i++ ) {
-            glActiveTexture( GL_TEXTURE0 + counter );
+            auto textureUnit = Tools::OpenGL::getTextureUnit();
+            if( !textureUnit ) {
+              throw Material::TextureUnitUnavailableException();
+            }
+            lockedTextureUnits.push_back( *textureUnit );
+
+            glActiveTexture( GL_TEXTURE0 + *textureUnit );
             glBindTexture( GL_TEXTURE_2D, diffuseTextures[ i ]->id );
-            Tools::OpenGL::setUniform( std::string( "material.diffuse" ) + std::to_string( i ), (int) counter++ );
+            Tools::OpenGL::setUniform( std::string( "material.diffuse" ) + std::to_string( i ), (int) *textureUnit );
           }
         }
 
@@ -101,15 +105,26 @@ namespace BlueBear {
           Tools::OpenGL::setUniform( "material.specular", specularColor );
         } else {
           for( int i = 0; i != specularTextures.size(); i++ ) {
-            glActiveTexture( GL_TEXTURE0 + counter );
+            auto textureUnit = Tools::OpenGL::getTextureUnit();
+            if( !textureUnit ) {
+              throw Material::TextureUnitUnavailableException();
+            }
+            lockedTextureUnits.push_back( *textureUnit );
+
+            glActiveTexture( GL_TEXTURE0 + *textureUnit );
             glBindTexture( GL_TEXTURE_2D, specularTextures[ i ]->id );
-            Tools::OpenGL::setUniform( std::string( "material.specular" ) + std::to_string( i ), (int) counter++ );
+            Tools::OpenGL::setUniform( std::string( "material.specular" ) + std::to_string( i ), (int) *textureUnit );
 
           }
         }
 
         Tools::OpenGL::setUniform( "material.shininess", shininess );
         Tools::OpenGL::setUniform( "material.opacity", opacity );
+      }
+
+      void Material::releaseTextureUnits() {
+        Tools::OpenGL::returnTextureUnits( lockedTextureUnits );
+        lockedTextureUnits.clear();
       }
 
     }

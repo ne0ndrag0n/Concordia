@@ -177,6 +177,7 @@ namespace BlueBear {
             getComputedTransform().send();
             drawable.material->send();
             drawable.mesh->drawElements();
+            drawable.material->releaseTextureUnits();
           }
         }
 

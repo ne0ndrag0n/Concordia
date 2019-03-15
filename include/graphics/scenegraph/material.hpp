@@ -25,11 +25,13 @@ namespace BlueBear {
         float shininess = 0.0f;
         float opacity = 1.0f;
         bool useAmbient = false;
+        std::vector< unsigned int > lockedTextureUnits;
 
         void checkTextureUnits();
 
       public:
         EXCEPTION_TYPE( ExceededTextureUnitsException, "Exceeded the maximum texture units for this hardware." );
+        EXCEPTION_TYPE( TextureUnitUnavailableException, "Unable to acquire a texture unit for draw." );
 
         Material( glm::vec3 ambientColor, glm::vec3 diffuseColor, glm::vec3 specularColor, float shininess, float opacity );
         Material( glm::vec3 diffuseColor, glm::vec3 specularColor, float shininess, float opacity );
@@ -55,6 +57,8 @@ namespace BlueBear {
         void sendDeferredTextures();
 
         void send();
+
+        void releaseTextureUnits();
       };
 
     }

@@ -20,6 +20,10 @@ namespace BlueBear {
       }
     }
 
+    Texture::Texture( const glm::uvec2& dimensions, const GLvoid* data ) {
+      prepareTextureFromData( dimensions, data );
+    }
+
     Texture::~Texture() {
       if( !deferred ) {
         glDeleteTextures( 1, &id );
@@ -37,6 +41,13 @@ namespace BlueBear {
         auto size = texture.getSize();
         glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture.getPixelsPtr() );
         glGenerateMipmap( GL_TEXTURE_2D );
+      glBindTexture( GL_TEXTURE_2D, 0 );
+    }
+
+    void Texture::prepareTextureFromData( const glm::uvec2& size, const GLvoid* data ) {
+      glGenTextures( 1, &id );
+      glBindTexture( GL_TEXTURE_2D, id );
+        glTexImage2D( GL_TEXTURE_2D, 0, GL_R32F, size.x, size.y, 0, GL_RED, GL_FLOAT, data );
       glBindTexture( GL_TEXTURE_2D, 0 );
     }
 

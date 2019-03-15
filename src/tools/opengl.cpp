@@ -6,6 +6,25 @@
 namespace BlueBear {
   namespace Tools {
 
+    std::array< bool, 16 > OpenGL::textureUnits{ false };
+
+    std::optional< unsigned int > OpenGL::getTextureUnit() {
+      for( unsigned int i = 0; i != 16; i++ ) {
+        if( textureUnits[ i ] == false ) {
+          textureUnits[ i ] = true;
+          return i;
+        }
+      }
+
+      return {};
+    }
+
+    void OpenGL::returnTextureUnits( const std::vector< unsigned int >& items ) {
+      for( unsigned int index : items ) {
+        textureUnits[ index ] = false;
+      }
+    }
+
     GLint OpenGL::getUniformID( const std::string& uniform ) {
       return glGetUniformLocation( Graphics::Shader::CURRENT_PROGRAM, uniform.c_str() );
     }

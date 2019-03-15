@@ -1,107 +1,159 @@
 #include "graphics/scenegraph/light/sector_illuminator.hpp"
+#include "graphics/texture.hpp"
 #include "tools/opengl.hpp"
+#include "configmanager.hpp"
 #include "log.hpp"
 #include <algorithm>
 #include <glm/gtx/string_cast.hpp>
+#include <tbb/parallel_for.h>
+#include <tbb/parallel_for_each.h>
 
 namespace BlueBear::Graphics::SceneGraph::Light {
-
-	SectorIlluminator::SectorIlluminator( const std::vector< Sector >& sectors ) : Illuminator::Illuminator() {
-		updateSectors( sectors );
-	}
 
 	static glm::vec3 correctByOrigin( const glm::vec3& value, const glm::vec3& origin ) {
 		return { origin.x + value.x, origin.y - value.y, value.z };
 	}
 
-	void SectorIlluminator::send() {
-		if( memo.dirty ) {
-			refresh();
+	static bool segmentsIntersect( const std::pair< glm::vec3, glm::vec3 >& line1, const std::pair< glm::vec3, glm::vec3 >& line2 ) {
+		// ta = (y3−y4)(x1−x3)+(x4−x3)(y1−y3)
+		//      -----------------------------
+		//      (x4−x3)(y1−y2)−(x1−x2)(y4−y3)
+
+		// tb = (y1−y2)(x1−x3)+(x2−x1)(y1−y3)
+		//      -----------------------------
+		//      (x4−x3)(y1−y2)−(x1−x2)(y4−y3)
+
+		// first - odd
+		// second - even
+
+		float denominator = ( ( line2.second.x - line2.first.x ) * ( line1.first.y - line1.second.y ) ) -
+							( ( line1.first.x - line1.second.x ) * ( line2.second.y - line2.first.y ) );
+
+		// collinear
+		if( denominator == 0.0f ) {
+			return false;
 		}
 
-		sendMemoized();
+	float ta_numerator = ( ( line2.first.y - line2.second.y ) * ( line1.first.x - line2.first.x ) ) +
+							( ( line2.second.x - line2.first.x ) * ( line1.first.y - line2.first.y ) );
+
+		float tb_numerator = ( ( line1.first.y - line1.second.y ) * ( line1.first.x - line2.first.x ) ) +
+							( ( line1.second.x - line1.first.x ) * ( line1.first.y - line2.first.y ) );
+
+
+		float ta = ta_numerator / denominator;
+		float tb = tb_numerator / denominator;
+
+		return ( ta >= 0.0f && ta <= 1.0f && tb >= 0.0f && tb <= 1.0f );
+	}
+
+	static float getPolygonMaxX( const SectorIlluminator::Sector& sector, const glm::vec3& origin ) {
+		float maxX = 1.175494351e-38;
+
+		for( const auto& lineSegment : sector.sides ) {
+			maxX = std::max(
+				maxX,
+				std::max(
+					correctByOrigin( lineSegment.first, origin ).x,
+					correctByOrigin( lineSegment.second, origin ).x
+				)
+			);
+		}
+
+		return maxX;
+	}
+
+	void SectorIlluminator::send() {
+		if( dirty ) {
+			refresh();
+
+			// Texture units 1-9 are reserved for levels.
+			if( textureData.size() > 8 ) {
+				Log::getInstance().warn( "SectorIlluminator::send", "Cannot send > 8 sector maps to shader!" );
+			}
+		}
+
+		int item = 0;
+		for( const auto& pair : textureData ) {
+			glActiveTexture( GL_TEXTURE0 + pair.second.second );
+			glBindTexture( GL_TEXTURE_2D, pair.second.first->id );
+			Tools::OpenGL::setUniform( "sectorMaps[ " + std::to_string( item ) + "]", ( int ) pair.second.second );
+			glBindTexture( GL_TEXTURE_2D, 0 );
+
+			item++;
+			if( item == 9 ) {
+				break;
+			}
+		}
 	}
 
 	/**
 	 * Generate and save anything that isn't trivial to send
 	 */
 	void SectorIlluminator::refresh() {
-		memo.dirty = false;
-		memo.lineSegments.clear();
-		memo.polygonSides.clear();
+		for( const auto& pair : textureData ) {
+			Tools::OpenGL::returnTextureUnits( { pair.second.second } );
+		}
+		textureData.clear();
 
-		int sectorIndex = 0;
-		for( const Sector& sector : sectors ) {
+		for( const auto& pair : levelData ) {
+			int resolution = std::min( ( int ) std::pow( 10, ConfigManager::getInstance().getIntValue( "sector_resolution" ) ), 100 );
+			int height = pair.second.second.y;
+			int width = pair.second.second.x;
 
-			int sidesIndex = 0;
-			for( auto lineSegment : sector.sides ) {
-				const glm::vec3& origin = origins[ lineSegment.first.z ];
-				lineSegment.first = correctByOrigin( lineSegment.first, origin );
-				lineSegment.second = correctByOrigin( lineSegment.second, origin );
+			std::unique_ptr< float[] > array = std::make_unique< float[] >( height * width * resolution );
+			const auto& constSectors = sectors;
 
-				auto it = std::find_if( memo.lineSegments.begin(), memo.lineSegments.end(), [ &lineSegment ]( const std::pair< glm::vec3, glm::vec3 >& value ) {
-					return lineSegment.first == value.first &&
-						   lineSegment.second == value.second;
+			tbb::parallel_for( 0, height * resolution, [ &array, &constSectors, &pair, height, width, resolution ]( int y ) {
+				tbb::parallel_for( 0, width * resolution, [ &array, &constSectors, &pair, y, height, width, resolution ]( int x ) {
+					const glm::vec3 fragment = correctByOrigin( glm::vec3( x / ( float ) resolution, y / ( float ) resolution, pair.first ), pair.second.first );
+
+					// Test fragment using point in polygon against all sectors
+					int sectorIndex = 0;
+					for( const Sector& sector : constSectors ) {
+						// Generate needle
+						std::pair< glm::vec3, glm::vec3 > needle = { fragment, glm::vec3{ getPolygonMaxX( sector, pair.second.first ) + 1.0f, fragment.y, fragment.z } };
+						int fragLevel = int( fragment.z / 4 );
+
+						// Check all sides of this sector against the needle
+						unsigned int intersectionCount = 0;
+						for( const auto& side : sector.sides ) {
+							std::pair< glm::vec3, glm::vec3 > correctedSide = { correctByOrigin( side.first, pair.second.first ), correctByOrigin( side.second, pair.second.first ) };
+							if( segmentsIntersect( needle, correctedSide ) && fragLevel == int( correctedSide.first.z / 4 ) ) {
+								intersectionCount++;
+							}
+						}
+
+						if( ( intersectionCount % 2 ) != 0 ) {
+							// odd means IN!
+							array[ ( y * width ) + x ] = sectorIndex;
+							break;
+						}
+
+						sectorIndex++;
+					}
 				} );
+			} );
 
-				unsigned int lineSegmentIndex;
-				if( it == memo.lineSegments.end() ) {
-					// Line segment needs to be added
-					memo.lineSegments.emplace_back( lineSegment );
-					lineSegmentIndex = memo.lineSegments.size() - 1;
-				} else {
-					// Line segment already exists
-					lineSegmentIndex = std::distance( memo.lineSegments.begin(), it );
-				}
-
-				memo.polygonSides.emplace_back( sectorIndex, sidesIndex, lineSegmentIndex );
-				sidesIndex++;
+			auto textureUnit = Tools::OpenGL::getTextureUnit();
+			if( !textureUnit ) {
+				Log::getInstance().error( "SectorIlluminator::refresh", "Unable to acquire texture unit for sector map; discarding data!" );
+			} else {
+				textureData[ pair.first ] = { std::make_unique< Texture >( glm::uvec2{ width * resolution, height * resolution }, array.get() ), *textureUnit };
 			}
-
-			sectorIndex++;
-		}
-	}
-
-	/**
-	 * Send everything that's trivial to send
-	 */
-	void SectorIlluminator::sendMemoized() {
-		Tools::OpenGL::setUniform( "sectorIlluminator.numSectors", ( unsigned int ) sectors.size() );
-		int sectorIndex = 0;
-		for( const Sector& sector : sectors ) {
-			Tools::OpenGL::setUniform( "sectorIlluminator.sectors[" + std::to_string( sectorIndex ) + "].light.direction", sector.direction );
-			Tools::OpenGL::setUniform( "sectorIlluminator.sectors[" + std::to_string( sectorIndex ) + "].light.ambient", sector.ambient );
-			Tools::OpenGL::setUniform( "sectorIlluminator.sectors[" + std::to_string( sectorIndex ) + "].light.diffuse", sector.diffuse );
-			Tools::OpenGL::setUniform( "sectorIlluminator.sectors[" + std::to_string( sectorIndex ) + "].light.specular", sector.specular );
-			Tools::OpenGL::setUniform( "sectorIlluminator.sectors[" + std::to_string( sectorIndex ) + "].polygon.numSides", ( unsigned int ) sector.sides.size() );
-			sectorIndex++;
 		}
 
-		for( auto [ sectorIndex, sidesIndex, lineSegmentIndex ] : memo.polygonSides ) {
-			Tools::OpenGL::setUniform( "sectorIlluminator.sectors[" + std::to_string( sectorIndex ) + "].polygon.sides[" + std::to_string( sidesIndex ) + "]", ( unsigned int ) lineSegmentIndex );
-		}
-
-		int lineSegmentsIndex = 0;
-		for( const auto& lineSegment : memo.lineSegments ) {
-			Tools::OpenGL::setUniform( "sectorIlluminator.lineSegments[" + std::to_string( lineSegmentsIndex ) + "].from", lineSegment.first );
-			Tools::OpenGL::setUniform( "sectorIlluminator.lineSegments[" + std::to_string( lineSegmentsIndex ) + "].to", lineSegment.second );
-			lineSegmentsIndex++;
-		}
-	}
-
-	void SectorIlluminator::updateSectors( const std::vector< Sector >& sectors ) {
-		memo.dirty = true;
-		this->sectors = sectors;
+		dirty = false;
 	}
 
 	void SectorIlluminator::insert( const Sector& value ) {
-		memo.dirty = true;
+		dirty = true;
 		sectors.emplace_back( value );
 	}
 
-	void SectorIlluminator::setOrigin( float level, const glm::vec3& topLeft ) {
-		memo.dirty = true;
-		origins[ level ] = topLeft;
+	void SectorIlluminator::setLevelData( const glm::vec3& topLeft, const glm::uvec2& dimensions ) {
+		dirty = true;
+		levelData[ topLeft.z ] = { topLeft, dimensions };
 	}
 
 }
