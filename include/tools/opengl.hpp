@@ -26,6 +26,7 @@ namespace BlueBear {
       static GLint getUniformID( const std::string& uniform );
 
       static void setUniform( const std::string& id, const glm::vec3& value );
+      static void setUniform( const std::string& id, const glm::vec2& value );
       static void setUniform( const std::string& id, const int value );
       static void setUniform( const std::string& id, const unsigned int value );
       static void setUniform( const std::string& id, const float value );

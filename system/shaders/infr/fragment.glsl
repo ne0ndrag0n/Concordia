@@ -4,9 +4,6 @@ in vec3 fragNormal;
 in vec3 fragPos;
 out vec4 color;
 
-#define   YES    1.0f
-#define   NO     0.0f
-
 struct Material {
   sampler2D diffuse0;
   float shininess;
@@ -20,119 +17,55 @@ struct DirectionalLight {
   vec3 specular;
 };
 
-struct LineSegment {
-  vec3 from;
-  vec3 to;
-};
-
-struct Polygon {
-  uint numSides;
-  uint sides[ 16 ];
-};
-
 struct Sector {
-  DirectionalLight light;
-  Polygon polygon;
-};
-
-struct SectorIlluminator {
-  LineSegment lineSegments[ 64 ];
-  Sector sectors[ 32 ];
-  uint numSectors;
+  vec3 origin;
+  vec2 dimensions;
 };
 
 uniform vec3 cameraPos;
 uniform Material material;
 uniform DirectionalLight directionalLight;
-uniform SectorIlluminator sectorIlluminator;
-
-float segmentsIntersect( LineSegment line1, LineSegment line2 ) {
-  // ta = (y3−y4)(x1−x3)+(x4−x3)(y1−y3)
-  //      -----------------------------
-  //      (x4−x3)(y1−y2)−(x1−x2)(y4−y3)
-
-  // tb = (y1−y2)(x1−x3)+(x2−x1)(y1−y3)
-  //      -----------------------------
-  //      (x4−x3)(y1−y2)−(x1−x2)(y4−y3)
-
-  // from - odd
-  // to - even
-
-  float denominator = ( ( line2.to.x - line2.from.x ) * ( line1.from.y - line1.to.y ) ) -
-                      ( ( line1.from.x - line1.to.x ) * ( line2.to.y - line2.from.y ) );
-
-  // collinear
-  if( denominator == 0.0f ) {
-    return NO;
-  }
-
-  float ta_numerator = ( ( line2.from.y - line2.to.y ) * ( line1.from.x - line2.from.x ) ) +
-                       ( ( line2.to.x - line2.from.x ) * ( line1.from.y - line2.from.y ) );
-
-  float tb_numerator = ( ( line1.from.y - line1.to.y ) * ( line1.from.x - line2.from.x ) ) +
-                       ( ( line1.to.x - line1.from.x ) * ( line1.from.y - line2.from.y ) );
-
-
-  float ta = ta_numerator / denominator;
-  float tb = tb_numerator / denominator;
-
-  if( ta >= 0.0f && ta <= 1.0f && tb >= 0.0f && tb <= 1.0f ) {
-    return YES;
-  } else {
-    return NO;
-  }
-}
-
-float getPolygonMaxX( Polygon polygon ) {
-  float maxX = 1.175494351e-38;
-
-  for( uint i = uint( 0 ); i != polygon.numSides; i++ ) {
-    maxX = max(
-      maxX,
-      max(
-        sectorIlluminator.lineSegments[ polygon.sides[ i ] ].from.x,
-        sectorIlluminator.lineSegments[ polygon.sides[ i ] ].to.x
-      )
-    );
-  }
-
-  return maxX;
-}
+uniform float sectorResolution;
+uniform DirectionalLight sectorLights[ 16 ];
+uniform sampler2D sectorMaps[ 8 ];
+uniform Sector sectors[ 8 ];
 
 /**
  * Turn fragpos into a position in a sector (or lack thereof) and then return its according directional light
  */
 DirectionalLight getDirectionalLightBySector() {
-  // Check each sector and determine if fragPos lays within a sector
-  for( uint i = uint( 0 ); i != sectorIlluminator.numSectors; i++ ) {
-    // For each sector, create a line from fragPos to ( MAX( sectorX ) + 1.0f )
-    // Test line against each edge of the sector
-    // Point is in polygon if number of intersections is odd - use this polygon's directional light
-    Sector sector = sectorIlluminator.sectors[ i ];
-    LineSegment needle = LineSegment( fragPos, vec3( getPolygonMaxX( sector.polygon ) + 1.0f, fragPos.y, fragPos.z ) );
-    int fragLevel = int( fragPos.z / 4 );
+  int level = int( fragPos.z / 4 );
+  vec3 lowerRightCorner = vec3(
+    sectors[ level ].origin.x + sectors[ level ].dimensions.x,
+    sectors[ level ].origin.y + sectors[ level ].dimensions.y,
+    sectors[ level ].origin.z
+  );
 
-    uint intersectionCount = uint( 0 );
-    for( uint j = uint( 0 ); j != sector.polygon.numSides; j++ ) {
-      // test intersection along infinite z (x & y only)
-      LineSegment value = sectorIlluminator.lineSegments[ sector.polygon.sides[ j ] ];
-      if( segmentsIntersect( needle, value ) == YES && fragLevel == int( value.from.z / 4 ) ) {
-        // Must intersect within +- 4.0f
-        // Two line segments in a polygon side are guaranteed to be at identical levels
-        intersectionCount++;
-      }
-    }
+  vec2 arrayCoordinates = vec2( fragPos.x, fragPos.y );
 
-    if( mod( intersectionCount, 2 ) != 0 ) {
-      // odd means IN!
-      return sector.light;
-    }
+  // Convert to 0-n coordinate system
+  arrayCoordinates.x = ( arrayCoordinates.x - sectors[ level ].origin.x ) / ( lowerRightCorner.x - sectors[ level ].origin.x );
+  arrayCoordinates.y = ( arrayCoordinates.y - sectors[ level ].origin.y ) / ( lowerRightCorner.y - sectors[ level ].origin.y );
+
+  // Wash precisions that don't matter
+  arrayCoordinates.x = floor( arrayCoordinates.x * sectorResolution ) / sectorResolution;
+  arrayCoordinates.y = floor( arrayCoordinates.y * sectorResolution ) / sectorResolution;
+
+  // Fix opengl coordinate system used in texture() method
+  arrayCoordinates.y = 1.0f - arrayCoordinates.y;
+
+  int sectorIndex = int( texture( sectorMaps[ level ], arrayCoordinates ).r );
+
+  if( sectorIndex != 0 ) {
+    return sectorLights[ sectorIndex - 1 ];
+  } else {
+    return directionalLight;
   }
-
-  return directionalLight;
 }
 
 void main() {
+  DirectionalLight directionalLight = getDirectionalLightBySector();
+
   vec3 texResult = texture( material.diffuse0, fragTexture ).rgb;
 
   vec3 norm = normalize( fragNormal );

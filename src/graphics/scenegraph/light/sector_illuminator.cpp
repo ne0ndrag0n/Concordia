@@ -73,7 +73,21 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 			}
 		}
 
+		int resolution = std::min( ( int ) std::pow( 10, ConfigManager::getInstance().getIntValue( "sector_resolution" ) ), 100 );
+		Tools::OpenGL::setUniform( "sectorResolution", ( float ) resolution );
+
 		int item = 0;
+		for( const auto& pair : levelData ) {
+			Tools::OpenGL::setUniform( "sectors[ " + std::to_string( item ) + "].origin", pair.second.first );
+			Tools::OpenGL::setUniform( "sectors[ " + std::to_string( item ) + "].dimensions", pair.second.second );
+
+			item++;
+			if( item == 8 ) {
+				break;
+			}
+		}
+
+		item = 0;
 		for( const auto& pair : textureData ) {
 			glActiveTexture( GL_TEXTURE0 + pair.second.second );
 			glBindTexture( GL_TEXTURE_2D, pair.second.first->id );
@@ -81,9 +95,19 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 			glBindTexture( GL_TEXTURE_2D, 0 );
 
 			item++;
-			if( item == 9 ) {
+			if( item == 8 ) {
 				break;
 			}
+		}
+
+		item = 0;
+		for( const Sector& sector : sectors ) {
+			Tools::OpenGL::setUniform( "sectorLights[" + std::to_string( item ) + "].direction", sector.direction );
+			Tools::OpenGL::setUniform( "sectorLights[" + std::to_string( item ) + "].ambient", sector.ambient );
+			Tools::OpenGL::setUniform( "sectorLights[" + std::to_string( item ) + "].diffuse", sector.diffuse );
+			Tools::OpenGL::setUniform( "sectorLights[" + std::to_string( item ) + "].specular", sector.specular );
+
+			item++;
 		}
 	}
 
@@ -109,7 +133,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 					const glm::vec3 fragment = correctByOrigin( glm::vec3( x / ( float ) resolution, y / ( float ) resolution, pair.first ), pair.second.first );
 
 					// Test fragment using point in polygon against all sectors
-					int sectorIndex = 0;
+					int sectorIndex = 1;
 					for( const Sector& sector : constSectors ) {
 						// Generate needle
 						std::pair< glm::vec3, glm::vec3 > needle = { fragment, glm::vec3{ getPolygonMaxX( sector, pair.second.first ) + 1.0f, fragment.y, fragment.z } };
