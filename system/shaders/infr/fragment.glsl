@@ -37,14 +37,14 @@ DirectionalLight getDirectionalLightBySector() {
   int level = int( fragPos.z / 4 );
   vec2 lowerRightCorner = vec2(
     sectors[ level ].origin.x + sectors[ level ].dimensions.x,
-    sectors[ level ].origin.y + sectors[ level ].dimensions.y
+    sectors[ level ].origin.y - sectors[ level ].dimensions.y
   );
 
   vec2 arrayCoordinates = vec2( fragPos.x, fragPos.y );
 
   // Convert to 0-n coordinate system
   arrayCoordinates.x = ( arrayCoordinates.x - sectors[ level ].origin.x ) / ( lowerRightCorner.x - sectors[ level ].origin.x );
-  arrayCoordinates.y = ( arrayCoordinates.y - sectors[ level ].origin.y ) / ( lowerRightCorner.y - sectors[ level ].origin.y );
+  arrayCoordinates.y = ( sectors[ level ].origin.y - arrayCoordinates.y ) / ( sectors[ level ].origin.y - lowerRightCorner.y );
 
   // Fix opengl coordinate system used in texture() method
   arrayCoordinates.y = 1.0f - arrayCoordinates.y;
