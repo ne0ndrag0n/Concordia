@@ -95,7 +95,6 @@ namespace BlueBear::Gameplay {
 
 		// Falls through if already added
 		state.as< State::HouseholdGameplayState >().getWorldRenderer().addIlluminator( "__sector_illuminator", sectorLights );
-		sectorLights->send();
 	}
 
 	bool InfrastructureManager::update() {

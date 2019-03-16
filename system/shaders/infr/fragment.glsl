@@ -46,33 +46,29 @@ DirectionalLight getDirectionalLightBySector() {
   arrayCoordinates.x = ( arrayCoordinates.x - sectors[ level ].origin.x ) / ( lowerRightCorner.x - sectors[ level ].origin.x );
   arrayCoordinates.y = ( arrayCoordinates.y - sectors[ level ].origin.y ) / ( lowerRightCorner.y - sectors[ level ].origin.y );
 
-  // Wash precisions that don't matter
-  arrayCoordinates.x = floor( arrayCoordinates.x * sectorResolution ) / sectorResolution;
-  arrayCoordinates.y = floor( arrayCoordinates.y * sectorResolution ) / sectorResolution;
-
   // Fix opengl coordinate system used in texture() method
   arrayCoordinates.y = 1.0f - arrayCoordinates.y;
 
   int sectorIndex = int( texture( sectorMaps[ level ], arrayCoordinates ).r );
 
   if( sectorIndex != 0 ) {
-    return sectorLights[ sectorIndex ];
+    return sectorLights[ sectorIndex - 1 ];
   } else {
     return directionalLight;
   }
 }
 
 void main() {
-  DirectionalLight directionalLight = getDirectionalLightBySector();
+  DirectionalLight light = getDirectionalLightBySector();
 
   vec3 texResult = texture( material.diffuse0, fragTexture ).rgb;
 
   vec3 norm = normalize( fragNormal );
-  vec3 lightDirection = normalize( -directionalLight.direction );
+  vec3 lightDirection = normalize( -light.direction );
   float diffTheta = max( dot( norm, lightDirection ), 0.0 );
 
-  vec3 ambient = directionalLight.ambient * texResult;
-  vec3 diffuse = directionalLight.diffuse * diffTheta * texResult;
+  vec3 ambient = light.ambient * texResult;
+  vec3 diffuse = light.diffuse * diffTheta * texResult;
 
   color = vec4( ambient + diffuse, material.opacity );
 }

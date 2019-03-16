@@ -78,8 +78,8 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 
 		int item = 0;
 		for( const auto& pair : levelData ) {
-			Tools::OpenGL::setUniform( "sectors[ " + std::to_string( item ) + "].origin", pair.second.first );
-			Tools::OpenGL::setUniform( "sectors[ " + std::to_string( item ) + "].dimensions", pair.second.second );
+			Tools::OpenGL::setUniform( "sectors[" + std::to_string( item ) + "].origin", pair.second.first );
+			Tools::OpenGL::setUniform( "sectors[" + std::to_string( item ) + "].dimensions", pair.second.second );
 
 			item++;
 			if( item == 8 ) {
@@ -91,7 +91,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		for( const auto& pair : textureData ) {
 			glActiveTexture( GL_TEXTURE0 + pair.second.second );
 			glBindTexture( GL_TEXTURE_2D, pair.second.first->id );
-			Tools::OpenGL::setUniform( "sectorMaps[ " + std::to_string( item ) + "]", ( int ) pair.second.second );
+			Tools::OpenGL::setUniform( "sectorMaps[" + std::to_string( item ) + "]", ( int ) pair.second.second );
 			glBindTexture( GL_TEXTURE_2D, 0 );
 
 			item++;
@@ -122,14 +122,16 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 
 		for( const auto& pair : levelData ) {
 			int resolution = std::min( ( int ) std::pow( 10, ConfigManager::getInstance().getIntValue( "sector_resolution" ) ), 100 );
-			int height = pair.second.second.y;
-			int width = pair.second.second.x;
+			int height = pair.second.second.y * resolution;
+			int width = pair.second.second.x * resolution;
 
-			std::unique_ptr< float[] > array = std::make_unique< float[] >( height * width * resolution );
+			std::unique_ptr< float[] > array = std::make_unique< float[] >( height * width );
 			const auto& constSectors = sectors;
 
-			tbb::parallel_for( 0, height * resolution, [ &array, &constSectors, &pair, height, width, resolution ]( int y ) {
-				tbb::parallel_for( 0, width * resolution, [ &array, &constSectors, &pair, y, height, width, resolution ]( int x ) {
+			//tbb::parallel_for( 0, height * resolution, [ &array, &constSectors, &pair, height, width, resolution ]( int y ) {
+				//tbb::parallel_for( 0, width * resolution, [ &array, &constSectors, &pair, y, height, width, resolution ]( int x ) {
+			for( int y = 0; y != height; y++ ) {
+				for( int x = 0; x != width; x++ ) {
 					const glm::vec3 fragment = correctByOrigin( glm::vec3( x / ( float ) resolution, y / ( float ) resolution, pair.first ), pair.second.first );
 
 					// Test fragment using point in polygon against all sectors
@@ -150,20 +152,22 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 
 						if( ( intersectionCount % 2 ) != 0 ) {
 							// odd means IN!
-							array[ ( y * width ) + x ] = sectorIndex - 1;
+							array[ ( y * width ) + x ] = sectorIndex;
 							break;
 						}
 
 						sectorIndex++;
 					}
-				} );
-			} );
+				}
+			}
+				//} );
+			//} );
 
 			auto textureUnit = Tools::OpenGL::getTextureUnit();
 			if( !textureUnit ) {
 				Log::getInstance().error( "SectorIlluminator::refresh", "Unable to acquire texture unit for sector map; discarding data!" );
 			} else {
-				textureData[ pair.first ] = { std::make_unique< Texture >( glm::uvec2{ width * resolution, height * resolution }, array.get() ), *textureUnit };
+				textureData[ pair.first ] = { std::make_unique< Texture >( glm::uvec2{ width, height }, array.get() ), *textureUnit };
 			}
 		}
 
