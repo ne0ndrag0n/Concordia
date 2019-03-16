@@ -178,8 +178,24 @@
 
           {
             "start": [ 1, 10 ],
-            "end": [ 1, 12 ],
+            "end": [ 1, 16 ],
             "faces": [
+              {
+                "front": "drywall",
+                "back": "bricks"
+              },
+              {
+                "front": "drywall",
+                "back": "bricks"
+              },
+              {
+                "front": "drywall",
+                "back": "bricks"
+              },
+              {
+                "front": "drywall",
+                "back": "bricks"
+              },
               {
                 "front": "drywall",
                 "back": "bricks"
@@ -192,8 +208,24 @@
           },
           {
             "start": [ 1, 10 ],
-            "end": [ 3, 10 ],
+            "end": [ 7, 10 ],
             "faces": [
+              {
+                "front": "drywall",
+                "back": "bricks"
+              },
+              {
+                "front": "drywall",
+                "back": "bricks"
+              },
+              {
+                "front": "drywall",
+                "back": "bricks"
+              },
+              {
+                "front": "drywall",
+                "back": "bricks"
+              },
               {
                 "front": "drywall",
                 "back": "bricks"
@@ -205,9 +237,25 @@
             ]
           },
           {
-            "start": [ 3, 10 ],
-            "end": [ 3, 12 ],
+            "start": [ 7, 10 ],
+            "end": [ 7, 16 ],
             "faces": [
+              {
+                "front": "drywall",
+                "back": "bricks"
+              },
+              {
+                "front": "drywall",
+                "back": "bricks"
+              },
+              {
+                "front": "drywall",
+                "back": "bricks"
+              },
+              {
+                "front": "drywall",
+                "back": "bricks"
+              },
               {
                 "front": "drywall",
                 "back": "bricks"
@@ -219,9 +267,25 @@
             ]
           },
           {
-            "start": [ 1, 12 ],
-            "end": [ 3, 12 ],
+            "start": [ 1, 16 ],
+            "end": [ 7, 16 ],
             "faces": [
+              {
+                "front": "drywall",
+                "back": "bricks"
+              },
+              {
+                "front": "drywall",
+                "back": "bricks"
+              },
+              {
+                "front": "drywall",
+                "back": "bricks"
+              },
+              {
+                "front": "drywall",
+                "back": "bricks"
+              },
               {
                 "front": "drywall",
                 "back": "bricks"

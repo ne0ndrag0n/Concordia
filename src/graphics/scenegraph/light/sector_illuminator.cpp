@@ -150,7 +150,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 
 						if( ( intersectionCount % 2 ) != 0 ) {
 							// odd means IN!
-							array[ ( y * width ) + x ] = sectorIndex;
+							array[ ( y * width ) + x ] = sectorIndex - 1;
 							break;
 						}
 

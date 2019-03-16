@@ -35,10 +35,9 @@ uniform Sector sectors[ 8 ];
  */
 DirectionalLight getDirectionalLightBySector() {
   int level = int( fragPos.z / 4 );
-  vec3 lowerRightCorner = vec3(
+  vec2 lowerRightCorner = vec2(
     sectors[ level ].origin.x + sectors[ level ].dimensions.x,
-    sectors[ level ].origin.y + sectors[ level ].dimensions.y,
-    sectors[ level ].origin.z
+    sectors[ level ].origin.y + sectors[ level ].dimensions.y
   );
 
   vec2 arrayCoordinates = vec2( fragPos.x, fragPos.y );
@@ -57,7 +56,7 @@ DirectionalLight getDirectionalLightBySector() {
   int sectorIndex = int( texture( sectorMaps[ level ], arrayCoordinates ).r );
 
   if( sectorIndex != 0 ) {
-    return sectorLights[ sectorIndex - 1 ];
+    return sectorLights[ sectorIndex ];
   } else {
     return directionalLight;
   }
