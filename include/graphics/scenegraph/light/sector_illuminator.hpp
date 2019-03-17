@@ -8,6 +8,7 @@
 #include <map>
 #include <vector>
 #include <tuple>
+#include <optional>
 
 namespace BlueBear::Graphics::SceneGraph::Light {
 
@@ -29,7 +30,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		std::vector< Sector > sectors;
 		// upper left corner and max dimensions
 		std::map< unsigned int, std::pair< glm::vec3, glm::uvec2 > > levelData;
-		std::map< unsigned int, std::pair< std::unique_ptr< Texture >, unsigned int > > textureData;
+		std::map< unsigned int, std::pair< std::unique_ptr< Texture >, std::optional< unsigned int > > > textureData;
 
 		void refresh();
 		std::vector< std::pair< glm::vec3, glm::vec3 > > getSectorBoundingBoxes();

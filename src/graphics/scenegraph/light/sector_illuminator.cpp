@@ -13,7 +13,9 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 
 	SectorIlluminator::~SectorIlluminator() {
 		for( const auto& pair : textureData ) {
-			Tools::OpenGL::returnTextureUnits( { pair.second.second } );
+			if( pair.second.second ) {
+				Tools::OpenGL::returnTextureUnits( { *pair.second.second } );
+			}
 		}
 	}
 
@@ -95,10 +97,20 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		}
 
 		item = 0;
-		for( const auto& pair : textureData ) {
-			glActiveTexture( GL_TEXTURE0 + pair.second.second );
+		for( auto& pair : textureData ) {
+			if( !pair.second.second ) {
+				auto potential = Tools::OpenGL::getTextureUnit();
+				if( !potential ) {
+					Log::getInstance().error( "SectorIlluminator::send", "Couldn't get texure unit; not sending texture to shader." );
+					continue;
+				}
+
+				pair.second.second = *potential;
+			}
+
+			glActiveTexture( GL_TEXTURE0 + *pair.second.second );
 			glBindTexture( GL_TEXTURE_2D, pair.second.first->id );
-			Tools::OpenGL::setUniform( "sectorMap" + std::to_string( item ), ( int ) pair.second.second );
+			Tools::OpenGL::setUniform( "sectorMap" + std::to_string( item ), ( int ) *pair.second.second );
 
 			item++;
 			if( item == 8 ) {
@@ -122,7 +134,9 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 	 */
 	void SectorIlluminator::refresh() {
 		for( const auto& pair : textureData ) {
-			Tools::OpenGL::returnTextureUnits( { pair.second.second } );
+			if( pair.second.second ) {
+				Tools::OpenGL::returnTextureUnits( { *pair.second.second } );
+			}
 		}
 		textureData.clear();
 
@@ -192,12 +206,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 				}
 			}
 
-			auto textureUnit = Tools::OpenGL::getTextureUnit();
-			if( !textureUnit ) {
-				Log::getInstance().error( "SectorIlluminator::refresh", "Unable to acquire texture unit for sector map; discarding data!" );
-			} else {
-				textureData[ pair.first ] = { std::make_unique< Texture >( glm::uvec2{ width, height }, array.get() ), *textureUnit };
-			}
+			textureData[ pair.first ] = { std::make_unique< Texture >( glm::uvec2{ width, height }, array.get() ), {} };
 		}
 
 		dirty = false;
