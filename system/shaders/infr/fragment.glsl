@@ -46,9 +46,6 @@ DirectionalLight getDirectionalLightBySector() {
   arrayCoordinates.x = ( arrayCoordinates.x - sectors[ level ].origin.x ) / ( lowerRightCorner.x - sectors[ level ].origin.x );
   arrayCoordinates.y = ( sectors[ level ].origin.y - arrayCoordinates.y ) / ( sectors[ level ].origin.y - lowerRightCorner.y );
 
-  // Fix opengl coordinate system used in texture() method
-  arrayCoordinates.y = 1.0f - arrayCoordinates.y;
-
   int sectorIndex = int( texture( sectorMaps[ level ], arrayCoordinates ).r );
 
   if( sectorIndex != 0 ) {

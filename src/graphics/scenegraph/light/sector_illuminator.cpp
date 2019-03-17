@@ -92,7 +92,6 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 			glActiveTexture( GL_TEXTURE0 + pair.second.second );
 			glBindTexture( GL_TEXTURE_2D, pair.second.first->id );
 			Tools::OpenGL::setUniform( "sectorMaps[" + std::to_string( item ) + "]", ( int ) pair.second.second );
-			glBindTexture( GL_TEXTURE_2D, 0 );
 
 			item++;
 			if( item == 8 ) {
@@ -128,8 +127,6 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 			std::unique_ptr< float[] > array = std::make_unique< float[] >( height * width );
 			const auto& constSectors = sectors;
 
-			//tbb::parallel_for( 0, height * resolution, [ &array, &constSectors, &pair, height, width, resolution ]( int y ) {
-				//tbb::parallel_for( 0, width * resolution, [ &array, &constSectors, &pair, y, height, width, resolution ]( int x ) {
 			for( int y = 0; y != height; y++ ) {
 				for( int x = 0; x != width; x++ ) {
 					const glm::vec3 fragment = correctByOrigin( glm::vec3( x / ( float ) resolution, y / ( float ) resolution, pair.first ), pair.second.first );
@@ -160,8 +157,6 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 					}
 				}
 			}
-				//} );
-			//} );
 
 			auto textureUnit = Tools::OpenGL::getTextureUnit();
 			if( !textureUnit ) {
