@@ -97,7 +97,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		for( const auto& pair : textureData ) {
 			glActiveTexture( GL_TEXTURE0 + pair.second.second );
 			glBindTexture( GL_TEXTURE_2D, pair.second.first->id );
-			Tools::OpenGL::setUniform( "sectorMaps[" + std::to_string( item ) + "]", ( int ) pair.second.second );
+			Tools::OpenGL::setUniform( "sectorMap" + std::to_string( item ), ( int ) pair.second.second );
 
 			item++;
 			if( item == 8 ) {

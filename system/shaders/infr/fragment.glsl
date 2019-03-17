@@ -27,7 +27,7 @@ uniform Material material;
 uniform DirectionalLight directionalLight;
 uniform float sectorResolution;
 uniform DirectionalLight sectorLights[ 16 ];
-uniform sampler2D sectorMaps[ 8 ];
+uniform sampler2D sectorMap0;
 uniform Sector sectors[ 8 ];
 
 /**
@@ -46,7 +46,15 @@ DirectionalLight getDirectionalLightBySector() {
   arrayCoordinates.x = ( arrayCoordinates.x - sectors[ level ].origin.x ) / ( lowerRightCorner.x - sectors[ level ].origin.x );
   arrayCoordinates.y = ( sectors[ level ].origin.y - arrayCoordinates.y ) / ( sectors[ level ].origin.y - lowerRightCorner.y );
 
-  int sectorIndex = int( texture( sectorMaps[ level ], arrayCoordinates ).r );
+  int sectorIndex;
+
+  switch( level ) {
+    case 0:
+      sectorIndex = int( texture( sectorMap0, arrayCoordinates ).r );
+      break;
+    default:
+      sectorIndex = 0;
+  }
 
   if( sectorIndex != 0 ) {
     return sectorLights[ sectorIndex - 1 ];
