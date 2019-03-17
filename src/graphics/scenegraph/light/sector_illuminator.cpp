@@ -140,28 +140,28 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		}
 		textureData.clear();
 
+		struct BoundedSector {
+			const Sector& sector;
+			std::pair< glm::vec3, glm::vec3 > bound;
+		};
+		std::vector< BoundedSector > constSectors;
+
+		{
+			auto boundingBoxes = getSectorBoundingBoxes();
+			// Unzip
+			int i = 0;
+			for( const auto& sector : sectors ) {
+				constSectors.emplace_back( BoundedSector{ sector, std::move( boundingBoxes[ i ] ) } );
+				i++;
+			}
+		}
+
 		for( const auto& pair : levelData ) {
 			int resolution = std::min( ( int ) std::pow( 10, ConfigManager::getInstance().getIntValue( "sector_resolution" ) ), 100 );
 			int height = pair.second.second.y * resolution;
 			int width = pair.second.second.x * resolution;
 
 			std::unique_ptr< float[] > array = std::make_unique< float[] >( height * width );
-
-			struct BoundedSector {
-				const Sector& sector;
-				std::pair< glm::vec3, glm::vec3 > bound;
-			};
-			std::vector< BoundedSector > constSectors;
-
-			{
-				auto boundingBoxes = getSectorBoundingBoxes();
-				// Unzip
-				int i = 0;
-				for( const auto& sector : sectors ) {
-					constSectors.emplace_back( BoundedSector{ sector, std::move( boundingBoxes[ i ] ) } );
-					i++;
-				}
-			}
 
 			for( int y = 0; y != height; y++ ) {
 				for( int x = 0; x != width; x++ ) {
