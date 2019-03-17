@@ -32,6 +32,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		std::map< unsigned int, std::pair< std::unique_ptr< Texture >, unsigned int > > textureData;
 
 		void refresh();
+		std::vector< std::pair< glm::vec3, glm::vec3 > > getSectorBoundingBoxes();
 
 	public:
 		void insert( const Sector& value );

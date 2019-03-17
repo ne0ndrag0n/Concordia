@@ -4,6 +4,7 @@
 #include "configmanager.hpp"
 #include "log.hpp"
 #include <algorithm>
+#include <limits>
 #include <glm/gtx/string_cast.hpp>
 #include <tbb/parallel_for.h>
 #include <tbb/parallel_for_each.h>
@@ -131,7 +132,22 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 			int width = pair.second.second.x * resolution;
 
 			std::unique_ptr< float[] > array = std::make_unique< float[] >( height * width );
-			const auto& constSectors = sectors;
+
+			struct BoundedSector {
+				const Sector& sector;
+				std::pair< glm::vec3, glm::vec3 > bound;
+			};
+			std::vector< BoundedSector > constSectors;
+
+			{
+				auto boundingBoxes = getSectorBoundingBoxes();
+				// Unzip
+				int i = 0;
+				for( const auto& sector : sectors ) {
+					constSectors.emplace_back( BoundedSector{ sector, std::move( boundingBoxes[ i ] ) } );
+					i++;
+				}
+			}
 
 			for( int y = 0; y != height; y++ ) {
 				for( int x = 0; x != width; x++ ) {
@@ -139,27 +155,39 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 
 					// Test fragment using point in polygon against all sectors
 					int sectorIndex = 1;
-					for( const Sector& sector : constSectors ) {
-						// Generate needle
-						std::pair< glm::vec3, glm::vec3 > needle = { fragment, glm::vec3{ getPolygonMaxX( sector, pair.second.first ) + 1.0f, fragment.y, fragment.z } };
+					for( const auto& boundedSector : constSectors ) {
+						const Sector& sector = boundedSector.sector;
+						std::pair< glm::vec3, glm::vec3 > correctedBound = {
+							correctByOrigin( boundedSector.bound.first, pair.second.first ),
+							correctByOrigin( boundedSector.bound.second, pair.second.first ),
+						};
 						int fragLevel = int( fragment.z / 4 );
 
-						// Check all sides of this sector against the needle
-						unsigned int intersectionCount = 0;
-						for( const auto& side : sector.sides ) {
-							std::pair< glm::vec3, glm::vec3 > correctedSide = { correctByOrigin( side.first, pair.second.first ), correctByOrigin( side.second, pair.second.first ) };
-							if( segmentsIntersect( needle, correctedSide ) && fragLevel == int( correctedSide.first.z / 4 ) ) {
-								intersectionCount++;
+						if(
+							fragment.x >= correctedBound.first.x && fragment.y >= correctedBound.first.y &&
+							fragment.x <= correctedBound.second.x && fragment.y <= correctedBound.second.y &&
+							fragment.z >= fragLevel && fragment.z <= ( fragLevel + 4 )
+						) {
+							// Generate needle
+							std::pair< glm::vec3, glm::vec3 > needle = { fragment, glm::vec3{ getPolygonMaxX( sector, pair.second.first ) + 1.0f, fragment.y, fragment.z } };
+
+							// Check all sides of this sector against the needle
+							unsigned int intersectionCount = 0;
+							for( const auto& side : sector.sides ) {
+								std::pair< glm::vec3, glm::vec3 > correctedSide = { correctByOrigin( side.first, pair.second.first ), correctByOrigin( side.second, pair.second.first ) };
+								if( segmentsIntersect( needle, correctedSide ) && fragLevel == int( correctedSide.first.z / 4 ) ) {
+									intersectionCount++;
+								}
 							}
-						}
 
-						if( ( intersectionCount % 2 ) != 0 ) {
-							// odd means IN!
-							array[ ( y * width ) + x ] = sectorIndex;
-							break;
-						}
+							if( ( intersectionCount % 2 ) != 0 ) {
+								// odd means IN!
+								array[ ( y * width ) + x ] = sectorIndex;
+								break;
+							}
 
-						sectorIndex++;
+							sectorIndex++;
+						}
 					}
 				}
 			}
@@ -173,6 +201,34 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		}
 
 		dirty = false;
+	}
+
+	std::vector< std::pair< glm::vec3, glm::vec3 > > SectorIlluminator::getSectorBoundingBoxes() {
+		std::vector< std::pair< glm::vec3, glm::vec3 > > pairs;
+
+		for( const auto& sector : sectors ) {
+			glm::vec2 min{ std::numeric_limits< float >::max(), std::numeric_limits< float >::max() };
+			glm::vec2 max{ std::numeric_limits< float >::lowest(), std::numeric_limits< float >::lowest() };
+
+			// zero-length sectors are invalid
+			for( const auto& lineSegment : sector.sides ) {
+				min.x = std::min( lineSegment.first.x, min.x );
+				min.x = std::min( lineSegment.second.x, min.x );
+
+				min.y = std::min( lineSegment.first.y, min.y );
+				min.y = std::min( lineSegment.second.y, min.y );
+
+				max.x = std::max( lineSegment.first.x, max.x );
+				max.x = std::max( lineSegment.second.x, max.x );
+
+				max.y = std::max( lineSegment.first.y, max.y );
+				max.y = std::max( lineSegment.second.y, max.y );
+			}
+
+			pairs.emplace_back( glm::vec3{ min.x, max.y, sector.sides.front().first.z }, glm::vec3{ max.x, min.y, sector.sides.front().first.z } );
+		}
+
+		return pairs;
 	}
 
 	void SectorIlluminator::insert( const Sector& value ) {
