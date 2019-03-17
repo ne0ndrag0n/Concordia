@@ -10,6 +10,12 @@
 
 namespace BlueBear::Graphics::SceneGraph::Light {
 
+	SectorIlluminator::~SectorIlluminator() {
+		for( const auto& pair : textureData ) {
+			Tools::OpenGL::returnTextureUnits( { pair.second.second } );
+		}
+	}
+
 	static glm::vec3 correctByOrigin( const glm::vec3& value, const glm::vec3& origin ) {
 		return { origin.x + value.x, origin.y - value.y, value.z };
 	}

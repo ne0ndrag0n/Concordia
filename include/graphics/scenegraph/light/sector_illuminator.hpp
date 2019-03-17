@@ -22,6 +22,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		};
 
 		SectorIlluminator() = default;
+		~SectorIlluminator();
 
 	private:
 		bool dirty = true;
