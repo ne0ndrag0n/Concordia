@@ -26,11 +26,16 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		~SectorIlluminator();
 
 	private:
+		struct TextureData {
+			std::unique_ptr< Texture > texture;
+			std::optional< unsigned int > textureUnit;
+		};
+
 		bool dirty = true;
 		std::vector< Sector > sectors;
 		// upper left corner and max dimensions
 		std::map< unsigned int, std::pair< glm::vec3, glm::uvec2 > > levelData;
-		std::vector< std::pair< std::unique_ptr< Texture >, std::optional< unsigned int > > > textureData;
+		std::vector< TextureData > textureData;
 
 		void refresh();
 		std::vector< std::pair< glm::vec3, glm::vec3 > > getSectorBoundingBoxes();
