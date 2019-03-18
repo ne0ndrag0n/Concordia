@@ -13,8 +13,8 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 
 	SectorIlluminator::~SectorIlluminator() {
 		for( const auto& pair : textureData ) {
-			if( pair.second.second ) {
-				Tools::OpenGL::returnTextureUnits( { *pair.second.second } );
+			if( pair.second ) {
+				Tools::OpenGL::returnTextureUnits( { *pair.second } );
 			}
 		}
 	}
@@ -98,19 +98,19 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 
 		item = 0;
 		for( auto& pair : textureData ) {
-			if( !pair.second.second ) {
+			if( !pair.second ) {
 				auto potential = Tools::OpenGL::getTextureUnit();
 				if( !potential ) {
 					Log::getInstance().error( "SectorIlluminator::send", "Couldn't get texure unit; not sending texture to shader." );
 					continue;
 				}
 
-				pair.second.second = *potential;
+				pair.second = *potential;
 			}
 
-			glActiveTexture( GL_TEXTURE0 + *pair.second.second );
-			glBindTexture( GL_TEXTURE_2D, pair.second.first->id );
-			Tools::OpenGL::setUniform( "sectorMap" + std::to_string( item ), ( int ) *pair.second.second );
+			glActiveTexture( GL_TEXTURE0 + *pair.second );
+			glBindTexture( GL_TEXTURE_2D, pair.first->id );
+			Tools::OpenGL::setUniform( "sectorMap" + std::to_string( item ), ( int ) *pair.second );
 
 			item++;
 			if( item == 8 ) {
@@ -134,8 +134,8 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 	 */
 	void SectorIlluminator::refresh() {
 		for( const auto& pair : textureData ) {
-			if( pair.second.second ) {
-				Tools::OpenGL::returnTextureUnits( { *pair.second.second } );
+			if( pair.second ) {
+				Tools::OpenGL::returnTextureUnits( { *pair.second } );
 			}
 		}
 		textureData.clear();
@@ -206,7 +206,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 				}
 			}
 
-			textureData[ pair.first ] = { std::make_unique< Texture >( glm::uvec2{ width, height }, array.get() ), {} };
+			textureData.emplace_back( std::make_unique< Texture >( glm::uvec2{ width, height }, array.get() ), std::optional< unsigned int >{} );
 		}
 
 		dirty = false;
