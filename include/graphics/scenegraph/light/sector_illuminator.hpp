@@ -34,6 +34,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		};
 
 		bool dirty = true;
+		std::future< std::vector< TextureData > > generatorTask;
 
 		std::vector< Sector > sectors;
 		std::map< unsigned int, std::pair< glm::vec3, glm::uvec2 > > levelData;

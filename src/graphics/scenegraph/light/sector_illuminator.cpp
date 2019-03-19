@@ -5,6 +5,7 @@
 #include "log.hpp"
 #include <algorithm>
 #include <limits>
+#include <chrono>
 #include <glm/gtx/string_cast.hpp>
 #include <tbb/parallel_for.h>
 #include <tbb/parallel_for_each.h>
@@ -143,15 +144,26 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 	 * Generate and save anything that isn't trivial to send
 	 */
 	void SectorIlluminator::refresh() {
-		for( const auto& pair : textureData ) {
-			if( pair.textureUnit ) {
-				Tools::OpenGL::returnTextureUnits( { *pair.textureUnit } );
+		if( generatorTask.valid() ) {
+			// Future is staged and is in-progress or complete
+			// Check if future is ready
+			if( generatorTask.wait_for( std::chrono::seconds( 0 ) ) == std::future_status::ready ) {
+				for( const auto& pair : textureData ) {
+					if( pair.textureUnit ) {
+						Tools::OpenGL::returnTextureUnits( { *pair.textureUnit } );
+					}
+				}
+
+				textureData = generatorTask.get();
+
+				dirty = false;
 			}
+
+			// Otherwise do nothing and stick with textureData
+		} else {
+			// Future is empty or used - Stage task to run on separate thread
+			generatorTask = std::async( std::launch::async, std::bind( &SectorIlluminator::getNewTextureData, this ) );
 		}
-
-		textureData = getNewTextureData();
-
-		dirty = false;
 	}
 
 	std::vector< SectorIlluminator::TextureData > SectorIlluminator::getNewTextureData() const {
