@@ -9,6 +9,7 @@
 #include <vector>
 #include <tuple>
 #include <optional>
+#include <future>
 
 namespace BlueBear::Graphics::SceneGraph::Light {
 
@@ -27,18 +28,21 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 
 	private:
 		struct TextureData {
-			std::unique_ptr< Texture > texture;
+			std::unique_ptr< Texture > texture = nullptr;
 			std::optional< unsigned int > textureUnit;
+			std::future< std::unique_ptr< Texture > > generator;
 		};
 
 		bool dirty = true;
+
 		std::vector< Sector > sectors;
-		// upper left corner and max dimensions
 		std::map< unsigned int, std::pair< glm::vec3, glm::uvec2 > > levelData;
+
 		std::vector< TextureData > textureData;
 
 		void refresh();
-		std::vector< std::pair< glm::vec3, glm::vec3 > > getSectorBoundingBoxes();
+		std::vector< std::pair< glm::vec3, glm::vec3 > > getSectorBoundingBoxes() const;
+		std::vector< TextureData > getNewTextureData() const;
 
 	public:
 		void insert( const Sector& value );

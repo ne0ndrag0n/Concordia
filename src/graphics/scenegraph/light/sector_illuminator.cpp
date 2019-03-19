@@ -108,6 +108,16 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 				pair.textureUnit = *potential;
 			}
 
+			if( pair.generator.valid() ) {
+				Log::getInstance().debug( "SectorIlluminator::send", "Regenerating sector texture for level " + std::to_string( item ) );
+				pair.texture = pair.generator.get();
+			}
+
+			if( !pair.texture ) {
+				Log::getInstance().error( "SectorIlluminator::send", "Assertion failed! Texture wasn't generated for a sector." );
+				continue;
+			}
+
 			glActiveTexture( GL_TEXTURE0 + *pair.textureUnit );
 			glBindTexture( GL_TEXTURE_2D, pair.texture->id );
 			Tools::OpenGL::setUniform( "sectorMap" + std::to_string( item ), ( int ) *pair.textureUnit );
@@ -138,7 +148,14 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 				Tools::OpenGL::returnTextureUnits( { *pair.textureUnit } );
 			}
 		}
-		textureData.clear();
+
+		textureData = getNewTextureData();
+
+		dirty = false;
+	}
+
+	std::vector< SectorIlluminator::TextureData > SectorIlluminator::getNewTextureData() const {
+		std::vector< TextureData > result;
 
 		struct BoundedSector {
 			const Sector& sector;
@@ -206,13 +223,18 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 				}
 			}
 
-			textureData.emplace_back( TextureData{ std::make_unique< Texture >( glm::uvec2{ width, height }, array.get() ), std::optional< unsigned int >{} } );
+			result.emplace_back( TextureData{
+				nullptr, {},
+				std::async( std::launch::deferred, [ width, height, array = std::move( array ) ]() {
+					return std::make_unique< Texture >( glm::uvec2{ width, height }, array.get() );
+				} )
+			} );
 		}
 
-		dirty = false;
+		return result;
 	}
 
-	std::vector< std::pair< glm::vec3, glm::vec3 > > SectorIlluminator::getSectorBoundingBoxes() {
+	std::vector< std::pair< glm::vec3, glm::vec3 > > SectorIlluminator::getSectorBoundingBoxes() const {
 		std::vector< std::pair< glm::vec3, glm::vec3 > > pairs;
 
 		for( const auto& sector : sectors ) {
