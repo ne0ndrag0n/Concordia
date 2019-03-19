@@ -148,15 +148,29 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 			// Future is staged and is in-progress or complete
 			// Check if future is ready
 			if( generatorTask.wait_for( std::chrono::seconds( 0 ) ) == std::future_status::ready ) {
-				for( const auto& pair : textureData ) {
-					if( pair.textureUnit ) {
-						Tools::OpenGL::returnTextureUnits( { *pair.textureUnit } );
+				// If elements were staged, we tried to add something while another operation was in progress
+				// Discard the results of that and stage a new operation
+				if( staging.sectors.size() || staging.levelData.size() ) {
+
+					sectors.insert( sectors.end(), staging.sectors.begin(), staging.sectors.end() );
+					levelData.insert( staging.levelData.begin(), staging.levelData.end() );
+
+					staging.sectors.clear();
+					staging.levelData.clear();
+
+					generatorTask = std::async( std::launch::async, std::bind( &SectorIlluminator::getNewTextureData, this ) );
+
+				} else {
+					for( const auto& pair : textureData ) {
+						if( pair.textureUnit ) {
+							Tools::OpenGL::returnTextureUnits( { *pair.textureUnit } );
+						}
 					}
+
+					textureData = generatorTask.get();
+
+					dirty = false;
 				}
-
-				textureData = generatorTask.get();
-
-				dirty = false;
 			}
 
 			// Otherwise do nothing and stick with textureData
@@ -167,6 +181,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 	}
 
 	std::vector< SectorIlluminator::TextureData > SectorIlluminator::getNewTextureData() const {
+		std::unique_lock< std::mutex > lock( mutex );
 		std::vector< TextureData > result;
 
 		struct BoundedSector {
@@ -275,13 +290,25 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 	}
 
 	void SectorIlluminator::insert( const Sector& value ) {
-		dirty = true;
-		sectors.emplace_back( value );
+		std::unique_lock< std::mutex > lock( mutex, std::defer_lock );
+		if( lock.try_lock() ) {
+			dirty = true;
+			sectors.emplace_back( value );
+		} else {
+			// Operation in progress - stage it instead
+			staging.sectors.emplace_back( value );
+		}
 	}
 
 	void SectorIlluminator::setLevelData( const glm::vec3& topLeft, const glm::uvec2& dimensions ) {
-		dirty = true;
-		levelData[ topLeft.z ] = { topLeft, dimensions };
+		std::unique_lock< std::mutex > lock( mutex, std::defer_lock );
+		if( lock.try_lock() ) {
+			dirty = true;
+			levelData[ topLeft.z ] = { topLeft, dimensions };
+		} else {
+			// Operation in progress - stage it instead
+			staging.levelData[ topLeft.z ] = { topLeft, dimensions };
+		}
 	}
 
 }
