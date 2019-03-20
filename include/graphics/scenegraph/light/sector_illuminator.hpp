@@ -36,18 +36,19 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		bool dirty = true;
 		struct {
 			std::vector< Sector > sectors;
-			std::map< unsigned int, std::pair< glm::vec3, glm::uvec2 > > levelData;
+			std::vector< std::pair< glm::vec3, glm::uvec2 > > levelData;
 		} staging;
 		mutable std::mutex mutex;
 		std::future< std::vector< TextureData > > generatorTask;
 
 		std::vector< Sector > sectors;
-		std::map< unsigned int, std::pair< glm::vec3, glm::uvec2 > > levelData;
+		std::vector< std::pair< glm::vec3, glm::uvec2 > > levelData;
 
 		std::vector< TextureData > textureData;
 
 		void refresh();
 		std::vector< std::pair< glm::vec3, glm::vec3 > > getSectorBoundingBoxes() const;
+		std::pair< glm::vec3, glm::vec3 > getBoundingBoxForSector( const Sector& sector ) const;
 		std::vector< TextureData > getNewTextureData() const;
 
 	public:

@@ -88,8 +88,8 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 
 		int item = 0;
 		for( const auto& pair : levelData ) {
-			Tools::OpenGL::setUniform( "sectors[" + std::to_string( item ) + "].origin", pair.second.first );
-			Tools::OpenGL::setUniform( "sectors[" + std::to_string( item ) + "].dimensions", pair.second.second );
+			Tools::OpenGL::setUniform( "sectors[" + std::to_string( item ) + "].origin", pair.first );
+			Tools::OpenGL::setUniform( "sectors[" + std::to_string( item ) + "].dimensions", pair.second );
 
 			item++;
 			if( item == 8 ) {
@@ -153,7 +153,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 				if( staging.sectors.size() || staging.levelData.size() ) {
 
 					sectors.insert( sectors.end(), staging.sectors.begin(), staging.sectors.end() );
-					levelData.insert( staging.levelData.begin(), staging.levelData.end() );
+					levelData.insert( levelData.end(), staging.levelData.begin(), staging.levelData.end() );
 
 					staging.sectors.clear();
 					staging.levelData.clear();
@@ -202,22 +202,22 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 
 		for( const auto& pair : levelData ) {
 			int resolution = std::min( ( int ) std::pow( 10, ConfigManager::getInstance().getIntValue( "sector_resolution" ) ), 100 );
-			int height = pair.second.second.y * resolution;
-			int width = pair.second.second.x * resolution;
+			int height = pair.second.y * resolution;
+			int width = pair.second.x * resolution;
 
 			std::unique_ptr< float[] > array = std::make_unique< float[] >( height * width );
 
 			for( int y = 0; y != height; y++ ) {
 				for( int x = 0; x != width; x++ ) {
-					const glm::vec3 fragment = correctByOrigin( glm::vec3( x / ( float ) resolution, y / ( float ) resolution, pair.first ), pair.second.first );
+					const glm::vec3 fragment = correctByOrigin( glm::vec3( x / ( float ) resolution, y / ( float ) resolution, pair.first.z ), pair.first );
 
 					// Test fragment using point in polygon against all sectors
 					int sectorIndex = 1;
 					for( const auto& boundedSector : constSectors ) {
 						const Sector& sector = boundedSector.sector;
 						std::pair< glm::vec3, glm::vec3 > correctedBound = {
-							correctByOrigin( boundedSector.bound.first, pair.second.first ),
-							correctByOrigin( boundedSector.bound.second, pair.second.first ),
+							correctByOrigin( boundedSector.bound.first, pair.first ),
+							correctByOrigin( boundedSector.bound.second, pair.first ),
 						};
 						int fragLevel = int( fragment.z / 4 );
 
@@ -227,12 +227,12 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 							fragment.z >= fragLevel && fragment.z <= ( fragLevel + 4 )
 						) {
 							// Generate needle
-							std::pair< glm::vec3, glm::vec3 > needle = { fragment, glm::vec3{ getPolygonMaxX( sector, pair.second.first ) + 1.0f, fragment.y, fragment.z } };
+							std::pair< glm::vec3, glm::vec3 > needle = { fragment, glm::vec3{ getPolygonMaxX( sector, pair.first ) + 1.0f, fragment.y, fragment.z } };
 
 							// Check all sides of this sector against the needle
 							unsigned int intersectionCount = 0;
 							for( const auto& side : sector.sides ) {
-								std::pair< glm::vec3, glm::vec3 > correctedSide = { correctByOrigin( side.first, pair.second.first ), correctByOrigin( side.second, pair.second.first ) };
+								std::pair< glm::vec3, glm::vec3 > correctedSide = { correctByOrigin( side.first, pair.first ), correctByOrigin( side.second, pair.first ) };
 								if( segmentsIntersect( needle, correctedSide ) && fragLevel == int( correctedSide.first.z / 4 ) ) {
 									intersectionCount++;
 								}
@@ -265,28 +265,32 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		std::vector< std::pair< glm::vec3, glm::vec3 > > pairs;
 
 		for( const auto& sector : sectors ) {
-			glm::vec2 min{ std::numeric_limits< float >::max(), std::numeric_limits< float >::max() };
-			glm::vec2 max{ std::numeric_limits< float >::lowest(), std::numeric_limits< float >::lowest() };
-
-			// zero-length sectors are invalid
-			for( const auto& lineSegment : sector.sides ) {
-				min.x = std::min( lineSegment.first.x, min.x );
-				min.x = std::min( lineSegment.second.x, min.x );
-
-				min.y = std::min( lineSegment.first.y, min.y );
-				min.y = std::min( lineSegment.second.y, min.y );
-
-				max.x = std::max( lineSegment.first.x, max.x );
-				max.x = std::max( lineSegment.second.x, max.x );
-
-				max.y = std::max( lineSegment.first.y, max.y );
-				max.y = std::max( lineSegment.second.y, max.y );
-			}
-
-			pairs.emplace_back( glm::vec3{ min.x, max.y, sector.sides.front().first.z }, glm::vec3{ max.x, min.y, sector.sides.front().first.z } );
+			pairs.emplace_back( getBoundingBoxForSector( sector ) );
 		}
 
 		return pairs;
+	}
+
+	std::pair< glm::vec3, glm::vec3 > SectorIlluminator::getBoundingBoxForSector( const Sector& sector ) const {
+		glm::vec2 min{ std::numeric_limits< float >::max(), std::numeric_limits< float >::max() };
+		glm::vec2 max{ std::numeric_limits< float >::lowest(), std::numeric_limits< float >::lowest() };
+
+		// zero-length sectors are invalid
+		for( const auto& lineSegment : sector.sides ) {
+			min.x = std::min( lineSegment.first.x, min.x );
+			min.x = std::min( lineSegment.second.x, min.x );
+
+			min.y = std::min( lineSegment.first.y, min.y );
+			min.y = std::min( lineSegment.second.y, min.y );
+
+			max.x = std::max( lineSegment.first.x, max.x );
+			max.x = std::max( lineSegment.second.x, max.x );
+
+			max.y = std::max( lineSegment.first.y, max.y );
+			max.y = std::max( lineSegment.second.y, max.y );
+		}
+
+		return { glm::vec3{ min.x, max.y, sector.sides.front().first.z }, glm::vec3{ max.x, min.y, sector.sides.front().first.z } };
 	}
 
 	void SectorIlluminator::insert( const Sector& value ) {
@@ -304,10 +308,10 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		std::unique_lock< std::mutex > lock( mutex, std::defer_lock );
 		if( lock.try_lock() ) {
 			dirty = true;
-			levelData[ topLeft.z ] = { topLeft, dimensions };
+			levelData.emplace_back( topLeft, dimensions );
 		} else {
 			// Operation in progress - stage it instead
-			staging.levelData[ topLeft.z ] = { topLeft, dimensions };
+			staging.levelData.emplace_back( topLeft, dimensions );
 		}
 	}
 

@@ -2,3 +2,4 @@ bbexec
 bluebear.log
 *.o
 test/test
+.vscode/ipch
