@@ -88,7 +88,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 
 		int item = 0;
 		for( const auto& [ origin, dimensions ] : levelData ) {
-			Tools::OpenGL::setUniform( "sectors[" + std::to_string( item ) + "].origin", origin );
+			Tools::OpenGL::setUniform( "sectors[" + std::to_string( item ) + "].origin", glm::vec2( origin ) );
 			Tools::OpenGL::setUniform( "sectors[" + std::to_string( item ) + "].dimensions", dimensions );
 
 			item++;
@@ -219,12 +219,11 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 							correctByOrigin( boundedSector.bound.first, origin ),
 							correctByOrigin( boundedSector.bound.second, origin ),
 						};
-						int fragLevel = int( fragment.z / 4 );
 
 						if(
 							fragment.x >= correctedBound.first.x && fragment.y >= correctedBound.first.y &&
 							fragment.x <= correctedBound.second.x && fragment.y <= correctedBound.second.y &&
-							fragment.z >= fragLevel && fragment.z <= ( fragLevel + 4 )
+							fragment.z == correctedBound.first.z
 						) {
 							// Generate needle
 							std::pair< glm::vec3, glm::vec3 > needle = { fragment, glm::vec3{ getPolygonMaxX( sector, origin ) + 1.0f, fragment.y, fragment.z } };
@@ -233,7 +232,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 							unsigned int intersectionCount = 0;
 							for( const auto& side : sector.sides ) {
 								std::pair< glm::vec3, glm::vec3 > correctedSide = { correctByOrigin( side.first, origin ), correctByOrigin( side.second, origin ) };
-								if( segmentsIntersect( needle, correctedSide ) && fragLevel == int( correctedSide.first.z / 4 ) ) {
+								if( segmentsIntersect( needle, correctedSide ) ) {
 									intersectionCount++;
 								}
 							}

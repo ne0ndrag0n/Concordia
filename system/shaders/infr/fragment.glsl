@@ -18,7 +18,7 @@ struct DirectionalLight {
 };
 
 struct Sector {
-  vec3 origin;
+  vec2 origin;
   vec2 dimensions;
 };
 
