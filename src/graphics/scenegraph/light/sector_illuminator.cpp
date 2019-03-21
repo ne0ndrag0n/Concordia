@@ -202,6 +202,8 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 			auto boundingBox = getBoundingBoxForSector( sector );
 			int level = boundingBox.first.z;
 			const auto& [ origin, dimensions ] = getLevel( level );
+			int height = dimensions.y * resolution;
+			int width = dimensions.x * resolution;
 
 			boundingBox.first = glm::vec3{ std::floor( boundingBox.first.x * resolution ), std::floor( boundingBox.first.y * resolution ), boundingBox.first.z };
 			boundingBox.second = glm::vec3{ std::floor( boundingBox.second.x * resolution ), std::floor( boundingBox.second.y * resolution ), boundingBox.second.z };
@@ -225,9 +227,6 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 					}
 
 					if( ( intersectionCount % 2 ) != 0 ) {
-						int height = dimensions.y * resolution;
-						int width = dimensions.x * resolution;
-
 						buffers[ level ][ ( y * width ) + x ] = sectorIndex;
 					}
 				}
@@ -237,12 +236,9 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		}
 
 		for( const auto& [ origin, dimensions ] : levelData ) {
-			int height = dimensions.y * resolution;
-			int width = dimensions.x * resolution;
-
 			result.emplace_back( TextureData{
 				nullptr, {},
-				std::async( std::launch::deferred, [ width, height, array = std::move( buffers[ origin.z ] ) ]() {
+				std::async( std::launch::deferred, [ width = dimensions.x * resolution, height = dimensions.y * resolution, array = std::move( buffers[ origin.z ] ) ]() {
 					return std::make_unique< Texture >( glm::uvec2{ width, height }, array.get() );
 				} )
 			} );
