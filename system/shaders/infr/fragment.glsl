@@ -34,7 +34,7 @@ uniform Sector sectors[ 8 ];
  * Turn fragpos into a position in a sector (or lack thereof) and then return its according directional light
  */
 DirectionalLight getDirectionalLightBySector() {
-  int level = int( fragPos.z / 4 );
+  int level = int( clamp( fragPos.z, 0, 3.402823466e+38 ) / 4 );
   vec2 lowerRightCorner = vec2(
     sectors[ level ].origin.x + sectors[ level ].dimensions.x,
     sectors[ level ].origin.y - sectors[ level ].dimensions.y

@@ -206,12 +206,14 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 			boundingBox.first = glm::vec3{ std::floor( boundingBox.first.x * resolution ), std::floor( boundingBox.first.y * resolution ), boundingBox.first.z };
 			boundingBox.second = glm::vec3{ std::floor( boundingBox.second.x * resolution ), std::floor( boundingBox.second.y * resolution ), boundingBox.second.z };
 
+			int epsilon = ( boundingBox.second.x - boundingBox.first.x );
+
 			for( int y = boundingBox.first.y; y <= boundingBox.second.y; y++ ) {
 				for( int x = boundingBox.first.x; x <= boundingBox.second.x; x++ ) {
 					glm::vec3 fragment{ x / ( float ) resolution, y / ( float ) resolution, level };
 
 					// Generate needle
-					std::pair< glm::vec3, glm::vec3 > needle = { fragment, fragment + glm::vec3{ 1.0f * resolution, 0.0f, 0.0f } };
+					std::pair< glm::vec3, glm::vec3 > needle = { fragment, fragment + glm::vec3{ epsilon, 0.0f, 0.0f } };
 
 					// Perform point-in-polygon against sector for this fragment
 					// Check all sides of this sector against the needle
