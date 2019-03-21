@@ -1,6 +1,7 @@
 #ifndef SG_SECTOR_ILLUMINATOR
 #define SG_SECTOR_ILLUMINATOR
 
+#include "exceptions/genexc.hpp"
 #include "graphics/scenegraph/illuminator.hpp"
 #include "graphics/texture.hpp"
 #include <glm/glm.hpp>
@@ -26,6 +27,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		SectorIlluminator() = default;
 		~SectorIlluminator();
 
+		EXCEPTION_TYPE( InvalidStateException, "Invalid state encountered!" );
 	private:
 		struct TextureData {
 			std::unique_ptr< Texture > texture = nullptr;
@@ -47,6 +49,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		std::vector< TextureData > textureData;
 
 		void refresh();
+		const std::pair< glm::vec3, glm::uvec2 >& getLevel( unsigned int level ) const;
 		std::vector< std::pair< glm::vec3, glm::vec3 > > getSectorBoundingBoxes() const;
 		std::pair< glm::vec3, glm::vec3 > getBoundingBoxForSector( const Sector& sector ) const;
 		std::vector< TextureData > getNewTextureData() const;

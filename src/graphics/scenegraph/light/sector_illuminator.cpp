@@ -184,80 +184,79 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		std::unique_lock< std::mutex > lock( mutex );
 		std::vector< TextureData > result;
 
-		struct BoundedSector {
-			const Sector& sector;
-			std::pair< glm::vec3, glm::vec3 > bound;
-		};
-		std::vector< BoundedSector > constSectors;
+		// Create array of buffers
+		// TODO: Verify all leveldata origin.z is unique
+		std::vector< std::unique_ptr< float[] > > buffers;
+		buffers.resize( levelData.size() );
 
-		{
-			auto boundingBoxes = getSectorBoundingBoxes();
-			// Unzip
-			int i = 0;
-			for( const auto& sector : sectors ) {
-				constSectors.emplace_back( BoundedSector{ sector, std::move( boundingBoxes[ i ] ) } );
-				i++;
-			}
-		}
-
+		int resolution = std::min( ( int ) std::pow( 10, ConfigManager::getInstance().getIntValue( "sector_resolution" ) ), 100 );
 		for( const auto& [ origin, dimensions ] : levelData ) {
-			int resolution = std::min( ( int ) std::pow( 10, ConfigManager::getInstance().getIntValue( "sector_resolution" ) ), 100 );
 			int height = dimensions.y * resolution;
 			int width = dimensions.x * resolution;
+			buffers[ origin.z ] = std::make_unique< float[] >( width * height );
+		}
 
-			std::unique_ptr< float[] > array = std::make_unique< float[] >( height * width );
+		// For each sector, get bounding box, and iterate each fragment in that bounding box against the sector
+		int sectorIndex = 1;
+		for( const Sector& sector : sectors ) {
+			auto boundingBox = getBoundingBoxForSector( sector );
+			int level = boundingBox.first.z;
+			const auto& [ origin, dimensions ] = getLevel( level );
 
-			for( int y = 0; y != height; y++ ) {
-				for( int x = 0; x != width; x++ ) {
-					const glm::vec3 fragment = correctByOrigin( glm::vec3( x / ( float ) resolution, y / ( float ) resolution, origin.z ), origin );
+			boundingBox.first = glm::vec3{ std::floor( boundingBox.first.x * resolution ), std::floor( boundingBox.first.y * resolution ), boundingBox.first.z };
+			boundingBox.second = glm::vec3{ std::floor( boundingBox.second.x * resolution ), std::floor( boundingBox.second.y * resolution ), boundingBox.second.z };
 
-					// Test fragment using point in polygon against all sectors
-					int sectorIndex = 1;
-					for( const auto& boundedSector : constSectors ) {
-						const Sector& sector = boundedSector.sector;
-						std::pair< glm::vec3, glm::vec3 > correctedBound = {
-							correctByOrigin( boundedSector.bound.first, origin ),
-							correctByOrigin( boundedSector.bound.second, origin ),
-						};
+			for( int y = boundingBox.first.y; y <= boundingBox.second.y; y++ ) {
+				for( int x = boundingBox.first.x; x <= boundingBox.second.x; x++ ) {
+					glm::vec3 fragment{ x / ( float ) resolution, y / ( float ) resolution, level };
 
-						if(
-							fragment.x >= correctedBound.first.x && fragment.y >= correctedBound.first.y &&
-							fragment.x <= correctedBound.second.x && fragment.y <= correctedBound.second.y &&
-							fragment.z == correctedBound.first.z
-						) {
-							// Generate needle
-							std::pair< glm::vec3, glm::vec3 > needle = { fragment, glm::vec3{ getPolygonMaxX( sector, origin ) + 1.0f, fragment.y, fragment.z } };
+					// Generate needle
+					std::pair< glm::vec3, glm::vec3 > needle = { fragment, fragment + glm::vec3{ 1.0f * resolution, 0.0f, 0.0f } };
 
-							// Check all sides of this sector against the needle
-							unsigned int intersectionCount = 0;
-							for( const auto& side : sector.sides ) {
-								std::pair< glm::vec3, glm::vec3 > correctedSide = { correctByOrigin( side.first, origin ), correctByOrigin( side.second, origin ) };
-								if( segmentsIntersect( needle, correctedSide ) ) {
-									intersectionCount++;
-								}
-							}
-
-							if( ( intersectionCount % 2 ) != 0 ) {
-								// odd means IN!
-								array[ ( y * width ) + x ] = sectorIndex;
-								break;
-							}
-
-							sectorIndex++;
+					// Perform point-in-polygon against sector for this fragment
+					// Check all sides of this sector against the needle
+					unsigned int intersectionCount = 0;
+					for( const auto& side : sector.sides ) {
+						if( segmentsIntersect( needle, side ) ) {
+							intersectionCount++;
 						}
+					}
+
+					if( ( intersectionCount % 2 ) != 0 ) {
+						int height = dimensions.y * resolution;
+						int width = dimensions.x * resolution;
+
+						buffers[ level ][ ( y * width ) + x ] = sectorIndex;
 					}
 				}
 			}
 
+			sectorIndex++;
+		}
+
+		for( const auto& [ origin, dimensions ] : levelData ) {
+			int height = dimensions.y * resolution;
+			int width = dimensions.x * resolution;
+
 			result.emplace_back( TextureData{
 				nullptr, {},
-				std::async( std::launch::deferred, [ width, height, array = std::move( array ) ]() {
+				std::async( std::launch::deferred, [ width, height, array = std::move( buffers[ origin.z ] ) ]() {
 					return std::make_unique< Texture >( glm::uvec2{ width, height }, array.get() );
 				} )
 			} );
 		}
 
 		return result;
+	}
+
+	const std::pair< glm::vec3, glm::uvec2 >& SectorIlluminator::getLevel( unsigned int level ) const {
+		for( const auto& pair : levelData ) {
+			if( level == pair.first.z ) {
+				return pair;
+			}
+		}
+
+		throw InvalidStateException();
 	}
 
 	std::vector< std::pair< glm::vec3, glm::vec3 > > SectorIlluminator::getSectorBoundingBoxes() const {
@@ -289,7 +288,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 			max.y = std::max( lineSegment.second.y, max.y );
 		}
 
-		return { glm::vec3{ min.x, max.y, sector.sides.front().first.z }, glm::vec3{ max.x, min.y, sector.sides.front().first.z } };
+		return { glm::vec3{ min.x, min.y, sector.sides.front().first.z }, glm::vec3{ max.x, max.y, sector.sides.front().first.z } };
 	}
 
 	void SectorIlluminator::insert( const Sector& value ) {
