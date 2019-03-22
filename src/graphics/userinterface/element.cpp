@@ -201,7 +201,7 @@ namespace BlueBear {
         return false;
       }
 
-      void Element::setAllocation( const glm::uvec4& allocation, bool doReflow ) {
+      void Element::setAllocation( const glm::ivec4& allocation, bool doReflow ) {
         this->allocation = allocation;
 
         if( doReflow ) {

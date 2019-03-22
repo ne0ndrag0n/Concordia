@@ -97,7 +97,7 @@ namespace BlueBear {
         glm::uvec2 getRequisition();
         glm::ivec4 getAllocation();
         glm::ivec2 getAbsolutePosition();
-        void setAllocation( const glm::uvec4& allocation, bool doReflow = true );
+        void setAllocation( const glm::ivec4& allocation, bool doReflow = true );
 
         std::vector< std::shared_ptr< Element > > getLeafNodes();
         std::vector< std::shared_ptr< Element > > getElementsByTag( const std::string& tag );
