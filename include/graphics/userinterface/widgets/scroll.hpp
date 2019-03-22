@@ -15,6 +15,9 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
     float scrollY = 0.0f;
     bool forceDirty = false;
 
+
+    bool getXVisible();
+    bool getYVisible();
     float getXRatio();
     float getYRatio();
     int getXGutter();

@@ -17,6 +17,14 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
     return scroll;
   }
 
+  bool Scroll::getXVisible() {
+    return ( localStyle.get< bool >( "scrollbar-x" ) && getXRatio() < 1.0f );
+  }
+
+  bool Scroll::getYVisible() {
+    return ( localStyle.get< bool >( "scrollbar-y" ) && getYRatio() < 1.0f );
+  }
+
   float Scroll::getXRatio() {
     return ( ( float ) allocation[ 2 ] / ( float ) getFinalRequisition( children[ 0 ] ).x );
   }
@@ -26,11 +34,11 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
   }
 
   int Scroll::getXGutter() {
-    return allocation[ 2 ] - ( ( localStyle.get< bool >( "scrollbar-y" ) && getYRatio() < 1.0f ) ? 10 : 0 );
+    return allocation[ 2 ] - ( getYVisible() ? 10 : 0 );
   }
 
   int Scroll::getYGutter() {
-    return allocation[ 3 ] - ( ( localStyle.get< bool >( "scrollbar-x" ) && getXRatio() < 1.0f ) ? 10 : 0 );
+    return allocation[ 3 ] - ( getXVisible() ? 10 : 0 );
   }
 
   int Scroll::getXSpace() {
@@ -44,7 +52,7 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
   void Scroll::onMouseDown( Device::Input::Metadata event ) {
     auto relative = toRelative( event.mouseLocation );
 
-    if( localStyle.get< bool >( "scrollbar-x" ) && getXRatio() < 1.0f ) {
+    if( getXVisible() ) {
       if( relative.x >= 0 && relative.y >= allocation[ 3 ] - 10 && relative.x <= getXGutter() && relative.y <= allocation[ 3 ] ) {
         updateX( relative.x );
 
@@ -59,7 +67,7 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
       }
     }
 
-    if( localStyle.get< bool >( "scrollbar-y" ) && getYRatio() < 1.0f ) {
+    if( getYVisible() ) {
       if( relative.x >= allocation[ 2 ] - 10 && relative.y >= 0 && relative.x <= allocation[ 2 ] && relative.y <= getYGutter() ) {
         updateY( relative.y );
 
@@ -160,44 +168,38 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
     if( children.size() ) {
       std::shared_ptr< Element > onlyChild = children[ 0 ];
 
-      if( localStyle.get< bool >( "scrollbar-x" ) ) {
-        float ratio = getXRatio();
-        if( ratio < 1.0f ) {
-          // Gutter
-          renderer.drawRect(
-            { 0, allocation[ 3 ] - 10, getXGutter(), allocation[ 3 ] },
-            localStyle.get< glm::uvec4 >( "background-color" )
-          );
+      if( getXVisible() ) {
+        // Gutter
+        renderer.drawRect(
+          { 0, allocation[ 3 ] - 10, getXGutter(), allocation[ 3 ] },
+          localStyle.get< glm::uvec4 >( "background-color" )
+        );
 
-          int xSpace = getXSpace();
-          int barSize = xSpace * ratio;
+        int xSpace = getXSpace();
+        int barSize = xSpace * getXRatio();
 
-          // Bar
-          renderer.drawRect(
-            { 1 + ( scrollX * xSpace ), allocation[ 3 ] - 9, 1 + ( scrollX * xSpace ) + barSize, allocation[ 3 ] - 1 },
-            localStyle.get< glm::uvec4 >( "color" )
-          );
-        }
+        // Bar
+        renderer.drawRect(
+          { 1 + ( scrollX * xSpace ), allocation[ 3 ] - 9, 1 + ( scrollX * xSpace ) + barSize, allocation[ 3 ] - 1 },
+          localStyle.get< glm::uvec4 >( "color" )
+        );
       }
 
-      if( localStyle.get< bool >( "scrollbar-y" ) ) {
-        float ratio = getYRatio();
-        if( ratio < 1.0f ) {
-          // Gutter
-          renderer.drawRect(
-            { allocation[ 2 ] - 10, 0, allocation[ 2 ], getYGutter() },
-            localStyle.get< glm::uvec4 >( "background-color" )
-          );
+      if( getYVisible() ) {
+        // Gutter
+        renderer.drawRect(
+          { allocation[ 2 ] - 10, 0, allocation[ 2 ], getYGutter() },
+          localStyle.get< glm::uvec4 >( "background-color" )
+        );
 
-          int ySpace = getYSpace();
-          int barSize = ySpace * ratio;
+        int ySpace = getYSpace();
+        int barSize = ySpace * getYRatio();
 
-          // Bar
-          renderer.drawRect(
-            { allocation[ 2 ] - 9, 1 + ( scrollY * ySpace ), allocation[ 2 ] - 1, 1 + ( scrollY * ySpace ) + barSize },
-            localStyle.get< glm::uvec4 >( "color" )
-          );
-        }
+        // Bar
+        renderer.drawRect(
+          { allocation[ 2 ] - 9, 1 + ( scrollY * ySpace ), allocation[ 2 ] - 1, 1 + ( scrollY * ySpace ) + barSize },
+          localStyle.get< glm::uvec4 >( "color" )
+        );
       }
     }
   }
