@@ -18,5 +18,9 @@
   "bricks": {
     "image": "bricks.png",
     "price": 0.0
+  },
+  "wood_paneling": {
+    "image": "wood_paneling.png",
+    "price": 0.0
   }
 }
