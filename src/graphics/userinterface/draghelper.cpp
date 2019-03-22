@@ -9,9 +9,19 @@ namespace BlueBear {
       DragHelper::DragHelper( std::shared_ptr< Element > target, const glm::ivec2& offset ) : target( target ), offset( offset ) {}
 
       void DragHelper::update( Device::Input::Metadata event ) {
-        target->getPropertyList().set< int >( "left", ( int ) event.mouseLocation.x - offset.x, false );
-        target->getPropertyList().set< int >( "top", ( int ) event.mouseLocation.y - offset.y, false );
+        glm::ivec2 newPos{ event.mouseLocation.x - offset.x, event.mouseLocation.y - offset.y };
 
+        auto allocation = target->getAllocation();
+        allocation.x = newPos.x;
+        allocation.y = newPos.y;
+
+        target->setAllocation( allocation, false );
+
+        target->getPropertyList().set< int >( "left", allocation.x, false );
+        target->getPropertyList().set< int >( "top", allocation.y, false );
+      }
+
+      void DragHelper::commit() {
         if( std::shared_ptr< Element > parent = target->getParent() ) {
           parent->paint();
         }

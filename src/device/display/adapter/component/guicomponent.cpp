@@ -232,6 +232,7 @@ namespace BlueBear {
 
             // Destroy the drag helper and swallow the event
             if( currentDrag ) {
+              currentDrag->commit();
               currentDrag = nullptr;
             } else {
               std::shared_ptr< Graphics::UserInterface::Element > captured = captureMouseEvent( rootElement, event );

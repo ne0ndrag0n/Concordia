@@ -21,6 +21,7 @@ namespace BlueBear {
         DragHelper( std::shared_ptr< Element > target, const glm::ivec2& offset );
 
         void update( Device::Input::Metadata event );
+        void commit();
       };
 
     }
