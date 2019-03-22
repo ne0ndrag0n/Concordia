@@ -53,6 +53,17 @@ namespace BlueBear::Scripting::LuaKit {
 
       return result;
     };
+
+    template< typename T >
+    static sol::table vectorToTable( sol::state& lua, const std::vector< T >& vector ) {
+      sol::table result = lua.create_table();
+
+      for( const auto& element : vector ) {
+        result.add( element );
+      }
+
+      return result;
+    }
   };
 
 }

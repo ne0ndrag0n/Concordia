@@ -159,13 +159,6 @@ namespace BlueBear::Graphics::UserInterface {
           self.addChild( other.shared_from_this() );
           Scripting::LuaKit::Utility::bagFunction( callback )();
         },
-        []( Element& self, std::vector< std::shared_ptr< Element > > elements ) {
-          for( auto& item : elements ) {
-            self.addChild( item, false );
-          }
-
-          self.reflow();
-        },
         []( Element& self, sol::table elements ) {
           for( auto& pair : elements ) {
             self.addChild( Scripting::LuaKit::Utility::cast< Element& >( pair.second ).shared_from_this(), false );
@@ -192,13 +185,13 @@ namespace BlueBear::Graphics::UserInterface {
       "get_id", &Element::getId,
       "has_class", &Element::hasClass,
       "get_selector_string", &Element::generateSelectorString,
-      "get_children", []( Element& self ) -> std::vector< UIType > {
-        return downcastAll( self.getChildren() );
+      "get_children", [ &lua ]( Element& self ) -> sol::table {
+        return Scripting::LuaKit::Utility::vectorToTable( lua, downcastAll( self.getChildren() ) );
       },
       "get_elements_by_tag", &Element::getElementsByTag,
       "get_element_by_id", &Element::getElementById,
-      "get_elements_by_class", []( Element& self, sol::table t ) -> std::vector< UIType > {
-        return downcastAll( self.getElementsByClass( Scripting::LuaKit::Utility::tableToVector< std::string >( t ) ) );
+      "get_elements_by_class", [ &lua ]( Element& self, sol::table t ) -> sol::table {
+        return Scripting::LuaKit::Utility::vectorToTable( lua, downcastAll( self.getElementsByClass( Scripting::LuaKit::Utility::tableToVector< std::string >( t ) ) ) );
       },
       "get_absolute_position", []( Element& self ) { return glm::vec2{ self.getAbsolutePosition() }; },
       "get_allocation", []( Element& self ) { return glm::vec4{ self.getAllocation() }; },

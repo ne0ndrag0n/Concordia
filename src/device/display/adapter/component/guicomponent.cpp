@@ -62,16 +62,18 @@ namespace BlueBear {
             sol::table gui = lua.create_table();
             gui.set_function( "load_xml", sol::overload(
               [ & ]( const std::string& xmlPath ) {
-                return addElementsFromXML( xmlPath );
+                return Scripting::LuaKit::Utility::vectorToTable( lua, addElementsFromXML( xmlPath ) );
               },
               [ & ]( const std::string& xmlPath, bool asString ) {
-                return addElementsFromXML( xmlPath, asString );
+                return Scripting::LuaKit::Utility::vectorToTable( lua, addElementsFromXML( xmlPath, asString ) );
               }
             ) );
             gui.set_function( "load_stylesheet", [ & ]( sol::table table ) {
               loadStylesheets( Scripting::LuaKit::Utility::tableToVector< std::string >( table ) );
             } );
-            gui.set_function( "get_elements", &GuiComponent::query, this );
+            gui.set_function( "get_elements", [ & ]( sol::table queries ) {
+              return Scripting::LuaKit::Utility::vectorToTable( lua, query( queries ) );
+            } );
 
             lua[ "bluebear" ][ "gui" ] = gui;
             Graphics::UserInterface::LuaRegistrant::registerWidgets( lua );
