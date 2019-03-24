@@ -19,8 +19,8 @@ Button {
 
 Input {
   font-hint-color: rgbaString( "aaaaaaff" );
-  fade-out-color: rgbaString( "0D686B00" );
-  fade-in-color: rgbaString( "0D686Bff" );
+  fade-out-color: rgbaString( "FFFFFF00" );
+  fade-in-color: rgbaString( "FFFFFFFF" );
   font-color: rgbaString( "000000ff" );
   color: rgbaString( "0D686Bff" );
 }
@@ -33,6 +33,11 @@ TabLayout {
   tab-inactive-accent-color: rgbaString( "803300ff" );
   tab-active-accent-color: rgbaString( "ff6600ff" );
   padding: 5;
+}
+
+Scroll {
+  color: rgbaString( "149a9faa" );
+  background-color: rgbaString( "0D686BAA" );
 }
 
 Window.error {
