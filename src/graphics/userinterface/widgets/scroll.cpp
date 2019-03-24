@@ -155,6 +155,8 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
       std::shared_ptr< Element > onlyChild = children[ 0 ];
       glm::uvec2 finalRequisition = getFinalRequisition( onlyChild );
 
+      finalRequisition += glm::uvec2{ 30.0f, 15.0f };
+
       onlyChild->setAllocation( {
         -( scrollX * finalRequisition.x ),
         -( scrollY * finalRequisition.y ),
@@ -219,6 +221,24 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
     } else {
       Element::reflow( selectorsInvalidated );
     }
+  }
+
+  glm::vec4 Scroll::computeScissor( const glm::vec4& parentScissor, const glm::ivec2& absolutePosition ) {
+    // parent: vec4(5.000000, 928.000000, 1142.000000, -64.000000)
+    // child: vec4(5.000000, 938.000000, 1147.000000, -74.000000)
+    // parent: vec4(5.000000, 478.000000, 1142.000000, 381.000000)
+    // child: vec4(5.000000, 488.000000, 1142.000000, 371.000000)
+    glm::vec4 computedScissor = Element::computeScissor( parentScissor, absolutePosition );
+
+    if( getYVisible() ) {
+      computedScissor[ 2 ] -= 10.0f;
+    }
+
+    if( getXVisible() ) {
+      computedScissor[ 1 ] += 10.0f;
+    }
+
+    return computedScissor;
   }
 
 }

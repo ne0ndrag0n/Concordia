@@ -60,7 +60,7 @@ namespace BlueBear {
         virtual void generateDrawable();
 
         glm::vec4 getParentScissor();
-        glm::vec4 computeScissor( const glm::vec4& parentScissor, const glm::ivec2& absolutePosition );
+        virtual glm::vec4 computeScissor( const glm::vec4& parentScissor, const glm::ivec2& absolutePosition );
         void setScissor( const glm::vec4& scissor );
 
       public:

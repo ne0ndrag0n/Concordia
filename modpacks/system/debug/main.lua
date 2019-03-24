@@ -61,7 +61,7 @@ local Panel = {
 }
 
 function Panel:init()
-  bluebear.gui.load_stylesheet( { path..'/panel.style', path..'/window.style' } )
+  bluebear.gui.load_stylesheet( { path..'/panel.style', path..'/window.style', path..'/window_test.style' } )
   self.pane = bluebear.gui.load_xml( path..'/panel.xml' )[ 1 ]
   bluebear.gui.root_element:add_child( self.pane )
 
@@ -69,6 +69,10 @@ function Panel:init()
   bluebear.event.register_key( 'w', function()
     self.window = bluebear.gui.load_xml( path..'/window.xml' )[ 1 ]
     bluebear.gui.root_element:add_child( self.window )
+  end )
+  bluebear.event.register_key( 'a', function()
+    self.other_window = bluebear.gui.load_xml( path..'/window_test.xml' )
+    bluebear.gui.root_element:add_child( self.other_window )
   end )
   self.pane:set_style_property( 'top', -450 )
 

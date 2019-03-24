@@ -28,6 +28,7 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
   protected:
     Scroll( const std::string& id, const std::vector< std::string >& classes );
 
+    glm::vec4 computeScissor( const glm::vec4& parentScissor, const glm::ivec2& absolutePosition ) override;
     void onMouseDown( Device::Input::Metadata event );
     void updateX( int x );
     void updateY( int y );
