@@ -213,15 +213,19 @@ namespace BlueBear {
         return localStyle;
       }
 
+      const Style::Style& Element::getPropertyList() const {
+        return localStyle;
+      }
+
       Event::EventBundle& Element::getEventBundle() {
         return eventBundle;
       }
 
-      glm::uvec2 Element::getRequisition() {
+      glm::uvec2 Element::getRequisition() const {
         return requisition;
       }
 
-      glm::ivec4 Element::getAllocation() {
+      glm::ivec4 Element::getAllocation() const {
         return allocation;
       }
 
@@ -235,7 +239,7 @@ namespace BlueBear {
         } );
       }
 
-      bool Element::valueIsLiteral( int r ) {
+      bool Element::valueIsLiteral( int r ) const {
         return ( Requisition ) r != Requisition::AUTO &&
           ( Requisition ) r != Requisition::NONE &&
           ( Requisition ) r != Requisition::FILL_PARENT;

@@ -17,35 +17,35 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
     return scroll;
   }
 
-  bool Scroll::getXVisible() {
+  bool Scroll::getXVisible() const {
     return ( localStyle.get< bool >( "scrollbar-x" ) && getXRatio() < 1.0f );
   }
 
-  bool Scroll::getYVisible() {
+  bool Scroll::getYVisible() const {
     return ( localStyle.get< bool >( "scrollbar-y" ) && getYRatio() < 1.0f );
   }
 
-  float Scroll::getXRatio() {
+  float Scroll::getXRatio() const {
     return ( ( float ) allocation[ 2 ] / ( float ) getFinalRequisition( children[ 0 ] ).x );
   }
 
-  float Scroll::getYRatio() {
+  float Scroll::getYRatio() const {
     return ( ( float ) allocation[ 3 ] / ( float ) getFinalRequisition( children[ 0 ] ).y );
   }
 
-  int Scroll::getXGutter() {
+  int Scroll::getXGutter() const {
     return allocation[ 2 ] - ( getYVisible() ? 10 : 0 );
   }
 
-  int Scroll::getYGutter() {
+  int Scroll::getYGutter() const {
     return allocation[ 3 ] - ( getXVisible() ? 10 : 0 );
   }
 
-  int Scroll::getXSpace() {
+  int Scroll::getXSpace() const {
     return getXGutter() - 2;
   }
 
-  int Scroll::getYSpace() {
+  int Scroll::getYSpace() const {
     return getYGutter() - 2;
   }
 
@@ -131,7 +131,7 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
     generateDrawable();
   }
 
-  glm::uvec2 Scroll::getFinalRequisition( std::shared_ptr< Element > prospect ) {
+  glm::uvec2 Scroll::getFinalRequisition( std::shared_ptr< Element > prospect ) const {
     int width = prospect->getPropertyList().get< int >( "width" );
     int height = prospect->getPropertyList().get< int >( "height" );
 
@@ -239,6 +239,18 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
     }
 
     return computedScissor;
+  }
+
+  int Scroll::getX() const {
+    return scrollX * getXSpace();
+  }
+
+  int Scroll::getY() const {
+    return scrollY * getYSpace();
+  }
+
+  glm::ivec2 Scroll::getMax() const {
+    return { getXSpace(), getYSpace() };
   }
 
 }

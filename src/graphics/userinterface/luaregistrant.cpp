@@ -329,6 +329,11 @@ namespace BlueBear::Graphics::UserInterface {
       "create", []( const std::string& id, sol::table classes ) {
         return Widgets::Scroll::create( id, Scripting::LuaKit::Utility::tableToVector< std::string >( classes ) );
       },
+      "get_max", &Widgets::Scroll::getMax,
+      "set_x", &Widgets::Scroll::updateX,
+      "set_y", &Widgets::Scroll::updateY,
+      "get_x", &Widgets::Scroll::getX,
+      "get_y", &Widgets::Scroll::getY,
       sol::base_classes, sol::bases< Element >()
     );
 

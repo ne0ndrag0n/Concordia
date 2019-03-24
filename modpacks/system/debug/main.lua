@@ -54,6 +54,7 @@ local Panel = {
   },
   pane = nil,
   scrollback_bin = nil,
+  scroll = nil,
   input_field = nil,
   system_event = nil,
   message_queue = nil,
@@ -77,6 +78,7 @@ function Panel:init()
   self.pane:set_style_property( 'top', -450 )
 
   self.scrollback_bin = self.pane:get_elements_by_class( { '-bb-scrollback-bin' } )[ 1 ]
+  self.scroll = self.pane:get_elements_by_class( { '-bb-scrollback' } )[ 1 ]
   self.input_field = self.pane:get_elements_by_class( { '-bb-terminal-text-input' } )[ 1 ]
   self.message_queue = {}
   self.queue_waiting = false

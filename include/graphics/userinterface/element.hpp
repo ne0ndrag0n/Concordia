@@ -54,7 +54,7 @@ namespace BlueBear {
 
         glm::ivec2 toRelative( const glm::uvec2& location );
         void setShadow( bool status );
-        bool valueIsLiteral( int r );
+        bool valueIsLiteral( int r ) const;
         virtual bool reuseDrawableInstance();
         virtual bool drawableDirty();
         virtual void generateDrawable();
@@ -93,9 +93,10 @@ namespace BlueBear {
         virtual void remove( const std::vector< std::shared_ptr< Element > >& elements, bool doReflow = true );
 
         Style::Style& getPropertyList();
+        const Style::Style& getPropertyList() const;
         Event::EventBundle& getEventBundle();
-        glm::uvec2 getRequisition();
-        glm::ivec4 getAllocation();
+        glm::uvec2 getRequisition() const;
+        glm::ivec4 getAllocation() const;
         glm::ivec2 getAbsolutePosition();
         void setAllocation( const glm::ivec4& allocation, bool doReflow = true );
 
