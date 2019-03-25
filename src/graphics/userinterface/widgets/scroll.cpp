@@ -26,11 +26,23 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
   }
 
   float Scroll::getXRatio() const {
-    return ( ( float ) allocation[ 2 ] / ( float ) getFinalRequisition( children[ 0 ] ).x );
+    float requisition = getFinalRequisition( children[ 0 ] ).x;
+
+    if( requisition == 0.0f ) {
+      return 1.0f;
+    }
+
+    return ( ( float ) allocation[ 2 ] / requisition  );
   }
 
   float Scroll::getYRatio() const {
-    return ( ( float ) allocation[ 3 ] / ( float ) getFinalRequisition( children[ 0 ] ).y );
+    float requisition = getFinalRequisition( children[ 0 ] ).y;
+
+    if( requisition == 0.0f ) {
+      return 1.0f;
+    }
+
+    return ( ( float ) allocation[ 3 ] / requisition );
   }
 
   int Scroll::getXGutter() const {

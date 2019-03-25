@@ -72,13 +72,11 @@ function Panel:init()
     bluebear.gui.root_element:add_child( self.window )
   end )
   bluebear.event.register_key( 'a', function()
-    self.other_window = bluebear.gui.load_xml( path..'/window_test.xml' )
-    bluebear.gui.root_element:add_child( self.other_window )
+    print( 'system.debug.debugger', tostring( self.pane:get_elements_by_class( { '-bb-scrollback' } )[ 1 ]:get_x() )..' '..tostring( self.pane:get_elements_by_class( { '-bb-scrollback' } )[ 1 ]:get_y() ) )
   end )
   self.pane:set_style_property( 'top', -450 )
 
   self.scrollback_bin = self.pane:get_elements_by_class( { '-bb-scrollback-bin' } )[ 1 ]
-  self.scroll = self.pane:get_elements_by_class( { '-bb-scrollback' } )[ 1 ]
   self.input_field = self.pane:get_elements_by_class( { '-bb-terminal-text-input' } )[ 1 ]
   self.message_queue = {}
   self.queue_waiting = false
@@ -124,6 +122,9 @@ function Panel:clear( event )
   end
 
   self.scrollback_bin:remove( tab )
+
+  self.pane:get_elements_by_class( { '-bb-scrollback' } )[ 1 ]:set_x( 0 )
+  self.pane:get_elements_by_class( { '-bb-scrollback' } )[ 1 ]:set_y( 0 )
 end
 
 function Panel:receive_message( message )

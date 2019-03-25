@@ -57,7 +57,8 @@
 		"variant": "cpp",
 		"algorithm": "cpp",
 		"unordered_set": "cpp",
-		"future": "cpp"
+		"future": "cpp",
+		"numeric": "cpp"
 	},
 	"C_Cpp.errorSquiggles": "Disabled"
 }
