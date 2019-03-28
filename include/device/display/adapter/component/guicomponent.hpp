@@ -18,6 +18,7 @@
 
 namespace BlueBear {
   namespace Device::Input {
+    class Input;
     class Metadata;
   }
 
@@ -47,15 +48,6 @@ namespace BlueBear {
             void fireFocusEvent( std::shared_ptr< Graphics::UserInterface::Element > selected, Device::Input::Metadata event );
             void fireInOutEvents( std::shared_ptr< Graphics::UserInterface::Element > selected, Device::Input::Metadata event );
 
-          public:
-
-            void loadStylesheets( const std::vector< std::string >& paths );
-            std::vector< std::shared_ptr< Graphics::UserInterface::Element > > addElementsFromXML( const std::string& xmlPath, bool file = true );
-            std::vector< std::shared_ptr< Graphics::UserInterface::Element > > query( sol::table queries );
-
-            void setupBlockingGlobalEvent( const std::string& eventId, std::function< void( Device::Input::Metadata ) > callback );
-            void unregisterBlockingGlobalEvent( const std::string& eventId );
-
             std::shared_ptr< Graphics::UserInterface::Element > captureMouseEvent(
               std::shared_ptr< Graphics::UserInterface::Element > element,
               Device::Input::Metadata event
@@ -66,6 +58,16 @@ namespace BlueBear {
             void mouseReleased( Device::Input::Metadata event );
             void keyPressed( Device::Input::Metadata event );
             void keyReleased( Device::Input::Metadata event );
+
+          public:
+            void loadStylesheets( const std::vector< std::string >& paths );
+            std::vector< std::shared_ptr< Graphics::UserInterface::Element > > addElementsFromXML( const std::string& xmlPath, bool file = true );
+            std::vector< std::shared_ptr< Graphics::UserInterface::Element > > query( sol::table queries );
+
+            void setupBlockingGlobalEvent( const std::string& eventId, std::function< void( Device::Input::Metadata ) > callback );
+            void unregisterBlockingGlobalEvent( const std::string& eventId );
+
+            void registerEvents( Device::Input::Input& inputManager );
 
             Graphics::Vector::Renderer& getVectorRenderer();
             Graphics::UserInterface::Style::StyleApplier& getStyleManager();

@@ -81,6 +81,33 @@ namespace BlueBear {
             gui[ "root_element" ] = rootElement;
           }
 
+          void GuiComponent::registerEvents( Device::Input::Input& inputManager ) {
+            inputManager.registerInputEvent(
+              sf::Event::KeyPressed,
+              std::bind( &Device::Display::Adapter::Component::GuiComponent::keyPressed, this, std::placeholders::_1 )
+            );
+
+            inputManager.registerInputEvent(
+              sf::Event::KeyReleased,
+              std::bind( &Device::Display::Adapter::Component::GuiComponent::keyReleased, this, std::placeholders::_1 )
+            );
+
+            inputManager.registerInputEvent(
+              sf::Event::MouseButtonPressed,
+              std::bind( &Device::Display::Adapter::Component::GuiComponent::mousePressed, this, std::placeholders::_1 )
+            );
+
+            inputManager.registerInputEvent(
+              sf::Event::MouseButtonReleased,
+              std::bind( &Device::Display::Adapter::Component::GuiComponent::mouseReleased, this, std::placeholders::_1 )
+            );
+
+            inputManager.registerInputEvent(
+              sf::Event::MouseMoved,
+              std::bind( &Device::Display::Adapter::Component::GuiComponent::mouseMoved, this, std::placeholders::_1 )
+            );
+          }
+
           void GuiComponent::loadStylesheets( const std::vector< std::string >& paths ) {
             styleManager.applyStyles( paths );
           }
