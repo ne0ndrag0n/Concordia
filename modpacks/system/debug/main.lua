@@ -72,7 +72,9 @@ function Panel:init()
     bluebear.gui.root_element:add_child( self.window )
   end )
   bluebear.event.register_key( 'a', function()
-    print( 'system.debug.debugger', tostring( self.pane:get_elements_by_class( { '-bb-scrollback' } )[ 1 ]:get_x() )..' '..tostring( self.pane:get_elements_by_class( { '-bb-scrollback' } )[ 1 ]:get_y() ) )
+    bluebear.gui.root_element:add_child(
+      bluebear.gui.load_xml( path..'/window_test.xml' )[ 1 ]
+    )
   end )
   self.pane:set_style_property( 'top', -450 )
 

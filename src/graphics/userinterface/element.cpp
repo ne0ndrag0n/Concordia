@@ -355,13 +355,19 @@ namespace BlueBear {
       }
 
       glm::vec4 Element::computeScissor( const glm::vec4& parentScissor, const glm::ivec2& absolutePosition ) {
+        int viewportY = ConfigManager::getInstance().getIntValue( "viewport_y" );
+
         glm::vec2 parentLowerCorner = { parentScissor[ 0 ], parentScissor[ 1 ] };
         glm::vec2 parentUpperCorner = { parentLowerCorner[ 0 ] + parentScissor[ 2 ], parentLowerCorner[ 1 ] + parentScissor[ 3 ] };
+
+        int lowerLeftCornerY = absolutePosition.y + allocation[ 3 ];
         glm::vec4 scissor = {
           absolutePosition.x,
-          ConfigManager::getInstance().getIntValue( "viewport_y" ) - ( absolutePosition.y + allocation[ 3 ] ),
-          allocation[ 2 ],
-          allocation[ 3 ]
+          viewportY - ( absolutePosition.y + allocation[ 3 ] ),
+          std::max( 0, allocation[ 2 ] - ( absolutePosition.x < 0 ? std::abs( absolutePosition.x ) : 0 ) ),
+          // TODO: Touch up Y case. Scissor Y height cannot be greater than viewportY
+          // Hint: starts at the bottom corner as opengl's coordinate system is a pita
+          std::max( 0, allocation[ 3 ] - ( lowerLeftCornerY > viewportY ? ( lowerLeftCornerY - viewportY ) : 0 ) )
         };
 
         scissor[ 0 ] = std::max( scissor.x, parentLowerCorner.x );
