@@ -243,7 +243,7 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
     glm::vec4 computedScissor = Element::computeScissor( parentScissor, absolutePosition );
 
     if( getYVisible() ) {
-      computedScissor[ 2 ] -= 10.0f;
+      computedScissor[ 2 ] = std::max( 0.0f, computedScissor[ 2 ] - 10.0f );
     }
 
     if( getXVisible() ) {
