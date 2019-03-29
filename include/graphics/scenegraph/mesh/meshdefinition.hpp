@@ -87,6 +87,8 @@ namespace BlueBear {
             if( !defer ) {
               loadIndexed();
             }
+
+            storeGenericTriangles( vertices, indices );
           }
 
           MeshDefinition( const std::vector< VertexType >& vertices, bool defer = false ) :
@@ -97,6 +99,8 @@ namespace BlueBear {
             if( !defer ) {
               loadVertices();
             }
+
+            storeGenericTriangles( vertices, indices );
           }
 
           ~MeshDefinition() {
