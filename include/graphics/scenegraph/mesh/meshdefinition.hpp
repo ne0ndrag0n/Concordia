@@ -23,17 +23,18 @@ namespace BlueBear {
           GLuint EBO;
           unsigned int size;
           bool indexed;
+          bool loaded = false;
           std::function< void() > drawMethod;
 
           // Deferred loading of meshes
-          std::unique_ptr< const std::vector< VertexType > > deferredVertices;
-          std::unique_ptr< const std::vector< GLuint > > deferredIndices;
+          const std::vector< VertexType > vertices;
+          const std::vector< GLuint > indices;
 
           // Disable copy
           MeshDefinition( const MeshDefinition& );
           MeshDefinition& operator=( const MeshDefinition& );
 
-          void loadIndexed( const std::vector< VertexType >& vertices, const std::vector< GLuint >& indices ) {
+          void loadIndexed() {
             glGenVertexArrays( 1, &VAO );
             glGenBuffers( 1, &VBO );
             glGenBuffers( 1, &EBO );
@@ -49,9 +50,11 @@ namespace BlueBear {
 
               glBindBuffer( GL_ARRAY_BUFFER, 0 );
             glBindVertexArray( 0 );
+
+            loaded = true;
           }
 
-          void loadVertices( const std::vector< VertexType >& vertices ) {
+          void loadVertices() {
             glGenVertexArrays( 1, &VAO );
             glGenBuffers( 1, &VBO );
 
@@ -63,6 +66,8 @@ namespace BlueBear {
 
               glBindBuffer( GL_ARRAY_BUFFER, 0 );
             glBindVertexArray( 0 );
+
+            loaded = true;
           }
 
           void drawIndexed() {
@@ -75,44 +80,27 @@ namespace BlueBear {
 
         public:
           MeshDefinition( const std::vector< VertexType >& vertices, const std::vector< GLuint >& indices, bool defer = false ) :
-            size( indices.size() ), indexed( true ), drawMethod( std::bind( &MeshDefinition::drawIndexed, this ) ) {
+            size( indices.size() ), indexed( true ), drawMethod( std::bind( &MeshDefinition::drawIndexed, this ) ),
+            vertices( vertices ), indices( indices ) {
             getDefaultShader = VertexType::getDefaultShader;
 
-            /*
-            for( const auto& vertex : vertices ) {
-              Log::getInstance().debug( "vertex",
-                std::to_string( vertex.position.x ) + " " +
-                std::to_string( vertex.position.y ) + " " +
-                std::to_string( vertex.position.z )
-              );
-            }
-
-            for( unsigned int index : indices ) {
-              Log::getInstance().debug( "index", std::to_string( index ) );
-            }
-            */
-
-            if( defer ) {
-              deferredVertices = std::make_unique< const std::vector< VertexType > >( vertices );
-              deferredIndices = std::make_unique< const std::vector< GLuint > >( indices );
-            } else {
-              loadIndexed( vertices, indices );
+            if( !defer ) {
+              loadIndexed();
             }
           }
 
           MeshDefinition( const std::vector< VertexType >& vertices, bool defer = false ) :
-            size( vertices.size() ), indexed( false ), drawMethod( std::bind( &MeshDefinition::drawVertices, this ) ) {
+            size( vertices.size() ), indexed( false ), drawMethod( std::bind( &MeshDefinition::drawVertices, this ) ),
+            vertices( vertices ) {
             getDefaultShader = VertexType::getDefaultShader;
 
-            if( defer ) {
-              deferredVertices = std::make_unique< const std::vector< VertexType > >( vertices );
-            } else {
-              loadVertices( vertices );
+            if( !defer ) {
+              loadVertices();
             }
           }
 
           ~MeshDefinition() {
-            if( !deferredVertices && !deferredIndices ) {
+            if( loaded ) {
               glDeleteVertexArrays( 1, &VAO );
               glDeleteBuffers( 1, &VBO );
               if( indexed ) {
@@ -122,14 +110,11 @@ namespace BlueBear {
           }
 
           void sendDeferred() override {
-            if( deferredVertices ) {
-              if( deferredIndices ) {
-                loadIndexed( *deferredVertices, *deferredIndices );
-                deferredVertices = nullptr;
-                deferredIndices = nullptr;
+            if( vertices.size() ) {
+              if( indices.size() ) {
+                loadIndexed();
               } else {
-                loadVertices( *deferredVertices );
-                deferredVertices = nullptr;
+                loadVertices();
               }
             }
           }
