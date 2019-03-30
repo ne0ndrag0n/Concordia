@@ -1,6 +1,8 @@
 #ifndef WORLD_RENDERER
 #define WORLD_RENDERER
 
+#include "containers/reusableobjectvector.hpp"
+#include "device/input/input.hpp"
 #include "device/display/adapter/adapter.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/scenegraph/resourcebank.hpp"
@@ -45,6 +47,7 @@ namespace BlueBear {
               const std::string originalId;
               const std::set< std::string > instanceClasses;
               std::shared_ptr< Graphics::SceneGraph::Model > instance;
+              std::unordered_map< std::string, Containers::ReusableObjectVector< std::function< void( Device::Input::Metadata ) > > > events;
 
               bool operator<( const ModelRegistration& rhs ) const {
                 return instance.get() < rhs.instance.get();
@@ -59,6 +62,9 @@ namespace BlueBear {
 
             std::unique_ptr< Graphics::SceneGraph::ModelLoader::FileModelLoader > getFileModelLoader( bool deferGLOperations );
 
+            void onMouseDown( Device::Input::Metadata metadata );
+            void onMouseUp( Device::Input::Metadata metadata );
+
           public:
             EXCEPTION_TYPE( ObjectIDNotRegisteredException, "Object ID not registered!" );
             WorldRenderer( Display& display );
@@ -68,6 +74,8 @@ namespace BlueBear {
             void load( const Json::Value& data ) override;
 
             void submitLuaContributions( sol::state& lua );
+
+            void registerEvents( Device::Input::Input& inputManager );
 
             std::shared_ptr< Graphics::SceneGraph::Model > placeObject( const std::string& objectId, const std::set< std::string >& classes = {} );
             std::vector< std::shared_ptr< Graphics::SceneGraph::Model > > findObjectsByType( const std::string& instanceId );
@@ -82,7 +90,7 @@ namespace BlueBear {
             Graphics::Camera& getCamera();
             void loadPathsParallel( const std::vector< std::pair< std::string, std::string > >& paths );
             void loadPaths( const std::vector< std::pair< std::string, std::string > >& paths );
-            void insertDirect( const std::shared_ptr< Graphics::SceneGraph::Model >& model );
+            void loadDirect( const std::string& id, const std::shared_ptr< Graphics::SceneGraph::Model >& model );
             void onShaderChange();
             void nextFrame() override;
           };

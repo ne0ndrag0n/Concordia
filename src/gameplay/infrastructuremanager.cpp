@@ -23,8 +23,11 @@ namespace BlueBear::Gameplay {
 		Graphics::Vector::Renderer vectorRenderer( state.as< State::HouseholdGameplayState >().getApplication().getDisplayDevice() );
 		Graphics::SceneGraph::ModelLoader::WallModelLoader wallModelLoader( model.getLevels(), vectorRenderer );
 
-		worldRenderer.insertDirect( floorModelLoader.get() );
-		worldRenderer.insertDirect( wallModelLoader.get() );
+		worldRenderer.loadDirect( "__floorrig", floorModelLoader.get() );
+		worldRenderer.loadDirect( "__wallrig", wallModelLoader.get() );
+
+		worldRenderer.placeObject( "__floorrig", {} );
+		worldRenderer.placeObject( "__wallrig", {} );
 
 		generateRooms();
 	}

@@ -92,6 +92,26 @@ namespace BlueBear {
             Graphics::SceneGraph::Model::submitLuaContributions( lua );
           }
 
+          void WorldRenderer::registerEvents( Device::Input::Input& inputManager ) {
+            inputManager.registerInputEvent(
+              sf::Event::MouseButtonPressed,
+              std::bind( &BlueBear::Device::Display::Adapter::Component::WorldRenderer::onMouseDown, this, std::placeholders::_1 )
+            );
+
+            inputManager.registerInputEvent(
+              sf::Event::MouseButtonReleased,
+              std::bind( &BlueBear::Device::Display::Adapter::Component::WorldRenderer::onMouseUp, this, std::placeholders::_1 )
+            );
+          }
+
+          void WorldRenderer::onMouseDown( Device::Input::Metadata metadata ) {
+            Log::getInstance().debug( "WorldRenderer::mouseDown", "Mousedown recieved" );
+          }
+
+          void WorldRenderer::onMouseUp( Device::Input::Metadata metadata ) {
+            Log::getInstance().debug( "WorldRenderer::mouseUp", "Mouseup recieved" );
+          }
+
           std::shared_ptr< Graphics::SceneGraph::Model > WorldRenderer::placeObject( const std::string& objectId, const std::set< std::string >& classes ) {
             auto it = originals.find( objectId );
 
@@ -243,12 +263,17 @@ namespace BlueBear {
             }
           }
 
-          void WorldRenderer::onShaderChange() {
-            Graphics::SceneGraph::Light::PointLight::sendLightCount();
+          void WorldRenderer::loadDirect( const std::string& id, const std::shared_ptr< Graphics::SceneGraph::Model >& model ) {
+            auto it = originals.find( id );
+            if( it != originals.end() ) {
+              Log::getInstance().warn( "WorldRenderer::loadDirect", "Overloading original registered model of type " + id );
+            }
+
+            originals[ id ] = model;
           }
 
-          void WorldRenderer::insertDirect( const std::shared_ptr< Graphics::SceneGraph::Model >& model ) {
-            models.emplace( ModelRegistration{ "", {}, model } );
+          void WorldRenderer::onShaderChange() {
+            Graphics::SceneGraph::Light::PointLight::sendLightCount();
           }
 
           /**

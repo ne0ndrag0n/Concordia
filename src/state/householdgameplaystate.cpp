@@ -92,6 +92,7 @@ namespace BlueBear {
       inputManager.registerInputEvent( sf::Event::KeyPressed, [ & ]( Device::Input::Metadata metadata ) {
         keyGroup.trigger( metadata.keyPressed );
       } );
+      worldRenderer.registerEvents( inputManager );
 
       luaEventHelper.connectInputDevice( inputManager );
     }
