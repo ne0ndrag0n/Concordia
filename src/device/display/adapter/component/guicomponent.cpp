@@ -210,6 +210,12 @@ namespace BlueBear {
           }
 
           void GuiComponent::mousePressed( Device::Input::Metadata event ) {
+            // Cancel event for rest of tick if it is captured anywhere in the GUI tree, besides rootElement
+            std::shared_ptr< Graphics::UserInterface::Element > captured = captureMouseEvent( rootElement, event );
+            if( captured && captured != rootElement ) {
+              event.cancelAll();
+            }
+
             // Swallow an event if it's a blocking global
             auto it = blockingGlobalEvents.find( "mouse-down" );
             if( it != blockingGlobalEvents.end() ) {
@@ -219,8 +225,6 @@ namespace BlueBear {
 
             // Swallow the event if a drag is in progress (no wheel or right click while dragging)
             if( !currentDrag ) {
-              std::shared_ptr< Graphics::UserInterface::Element > captured = captureMouseEvent( rootElement, event );
-
               if( captured ) {
                 fireFocusEvent( captured, event );
                 captured->getEventBundle().trigger( "mouse-down", event );
@@ -229,6 +233,12 @@ namespace BlueBear {
           }
 
           void GuiComponent::mouseMoved( Device::Input::Metadata event ) {
+            // Cancel event for rest of tick if it is captured anywhere in the GUI tree, besides rootElement
+            std::shared_ptr< Graphics::UserInterface::Element > captured = captureMouseEvent( rootElement, event );
+            if( captured && captured != rootElement ) {
+              event.cancelAll();
+            }
+
             // Swallow an event if it's a blocking global
             auto it = blockingGlobalEvents.find( "mouse-moved" );
             if( it != blockingGlobalEvents.end() ) {
@@ -240,8 +250,6 @@ namespace BlueBear {
             if( currentDrag ) {
               return currentDrag->update( event );
             } else {
-              std::shared_ptr< Graphics::UserInterface::Element > captured = captureMouseEvent( rootElement, event );
-
               if( captured ) {
                 fireInOutEvents( captured, event );
                 captured->getEventBundle().trigger( "mouse-moved", event );
@@ -250,6 +258,12 @@ namespace BlueBear {
           }
 
           void GuiComponent::mouseReleased( Device::Input::Metadata event ) {
+            // Cancel event for rest of tick if it is captured anywhere in the GUI tree, besides rootElement
+            std::shared_ptr< Graphics::UserInterface::Element > captured = captureMouseEvent( rootElement, event );
+            if( captured && captured != rootElement ) {
+              event.cancelAll();
+            }
+
             // Swallow an event if it's a blocking global
             auto it = blockingGlobalEvents.find( "mouse-up" );
             if( it != blockingGlobalEvents.end() ) {
@@ -262,8 +276,6 @@ namespace BlueBear {
               currentDrag->commit();
               currentDrag = nullptr;
             } else {
-              std::shared_ptr< Graphics::UserInterface::Element > captured = captureMouseEvent( rootElement, event );
-
               if( captured ) {
                 captured->getEventBundle().trigger( "mouse-up", event );
               }
