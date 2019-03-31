@@ -22,6 +22,10 @@ namespace BlueBear {
       eventManager.SHADER_CHANGE.listen( this, std::bind( &Camera::sendToShader, this ) );
     }
 
+    const glm::vec3& Camera::getPosition() const {
+      return camera;
+    }
+
     void Camera::move( GLfloat x, GLfloat y, GLfloat z ) {
       camera += glm::vec3( x, y, z );
       dirty = true;

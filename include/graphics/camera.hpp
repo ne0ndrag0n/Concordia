@@ -32,6 +32,7 @@ namespace BlueBear {
 
       public:
         Camera( int screenWidth, int screenHeight );
+        const glm::vec3& getPosition() const;
         void move( GLfloat x, GLfloat y, GLfloat z );
         float zoomIn();
         float zoomOut();

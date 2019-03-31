@@ -4,6 +4,7 @@
 #include "containers/reusableobjectvector.hpp"
 #include "device/input/input.hpp"
 #include "device/display/adapter/adapter.hpp"
+#include "geometry/ray.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/scenegraph/resourcebank.hpp"
 #include "exceptions/genexc.hpp"
@@ -62,6 +63,7 @@ namespace BlueBear {
 
             std::unique_ptr< Graphics::SceneGraph::ModelLoader::FileModelLoader > getFileModelLoader( bool deferGLOperations );
 
+            Geometry::Ray getRayFromMouseEvent( const glm::ivec2& mouseLocation );
             void onMouseDown( Device::Input::Metadata metadata );
             void onMouseUp( Device::Input::Metadata metadata );
 

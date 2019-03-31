@@ -1,4 +1,5 @@
 #include "device/display/adapter/component/worldrenderer.hpp"
+#include "device/display/display.hpp"
 #include "graphics/scenegraph/light/pointlight.hpp"
 #include "graphics/scenegraph/light/directionallight.hpp"
 #include "graphics/scenegraph/model.hpp"
@@ -104,12 +105,45 @@ namespace BlueBear {
             );
           }
 
+          Geometry::Ray WorldRenderer::getRayFromMouseEvent( const glm::ivec2& mouseLocation ) {
+            // origin, direction
+            Geometry::Ray ray;
+
+            const glm::uvec2& screenDimensions = display.getDimensions();
+            glm::mat4 viewMatrix = camera.getOrthoView();
+            glm::mat4 projectionMatrix = camera.getOrthoMatrix();
+
+            // screen-to-clip
+            glm::vec4 clip{
+              ( 2 * float( mouseLocation.x ) ) / screenDimensions.x - 1,
+              1 - ( 2 * float( mouseLocation.y ) ) / screenDimensions.y,
+              0,
+              1
+            };
+
+            // clip-to-view
+            glm::vec4 eyeDirection = glm::inverse( projectionMatrix ) * clip;
+            eyeDirection.w = 0.0f;
+
+            // view-to-world
+            ray.direction = glm::normalize( glm::inverse( viewMatrix ) * eyeDirection );
+
+            // Set origin
+            ray.origin = camera.getPosition();
+
+            // send Ray off to do his job, he's a good guy
+            return ray;
+          }
+
           void WorldRenderer::onMouseDown( Device::Input::Metadata metadata ) {
-            Log::getInstance().debug( "WorldRenderer::mouseDown", "Mousedown recieved" );
+            // Go bother Ray
+            Geometry::Ray ray = getRayFromMouseEvent( metadata.mouseLocation );
+
+            Log::getInstance().debug( "WorldRenderer::mouseDown", "origin: " + glm::to_string( ray.origin ) );
+            Log::getInstance().debug( "WorldRenderer::mouseDown", "direction: " + glm::to_string( ray.direction ) );
           }
 
           void WorldRenderer::onMouseUp( Device::Input::Metadata metadata ) {
-            Log::getInstance().debug( "WorldRenderer::mouseUp", "Mouseup recieved" );
           }
 
           std::shared_ptr< Graphics::SceneGraph::Model > WorldRenderer::placeObject( const std::string& objectId, const std::set< std::string >& classes ) {
