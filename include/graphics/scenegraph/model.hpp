@@ -3,6 +3,8 @@
 
 #include "graphics/scenegraph/transform.hpp"
 #include "graphics/scenegraph/drawable.hpp"
+#include "geometry/triangle.hpp"
+#include "geometry/ray.hpp"
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -39,6 +41,7 @@ namespace BlueBear {
         Model( const std::string& id, const std::vector< Drawable >& drawables );
         Model( const Model& other );
 
+        std::vector< Geometry::Triangle > getModelTriangles() const;
         void sendBones( const Mesh::Mesh& mesh, const std::map< std::string, glm::mat4 >& bones );
 
       public:
@@ -70,6 +73,8 @@ namespace BlueBear {
         std::shared_ptr< Model > findChildById( const std::string& id ) const;
 
         void sendDeferredObjects();
+
+        std::optional< glm::vec3 > getNearestIntersection( const Geometry::Ray& ray ) const;
 
         void draw( Animation::Animator* parentAnimator = nullptr );
       };

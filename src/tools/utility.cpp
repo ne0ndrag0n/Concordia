@@ -556,5 +556,9 @@ namespace BlueBear {
 			return glm::distance( glm::vec2{ start.x, start.y }, glm::vec2{ end.x, end.y } );
 		}
 
+		float Utility::distance( const glm::vec3& start, const glm::vec3& end ) {
+			return glm::distance( start, end );
+		}
+
 	}
 }

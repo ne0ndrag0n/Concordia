@@ -1,5 +1,6 @@
 #include "device/display/adapter/component/worldrenderer.hpp"
 #include "device/display/display.hpp"
+#include "geometry/triangle.hpp"
 #include "graphics/scenegraph/light/pointlight.hpp"
 #include "graphics/scenegraph/light/directionallight.hpp"
 #include "graphics/scenegraph/model.hpp"
@@ -141,6 +142,22 @@ namespace BlueBear {
 
             Log::getInstance().debug( "WorldRenderer::mouseDown", "origin: " + glm::to_string( ray.origin ) );
             Log::getInstance().debug( "WorldRenderer::mouseDown", "direction: " + glm::to_string( ray.direction ) );
+
+            /*
+            // TODO and test only
+            // Find what objects this ray intersects
+            std::vector< std::shared_ptr< Graphics::SceneGraph::Model > > picked;
+            for( const auto& registration : models ) {
+              // Perform ray intersection test for all triangles in model
+              if( registration.instance->getNearestIntersection( ray ) ) {
+                picked.push_back( registration.instance );
+              }
+            }
+
+            for( const auto& pick : picked ) {
+              Log::getInstance().debug( "WorldRenderer::mouseDown", pick->getId() );
+            }
+            */
           }
 
           void WorldRenderer::onMouseUp( Device::Input::Metadata metadata ) {

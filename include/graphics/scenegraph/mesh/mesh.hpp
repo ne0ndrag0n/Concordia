@@ -9,6 +9,7 @@
 #include <memory>
 #include <string>
 #include <utility>
+#include <vector>
 #include <map>
 
 namespace BlueBear {
@@ -61,6 +62,8 @@ namespace BlueBear {
 
           virtual void sendDeferred() = 0;
           virtual void drawElements() = 0;
+
+          const std::vector< Geometry::Triangle >& getTriangles() const;
         };
 
       }
