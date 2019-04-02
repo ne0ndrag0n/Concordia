@@ -16,7 +16,7 @@ namespace BlueBear::Geometry {
 		if( determinant < 0.000001f ) {
 			return {};
 		}
-		glm::vec3 tvec = ray.origin * triangle[ 0 ];
+		glm::vec3 tvec = ray.origin - triangle[ 0 ];
 		float u = glm::dot( tvec, pvec );
 		if( u < 0 || u > determinant ) {
 			return {};

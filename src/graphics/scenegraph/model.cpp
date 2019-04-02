@@ -185,6 +185,8 @@ namespace BlueBear {
         std::optional< glm::vec3 > nearestIntersection;
         float lastDistance = std::numeric_limits< float >::max();
 
+        std::optional< Geometry::Triangle > test;
+
         // Iterate through triangles, test ray against each one.
         // If intersection is found, verify that distance from ray.origin to triangle is < lastDistance
         // If the distance from ray.origin to that point is less than the last measured (closer), set it as nearestIntersection
@@ -195,7 +197,15 @@ namespace BlueBear {
               nearestIntersection = intersectionPoint;
               lastDistance = distance;
             }
+
+            test = triangle;
           }
+        }
+
+        if( test ) {
+          Log::getInstance().debug( "Model::getNearestIntersection",
+            "Triangle: " + glm::to_string( (*test)[ 0 ] ) + " "  + glm::to_string( (*test)[ 1 ] ) + " "  + glm::to_string( (*test)[ 2 ] ) + " --- " + id
+          );
         }
 
         return nearestIntersection;

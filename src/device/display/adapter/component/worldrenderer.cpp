@@ -153,10 +153,6 @@ namespace BlueBear {
                 picked.push_back( registration.instance );
               }
             }
-
-            for( const auto& pick : picked ) {
-              Log::getInstance().debug( "WorldRenderer::mouseDown", pick->getId() );
-            }
           }
 
           void WorldRenderer::onMouseUp( Device::Input::Metadata metadata ) {
