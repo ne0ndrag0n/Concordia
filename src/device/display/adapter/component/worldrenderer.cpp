@@ -111,26 +111,17 @@ namespace BlueBear {
             Geometry::Ray ray;
 
             const glm::uvec2& screenDimensions = display.getDimensions();
-            glm::mat4 viewMatrix = camera.getOrthoView();
-            glm::mat4 projectionMatrix = camera.getOrthoMatrix();
-
-            // screen-to-clip
-            glm::vec4 clip{
+            glm::vec2 clip{
               ( 2 * float( mouseLocation.x ) ) / screenDimensions.x - 1,
-              1 - ( 2 * float( mouseLocation.y ) ) / screenDimensions.y,
-              1.0f,
-              1
+              1 - ( 2 * float( mouseLocation.y ) ) / screenDimensions.y
             };
 
-            // clip-to-view
-            glm::vec4 eyeDirection = glm::inverse( projectionMatrix ) * clip;
-            eyeDirection.w = 0.0f;
+            // Convert these clip coordinates to a point on the near plane
+            glm::vec2 scaledCoordinates = camera.getScaledCoordinates() / 2.0f;
+            glm::vec3 nearPlanePoint{ scaledCoordinates.x * clip.x, scaledCoordinates.y * clip.y, -1.0f };
 
-            // view-to-world
-            ray.direction = glm::normalize( glm::inverse( viewMatrix ) * eyeDirection );
-
-            // Set origin
-            ray.origin = camera.getPosition();
+            ray.origin = nearPlanePoint;
+            ray.direction = glm::vec3{ 0.0f, 0.0f, -1.0f };
 
             // send Ray off to do his job, he's a good guy
             return ray;

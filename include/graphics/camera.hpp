@@ -17,7 +17,7 @@ namespace BlueBear {
         glm::mat4 view;
         glm::mat4 projection;
 
-        glm::vec3 camera = glm::vec3( 0, 0, 10.0f );
+        glm::vec3 camera = glm::vec3( 0, 0, 0.0f );
         GLuint currentRotation = 0;
 
         float widthHalf;
@@ -41,6 +41,7 @@ namespace BlueBear {
         void sendToShader();
         glm::mat4 getOrthoView();
         glm::mat4 getOrthoMatrix();
+        glm::vec2 getScaledCoordinates() const;
         unsigned int rotateRight();
         unsigned int rotateLeft();
         GLuint getCurrentRotation();

@@ -108,12 +108,15 @@ namespace BlueBear {
 
     glm::mat4 Camera::getOrthoMatrix() {
       glm::mat4 ortho;
-      GLfloat scaledWidthHalf = ( widthHalf * zoom ) / 100.0f;
-      GLfloat scaledHeightHalf = ( heightHalf * zoom ) / 100.0f;
+      glm::vec2 scaledCoordinates = getScaledCoordinates();
 
-      ortho = glm::ortho( -scaledWidthHalf, scaledWidthHalf, -scaledHeightHalf, scaledHeightHalf, -100.0f, 100.0f );
+      ortho = glm::ortho( -scaledCoordinates.x, scaledCoordinates.x, -scaledCoordinates.y, scaledCoordinates.y, -100.0f, 100.0f );
 
       return ortho;
+    }
+
+    glm::vec2 Camera::getScaledCoordinates() const {
+      return { ( widthHalf * zoom ) / 100.0f, ( heightHalf * zoom ) / 100.0f };
     }
 
     unsigned int Camera::rotateRight() {
