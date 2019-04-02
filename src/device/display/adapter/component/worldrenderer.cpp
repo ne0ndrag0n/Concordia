@@ -118,7 +118,7 @@ namespace BlueBear {
             glm::vec4 clip{
               ( 2 * float( mouseLocation.x ) ) / screenDimensions.x - 1,
               1 - ( 2 * float( mouseLocation.y ) ) / screenDimensions.y,
-              0,
+              1.0f,
               1
             };
 
@@ -140,10 +140,10 @@ namespace BlueBear {
             // Go bother Ray
             Geometry::Ray ray = getRayFromMouseEvent( metadata.mouseLocation );
 
+            Log::getInstance().debug( "WorldRenderer::mouseDown", "mouse event: " + glm::to_string( metadata.mouseLocation )  );
             Log::getInstance().debug( "WorldRenderer::mouseDown", "origin: " + glm::to_string( ray.origin ) );
             Log::getInstance().debug( "WorldRenderer::mouseDown", "direction: " + glm::to_string( ray.direction ) );
 
-            /*
             // TODO and test only
             // Find what objects this ray intersects
             std::vector< std::shared_ptr< Graphics::SceneGraph::Model > > picked;
@@ -157,7 +157,6 @@ namespace BlueBear {
             for( const auto& pick : picked ) {
               Log::getInstance().debug( "WorldRenderer::mouseDown", pick->getId() );
             }
-            */
           }
 
           void WorldRenderer::onMouseUp( Device::Input::Metadata metadata ) {
