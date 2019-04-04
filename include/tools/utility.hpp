@@ -156,7 +156,7 @@ namespace BlueBear {
 				static float distance( const glm::vec3& start, const glm::vec3& end );
 
 				template < typename T >
-				void runParallel( const std::vector< T >& collection, const std::function< void( const T& ) >& functor ) {
+				static void runParallel( const std::vector< T >& collection, const std::function< void( const T& ) >& functor ) {
 					if( collection.empty() ) {
 						return;
 					}
@@ -170,8 +170,8 @@ namespace BlueBear {
 
 					tbb::task_group group;
 					int upperBound;
-					for( int i = 0; i <= collection.size(); i = upperBound ) {
-						upperBound = std::min( collection.size(), i + itemsPerBucket + ( bumps ? 1 : 0 ) );
+					for( int i = 0; i < collection.size(); i = upperBound ) {
+						upperBound = std::min( (int) collection.size(), i + itemsPerBucket + ( bumps ? 1 : 0 ) );
 
 						group.run( [ &collection, &functor, i, upperBound ]() {
 							for( int index = i; index != upperBound; index++ ) {
