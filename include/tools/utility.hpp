@@ -14,8 +14,11 @@
 #include <string>
 #include <functional>
 #include <memory>
+#include <thread>
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
+#include <tbb/task_group.h>
+#include <tbb/task.h>
 
 namespace BlueBear {
 	namespace Tools {
@@ -151,6 +154,39 @@ namespace BlueBear {
 				static glm::ivec2 normalize( const glm::ivec2& candidate );
 				static int distance( const glm::ivec2& start, const glm::ivec2& end );
 				static float distance( const glm::vec3& start, const glm::vec3& end );
+
+				template < typename T >
+				void runParallel( const std::vector< T >& collection, const std::function< void( const T& ) >& functor ) {
+					if( collection.empty() ) {
+						return;
+					}
+
+					int cores = std::max( (unsigned int) 1, std::thread::hardware_concurrency() );
+
+					// Number of cores used to calculate items per bucket will need to be reduced
+					// if there is a partially full bucket at the end
+					int itemsPerBucket = collection.size() / cores;
+					int bumps = collection.size() % cores;
+
+					tbb::task_group group;
+					int upperBound;
+					for( int i = 0; i <= collection.size(); i = upperBound ) {
+						upperBound = std::min( collection.size(), i + itemsPerBucket + ( bumps ? 1 : 0 ) );
+
+						group.run( [ &collection, &functor, i, upperBound ]() {
+							for( int index = i; index != upperBound; index++ ) {
+								functor( collection[ index ] );
+							}
+						} );
+
+						if( bumps ) {
+							bumps--;
+						}
+					}
+
+					// Block on bucketised, parallel task
+					group.wait();
+				};
 		};
 	}
 }
