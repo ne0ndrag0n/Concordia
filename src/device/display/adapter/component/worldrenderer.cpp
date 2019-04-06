@@ -112,31 +112,28 @@ namespace BlueBear {
             // origin, direction
             Geometry::Ray ray;
 
-            /*
-            const glm::uvec2& screenDimensions = display.getDimensions();
-            glm::vec2 scaledCoordinates = camera.getScaledCoordinates();
-            glm::vec3 frontPlanePosition{
-              -scaledCoordinates.x + ( ( mouseLocation.x / screenDimensions.x ) * ( scaledCoordinates.x * 2 ) ),
-              scaledCoordinates.y - ( ( mouseLocation.y / screenDimensions.y ) * ( scaledCoordinates.y * 2 ) ),
-              0.0f
-            };
-            */
-
             const glm::uvec2& screenDimensions = display.getDimensions();
             glm::mat4 viewMatrix = camera.getOrthoView();
             glm::mat4 projectionMatrix = camera.getOrthoMatrix();
 
-            // screen-to-clip
-            glm::vec4 clip{
-              ( 2 * float( mouseLocation.x ) ) / screenDimensions.x - 1,
-              1 - ( 2 * float( mouseLocation.y ) ) / screenDimensions.y,
-              0,
-              1.0f
-            };
+            glm::ivec2 mouseCoords( mouseLocation.x, screenDimensions.y - mouseLocation.y );
 
-            // Set origin
-            ray.origin = camera.getPosition();
-            ray.direction = glm::normalize( ( glm::inverse( viewMatrix ) * glm::inverse( projectionMatrix ) * clip ) - glm::vec4( ray.origin, 0.0f ) );
+            glm::vec3 nearPlane = glm::unProject(
+              glm::vec3( mouseCoords.x, mouseCoords.y, 0.0f ),
+              viewMatrix,
+              projectionMatrix,
+              glm::vec4( 0.0f, 0.0f, screenDimensions.x, screenDimensions.y )
+            );
+
+            glm::vec3 farPlane = glm::unProject(
+              glm::vec3( mouseCoords.x, mouseCoords.y, 1.0f ),
+              viewMatrix,
+              projectionMatrix,
+              glm::vec4( 0.0f, 0.0f, screenDimensions.x, screenDimensions.y )
+            );
+
+            ray.origin = nearPlane;
+            ray.direction = glm::normalize( farPlane - nearPlane );
 
             // send Ray off to do his job, he's a good guy
             return ray;
@@ -145,10 +142,6 @@ namespace BlueBear {
           void WorldRenderer::onMouseDown( Device::Input::Metadata metadata ) {
             // Go bother Ray
             Geometry::Ray ray = getRayFromMouseEvent( metadata.mouseLocation );
-
-            Log::getInstance().debug( "WorldRenderer::mouseDown", "mouse event: " + glm::to_string( metadata.mouseLocation )  );
-            Log::getInstance().debug( "WorldRenderer::mouseDown", "origin: " + glm::to_string( ray.origin ) );
-            Log::getInstance().debug( "WorldRenderer::mouseDown", "direction: " + glm::to_string( ray.direction ) );
 
             struct IntersectionCandidate {
               Geometry::Triangle triangle;
@@ -173,6 +166,7 @@ namespace BlueBear {
             float lastDistance = std::numeric_limits< float >::max();
 
             Tools::Utility::runParallel< IntersectionCandidate >( intersectionCandidates, [ & ]( const IntersectionCandidate& candidate ) {
+              // TODO: Triangle transform must take into account current state of bone animation
               Geometry::Triangle triangle{
                 candidate.modelTransform * glm::vec4{ candidate.triangle[ 0 ], 0.0f },
                 candidate.modelTransform * glm::vec4{ candidate.triangle[ 1 ], 0.0f },
@@ -188,12 +182,15 @@ namespace BlueBear {
                     closestIntersectingModel = candidate.associatedRegistration;
                   }
                 }
-
-                Log::getInstance().debug( "intersected triangle", candidate.associatedRegistration->instance->getId() );
-                Log::getInstance().debug( "original triangle", glm::to_string( candidate.triangle[ 0 ] ) + " " + glm::to_string( candidate.triangle[ 1 ] ) + " " + glm::to_string( candidate.triangle[ 2 ] ) );
-                Log::getInstance().debug( "transformed triangle", glm::to_string( triangle[ 0 ] ) + " " + glm::to_string( triangle[ 1 ] ) + " " + glm::to_string( triangle[ 2 ] ) );
               }
             } );
+
+            // TODO: remove this DEBUG code and replace with firing of events
+            if( closestIntersectingModel ) {
+              Log::getInstance().debug( "WorldRenderer::onMouseDown", "Intersection found model ID is " + closestIntersectingModel->instance->getId() );
+            } else {
+              Log::getInstance().debug( "WorldRenderer::onMouseDown", "No intersection at this point" );
+            }
           }
 
           void WorldRenderer::onMouseUp( Device::Input::Metadata metadata ) {
