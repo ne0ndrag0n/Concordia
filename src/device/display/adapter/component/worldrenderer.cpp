@@ -134,16 +134,9 @@ namespace BlueBear {
               1.0f
             };
 
-            // clip-to-view
-            glm::vec4 eyeDirection = glm::inverse( projectionMatrix ) * clip;
-            eyeDirection.w = 0.0f;
-
-            // view-to-world
-            ray.direction = glm::normalize( glm::inverse( viewMatrix ) * eyeDirection );
-
             // Set origin
             ray.origin = camera.getPosition();
-
+            ray.direction = glm::normalize( ( glm::inverse( viewMatrix ) * glm::inverse( projectionMatrix ) * clip ) - glm::vec4( ray.origin, 0.0f ) );
 
             // send Ray off to do his job, he's a good guy
             return ray;
@@ -152,6 +145,10 @@ namespace BlueBear {
           void WorldRenderer::onMouseDown( Device::Input::Metadata metadata ) {
             // Go bother Ray
             Geometry::Ray ray = getRayFromMouseEvent( metadata.mouseLocation );
+
+            Log::getInstance().debug( "WorldRenderer::mouseDown", "mouse event: " + glm::to_string( metadata.mouseLocation )  );
+            Log::getInstance().debug( "WorldRenderer::mouseDown", "origin: " + glm::to_string( ray.origin ) );
+            Log::getInstance().debug( "WorldRenderer::mouseDown", "direction: " + glm::to_string( ray.direction ) );
 
             struct IntersectionCandidate {
               Geometry::Triangle triangle;
@@ -192,10 +189,6 @@ namespace BlueBear {
                   }
                 }
 
-                Log::getInstance().debug( "WorldRenderer::mouseDown", "mouse event: " + glm::to_string( metadata.mouseLocation )  );
-                Log::getInstance().debug( "WorldRenderer::mouseDown", "origin: " + glm::to_string( ray.origin ) );
-                Log::getInstance().debug( "WorldRenderer::mouseDown", "direction: " + glm::to_string( ray.direction ) );
-                Log::getInstance().debug( "WorldRenderer::mouseDown", "projection coords: " + glm::to_string( camera.getScaledCoordinates() ) );
                 Log::getInstance().debug( "intersected triangle", candidate.associatedRegistration->instance->getId() );
                 Log::getInstance().debug( "original triangle", glm::to_string( candidate.triangle[ 0 ] ) + " " + glm::to_string( candidate.triangle[ 1 ] ) + " " + glm::to_string( candidate.triangle[ 2 ] ) );
                 Log::getInstance().debug( "transformed triangle", glm::to_string( triangle[ 0 ] ) + " " + glm::to_string( triangle[ 1 ] ) + " " + glm::to_string( triangle[ 2 ] ) );
