@@ -1,6 +1,5 @@
 #include "device/display/adapter/component/worldrenderer.hpp"
 #include "device/display/display.hpp"
-#include "geometry/triangle.hpp"
 #include "geometry/methods.hpp"
 #include "graphics/scenegraph/light/pointlight.hpp"
 #include "graphics/scenegraph/light/directionallight.hpp"
@@ -108,46 +107,9 @@ namespace BlueBear {
             );
           }
 
-          Geometry::Ray WorldRenderer::getRayFromMouseEvent( const glm::ivec2& mouseLocation ) {
-            // origin, direction
-            Geometry::Ray ray;
-
-            const glm::uvec2& screenDimensions = display.getDimensions();
-            glm::mat4 viewMatrix = camera.getOrthoView();
-            glm::mat4 projectionMatrix = camera.getOrthoMatrix();
-
-            glm::ivec2 mouseCoords( mouseLocation.x, screenDimensions.y - mouseLocation.y );
-
-            glm::vec3 nearPlane = glm::unProject(
-              glm::vec3( mouseCoords.x, mouseCoords.y, 0.0f ),
-              viewMatrix,
-              projectionMatrix,
-              glm::vec4( 0.0f, 0.0f, screenDimensions.x, screenDimensions.y )
-            );
-
-            glm::vec3 farPlane = glm::unProject(
-              glm::vec3( mouseCoords.x, mouseCoords.y, 1.0f ),
-              viewMatrix,
-              projectionMatrix,
-              glm::vec4( 0.0f, 0.0f, screenDimensions.x, screenDimensions.y )
-            );
-
-            ray.origin = nearPlane;
-            ray.direction = glm::normalize( farPlane - nearPlane );
-
-            // send Ray off to do his job, he's a good guy
-            return ray;
-          }
-
           void WorldRenderer::onMouseDown( Device::Input::Metadata metadata ) {
             // Go bother Ray
-            Geometry::Ray ray = getRayFromMouseEvent( metadata.mouseLocation );
-
-            struct IntersectionCandidate {
-              Geometry::Triangle triangle;
-              glm::mat4 modelTransform;
-              const ModelRegistration* associatedRegistration;
-            };
+            Geometry::Ray ray = camera.getPickingRay( metadata.mouseLocation, display.getDimensions() );
 
             // Build list of IntersectionCandidates
             std::vector< IntersectionCandidate > intersectionCandidates;

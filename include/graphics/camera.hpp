@@ -1,6 +1,7 @@
 #ifndef CAMERA
 #define CAMERA
 
+#include "geometry/ray.hpp"
 #include <string>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -46,6 +47,8 @@ namespace BlueBear {
         unsigned int rotateLeft();
         GLuint getCurrentRotation();
         void setRotationDirect( GLuint rotation );
+
+        Geometry::Ray getPickingRay( glm::ivec2 mouseLocation, const glm::uvec2& screenDimensions );
     };
   }
 }

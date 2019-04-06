@@ -146,5 +146,33 @@ namespace BlueBear {
       doRotate();
     }
 
+    Geometry::Ray Camera::getPickingRay( glm::ivec2 mouseLocation, const glm::uvec2& screenDimensions ) {
+      Geometry::Ray ray;
+
+      glm::mat4 viewMatrix = getOrthoView();
+      glm::mat4 projectionMatrix = getOrthoMatrix();
+
+      mouseLocation.y = screenDimensions.y - mouseLocation.y;
+
+      glm::vec3 nearPlane = glm::unProject(
+        glm::vec3( mouseLocation.x, mouseLocation.y, 0.0f ),
+        viewMatrix,
+        projectionMatrix,
+        glm::vec4( 0.0f, 0.0f, screenDimensions.x, screenDimensions.y )
+      );
+
+      glm::vec3 farPlane = glm::unProject(
+        glm::vec3( mouseLocation.x, mouseLocation.y, 1.0f ),
+        viewMatrix,
+        projectionMatrix,
+        glm::vec4( 0.0f, 0.0f, screenDimensions.x, screenDimensions.y )
+      );
+
+      ray.origin = nearPlane;
+      ray.direction = glm::normalize( farPlane - nearPlane );
+
+      return ray;
+    }
+
   }
 }

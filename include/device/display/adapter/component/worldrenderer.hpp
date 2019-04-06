@@ -5,6 +5,7 @@
 #include "device/input/input.hpp"
 #include "device/display/adapter/adapter.hpp"
 #include "geometry/ray.hpp"
+#include "geometry/triangle.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/scenegraph/resourcebank.hpp"
 #include "exceptions/genexc.hpp"
@@ -55,6 +56,12 @@ namespace BlueBear {
               };
             };
 
+            struct IntersectionCandidate {
+              Geometry::Triangle triangle;
+              glm::mat4 modelTransform;
+              const ModelRegistration* associatedRegistration;
+            };
+
             Graphics::Camera camera;
             Graphics::SceneGraph::ResourceBank cache;
             std::unordered_map< std::string, std::shared_ptr< Graphics::SceneGraph::Model > > originals;
@@ -63,7 +70,6 @@ namespace BlueBear {
 
             std::unique_ptr< Graphics::SceneGraph::ModelLoader::FileModelLoader > getFileModelLoader( bool deferGLOperations );
 
-            Geometry::Ray getRayFromMouseEvent( const glm::ivec2& mouseLocation );
             void onMouseDown( Device::Input::Metadata metadata );
             void onMouseUp( Device::Input::Metadata metadata );
 
