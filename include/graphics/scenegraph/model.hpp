@@ -41,7 +41,6 @@ namespace BlueBear {
         Model( const std::string& id, const std::vector< Drawable >& drawables );
         Model( const Model& other );
 
-        std::vector< Geometry::Triangle > getModelTriangles() const;
         void sendBones( const Mesh::Mesh& mesh, const std::map< std::string, glm::mat4 >& bones );
 
       public:
@@ -74,7 +73,7 @@ namespace BlueBear {
 
         void sendDeferredObjects();
 
-        std::optional< glm::vec3 > getNearestIntersection( const Geometry::Ray& ray ) const;
+        std::vector< std::pair< Geometry::Triangle, glm::mat4 > > getModelTriangles() const;
 
         void draw( Animation::Animator* parentAnimator = nullptr );
       };

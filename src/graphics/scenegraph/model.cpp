@@ -163,13 +163,19 @@ namespace BlueBear {
         }
       }
 
-      std::vector< Geometry::Triangle > Model::getModelTriangles() const {
-        std::vector< Geometry::Triangle > triangles;
+      std::vector< std::pair< Geometry::Triangle, glm::mat4 > > Model::getModelTriangles() const {
+        std::vector< std::pair< Geometry::Triangle, glm::mat4 > > triangles;
+
+        glm::mat4 thisTransform = getComputedTransform().getMatrix();
 
         // Add local mesh triangles
         for( const auto& drawable : drawables ) {
           if( drawable.mesh ) {
-            triangles = Tools::Utility::concatArrays( triangles, drawable.mesh->getTriangles() );
+            auto meshTriangles = drawable.mesh->getTriangles();
+
+            for( const auto& triangle : meshTriangles ) {
+              triangles.emplace_back( triangle, thisTransform );
+            }
           }
         }
 
@@ -178,37 +184,6 @@ namespace BlueBear {
         }
 
         return triangles;
-      }
-
-      std::optional< glm::vec3 > Model::getNearestIntersection( const Geometry::Ray& ray ) const {
-        std::vector< Geometry::Triangle > triangles = getModelTriangles();
-        std::optional< glm::vec3 > nearestIntersection;
-        float lastDistance = std::numeric_limits< float >::max();
-
-        std::optional< Geometry::Triangle > test;
-
-        // Iterate through triangles, test ray against each one.
-        // If intersection is found, verify that distance from ray.origin to triangle is < lastDistance
-        // If the distance from ray.origin to that point is less than the last measured (closer), set it as nearestIntersection
-        for( const auto& triangle : triangles ) {
-          if( std::optional< glm::vec3 > intersectionPoint = Geometry::getIntersectionPoint( ray, triangle ) ) {
-            float distance = Tools::Utility::distance( ray.origin, *intersectionPoint );
-            if( distance < lastDistance ) {
-              nearestIntersection = intersectionPoint;
-              lastDistance = distance;
-            }
-
-            test = triangle;
-          }
-        }
-
-        if( test ) {
-          Log::getInstance().debug( "Model::getNearestIntersection",
-            "Triangle: " + glm::to_string( (*test)[ 0 ] ) + " "  + glm::to_string( (*test)[ 1 ] ) + " "  + glm::to_string( (*test)[ 2 ] ) + " --- " + id
-          );
-        }
-
-        return nearestIntersection;
       }
 
       void Model::draw( Animation::Animator* parentAnimator ) {

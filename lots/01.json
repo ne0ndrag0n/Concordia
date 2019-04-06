@@ -1,7 +1,6 @@
 {
   "registry": {
     "entities": [
-      { "id": "system.debug.debugger" },
       {
         "id": "game.entity.plant",
         "components": {

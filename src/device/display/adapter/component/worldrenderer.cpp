@@ -1,6 +1,7 @@
 #include "device/display/adapter/component/worldrenderer.hpp"
 #include "device/display/display.hpp"
 #include "geometry/triangle.hpp"
+#include "geometry/methods.hpp"
 #include "graphics/scenegraph/light/pointlight.hpp"
 #include "graphics/scenegraph/light/directionallight.hpp"
 #include "graphics/scenegraph/model.hpp"
@@ -16,6 +17,7 @@
 #include <tbb/task_group.h>
 #include <tbb/concurrent_queue.h>
 #include <functional>
+#include <mutex>
 
 namespace BlueBear {
   namespace Device {
@@ -110,18 +112,38 @@ namespace BlueBear {
             // origin, direction
             Geometry::Ray ray;
 
+            /*
             const glm::uvec2& screenDimensions = display.getDimensions();
-            glm::vec2 clip{
+            glm::vec2 scaledCoordinates = camera.getScaledCoordinates();
+            glm::vec3 frontPlanePosition{
+              -scaledCoordinates.x + ( ( mouseLocation.x / screenDimensions.x ) * ( scaledCoordinates.x * 2 ) ),
+              scaledCoordinates.y - ( ( mouseLocation.y / screenDimensions.y ) * ( scaledCoordinates.y * 2 ) ),
+              0.0f
+            };
+            */
+
+            const glm::uvec2& screenDimensions = display.getDimensions();
+            glm::mat4 viewMatrix = camera.getOrthoView();
+            glm::mat4 projectionMatrix = camera.getOrthoMatrix();
+
+            // screen-to-clip
+            glm::vec4 clip{
               ( 2 * float( mouseLocation.x ) ) / screenDimensions.x - 1,
-              1 - ( 2 * float( mouseLocation.y ) ) / screenDimensions.y
+              1 - ( 2 * float( mouseLocation.y ) ) / screenDimensions.y,
+              0,
+              1.0f
             };
 
-            // Convert these clip coordinates to a point on the near plane
-            glm::vec2 scaledCoordinates = camera.getScaledCoordinates() / 2.0f;
-            glm::vec3 nearPlanePoint{ scaledCoordinates.x * clip.x, scaledCoordinates.y * clip.y, -1.0f };
+            // clip-to-view
+            glm::vec4 eyeDirection = glm::inverse( projectionMatrix ) * clip;
+            eyeDirection.w = 0.0f;
 
-            ray.origin = nearPlanePoint;
-            ray.direction = glm::vec3{ 0.0f, 0.0f, -1.0f };
+            // view-to-world
+            ray.direction = glm::normalize( glm::inverse( viewMatrix ) * eyeDirection );
+
+            // Set origin
+            ray.origin = camera.getPosition();
+
 
             // send Ray off to do his job, he's a good guy
             return ray;
@@ -131,19 +153,54 @@ namespace BlueBear {
             // Go bother Ray
             Geometry::Ray ray = getRayFromMouseEvent( metadata.mouseLocation );
 
-            Log::getInstance().debug( "WorldRenderer::mouseDown", "mouse event: " + glm::to_string( metadata.mouseLocation )  );
-            Log::getInstance().debug( "WorldRenderer::mouseDown", "origin: " + glm::to_string( ray.origin ) );
-            Log::getInstance().debug( "WorldRenderer::mouseDown", "direction: " + glm::to_string( ray.direction ) );
+            struct IntersectionCandidate {
+              Geometry::Triangle triangle;
+              glm::mat4 modelTransform;
+              const ModelRegistration* associatedRegistration;
+            };
 
-            // TODO and test only
-            // Find what objects this ray intersects
-            std::vector< std::shared_ptr< Graphics::SceneGraph::Model > > picked;
+            // Build list of IntersectionCandidates
+            std::vector< IntersectionCandidate > intersectionCandidates;
             for( const auto& registration : models ) {
-              // Perform ray intersection test for all triangles in model
-              if( registration.instance->getNearestIntersection( ray ) ) {
-                picked.push_back( registration.instance );
-              }
+              //if( registration.events.find( "mouse-down" ) != registration.events.end() ) {
+                auto modelTriangles = registration.instance->getModelTriangles();
+                for( const auto& triangle : modelTriangles ) {
+                  intersectionCandidates.emplace_back( IntersectionCandidate{ triangle.first, triangle.second, &registration } );
+                }
+              //}
             }
+
+            // Compare ray to each triangle intersection
+            std::mutex mutex;
+            const ModelRegistration* closestIntersectingModel = nullptr;
+            float lastDistance = std::numeric_limits< float >::max();
+
+            Tools::Utility::runParallel< IntersectionCandidate >( intersectionCandidates, [ & ]( const IntersectionCandidate& candidate ) {
+              Geometry::Triangle triangle{
+                candidate.modelTransform * glm::vec4{ candidate.triangle[ 0 ], 0.0f },
+                candidate.modelTransform * glm::vec4{ candidate.triangle[ 1 ], 0.0f },
+                candidate.modelTransform * glm::vec4{ candidate.triangle[ 2 ], 0.0f }
+              };
+
+              if( auto potentialIntersection = Geometry::getIntersectionPoint( ray, triangle ) ) {
+                float distance = Tools::Utility::distance( ray.origin, *potentialIntersection );
+                {
+                  std::unique_lock< std::mutex > lock( mutex );
+                  if( distance < lastDistance ) {
+                    lastDistance = distance;
+                    closestIntersectingModel = candidate.associatedRegistration;
+                  }
+                }
+
+                Log::getInstance().debug( "WorldRenderer::mouseDown", "mouse event: " + glm::to_string( metadata.mouseLocation )  );
+                Log::getInstance().debug( "WorldRenderer::mouseDown", "origin: " + glm::to_string( ray.origin ) );
+                Log::getInstance().debug( "WorldRenderer::mouseDown", "direction: " + glm::to_string( ray.direction ) );
+                Log::getInstance().debug( "WorldRenderer::mouseDown", "projection coords: " + glm::to_string( camera.getScaledCoordinates() ) );
+                Log::getInstance().debug( "intersected triangle", candidate.associatedRegistration->instance->getId() );
+                Log::getInstance().debug( "original triangle", glm::to_string( candidate.triangle[ 0 ] ) + " " + glm::to_string( candidate.triangle[ 1 ] ) + " " + glm::to_string( candidate.triangle[ 2 ] ) );
+                Log::getInstance().debug( "transformed triangle", glm::to_string( triangle[ 0 ] ) + " " + glm::to_string( triangle[ 1 ] ) + " " + glm::to_string( triangle[ 2 ] ) );
+              }
+            } );
           }
 
           void WorldRenderer::onMouseUp( Device::Input::Metadata metadata ) {
