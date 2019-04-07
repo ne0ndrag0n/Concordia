@@ -3,6 +3,9 @@
 #include "graphics/scenegraph/animation/animator.hpp"
 #include "graphics/scenegraph/mesh/boneuniform.hpp"
 #include "graphics/scenegraph/mesh/mesh.hpp"
+#include "graphics/scenegraph/mesh/meshdefinition.hpp"
+#include "graphics/scenegraph/mesh/texturedriggedvertex.hpp"
+#include "graphics/scenegraph/mesh/riggedvertex.hpp"
 #include "graphics/scenegraph/material.hpp"
 #include "graphics/shader.hpp"
 #include "tools/utility.hpp"
@@ -163,24 +166,79 @@ namespace BlueBear {
         }
       }
 
-      std::vector< std::pair< Geometry::Triangle, glm::mat4 > > Model::getModelTriangles() const {
+      std::vector< std::pair< Geometry::Triangle, glm::mat4 > > Model::getModelTriangles( Animation::Animator* parentAnimator ) const {
         std::vector< std::pair< Geometry::Triangle, glm::mat4 > > triangles;
 
-        glm::mat4 thisTransform = getComputedTransform().getMatrix();
+        glm::mat4 modelTransform = getComputedTransform().getMatrix();
+
+        if( animator ) {
+          parentAnimator = animator.get();
+        }
 
         // Add local mesh triangles
-        for( const auto& drawable : drawables ) {
+        for( auto& drawable : drawables ) {
           if( drawable.mesh ) {
-            auto meshTriangles = drawable.mesh->getTriangles();
+            // If animator is set:
+            // * Get bone list from mesh bone uniform (should be located at "bone")
+            // * Attempt to downcast Mesh to either Mesh::MeshDefinition< Mesh::RiggedVertex > or Mesh::MeshDefinition< Mesh::TexturedRiggedVertex >
+            // * Set mesh's generic transform method to a function that multiplies each point by the same matrix in the shader
+            // * Take triangles
+            // * Reset generic transform method
+            std::vector< Geometry::Triangle > meshTriangles;
+
+            if( parentAnimator ) {
+              // This complicated mess
+              auto it = drawable.mesh->meshUniforms.find( "bone" );
+              if( it != drawable.mesh->meshUniforms.end() ) {
+                Mesh::BoneUniform* boneUniform = ( Mesh::BoneUniform* ) it->second.get();
+                // This doesn't hurt too much because the bone uniform will have configure called again before send
+                boneUniform->configure( parentAnimator->getComputedMatrices() );
+
+                std::vector< glm::mat4 > boneList = boneUniform->getBoneList();
+
+                if( auto downcast = std::dynamic_pointer_cast< Mesh::MeshDefinition< Mesh::TexturedRiggedVertex > >( drawable.mesh ) ) {
+                  downcast->setGenericTransformMethod( [ &boneList ]( const Mesh::TexturedRiggedVertex& vertex ) {
+                    glm::mat4 boneTransform =
+                      ( boneList[ vertex.boneIDs[ 0 ] ] * vertex.boneWeights[ 0 ] ) +
+                      ( boneList[ vertex.boneIDs[ 1 ] ] * vertex.boneWeights[ 1 ] ) +
+                      ( boneList[ vertex.boneIDs[ 2 ] ] * vertex.boneWeights[ 2 ] ) +
+                      ( boneList[ vertex.boneIDs[ 3 ] ] * vertex.boneWeights[ 3 ] );
+
+                    return boneTransform * glm::vec4( vertex.position, 1.0f );
+                  } );
+                  meshTriangles = downcast->getTriangles();
+                  downcast->setGenericTransformMethod( {} );
+                } else if ( auto downcast = std::dynamic_pointer_cast< Mesh::MeshDefinition< Mesh::RiggedVertex > >( drawable.mesh ) ) {
+                  downcast->setGenericTransformMethod( [ &boneList ]( const Mesh::RiggedVertex& vertex ) {
+                    glm::mat4 boneTransform =
+                      ( boneList[ vertex.boneIDs[ 0 ] ] * vertex.boneWeights[ 0 ] ) +
+                      ( boneList[ vertex.boneIDs[ 1 ] ] * vertex.boneWeights[ 1 ] ) +
+                      ( boneList[ vertex.boneIDs[ 2 ] ] * vertex.boneWeights[ 2 ] ) +
+                      ( boneList[ vertex.boneIDs[ 3 ] ] * vertex.boneWeights[ 3 ] );
+
+                    return boneTransform * glm::vec4( vertex.position, 1.0f );
+                  } );
+                  meshTriangles = downcast->getTriangles();
+                  downcast->setGenericTransformMethod( {} );
+                } else {
+                  Log::getInstance().error( "Model::getModelTriangles", "Exhausted rigged vertex types attempting to build cpuBoneTransform" );
+                }
+              } else {
+                Log::getInstance().error( "Model::getModelTriangles", "Animator set without mesh bone uniform" );
+              }
+            } else {
+              // This nice, simple line
+              meshTriangles = drawable.mesh->getTriangles();
+            }
 
             for( const auto& triangle : meshTriangles ) {
-              triangles.emplace_back( triangle, thisTransform );
+              triangles.emplace_back( triangle, modelTransform );
             }
           }
         }
 
         for( const auto& child : submodels ) {
-          triangles = Tools::Utility::concatArrays( triangles, child->getModelTriangles() );
+          triangles = Tools::Utility::concatArrays( triangles, child->getModelTriangles( parentAnimator ) );
         }
 
         return triangles;

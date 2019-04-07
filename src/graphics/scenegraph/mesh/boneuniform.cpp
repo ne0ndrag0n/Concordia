@@ -25,6 +25,10 @@ namespace BlueBear {
           }
         }
 
+        const std::vector< glm::mat4 >& BoneUniform::getBoneList() const {
+          return boneUniform;
+        }
+
         void BoneUniform::send() {
           Tools::OpenGL::setUniform( "bones", boneUniform.size(), glm::value_ptr( boneUniform[ 0 ] ) );
         }

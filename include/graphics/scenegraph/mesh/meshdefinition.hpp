@@ -2,13 +2,12 @@
 #define SG_MESH_DEFINITION
 
 #include "graphics/scenegraph/mesh/mesh.hpp"
+#include "log.hpp"
 #include <GL/glew.h>
 #include <vector>
 #include <memory>
 #include <map>
 #include <functional>
-
-//#include "log.hpp"
 
 namespace BlueBear {
   namespace Graphics {
@@ -25,6 +24,7 @@ namespace BlueBear {
           bool indexed;
           bool loaded = false;
           std::function< void() > drawMethod;
+          std::function< glm::vec3( const VertexType& ) > genericTransformMethod;
 
           // Deferred loading of meshes
           const std::vector< VertexType > vertices;
@@ -81,26 +81,22 @@ namespace BlueBear {
         public:
           MeshDefinition( const std::vector< VertexType >& vertices, const std::vector< GLuint >& indices, bool defer = false ) :
             size( indices.size() ), indexed( true ), drawMethod( std::bind( &MeshDefinition::drawIndexed, this ) ),
-            vertices( vertices ), indices( indices ) {
+            vertices( vertices ), indices( indices ), genericTransformMethod( std::bind( &MeshDefinition::defaultGenericTransform, this, std::placeholders::_1 ) ) {
             getDefaultShader = VertexType::getDefaultShader;
 
             if( !defer ) {
               loadIndexed();
             }
-
-            storeGenericTriangles( vertices, indices );
           }
 
           MeshDefinition( const std::vector< VertexType >& vertices, bool defer = false ) :
             size( vertices.size() ), indexed( false ), drawMethod( std::bind( &MeshDefinition::drawVertices, this ) ),
-            vertices( vertices ) {
+            vertices( vertices ), genericTransformMethod( std::bind( &MeshDefinition::defaultGenericTransform, this, std::placeholders::_1 ) ) {
             getDefaultShader = VertexType::getDefaultShader;
 
             if( !defer ) {
               loadVertices();
             }
-
-            storeGenericTriangles( vertices, indices );
           }
 
           ~MeshDefinition() {
@@ -110,6 +106,52 @@ namespace BlueBear {
               if( indexed ) {
                 glDeleteBuffers( 1, &EBO );
               }
+            }
+          }
+
+          std::vector< Geometry::Triangle > getTriangles() override {
+            std::vector< Geometry::Triangle > genericTriangles;
+
+            if( indices.size() ) {
+              bool check = indices.size() % 3 == 0;
+              if( check ) {
+                for( int i = 0; i < indices.size(); i += 3 ) {
+                  genericTriangles.emplace_back( Geometry::Triangle{
+                    genericTransformMethod( vertices[ indices[ i ] ] ),
+                    genericTransformMethod( vertices[ indices[ i + 1 ] ] ),
+                    genericTransformMethod( vertices[ indices[ i + 2 ] ] )
+                  } );
+                }
+              } else {
+                Log::getInstance().warn( "MeshDefinition::storeGenericTriangles", "Mesh indices are not a multiple of 3; skipping generic triangle generation." );
+              }
+            } else {
+              bool check = vertices.size() % 3 == 0;
+              if( check ) {
+                for( int i = 0; i < vertices.size(); i += 3 ) {
+                  genericTriangles.emplace_back( Geometry::Triangle{
+                    genericTransformMethod( vertices[ i ] ),
+                    genericTransformMethod( vertices[ i + 1 ] ),
+                    genericTransformMethod( vertices[ i + 2 ] )
+                  } );
+                }
+              } else {
+                Log::getInstance().warn( "MeshDefinition::storeGenericTriangles", "Mesh vertices are not a multiple of 3; skipping generic triangle generation." );
+              }
+            }
+
+            return genericTriangles;
+          }
+
+          glm::vec3 defaultGenericTransform( const VertexType& vertex ) {
+            return vertex.position;
+          }
+
+          void setGenericTransformMethod( const std::function< glm::vec3( const VertexType& ) >& method ) {
+            if( method ) {
+              genericTransformMethod = method;
+            } else {
+              genericTransformMethod = std::bind( &MeshDefinition::defaultGenericTransform, this, std::placeholders::_1 );
             }
           }
 

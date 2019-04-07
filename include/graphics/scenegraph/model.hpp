@@ -73,7 +73,7 @@ namespace BlueBear {
 
         void sendDeferredObjects();
 
-        std::vector< std::pair< Geometry::Triangle, glm::mat4 > > getModelTriangles() const;
+        std::vector< std::pair< Geometry::Triangle, glm::mat4 > > getModelTriangles( Animation::Animator* parentAnimator = nullptr ) const;
 
         void draw( Animation::Animator* parentAnimator = nullptr );
       };

@@ -26,6 +26,7 @@ namespace BlueBear {
         public:
           BoneUniform( const std::vector< std::string >& boneIDs );
           void configure( const std::map< std::string, glm::mat4 >& computedBones );
+          const std::vector< glm::mat4 >& getBoneList() const;
           void send() override;
         };
 

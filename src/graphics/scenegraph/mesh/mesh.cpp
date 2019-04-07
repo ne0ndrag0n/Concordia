@@ -2,8 +2,5 @@
 
 namespace BlueBear::Graphics::SceneGraph::Mesh {
 
-	const std::vector< Geometry::Triangle >& Mesh::getTriangles() const {
-		return genericTriangles;
-	}
 
 }
