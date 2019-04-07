@@ -56,22 +56,20 @@ namespace BlueBear {
               };
             };
 
-            struct IntersectionCandidate {
-              Geometry::Triangle triangle;
-              glm::mat4 modelTransform;
-              const ModelRegistration* associatedRegistration;
-            };
-
             Graphics::Camera camera;
             Graphics::SceneGraph::ResourceBank cache;
+            std::set< std::shared_ptr< Graphics::SceneGraph::Model > > previousMove;
             std::unordered_map< std::string, std::shared_ptr< Graphics::SceneGraph::Model > > originals;
             std::unordered_map< std::string, std::shared_ptr< Graphics::SceneGraph::Illuminator > > illuminators;
             std::set< ModelRegistration > models;
 
             std::unique_ptr< Graphics::SceneGraph::ModelLoader::FileModelLoader > getFileModelLoader( bool deferGLOperations );
 
+            const ModelRegistration* getModelAtMouse( const glm::ivec2& mouse, const std::vector< const ModelRegistration* >& candidateModels );
+
             void onMouseDown( Device::Input::Metadata metadata );
             void onMouseUp( Device::Input::Metadata metadata );
+            void onMouseMoved( Device::Input::Metadata metadata );
 
           public:
             EXCEPTION_TYPE( ObjectIDNotRegisteredException, "Object ID not registered!" );

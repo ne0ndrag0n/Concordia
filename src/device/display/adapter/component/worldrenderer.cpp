@@ -105,34 +105,60 @@ namespace BlueBear {
               sf::Event::MouseButtonReleased,
               std::bind( &BlueBear::Device::Display::Adapter::Component::WorldRenderer::onMouseUp, this, std::placeholders::_1 )
             );
+
+            inputManager.registerInputEvent(
+              sf::Event::MouseMoved,
+              std::bind( &BlueBear::Device::Display::Adapter::Component::WorldRenderer::onMouseMoved, this, std::placeholders::_1 )
+            );
           }
 
           void WorldRenderer::onMouseDown( Device::Input::Metadata metadata ) {
-            // Go bother Ray
-            Geometry::Ray ray = camera.getPickingRay( metadata.mouseLocation, display.getDimensions() );
-
-            // Build list of IntersectionCandidates
-            std::vector< IntersectionCandidate > intersectionCandidates;
+            std::vector< const ModelRegistration* > candidates;
             for( const auto& registration : models ) {
-              //if( registration.events.find( "mouse-down" ) != registration.events.end() ) {
-                auto modelTriangles = registration.instance->getModelTriangles();
-                for( const auto& triangle : modelTriangles ) {
-                  intersectionCandidates.emplace_back( IntersectionCandidate{ triangle.first, triangle.second, &registration } );
-                }
-              //}
+              candidates.emplace_back( &registration );
             }
 
-            // Compare ray to each triangle intersection
+            const ModelRegistration* closestIntersection = getModelAtMouse( metadata.mouseLocation, candidates );
+          }
+
+          void WorldRenderer::onMouseUp( Device::Input::Metadata metadata ) {
+          }
+
+          void WorldRenderer::onMouseMoved( Device::Input::Metadata metadata ) {
+            std::vector< const ModelRegistration* > candidates;
+            for( const auto& registration : models ) {
+              candidates.emplace_back( &registration );
+            }
+
+            const ModelRegistration* closestIntersection = getModelAtMouse( metadata.mouseLocation, candidates );
+          }
+
+          const WorldRenderer::ModelRegistration* WorldRenderer::getModelAtMouse( const glm::ivec2& mouse, const std::vector< const WorldRenderer::ModelRegistration* >& candidateModels ) {
+            struct ModelTriangle {
+              std::pair< Geometry::Triangle, glm::mat4 > modelTriangle;
+              const ModelRegistration* registration;
+            };
+
+            std::vector< ModelTriangle > modelTriangles;
+            for( const ModelRegistration* registration : candidateModels ) {
+              auto trianglePairs = registration->instance->getModelTriangles();
+              // Unzip triangles
+              for( const auto& trianglePair : trianglePairs ) {
+                modelTriangles.emplace_back( ModelTriangle{ trianglePair, registration } );
+              }
+            }
+
+            Geometry::Ray ray = camera.getPickingRay( mouse, display.getDimensions() );
+
             std::mutex mutex;
-            const ModelRegistration* closestIntersectingModel = nullptr;
+            const ModelRegistration* result = nullptr;
             float lastDistance = std::numeric_limits< float >::max();
 
-            Tools::Utility::runParallel< IntersectionCandidate >( intersectionCandidates, [ & ]( const IntersectionCandidate& candidate ) {
-              // TODO: Triangle transform must take into account current state of bone animation
+            Tools::Utility::runParallel< ModelTriangle >( modelTriangles, [ & ]( const ModelTriangle& candidate ) {
               Geometry::Triangle triangle{
-                candidate.modelTransform * glm::vec4{ candidate.triangle[ 0 ], 0.0f },
-                candidate.modelTransform * glm::vec4{ candidate.triangle[ 1 ], 0.0f },
-                candidate.modelTransform * glm::vec4{ candidate.triangle[ 2 ], 0.0f }
+                candidate.modelTriangle.second * glm::vec4{ candidate.modelTriangle.first[ 0 ], 0.0f },
+                candidate.modelTriangle.second * glm::vec4{ candidate.modelTriangle.first[ 1 ], 0.0f },
+                candidate.modelTriangle.second * glm::vec4{ candidate.modelTriangle.first[ 2 ], 0.0f }
               };
 
               if( auto potentialIntersection = Geometry::getIntersectionPoint( ray, triangle ) ) {
@@ -141,21 +167,13 @@ namespace BlueBear {
                   std::unique_lock< std::mutex > lock( mutex );
                   if( distance < lastDistance ) {
                     lastDistance = distance;
-                    closestIntersectingModel = candidate.associatedRegistration;
+                    result = candidate.registration;
                   }
                 }
               }
             } );
 
-            // TODO: remove this DEBUG code and replace with firing of events
-            if( closestIntersectingModel ) {
-              Log::getInstance().debug( "WorldRenderer::onMouseDown", "Intersection found model ID is " + closestIntersectingModel->instance->getId() );
-            } else {
-              Log::getInstance().debug( "WorldRenderer::onMouseDown", "No intersection at this point" );
-            }
-          }
-
-          void WorldRenderer::onMouseUp( Device::Input::Metadata metadata ) {
+            return result;
           }
 
           std::shared_ptr< Graphics::SceneGraph::Model > WorldRenderer::placeObject( const std::string& objectId, const std::set< std::string >& classes ) {
