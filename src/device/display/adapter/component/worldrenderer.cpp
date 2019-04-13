@@ -195,9 +195,9 @@ namespace BlueBear {
 
             Tools::Utility::runParallel< ModelTriangle >( modelTriangles, [ & ]( const ModelTriangle& candidate ) {
               Geometry::Triangle triangle{
-                candidate.modelTriangle.second * glm::vec4{ candidate.modelTriangle.first[ 0 ], 0.0f },
-                candidate.modelTriangle.second * glm::vec4{ candidate.modelTriangle.first[ 1 ], 0.0f },
-                candidate.modelTriangle.second * glm::vec4{ candidate.modelTriangle.first[ 2 ], 0.0f }
+                candidate.modelTriangle.second * glm::vec4{ candidate.modelTriangle.first[ 0 ], 1.0f },
+                candidate.modelTriangle.second * glm::vec4{ candidate.modelTriangle.first[ 1 ], 1.0f },
+                candidate.modelTriangle.second * glm::vec4{ candidate.modelTriangle.first[ 2 ], 1.0f }
               };
 
               if( auto potentialIntersection = Geometry::getIntersectionPoint( ray, triangle ) ) {
