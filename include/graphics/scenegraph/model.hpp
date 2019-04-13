@@ -3,6 +3,7 @@
 
 #include "graphics/scenegraph/transform.hpp"
 #include "graphics/scenegraph/drawable.hpp"
+#include "graphics/scenegraph/uniform.hpp"
 #include "geometry/triangle.hpp"
 #include "geometry/ray.hpp"
 #include <lua.h>
@@ -36,12 +37,15 @@ namespace BlueBear {
         std::vector< Drawable > drawables;
         std::shared_ptr< Animation::Animator > animator;
         std::vector< std::shared_ptr< Model > > submodels;
+        std::map< std::string, std::unique_ptr< Uniform > > uniforms;
 
         Model() = default;
         Model( const std::string& id, const std::vector< Drawable >& drawables );
         Model( const Model& other );
 
         void sendBones( const Mesh::Mesh& mesh, const std::map< std::string, glm::mat4 >& bones );
+        void sendUniforms() const;
+        void removeUniformEvents() const;
 
       public:
         virtual ~Model() = default;

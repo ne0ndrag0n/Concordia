@@ -9,6 +9,7 @@
 #include "graphics/scenegraph/material.hpp"
 #include "graphics/shader.hpp"
 #include "tools/utility.hpp"
+#include "eventmanager.hpp"
 #include "log.hpp"
 #include <glm/glm.hpp>
 #include <algorithm>
@@ -145,6 +146,23 @@ namespace BlueBear {
         }
       }
 
+      void Model::sendUniforms() const {
+        for( const auto& pair : uniforms ) {
+          pair.second->update();
+          eventManager.SHADER_CHANGE.listen( pair.second.get(), [ ptr = pair.second.get() ]() {
+            ptr->send();
+          } );
+
+          pair.second->send();
+        }
+      }
+
+      void Model::removeUniformEvents() const {
+        for( const auto& pair : uniforms ) {
+          eventManager.SHADER_CHANGE.stopListening( pair.second.get() );
+        }
+      }
+
       void Model::sendDeferredObjects() {
 
         for( const Drawable& drawable : drawables ) {
@@ -251,6 +269,8 @@ namespace BlueBear {
           parentAnimator = animator.get();
         }
 
+        sendUniforms();
+
         for( const Drawable& drawable : drawables ) {
           if( drawable ) {
             drawable.shader->use();
@@ -267,6 +287,8 @@ namespace BlueBear {
         for( std::shared_ptr< Model >& model : submodels ) {
           model->draw( parentAnimator );
         }
+
+        removeUniformEvents();
       }
 
     }

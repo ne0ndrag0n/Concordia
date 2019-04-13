@@ -7,6 +7,7 @@ namespace BlueBear {
 
         class Uniform {
         public:
+          virtual void update();
           virtual void send() = 0;
         };
 
