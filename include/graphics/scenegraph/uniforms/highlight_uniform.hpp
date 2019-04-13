@@ -21,10 +21,10 @@ namespace BlueBear::Graphics::SceneGraph::Uniforms {
 		int currentFrame;
 
 	public:
-		HighlightUniform( const std::string& uniformId, int animDuration );
+		HighlightUniform( const std::string& uniformId, float animDuration );
 
 		double getAnimDuration() const;
-		void setAnimDuration( int animDuration );
+		void setAnimDuration( float animDuration );
 
 		void fadeTo( const glm::vec4& color );
 

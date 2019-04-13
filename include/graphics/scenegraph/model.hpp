@@ -66,6 +66,9 @@ namespace BlueBear {
         Drawable& getDrawable( unsigned int index );
         std::vector< Drawable >& getDrawableList();
 
+        Uniform* getUniform( const std::string& id );
+        void setUniform( const std::string& id, std::unique_ptr< Uniform > uniform );
+
         Transform getComputedTransform() const;
         Transform& getLocalTransform();
         void setLocalTransform( Transform transform );

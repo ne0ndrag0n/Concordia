@@ -6,6 +6,7 @@
 #include "graphics/scenegraph/model.hpp"
 #include "graphics/scenegraph/modelloader/filemodelloader.hpp"
 #include "graphics/scenegraph/modelloader/assimpmodelloader.hpp"
+#include "graphics/scenegraph/uniforms/highlight_uniform.hpp"
 #include "tools/objectpool.hpp"
 #include "tools/utility.hpp"
 #include "scripting/entitykit/components/modelmanager.hpp"
@@ -112,6 +113,43 @@ namespace BlueBear {
             );
           }
 
+          void WorldRenderer::fireInOutEvents( const ModelRegistration* selected, const Device::Input::Metadata& event ) {
+            // Nothing changes if selected is the same as previousMove
+            if( selected != previousMove ) {
+              // Fire mouse-out event on previousMove
+              if( previousMove ) {
+                auto it = previousMove->events.find( "mouse-out" );
+                if( it != previousMove->events.end() ) {
+                  for( const auto& f : it->second ) {
+                    if( f ) { f( event, previousMove->instance ); }
+                  }
+                }
+              }
+
+              previousMove = selected;
+
+              // Fire mouse-in event on selected item
+              if( selected ) {
+                auto it = selected->events.find( "mouse-in" );
+                if( it != selected->events.end() ) {
+                  for( const auto& f : it->second ) {
+                    if( f ) { f( event, selected->instance ); }
+                  }
+                }
+              }
+            }
+          }
+
+          void WorldRenderer::modelMouseIn( Device::Input::Metadata event, std::shared_ptr< Graphics::SceneGraph::Model > model ) {
+            Graphics::SceneGraph::Uniforms::HighlightUniform* highlighter = ( Graphics::SceneGraph::Uniforms::HighlightUniform* ) model->getUniform( "highlight" );
+            highlighter->fadeTo( { 0.15f, 0.15f, 0.15f, 0.0f } );
+          }
+
+          void WorldRenderer::modelMouseOut( Device::Input::Metadata event, std::shared_ptr< Graphics::SceneGraph::Model > model ) {
+            Graphics::SceneGraph::Uniforms::HighlightUniform* highlighter = ( Graphics::SceneGraph::Uniforms::HighlightUniform* ) model->getUniform( "highlight" );
+            highlighter->fadeTo( { 0.0f, 0.0f, 0.0f, 0.0f } );
+          }
+
           void WorldRenderer::onMouseDown( Device::Input::Metadata metadata ) {
             std::vector< const ModelRegistration* > candidates;
             for( const auto& registration : models ) {
@@ -131,6 +169,7 @@ namespace BlueBear {
             }
 
             const ModelRegistration* closestIntersection = getModelAtMouse( metadata.mouseLocation, candidates );
+            fireInOutEvents( closestIntersection, metadata );
           }
 
           const WorldRenderer::ModelRegistration* WorldRenderer::getModelAtMouse( const glm::ivec2& mouse, const std::vector< const WorldRenderer::ModelRegistration* >& candidateModels ) {
@@ -181,7 +220,14 @@ namespace BlueBear {
 
             if( it != originals.end() ) {
               std::shared_ptr< Graphics::SceneGraph::Model > copy = it->second->copy();
-              models.insert( { objectId, classes, copy } );
+
+              ModelRegistration registration{ objectId, classes, copy };
+              registration.events[ "mouse-in" ] = { std::bind( &WorldRenderer::modelMouseIn, this, std::placeholders::_1, std::placeholders::_2 ) };
+              registration.events[ "mouse-out" ] = { std::bind( &WorldRenderer::modelMouseOut, this, std::placeholders::_1, std::placeholders::_2 ) };
+
+              copy->setUniform( "highlight", std::make_unique< Graphics::SceneGraph::Uniforms::HighlightUniform >( "highlight", 0.25f ) );
+
+              models.emplace( std::move( registration ) );
               return copy;
             } else {
               Log::getInstance().warn( "WorldRenderer::placeObject", "Could not add object of id " + objectId + ": ID not registered!" );

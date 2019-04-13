@@ -99,6 +99,19 @@ namespace BlueBear {
         return drawables;
       }
 
+      Uniform* Model::getUniform( const std::string& id ) {
+        auto it = uniforms.find( id );
+        if( it != uniforms.end() ) {
+          return it->second.get();
+        }
+
+        return nullptr;
+      }
+
+      void Model::setUniform( const std::string& id, std::unique_ptr< Uniform > uniform ) {
+        uniforms[ id ] = std::move( uniform );
+      }
+
       Transform Model::getComputedTransform() const {
         if( std::shared_ptr< Model > realParent = parent.lock() ) {
           return realParent->getComputedTransform() * transform;

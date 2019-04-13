@@ -3,18 +3,19 @@
 #include "configmanager.hpp"
 #include "log.hpp"
 #include <glm/glm.hpp>
+#include <glm/gtx/string_cast.hpp>
 #include <cmath>
 
 namespace BlueBear::Graphics::SceneGraph::Uniforms {
 
-	HighlightUniform::HighlightUniform( const std::string& uniformId, int animDuration ) : uniformId( uniformId ), animDuration( ConfigManager::getInstance().getIntValue( "fps_overview" ) * animDuration ), animating( false ), currentFrame( 0 ) {}
+	HighlightUniform::HighlightUniform( const std::string& uniformId, float animDuration ) : uniformId( uniformId ), animDuration( ConfigManager::getInstance().getIntValue( "fps_overview" ) * animDuration ), animating( false ), currentFrame( 0 ) {}
 
 	double HighlightUniform::getAnimDuration() const {
 		return animDuration;
 	}
 
 
-	void HighlightUniform::setAnimDuration( int animDuration ) {
+	void HighlightUniform::setAnimDuration( float animDuration ) {
 		this->animDuration = ConfigManager::getInstance().getIntValue( "fps_overview" ) * animDuration;
 	}
 
@@ -34,7 +35,8 @@ namespace BlueBear::Graphics::SceneGraph::Uniforms {
 			int nextFrame = currentFrame + 1;
 
 			if( nextFrame <= animDuration ) {
-				float alpha = ( float ) animDuration / ( float ) currentFrame;
+				currentFrame = nextFrame;
+				float alpha = ( float ) currentFrame / ( float ) animDuration;
 				currentColor = glm::mix( fromColor, toColor, alpha );
 			} else {
 				animating = false;

@@ -45,11 +45,13 @@ namespace BlueBear {
         namespace Component {
 
           class WorldRenderer : public Adapter, public Serializable {
+            using ModelEventCallback = std::function< void( Device::Input::Metadata, std::shared_ptr< Graphics::SceneGraph::Model > ) >;
+
             struct ModelRegistration {
               const std::string originalId;
               const std::set< std::string > instanceClasses;
               std::shared_ptr< Graphics::SceneGraph::Model > instance;
-              std::unordered_map< std::string, Containers::ReusableObjectVector< std::function< void( Device::Input::Metadata ) > > > events;
+              std::unordered_map< std::string, std::vector< ModelEventCallback > > events;
 
               bool operator<( const ModelRegistration& rhs ) const {
                 return instance.get() < rhs.instance.get();
@@ -58,7 +60,7 @@ namespace BlueBear {
 
             Graphics::Camera camera;
             Graphics::SceneGraph::ResourceBank cache;
-            std::set< std::shared_ptr< Graphics::SceneGraph::Model > > previousMove;
+            const ModelRegistration* previousMove = nullptr;
             std::unordered_map< std::string, std::shared_ptr< Graphics::SceneGraph::Model > > originals;
             std::unordered_map< std::string, std::shared_ptr< Graphics::SceneGraph::Illuminator > > illuminators;
             std::set< ModelRegistration > models;
@@ -66,6 +68,11 @@ namespace BlueBear {
             std::unique_ptr< Graphics::SceneGraph::ModelLoader::FileModelLoader > getFileModelLoader( bool deferGLOperations );
 
             const ModelRegistration* getModelAtMouse( const glm::ivec2& mouse, const std::vector< const ModelRegistration* >& candidateModels );
+
+            void fireInOutEvents( const ModelRegistration* selected, const Device::Input::Metadata& event );
+
+            void modelMouseIn( Device::Input::Metadata event, std::shared_ptr< Graphics::SceneGraph::Model > model );
+            void modelMouseOut( Device::Input::Metadata event, std::shared_ptr< Graphics::SceneGraph::Model > model );
 
             void onMouseDown( Device::Input::Metadata metadata );
             void onMouseUp( Device::Input::Metadata metadata );

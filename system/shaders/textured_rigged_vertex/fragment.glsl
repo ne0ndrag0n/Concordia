@@ -20,6 +20,7 @@ struct DirectionalLight {
 uniform vec3 cameraPos;
 uniform Material material;
 uniform DirectionalLight directionalLight;
+uniform vec4 highlight;
 
 void main() {
   vec3 texResult = texture( material.diffuse0, fragTexture ).xyz;
@@ -37,5 +38,5 @@ void main() {
   vec3 diffuse = directionalLight.diffuse * diffTheta * texResult;
   vec3 specular = directionalLight.specular * specTheta * texResult;
 
-  color = vec4( ambient + diffuse + specular, material.opacity );
+  color = vec4( ambient + diffuse + specular, material.opacity ) + highlight;
 }
