@@ -142,7 +142,7 @@ namespace BlueBear {
 
           void WorldRenderer::modelMouseIn( Device::Input::Metadata event, std::shared_ptr< Graphics::SceneGraph::Model > model ) {
             Graphics::SceneGraph::Uniforms::HighlightUniform* highlighter = ( Graphics::SceneGraph::Uniforms::HighlightUniform* ) model->getUniform( "highlight" );
-            highlighter->fadeTo( { 0.15f, 0.15f, 0.15f, 0.0f } );
+            highlighter->fadeTo( { 0.2f, 0.2f, 0.2f, 0.0f } );
           }
 
           void WorldRenderer::modelMouseOut( Device::Input::Metadata event, std::shared_ptr< Graphics::SceneGraph::Model > model ) {
