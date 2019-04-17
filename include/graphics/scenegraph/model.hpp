@@ -2,8 +2,10 @@
 #define SG_MODEL
 
 #include "graphics/scenegraph/transform.hpp"
+#include "graphics/scenegraph/bounding_volume/bounding_volume.hpp"
 #include "graphics/scenegraph/drawable.hpp"
 #include "graphics/scenegraph/uniform.hpp"
+#include "graphics/scenegraph/modeltriangle.hpp"
 #include "geometry/triangle.hpp"
 #include "geometry/ray.hpp"
 #include <lua.h>
@@ -38,6 +40,7 @@ namespace BlueBear {
         std::shared_ptr< Animation::Animator > animator;
         std::vector< std::shared_ptr< Model > > submodels;
         std::map< std::string, std::unique_ptr< Uniform > > uniforms;
+        std::unique_ptr< BoundingVolume::BoundingVolume > boundingVolume;
 
         Model() = default;
         Model( const std::string& id, const std::vector< Drawable >& drawables );
@@ -80,7 +83,7 @@ namespace BlueBear {
 
         void sendDeferredObjects();
 
-        std::vector< std::pair< Geometry::Triangle, glm::mat4 > > getModelTriangles( Animation::Animator* parentAnimator = nullptr ) const;
+        std::vector< ModelTriangle > getModelTriangles( Animation::Animator* parentAnimator = nullptr ) const;
 
         void draw( Animation::Animator* parentAnimator = nullptr );
       };

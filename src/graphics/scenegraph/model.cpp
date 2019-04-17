@@ -197,8 +197,8 @@ namespace BlueBear {
         }
       }
 
-      std::vector< std::pair< Geometry::Triangle, glm::mat4 > > Model::getModelTriangles( Animation::Animator* parentAnimator ) const {
-        std::vector< std::pair< Geometry::Triangle, glm::mat4 > > triangles;
+      std::vector< ModelTriangle > Model::getModelTriangles( Animation::Animator* parentAnimator ) const {
+        std::vector< ModelTriangle > triangles;
 
         glm::mat4 modelTransform = getComputedTransform().getMatrix();
 
