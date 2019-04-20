@@ -31,4 +31,43 @@ namespace BlueBear::Geometry {
 		return ray.origin + t * ray.direction;
 	}
 
+	/**
+	 * mit licenced ray-AABB intersection
+	 * https://github.com/stackgl/ray-aabb-intersection/blob/master/index.js
+	 */
+	std::optional< glm::vec3 > getIntersectionPoint( const Ray& ray, const AABB& aabb ) {
+		double low = std::numeric_limits< double >::lowest();
+		double high = std::numeric_limits< double >::max();
+
+		for( int i = 0; i != 3; i++ ) {
+			double dimLow = ( aabb.minima[ i ] - ray.origin[ i ] ) / ray.direction[ i ];
+			double dimHigh = ( aabb.maxima[ i ] - ray.origin[ i ] ) / ray.direction[ i ];
+
+			if( dimLow > dimHigh ) {
+				double tmp = dimLow;
+				dimLow = dimHigh;
+				dimHigh = tmp;
+			}
+
+			if( dimHigh < low || dimLow > high ) {
+				return {};
+			}
+
+			if( dimLow > low ) { low = dimLow; }
+			if( dimHigh < high ) { high = dimHigh; }
+		}
+
+		if( low > high ) {
+			return {};
+		}
+
+		double distance = low;
+		// At this point there must be an intersection
+		return glm::vec3{
+			ray.origin.x + ray.direction.x * distance,
+			ray.origin.y + ray.direction.y * distance,
+			ray.origin.z + ray.direction.z * distance
+		};
+	}
+
 }

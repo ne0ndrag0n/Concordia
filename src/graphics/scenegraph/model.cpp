@@ -1,6 +1,7 @@
 #include "graphics/scenegraph/model.hpp"
 #include "geometry/methods.hpp"
 #include "graphics/scenegraph/animation/animator.hpp"
+#include "graphics/scenegraph/bounding_volume/axis_aligned_bounding_volume.hpp"
 #include "graphics/scenegraph/mesh/boneuniform.hpp"
 #include "graphics/scenegraph/mesh/mesh.hpp"
 #include "graphics/scenegraph/mesh/meshdefinition.hpp"
@@ -9,6 +10,7 @@
 #include "graphics/scenegraph/material.hpp"
 #include "graphics/shader.hpp"
 #include "tools/utility.hpp"
+#include "configmanager.hpp"
 #include "eventmanager.hpp"
 #include "log.hpp"
 #include <glm/glm.hpp>
@@ -150,6 +152,19 @@ namespace BlueBear {
         return std::shared_ptr< Model >();
       }
 
+      void Model::generateBoundingVolume() {
+        const std::string method = ConfigManager::getInstance().getValue( "bounding_volume_method" );
+        switch( Tools::Utility::hash( method.c_str() ) ) {
+          default: {
+            Log::getInstance().warn( "Model::generateBoundingVolume", "Unknown bounding volume method: " + method + ", defaulting to \"aabb\"" );
+          }
+          case Tools::Utility::hash( "aabb" ): {
+            boundingVolume = std::make_unique< BoundingVolume::AxisAlignedBoundingVolume >();
+            boundingVolume->generate( getModelTriangles( animator.get() ) );
+          }
+        }
+      }
+
       void Model::sendBones( const Mesh::Mesh& mesh, const std::map< std::string, glm::mat4 >& bones ) {
         auto it = mesh.meshUniforms.find( "bone" );
         if( it != mesh.meshUniforms.end() ) {
@@ -275,9 +290,22 @@ namespace BlueBear {
         return triangles;
       }
 
+      bool Model::intersectsBoundingVolume( const Geometry::Ray& ray ) {
+        if( !boundingVolume ) {
+          generateBoundingVolume();
+        }
+
+        return boundingVolume->intersects( ray );
+      }
+
       void Model::draw( Animation::Animator* parentAnimator ) {
 
         if( animator ) {
+          // Invalidate bounding volume if animator morphs the mesh
+          if( animator->updating() ) {
+            boundingVolume = nullptr;
+          }
+
           animator->update();
           parentAnimator = animator.get();
         }

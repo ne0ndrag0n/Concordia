@@ -46,6 +46,7 @@ namespace BlueBear {
         Model( const std::string& id, const std::vector< Drawable >& drawables );
         Model( const Model& other );
 
+        void generateBoundingVolume();
         void sendBones( const Mesh::Mesh& mesh, const std::map< std::string, glm::mat4 >& bones );
         void sendUniforms() const;
         void removeUniformEvents() const;
@@ -84,6 +85,7 @@ namespace BlueBear {
         void sendDeferredObjects();
 
         std::vector< ModelTriangle > getModelTriangles( Animation::Animator* parentAnimator = nullptr ) const;
+        bool intersectsBoundingVolume( const Geometry::Ray& ray );
 
         void draw( Animation::Animator* parentAnimator = nullptr );
       };

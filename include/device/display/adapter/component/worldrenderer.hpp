@@ -67,7 +67,7 @@ namespace BlueBear {
 
             std::unique_ptr< Graphics::SceneGraph::ModelLoader::FileModelLoader > getFileModelLoader( bool deferGLOperations );
 
-            const ModelRegistration* getModelAtMouse( const glm::ivec2& mouse, const std::vector< const ModelRegistration* >& candidateModels );
+            const ModelRegistration* getModelAtMouse( const Geometry::Ray& ray, const std::vector< const ModelRegistration* >& candidateModels );
 
             void fireInOutEvents( const ModelRegistration* selected, const Device::Input::Metadata& event );
 

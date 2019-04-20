@@ -44,6 +44,8 @@ namespace BlueBear {
           Bone& getBindSkeletonRef();
           Bone& getCurrentSkeletonRef();
 
+          bool updating() const;
+
           void setCurrentAnimation( const std::string& animationId );
           void setPause( bool status );
           void setFrame( double frame );

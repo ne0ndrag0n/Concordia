@@ -1,4 +1,5 @@
 #include "graphics/scenegraph/bounding_volume/axis_aligned_bounding_volume.hpp"
+#include "geometry/methods.hpp"
 #include <limits>
 
 namespace BlueBear::Graphics::SceneGraph::BoundingVolume {
@@ -61,7 +62,7 @@ namespace BlueBear::Graphics::SceneGraph::BoundingVolume {
 	}
 
 	bool AxisAlignedBoundingVolume::intersects( const Geometry::Ray& ray ) const {
-
+		return Geometry::getIntersectionPoint( ray, boundingBox ).operator bool();
 	}
 
 }

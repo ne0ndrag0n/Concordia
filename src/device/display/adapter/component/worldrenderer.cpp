@@ -151,28 +151,33 @@ namespace BlueBear {
           }
 
           void WorldRenderer::onMouseDown( Device::Input::Metadata metadata ) {
-            std::vector< const ModelRegistration* > candidates;
-            for( const auto& registration : models ) {
-              candidates.emplace_back( &registration );
-            }
-
-            const ModelRegistration* closestIntersection = getModelAtMouse( metadata.mouseLocation, candidates );
           }
 
           void WorldRenderer::onMouseUp( Device::Input::Metadata metadata ) {
           }
 
           void WorldRenderer::onMouseMoved( Device::Input::Metadata metadata ) {
+            // TODO: Only get models with "mouse-in" and "mouse-out" events attached
             std::vector< const ModelRegistration* > candidates;
             for( const auto& registration : models ) {
               candidates.emplace_back( &registration );
             }
 
-            const ModelRegistration* closestIntersection = getModelAtMouse( metadata.mouseLocation, candidates );
+            Geometry::Ray ray = camera.getPickingRay( metadata.mouseLocation, display.getDimensions() );
+
+            // Create a "relevant" list only for items which intersect the bounding volume
+            std::vector< const ModelRegistration* > relevant;
+            for( const ModelRegistration* registration : candidates ) {
+              if( registration->instance->intersectsBoundingVolume( ray ) ) {
+                relevant.emplace_back( registration );
+              }
+            }
+
+            const ModelRegistration* closestIntersection = getModelAtMouse( ray, relevant );
             fireInOutEvents( closestIntersection, metadata );
           }
 
-          const WorldRenderer::ModelRegistration* WorldRenderer::getModelAtMouse( const glm::ivec2& mouse, const std::vector< const WorldRenderer::ModelRegistration* >& candidateModels ) {
+          const WorldRenderer::ModelRegistration* WorldRenderer::getModelAtMouse( const Geometry::Ray& ray, const std::vector< const WorldRenderer::ModelRegistration* >& candidateModels ) {
             struct ModelTriangle {
               std::pair< Geometry::Triangle, glm::mat4 > modelTriangle;
               const ModelRegistration* registration;
@@ -186,8 +191,6 @@ namespace BlueBear {
                 modelTriangles.emplace_back( ModelTriangle{ trianglePair, registration } );
               }
             }
-
-            Geometry::Ray ray = camera.getPickingRay( mouse, display.getDimensions() );
 
             std::mutex mutex;
             const ModelRegistration* result = nullptr;
