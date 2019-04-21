@@ -25,10 +25,6 @@ namespace BlueBear::Tools {
 		}
 
 		void enqueue( const std::vector< Task >& tasks, const Callback& callback ) {
-			if( tasks.empty() ) {
-				return;
-			}
-
 			TaskCallbackPair pair{ {}, callback };
 
 			for( const auto& task : tasks ) {
