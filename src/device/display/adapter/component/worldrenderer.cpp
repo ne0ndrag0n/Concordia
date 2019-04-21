@@ -192,11 +192,10 @@ namespace BlueBear {
               }
             }
 
-            std::mutex mutex;
             const ModelRegistration* result = nullptr;
             float lastDistance = std::numeric_limits< float >::max();
 
-            Tools::Utility::runParallel< ModelTriangle >( modelTriangles, [ & ]( const ModelTriangle& candidate ) {
+            for( const auto& candidate : modelTriangles ) {
               Geometry::Triangle triangle{
                 candidate.modelTriangle.second * glm::vec4{ candidate.modelTriangle.first[ 0 ], 1.0f },
                 candidate.modelTriangle.second * glm::vec4{ candidate.modelTriangle.first[ 1 ], 1.0f },
@@ -205,15 +204,12 @@ namespace BlueBear {
 
               if( auto potentialIntersection = Geometry::getIntersectionPoint( ray, triangle ) ) {
                 float distance = Tools::Utility::distance( ray.origin, *potentialIntersection );
-                {
-                  std::unique_lock< std::mutex > lock( mutex );
-                  if( distance < lastDistance ) {
-                    lastDistance = distance;
-                    result = candidate.registration;
-                  }
+                if( distance < lastDistance ) {
+                  lastDistance = distance;
+                  result = candidate.registration;
                 }
               }
-            } );
+            }
 
             return result;
           }
