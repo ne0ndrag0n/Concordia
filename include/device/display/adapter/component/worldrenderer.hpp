@@ -69,7 +69,6 @@ namespace BlueBear {
 
             std::unique_ptr< Graphics::SceneGraph::ModelLoader::FileModelLoader > getFileModelLoader( bool deferGLOperations );
 
-            const ModelRegistration* getModelAtMouse( const Geometry::Ray& ray, const std::vector< const ModelRegistration* >& candidateModels );
             void getModelAtMouse(
               const Geometry::Ray& ray,
               const std::vector< const ModelRegistration* >& candidateModels,

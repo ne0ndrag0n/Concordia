@@ -182,8 +182,6 @@ namespace BlueBear {
               }
             }
 
-            //const ModelRegistration* closestIntersection = getModelAtMouse( ray, relevant );
-            //fireInOutEvents( closestIntersection, metadata );
             getModelAtMouse( ray, relevant, [ this, metadata ]( const ModelRegistration* found ) {
               fireInOutEvents( found, metadata );
               inProgress = false;
@@ -239,43 +237,6 @@ namespace BlueBear {
                 callback( heap->result );
               }
             } );
-          }
-
-          const WorldRenderer::ModelRegistration* WorldRenderer::getModelAtMouse( const Geometry::Ray& ray, const std::vector< const WorldRenderer::ModelRegistration* >& candidateModels ) {
-            struct ModelTriangle {
-              std::pair< Geometry::Triangle, glm::mat4 > modelTriangle;
-              const ModelRegistration* registration;
-            };
-
-            std::vector< ModelTriangle > modelTriangles;
-            for( const ModelRegistration* registration : candidateModels ) {
-              auto trianglePairs = registration->instance->getModelTriangles();
-              // Unzip triangles
-              for( const auto& trianglePair : trianglePairs ) {
-                modelTriangles.emplace_back( ModelTriangle{ trianglePair, registration } );
-              }
-            }
-
-            const ModelRegistration* result = nullptr;
-            float lastDistance = std::numeric_limits< float >::max();
-
-            for( const auto& candidate : modelTriangles ) {
-              Geometry::Triangle triangle{
-                candidate.modelTriangle.second * glm::vec4{ candidate.modelTriangle.first[ 0 ], 1.0f },
-                candidate.modelTriangle.second * glm::vec4{ candidate.modelTriangle.first[ 1 ], 1.0f },
-                candidate.modelTriangle.second * glm::vec4{ candidate.modelTriangle.first[ 2 ], 1.0f }
-              };
-
-              if( auto potentialIntersection = Geometry::getIntersectionPoint( ray, triangle ) ) {
-                float distance = Tools::Utility::distance( ray.origin, *potentialIntersection );
-                if( distance < lastDistance ) {
-                  lastDistance = distance;
-                  result = candidate.registration;
-                }
-              }
-            }
-
-            return result;
           }
 
           std::shared_ptr< Graphics::SceneGraph::Model > WorldRenderer::placeObject( const std::string& objectId, const std::set< std::string >& classes ) {
