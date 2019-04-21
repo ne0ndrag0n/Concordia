@@ -123,6 +123,7 @@ namespace BlueBear {
       }
 
       Transform& Model::getLocalTransform() {
+        boundingVolume = nullptr;
         return transform;
       }
 
