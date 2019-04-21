@@ -31,6 +31,8 @@ namespace BlueBear {
               Scripting::EntityKit::Components::ModelManager::worldRenderer = this;
               eventManager.LUA_STATE_READY.listen( this, std::bind( &WorldRenderer::submitLuaContributions, this, std::placeholders::_1 ) );
               eventManager.SHADER_CHANGE.listen( this, std::bind( &WorldRenderer::onShaderChange, this ) );
+
+              asyncTasks.setAmountPerFrame( 333 );
             }
 
           WorldRenderer::~WorldRenderer() {
@@ -157,6 +159,13 @@ namespace BlueBear {
           }
 
           void WorldRenderer::onMouseMoved( Device::Input::Metadata metadata ) {
+            static bool inProgress = false;
+            if( inProgress ) {
+              return;
+            }
+
+            inProgress = true;
+
             // TODO: Only get models with "mouse-in" and "mouse-out" events attached
             std::vector< const ModelRegistration* > candidates;
             for( const auto& registration : models ) {
@@ -173,8 +182,63 @@ namespace BlueBear {
               }
             }
 
-            const ModelRegistration* closestIntersection = getModelAtMouse( ray, relevant );
-            fireInOutEvents( closestIntersection, metadata );
+            //const ModelRegistration* closestIntersection = getModelAtMouse( ray, relevant );
+            //fireInOutEvents( closestIntersection, metadata );
+            getModelAtMouse( ray, relevant, [ this, metadata ]( const ModelRegistration* found ) {
+              fireInOutEvents( found, metadata );
+              inProgress = false;
+            } );
+          }
+
+          void WorldRenderer::getModelAtMouse(
+            const Geometry::Ray& ray,
+            const std::vector< const ModelRegistration* >& candidateModels,
+            const std::function< void( const ModelRegistration* ) >& callback
+          ) {
+            struct ModelTriangle {
+              std::pair< Geometry::Triangle, glm::mat4 > modelTriangle;
+              const ModelRegistration* registration;
+            };
+
+            std::vector< ModelTriangle > modelTriangles;
+            for( const ModelRegistration* registration : candidateModels ) {
+              auto trianglePairs = registration->instance->getModelTriangles();
+              // Unzip triangles
+              for( const auto& trianglePair : trianglePairs ) {
+                modelTriangles.emplace_back( ModelTriangle{ trianglePair, registration } );
+              }
+            }
+
+            struct HeapObject {
+              const ModelRegistration* result = nullptr;
+              float lastDistance = std::numeric_limits< float >::max();
+            };
+            std::shared_ptr< HeapObject > heap = std::make_shared< HeapObject >();
+
+            std::vector< Tools::AsyncTable::Task > tasks;
+            for( const auto& candidate : modelTriangles ) {
+              tasks.emplace_back( [ heap, ray, candidate ]() {
+                Geometry::Triangle triangle{
+                  candidate.modelTriangle.second * glm::vec4{ candidate.modelTriangle.first[ 0 ], 1.0f },
+                  candidate.modelTriangle.second * glm::vec4{ candidate.modelTriangle.first[ 1 ], 1.0f },
+                  candidate.modelTriangle.second * glm::vec4{ candidate.modelTriangle.first[ 2 ], 1.0f }
+                };
+
+                if( auto potentialIntersection = Geometry::getIntersectionPoint( ray, triangle ) ) {
+                  float distance = Tools::Utility::distance( ray.origin, *potentialIntersection );
+                  if( distance < heap->lastDistance ) {
+                    heap->lastDistance = distance;
+                    heap->result = candidate.registration;
+                  }
+                }
+              } );
+            }
+
+            asyncTasks.enqueue( tasks, [ heap, callback ]() {
+              if( callback ) {
+                callback( heap->result );
+              }
+            } );
           }
 
           const WorldRenderer::ModelRegistration* WorldRenderer::getModelAtMouse( const Geometry::Ray& ray, const std::vector< const WorldRenderer::ModelRegistration* >& candidateModels ) {
@@ -389,6 +453,8 @@ namespace BlueBear {
            * TODO: Optimized renderer that sorts by shader to minimize shader changes
            */
           void WorldRenderer::nextFrame() {
+            asyncTasks.update();
+
             // Position camera
             camera.position();
 

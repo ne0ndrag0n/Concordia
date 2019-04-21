@@ -9,6 +9,7 @@
 #include "graphics/camera.hpp"
 #include "graphics/scenegraph/resourcebank.hpp"
 #include "exceptions/genexc.hpp"
+#include "tools/async_table.hpp"
 #include "serializable.hpp"
 #include <tbb/concurrent_unordered_map.h>
 #include <lua.h>
@@ -64,10 +65,16 @@ namespace BlueBear {
             std::unordered_map< std::string, std::shared_ptr< Graphics::SceneGraph::Model > > originals;
             std::unordered_map< std::string, std::shared_ptr< Graphics::SceneGraph::Illuminator > > illuminators;
             std::set< ModelRegistration > models;
+            Tools::AsyncTable asyncTasks;
 
             std::unique_ptr< Graphics::SceneGraph::ModelLoader::FileModelLoader > getFileModelLoader( bool deferGLOperations );
 
             const ModelRegistration* getModelAtMouse( const Geometry::Ray& ray, const std::vector< const ModelRegistration* >& candidateModels );
+            void getModelAtMouse(
+              const Geometry::Ray& ray,
+              const std::vector< const ModelRegistration* >& candidateModels,
+              const std::function< void( const ModelRegistration* ) >& callback
+            );
 
             void fireInOutEvents( const ModelRegistration* selected, const Device::Input::Metadata& event );
 

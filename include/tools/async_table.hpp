@@ -9,17 +9,21 @@
 
 namespace BlueBear::Tools {
 
-	template< typename... CallbackSignature >
 	class AsyncTable {
 	public:
 		using Task = std::function< void() >;
-		using Callback = std::function< void( CallbackSignature... ) >;
+		using Callback = std::function< void() >;
 		using TaskCallbackPair = std::pair< std::queue< Task >, Callback >;
 
 	private:
 		std::list< TaskCallbackPair > table;
+		int runPer = 1;
 
 	public:
+		void setAmountPerFrame( int runPer ) {
+			this->runPer = runPer;
+		}
+
 		void enqueue( const std::vector< Task >& tasks, const Callback& callback ) {
 			if( tasks.empty() ) {
 				return;
@@ -38,9 +42,12 @@ namespace BlueBear::Tools {
 			auto it = table.begin();
 
 			while( it != table.end() ) {
-				auto& task = it->first.front();
-				if( task ) { task(); }
-				it->first.pop();
+				for( int i = 0; i != runPer && !it->first.empty(); i++ ) {
+					auto& task = it->first.front();
+					if( task ) { task(); }
+					it->first.pop();
+				}
+
 				if( it->first.empty() ) {
 					// Hit callback then remove iterator
 					if( it->second ) {
