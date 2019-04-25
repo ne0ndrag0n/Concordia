@@ -1,13 +1,16 @@
 {
   "registry": {
-    "entities": [
+    "newEntities": [
       {
         "id": "game.entity.plant",
-        "components": {
-          "system.component.model_manager": {
-            "armaturebox": "dev/box/armaturebox.fbx"
+        "components": [
+          {
+            "id": "system.component.model_manager",
+            "data": {
+              "armaturebox": "dev/box/armaturebox.fbx"
+            }
           }
-        }
+        ]
       }
     ]
   },

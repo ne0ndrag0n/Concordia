@@ -1,4 +1,5 @@
 #include "scripting/entitykit/entity.hpp"
+#include "scripting/luakit/utility.hpp"
 #include "tools/utility.hpp"
 #include "log.hpp"
 
@@ -6,11 +7,10 @@ namespace BlueBear::Scripting::EntityKit {
 
   BasicEvent< void*, std::shared_ptr< Entity > > Entity::ENTITY_CLOSING;
 
-  Entity::Entity( std::map< std::string, std::shared_ptr< Component > > components ) : components( components ) {
-    associate( this );
-  }
+  Entity::Entity( const std::string& entityId, const std::vector< std::shared_ptr< Component > >& components ) : entityId( entityId ), components( components ) {}
 
   Entity::Entity( const Entity& entity ) {
+    entityId = entity.entityId;
     components = entity.components;
 
     associate( this );
@@ -21,61 +21,46 @@ namespace BlueBear::Scripting::EntityKit {
     associate( nullptr );
   }
 
-  Json::Value Entity::save() {
-    return {};
-  }
-
-  void Entity::load( const Json::Value& data ) {
-    if( data != Json::Value::null ) {
-      const Json::Value& componentsJson = data[ "components" ];
-      if( componentsJson != Json::Value::null && componentsJson.isObject() ) {
-        for( auto it = componentsJson.begin(); it != componentsJson.end(); ++it ) {
-          auto pair = Tools::Utility::jsonIteratorToPair( it );
-          auto instance = components.find( pair.first );
-          if( instance != components.end() ) {
-            instance->second->load( pair.second );
-          } else {
-            Log::getInstance().error( "Entity::load", "Did not find component " + pair.first + " attached to this entity" );
-          }
-        }
-      }
-    }
+  const std::string& Entity::getId() const {
+    return entityId;
   }
 
   void Entity::submitLuaContributions( sol::state& lua, sol::table types ) {
     types.new_usertype< EntityKit::Entity >( "Entity",
       "new", sol::no_constructor,
-      "get_component", &Entity::getComponent
+      "get_component", &Entity::findComponents,
+      "get_entity_id", &Entity::getId
     );
   }
 
   void Entity::associate( Entity* pointer ) {
-    for( auto& pair : components ) {
-      pair.second->attach( pointer );
+    for( auto& component : components ) {
+      component->attach( pointer );
     }
   }
 
-  Components::ComponentReturn Entity::getComponent( const std::string& componentId ) {
-    auto it = components.find( componentId );
-    if( it == components.end() ) {
-      throw NotFoundException();
+  std::vector< Components::ComponentReturn > Entity::findComponents( const std::string& componentId ) {
+    std::vector< Components::ComponentReturn > result;
+
+    for( auto& component : components ) {
+      if( component->getId() == componentId ) {
+        result.push_back( Components::cast( component ) );
+      }
     }
 
-    return Components::cast( it->second );
+    return result;
+  }
+
+  void Entity::attachComponent( std::shared_ptr< Component > component ) {
+    components.push_back( component );
   }
 
   void Entity::close() {
     ENTITY_CLOSING.trigger( shared_from_this() );
 
-    for( auto& pair : components ) {
-      auto& component = *( pair.second );
-      sol::object potentialFunction = component[ "close" ];
-      if( potentialFunction.is< sol::function >() ) {
-        potentialFunction.as< sol::function >()( component );
-      }
+    for( auto& component : components ) {
+      component->drop();
     }
-
-    associate( nullptr );
   }
 
 }

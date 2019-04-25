@@ -13,10 +13,7 @@ namespace BlueBear::Scripting::EntityKit::Components {
       "new", sol::no_constructor,
       "init", &ModelManager::init,
       "get_potential_models", &ModelManager::getPotentialModels,
-      sol::meta_function::index, &LuaKit::DynamicUsertype::get,
-      sol::meta_function::new_index, &LuaKit::DynamicUsertype::set,
-      sol::meta_function::length, &LuaKit::DynamicUsertype::size,
-      sol::base_classes, sol::bases< LuaKit::DynamicUsertype, Component >()
+      sol::base_classes, sol::bases< SystemComponent, Component >()
     );
   }
 

@@ -44,4 +44,4 @@ function WaterLevel:decay()
   )
 end
 
-bluebear.entity.register_component( 'game.component.plant.water_level', WaterLevel )
+--bluebear.entity.register_component( 'game.component.plant.water_level', WaterLevel )

@@ -22,8 +22,6 @@ namespace BlueBear::Scripting::EntityKit {
     std::map< std::string, sol::table > components;
     std::map< std::string, std::vector< std::string > > entities;
 
-    Containers::ReusableObjectVector< std::shared_ptr< Entity > > instances;
-
     std::map< std::string, sol::object > tableToMap( sol::table table );
     void submitLuaContributions( sol::state& lua );
     void registerComponent( const std::string& id, sol::table table );
@@ -31,11 +29,6 @@ namespace BlueBear::Scripting::EntityKit {
 
     bool entityRegistered( const std::string& id );
     bool componentRegistered( const std::string& id );
-
-    std::shared_ptr< Component > newComponent( const std::string& id );
-    std::shared_ptr< Entity > newEntity( const std::string& id, std::variant< sol::nil_t, sol::table > constructors );
-
-    void forget( std::shared_ptr< Entity > entity );
 
   public:
     EXCEPTION_TYPE( InvalidIDException, "Invalid ID!" );

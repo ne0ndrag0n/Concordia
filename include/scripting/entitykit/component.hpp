@@ -2,17 +2,17 @@
 #define ENTITYKIT_COMPONENT
 
 #include "exceptions/genexc.hpp"
-#include "scripting/luakit/dynamicusertype.hpp"
+#include "serializable.hpp"
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
 #include <sol.hpp>
-#include <map>
 
 namespace BlueBear::Scripting::EntityKit {
   class Entity;
 
-  class Component : public LuaKit::DynamicUsertype {
+  class Component : public Serializable {
+    std::string componentId;
     Entity* entity = nullptr;
 
     Entity& getEntity();
@@ -20,11 +20,19 @@ namespace BlueBear::Scripting::EntityKit {
   public:
     EXCEPTION_TYPE( EntityDestroyedException, "Parent entity has been destroyed" );
 
-    Component( const std::map< std::string, sol::object >& types = {} );
+    Component( const std::string& componentId );
+
+    Json::Value save() override;
+    void load( const Json::Value& data ) override;
+
     static void submitLuaContributions( sol::state& lua, sol::table types );
+
     void attach( Entity* entity );
 
+    const std::string& getId() const;
+
     virtual void init( sol::object object );
+    virtual void drop();
   };
 
 }

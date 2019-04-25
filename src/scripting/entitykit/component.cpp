@@ -4,16 +4,17 @@
 
 namespace BlueBear::Scripting::EntityKit {
 
-  Component::Component( const std::map< std::string, sol::object >& types ) : LuaKit::DynamicUsertype( types ) {}
+  Component::Component( const std::string& componentId ) : componentId( componentId ) {}
+
+  Json::Value Component::save() {}
+
+  void Component::load( const Json::Value& data ) {}
 
   void Component::submitLuaContributions( sol::state& lua, sol::table types ) {
     types.new_usertype< EntityKit::Component >( "Component",
       "new", sol::no_constructor,
       "get_entity", &Component::getEntity,
-      sol::meta_function::index, &LuaKit::DynamicUsertype::get,
-      sol::meta_function::new_index, &LuaKit::DynamicUsertype::set,
-      sol::meta_function::length, &LuaKit::DynamicUsertype::size,
-      sol::base_classes, sol::bases< LuaKit::DynamicUsertype >()
+      "get_component_id", &Component::getId
     );
   }
 
@@ -30,11 +31,16 @@ namespace BlueBear::Scripting::EntityKit {
     this->entity = entity;
   }
 
+  const std::string& Component::getId() const {
+    return componentId;
+  }
+
   void Component::init( sol::object object ) {
-    sol::object init = get( "init" );
-    if( init.is< sol::function >() ) {
-      init.as< sol::function >()( *this, object );
-    }
+    // Abstract
+  }
+
+  void Component::drop() {
+    // Abstract
   }
 
 }
