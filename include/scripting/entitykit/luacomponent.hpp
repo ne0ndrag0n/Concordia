@@ -22,6 +22,8 @@ namespace BlueBear::Scripting::EntityKit {
 
 		void load( const Json::Value& data ) override;
 
+		void init( sol::object object ) override;
+
 		static void submitLuaContributions( sol::state& lua, sol::table types );
 	};
 

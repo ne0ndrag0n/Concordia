@@ -18,6 +18,13 @@ namespace BlueBear::Scripting::EntityKit {
 		}
 	}
 
+	void LuaComponent::init( sol::object object ) {
+		sol::object potentialFunction = table[ "init" ];
+		if( potentialFunction.is< sol::function >() ) {
+			table[ "init" ]( table, object );
+		}
+	}
+
 	void LuaComponent::submitLuaContributions( sol::state& lua, sol::table types ) {
 		types.new_usertype< EntityKit::LuaComponent >( "LuaComponent",
 			"new", sol::no_constructor,

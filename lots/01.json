@@ -1,6 +1,6 @@
 {
-  "registry": {
-    "newEntities": [
+  "worldManager": {
+    "entities": [
       {
         "id": "game.entity.plant",
         "components": [

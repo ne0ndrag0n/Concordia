@@ -5,7 +5,6 @@
 #include "exceptions/genexc.hpp"
 #include "scripting/entitykit/entity.hpp"
 #include "scripting/entitykit/component.hpp"
-#include "serializable.hpp"
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -18,11 +17,11 @@
 
 namespace BlueBear::Scripting::EntityKit {
 
-  class Registry : public Serializable {
+  class Registry {
+    sol::state* engineState;
     std::map< std::string, sol::table > components;
     std::map< std::string, std::vector< std::string > > entities;
 
-    std::map< std::string, sol::object > tableToMap( sol::table table );
     void submitLuaContributions( sol::state& lua );
     void registerComponent( const std::string& id, sol::table table );
     void registerEntity( const std::string& id, sol::table componentlist );
@@ -33,11 +32,11 @@ namespace BlueBear::Scripting::EntityKit {
   public:
     EXCEPTION_TYPE( InvalidIDException, "Invalid ID!" );
 
-    Json::Value save() override;
-    void load( const Json::Value& data ) override;
-
     Registry();
     ~Registry();
+
+    std::shared_ptr< Entity > createEntity( const std::string& registeredId, bool defaults = true );
+    std::shared_ptr< Component > createComponent( const std::string& registeredId, sol::object initArgs );
   };
 
 }

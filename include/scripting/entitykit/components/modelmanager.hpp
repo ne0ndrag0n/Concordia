@@ -22,7 +22,7 @@ namespace BlueBear::Scripting::EntityKit::Components {
   public:
     EXCEPTION_TYPE( ModelNotFoundException, "Local ID not found in ModelManager!" );
 
-    using SystemComponent::SystemComponent;
+    ModelManager();
 
     static BlueBear::Device::Display::Adapter::Component::WorldRenderer* worldRenderer;
     static void submitLuaContributions( sol::state& lua, sol::table types );

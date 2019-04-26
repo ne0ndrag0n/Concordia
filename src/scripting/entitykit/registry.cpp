@@ -2,7 +2,7 @@
 #include "scripting/entitykit/entity.hpp"
 #include "scripting/entitykit/luacomponent.hpp"
 #include "scripting/entitykit/components/modelmanager.hpp"
-#include "scripting/luakit/dynamicusertype.hpp"
+#include "scripting/luakit/utility.hpp"
 #include "graphics/scenegraph/model.hpp"
 #include "containers/visitor.hpp"
 #include "tools/utility.hpp"
@@ -20,36 +20,9 @@ namespace BlueBear::Scripting::EntityKit {
     eventManager.LUA_STATE_READY.stopListening( this );
   }
 
-  Json::Value Registry::save() {
-    return {};
-  }
-
-  void Registry::load( const Json::Value& data ) {
-    if( data != Json::Value::null ) {
-      const Json::Value& entities = data[ "entities" ];
-      if( entities.isArray() ) {
-        for( Json::Value::const_iterator it = entities.begin(); it != entities.end(); ++it ) {
-          // TODO: Unserialize the new format:
-          /*
-            {
-              "id": "game.entity.plant",
-              "components": [
-                {
-                  "id": "system.component.model_manager",
-                  "data": {
-                    "armaturebox": "dev/box/armaturebox.fbx"
-                  }
-                }
-              ]
-            }
-          */
-
-        }
-      }
-    }
-  }
-
   void Registry::submitLuaContributions( sol::state& lua ) {
+    engineState = &lua;
+
     if( lua[ "bluebear" ][ "entity" ] == sol::nil ) {
       lua[ "bluebear" ][ "entity" ] = lua.create_table();
     }
@@ -111,16 +84,49 @@ namespace BlueBear::Scripting::EntityKit {
     }
   }
 
-  std::map< std::string, sol::object > Registry::tableToMap( sol::table table ) {
-    std::map< std::string, sol::object > result;
-
-    for( std::pair< sol::object, sol::object >& pair : table ) {
-      if( pair.first.is< std::string >() ) {
-        result[ pair.first.as< std::string >() ] = pair.second;
-      }
+  std::shared_ptr< Entity > Registry::createEntity( const std::string& registeredId, bool defaults ) {
+    auto it = entities.find( registeredId );
+    if( it == entities.end() ) {
+      Log::getInstance().debug( "Registry::createEntity", "Entity type not registered: " + registeredId );
+      return nullptr;
     }
 
-    return result;
+    if( defaults ) {
+      std::shared_ptr< Entity > entity;
+
+      for( const auto& stringId : it->second ) {
+        std::shared_ptr< Component > component = createComponent( stringId, sol::nil );
+        if ( !component ) {
+          Log::getInstance().warn( "Registry::createEntity", "Attempted to add component " + stringId + " but component is not registered." );
+        } else {
+          entity->attachComponent( component );
+        }
+      }
+
+      return entity;
+    } else {
+      return std::make_shared< Entity >( registeredId, std::vector< std::shared_ptr< Component > >{} );
+    }
+  }
+
+  std::shared_ptr< Component > Registry::createComponent( const std::string& registeredId, sol::object initArgs ) {
+    switch( Tools::Utility::hash( registeredId.c_str() ) ) {
+      case Tools::Utility::hash( "system.component.model_manager" ): {
+        return std::make_shared< Components::ModelManager >();
+      }
+      default: {
+        auto it = components.find( registeredId );
+        if( it == components.end() ) {
+          Log::getInstance().debug( "Registry::createComponent", "Component not registered: " + registeredId );
+          return nullptr;
+        }
+
+        std::shared_ptr< LuaComponent > luaComponent = std::make_shared< LuaComponent >( registeredId, LuaKit::Utility::copyTable( *engineState, it->second, true ) );
+        luaComponent->init( initArgs );
+
+        return luaComponent;
+      }
+    }
   }
 
 }

@@ -8,6 +8,8 @@ namespace BlueBear::Scripting::EntityKit::Components {
 
   BlueBear::Device::Display::Adapter::Component::WorldRenderer* ModelManager::worldRenderer = nullptr;
 
+  ModelManager::ModelManager() : SystemComponent::SystemComponent( "system.component.model_manager" ) {}
+
   void ModelManager::submitLuaContributions( sol::state& lua, sol::table types ) {
     types.new_usertype< ModelManager >( "ModelManager",
       "new", sol::no_constructor,

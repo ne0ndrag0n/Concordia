@@ -29,6 +29,7 @@ namespace BlueBear::Scripting::EntityKit {
     types.new_usertype< EntityKit::Entity >( "Entity",
       "new", sol::no_constructor,
       "get_component", &Entity::findComponents,
+      "attach_component", &Entity::attachComponent,
       "get_entity_id", &Entity::getId
     );
   }
@@ -53,6 +54,7 @@ namespace BlueBear::Scripting::EntityKit {
 
   void Entity::attachComponent( std::shared_ptr< Component > component ) {
     components.push_back( component );
+    component->attach( this );
   }
 
   void Entity::close() {
