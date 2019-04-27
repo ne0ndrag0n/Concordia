@@ -1,8 +1,10 @@
 #include "scripting/entitykit/components/modelmanager.hpp"
+#include "scripting/luakit/utility.hpp"
 #include "device/display/adapter/component/worldrenderer.hpp"
 #include "graphics/scenegraph/model.hpp"
 #include "tools/utility.hpp"
 #include "log.hpp"
+#include <set>
 
 namespace BlueBear::Scripting::EntityKit::Components {
 
@@ -15,6 +17,8 @@ namespace BlueBear::Scripting::EntityKit::Components {
       "new", sol::no_constructor,
       "init", &ModelManager::init,
       "get_potential_models", &ModelManager::getPotentialModels,
+      "place_object", &ModelManager::placeObject,
+      "remove_object", &ModelManager::removeObject,
       sol::base_classes, sol::bases< SystemComponent, Component >()
     );
   }
@@ -42,6 +46,35 @@ namespace BlueBear::Scripting::EntityKit::Components {
 
     if( paths.size() ) {
       worldRenderer->loadPathsParallel( paths );
+    }
+  }
+
+  void ModelManager::drop() {
+    for( const auto& model : models ) {
+      worldRenderer->removeObject( model );
+    }
+  }
+
+  std::shared_ptr< Graphics::SceneGraph::Model > ModelManager::placeObject( const std::string& modelId, sol::table classes ) {
+    std::shared_ptr< Graphics::SceneGraph::Model > model = worldRenderer->placeObject( modelId, LuaKit::Utility::tableToSet< std::string >( classes ) );
+
+    models.push_back( model );
+
+    return model;
+  }
+
+  void ModelManager::removeObject( Graphics::SceneGraph::Model& model ) {
+    auto asPtr = model.shared_from_this();
+
+    for( auto it = models.begin(); it != models.end(); ) {
+      if( *it == asPtr ) {
+        worldRenderer->removeObject( asPtr );
+        it = models.erase( it );
+
+        return;
+      } else {
+        ++it;
+      }
     }
   }
 

@@ -12,7 +12,6 @@
 #include "models/infrastructure.hpp"
 #include "gameplay/entitymanager.hpp"
 #include "gameplay/infrastructuremanager.hpp"
-#include "models/world.hpp"
 #include "serializable.hpp"
 #include <memory>
 #include <string>
@@ -37,7 +36,6 @@ namespace BlueBear {
       Device::Input::Input::KeyGroup keyGroup;
 
       Models::Utilities::WorldCache worldCache;
-      Models::World world;
 
       Gameplay::InfrastructureManager infrastructureManager;
       Gameplay::EntityManager entityManager;

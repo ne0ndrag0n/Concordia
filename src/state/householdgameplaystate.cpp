@@ -26,7 +26,6 @@ namespace BlueBear {
       guiComponent( application.getDisplayDevice() ),
       engine( *this ),
       luaEventHelper( engine ),
-      world( worldRenderer ),
       infrastructureManager( *this )
     {
       setupDisplayDevice();

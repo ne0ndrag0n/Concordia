@@ -18,6 +18,7 @@ namespace BlueBear::Scripting::EntityKit::Components {
 
   class ModelManager : public SystemComponent {
     std::vector< std::string > potentialModels;
+    std::vector< std::shared_ptr< Graphics::SceneGraph::Model > > models;
 
   public:
     EXCEPTION_TYPE( ModelNotFoundException, "Local ID not found in ModelManager!" );
@@ -29,6 +30,10 @@ namespace BlueBear::Scripting::EntityKit::Components {
 
     void init( sol::object incoming ) override;
     void load( const Json::Value& data ) override;
+    void drop() override;
+
+    std::shared_ptr< Graphics::SceneGraph::Model > placeObject( const std::string& modelId, sol::table classes );
+    void removeObject( Graphics::SceneGraph::Model& model );
 
     std::vector< std::string > getPotentialModels();
   };

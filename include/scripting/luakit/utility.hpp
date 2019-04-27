@@ -10,6 +10,7 @@
 #include <functional>
 #include <string>
 #include <vector>
+#include <set>
 
 namespace BlueBear::Scripting::LuaKit {
 
@@ -49,6 +50,17 @@ namespace BlueBear::Scripting::LuaKit {
 
       for( auto& pair : table ) {
         result.emplace_back( cast< T >( pair.second ) );
+      }
+
+      return result;
+    };
+
+    template< typename T >
+    static std::set< T > tableToSet( sol::table table ) {
+      std::set< T > result;
+
+      for( const auto& pair : table ) {
+        result.insert( cast< T >( pair.second ) );
       }
 
       return result;

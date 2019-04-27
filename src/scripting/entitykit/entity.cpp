@@ -28,7 +28,9 @@ namespace BlueBear::Scripting::EntityKit {
   void Entity::submitLuaContributions( sol::state& lua, sol::table types ) {
     types.new_usertype< EntityKit::Entity >( "Entity",
       "new", sol::no_constructor,
-      "get_component", &Entity::findComponents,
+      "find_components", [ &lua ]( Entity& self, const std::string& componentId ) {
+        return LuaKit::Utility::vectorToTable< Components::ComponentReturn >( lua, self.findComponents( componentId ) );
+      },
       "attach_component", &Entity::attachComponent,
       "get_entity_id", &Entity::getId
     );

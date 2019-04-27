@@ -46,8 +46,10 @@ namespace BlueBear {
         namespace Component {
 
           class WorldRenderer : public Adapter, public Serializable {
+          public:
             using ModelEventCallback = std::function< void( Device::Input::Metadata, std::shared_ptr< Graphics::SceneGraph::Model > ) >;
 
+          private:
             struct ModelRegistration {
               const std::string originalId;
               const std::set< std::string > instanceClasses;

@@ -8,7 +8,7 @@ local Demo = {
 function Demo:init()
   bluebear.event.register_key( 'x', function()
     if not self.instance then
-      self.instance = bluebear.world.place_object( self:get_entity(), 'armaturebox', {} )
+      self.instance = self:get_model_manager():place_object( 'armaturebox', {} )
     end
   end )
 
@@ -20,7 +20,7 @@ function Demo:init()
 
   bluebear.event.register_key( 'v', function()
     if self.instance then
-      bluebear.world.remove_object( self.instance )
+      self:get_model_manager():remove_object( self.instance )
       self.instance = nil
     end
   end )
@@ -30,6 +30,16 @@ function Demo:init()
       self.instance:get_transform():set_position( bluebear.util.types.Vec3.new( 0.0, 5.0, 0.0 ) )
     end
   end )
+end
+
+function Demo:get_model_manager()
+  local matches = self:get_entity():find_components( 'system.component.model_manager' )
+
+  if #matches > 0 then
+    return matches[ 1 ]
+  else
+    return nil
+  end
 end
 
 bluebear.entity.register_component( 'game.component.plant_keys', Demo )
