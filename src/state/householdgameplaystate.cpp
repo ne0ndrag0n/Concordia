@@ -51,7 +51,7 @@ namespace BlueBear {
 
     void HouseholdGameplayState::load( const Json::Value& data ) {
       if( data != Json::Value::null ) {
-        // TODO: load serialised entity/components
+        entityManager.load( data[ "entityManager" ] );
         infrastructureManager.loadInfrastructure( data[ "infrastructure" ] );
         worldRenderer.load( data[ "renderer" ] );
       }

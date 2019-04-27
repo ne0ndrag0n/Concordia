@@ -1,5 +1,5 @@
 {
-  "worldManager": {
+  "entityManager": {
     "entities": [
       {
         "id": "game.entity.plant",
@@ -9,6 +9,12 @@
             "data": {
               "armaturebox": "dev/box/armaturebox.fbx"
             }
+          },
+          {
+            "id": "game.component.plant.water_level"
+          },
+          {
+            "id": "game.component.plant_keys"
           }
         ]
       }

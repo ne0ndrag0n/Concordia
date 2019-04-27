@@ -15,6 +15,7 @@ namespace BlueBear::Scripting::EntityKit {
     std::string componentId;
     Entity* entity = nullptr;
 
+  protected:
     Entity& getEntity();
 
   public:

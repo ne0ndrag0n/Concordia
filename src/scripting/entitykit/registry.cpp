@@ -34,6 +34,7 @@ namespace BlueBear::Scripting::EntityKit {
 
     sol::table types = lua[ "bluebear" ][ "entity" ][ "types" ] = lua.create_table();
     Component::submitLuaContributions( lua, types );
+    LuaComponent::submitLuaContributions( lua, types );
     Entity::submitLuaContributions( lua, types );
     Components::ModelManager::submitLuaContributions( lua, types );
   }

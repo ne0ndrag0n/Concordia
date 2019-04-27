@@ -6,11 +6,11 @@
 #include "device/display/adapter/component/guicomponent.hpp"
 #include "scripting/coreengine.hpp"
 #include "scripting/luakit/eventhelper.hpp"
-#include "scripting/entitykit/registry.hpp"
 #include "exceptions/genexc.hpp"
 #include "device/input/input.hpp"
 #include "models/utilities/worldcache.hpp"
 #include "models/infrastructure.hpp"
+#include "gameplay/entitymanager.hpp"
 #include "gameplay/infrastructuremanager.hpp"
 #include "models/world.hpp"
 #include "serializable.hpp"
@@ -33,13 +33,14 @@ namespace BlueBear {
 
       Scripting::CoreEngine engine;
       Scripting::LuaKit::EventHelper luaEventHelper;
-      Scripting::EntityKit::Registry entityRegistry;
 
       Device::Input::Input::KeyGroup keyGroup;
 
       Models::Utilities::WorldCache worldCache;
       Models::World world;
+
       Gameplay::InfrastructureManager infrastructureManager;
+      Gameplay::EntityManager entityManager;
 
       void setupDisplayDevice();
       void setupInputDevice();

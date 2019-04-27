@@ -192,5 +192,5 @@ function Panel:toggle()
   end
 end
 
---bluebear.entity.register_component( 'system.debug.terminal', Panel )
---bluebear.entity.register_entity( 'system.debug.debugger', { 'system.debug.terminal' } )
+bluebear.entity.register_component( 'system.debug.terminal', Panel )
+bluebear.entity.register_entity( 'system.debug.debugger', { 'system.debug.terminal' } )

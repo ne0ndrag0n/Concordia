@@ -32,7 +32,6 @@ function Demo:init()
   end )
 end
 
---[[
 bluebear.entity.register_component( 'game.component.plant_keys', Demo )
 
 bluebear.entity.register_entity( 'game.entity.plant',
@@ -42,4 +41,3 @@ bluebear.entity.register_entity( 'game.entity.plant',
     'game.component.plant_keys'
   }
 )
-]]--
