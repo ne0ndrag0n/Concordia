@@ -2,6 +2,14 @@
   "entityManager": {
     "entities": [
       {
+        "id": "system.debug.debugger",
+        "components": [
+          {
+            "id": "system.debug.terminal"
+          }
+        ]
+      },
+      {
         "id": "game.entity.plant",
         "components": [
           {
