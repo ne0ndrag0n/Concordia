@@ -1,6 +1,7 @@
 #include "scripting/entitykit/luacomponent.hpp"
 #include "scripting/luakit/utility.hpp"
 #include "tools/utility.hpp"
+#include "log.hpp"
 
 namespace BlueBear::Scripting::EntityKit {
 
@@ -21,7 +22,7 @@ namespace BlueBear::Scripting::EntityKit {
 	void LuaComponent::init( sol::object object ) {
 		sol::object potentialFunction = table[ "init" ];
 		if( potentialFunction.is< sol::function >() ) {
-			table[ "init" ]( table, object );
+			table[ "init" ]( *this, object );
 		}
 	}
 
