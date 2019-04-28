@@ -169,7 +169,9 @@ namespace BlueBear {
             // TODO: Only get models with "mouse-in" and "mouse-out" events attached
             std::vector< const ModelRegistration* > candidates;
             for( const auto& registration : models ) {
-              candidates.emplace_back( &registration );
+              if( registration ) {
+                candidates.emplace_back( registration.get() );
+              }
             }
 
             Geometry::Ray ray = camera.getPickingRay( metadata.mouseLocation, display.getDimensions() );
@@ -245,13 +247,25 @@ namespace BlueBear {
             if( it != originals.end() ) {
               std::shared_ptr< Graphics::SceneGraph::Model > copy = it->second->copy();
 
-              ModelRegistration registration{ objectId, classes, copy };
-              registration.events[ "mouse-in" ] = { std::bind( &WorldRenderer::modelMouseIn, this, std::placeholders::_1, std::placeholders::_2 ) };
-              registration.events[ "mouse-out" ] = { std::bind( &WorldRenderer::modelMouseOut, this, std::placeholders::_1, std::placeholders::_2 ) };
+              std::unique_ptr< ModelRegistration > registration = std::make_unique< ModelRegistration >( ModelRegistration{ objectId, classes, copy } );
+              registration->events[ "mouse-in" ] = { std::bind( &WorldRenderer::modelMouseIn, this, std::placeholders::_1, std::placeholders::_2 ) };
+              registration->events[ "mouse-out" ] = { std::bind( &WorldRenderer::modelMouseOut, this, std::placeholders::_1, std::placeholders::_2 ) };
 
               copy->setUniform( "highlight", std::make_unique< Graphics::SceneGraph::Uniforms::HighlightUniform >( "highlight", 0.25f ) );
 
-              models.emplace( std::move( registration ) );
+              bool found = false;
+              for( auto& model : models ) {
+                if( !model ) {
+                  found = true;
+                  model = std::move( registration );
+                  break;
+                }
+              }
+
+              if( !found ) {
+                models.emplace_back( std::move( registration ) );
+              }
+
               return copy;
             } else {
               Log::getInstance().warn( "WorldRenderer::placeObject", "Could not add object of id " + objectId + ": ID not registered!" );
@@ -262,9 +276,9 @@ namespace BlueBear {
           std::vector< std::shared_ptr< Graphics::SceneGraph::Model > > WorldRenderer::findObjectsByType( const std::string& instanceId ) {
             std::vector< std::shared_ptr< Graphics::SceneGraph::Model > > result;
 
-            std::for_each( models.begin(), models.end(), [ & ]( const ModelRegistration& item ) {
-              if( item.originalId == instanceId ) {
-                result.push_back( item.instance );
+            std::for_each( models.begin(), models.end(), [ & ]( const std::unique_ptr< ModelRegistration >& item ) {
+              if( item && item->originalId == instanceId ) {
+                result.push_back( item->instance );
               }
             } );
 
@@ -274,17 +288,19 @@ namespace BlueBear {
           std::vector< std::shared_ptr< Graphics::SceneGraph::Model > > WorldRenderer::findObjectsByClass( const std::set< std::string >& classes ) {
             std::vector< std::shared_ptr< Graphics::SceneGraph::Model > > result;
 
-            std::for_each( models.begin(), models.end(), [ & ]( const ModelRegistration& item ) {
-              std::set< std::string > difference;
+            std::for_each( models.begin(), models.end(), [ & ]( const std::unique_ptr< ModelRegistration >& item ) {
+              if( item ) {
+                std::set< std::string > difference;
 
-              std::set_symmetric_difference(
-                classes.begin(), classes.end(),
-                item.instanceClasses.begin(), item.instanceClasses.end(),
-                std::inserter( difference, difference.end() )
-              );
+                std::set_symmetric_difference(
+                  classes.begin(), classes.end(),
+                  item->instanceClasses.begin(), item->instanceClasses.end(),
+                  std::inserter( difference, difference.end() )
+                );
 
-              if( difference.size() == 0 ) {
-                result.push_back( item.instance );
+                if( difference.size() == 0 ) {
+                  result.push_back( item->instance );
+                }
               }
             } );
 
@@ -322,7 +338,7 @@ namespace BlueBear {
 
           void WorldRenderer::removeObject( std::shared_ptr< Graphics::SceneGraph::Model > model ) {
             for( auto it = models.begin(); it != models.end(); ) {
-              if( it->instance == model ) {
+              if( ( *it )->instance == model ) {
                 models.erase( it );
                 return;
               } else {
@@ -338,8 +354,8 @@ namespace BlueBear {
           ) {
             const ModelRegistration* registration = nullptr;
             for( const auto& modelRegistration : models ) {
-              if( modelRegistration.instance == instance ) {
-                registration = &modelRegistration;
+              if( modelRegistration && modelRegistration->instance == instance ) {
+                registration = modelRegistration.get();
                 break;
               }
             }
@@ -444,7 +460,9 @@ namespace BlueBear {
             camera.position();
 
             for( auto& registration : models ) {
-              registration.instance->draw();
+              if( registration ) {
+                registration->instance->draw();
+              }
             }
           }
 

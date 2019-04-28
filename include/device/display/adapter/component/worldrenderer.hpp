@@ -66,7 +66,7 @@ namespace BlueBear {
             const ModelRegistration* previousMove = nullptr;
             std::unordered_map< std::string, std::shared_ptr< Graphics::SceneGraph::Model > > originals;
             std::unordered_map< std::string, std::shared_ptr< Graphics::SceneGraph::Illuminator > > illuminators;
-            std::set< ModelRegistration > models;
+            std::vector< std::unique_ptr< ModelRegistration > > models;
             Tools::AsyncTable asyncTasks;
 
             std::unique_ptr< Graphics::SceneGraph::ModelLoader::FileModelLoader > getFileModelLoader( bool deferGLOperations );
