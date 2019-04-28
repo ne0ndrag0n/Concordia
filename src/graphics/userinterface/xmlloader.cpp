@@ -9,6 +9,7 @@
 #include "graphics/userinterface/widgets/spacer.hpp"
 #include "graphics/userinterface/widgets/pane.hpp"
 #include "graphics/userinterface/widgets/scroll.hpp"
+#include "graphics/userinterface/widgets/context_menu.hpp"
 #include "tools/utility.hpp"
 #include "log.hpp"
 
@@ -104,6 +105,15 @@ namespace BlueBear::Graphics::UserInterface {
         result = Widgets::Scroll::create(
           Tools::Utility::safeString( element->Attribute( "id" ) ),
           Tools::Utility::split( Tools::Utility::safeString( element->Attribute( "class" ) ), ' ' )
+        );
+        break;
+      }
+      case Tools::Utility::hash( "ContextMenu" ): {
+        result = Widgets::ContextMenu::create(
+          Tools::Utility::safeString( element->Attribute( "id" ) ),
+          Tools::Utility::split( Tools::Utility::safeString( element->Attribute( "class" ) ), ' ' ),
+          // TODO
+          {}
         );
         break;
       }

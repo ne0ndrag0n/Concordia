@@ -114,6 +114,8 @@ namespace BlueBear::Graphics::UserInterface {
       return newPointer;
     } else if( auto newPointer = std::dynamic_pointer_cast< Widgets::Scroll >( self ) ) {
       return newPointer;
+    } else if( auto newPointer = std::dynamic_pointer_cast< Widgets::ContextMenu >( self ) ) {
+      return newPointer;
     } else {
       // You tried and failed
       return std::shared_ptr< Element >( nullptr );
@@ -334,6 +336,16 @@ namespace BlueBear::Graphics::UserInterface {
       "set_y", &Widgets::Scroll::updateY,
       "get_x", &Widgets::Scroll::getX,
       "get_y", &Widgets::Scroll::getY,
+      sol::base_classes, sol::bases< Element >()
+    );
+
+    types.new_usertype< Widgets::ContextMenu >(
+      "ContextMenu",
+      "new", sol::no_constructor,
+      "create", []( const std::string& id, sol::table classes ) {
+        // TODO
+        return Widgets::ContextMenu::create( id, Scripting::LuaKit::Utility::tableToVector< std::string >( classes ), {} );
+      },
       sol::base_classes, sol::bases< Element >()
     );
 

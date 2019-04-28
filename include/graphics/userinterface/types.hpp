@@ -11,6 +11,7 @@
 #include "graphics/userinterface/widgets/spacer.hpp"
 #include "graphics/userinterface/widgets/pane.hpp"
 #include "graphics/userinterface/widgets/scroll.hpp"
+#include "graphics/userinterface/widgets/context_menu.hpp"
 #include <memory>
 #include <variant>
 
@@ -29,7 +30,8 @@ namespace BlueBear::Graphics::UserInterface {
     std::shared_ptr< Widgets::Image >,
     std::shared_ptr< Widgets::Spacer >,
     std::shared_ptr< Widgets::Pane >,
-    std::shared_ptr< Widgets::Scroll >
+    std::shared_ptr< Widgets::Scroll >,
+    std::shared_ptr< Widgets::ContextMenu >
   >;
 
 }
