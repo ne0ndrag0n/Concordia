@@ -253,18 +253,7 @@ namespace BlueBear {
 
               copy->setUniform( "highlight", std::make_unique< Graphics::SceneGraph::Uniforms::HighlightUniform >( "highlight", 0.25f ) );
 
-              bool found = false;
-              for( auto& model : models ) {
-                if( !model ) {
-                  found = true;
-                  model = std::move( registration );
-                  break;
-                }
-              }
-
-              if( !found ) {
-                models.emplace_back( std::move( registration ) );
-              }
+              models.emplace_back( std::move( registration ) );
 
               return copy;
             } else {
