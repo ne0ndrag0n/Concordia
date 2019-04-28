@@ -2,6 +2,7 @@
 #include "device/display/adapter/component/guicomponent.hpp"
 #include "graphics/userinterface/style/style.hpp"
 #include "containers/visitor.hpp"
+#include "tools/utility.hpp"
 
 namespace BlueBear::Graphics::UserInterface::Widgets {
 
@@ -12,6 +13,34 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 		std::shared_ptr< ContextMenu > contextMenu( new ContextMenu( id, classes, items ) );
 
     	return contextMenu;
+	}
+
+	std::vector< ContextMenu::Entry > ContextMenu::parseEntries( const std::string& text ) {
+		/*
+			Format in XML:
+			id:label\n
+			id:label\n
+			---\n
+			id:label\n
+		*/
+
+		std::vector< ContextMenu::Entry > result;
+
+		std::vector< std::string > lines = Tools::Utility::split( Tools::Utility::stringTrim( text ), '\n' );
+		for( auto line : lines ) {
+			line = Tools::Utility::stringTrim( line );
+
+			if( line == "---" ) {
+				result.emplace_back( Divider() );
+			} else {
+				std::vector< std::string > pair = Tools::Utility::split( text, ':' );
+				if( pair.size() == 2 ) {
+					result.emplace_back( Item{ pair[ 0 ], pair[ 1 ] } );
+				}
+			}
+		}
+
+		return result;
 	}
 
 	std::string ContextMenu::getLongestLabel() const {
@@ -37,10 +66,11 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 		double fontSize = localStyle.get< double >( "font-size" );
 		glm::vec4 size = manager->getVectorRenderer().getTextSizeParams( localStyle.get< std::string >( "font" ), getLongestLabel(), fontSize );
     	longestTextSpan = size[ 2 ];
+		textHeight = size[ 3 ];
 
 		requisition = glm::uvec2{
 			( padding * 2 ) + longestTextSpan + 10,
-			10 // TODO
+			( padding * 2 ) + ( items.size() * textHeight )
 		};
 	}
 }

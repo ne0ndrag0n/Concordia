@@ -112,8 +112,7 @@ namespace BlueBear::Graphics::UserInterface {
         result = Widgets::ContextMenu::create(
           Tools::Utility::safeString( element->Attribute( "id" ) ),
           Tools::Utility::split( Tools::Utility::safeString( element->Attribute( "class" ) ), ' ' ),
-          // TODO
-          {}
+          Widgets::ContextMenu::parseEntries( Tools::Utility::safeString( element->GetText() ) )
         );
         break;
       }

@@ -23,6 +23,7 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 	private:
 		std::vector< Entry > items;
 		double longestTextSpan = 0.0f;
+		double textHeight = 0.0f;
 
 		std::string getLongestLabel() const;
 
@@ -32,6 +33,7 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 	public:
 		void calculate() override;
 
+		static std::vector< Entry > parseEntries( const std::string& text );
 		static std::shared_ptr< ContextMenu > create( const std::string& id, const std::vector< std::string >& classes, const std::vector< Entry >& items );
 	};
 
