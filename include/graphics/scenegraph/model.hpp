@@ -72,6 +72,7 @@ namespace BlueBear {
 
         Uniform* getUniform( const std::string& id );
         void setUniform( const std::string& id, std::unique_ptr< Uniform > uniform );
+        void removeUniform( const std::string& id );
 
         Transform getComputedTransform() const;
         Transform& getLocalTransform();

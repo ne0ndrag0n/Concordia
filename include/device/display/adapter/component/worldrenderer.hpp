@@ -113,7 +113,11 @@ namespace BlueBear {
               const std::string& eventTag,
               const ModelEventCallback& callback
             );
-            void unregisterEvent( std::shared_ptr< Graphics::SceneGraph::Model > instance, unsigned int item );
+            void unregisterEvent(
+              std::shared_ptr< Graphics::SceneGraph::Model > instance,
+              const std::string& eventTag,
+              unsigned int item
+            );
 
             Graphics::Camera& getCamera();
             void loadPathsParallel( const std::vector< std::pair< std::string, std::string > >& paths );

@@ -50,15 +50,15 @@ namespace BlueBear::Scripting::EntityKit::Components {
   }
 
   void ModelManager::drop() {
-    for( const auto& model : models ) {
-      worldRenderer->removeObject( model );
+    for( const auto& pair : models ) {
+      worldRenderer->removeObject( pair.second );
     }
   }
 
   std::shared_ptr< Graphics::SceneGraph::Model > ModelManager::placeObject( const std::string& modelId, sol::table classes ) {
     std::shared_ptr< Graphics::SceneGraph::Model > model = worldRenderer->placeObject( modelId, LuaKit::Utility::tableToSet< std::string >( classes ) );
 
-    models.push_back( model );
+    models.emplace_back( modelId, model );
 
     return model;
   }
@@ -67,7 +67,7 @@ namespace BlueBear::Scripting::EntityKit::Components {
     auto asPtr = model.shared_from_this();
 
     for( auto it = models.begin(); it != models.end(); ) {
-      if( *it == asPtr ) {
+      if( it->second == asPtr ) {
         worldRenderer->removeObject( asPtr );
         it = models.erase( it );
 
@@ -80,6 +80,10 @@ namespace BlueBear::Scripting::EntityKit::Components {
 
   std::vector< std::string > ModelManager::getPotentialModels() {
     return potentialModels;
+  }
+
+  std::vector< std::pair< std::string, std::shared_ptr< Graphics::SceneGraph::Model > > > ModelManager::getModels() const {
+    return models;
   }
 
 }

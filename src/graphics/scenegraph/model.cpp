@@ -114,6 +114,10 @@ namespace BlueBear {
         uniforms[ id ] = std::move( uniform );
       }
 
+      void Model::removeUniform( const std::string& id ) {
+        uniforms.erase( id );
+      }
+
       Transform Model::getComputedTransform() const {
         if( std::shared_ptr< Model > realParent = parent.lock() ) {
           return realParent->getComputedTransform() * transform;

@@ -341,7 +341,7 @@ namespace BlueBear {
             const std::string& eventTag,
             const ModelEventCallback& callback
           ) {
-            const ModelRegistration* registration = nullptr;
+            ModelRegistration* registration = nullptr;
             for( const auto& modelRegistration : models ) {
               if( modelRegistration && modelRegistration->instance == instance ) {
                 registration = modelRegistration.get();
@@ -350,14 +350,36 @@ namespace BlueBear {
             }
 
             if( registration ) {
-              // TODO
+              auto& bucket = registration->events[ eventTag ];
+              bool found = false;
+              for( auto& item : bucket ) {
+                if( !item ) {
+                  found = true;
+                  item = callback;
+                  break;
+                }
+              }
+
+              if( !found ) {
+                bucket.push_back( callback );
+              }
             } else {
               Log::getInstance().warn( "WorldRenderer::registerEvent", "Instance not registered" );
             }
           }
 
-          void WorldRenderer::unregisterEvent( std::shared_ptr< Graphics::SceneGraph::Model > instance, unsigned int item ) {
-            // TODO
+          void WorldRenderer::unregisterEvent( std::shared_ptr< Graphics::SceneGraph::Model > instance, const std::string& eventTag, unsigned int item ) {
+            ModelRegistration* registration = nullptr;
+            for( const auto& modelRegistration : models ) {
+              if( modelRegistration && modelRegistration->instance == instance ) {
+                registration = modelRegistration.get();
+                break;
+              }
+            }
+
+            if( registration ) {
+              registration->events[ eventTag ][ item ] = {};
+            }
           }
 
           Graphics::Camera& WorldRenderer::getCamera() {
