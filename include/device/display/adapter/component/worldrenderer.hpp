@@ -108,6 +108,13 @@ namespace BlueBear {
             void addIlluminator( const std::string& id, std::shared_ptr< Graphics::SceneGraph::Illuminator > illuminator );
             void removeIlluminator( const std::string& id );
 
+            unsigned int registerEvent(
+              std::shared_ptr< Graphics::SceneGraph::Model > instance,
+              const std::string& eventTag,
+              const ModelEventCallback& callback
+            );
+            void unregisterEvent( std::shared_ptr< Graphics::SceneGraph::Model > instance, unsigned int item );
+
             Graphics::Camera& getCamera();
             void loadPathsParallel( const std::vector< std::pair< std::string, std::string > >& paths );
             void loadPaths( const std::vector< std::pair< std::string, std::string > >& paths );

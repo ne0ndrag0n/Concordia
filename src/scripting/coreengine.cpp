@@ -4,6 +4,7 @@
 #include "scripting/luakit/dynamicusertype.hpp"
 #include "scripting/luakit/utility.hpp"
 #include "scripting/entitykit/registry.hpp"
+#include "gameplay/interaction.hpp"
 #include "tools/utility.hpp"
 #include "configmanager.hpp"
 #include "log.hpp"
@@ -49,6 +50,7 @@ namespace BlueBear::Scripting {
     sol::table types = lua[ "bluebear" ][ "util" ][ "types" ] = lua.create_table();
 
     VectorTypes::submitLuaContributions( types );
+    Gameplay::Interaction::submitLuaContributions( types );
     LuaKit::DynamicUsertype::submitLuaContributions( types );
     LuaKit::Utility::submitLuaContributions( lua );
   }

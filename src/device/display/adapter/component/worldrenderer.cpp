@@ -331,6 +331,30 @@ namespace BlueBear {
             }
           }
 
+          unsigned int WorldRenderer::registerEvent(
+            std::shared_ptr< Graphics::SceneGraph::Model > instance,
+            const std::string& eventTag,
+            const ModelEventCallback& callback
+          ) {
+            const ModelRegistration* registration = nullptr;
+            for( const auto& modelRegistration : models ) {
+              if( modelRegistration.instance == instance ) {
+                registration = &modelRegistration;
+                break;
+              }
+            }
+
+            if( registration ) {
+              // TODO
+            } else {
+              Log::getInstance().warn( "WorldRenderer::registerEvent", "Instance not registered" );
+            }
+          }
+
+          void WorldRenderer::unregisterEvent( std::shared_ptr< Graphics::SceneGraph::Model > instance, unsigned int item ) {
+            // TODO
+          }
+
           Graphics::Camera& WorldRenderer::getCamera() {
             return camera;
           }

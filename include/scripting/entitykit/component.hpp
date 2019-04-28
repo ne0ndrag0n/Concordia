@@ -11,7 +11,7 @@
 namespace BlueBear::Scripting::EntityKit {
   class Entity;
 
-  class Component : public Serializable {
+  class Component : public Serializable, public std::enable_shared_from_this< Component > {
     std::string componentId;
     Entity* entity = nullptr;
 
