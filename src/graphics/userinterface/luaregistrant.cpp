@@ -342,9 +342,12 @@ namespace BlueBear::Graphics::UserInterface {
     types.new_usertype< Widgets::ContextMenu >(
       "ContextMenu",
       "new", sol::no_constructor,
-      "create", []( const std::string& id, sol::table classes ) {
-        // TODO
-        return Widgets::ContextMenu::create( id, Scripting::LuaKit::Utility::tableToVector< std::string >( classes ), {} );
+      "create", []( const std::string& id, sol::table classes, sol::table entries ) {
+        return Widgets::ContextMenu::create(
+          id,
+          Scripting::LuaKit::Utility::tableToVector< std::string >( classes ),
+          Widgets::ContextMenu::parseTable( entries )
+        );
       },
       sol::base_classes, sol::bases< Element >()
     );

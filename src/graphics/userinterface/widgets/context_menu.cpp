@@ -1,6 +1,7 @@
 #include "graphics/userinterface/widgets/context_menu.hpp"
 #include "device/display/adapter/component/guicomponent.hpp"
 #include "graphics/userinterface/style/style.hpp"
+#include "scripting/luakit/utility.hpp"
 #include "containers/visitor.hpp"
 #include "tools/utility.hpp"
 
@@ -37,6 +38,23 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 				if( pair.size() == 2 ) {
 					result.emplace_back( Item{ pair[ 0 ], pair[ 1 ] } );
 				}
+			}
+		}
+
+		return result;
+	}
+
+	std::vector< ContextMenu::Entry > ContextMenu::parseTable( sol::table table ) {
+		std::vector< ContextMenu::Entry > result;
+
+		for( auto& pair : table ) {
+			if( Scripting::LuaKit::Utility::cast< std::string >( pair.second ) == "---" ) {
+				result.emplace_back( Divider() );
+			} else {
+				result.emplace_back( Item{
+					Scripting::LuaKit::Utility::cast< std::string >( pair.first ),
+					Scripting::LuaKit::Utility::cast< std::string >( pair.second )
+				} );
 			}
 		}
 

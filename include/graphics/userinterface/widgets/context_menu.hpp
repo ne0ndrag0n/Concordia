@@ -2,6 +2,10 @@
 #define CONCORDIA_GUI_CONTEXT_MENU
 
 #include "graphics/userinterface/element.hpp"
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
+#include <sol.hpp>
 #include <variant>
 #include <vector>
 #include <string>
@@ -33,6 +37,8 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 	public:
 		void calculate() override;
 
+
+		static std::vector< Entry > parseTable( sol::table table );
 		static std::vector< Entry > parseEntries( const std::string& text );
 		static std::shared_ptr< ContextMenu > create( const std::string& id, const std::vector< std::string >& classes, const std::vector< Entry >& items );
 	};
