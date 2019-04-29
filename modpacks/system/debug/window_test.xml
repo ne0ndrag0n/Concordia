@@ -26,8 +26,6 @@
 </Window>
 -->
 <ContextMenu class="context-menu-test">
-  id:label
-  id2:label2
-  id3:MMMMMMMMMMMMMMM
-  id4:iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
+  id:nnlnn
+  id2:nnlnn
 </ContextMenu>

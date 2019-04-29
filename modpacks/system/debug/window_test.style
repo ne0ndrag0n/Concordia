@@ -13,6 +13,7 @@
   placement: Placement::FREE;
   left: 5;
   top: 5;
-  width: 300;
+  width: 150;
   height: 600;
+  padding: 5;
 }

@@ -111,8 +111,7 @@ namespace BlueBear::Graphics::UserInterface {
       case Tools::Utility::hash( "ContextMenu" ): {
         result = Widgets::ContextMenu::create(
           Tools::Utility::safeString( element->Attribute( "id" ) ),
-          Tools::Utility::split( Tools::Utility::safeString( element->Attribute( "class" ) ), ' ' ),
-          Widgets::ContextMenu::parseEntries( Tools::Utility::safeString( element->GetText() ) )
+          Tools::Utility::split( Tools::Utility::safeString( element->Attribute( "class" ) ), ' ' )
         );
         break;
       }
