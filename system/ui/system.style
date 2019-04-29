@@ -45,3 +45,9 @@ Window.error {
     color: rgbaString( "990000ff" );
   }
 }
+
+ContextMenu {
+  background-color: rgbaString( "36393Eff" );
+  font-color: rgbaString( "ffffffff" );
+  font-size: 26.0;
+}

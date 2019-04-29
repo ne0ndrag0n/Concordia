@@ -1,9 +1,12 @@
 #include "graphics/userinterface/widgets/context_menu.hpp"
 #include "device/display/adapter/component/guicomponent.hpp"
 #include "graphics/userinterface/style/style.hpp"
+#include "graphics/vector/renderer.hpp"
 #include "scripting/luakit/utility.hpp"
 #include "containers/visitor.hpp"
 #include "tools/utility.hpp"
+#include <glm/glm.hpp>
+#include "log.hpp"
 
 namespace BlueBear::Graphics::UserInterface::Widgets {
 
@@ -25,6 +28,8 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 			id:label\n
 		*/
 
+		Log::getInstance().debug( "Got", "Here" );
+
 		std::vector< ContextMenu::Entry > result;
 
 		std::vector< std::string > lines = Tools::Utility::split( Tools::Utility::stringTrim( text ), '\n' );
@@ -34,7 +39,7 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 			if( line == "---" ) {
 				result.emplace_back( Divider() );
 			} else {
-				std::vector< std::string > pair = Tools::Utility::split( text, ':' );
+				std::vector< std::string > pair = Tools::Utility::split( line, ':' );
 				if( pair.size() == 2 ) {
 					result.emplace_back( Item{ pair[ 0 ], pair[ 1 ] } );
 				}
@@ -90,5 +95,92 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 			( padding * 2 ) + longestTextSpan + 10,
 			( padding * 2 ) + ( items.size() * textHeight )
 		};
+	}
+
+	void ContextMenu::render( Vector::Renderer& renderer ) {
+		glm::ivec2 origin = { 5, 5 };
+		glm::ivec2 dimensions = { allocation[ 2 ] - 5, allocation[ 3 ] - 5 };
+
+		// Drop shadow
+		// Left segment
+		renderer.drawLinearGradient(
+			{ 0, origin.y, origin.x, dimensions.y },
+			{ origin.x, ( origin.y + ( ( dimensions.y - origin.y ) / 2 ) ), 0, ( origin.y + ( ( dimensions.y - origin.y ) / 2 ) ) },
+			{ 0, 0, 0, 128 },
+			{ 0, 0, 0, 0 }
+		);
+		// Top left corner
+		renderer.drawScissored( { 0, 0, origin.x, origin.y }, [ & ]() {
+			renderer.drawRadialGradient( origin, 0.05f, 4.95f, { 0, 0, 0, 128 }, { 0, 0, 0, 0 } );
+		} );
+		// Top segment
+		renderer.drawLinearGradient(
+			{ 5, 0, dimensions.x, 5 },
+			{ ( origin.x + ( ( dimensions.x - origin.x ) / 2 ) ), 5, ( origin.x + ( ( dimensions.x - origin.x ) / 2 ) ), 0 },
+			{ 0, 0, 0, 128 },
+			{ 0, 0, 0, 0 }
+		);
+		// Top right corner
+		renderer.drawScissored( { allocation[ 2 ] - origin.x, 0, allocation[ 2 ], origin.y }, [ & ]() {
+			renderer.drawRadialGradient( { allocation[ 2 ] - origin.x, origin.y }, 0.05f, 4.95f, { 0, 0, 0, 128 }, { 0, 0, 0, 0 } );
+		} );
+		// Right segment
+		renderer.drawLinearGradient(
+			{ allocation[ 2 ] - origin.x, origin.y, allocation[ 2 ], dimensions.y },
+			{ allocation[ 2 ] - origin.x, ( origin.y + ( ( dimensions.y - origin.y ) / 2 ) ), allocation[ 2 ], ( origin.y + ( ( dimensions.y - origin.y ) / 2 ) ) },
+			{ 0, 0, 0, 128 },
+			{ 0, 0, 0, 0 }
+		);
+		// Bottom segment
+		renderer.drawLinearGradient(
+			{ origin.x, dimensions.y, allocation[ 2 ] - origin.x, allocation[ 3 ] },
+			{ ( ( dimensions.x - origin.x ) / 2 ), dimensions.y, ( ( dimensions.x - origin.x ) / 2 ), allocation[ 3 ] },
+			{ 0, 0, 0, 128 },
+			{ 0, 0, 0, 0 }
+		);
+		// Bottom left corner
+		renderer.drawScissored( { 0, dimensions.y, origin.x, allocation[ 3 ] }, [ & ]() {
+			renderer.drawRadialGradient( { origin.x, dimensions.y }, 0.05f, 4.95f, { 0, 0, 0, 128 }, { 0, 0, 0, 0 } );
+		} );
+		// Bottom right corner
+		renderer.drawScissored( { dimensions.x, dimensions.y, allocation[ 2 ], allocation[ 3 ] }, [ & ]() {
+			renderer.drawRadialGradient( { dimensions.x, dimensions.y }, 0.05f, 4.95f, { 0, 0, 0, 128 }, { 0, 0, 0, 0 } );
+		} );
+
+		// Background color
+		renderer.drawRect(
+			glm::uvec4{ origin.x, origin.y, dimensions.x, dimensions.y },
+			localStyle.get< glm::uvec4 >( "background-color" )
+		);
+
+
+		double fontSize = localStyle.get< double >( "font-size" );
+		std::string font = localStyle.get< std::string >( "font" );
+		int padding = localStyle.get< int >( "padding" );
+		int verticalPosition = 5 + padding;
+
+		for( const auto& item : items ) {
+			std::visit( overloaded {
+				[ & ]( const Item& item ) {
+					/*
+					glm::vec4 size = renderer.getTextSizeParams( font, item.label, fontSize );
+
+					renderer.drawText(
+						font,
+						item.label,
+						glm::uvec2 {
+							( allocation[ 2 ] / 2 ) - ( size[ 2 ] / 2 ),
+							verticalPosition + ( size[ 3 ] / 2.0f )
+						},
+						localStyle.get< glm::uvec4 >( "font-color" ),
+						fontSize
+					);
+
+					verticalPosition += size[ 3 ] + padding;
+					*/
+				},
+				[]( const Divider& divider ) { /* Nothing */ }
+			}, item );
+		}
 	}
 }

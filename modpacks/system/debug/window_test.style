@@ -8,3 +8,11 @@
     gravity: Gravity::TOP;
   }
 }
+
+.context-menu-test {
+  placement: Placement::FREE;
+  left: 5;
+  top: 5;
+  width: 300;
+  height: 600;
+}

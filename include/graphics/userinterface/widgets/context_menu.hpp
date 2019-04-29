@@ -36,7 +36,7 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 
 	public:
 		void calculate() override;
-
+		void render( Vector::Renderer& renderer );
 
 		static std::vector< Entry > parseTable( sol::table table );
 		static std::vector< Entry > parseEntries( const std::string& text );

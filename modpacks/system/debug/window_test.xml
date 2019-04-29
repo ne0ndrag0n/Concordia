@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
 <Window id="test-scroll-window" class="-bb-scroll-test" window-title="Scroll Test">
   <Scroll id="test-scroll-scroll" class="-bb-scroll-test-widget">
     <Layout>
@@ -23,3 +24,10 @@
     </Layout>
   </Scroll>
 </Window>
+-->
+<ContextMenu class="context-menu-test">
+  id:label
+  id2:label2
+  id3:MMMMMMMMMMMMMMM
+  id4:iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
+</ContextMenu>
