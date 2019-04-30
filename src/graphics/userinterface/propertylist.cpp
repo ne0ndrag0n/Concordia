@@ -35,6 +35,7 @@ namespace BlueBear {
         { "font-hint-color", glm::uvec4{ 128, 128, 128, 255 } },
         { "font-size", 16.0 },
         { "close-event", false },
+        { "fade", false },
         { "draggable", false },
         { "local-z-order", 1 },
         { "scrollbar-x", true },

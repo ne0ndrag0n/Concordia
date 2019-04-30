@@ -22,6 +22,9 @@ namespace BlueBear {
         protected:
           Text( const std::string& id, const std::vector< std::string >& classes, const std::string& innerText );
 
+          void onMouseIn( Device::Input::Metadata event );
+          void onMouseOut( Device::Input::Metadata event );
+
         public:
           virtual void render( Graphics::Vector::Renderer& renderer ) override;
           virtual void calculate() override;

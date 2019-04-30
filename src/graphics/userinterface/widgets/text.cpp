@@ -1,8 +1,10 @@
 #include "graphics/userinterface/widgets/text.hpp"
 #include "graphics/userinterface/propertylist.hpp"
 #include "device/display/adapter/component/guicomponent.hpp"
+#include "device/input/input.hpp"
 #include "graphics/vector/renderer.hpp"
 #include "graphics/userinterface/drawable.hpp"
+#include "configmanager.hpp"
 #include <cstdlib>
 
 namespace BlueBear {
@@ -10,7 +12,71 @@ namespace BlueBear {
     namespace UserInterface {
       namespace Widgets {
 
-        Text::Text( const std::string& id, const std::vector< std::string >& classes, const std::string& innerText ) : Element::Element( "Text", id, classes ), innerText( innerText ) {}
+        Text::Text( const std::string& id, const std::vector< std::string >& classes, const std::string& innerText ) : Element::Element( "Text", id, classes ), innerText( innerText ) {
+          eventBundle.registerInputEvent( "mouse-in", std::bind( &Text::onMouseIn, this, std::placeholders::_1 ) );
+          eventBundle.registerInputEvent( "mouse-out", std::bind( &Text::onMouseOut, this, std::placeholders::_1 ) );
+        }
+
+        void Text::onMouseIn( Device::Input::Metadata event ) {
+          if( localStyle.get< bool >( "fade" ) ) {
+            double fps = ConfigManager::getInstance().getIntValue( "fps_overview" );
+
+            // Refresh and remove
+            localStyle.attachAnimation( nullptr );
+
+            // Attach animation
+            localStyle.attachAnimation( std::make_unique< Style::Style::Animation >(
+              &localStyle,
+              std::map< double, Style::Style::Animation::Keyframe >{
+                {
+                  fps,
+                  {
+                    PropertyList( { { "background-color", localStyle.get< glm::uvec4 >( "fade-in-color" ) } } ),
+                    true
+                  }
+                }
+              },
+              fps * 3.0,
+              fps,
+              false,
+              true
+            ) );
+          }
+        }
+
+        void Text::onMouseOut( Device::Input::Metadata event ) {
+          if( localStyle.get< bool >( "fade" ) ) {
+            double fps = ConfigManager::getInstance().getIntValue( "fps_overview" );
+
+            // Refresh and remove
+            localStyle.attachAnimation( nullptr );
+
+            // Attach animation
+            localStyle.attachAnimation( std::make_unique< Style::Style::Animation >(
+              &localStyle,
+              std::map< double, Style::Style::Animation::Keyframe >{
+                {
+                  0.0,
+                  {
+                    PropertyList( { { "background-color", localStyle.get< glm::uvec4 >( "fade-in-color" ) } } ),
+                    true
+                  }
+                },
+                {
+                  fps,
+                  {
+                    PropertyList( { { "background-color", localStyle.get< glm::uvec4 >( "background-color" ) } } ),
+                    true
+                  }
+                }
+              },
+              fps * 3.0,
+              fps,
+              true,
+              false
+            ) );
+          }
+        }
 
         std::shared_ptr< Text > Text::create( const std::string& id, const std::vector< std::string >& classes, const std::string& innerText ) {
           std::shared_ptr< Text > text( new Text( id, classes, innerText ) );

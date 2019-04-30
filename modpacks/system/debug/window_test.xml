@@ -26,6 +26,7 @@
 </Window>
 -->
 <ContextMenu class="context-menu-test">
-  <Text class="test-1">rye</Text>
-  <Text class="test-2">wheat</Text>
+  <Text class="test-1">Animate</Text>
+  <Text class="test-2">Move</Text>
+  <Text class="test-2">Properties</Text>
 </ContextMenu>

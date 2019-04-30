@@ -13,18 +13,18 @@
   placement: Placement::FREE;
   left: 5;
   top: 5;
+  width: 150;
 
   Text {
+    font-size: 24.0;
     padding: 3;
-  }
 
-  .test-1 {
-    background-color: rgbaString( "330000FF" );
+    fade: true;
+    fade-in-color: rgbaString( "848a94ff" );
+    fade-out-color: rgbaString( "36393Eff" );
+
+    background-color: rgbaString( "36393Eff" );
     color: rgbaString( "FFFFFFFF" );
   }
 
-  .test-2 {
-    background-color: rgbaString( "003300FF" );
-    color: rgbaString( "FFFFFFFF" );
-  }
 }
