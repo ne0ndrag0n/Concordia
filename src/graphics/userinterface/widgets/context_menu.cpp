@@ -42,7 +42,9 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 			child->calculate();
 		}
 
+		int styleWidth = localStyle.get< int >( "width" );
 		int styleHeight = localStyle.get< int >( "height" );
+
 		if( ( Requisition ) styleHeight == Requisition::AUTO ) {
 			// Compute styleHeight based on requested items
 			styleHeight = 0;
@@ -50,11 +52,18 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 			for( const auto child : children ) {
 				styleHeight += getFinalRequisition( child ).y;
 			}
-
-			requisition = glm::uvec2{ localStyle.get< int >( "width" ), styleHeight };
-		} else {
-			requisition = glm::uvec2{ localStyle.get< int >( "width" ), localStyle.get< int >( "height" ) };
 		}
+
+		if( ( Requisition ) styleWidth == Requisition::AUTO ) {
+			// Compute styleWidth based on requested items
+			styleWidth = 0;
+
+			for( const auto child : children ) {
+				styleWidth += getFinalRequisition( child ).x;
+			}
+		}
+
+		requisition = glm::uvec2{ styleWidth, styleHeight };
 	}
 
 	void ContextMenu::positionAndSizeChildren() {
