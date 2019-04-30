@@ -26,6 +26,6 @@
 </Window>
 -->
 <ContextMenu class="context-menu-test">
-  id:nnlnn
-  id2:nnlnn
+  <Text class="test-1">rye</Text>
+  <Text class="test-2">wheat</Text>
 </ContextMenu>

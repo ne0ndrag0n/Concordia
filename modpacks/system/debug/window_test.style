@@ -14,6 +14,19 @@
   left: 5;
   top: 5;
   width: 150;
-  height: 600;
   padding: 5;
+
+  Text {
+    padding: 3;
+  }
+
+  .test-1 {
+    background-color: rgbaString( "330000FF" );
+    color: rgbaString( "FFFFFFFF" );
+  }
+
+  .test-2 {
+    background-color: rgbaString( "003300FF" );
+    color: rgbaString( "FFFFFFFF" );
+  }
 }

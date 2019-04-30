@@ -18,6 +18,7 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 		ContextMenu( const std::string& id, const std::vector< std::string >& classes );
 
 	public:
+		void positionAndSizeChildren() override;
 		void calculate() override;
 		void render( Vector::Renderer& renderer );
 

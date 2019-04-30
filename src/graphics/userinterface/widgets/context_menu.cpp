@@ -1,5 +1,6 @@
 #include "graphics/userinterface/widgets/context_menu.hpp"
 #include "device/display/adapter/component/guicomponent.hpp"
+#include "graphics/userinterface/propertylist.hpp"
 #include "graphics/userinterface/style/style.hpp"
 #include "graphics/vector/renderer.hpp"
 #include "scripting/luakit/utility.hpp"
@@ -9,6 +10,22 @@
 #include "log.hpp"
 
 namespace BlueBear::Graphics::UserInterface::Widgets {
+
+	static bool valueIsLiteral( int r ) {
+		return ( Requisition ) r != Requisition::AUTO &&
+			( Requisition ) r != Requisition::NONE &&
+			( Requisition ) r != Requisition::FILL_PARENT;
+	};
+
+	static glm::uvec2 getFinalRequisition( std::shared_ptr< Element > prospect ) {
+		int width = prospect->getPropertyList().get< int >( "width" );
+		int height = prospect->getPropertyList().get< int >( "height" );
+
+		return glm::uvec2{
+			valueIsLiteral( width ) ? width : prospect->getRequisition().x,
+			valueIsLiteral( height ) ? height : prospect->getRequisition().y
+		};
+	};
 
 	ContextMenu::ContextMenu( const std::string& id, const std::vector< std::string >& classes ) :
 		Element::Element( "ContextMenu", id, classes ) {}
@@ -20,7 +37,40 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 	}
 
 	void ContextMenu::calculate() {
-		requisition = glm::uvec2{ 1, 1 };
+		// Call calculate on all child elements per parent object's responsibility
+		for( std::shared_ptr< Element > child : children ) {
+			child->calculate();
+		}
+
+		int styleHeight = localStyle.get< int >( "height" );
+		if( ( Requisition ) styleHeight == Requisition::AUTO ) {
+			// Compute styleHeight based on requested items
+			styleHeight = 0;
+
+			for( const auto child : children ) {
+				styleHeight += getFinalRequisition( child ).y;
+			}
+
+			requisition = glm::uvec2{ localStyle.get< int >( "width" ), styleHeight };
+		} else {
+			requisition = glm::uvec2{ localStyle.get< int >( "width" ), localStyle.get< int >( "height" ) };
+		}
+	}
+
+	void ContextMenu::positionAndSizeChildren() {
+		if( getParent() == nullptr ) {
+			calculate();
+		}
+
+		auto numItems = children.size();
+		if( numItems ) {
+			glm::ivec2 sizePerItem{ allocation[ 2 ] - 10, ( allocation[ 3 ] - 10 ) / numItems };
+			int currentY = 5;
+			for( auto child : children ) {
+				child->setAllocation( { 5, currentY, sizePerItem.x, sizePerItem.y }, false );
+				currentY += sizePerItem.y;
+			}
+		}
 	}
 
 	void ContextMenu::render( Vector::Renderer& renderer ) {
