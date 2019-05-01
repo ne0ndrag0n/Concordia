@@ -92,10 +92,20 @@ namespace BlueBear {
             localStyle.get< glm::uvec4 >( "background-color" )
           );
 
+          glm::uvec2 position{ ( allocation[ 2 ] / 2 ) - ( textSpan / 2 ), fontSize / 2 };
+
+          if( localStyle.get< Orientation >( "text-alignment" ) == Orientation::LEFT ) {
+            position.x = localStyle.get< int >( "padding" );
+          }
+
+          if( localStyle.get< Orientation >( "text-alignment" ) == Orientation::RIGHT ) {
+            position.x = allocation[ 2 ] - textSpan - localStyle.get< int >( "padding" );
+          }
+
           renderer.drawText(
             localStyle.get< std::string >( "font" ),
             innerText,
-            glm::uvec2{ ( allocation[ 2 ] / 2 ) - ( textSpan / 2 ), fontSize / 2 },
+            position,
             localStyle.get< glm::uvec4 >( "color" ),
             fontSize
           );

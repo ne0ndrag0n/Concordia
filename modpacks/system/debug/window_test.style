@@ -18,6 +18,7 @@
   Text {
     font-size: 24.0;
     padding: 3;
+    text-alignment: Orientation::LEFT;
 
     fade: true;
     fade-in-color: rgbaString( "848a94ff" );
