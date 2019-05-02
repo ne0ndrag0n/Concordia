@@ -18,15 +18,17 @@ namespace BlueBear::Scripting::EntityKit::Components {
 			std::vector< std::pair< std::string, unsigned int > > registeredEvents;
 		};
 
-		std::map< std::shared_ptr< Graphics::SceneGraph::Model >, std::vector< EventDescriptor > > interactions;
-
-		void refresh();
+		std::map< std::shared_ptr< Graphics::SceneGraph::Model >, EventDescriptor > interactions;
 
 		void modelMouseIn( Device::Input::Metadata event, std::shared_ptr< Graphics::SceneGraph::Model > model );
         void modelMouseOut( Device::Input::Metadata event, std::shared_ptr< Graphics::SceneGraph::Model > model );
+		void modelRemoved( std::shared_ptr< Graphics::SceneGraph::Model > model );
+
+		void updateUniformsAndEvents( std::shared_ptr< Graphics::SceneGraph::Model > instance );
 
 	public:
 		InteractionSet();
+		~InteractionSet();
 
 		void associateInteraction( std::shared_ptr< Graphics::SceneGraph::Model > model, const Gameplay::Interaction& interaction );
 	};
