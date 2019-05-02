@@ -18,6 +18,22 @@ namespace BlueBear::Scripting::EntityKit::Components {
 		relevantState->getWorldRenderer().MODEL_REMOVED.stopListening( this );
 	}
 
+	Json::Value InteractionSet::save() {
+		// TODO
+	}
+
+    void InteractionSet::load( const Json::Value& data ) {
+		// TODO
+	}
+
+	void InteractionSet::submitLuaContributions( sol::state& lua, sol::table types ) {
+		types.new_usertype< InteractionSet >( "InteractionSet",
+			"new", sol::no_constructor,
+			"associate_interaction", &InteractionSet::associateInteraction,
+			sol::base_classes, sol::bases< SystemComponent, Component >()
+		);
+	}
+
 	void InteractionSet::modelMouseIn( Device::Input::Metadata event, std::shared_ptr< Graphics::SceneGraph::Model > model ) {
 		Graphics::SceneGraph::Uniforms::HighlightUniform* highlighter = ( Graphics::SceneGraph::Uniforms::HighlightUniform* ) model->getUniform( "highlight" );
 		highlighter->fadeTo( { 0.2f, 0.2f, 0.2f, 0.0f } );

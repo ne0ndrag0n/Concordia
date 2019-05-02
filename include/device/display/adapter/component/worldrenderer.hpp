@@ -82,9 +82,6 @@ namespace BlueBear {
 
             void fireInOutEvents( const ModelRegistration* selected, const Device::Input::Metadata& event );
 
-            void modelMouseIn( Device::Input::Metadata event, std::shared_ptr< Graphics::SceneGraph::Model > model );
-            void modelMouseOut( Device::Input::Metadata event, std::shared_ptr< Graphics::SceneGraph::Model > model );
-
             void onMouseDown( Device::Input::Metadata metadata );
             void onMouseUp( Device::Input::Metadata metadata );
             void onMouseMoved( Device::Input::Metadata metadata );

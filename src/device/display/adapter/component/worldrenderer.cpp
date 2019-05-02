@@ -139,16 +139,6 @@ namespace BlueBear {
             }
           }
 
-          void WorldRenderer::modelMouseIn( Device::Input::Metadata event, std::shared_ptr< Graphics::SceneGraph::Model > model ) {
-            Graphics::SceneGraph::Uniforms::HighlightUniform* highlighter = ( Graphics::SceneGraph::Uniforms::HighlightUniform* ) model->getUniform( "highlight" );
-            highlighter->fadeTo( { 0.2f, 0.2f, 0.2f, 0.0f } );
-          }
-
-          void WorldRenderer::modelMouseOut( Device::Input::Metadata event, std::shared_ptr< Graphics::SceneGraph::Model > model ) {
-            Graphics::SceneGraph::Uniforms::HighlightUniform* highlighter = ( Graphics::SceneGraph::Uniforms::HighlightUniform* ) model->getUniform( "highlight" );
-            highlighter->fadeTo( { 0.0f, 0.0f, 0.0f, 0.0f } );
-          }
-
           void WorldRenderer::onMouseDown( Device::Input::Metadata metadata ) {
           }
 
@@ -245,10 +235,6 @@ namespace BlueBear {
               std::shared_ptr< Graphics::SceneGraph::Model > copy = it->second->copy();
 
               std::unique_ptr< ModelRegistration > registration = std::make_unique< ModelRegistration >( ModelRegistration{ objectId, classes, copy } );
-              registration->events[ "mouse-in" ] = { std::bind( &WorldRenderer::modelMouseIn, this, std::placeholders::_1, std::placeholders::_2 ) };
-              registration->events[ "mouse-out" ] = { std::bind( &WorldRenderer::modelMouseOut, this, std::placeholders::_1, std::placeholders::_2 ) };
-
-              copy->setUniform( "highlight", std::make_unique< Graphics::SceneGraph::Uniforms::HighlightUniform >( "highlight", 0.25f ) );
 
               models.emplace_back( std::move( registration ) );
               MODEL_ADDED.trigger( copy );

@@ -23,6 +23,9 @@
           },
           {
             "id": "game.component.plant_keys"
+          },
+          {
+            "id": "system.component.interaction_set"
           }
         ]
       }

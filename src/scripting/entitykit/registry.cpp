@@ -2,6 +2,7 @@
 #include "scripting/entitykit/entity.hpp"
 #include "scripting/entitykit/luacomponent.hpp"
 #include "scripting/entitykit/components/modelmanager.hpp"
+#include "scripting/entitykit/components/interactionset.hpp"
 #include "scripting/luakit/utility.hpp"
 #include "graphics/scenegraph/model.hpp"
 #include "containers/visitor.hpp"
@@ -37,6 +38,7 @@ namespace BlueBear::Scripting::EntityKit {
     LuaComponent::submitLuaContributions( lua, types );
     Entity::submitLuaContributions( lua, types );
     Components::ModelManager::submitLuaContributions( lua, types );
+    Components::InteractionSet::submitLuaContributions( lua, types );
   }
 
   void Registry::registerComponent( const std::string& id, sol::table table ) {
@@ -79,6 +81,7 @@ namespace BlueBear::Scripting::EntityKit {
   bool Registry::componentRegistered( const std::string& id ) {
     switch( Tools::Utility::hash( id.c_str() ) ) {
       case Tools::Utility::hash( "system.component.model_manager" ):
+      case Tools::Utility::hash( "system.component.interaction_set" ):
         return true;
       default:
         return components.find( id ) != components.end();
@@ -114,6 +117,9 @@ namespace BlueBear::Scripting::EntityKit {
     switch( Tools::Utility::hash( registeredId.c_str() ) ) {
       case Tools::Utility::hash( "system.component.model_manager" ): {
         return std::make_shared< Components::ModelManager >();
+      }
+      case Tools::Utility::hash( "system.component.interaction_set" ): {
+        return std::make_shared< Components::InteractionSet >();
       }
       default: {
         auto it = components.find( registeredId );

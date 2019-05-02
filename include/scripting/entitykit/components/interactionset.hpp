@@ -6,6 +6,10 @@
 #include "graphics/scenegraph/model.hpp"
 #include "gameplay/interaction.hpp"
 #include "device/input/input.hpp"
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
+#include <sol.hpp>
 #include <memory>
 #include <set>
 
@@ -29,6 +33,11 @@ namespace BlueBear::Scripting::EntityKit::Components {
 	public:
 		InteractionSet();
 		~InteractionSet();
+
+		Json::Value save() override;
+		void load( const Json::Value& data ) override;
+
+		static void submitLuaContributions( sol::state& lua, sol::table types );
 
 		void associateInteraction( std::shared_ptr< Graphics::SceneGraph::Model > model, const Gameplay::Interaction& interaction );
 	};
