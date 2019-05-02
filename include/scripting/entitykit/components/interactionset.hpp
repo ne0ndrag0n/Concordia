@@ -14,17 +14,11 @@ namespace BlueBear::Scripting::EntityKit::Components {
 
 	class InteractionSet : public SystemComponent {
 		struct EventDescriptor {
-			std::shared_ptr< Graphics::SceneGraph::Model > model;
+			std::set< Gameplay::Interaction > interactions;
 			std::vector< std::pair< std::string, unsigned int > > registeredEvents;
-
-			bool operator<( const EventDescriptor& rhs ) const {
-				return model.get() < rhs.model.get();
-			};
 		};
 
-		std::map< std::string, std::vector< Gameplay::Interaction > > interactions;
-		std::set< EventDescriptor > previousItems;
-		std::shared_ptr< ModelManager > modelManager;
+		std::map< std::shared_ptr< Graphics::SceneGraph::Model >, std::vector< EventDescriptor > > interactions;
 
 		void refresh();
 
@@ -34,8 +28,7 @@ namespace BlueBear::Scripting::EntityKit::Components {
 	public:
 		InteractionSet();
 
-		void associateComponent( Component& component );
-		void associateInteraction( const std::string& modelId, const Gameplay::Interaction& interaction );
+		void associateInteraction( std::shared_ptr< Graphics::SceneGraph::Model > model, const Gameplay::Interaction& interaction );
 	};
 
 }

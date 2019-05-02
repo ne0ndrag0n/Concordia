@@ -2,6 +2,7 @@
 #include "log.hpp"
 #include "application.hpp"
 #include "scripting/luastate.hpp"
+#include "scripting/entitykit/systemcomponent.hpp"
 #include "configmanager.hpp"
 #include "eventmanager.hpp"
 #include "graphics/scenegraph/animation/animator.hpp"
@@ -28,6 +29,8 @@ namespace BlueBear {
       luaEventHelper( engine ),
       infrastructureManager( *this )
     {
+      Scripting::EntityKit::SystemComponent::relevantState = this;
+
       setupDisplayDevice();
       setupInputDevice();
 

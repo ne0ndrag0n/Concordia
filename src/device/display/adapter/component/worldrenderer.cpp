@@ -9,10 +9,8 @@
 #include "graphics/scenegraph/uniforms/highlight_uniform.hpp"
 #include "tools/objectpool.hpp"
 #include "tools/utility.hpp"
-#include "scripting/entitykit/components/modelmanager.hpp"
 #include "scripting/luakit/utility.hpp"
 #include "configmanager.hpp"
-#include "eventmanager.hpp"
 #include "log.hpp"
 #include <tbb/task_group.h>
 #include <tbb/concurrent_queue.h>
@@ -28,7 +26,6 @@ namespace BlueBear {
           WorldRenderer::WorldRenderer( Device::Display::Display& display ) :
             Adapter::Adapter( display ),
             camera( Graphics::Camera( ConfigManager::getInstance().getIntValue( "viewport_x" ), ConfigManager::getInstance().getIntValue( "viewport_y" ) ) ) {
-              Scripting::EntityKit::Components::ModelManager::worldRenderer = this;
               eventManager.LUA_STATE_READY.listen( this, std::bind( &WorldRenderer::submitLuaContributions, this, std::placeholders::_1 ) );
               eventManager.SHADER_CHANGE.listen( this, std::bind( &WorldRenderer::onShaderChange, this ) );
 
@@ -254,6 +251,7 @@ namespace BlueBear {
               copy->setUniform( "highlight", std::make_unique< Graphics::SceneGraph::Uniforms::HighlightUniform >( "highlight", 0.25f ) );
 
               models.emplace_back( std::move( registration ) );
+              MODEL_ADDED.trigger( copy );
 
               return copy;
             } else {
@@ -329,6 +327,7 @@ namespace BlueBear {
             for( auto it = models.begin(); it != models.end(); ) {
               if( ( *it )->instance == model ) {
                 models.erase( it );
+                MODEL_REMOVED.trigger( model );
                 return;
               } else {
                 ++it;

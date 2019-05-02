@@ -10,6 +10,7 @@
 #include "graphics/scenegraph/resourcebank.hpp"
 #include "exceptions/genexc.hpp"
 #include "tools/async_table.hpp"
+#include "eventmanager.hpp"
 #include "serializable.hpp"
 #include <tbb/concurrent_unordered_map.h>
 #include <lua.h>
@@ -48,6 +49,8 @@ namespace BlueBear {
           class WorldRenderer : public Adapter, public Serializable {
           public:
             using ModelEventCallback = std::function< void( Device::Input::Metadata, std::shared_ptr< Graphics::SceneGraph::Model > ) >;
+            BasicEvent< void*, std::shared_ptr< Graphics::SceneGraph::Model > > MODEL_ADDED;
+            BasicEvent< void*, std::shared_ptr< Graphics::SceneGraph::Model > > MODEL_REMOVED;
 
           private:
             struct ModelRegistration {

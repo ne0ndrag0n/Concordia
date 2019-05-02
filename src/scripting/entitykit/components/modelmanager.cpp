@@ -1,5 +1,6 @@
 #include "scripting/entitykit/components/modelmanager.hpp"
 #include "scripting/luakit/utility.hpp"
+#include "state/householdgameplaystate.hpp"
 #include "device/display/adapter/component/worldrenderer.hpp"
 #include "graphics/scenegraph/model.hpp"
 #include "tools/utility.hpp"
@@ -7,8 +8,6 @@
 #include <set>
 
 namespace BlueBear::Scripting::EntityKit::Components {
-
-  BlueBear::Device::Display::Adapter::Component::WorldRenderer* ModelManager::worldRenderer = nullptr;
 
   ModelManager::ModelManager() : SystemComponent::SystemComponent( "system.component.model_manager" ) {}
 
@@ -45,18 +44,18 @@ namespace BlueBear::Scripting::EntityKit::Components {
     }
 
     if( paths.size() ) {
-      worldRenderer->loadPathsParallel( paths );
+      relevantState->getWorldRenderer().loadPathsParallel( paths );
     }
   }
 
   void ModelManager::drop() {
     for( const auto& pair : models ) {
-      worldRenderer->removeObject( pair.second );
+      relevantState->getWorldRenderer().removeObject( pair.second );
     }
   }
 
   std::shared_ptr< Graphics::SceneGraph::Model > ModelManager::placeObject( const std::string& modelId, sol::table classes ) {
-    std::shared_ptr< Graphics::SceneGraph::Model > model = worldRenderer->placeObject( modelId, LuaKit::Utility::tableToSet< std::string >( classes ) );
+    std::shared_ptr< Graphics::SceneGraph::Model > model = relevantState->getWorldRenderer().placeObject( modelId, LuaKit::Utility::tableToSet< std::string >( classes ) );
 
     models.emplace_back( modelId, model );
 
@@ -68,7 +67,7 @@ namespace BlueBear::Scripting::EntityKit::Components {
 
     for( auto it = models.begin(); it != models.end(); ) {
       if( it->second == asPtr ) {
-        worldRenderer->removeObject( asPtr );
+        relevantState->getWorldRenderer().removeObject( asPtr );
         it = models.erase( it );
 
         return;

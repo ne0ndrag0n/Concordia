@@ -12,7 +12,6 @@
 #include <vector>
 #include <unordered_map>
 
-namespace BlueBear::Device::Display::Adapter::Component{ class WorldRenderer; }
 namespace BlueBear::Graphics::SceneGraph{ class Model; }
 namespace BlueBear::Scripting::EntityKit::Components {
 
@@ -25,7 +24,6 @@ namespace BlueBear::Scripting::EntityKit::Components {
 
     ModelManager();
 
-    static BlueBear::Device::Display::Adapter::Component::WorldRenderer* worldRenderer;
     static void submitLuaContributions( sol::state& lua, sol::table types );
 
     void init( sol::object incoming ) override;
