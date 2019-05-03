@@ -216,12 +216,7 @@ namespace BlueBear {
 
             for( const auto& registration : models ) {
               if( registration ) {
-                for( const auto& event : registration->events ) {
-                  if( acceptable.find( event.first ) != acceptable.end() ) {
-                    result.emplace_back( registration.get() );
-                    break;
-                  }
-                }
+                  result.emplace_back( registration.get() );
               }
             }
 
