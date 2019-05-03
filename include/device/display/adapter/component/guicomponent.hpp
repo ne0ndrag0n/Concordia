@@ -62,6 +62,7 @@ namespace BlueBear {
           public:
             void loadStylesheets( const std::vector< std::string >& paths );
             std::vector< std::shared_ptr< Graphics::UserInterface::Element > > addElementsFromXML( const std::string& xmlPath, bool file = true );
+            void addElement( std::shared_ptr< Graphics::UserInterface::Element > element );
             std::vector< std::shared_ptr< Graphics::UserInterface::Element > > query( sol::table queries );
 
             void setupBlockingGlobalEvent( const std::string& eventId, std::function< void( Device::Input::Metadata ) > callback );

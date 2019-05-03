@@ -1,4 +1,6 @@
 #include "scripting/entitykit/components/interactionset.hpp"
+#include "graphics/userinterface/widgets/context_menu.hpp"
+#include "graphics/userinterface/widgets/text.hpp"
 #include "device/display/adapter/component/worldrenderer.hpp"
 #include "graphics/scenegraph/uniforms/highlight_uniform.hpp"
 #include "scripting/entitykit/entity.hpp"
@@ -44,6 +46,11 @@ namespace BlueBear::Scripting::EntityKit::Components {
 		highlighter->fadeTo( { 0.0f, 0.0f, 0.0f, 0.0f } );
 	}
 
+	void InteractionSet::modelMouseDown( Device::Input::Metadata event, std::shared_ptr< Graphics::SceneGraph::Model > model ) {
+		Log::getInstance().debug( "Got", "Here" );
+		//relevantState->getGuiComponent().addElement( getMenuWidget( event.mouseLocation, interactions[ model ].interactions ) );
+	}
+
 	void InteractionSet::modelRemoved( std::shared_ptr< Graphics::SceneGraph::Model > model ) {
 		// Perform a simple drop of all interactions for this model
 		interactions.erase( model );
@@ -68,6 +75,13 @@ namespace BlueBear::Scripting::EntityKit::Components {
 				)
 			);
 
+			descriptor.registeredEvents.emplace_back(
+				"mouse-down",
+				relevantState->getWorldRenderer().registerEvent(
+					instance, "mouse-down", std::bind( &InteractionSet::modelMouseDown, this, std::placeholders::_1, std::placeholders::_2 )
+				)
+			);
+
 			if( !instance->getUniform( "highlight" ) ) {
 				instance->setUniform( "highlight", std::make_unique< Graphics::SceneGraph::Uniforms::HighlightUniform >( "highlight", 0.25f ) );
 			}
@@ -86,8 +100,21 @@ namespace BlueBear::Scripting::EntityKit::Components {
 		}
 	}
 
+	std::shared_ptr< Graphics::UserInterface::Widgets::ContextMenu > InteractionSet::getMenuWidget( const glm::ivec2& position, const std::vector< Gameplay::Interaction >& interactions ) {
+		auto menu = Graphics::UserInterface::Widgets::ContextMenu::create( "", { "__contextmenu" } );
+
+		for( const auto& interaction : interactions ) {
+			menu->addChild( Graphics::UserInterface::Widgets::Text::create( "", { "__contextmenu_item" }, interaction.label ), false );
+		}
+
+		menu->getPropertyList().set< int >( "left", position.x );
+		menu->getPropertyList().set< int >( "top", position.y );
+
+		return menu;
+	}
+
 	void InteractionSet::associateInteraction( std::shared_ptr< Graphics::SceneGraph::Model > model, const Gameplay::Interaction& interaction ) {
-		interactions[ model ].interactions.emplace( interaction );
+		interactions[ model ].interactions.emplace_back( interaction );
 		updateUniformsAndEvents( model );
 	}
 

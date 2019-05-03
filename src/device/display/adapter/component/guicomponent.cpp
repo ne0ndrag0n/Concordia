@@ -117,6 +117,10 @@ namespace BlueBear {
             return loader.getElements();
           }
 
+          void GuiComponent::addElement( std::shared_ptr< Graphics::UserInterface::Element > element ) {
+            rootElement->addChild( element );
+          }
+
           std::vector< std::shared_ptr< Graphics::UserInterface::Element > > GuiComponent::query( sol::table queries ) {
             std::vector< std::shared_ptr< Graphics::UserInterface::Element > > results;
             Graphics::UserInterface::Querier querier( rootElement );

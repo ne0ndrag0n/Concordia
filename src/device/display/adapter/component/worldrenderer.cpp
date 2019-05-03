@@ -140,9 +140,49 @@ namespace BlueBear {
           }
 
           void WorldRenderer::onMouseDown( Device::Input::Metadata metadata ) {
+            Geometry::Ray ray = camera.getPickingRay( metadata.mouseLocation, display.getDimensions() );
+
+            std::vector< const ModelRegistration* > candidates = narrowByEvent( { "mouse-down" } );
+            std::vector< const ModelRegistration* > relevant;
+            for( const ModelRegistration* registration : candidates ) {
+              if( registration->instance->intersectsBoundingVolume( ray ) ) {
+                relevant.emplace_back( registration );
+              }
+            }
+
+            getModelAtMouse( ray, relevant, [ this, metadata ]( const ModelRegistration* found ) {
+              if( found ) {
+                auto it = found->events.find( "mouse-down" );
+                if( it != found->events.end() ) {
+                  for( const auto& f : it->second ) {
+                    if( f ) { f( metadata, found->instance ); }
+                  }
+                }
+              }
+            } );
           }
 
           void WorldRenderer::onMouseUp( Device::Input::Metadata metadata ) {
+            Geometry::Ray ray = camera.getPickingRay( metadata.mouseLocation, display.getDimensions() );
+
+            std::vector< const ModelRegistration* > candidates = narrowByEvent( { "mouse-up" } );
+            std::vector< const ModelRegistration* > relevant;
+            for( const ModelRegistration* registration : candidates ) {
+              if( registration->instance->intersectsBoundingVolume( ray ) ) {
+                relevant.emplace_back( registration );
+              }
+            }
+
+            getModelAtMouse( ray, relevant, [ this, metadata ]( const ModelRegistration* found ) {
+              if( found ) {
+                auto it = found->events.find( "mouse-up" );
+                if( it != found->events.end() ) {
+                  for( const auto& f : it->second ) {
+                    if( f ) { f( metadata, found->instance ); }
+                  }
+                }
+              }
+            } );
           }
 
           void WorldRenderer::onMouseMoved( Device::Input::Metadata metadata ) {
@@ -153,13 +193,7 @@ namespace BlueBear {
 
             inProgress = true;
 
-            // TODO: Only get models with "mouse-in" and "mouse-out" events attached
-            std::vector< const ModelRegistration* > candidates;
-            for( const auto& registration : models ) {
-              if( registration ) {
-                candidates.emplace_back( registration.get() );
-              }
-            }
+            std::vector< const ModelRegistration* > candidates = narrowByEvent( { "mouse-in", "mouse-out" } );
 
             Geometry::Ray ray = camera.getPickingRay( metadata.mouseLocation, display.getDimensions() );
 
@@ -175,6 +209,23 @@ namespace BlueBear {
               fireInOutEvents( found, metadata );
               inProgress = false;
             } );
+          }
+
+          std::vector< const WorldRenderer::ModelRegistration* > WorldRenderer::narrowByEvent( const std::set< std::string >& acceptable ) {
+            std::vector< const ModelRegistration* > result;
+
+            for( const auto& registration : models ) {
+              if( registration ) {
+                for( const auto& event : registration->events ) {
+                  if( acceptable.find( event.first ) != acceptable.end() ) {
+                    result.emplace_back( registration.get() );
+                    break;
+                  }
+                }
+              }
+            }
+
+            return result;
           }
 
           void WorldRenderer::getModelAtMouse(

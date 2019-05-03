@@ -10,8 +10,8 @@ function Demo:init()
     if not self.instance then
       self.instance = self:get_model_manager():place_object( 'armaturebox', {} )
 
-     local interaction = bluebear.util.types.Interaction.new( "id", "Label", function() print( 'called' ) end )
-      self:get_entity():find_components( 'system.component.interaction_set' )[ 1 ]:associate_interaction( self.instance, interaction )
+     --local interaction = bluebear.util.types.Interaction.new( "id", "Label", function() print( 'called' ) end )
+      --self:get_entity():find_components( 'system.component.interaction_set' )[ 1 ]:associate_interaction( self.instance, interaction )
     end
   end )
 

@@ -107,6 +107,10 @@ namespace BlueBear {
       return worldRenderer;
     }
 
+    Device::Display::Adapter::Component::GuiComponent& HouseholdGameplayState::getGuiComponent() {
+      return guiComponent;
+    }
+
     Models::Utilities::WorldCache& HouseholdGameplayState::getWorldCache() {
       return worldCache;
     }

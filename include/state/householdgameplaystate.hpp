@@ -54,6 +54,7 @@ namespace BlueBear {
 
       Scripting::CoreEngine& getEngine();
       Device::Display::Adapter::Component::WorldRenderer& getWorldRenderer();
+      Device::Display::Adapter::Component::GuiComponent& getGuiComponent();
       Models::Utilities::WorldCache& getWorldCache();
 
       void update() override;
