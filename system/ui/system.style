@@ -46,8 +46,23 @@ Window.error {
   }
 }
 
+ContextMenu.__contextmenu {
+  width: 150;
+}
+
 ContextMenu {
   background-color: rgbaString( "36393Eff" );
-  font-color: rgbaString( "ffffffff" );
-  font-size: 26.0;
+
+  Text.__contextmenu_item {
+    font-size: 24.0;
+    padding: 5;
+    text-alignment: Orientation::LEFT;
+
+    fade: true;
+    fade-in-color: rgbaString( "848a94ff" );
+    fade-out-color: rgbaString( "36393Eff" );
+
+    background-color: rgbaString( "36393Eff" );
+    color: rgbaString( "FFFFFFFF" );
+  }
 }

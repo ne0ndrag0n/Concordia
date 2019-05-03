@@ -148,6 +148,10 @@ namespace BlueBear {
             return querier.get( totalQuery );
           }
 
+          void GuiComponent::removeElement( std::shared_ptr< Graphics::UserInterface::Element > element ) {
+            rootElement->remove( { element } );
+          }
+
           void GuiComponent::setupBlockingGlobalEvent( const std::string& eventId, std::function< void( Device::Input::Metadata ) > callback ) {
             blockingGlobalEvents[ eventId ] = [ callback ]( Device::Input::Metadata event ) {
               callback( event );
@@ -232,6 +236,7 @@ namespace BlueBear {
               if( captured ) {
                 fireFocusEvent( captured, event );
                 captured->getEventBundle().trigger( "mouse-down", event );
+                GUI_OBJECT_MOUSE_DOWN.trigger( captured );
               }
             }
           }
@@ -282,6 +287,7 @@ namespace BlueBear {
             } else {
               if( captured ) {
                 captured->getEventBundle().trigger( "mouse-up", event );
+                GUI_OBJECT_MOUSE_UP.trigger( captured );
               }
             }
           }

@@ -36,6 +36,14 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
     	return contextMenu;
 	}
 
+	void ContextMenu::reflow( bool selectorsInvalidated ) {
+		if( auto parent = getParent() ) {
+			parent->reflow( selectorsInvalidated );
+		} else {
+			Element::reflow( selectorsInvalidated );
+		}
+	}
+
 	void ContextMenu::calculate() {
 		// Call calculate on all child elements per parent object's responsibility
 		for( std::shared_ptr< Element > child : children ) {

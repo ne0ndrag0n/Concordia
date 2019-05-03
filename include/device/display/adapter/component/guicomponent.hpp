@@ -6,6 +6,7 @@
 #include "graphics/userinterface/propertylist.hpp"
 #include "graphics/userinterface/style/styleapplier.hpp"
 #include "graphics/shader.hpp"
+#include "eventmanager.hpp"
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -60,10 +61,15 @@ namespace BlueBear {
             void keyReleased( Device::Input::Metadata event );
 
           public:
+            BasicEvent< void*, std::shared_ptr< Graphics::UserInterface::Element > > GUI_OBJECT_MOUSE_DOWN;
+            BasicEvent< void*, std::shared_ptr< Graphics::UserInterface::Element > > GUI_OBJECT_MOUSE_UP;
+
             void loadStylesheets( const std::vector< std::string >& paths );
             std::vector< std::shared_ptr< Graphics::UserInterface::Element > > addElementsFromXML( const std::string& xmlPath, bool file = true );
             void addElement( std::shared_ptr< Graphics::UserInterface::Element > element );
             std::vector< std::shared_ptr< Graphics::UserInterface::Element > > query( sol::table queries );
+
+            void removeElement( std::shared_ptr< Graphics::UserInterface::Element > element );
 
             void setupBlockingGlobalEvent( const std::string& eventId, std::function< void( Device::Input::Metadata ) > callback );
             void unregisterBlockingGlobalEvent( const std::string& eventId );

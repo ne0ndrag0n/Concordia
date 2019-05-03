@@ -14,17 +14,22 @@
 #include <set>
 
 namespace BlueBear::Graphics::SceneGraph { class Model; }
+namespace BlueBear::Graphics::UserInterface { class Element; }
 namespace BlueBear::Graphics::UserInterface::Widgets { class ContextMenu; }
 namespace BlueBear::Scripting::EntityKit::Components {
 
 	class InteractionSet : public SystemComponent {
 		struct EventDescriptor {
-			std::shared_ptr< Graphics::UserInterface::Widgets::ContextMenu > menuItem;
 			std::vector< Gameplay::Interaction > interactions;
-			std::vector< std::pair< std::string, unsigned int > > registeredEvents;
+			std::optional< unsigned int > mouseInEvent;
+			std::optional< unsigned int > mouseOutEvent;
+			std::optional< unsigned int > mouseDownEvent;
 		};
 
 		std::map< std::shared_ptr< Graphics::SceneGraph::Model >, EventDescriptor > interactions;
+		std::shared_ptr< Graphics::UserInterface::Widgets::ContextMenu > menu = nullptr;
+
+		void checkClickOut( std::shared_ptr< Graphics::UserInterface::Element > selectedElement );
 
 		void modelMouseIn( Device::Input::Metadata event, std::shared_ptr< Graphics::SceneGraph::Model > model );
         void modelMouseOut( Device::Input::Metadata event, std::shared_ptr< Graphics::SceneGraph::Model > model );
@@ -33,9 +38,7 @@ namespace BlueBear::Scripting::EntityKit::Components {
 
 		void updateUniformsAndEvents( std::shared_ptr< Graphics::SceneGraph::Model > instance );
 
-		std::shared_ptr< Graphics::UserInterface::Widgets::ContextMenu > getMenuWidget(
-			const glm::ivec2& position, const std::vector< Gameplay::Interaction >& interactions
-		);
+		std::shared_ptr< Graphics::UserInterface::Widgets::ContextMenu > getMenuWidget( const std::vector< Gameplay::Interaction >& interactions );
 
 	public:
 		InteractionSet();
