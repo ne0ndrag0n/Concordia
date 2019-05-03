@@ -86,7 +86,7 @@ namespace BlueBear {
             void onMouseUp( Device::Input::Metadata metadata );
             void onMouseMoved( Device::Input::Metadata metadata );
 
-            std::vector< const ModelRegistration* > narrowByEvent( const std::set< std::string >& acceptable );
+            std::vector< const ModelRegistration* > getModels();
 
           public:
             EXCEPTION_TYPE( ObjectIDNotRegisteredException, "Object ID not registered!" );

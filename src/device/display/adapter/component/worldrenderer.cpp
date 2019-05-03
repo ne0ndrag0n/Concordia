@@ -142,7 +142,7 @@ namespace BlueBear {
           void WorldRenderer::onMouseDown( Device::Input::Metadata metadata ) {
             Geometry::Ray ray = camera.getPickingRay( metadata.mouseLocation, display.getDimensions() );
 
-            std::vector< const ModelRegistration* > candidates = narrowByEvent( { "mouse-down" } );
+            std::vector< const ModelRegistration* > candidates = getModels();
             std::vector< const ModelRegistration* > relevant;
             for( const ModelRegistration* registration : candidates ) {
               if( registration->instance->intersectsBoundingVolume( ray ) ) {
@@ -165,7 +165,7 @@ namespace BlueBear {
           void WorldRenderer::onMouseUp( Device::Input::Metadata metadata ) {
             Geometry::Ray ray = camera.getPickingRay( metadata.mouseLocation, display.getDimensions() );
 
-            std::vector< const ModelRegistration* > candidates = narrowByEvent( { "mouse-up" } );
+            std::vector< const ModelRegistration* > candidates = getModels();
             std::vector< const ModelRegistration* > relevant;
             for( const ModelRegistration* registration : candidates ) {
               if( registration->instance->intersectsBoundingVolume( ray ) ) {
@@ -193,7 +193,7 @@ namespace BlueBear {
 
             inProgress = true;
 
-            std::vector< const ModelRegistration* > candidates = narrowByEvent( { "mouse-in", "mouse-out" } );
+            std::vector< const ModelRegistration* > candidates = getModels();
 
             Geometry::Ray ray = camera.getPickingRay( metadata.mouseLocation, display.getDimensions() );
 
@@ -211,7 +211,7 @@ namespace BlueBear {
             } );
           }
 
-          std::vector< const WorldRenderer::ModelRegistration* > WorldRenderer::narrowByEvent( const std::set< std::string >& acceptable ) {
+          std::vector< const WorldRenderer::ModelRegistration* > WorldRenderer::getModels() {
             std::vector< const ModelRegistration* > result;
 
             for( const auto& registration : models ) {
