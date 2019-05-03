@@ -358,6 +358,10 @@ namespace BlueBear {
           void WorldRenderer::removeObject( std::shared_ptr< Graphics::SceneGraph::Model > model ) {
             for( auto it = models.begin(); it != models.end(); ) {
               if( ( *it )->instance == model ) {
+                if( previousMove == it->get() ) {
+                  previousMove = nullptr;
+                }
+
                 models.erase( it );
                 MODEL_REMOVED.trigger( model );
                 return;
