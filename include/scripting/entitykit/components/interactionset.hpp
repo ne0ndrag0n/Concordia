@@ -30,6 +30,7 @@ namespace BlueBear::Scripting::EntityKit::Components {
 		std::shared_ptr< Graphics::UserInterface::Widgets::ContextMenu > menu = nullptr;
 
 		void checkClickOut( std::shared_ptr< Graphics::UserInterface::Element > selectedElement );
+		void removeMenu();
 
 		void modelMouseIn( Device::Input::Metadata event, std::shared_ptr< Graphics::SceneGraph::Model > model );
         void modelMouseOut( Device::Input::Metadata event, std::shared_ptr< Graphics::SceneGraph::Model > model );

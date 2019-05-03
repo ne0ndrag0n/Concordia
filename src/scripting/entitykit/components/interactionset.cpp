@@ -5,6 +5,7 @@
 #include "graphics/scenegraph/uniforms/highlight_uniform.hpp"
 #include "scripting/entitykit/entity.hpp"
 #include "scripting/entitykit/components/componentcast.hpp"
+#include "scripting/coreengine.hpp"
 #include "state/householdgameplaystate.hpp"
 #include "containers/visitor.hpp"
 #include "log.hpp"
@@ -53,9 +54,13 @@ namespace BlueBear::Scripting::EntityKit::Components {
 
 			// If we get here then selectedElement was something totally unrelated to the menu
 			// Close + remove it
-			relevantState->getGuiComponent().removeElement( menu );
-			menu = nullptr;
+			removeMenu();
 		}
+	}
+
+	void InteractionSet::removeMenu() {
+		relevantState->getGuiComponent().removeElement( menu );
+		menu = nullptr;
 	}
 
 	void InteractionSet::modelMouseIn( Device::Input::Metadata event, std::shared_ptr< Graphics::SceneGraph::Model > model ) {
@@ -69,12 +74,14 @@ namespace BlueBear::Scripting::EntityKit::Components {
 	}
 
 	void InteractionSet::modelMouseDown( Device::Input::Metadata event, std::shared_ptr< Graphics::SceneGraph::Model > model ) {
-		menu = getMenuWidget( interactions[ model ].interactions );
-		relevantState->getGuiComponent().addElement( menu );
+		if( !menu ) {
+			menu = getMenuWidget( interactions[ model ].interactions );
+			relevantState->getGuiComponent().addElement( menu );
 
-		menu->getPropertyList().set< int >( "left", event.mouseLocation.x );
-		menu->getPropertyList().set< int >( "top", event.mouseLocation.y );
-		menu->getPropertyList().set< Graphics::UserInterface::Placement >( "placement", Graphics::UserInterface::Placement::FREE );
+			menu->getPropertyList().set< int >( "left", event.mouseLocation.x );
+			menu->getPropertyList().set< int >( "top", event.mouseLocation.y );
+			menu->getPropertyList().set< Graphics::UserInterface::Placement >( "placement", Graphics::UserInterface::Placement::FREE );
+		}
 	}
 
 	void InteractionSet::modelRemoved( std::shared_ptr< Graphics::SceneGraph::Model > model ) {
@@ -133,7 +140,12 @@ namespace BlueBear::Scripting::EntityKit::Components {
 		auto menu = Graphics::UserInterface::Widgets::ContextMenu::create( "", { "__contextmenu" } );
 
 		for( const auto& interaction : interactions ) {
-			menu->addChild( Graphics::UserInterface::Widgets::Text::create( "", { "__contextmenu_item" }, interaction.label ), false );
+			auto text = Graphics::UserInterface::Widgets::Text::create( "", { "__contextmenu_item" }, interaction.label );
+			text->getEventBundle().registerInputEvent( "mouse-up", [ this, callback = interaction.callback ]( const Device::Input::Metadata& metadata ) {
+				relevantState->getEngine().setTimeout( 1, callback );
+				removeMenu();
+			} );
+			menu->addChild( text, false );
 		}
 
 		return menu;
