@@ -27,8 +27,12 @@ namespace BlueBear::Scripting::EntityKit::Components {
 		// TODO
 	}
 
-    void InteractionSet::load( const Json::Value& data ) {
+  void InteractionSet::load( const Json::Value& data ) {
 		// TODO
+	}
+
+	void InteractionSet::drop() {
+		removeMenu();
 	}
 
 	void InteractionSet::submitLuaContributions( sol::state& lua, sol::table types ) {

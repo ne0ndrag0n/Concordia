@@ -48,6 +48,7 @@ namespace BlueBear::Scripting::EntityKit::Components {
 
 		Json::Value save() override;
 		void load( const Json::Value& data ) override;
+		void drop() override;
 
 		static void submitLuaContributions( sol::state& lua, sol::table types );
 
