@@ -61,6 +61,7 @@ namespace BlueBear::Scripting::EntityKit::Components {
 	void InteractionSet::removeMenu() {
 		relevantState->getGuiComponent().removeElement( menu );
 		menu = nullptr;
+		menuModel = nullptr;
 	}
 
 	void InteractionSet::modelMouseIn( Device::Input::Metadata event, std::shared_ptr< Graphics::SceneGraph::Model > model ) {
@@ -81,12 +82,18 @@ namespace BlueBear::Scripting::EntityKit::Components {
 			menu->getPropertyList().set< int >( "left", event.mouseLocation.x );
 			menu->getPropertyList().set< int >( "top", event.mouseLocation.y );
 			menu->getPropertyList().set< Graphics::UserInterface::Placement >( "placement", Graphics::UserInterface::Placement::FREE );
+
+			menuModel = model;
 		}
 	}
 
 	void InteractionSet::modelRemoved( std::shared_ptr< Graphics::SceneGraph::Model > model ) {
 		// Perform a simple drop of all interactions for this model
 		interactions.erase( model );
+
+		if( menuModel == model ) {
+			removeMenu();
+		}
 	}
 
 	void InteractionSet::updateUniformsAndEvents( std::shared_ptr< Graphics::SceneGraph::Model > instance ) {

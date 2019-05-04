@@ -28,6 +28,7 @@ namespace BlueBear::Scripting::EntityKit::Components {
 
 		std::map< std::shared_ptr< Graphics::SceneGraph::Model >, EventDescriptor > interactions;
 		std::shared_ptr< Graphics::UserInterface::Widgets::ContextMenu > menu = nullptr;
+		std::shared_ptr< Graphics::SceneGraph::Model > menuModel = nullptr;
 
 		void checkClickOut( std::shared_ptr< Graphics::UserInterface::Element > selectedElement );
 		void removeMenu();
