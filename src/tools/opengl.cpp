@@ -7,6 +7,7 @@ namespace BlueBear {
   namespace Tools {
 
     std::array< bool, 16 > OpenGL::textureUnits{ false };
+    std::map< GLint, std::map< std::string, GLint > >  OpenGL::cachedUniformIds;
 
     std::optional< unsigned int > OpenGL::getTextureUnit() {
       for( unsigned int i = 0; i != 16; i++ ) {
@@ -26,7 +27,14 @@ namespace BlueBear {
     }
 
     GLint OpenGL::getUniformID( const std::string& uniform ) {
-      return glGetUniformLocation( Graphics::Shader::CURRENT_PROGRAM, uniform.c_str() );
+      auto& bucket = cachedUniformIds[ Graphics::Shader::CURRENT_PROGRAM ];
+      auto it = bucket.find( uniform );
+      if( it != bucket.end() ) {
+        // Seen before
+        return it->second;
+      }
+
+      return bucket[ uniform ] = glGetUniformLocation( Graphics::Shader::CURRENT_PROGRAM, uniform.c_str() );
     }
 
     GLint OpenGL::getUniformLocation( const std::string& uniform ) {
