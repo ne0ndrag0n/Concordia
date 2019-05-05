@@ -382,28 +382,51 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     }
   }
 
-  /**
-   * All the meshes are ready and corners fixed
-   */
-  Drawable WallModelLoader::generateDrawable() {
+  std::shared_ptr< Model > WallModelLoader::getLevel() {
     std::shared_ptr< Texture > generatedTexture = std::make_shared< Texture >( *atlas.generateAtlas() );
+    std::shared_ptr< Material > generatedMaterial = std::make_shared< Material >( std::vector< std::shared_ptr< Texture > >{ generatedTexture }, std::vector< std::shared_ptr< Texture > >{}, 0.0f, 1.0f );
+    std::shared_ptr< Model > result = Model::create( "__wall_level", {} );
 
-    // Result will be a single model with a single mesh built using a mesh generator
-    Mesh::IndexedMeshGenerator< Mesh::TexturedVertex > generator;
-    for( const auto& row : cornerMap ) {
-      for( const auto& corner : row ) {
-        if( corner.horizontal.model ) { addToGenerator( generator, corner.horizontal.stagedMesh ); }
-        if( corner.vertical.model ) { addToGenerator( generator, corner.vertical.stagedMesh ); }
-        if( corner.diagonal.model ) { addToGenerator( generator, corner.diagonal.stagedMesh ); }
-        if( corner.reverseDiagonal.model ) { addToGenerator( generator, corner.reverseDiagonal.stagedMesh ); }
+    for( auto y = 0; y != cornerMap.size(); y++ ) {
+      for( auto x = 0; x != cornerMap[ 0 ].size(); x++ ) {
+        const Corner& corner = cornerMap[ y ][ x ];
+
+        if( corner.horizontal.model ) {
+          Mesh::IndexedMeshGenerator< Mesh::TexturedVertex> generator;
+          addToGenerator( generator, corner.horizontal.stagedMesh );
+
+          result->addChild(
+            Model::create( "__horizontal_" + std::to_string( y ) + "," + std::to_string( x ), { { generator.generateMesh(), shader, generatedMaterial } } )
+          );
+        }
+        if( corner.vertical.model ) {
+          Mesh::IndexedMeshGenerator< Mesh::TexturedVertex> generator;
+          addToGenerator( generator, corner.vertical.stagedMesh );
+
+          result->addChild(
+            Model::create( "__vertical_" + std::to_string( y ) + "," + std::to_string( x ), { { generator.generateMesh(), shader, generatedMaterial } } )
+          );
+        };
+        if( corner.diagonal.model ) {
+          Mesh::IndexedMeshGenerator< Mesh::TexturedVertex> generator;
+          addToGenerator( generator, corner.diagonal.stagedMesh );
+
+          result->addChild(
+            Model::create( "__diagonal_" + std::to_string( y ) + "," + std::to_string( x ), { { generator.generateMesh(), shader, generatedMaterial } } )
+          );
+        }
+        if( corner.reverseDiagonal.model ) {
+          Mesh::IndexedMeshGenerator< Mesh::TexturedVertex> generator;
+          addToGenerator( generator, corner.reverseDiagonal.stagedMesh );
+
+          result->addChild(
+            Model::create( "__reverseDiagonal_" + std::to_string( y ) + "," + std::to_string( x ), { { generator.generateMesh(), shader, generatedMaterial } } )
+          );
+        }
       }
     }
 
-    return {
-      generator.generateMesh(),
-      shader,
-      std::make_shared< Material >( std::vector< std::shared_ptr< Texture > >{ generatedTexture }, std::vector< std::shared_ptr< Texture > >{}, 0.0f, 1.0f )
-    };
+    return result;
   }
 
   std::shared_ptr< Model > WallModelLoader::get() {
@@ -430,7 +453,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
 
       generateDeferredMeshes();
 
-      result->addChild( Model::create( "__wall_level", { generateDrawable() } ) );
+      result->addChild( getLevel() );
     }
 
     return result;

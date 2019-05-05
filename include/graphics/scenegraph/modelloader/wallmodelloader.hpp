@@ -67,7 +67,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     PlaneGroup sideToStagedMesh( const Models::Sides& sides, const glm::vec3& origin, const glm::vec3& width );
     void generateDeferredMeshes();
     void addToGenerator( Mesh::IndexedMeshGenerator< Mesh::TexturedVertex >& generator, const PlaneGroup& planeGroup );
-    Drawable generateDrawable();
+    std::shared_ptr< Model > getLevel();
 
   public:
     WallModelLoader( const std::vector< Models::Infrastructure::FloorLevel >& floorLevels, Vector::Renderer& renderer );
