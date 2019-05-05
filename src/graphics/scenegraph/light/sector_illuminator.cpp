@@ -83,9 +83,6 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 			}
 		}
 
-		int resolution = std::min( ( int ) std::pow( 10, ConfigManager::getInstance().getIntValue( "sector_resolution" ) ), 100 );
-		Tools::OpenGL::setUniform( "sectorResolution", ( float ) resolution );
-
 		int item = 0;
 		for( const auto& [ origin, dimensions ] : levelData ) {
 			Tools::OpenGL::setUniform( "sectors[" + std::to_string( item ) + "].origin", glm::vec2( origin ) );
@@ -189,7 +186,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		std::vector< std::unique_ptr< float[] > > buffers;
 		buffers.resize( levelData.size() );
 
-		int resolution = std::min( ( int ) std::pow( 10, ConfigManager::getInstance().getIntValue( "sector_resolution" ) ), 100 );
+		int resolution = 100;
 		for( const auto& [ origin, dimensions ] : levelData ) {
 			int height = dimensions.y * resolution;
 			int width = dimensions.x * resolution;

@@ -3,6 +3,5 @@
   "fps_overview": 60,
   "min_log_level": 0,
   "viewport_x": 1152,
-  "viewport_y": 864,
-  "sector_resolution": 2
+  "viewport_y": 864
 }

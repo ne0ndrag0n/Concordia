@@ -4,6 +4,8 @@ in vec3 fragNormal;
 in vec3 fragPos;
 out vec4 color;
 
+const float sectorResolution = 100.0f;
+
 struct Material {
   sampler2D diffuse0;
   float shininess;
@@ -25,7 +27,6 @@ struct Sector {
 uniform vec3 cameraPos;
 uniform Material material;
 uniform DirectionalLight directionalLight;
-uniform float sectorResolution;
 uniform DirectionalLight sectorLights[ 16 ];
 uniform sampler2D sectorMap0;
 uniform Sector sectors[ 8 ];
