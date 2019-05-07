@@ -1,10 +1,13 @@
 #include "graphics/scenegraph/resourcebank.hpp"
+#include "graphics/utilities/shader_manager.hpp"
 #include "graphics/texture.hpp"
 #include "graphics/shader.hpp"
 
 namespace BlueBear {
   namespace Graphics {
     namespace SceneGraph {
+
+      ResourceBank::ResourceBank( Utilities::ShaderManager& shaderManager ) : shaderManager( shaderManager ) {}
 
       bool ResourceBank::listsCongruent( const TextureList& list1, const TextureList& list2 ) {
         if( list1.size() == list2.size() ) {
@@ -21,15 +24,8 @@ namespace BlueBear {
       }
 
       std::shared_ptr< Shader > ResourceBank::getOrCreateShader( const std::string& vertexPath, const std::string& fragmentPath, bool defer ) {
-        std::string key = vertexPath + ":" + fragmentPath;
-
         std::lock_guard< std::mutex > lock( shadersMutex );
-        auto it = shaders.find( key );
-        if( it != shaders.end() ) {
-          return it->second;
-        } else {
-          return shaders[ key ] = std::make_shared< Shader >( vertexPath, fragmentPath, defer );
-        }
+        shaderManager.getShader( vertexPath, fragmentPath, defer );
       }
 
       std::shared_ptr< Texture > ResourceBank::getOrCreateTexture( const std::string& path, bool defer ) {

@@ -13,15 +13,19 @@ namespace BlueBear {
     class Texture;
     class Shader;
 
+    namespace Utilities {
+      class ShaderManager;
+    }
+
     namespace SceneGraph {
 
       /**
        * Facilitates reuse of common by-ref objects used in Models
        */
       class ResourceBank {
+        Utilities::ShaderManager& shaderManager;
         tbb::concurrent_vector< std::shared_ptr< Material > > materials;
         std::unordered_map< std::string, std::shared_ptr< Texture > > textures;
-        std::unordered_map< std::string, std::shared_ptr< Shader > > shaders;
         std::mutex materialsMutex;
         std::mutex texturesMutex;
         std::mutex shadersMutex;
@@ -29,6 +33,8 @@ namespace BlueBear {
         bool listsCongruent( const TextureList& list1, const TextureList& list2 );
 
       public:
+        ResourceBank( Utilities::ShaderManager& shaderManager );
+
         std::shared_ptr< Shader > getOrCreateShader( const std::string& vertexPath, const std::string& fragmentPath, bool defer );
 
         std::shared_ptr< Texture > getOrCreateTexture( const std::string& path, bool defer );

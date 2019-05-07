@@ -23,8 +23,8 @@ namespace BlueBear {
       namespace Adapter {
         namespace Component {
 
-          WorldRenderer::WorldRenderer( Device::Display::Display& display ) :
-            Adapter::Adapter( display ),
+          WorldRenderer::WorldRenderer( Device::Display::Display& display, Graphics::Utilities::ShaderManager& shaderManager ) :
+            Adapter::Adapter( display ), shaderManager( shaderManager ), cache( shaderManager ),
             camera( Graphics::Camera( ConfigManager::getInstance().getIntValue( "viewport_x" ), ConfigManager::getInstance().getIntValue( "viewport_y" ) ) ) {
               eventManager.LUA_STATE_READY.listen( this, std::bind( &WorldRenderer::submitLuaContributions, this, std::placeholders::_1 ) );
               eventManager.SHADER_CHANGE.listen( this, std::bind( &WorldRenderer::onShaderChange, this ) );
@@ -422,7 +422,7 @@ namespace BlueBear {
           }
 
           std::unique_ptr< Graphics::SceneGraph::ModelLoader::FileModelLoader > WorldRenderer::getFileModelLoader( bool deferGLOperations ) {
-            std::unique_ptr< Graphics::SceneGraph::ModelLoader::FileModelLoader > result = std::make_unique< Graphics::SceneGraph::ModelLoader::AssimpModelLoader >();
+            std::unique_ptr< Graphics::SceneGraph::ModelLoader::FileModelLoader > result = std::make_unique< Graphics::SceneGraph::ModelLoader::AssimpModelLoader >( shaderManager );
 
             Graphics::SceneGraph::ModelLoader::AssimpModelLoader& asAssimp = ( Graphics::SceneGraph::ModelLoader::AssimpModelLoader& )*result;
             asAssimp.deferGLOperations = deferGLOperations;

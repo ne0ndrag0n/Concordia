@@ -4,13 +4,14 @@
 #include "graphics/vector/renderer.hpp"
 #include "graphics/texture.hpp"
 #include "graphics/shader.hpp"
+#include "graphics/utilities/shader_manager.hpp"
 #include "exceptions/nullpointerexception.hpp"
 #include "tools/utility.hpp"
 
 namespace BlueBear::Graphics::SceneGraph::ModelLoader {
 
-  WallModelLoader::WallModelLoader( const std::vector< Models::Infrastructure::FloorLevel >& floorLevels, Vector::Renderer& renderer )
-    : floorLevels( floorLevels ), shader( std::make_shared< Shader >( "system/shaders/infr/vertex.glsl", "system/shaders/infr/fragment.glsl" ) ) {
+  WallModelLoader::WallModelLoader( const std::vector< Models::Infrastructure::FloorLevel >& floorLevels, Vector::Renderer& renderer, Utilities::ShaderManager& shaderManager )
+    : floorLevels( floorLevels ), shader( shaderManager.getShader( "system/shaders/infr/vertex.glsl", "system/shaders/infr/fragment.glsl" ) ) {
       initTopTexture( renderer );
     }
 

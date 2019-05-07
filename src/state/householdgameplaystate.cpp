@@ -23,8 +23,8 @@ namespace BlueBear {
 
     HouseholdGameplayState::HouseholdGameplayState( Application& application, const std::string& path ) :
       State::State( application ),
-      worldRenderer( application.getDisplayDevice() ),
-      guiComponent( application.getDisplayDevice() ),
+      worldRenderer( application.getDisplayDevice(), shaderManager ),
+      guiComponent( application.getDisplayDevice(), shaderManager ),
       engine( *this ),
       luaEventHelper( engine ),
       infrastructureManager( *this )
@@ -113,6 +113,10 @@ namespace BlueBear {
 
     Models::Utilities::WorldCache& HouseholdGameplayState::getWorldCache() {
       return worldCache;
+    }
+
+    Graphics::Utilities::ShaderManager& HouseholdGameplayState::getShaderManager() {
+      return shaderManager;
     }
 
     void HouseholdGameplayState::update() {

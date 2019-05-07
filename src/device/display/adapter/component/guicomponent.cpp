@@ -10,6 +10,7 @@
 #include "graphics/userinterface/luaregistrant.hpp"
 #include "graphics/userinterface/xmlloader.hpp"
 #include "graphics/userinterface/style/ast/selectorquery.hpp"
+#include "graphics/utilities/shader_manager.hpp"
 #include "scripting/luakit/utility.hpp"
 #include "tools/utility.hpp"
 #include "configmanager.hpp"
@@ -25,10 +26,10 @@ namespace BlueBear {
       namespace Adapter {
         namespace Component {
 
-          GuiComponent::GuiComponent( Device::Display::Display& display ) :
+          GuiComponent::GuiComponent( Device::Display::Display& display, Graphics::Utilities::ShaderManager& shaderManager ) :
             Adapter::Adapter( display ),
             vector( display ),
-            guiShader( "system/shaders/gui/vertex.glsl", "system/shaders/gui/fragment.glsl" ),
+            guiShader( shaderManager.getShader( "system/shaders/gui/vertex.glsl", "system/shaders/gui/fragment.glsl" ) ),
             rootElement( Graphics::UserInterface::Widgets::Layout::create( "", {} ) ),
             styleManager( rootElement ) {
               Graphics::UserInterface::Element::manager = this;
@@ -322,7 +323,7 @@ namespace BlueBear {
 
             glEnable( GL_SCISSOR_TEST );
 
-            guiShader.use( true );
+            guiShader->use( true );
             rootElement->walk( []( Graphics::UserInterface::Element& element ) {
               element.getPropertyList().updateAnimation();
             } );

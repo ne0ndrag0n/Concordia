@@ -12,7 +12,7 @@
 #include <optional>
 
 namespace BlueBear::Graphics { class Texture; }
-namespace BlueBear::Graphics::Utilities{ class TextureAtlas; }
+namespace BlueBear::Graphics::Utilities{ class TextureAtlas; class ShaderManager; }
 namespace BlueBear::Graphics::Vector{ class Renderer; }
 namespace BlueBear::Graphics::SceneGraph::ModelLoader {
 
@@ -70,7 +70,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     std::shared_ptr< Model > getLevel();
 
   public:
-    WallModelLoader( const std::vector< Models::Infrastructure::FloorLevel >& floorLevels, Vector::Renderer& renderer );
+    WallModelLoader( const std::vector< Models::Infrastructure::FloorLevel >& floorLevels, Vector::Renderer& renderer, Utilities::ShaderManager& shaderManager );
 
     std::shared_ptr< Model > get() override;
   };

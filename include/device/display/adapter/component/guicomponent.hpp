@@ -28,6 +28,10 @@ namespace BlueBear {
     class Element;
   }
 
+  namespace Graphics::Utilities {
+    class ShaderManager;
+  }
+
   namespace Device {
     namespace Display {
       class Display;
@@ -37,7 +41,7 @@ namespace BlueBear {
 
           class GuiComponent : public Adapter {
             Graphics::Vector::Renderer vector;
-            Graphics::Shader guiShader;
+            std::shared_ptr< Graphics::Shader > guiShader;
             std::unique_ptr< Graphics::UserInterface::DragHelper > currentDrag;
             std::set< std::shared_ptr< Graphics::UserInterface::Element > > previousMove;
             std::shared_ptr< Graphics::UserInterface::Element > rootElement;
@@ -81,7 +85,7 @@ namespace BlueBear {
 
             void startDrag( std::shared_ptr< Graphics::UserInterface::Element > target, const glm::ivec2& offset );
 
-            GuiComponent( Device::Display::Display& display );
+            GuiComponent( Device::Display::Display& display, Graphics::Utilities::ShaderManager& shaderManager );
             ~GuiComponent();
             void nextFrame() override;
           };

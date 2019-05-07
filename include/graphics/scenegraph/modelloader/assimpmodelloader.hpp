@@ -19,22 +19,20 @@ namespace BlueBear {
     class Texture;
     class Shader;
 
+    namespace Utilities { class ShaderManager; }
+
     namespace SceneGraph {
       class Model;
       class Material;
       class ResourceBank;
 
-      namespace Mesh {
-        class Mesh;
-      }
-
-      namespace Animation {
-        class Animator;
-      }
+      namespace Mesh { class Mesh; }
+      namespace Animation { class Animator; }
 
       namespace ModelLoader {
 
         class AssimpModelLoader : public FileModelLoader {
+          Utilities::ShaderManager& shaderManager;
           Assimp::Importer importer;
           struct ImportContext {
             const aiScene* scene;
@@ -66,6 +64,8 @@ namespace BlueBear {
         public:
           EXCEPTION_TYPE( MalformedAnimationException, "Malformed animation data" );
           EXCEPTION_TYPE( TooManyBonesException, "Too many bones for this vertex!" );
+
+          AssimpModelLoader( Utilities::ShaderManager& shaderManager );
 
           // Only a hint!
           bool useIndices = true;

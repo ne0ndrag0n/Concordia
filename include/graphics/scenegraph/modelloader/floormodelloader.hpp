@@ -21,17 +21,21 @@ namespace BlueBear {
   }
 
   namespace Graphics {
+    namespace Utilities{ class ShaderManager; }
+    class Shader;
+
     namespace SceneGraph {
       class Model;
 
       namespace ModelLoader {
         class FloorModelLoader : public ProceduralModelLoader {
+          std::shared_ptr< Shader > shader;
           const std::vector< Models::Infrastructure::FloorLevel >& levels;
 
           sf::Image generateTexture( const Models::Infrastructure::FloorLevel& currentLevel );
 
         public:
-          FloorModelLoader( const std::vector< Models::Infrastructure::FloorLevel >& levels );
+          FloorModelLoader( const std::vector< Models::Infrastructure::FloorLevel >& levels, Utilities::ShaderManager& shaderManager );
 
           virtual std::shared_ptr< Model > get();
         };

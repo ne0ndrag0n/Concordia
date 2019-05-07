@@ -12,6 +12,7 @@
 #include "models/infrastructure.hpp"
 #include "gameplay/entitymanager.hpp"
 #include "gameplay/infrastructuremanager.hpp"
+#include "graphics/utilities/shader_manager.hpp"
 #include "serializable.hpp"
 #include <memory>
 #include <string>
@@ -27,6 +28,8 @@ namespace BlueBear {
   namespace State {
 
     class HouseholdGameplayState : public State, public Serializable {
+      Graphics::Utilities::ShaderManager shaderManager;
+
       Device::Display::Adapter::Component::WorldRenderer worldRenderer;
       Device::Display::Adapter::Component::GuiComponent guiComponent;
 
@@ -56,6 +59,7 @@ namespace BlueBear {
       Device::Display::Adapter::Component::WorldRenderer& getWorldRenderer();
       Device::Display::Adapter::Component::GuiComponent& getGuiComponent();
       Models::Utilities::WorldCache& getWorldCache();
+      Graphics::Utilities::ShaderManager& getShaderManager();
 
       void update() override;
     };

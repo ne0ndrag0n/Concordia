@@ -4,6 +4,7 @@
 #include "graphics/scenegraph/drawable.hpp"
 #include "graphics/scenegraph/model.hpp"
 #include "graphics/scenegraph/material.hpp"
+#include "graphics/utilities/shader_manager.hpp"
 #include "graphics/texture.hpp"
 #include "graphics/shader.hpp"
 #include "configmanager.hpp"
@@ -14,8 +15,8 @@ namespace BlueBear {
     namespace SceneGraph {
       namespace ModelLoader {
 
-        FloorModelLoader::FloorModelLoader( const std::vector< Models::Infrastructure::FloorLevel >& levels ) :
-          levels( levels ) {}
+        FloorModelLoader::FloorModelLoader( const std::vector< Models::Infrastructure::FloorLevel >& levels, Utilities::ShaderManager& shaderManager ) :
+          shader( shaderManager.getShader( "system/shaders/infr/vertex.glsl", "system/shaders/infr/fragment.glsl" ) ), levels( levels ) {}
 
         sf::Image FloorModelLoader::generateTexture( const Models::Infrastructure::FloorLevel& currentLevel ) {
           sf::Image result;
@@ -29,7 +30,6 @@ namespace BlueBear {
         std::shared_ptr< Model > FloorModelLoader::get() {
           int side = ConfigManager::getInstance().getIntValue( "floor_texture_size" );
           std::shared_ptr< Model > finalResult = Model::create( "__floorrig", {} );
-          std::shared_ptr< Shader > shader = std::make_shared< Shader >( "system/shaders/infr/vertex.glsl", "system/shaders/infr/fragment.glsl" );
 
           float baseElevation = 0.0f;
           for( const Models::Infrastructure::FloorLevel& floorLevel : levels ) {

@@ -8,6 +8,7 @@
 #include "geometry/triangle.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/scenegraph/resourcebank.hpp"
+#include "graphics/utilities/shader_manager.hpp"
 #include "exceptions/genexc.hpp"
 #include "tools/async_table.hpp"
 #include "eventmanager.hpp"
@@ -65,6 +66,7 @@ namespace BlueBear {
             };
 
             Graphics::Camera camera;
+            Graphics::Utilities::ShaderManager& shaderManager;
             Graphics::SceneGraph::ResourceBank cache;
             const ModelRegistration* previousMove = nullptr;
             std::unordered_map< std::string, std::shared_ptr< Graphics::SceneGraph::Model > > originals;
@@ -90,7 +92,7 @@ namespace BlueBear {
 
           public:
             EXCEPTION_TYPE( ObjectIDNotRegisteredException, "Object ID not registered!" );
-            WorldRenderer( Display& display );
+            WorldRenderer( Display& display, Graphics::Utilities::ShaderManager& shaderManager );
             virtual ~WorldRenderer();
 
             Json::Value save() override;

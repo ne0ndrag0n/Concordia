@@ -11,6 +11,7 @@
 #include <vector>
 
 namespace BlueBear::State { class HouseholdGameplayState; }
+namespace BlueBear::Graphics::Utilities{ class ShaderManager; }
 namespace BlueBear::Graphics::SceneGraph::Light { class SectorIlluminator; }
 namespace BlueBear::Gameplay {
 

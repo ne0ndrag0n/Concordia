@@ -11,6 +11,7 @@
 #include "graphics/scenegraph/material.hpp"
 #include "graphics/scenegraph/transform.hpp"
 #include "graphics/scenegraph/resourcebank.hpp"
+#include "graphics/utilities/shader_manager.hpp"
 #include "graphics/texture.hpp"
 #include "graphics/shader.hpp"
 #include "tools/assimptools.hpp"
@@ -25,6 +26,8 @@ namespace BlueBear {
     namespace SceneGraph {
       namespace ModelLoader {
 
+        AssimpModelLoader::AssimpModelLoader( Utilities::ShaderManager& shaderManager ) : shaderManager( shaderManager ) {}
+
         void AssimpModelLoader::log( const std::string& tag, const std::string& message ) {
           std::string indents;
 
@@ -36,11 +39,7 @@ namespace BlueBear {
         }
 
         std::shared_ptr< Shader > AssimpModelLoader::getShader( const std::string& vertexPath, const std::string& fragmentPath ) {
-          if( cache ) {
-            return cache->getOrCreateShader( vertexPath, fragmentPath, deferGLOperations );
-          }
-
-          return std::make_shared< Shader >( vertexPath, fragmentPath, deferGLOperations );
+          return shaderManager.getShader( vertexPath, fragmentPath, deferGLOperations );
         }
 
         std::shared_ptr< Texture > AssimpModelLoader::getTexture( const std::string& path ) {

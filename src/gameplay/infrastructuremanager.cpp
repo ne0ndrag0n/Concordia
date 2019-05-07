@@ -19,9 +19,9 @@ namespace BlueBear::Gameplay {
 
 		auto& worldRenderer = state.as< State::HouseholdGameplayState >().getWorldRenderer();
 
-		Graphics::SceneGraph::ModelLoader::FloorModelLoader floorModelLoader( model.getLevels() );
+		Graphics::SceneGraph::ModelLoader::FloorModelLoader floorModelLoader( model.getLevels(), state.as< State::HouseholdGameplayState >().getShaderManager() );
 		Graphics::Vector::Renderer vectorRenderer( state.as< State::HouseholdGameplayState >().getApplication().getDisplayDevice() );
-		Graphics::SceneGraph::ModelLoader::WallModelLoader wallModelLoader( model.getLevels(), vectorRenderer );
+		Graphics::SceneGraph::ModelLoader::WallModelLoader wallModelLoader( model.getLevels(), vectorRenderer, state.as< State::HouseholdGameplayState >().getShaderManager() );
 
 		worldRenderer.loadDirect( "__floorrig", floorModelLoader.get() );
 		worldRenderer.loadDirect( "__wallrig", wallModelLoader.get() );
