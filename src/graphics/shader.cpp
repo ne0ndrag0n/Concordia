@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <GL/glew.h>
+#include <glm/gtc/type_ptr.hpp>
 
 /**
  * TODO:
@@ -139,7 +140,9 @@ namespace BlueBear {
 
     void Shader::sendData( Uniform uniform, const glm::vec2& value ) const {
       if( this->Program == Shader::CURRENT_PROGRAM ) {
-        glUniform2f( uniform, value[ 0 ], value[ 1 ] );
+        if( uniform != -1 ) {
+          glUniform2f( uniform, value[ 0 ], value[ 1 ] );
+        }
       } else {
         Log::getInstance().warn( "Shader::getUniform", "Shader was not set before sendData was called." );
       }
@@ -147,7 +150,9 @@ namespace BlueBear {
 
     void Shader::sendData( Uniform uniform, const glm::vec3& value ) const {
       if( this->Program == Shader::CURRENT_PROGRAM ) {
-        glUniform3f( uniform, value[ 0 ], value[ 1 ], value[ 2 ] );
+        if( uniform != -1 ) {
+          glUniform3f( uniform, value[ 0 ], value[ 1 ], value[ 2 ] );
+        }
       } else {
         Log::getInstance().warn( "Shader::getUniform", "Shader was not set before sendData was called." );
       }
@@ -155,7 +160,49 @@ namespace BlueBear {
 
     void Shader::sendData( Uniform uniform, const glm::vec4& value ) const {
       if( this->Program == Shader::CURRENT_PROGRAM ) {
-        glUniform4f( uniform, value[ 0 ], value[ 1 ], value[ 2 ], value[ 3 ] );
+        if( uniform != -1 ) {
+          glUniform4f( uniform, value[ 0 ], value[ 1 ], value[ 2 ], value[ 3 ] );
+        }
+      } else {
+        Log::getInstance().warn( "Shader::getUniform", "Shader was not set before sendData was called." );
+      }
+    }
+
+    void Shader::sendData( Uniform uniform, const glm::mat4& value ) const {
+      if( this->Program == Shader::CURRENT_PROGRAM ) {
+        if( uniform != -1 ) {
+          glUniformMatrix4fv( uniform, 1, GL_FALSE, glm::value_ptr( value ) );
+        }
+      } else {
+        Log::getInstance().warn( "Shader::getUniform", "Shader was not set before sendData was called." );
+      }
+    }
+
+    void Shader::sendData( Uniform uniform, const int value ) const {
+      if( this->Program == Shader::CURRENT_PROGRAM ) {
+        if( uniform != -1 ) {
+          glUniform1i( uniform, value );
+        }
+      } else {
+        Log::getInstance().warn( "Shader::getUniform", "Shader was not set before sendData was called." );
+      }
+    }
+
+    void Shader::sendData( Uniform uniform, const unsigned int value ) const {
+      if( this->Program == Shader::CURRENT_PROGRAM ) {
+        if( uniform != -1 ) {
+          glUniform1ui( uniform, value );
+        }
+      } else {
+        Log::getInstance().warn( "Shader::getUniform", "Shader was not set before sendData was called." );
+      }
+    }
+
+    void Shader::sendData( Uniform uniform, const float value ) const {
+      if( this->Program == Shader::CURRENT_PROGRAM ) {
+        if( uniform != -1 ) {
+          glUniform1f( uniform, value );
+        }
       } else {
         Log::getInstance().warn( "Shader::getUniform", "Shader was not set before sendData was called." );
       }

@@ -74,10 +74,54 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 	}
 
 	const SectorIlluminator::ShaderUniformSet& SectorIlluminator::getShaderUniformSet( const Shader* address ) {
-		// TODO
+		auto it = shaderUniformSets.find( address );
+		if( it != shaderUniformSets.end() ) {
+			return it->second;
+		}
+
+		ShaderUniformSet& newSet = shaderUniformSets[ address ];
+
+		int numSectors = ConfigManager::getInstance().getIntValue( "shader_num_rooms" );
+		for( int i = 0; i != numSectors; i++ ) {
+			auto& sectorOrigin = newSet.sectorsOrigin.emplace_back( -1 );
+			auto& sectorDimensions = newSet.sectorsDimensions.emplace_back( -1 );
+
+			if( auto optional = address->getUniform( "sectors[" + std::to_string( i ) + "].origin" ) ) {
+				sectorOrigin = *optional;
+				sectorDimensions = *address->getUniform( "sectors[" + std::to_string( i ) + "].dimensions" );
+			}
+		}
+
+		int numSectorLevels = ConfigManager::getInstance().getIntValue( "shader_num_sector_levels" );
+		for( int i = 0; i != numSectorLevels; i++ ) {
+			auto& sectorMap = newSet.sectorMaps.emplace_back( -1 );
+
+			if( auto optional = address->getUniform( "sectorMap" + std::to_string( i ) ) ) {
+				sectorMap = *optional;
+			}
+		}
+
+		int numSectorLights = ConfigManager::getInstance().getIntValue( "shader_num_room_lights" );
+		for( int i = 0; i != numSectorLights; i++ ) {
+			auto& sectorLightDirection = newSet.sectorLightsDirection.emplace_back( -1 );
+			auto& sectorLightAmbient = newSet.sectorLightsAmbient.emplace_back( -1 );
+			auto& sectorLightDiffuse = newSet.sectorLightsDiffuse.emplace_back( -1 );
+			auto& sectorLightSpecular = newSet.sectorLightsSpecular.emplace_back( -1 );
+
+			if( auto optional = address->getUniform( "sectorLights[" + std::to_string( i ) + "].direction" ) ) {
+				sectorLightDirection = *optional;
+				sectorLightAmbient = *address->getUniform( "sectorLights[" + std::to_string( i ) + "].ambient" );
+				sectorLightDiffuse = *address->getUniform( "sectorLights[" + std::to_string( i ) + "].diffuse" );
+				sectorLightSpecular = *address->getUniform( "sectorLights[" + std::to_string( i ) + "].specular" );
+			}
+		}
+
+		return newSet;
 	}
 
 	void SectorIlluminator::send( const Shader& shader ) {
+		const ShaderUniformSet& uniforms = getShaderUniformSet( &shader );
+
 		if( dirty ) {
 			refresh();
 
@@ -89,8 +133,8 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 
 		int item = 0;
 		for( const auto& [ origin, dimensions ] : levelData ) {
-			Tools::OpenGL::setUniform( "sectors[" + std::to_string( item ) + "].origin", glm::vec2( origin ) );
-			Tools::OpenGL::setUniform( "sectors[" + std::to_string( item ) + "].dimensions", dimensions );
+			shader.sendData( uniforms.sectorsOrigin[ item ], glm::vec2( origin ) );
+			shader.sendData( uniforms.sectorsDimensions[ item ], dimensions );
 
 			item++;
 			if( item == 8 ) {
@@ -122,7 +166,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 
 			glActiveTexture( GL_TEXTURE0 + *pair.textureUnit );
 			glBindTexture( GL_TEXTURE_2D, pair.texture->id );
-			Tools::OpenGL::setUniform( "sectorMap" + std::to_string( item ), ( int ) *pair.textureUnit );
+			shader.sendData( uniforms.sectorMaps[ item ], ( int ) *pair.textureUnit );
 
 			item++;
 			if( item == 8 ) {
@@ -132,10 +176,10 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 
 		item = 0;
 		for( const Sector& sector : sectors ) {
-			Tools::OpenGL::setUniform( "sectorLights[" + std::to_string( item ) + "].direction", sector.direction );
-			Tools::OpenGL::setUniform( "sectorLights[" + std::to_string( item ) + "].ambient", sector.ambient );
-			Tools::OpenGL::setUniform( "sectorLights[" + std::to_string( item ) + "].diffuse", sector.diffuse );
-			Tools::OpenGL::setUniform( "sectorLights[" + std::to_string( item ) + "].specular", sector.specular );
+			shader.sendData( uniforms.sectorLightsDirection[ item ], sector.direction );
+			shader.sendData( uniforms.sectorLightsAmbient[ item ], sector.ambient );
+			shader.sendData( uniforms.sectorLightsDiffuse[ item ], sector.diffuse );
+			shader.sendData( uniforms.sectorLightsSpecular[ item ], sector.specular );
 
 			item++;
 		}

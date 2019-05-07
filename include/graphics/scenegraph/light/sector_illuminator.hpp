@@ -60,7 +60,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 
 		std::vector< TextureData > textureData;
 
-		std::unordered_map< void*, ShaderUniformSet > shaderUniformSets;
+		std::unordered_map< const void*, ShaderUniformSet > shaderUniformSets;
 
 		const ShaderUniformSet& getShaderUniformSet( const Shader* address );
 		void refresh();

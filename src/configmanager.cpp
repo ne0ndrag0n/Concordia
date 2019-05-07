@@ -39,6 +39,9 @@ namespace BlueBear {
     configRoot[ "wall_texture_size" ] = 48;
     configRoot[ "sector_resolution" ] = 1;
     configRoot[ "bounding_volume_method" ] = "aabb";
+    configRoot[ "shader_num_rooms" ] = 8;
+    configRoot[ "shader_num_sector_levels" ] = 1;
+    configRoot[ "shader_num_room_lights" ] = 16;
 
     // Load settings.json from file
     std::ifstream settingsFile( SETTINGS_PATH );

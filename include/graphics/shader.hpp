@@ -30,6 +30,10 @@ namespace BlueBear {
       void sendData( Uniform uniform, const glm::vec2& value ) const;
       void sendData( Uniform uniform, const glm::vec3& value ) const;
       void sendData( Uniform uniform, const glm::vec4& value ) const;
+      void sendData( Uniform uniform, const glm::mat4& value ) const;
+      void sendData( Uniform uniform, const int value ) const;
+      void sendData( Uniform uniform, const unsigned int value ) const;
+      void sendData( Uniform uniform, const float value ) const;
 
       void use( bool silent = false );
     };
