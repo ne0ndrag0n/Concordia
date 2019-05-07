@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 #include <string>
 
+namespace BlueBear::Graphics { class Shader; }
 namespace BlueBear::Graphics::SceneGraph::Light {
 
     class Light : public Illuminator {
@@ -14,7 +15,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 
     protected:
       virtual std::string getPreamble() = 0;
-      void send() override;
+      void send( const Shader& shader ) override;
 
     public:
       Light(

@@ -5,7 +5,7 @@
 namespace BlueBear::Graphics::SceneGraph {
 
 	Illuminator::Illuminator() {
-		Graphics::Shader::SHADER_CHANGE.listen( this, [ this ]( const Shader& shader ) { send(); } );
+		Graphics::Shader::SHADER_CHANGE.listen( this, [ this ]( const Shader& shader ) { send( shader ); } );
 	}
 
 	Illuminator::~Illuminator() {

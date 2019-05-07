@@ -1,6 +1,7 @@
 #ifndef SG_ILLUMINATOR
 #define SG_ILLUMINATOR
 
+namespace BlueBear::Graphics { class Shader; }
 namespace BlueBear::Graphics::SceneGraph {
 
 	class Illuminator {
@@ -8,7 +9,7 @@ namespace BlueBear::Graphics::SceneGraph {
 		Illuminator();
 		virtual ~Illuminator();
 
-		virtual void send() = 0;
+		virtual void send( const Shader& shader ) = 0;
 	};
 
 }

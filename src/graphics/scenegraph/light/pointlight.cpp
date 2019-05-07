@@ -28,8 +28,8 @@ namespace BlueBear::Graphics::SceneGraph::Light {
     return "pointLights[" + std::to_string( id ) + "]";
   }
 
-  void PointLight::send() {
-    Light::send();
+  void PointLight::send( const Shader& shader ) {
+    Light::send( shader );
 
     std::string preamble = getPreamble() + ".";
     Tools::OpenGL::setUniform( preamble + "position", position );

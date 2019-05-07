@@ -3,6 +3,7 @@
 
 #include "graphics/scenegraph/light/light.hpp"
 
+namespace BlueBear::Graphics { class Shader; }
 namespace BlueBear::Graphics::SceneGraph::Light {
 
   class DirectionalLight : public Light {
@@ -11,7 +12,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 
   protected:
     std::string getPreamble() override;
-    void send() override;
+    void send( const Shader& shader ) override;
 
   public:
     DirectionalLight(

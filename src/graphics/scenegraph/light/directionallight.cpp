@@ -12,8 +12,8 @@ namespace BlueBear::Graphics::SceneGraph::Light {
     return "directionalLight";
   }
 
-  void DirectionalLight::send() {
-    Light::send();
+  void DirectionalLight::send( const Shader& shader ) {
+    Light::send( shader );
 
     std::string preamble = getPreamble() + ".";
     Tools::OpenGL::setUniform( preamble + "direction", direction );

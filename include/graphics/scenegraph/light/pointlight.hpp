@@ -4,6 +4,7 @@
 #include "graphics/scenegraph/light/light.hpp"
 #include <atomic>
 
+namespace BlueBear::Graphics { class Shader; }
 namespace BlueBear::Graphics::SceneGraph::Light {
 
   class PointLight : public Light {
@@ -17,7 +18,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 
   protected:
     std::string getPreamble() override;
-    void send() override;
+    void send( const Shader& shader ) override;
 
   public:
     static void sendLightCount();

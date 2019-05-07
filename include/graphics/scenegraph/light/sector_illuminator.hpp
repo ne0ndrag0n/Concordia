@@ -4,6 +4,7 @@
 #include "exceptions/genexc.hpp"
 #include "graphics/scenegraph/illuminator.hpp"
 #include "graphics/texture.hpp"
+#include "graphics/shader.hpp"
 #include <glm/glm.hpp>
 #include <utility>
 #include <map>
@@ -11,6 +12,7 @@
 #include <tuple>
 #include <optional>
 #include <future>
+#include <unordered_map>
 
 namespace BlueBear::Graphics::SceneGraph::Light {
 
@@ -35,6 +37,16 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 			std::future< std::unique_ptr< Texture > > generator;
 		};
 
+		struct ShaderUniformSet {
+			std::vector< Shader::Uniform > sectorsOrigin;
+			std::vector< Shader::Uniform > sectorsDimensions;
+			std::vector< Shader::Uniform > sectorMaps;
+			std::vector< Shader::Uniform > sectorLightsDirection;
+			std::vector< Shader::Uniform > sectorLightsAmbient;
+			std::vector< Shader::Uniform > sectorLightsDiffuse;
+			std::vector< Shader::Uniform > sectorLightsSpecular;
+		};
+
 		bool dirty = true;
 		struct {
 			std::vector< Sector > sectors;
@@ -48,7 +60,11 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 
 		std::vector< TextureData > textureData;
 
+		std::unordered_map< void*, ShaderUniformSet > shaderUniformSets;
+
+		const ShaderUniformSet& getShaderUniformSet( const Shader* address );
 		void refresh();
+
 		const std::pair< glm::vec3, glm::uvec2 >& getLevel( unsigned int level ) const;
 		std::vector< std::pair< glm::vec3, glm::vec3 > > getSectorBoundingBoxes() const;
 		std::pair< glm::vec3, glm::vec3 > getBoundingBoxForSector( const Sector& sector ) const;
@@ -57,7 +73,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 	public:
 		void insert( const Sector& value );
 		void setLevelData( const glm::vec3& topLeft, const glm::uvec2& dimensions );
-		void send() override;
+		void send( const Shader& shader ) override;
 	};
 
 }

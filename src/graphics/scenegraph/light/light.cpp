@@ -36,7 +36,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
     /**
      * All light locations can be sent before drawing all potentially lit components
      */
-    void Light::send() {
+    void Light::send( const Shader& shader ) {
       std::string preamble = getPreamble() + ".";
 
       Tools::OpenGL::setUniform( preamble + "ambient", ambientComponent );

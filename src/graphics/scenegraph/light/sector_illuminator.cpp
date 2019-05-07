@@ -73,7 +73,11 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		return maxX;
 	}
 
-	void SectorIlluminator::send() {
+	const SectorIlluminator::ShaderUniformSet& SectorIlluminator::getShaderUniformSet( const Shader* address ) {
+		// TODO
+	}
+
+	void SectorIlluminator::send( const Shader& shader ) {
 		if( dirty ) {
 			refresh();
 
