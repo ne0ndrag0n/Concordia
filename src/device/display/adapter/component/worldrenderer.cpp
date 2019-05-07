@@ -7,6 +7,7 @@
 #include "graphics/scenegraph/modelloader/filemodelloader.hpp"
 #include "graphics/scenegraph/modelloader/assimpmodelloader.hpp"
 #include "graphics/scenegraph/uniforms/highlight_uniform.hpp"
+#include "graphics/shader.hpp"
 #include "tools/objectpool.hpp"
 #include "tools/utility.hpp"
 #include "scripting/luakit/utility.hpp"
@@ -27,14 +28,14 @@ namespace BlueBear {
             Adapter::Adapter( display ), shaderManager( shaderManager ), cache( shaderManager ),
             camera( Graphics::Camera( ConfigManager::getInstance().getIntValue( "viewport_x" ), ConfigManager::getInstance().getIntValue( "viewport_y" ) ) ) {
               eventManager.LUA_STATE_READY.listen( this, std::bind( &WorldRenderer::submitLuaContributions, this, std::placeholders::_1 ) );
-              eventManager.SHADER_CHANGE.listen( this, std::bind( &WorldRenderer::onShaderChange, this ) );
+              Graphics::Shader::SHADER_CHANGE.listen( this, std::bind( &WorldRenderer::onShaderChange, this, std::placeholders::_1 ) );
 
               asyncTasks.setAmountPerFrame( 333 );
             }
 
           WorldRenderer::~WorldRenderer() {
             eventManager.LUA_STATE_READY.stopListening( this );
-            eventManager.SHADER_CHANGE.stopListening( this );
+            Graphics::Shader::SHADER_CHANGE.stopListening( this );
           }
 
           Json::Value WorldRenderer::save() {
@@ -492,7 +493,7 @@ namespace BlueBear {
             originals[ id ] = model;
           }
 
-          void WorldRenderer::onShaderChange() {
+          void WorldRenderer::onShaderChange( const Graphics::Shader& shader ) {
             Graphics::SceneGraph::Light::PointLight::sendLightCount();
           }
 

@@ -182,7 +182,7 @@ namespace BlueBear {
       void Model::sendUniforms() const {
         for( const auto& pair : uniforms ) {
           pair.second->update();
-          eventManager.SHADER_CHANGE.listen( pair.second.get(), [ ptr = pair.second.get() ]() {
+          Graphics::Shader::SHADER_CHANGE.listen( pair.second.get(), [ ptr = pair.second.get() ]( const Shader& shader ) {
             ptr->send();
           } );
 
@@ -192,7 +192,7 @@ namespace BlueBear {
 
       void Model::removeUniformEvents() const {
         for( const auto& pair : uniforms ) {
-          eventManager.SHADER_CHANGE.stopListening( pair.second.get() );
+          Graphics::Shader::SHADER_CHANGE.stopListening( pair.second.get() );
         }
       }
 

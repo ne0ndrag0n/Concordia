@@ -17,6 +17,7 @@ namespace BlueBear {
   namespace Graphics {
 
     GLint Shader::CURRENT_PROGRAM = -1;
+    BasicEvent< void*, const Shader& > Shader::SHADER_CHANGE;
 
     void Shader::sendDeferred() {
       if( vPath.empty() && fPath.empty() ) {
@@ -124,6 +125,42 @@ namespace BlueBear {
       sendDeferred();
     }
 
+    std::optional< Shader::Uniform > Shader::getUniform( const std::string& id ) const {
+      std::optional< Uniform > result;
+
+      if( this->Program == Shader::CURRENT_PROGRAM ) {
+        result = glGetUniformLocation( this->Program, id.c_str() );
+      } else {
+        Log::getInstance().warn( "Shader::getUniform", "Shader was not set before getUniform was called." );
+      }
+
+      return result;
+    }
+
+    void Shader::sendData( Uniform uniform, const glm::vec2& value ) const {
+      if( this->Program == Shader::CURRENT_PROGRAM ) {
+        glUniform2f( uniform, value[ 0 ], value[ 1 ] );
+      } else {
+        Log::getInstance().warn( "Shader::getUniform", "Shader was not set before sendData was called." );
+      }
+    }
+
+    void Shader::sendData( Uniform uniform, const glm::vec3& value ) const {
+      if( this->Program == Shader::CURRENT_PROGRAM ) {
+        glUniform3f( uniform, value[ 0 ], value[ 1 ], value[ 2 ] );
+      } else {
+        Log::getInstance().warn( "Shader::getUniform", "Shader was not set before sendData was called." );
+      }
+    }
+
+    void Shader::sendData( Uniform uniform, const glm::vec4& value ) const {
+      if( this->Program == Shader::CURRENT_PROGRAM ) {
+        glUniform4f( uniform, value[ 0 ], value[ 1 ], value[ 2 ], value[ 3 ] );
+      } else {
+        Log::getInstance().warn( "Shader::getUniform", "Shader was not set before sendData was called." );
+      }
+    }
+
     void Shader::use( bool silent ) {
       if( Shader::CURRENT_PROGRAM != this->Program ) {
         glUseProgram( this->Program );
@@ -131,7 +168,7 @@ namespace BlueBear {
       }
 
       if( !silent ) {
-        eventManager.SHADER_CHANGE.trigger();
+        SHADER_CHANGE.trigger( *this );
       }
     }
 

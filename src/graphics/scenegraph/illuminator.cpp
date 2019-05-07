@@ -1,14 +1,15 @@
 #include "graphics/scenegraph/illuminator.hpp"
+#include "graphics/shader.hpp"
 #include "eventmanager.hpp"
 
 namespace BlueBear::Graphics::SceneGraph {
 
 	Illuminator::Illuminator() {
-        eventManager.SHADER_CHANGE.listen( this, [ & ]() { send(); } );
+		Graphics::Shader::SHADER_CHANGE.listen( this, [ this ]( const Shader& shader ) { send(); } );
 	}
 
 	Illuminator::~Illuminator() {
-      eventManager.SHADER_CHANGE.stopListening( this );
+		Graphics::Shader::SHADER_CHANGE.stopListening( this );
 	}
 
 }

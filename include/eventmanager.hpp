@@ -69,7 +69,6 @@ namespace BlueBear {
 
   struct EventManager {
     BasicEvent< void*, std::string > MESSAGE_LOGGED;
-    BasicEvent< void* > SHADER_CHANGE;
     BasicEvent< void*, sol::state& > LUA_STATE_READY;
   };
 

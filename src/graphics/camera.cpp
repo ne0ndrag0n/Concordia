@@ -19,7 +19,9 @@ namespace BlueBear {
       widthHalf = ( (float)screenWidth / 2 );
       heightHalf = ( (float)screenHeight / 2 );
 
-      eventManager.SHADER_CHANGE.listen( this, std::bind( &Camera::sendToShader, this ) );
+      Graphics::Shader::SHADER_CHANGE.listen( this, [ this ]( const Shader& shader ) {
+        sendToShader();
+      } );
     }
 
     const glm::vec3& Camera::getPosition() const {
