@@ -9,14 +9,14 @@
 #include <array>
 #include <optional>
 #include <vector>
-#include <map>
+#include <unordered_map>
 
 namespace BlueBear {
   namespace Tools {
 
     class OpenGL {
       static std::array< bool, 16 > textureUnits;
-      static std::map< GLint, std::map< std::string, GLint > > cachedUniformIds;
+      static std::unordered_map< GLint, std::unordered_map< std::string, GLint > > cachedUniformIds;
 
     public:
       EXCEPTION_TYPE( IncorrectShaderException, "Applied uniform to incorrect shader!" );

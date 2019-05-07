@@ -7,7 +7,7 @@ namespace BlueBear {
   namespace Tools {
 
     std::array< bool, 16 > OpenGL::textureUnits{ false };
-    std::map< GLint, std::map< std::string, GLint > >  OpenGL::cachedUniformIds;
+    std::unordered_map< GLint, std::unordered_map< std::string, GLint > >  OpenGL::cachedUniformIds;
 
     std::optional< unsigned int > OpenGL::getTextureUnit() {
       for( unsigned int i = 0; i != 16; i++ ) {
