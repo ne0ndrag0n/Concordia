@@ -324,7 +324,7 @@ namespace BlueBear {
               sendBones( *drawable.mesh, parentAnimator->getComputedMatrices() );
             }
             getComputedTransform().send();
-            drawable.material->send();
+            drawable.material->send( *drawable.shader );
             drawable.mesh->drawElements();
             drawable.material->releaseTextureUnits();
           }

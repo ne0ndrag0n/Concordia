@@ -2,10 +2,12 @@
 #define SG_MATERIAL
 
 #include "exceptions/genexc.hpp"
+#include "graphics/shader.hpp"
 #include <glm/glm.hpp>
 #include <vector>
 #include <memory>
 #include <exception>
+#include <unordered_map>
 
 namespace BlueBear {
   namespace Graphics {
@@ -25,8 +27,22 @@ namespace BlueBear {
         float shininess = 0.0f;
         float opacity = 1.0f;
         bool useAmbient = false;
-        std::vector< unsigned int > lockedTextureUnits;
 
+        std::vector< unsigned int > lockedTextureUnits;
+        struct MaterialUniforms {
+          Shader::Uniform ambient;
+          Shader::Uniform diffuse;
+          Shader::Uniform specular;
+          std::vector< Shader::Uniform > diffuseArray;
+          std::vector< Shader::Uniform > specularArray;
+          Shader::Uniform shininess;
+          Shader::Uniform opacity;
+        };
+        std::unordered_map< const void*, MaterialUniforms > uniforms;
+        int maxDiffuseTextures = 0;
+        int maxSpecularTextures = 0;
+
+        const MaterialUniforms& getMaterialUniforms( const Shader* shader );
         void checkTextureUnits();
 
       public:
@@ -56,7 +72,7 @@ namespace BlueBear {
 
         void sendDeferredTextures();
 
-        void send();
+        void send( const Shader& shader );
 
         void releaseTextureUnits();
       };
