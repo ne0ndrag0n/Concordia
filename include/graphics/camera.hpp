@@ -2,6 +2,8 @@
 #define CAMERA
 
 #include "geometry/ray.hpp"
+#include "graphics/shader.hpp"
+#include <unordered_map>
 #include <string>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -10,8 +12,6 @@
 
 namespace BlueBear {
   namespace Graphics {
-    class Shader;
-
     class Camera {
 
       private:
@@ -29,7 +29,17 @@ namespace BlueBear {
 
         GLfloat orthoRotationAngle = 45.0f;
 
+        struct CameraUniformBundle {
+          Shader::Uniform cameraPosUniform;
+          Shader::Uniform viewUniform;
+          Shader::Uniform projectionUniform;
+        };
+
+        std::unordered_map< const void*, CameraUniformBundle > shaders;
+
+        const CameraUniformBundle& getUniforms( const Shader* shader );
         void doRotate();
+        void sendToShader( const Shader& shader );
 
       public:
         Camera( int screenWidth, int screenHeight );
@@ -39,7 +49,6 @@ namespace BlueBear {
         float zoomOut();
         float setZoom( float zoomSetting );
         void position();
-        void sendToShader();
         glm::mat4 getOrthoView();
         glm::mat4 getOrthoMatrix();
         glm::vec2 getScaledCoordinates() const;

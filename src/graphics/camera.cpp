@@ -20,7 +20,7 @@ namespace BlueBear {
       heightHalf = ( (float)screenHeight / 2 );
 
       Graphics::Shader::SHADER_CHANGE.listen( this, [ this ]( const Shader& shader ) {
-        sendToShader();
+        sendToShader( shader );
       } );
     }
 
@@ -88,13 +88,24 @@ namespace BlueBear {
       }
     }
 
-    void Camera::sendToShader() {
-      GLint cameraPos = Tools::OpenGL::getUniformID( "cameraPos" );
-      if( cameraPos != -1 ) {
-        glUniform3f( cameraPos, camera[ 0 ], camera[ 1 ], camera[ 2 ] );
+    const Camera::CameraUniformBundle& Camera::getUniforms( const Shader* shader ) {
+      auto it = shaders.find( shader );
+      if( it != shaders.end() ) {
+        return it->second;
       }
-      glUniformMatrix4fv( Tools::OpenGL::getUniformLocation( "view" ), 1, GL_FALSE, glm::value_ptr( view ) );
-      glUniformMatrix4fv( Tools::OpenGL::getUniformLocation( "projection" ), 1, GL_FALSE, glm::value_ptr( projection ) );
+
+      CameraUniformBundle& bundle = shaders[ shader ];
+      bundle.cameraPosUniform = shader->getUniform( "cameraPos" );
+      bundle.viewUniform = shader->getUniform( "view" );
+      bundle.projectionUniform = shader->getUniform( "projection" );
+      return bundle;
+    }
+
+    void Camera::sendToShader( const Shader& shader ) {
+      const auto& bundle = getUniforms( &shader );
+      shader.sendData( bundle.cameraPosUniform, camera );
+      shader.sendData( bundle.viewUniform, view );
+      shader.sendData( bundle.projectionUniform, projection );
     }
 
     glm::mat4 Camera::getOrthoView() {
