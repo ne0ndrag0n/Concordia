@@ -3,7 +3,6 @@
 
 #include <GL/glew.h>
 #include <string>
-#include <optional>
 #include <glm/glm.hpp>
 #include "eventmanager.hpp"
 
@@ -15,6 +14,7 @@ namespace BlueBear {
 
     public:
       using Uniform = GLint;
+      static constexpr const Uniform UNDEFINED_UNIFORM = -1;
 
       GLuint Program;
       static GLint CURRENT_PROGRAM;
@@ -25,7 +25,7 @@ namespace BlueBear {
 
       void sendDeferred();
 
-      std::optional< Uniform > getUniform( const std::string& id ) const;
+      Uniform getUniform( const std::string& id ) const;
 
       void sendData( Uniform uniform, const glm::vec2& value ) const;
       void sendData( Uniform uniform, const glm::vec3& value ) const;

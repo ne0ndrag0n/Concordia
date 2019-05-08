@@ -28,14 +28,29 @@ namespace BlueBear::Graphics::SceneGraph::Light {
     return "pointLights[" + std::to_string( id ) + "]";
   }
 
+  void PointLight::generateUniformBundles( const Shader* shader ) {
+    Light::generateUniformBundles( shader );
+
+    auto it = pointBundles.find( shader );
+    if( it == pointBundles.end() ) {
+      std::string preamble = getPreamble() + ".";
+      auto& bundle = pointBundles[ shader ];
+
+      bundle.positionUniform = shader->getUniform( preamble + "position" );
+      bundle.constantUniform = shader->getUniform( preamble + "constant" );
+      bundle.linearUniform   = shader->getUniform( preamble + "linear" );
+      bundle.quadraticUniform = shader->getUniform( preamble + "quadratic" );
+    }
+  }
+
   void PointLight::send( const Shader& shader ) {
     Light::send( shader );
 
-    std::string preamble = getPreamble() + ".";
-    Tools::OpenGL::setUniform( preamble + "position", position );
-    Tools::OpenGL::setUniform( preamble + "constant", constant );
-    Tools::OpenGL::setUniform( preamble + "linear", linear );
-    Tools::OpenGL::setUniform( preamble + "quadratic", quadratic );
+    const auto& bundle = pointBundles[ &shader ];
+    shader.sendData( bundle.positionUniform, position );
+    shader.sendData( bundle.constantUniform, constant );
+    shader.sendData( bundle.linearUniform, linear );
+    shader.sendData( bundle.quadraticUniform, quadratic );
   }
 
 }

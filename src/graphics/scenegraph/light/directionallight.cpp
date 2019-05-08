@@ -12,11 +12,22 @@ namespace BlueBear::Graphics::SceneGraph::Light {
     return "directionalLight";
   }
 
+  void DirectionalLight::generateUniformBundles( const Shader* shader ) {
+    Light::generateUniformBundles( shader );
+
+    auto it = uniforms.find( shader );
+    if( it == uniforms.end() ) {
+      std::string preamble = getPreamble() + ".";
+      auto& uniform = uniforms[ shader ];
+
+      uniform = shader->getUniform( preamble + "direction" );
+    }
+  }
+
   void DirectionalLight::send( const Shader& shader ) {
     Light::send( shader );
 
-    std::string preamble = getPreamble() + ".";
-    Tools::OpenGL::setUniform( preamble + "direction", direction );
+    shader.sendData( uniforms[ &shader ], direction );
   }
 
 }

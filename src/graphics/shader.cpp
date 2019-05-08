@@ -126,8 +126,8 @@ namespace BlueBear {
       sendDeferred();
     }
 
-    std::optional< Shader::Uniform > Shader::getUniform( const std::string& id ) const {
-      std::optional< Uniform > result;
+    Shader::Uniform Shader::getUniform( const std::string& id ) const {
+      Uniform result = Shader::UNDEFINED_UNIFORM;
 
       if( this->Program == Shader::CURRENT_PROGRAM ) {
         result = glGetUniformLocation( this->Program, id.c_str() );

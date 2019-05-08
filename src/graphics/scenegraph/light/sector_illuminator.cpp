@@ -83,37 +83,21 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 
 		int numSectors = ConfigManager::getInstance().getIntValue( "shader_num_rooms" );
 		for( int i = 0; i != numSectors; i++ ) {
-			auto& sectorOrigin = newSet.sectorsOrigin.emplace_back( -1 );
-			auto& sectorDimensions = newSet.sectorsDimensions.emplace_back( -1 );
-
-			if( auto optional = address->getUniform( "sectors[" + std::to_string( i ) + "].origin" ) ) {
-				sectorOrigin = *optional;
-				sectorDimensions = *address->getUniform( "sectors[" + std::to_string( i ) + "].dimensions" );
-			}
+			newSet.sectorsOrigin.emplace_back( address->getUniform( "sectors[" + std::to_string( i ) + "].origin" ) );
+			newSet.sectorsDimensions.emplace_back( address->getUniform( "sectors[" + std::to_string( i ) + "].dimensions" ) );
 		}
 
 		int numSectorLevels = ConfigManager::getInstance().getIntValue( "shader_num_sector_levels" );
 		for( int i = 0; i != numSectorLevels; i++ ) {
-			auto& sectorMap = newSet.sectorMaps.emplace_back( -1 );
-
-			if( auto optional = address->getUniform( "sectorMap" + std::to_string( i ) ) ) {
-				sectorMap = *optional;
-			}
+			newSet.sectorMaps.emplace_back( address->getUniform( "sectorMap" + std::to_string( i ) ) );
 		}
 
 		int numSectorLights = ConfigManager::getInstance().getIntValue( "shader_num_room_lights" );
 		for( int i = 0; i != numSectorLights; i++ ) {
-			auto& sectorLightDirection = newSet.sectorLightsDirection.emplace_back( -1 );
-			auto& sectorLightAmbient = newSet.sectorLightsAmbient.emplace_back( -1 );
-			auto& sectorLightDiffuse = newSet.sectorLightsDiffuse.emplace_back( -1 );
-			auto& sectorLightSpecular = newSet.sectorLightsSpecular.emplace_back( -1 );
-
-			if( auto optional = address->getUniform( "sectorLights[" + std::to_string( i ) + "].direction" ) ) {
-				sectorLightDirection = *optional;
-				sectorLightAmbient = *address->getUniform( "sectorLights[" + std::to_string( i ) + "].ambient" );
-				sectorLightDiffuse = *address->getUniform( "sectorLights[" + std::to_string( i ) + "].diffuse" );
-				sectorLightSpecular = *address->getUniform( "sectorLights[" + std::to_string( i ) + "].specular" );
-			}
+			newSet.sectorLightsDirection.emplace_back( address->getUniform( "sectorLights[" + std::to_string( i ) + "].direction" ) );
+			newSet.sectorLightsAmbient.emplace_back( address->getUniform( "sectorLights[" + std::to_string( i ) + "].ambient" ) );
+			newSet.sectorLightsDiffuse.emplace_back( address->getUniform( "sectorLights[" + std::to_string( i ) + "].diffuse" ) );
+			newSet.sectorLightsSpecular.emplace_back( address->getUniform( "sectorLights[" + std::to_string( i ) + "].specular" ) );
 		}
 
 		return newSet;
