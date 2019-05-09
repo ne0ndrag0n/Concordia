@@ -355,38 +355,38 @@ namespace BlueBear {
       }
 
       glm::vec4 Element::computeScissor( const glm::vec4& parentScissor, const glm::ivec2& absolutePosition ) {
-        int viewportY = ConfigManager::getInstance().getIntValue( "viewport_y" );
+        static int viewportY = ConfigManager::getInstance().getIntValue( "viewport_y" );
 
-        glm::vec2 parentLowerCorner = { parentScissor[ 0 ], parentScissor[ 1 ] };
-        glm::vec2 parentUpperCorner = { parentLowerCorner[ 0 ] + parentScissor[ 2 ], parentLowerCorner[ 1 ] + parentScissor[ 3 ] };
+        glm::vec2 parentLowerCorner = { parentScissor.x, parentScissor.y };
+        glm::vec2 parentUpperCorner = { parentLowerCorner.x + parentScissor.z, parentLowerCorner.y + parentScissor.w };
 
-        int lowerLeftCornerY = absolutePosition.y + allocation[ 3 ];
+        int lowerLeftCornerY = absolutePosition.y + allocation.w;
         glm::vec4 scissor = {
           absolutePosition.x,
-          viewportY - ( absolutePosition.y + allocation[ 3 ] ),
-          std::max( 0, allocation[ 2 ] - ( absolutePosition.x < 0 ? std::abs( absolutePosition.x ) : 0 ) ),
+          viewportY - ( absolutePosition.y + allocation.w ),
+          std::max( 0, allocation.z - ( absolutePosition.x < 0 ? std::abs( absolutePosition.x ) : 0 ) ),
           // TODO: Touch up Y case. Scissor Y height cannot be greater than viewportY
           // Hint: starts at the bottom corner as opengl's coordinate system is a pita
-          std::max( 0, allocation[ 3 ] - ( lowerLeftCornerY > viewportY ? ( lowerLeftCornerY - viewportY ) : 0 ) )
+          std::max( 0, allocation.w - ( lowerLeftCornerY > viewportY ? ( lowerLeftCornerY - viewportY ) : 0 ) )
         };
 
-        scissor[ 0 ] = std::max( scissor.x, parentLowerCorner.x );
-        scissor[ 1 ] = std::max( scissor.y, parentLowerCorner.y );
+        scissor.x = std::max( scissor.x, parentLowerCorner.x );
+        scissor.y = std::max( scissor.y, parentLowerCorner.y );
 
-        glm::vec2 upperCorner = { scissor[ 0 ] + scissor[ 2 ], scissor[ 1 ] + scissor[ 3 ] };
+        glm::vec2 upperCorner = { scissor.x + scissor.z, scissor.y + scissor.w };
         if( upperCorner.x > parentUpperCorner.x ) {
-          scissor[ 2 ] = parentUpperCorner.x - scissor[ 0 ];
+          scissor.z = parentUpperCorner.x - scissor.x;
         }
 
         if( upperCorner.y > parentUpperCorner.y ) {
-          scissor[ 3 ] = parentUpperCorner.y - scissor[ 1 ];
+          scissor.w = parentUpperCorner.y - scissor.y;
         }
 
         return scissor;
       }
 
       void Element::setScissor( const glm::vec4& scissor ) {
-        glScissor( scissor[ 0 ], scissor[ 1 ], scissor[ 2 ], scissor[ 3 ] );
+        glScissor( scissor.x, scissor.y, scissor.z, scissor.w );
       }
 
       void Element::draw( const Graphics::Shader& guiShader, glm::ivec2 parentAllocation ) {

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
 <Window id="test-scroll-window" class="-bb-scroll-test" window-title="Scroll Test">
   <Scroll id="test-scroll-scroll" class="-bb-scroll-test-widget">
     <Layout>
@@ -24,9 +23,3 @@
     </Layout>
   </Scroll>
 </Window>
--->
-<ContextMenu class="context-menu-test">
-  <Text class="test-1">Animate</Text>
-  <Text class="test-2">Move</Text>
-  <Text class="test-2">Properties</Text>
-</ContextMenu>
