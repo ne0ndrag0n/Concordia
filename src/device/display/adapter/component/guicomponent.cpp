@@ -327,7 +327,7 @@ namespace BlueBear {
             rootElement->walk( []( Graphics::UserInterface::Element& element ) {
               element.getPropertyList().updateAnimation();
             } );
-            rootElement->draw();
+            rootElement->draw( *guiShader );
 
             glEnable( GL_CULL_FACE );
             glEnable( GL_DEPTH_TEST );

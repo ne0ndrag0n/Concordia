@@ -74,23 +74,27 @@ namespace BlueBear {
         return texture;
       }
 
-      void Drawable::draw( const glm::ivec2& position ) {
-        glm::mat4 orthoProjection = glm::ortho(
-          0.0f,
-          ( float ) ConfigManager::getInstance().getIntValue( "viewport_x" ),
-          ( float ) ConfigManager::getInstance().getIntValue( "viewport_y" ),
-          0.0f,
-          -1.0f,
-          1.0f
-        );
+      void Drawable::draw( const Shader& guiShader, const glm::ivec2& position ) {
+        static float viewportX = ConfigManager::getInstance().getIntValue( "viewport_x" );
+        static float viewportY = ConfigManager::getInstance().getIntValue( "viewport_y" );
+        static glm::mat4 orthoProjection = glm::ortho( 0.0f, viewportX, viewportY, 0.0f, -1.0f, 1.0f );
 
-        Tools::OpenGL::setUniform( "orthoProjection", orthoProjection );
+        if( !uniforms ) {
+          uniforms = Uniforms {
+            guiShader.getUniform( "orthoProjection" ),
+            guiShader.getUniform( "translation" ),
+            guiShader.getUniform( "surface" )
+          };
+        }
+
+        guiShader.sendData( uniforms->orthoProjection, orthoProjection );
+
         glm::mat4 translation = glm::translate( glm::mat4( 1.0f ), glm::vec3{ position.x, position.y, 0.0f } );
-        Tools::OpenGL::setUniform( "translation", translation );
+        guiShader.sendData( uniforms->translation, translation );
 
         glActiveTexture( GL_TEXTURE0 );
         glBindTexture( GL_TEXTURE_2D, texture->getTextureId() );
-        Tools::OpenGL::setUniform( "surface", 0 );
+        guiShader.sendData( uniforms->surface, 0 );
 
         glBindVertexArray( VAO );
           glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );

@@ -4,6 +4,7 @@
 #include "graphics/userinterface/drawable.hpp"
 #include "graphics/userinterface/style/style.hpp"
 #include "graphics/userinterface/event/eventbundle.hpp"
+#include "graphics/shader.hpp"
 #include "log.hpp"
 #include <glm/glm.hpp>
 #include <string>
@@ -107,7 +108,7 @@ namespace BlueBear {
 
         virtual void reflow( bool selectorsInvalidated = true );
         void paint();
-        void draw( glm::ivec2 parentAllocation = { 0, 0 } );
+        void draw( const Graphics::Shader& guiShader, glm::ivec2 parentAllocation = { 0, 0 } );
       };
 
     }

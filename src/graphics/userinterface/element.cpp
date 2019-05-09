@@ -77,7 +77,7 @@ namespace BlueBear {
       void Element::walk( std::function< void( Element& ) > predicate ) {
         predicate( *this );
 
-        for( std::shared_ptr< Element > child : children ) {
+        for( std::shared_ptr< Element >& child : children ) {
           child->walk( predicate );
         }
       }
@@ -389,20 +389,20 @@ namespace BlueBear {
         glScissor( scissor[ 0 ], scissor[ 1 ], scissor[ 2 ], scissor[ 3 ] );
       }
 
-      void Element::draw( glm::ivec2 parentAllocation ) {
+      void Element::draw( const Graphics::Shader& guiShader, glm::ivec2 parentAllocation ) {
         if( !visible ) {
           return;
         }
 
         glm::ivec2 absolutePosition = parentAllocation + glm::ivec2{ allocation.x, allocation.y };
         if( drawable ) {
-          drawable->draw( absolutePosition );
+          drawable->draw( guiShader, absolutePosition );
         }
 
         glm::vec4 parentScissor = getParentScissor();
         setScissor( computeScissor( parentScissor, absolutePosition ) );
         for( std::shared_ptr< Element > element : children ) {
-          element->draw( absolutePosition );
+          element->draw( guiShader, absolutePosition );
         }
         setScissor( parentScissor );
       }
