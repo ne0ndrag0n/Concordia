@@ -74,7 +74,7 @@ namespace BlueBear {
         return result;
       }
 
-      void Element::walk( std::function< void( Element& ) > predicate ) {
+      void Element::walk( const std::function< void( Element& ) >& predicate ) {
         predicate( *this );
 
         for( std::shared_ptr< Element >& child : children ) {

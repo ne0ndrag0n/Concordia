@@ -69,7 +69,7 @@ namespace BlueBear {
 
         static Device::Display::Adapter::Component::GuiComponent* manager;
 
-        void walk( std::function< void( Element& ) > predicate );
+        void walk( const std::function< void( Element& ) >& predicate );
 
         bool getVisible();
         void setVisible( bool status );
