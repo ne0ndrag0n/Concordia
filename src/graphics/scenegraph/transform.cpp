@@ -49,7 +49,10 @@ namespace BlueBear {
       }
 
       Transform Transform::operator*( const Transform& rhs ) const {
-        return Transform( getMatrixImmediate() * rhs.getMatrixImmediate() );
+        const glm::mat4& thisMatrix = dirty ? getMatrixImmediate() : result;
+        const glm::mat4& thatMatrix = rhs.dirty ? rhs.getMatrixImmediate() : rhs.result;
+
+        return Transform( thisMatrix * thatMatrix );
       }
 
       Transform& Transform::operator*=( const Transform& rhs ) {
