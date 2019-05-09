@@ -8,13 +8,13 @@
 #include "graphics/scenegraph/mesh/texturedriggedvertex.hpp"
 #include "graphics/scenegraph/mesh/riggedvertex.hpp"
 #include "graphics/scenegraph/material.hpp"
-#include "graphics/shader.hpp"
 #include "tools/utility.hpp"
 #include "configmanager.hpp"
 #include "eventmanager.hpp"
 #include "log.hpp"
 #include <glm/glm.hpp>
 #include <algorithm>
+#include <stack>
 
 namespace BlueBear {
   namespace Graphics {
@@ -124,6 +124,36 @@ namespace BlueBear {
         }
 
         return transform;
+      }
+
+      glm::mat4 Model::getHierarchicalTransform() {
+        std::stack< glm::mat4 > levels;
+        levels.push( transform.getMatrix() );
+
+        std::shared_ptr< Model > current = parent.lock();
+        while( current ) {
+          levels.push( current->transform.getMatrix() );
+          current = current->parent.lock();
+        }
+
+        glm::mat4 result = levels.top();
+        levels.pop();
+
+        while( !levels.empty() ) {
+          result *= levels.top();
+          levels.pop();
+        }
+
+        return result;
+      }
+
+      Shader::Uniform Model::getTransformUniform( const Shader* shader ) {
+        auto it = transformUniform.find( shader );
+        if( it != transformUniform.end() ) {
+          return it->second;
+        }
+
+        return transformUniform[ shader ] = shader->getUniform( "model" );
       }
 
       Transform& Model::getLocalTransform() {
@@ -323,7 +353,7 @@ namespace BlueBear {
             if( parentAnimator ) {
               sendBones( *drawable.mesh, parentAnimator->getComputedMatrices() );
             }
-            getComputedTransform().send();
+            drawable.shader->sendData( getTransformUniform( drawable.shader.get() ), getHierarchicalTransform() );
             drawable.material->send( *drawable.shader );
             drawable.mesh->drawElements();
             drawable.material->releaseTextureUnits();

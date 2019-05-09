@@ -8,6 +8,7 @@
 #include "graphics/scenegraph/modeltriangle.hpp"
 #include "geometry/triangle.hpp"
 #include "geometry/ray.hpp"
+#include "graphics/shader.hpp"
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
@@ -17,11 +18,10 @@
 #include <memory>
 #include <map>
 #include <optional>
+#include <unordered_map>
 
 namespace BlueBear {
   namespace Graphics {
-    class Shader;
-
     namespace SceneGraph {
       class Material;
 
@@ -42,6 +42,8 @@ namespace BlueBear {
         std::map< std::string, std::unique_ptr< Uniform > > uniforms;
         std::unique_ptr< BoundingVolume::BoundingVolume > boundingVolume;
 
+        std::unordered_map< const void*, Shader::Uniform > transformUniform;
+
         Model() = default;
         Model( const std::string& id, const std::vector< Drawable >& drawables );
         Model( const Model& other );
@@ -50,6 +52,8 @@ namespace BlueBear {
         void sendBones( const Mesh::Mesh& mesh, const std::map< std::string, glm::mat4 >& bones );
         void sendUniforms() const;
         void removeUniformEvents() const;
+        glm::mat4 getHierarchicalTransform();
+        Shader::Uniform getTransformUniform( const Shader* shader );
 
       public:
         virtual ~Model() = default;
