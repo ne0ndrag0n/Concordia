@@ -9,12 +9,6 @@
 #include <GL/glew.h>
 #include <glm/gtc/type_ptr.hpp>
 
-/**
- * TODO:
- * This code is a mess as it's modified tutorial code from learnopengl.com
- * PLEASE clean this up as it will affect loading times of the application.
- */
-
 namespace BlueBear {
   namespace Graphics {
 
