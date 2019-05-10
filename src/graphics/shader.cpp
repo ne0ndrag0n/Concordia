@@ -141,7 +141,7 @@ namespace BlueBear {
     void Shader::sendData( Uniform uniform, const glm::vec2& value ) const {
       if( this->Program == Shader::CURRENT_PROGRAM ) {
         if( uniform != -1 ) {
-          glUniform2f( uniform, value[ 0 ], value[ 1 ] );
+          glUniform2f( uniform, value.x, value.y );
         }
       } else {
         Log::getInstance().warn( "Shader::getUniform", "Shader was not set before sendData was called." );
@@ -151,7 +151,7 @@ namespace BlueBear {
     void Shader::sendData( Uniform uniform, const glm::vec3& value ) const {
       if( this->Program == Shader::CURRENT_PROGRAM ) {
         if( uniform != -1 ) {
-          glUniform3f( uniform, value[ 0 ], value[ 1 ], value[ 2 ] );
+          glUniform3f( uniform, value.x, value.y, value.z );
         }
       } else {
         Log::getInstance().warn( "Shader::getUniform", "Shader was not set before sendData was called." );
@@ -161,7 +161,7 @@ namespace BlueBear {
     void Shader::sendData( Uniform uniform, const glm::vec4& value ) const {
       if( this->Program == Shader::CURRENT_PROGRAM ) {
         if( uniform != -1 ) {
-          glUniform4f( uniform, value[ 0 ], value[ 1 ], value[ 2 ], value[ 3 ] );
+          glUniform4f( uniform, value.x, value.y, value.z, value.w );
         }
       } else {
         Log::getInstance().warn( "Shader::getUniform", "Shader was not set before sendData was called." );
