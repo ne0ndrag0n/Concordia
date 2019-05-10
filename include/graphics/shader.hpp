@@ -6,19 +6,23 @@
 #include <GL/glew.h>
 #include <string>
 #include <glm/glm.hpp>
+#include <unordered_set>
 
 namespace BlueBear {
   namespace Graphics {
     class Shader {
       std::string vPath;
       std::string fPath;
+      std::unordered_set< std::string > visitedFiles;
 
       struct FilePackage {
         std::string vertex;
         std::string fragment;
       };
 
+      std::string getFile( const std::string& path );
       FilePackage getFilePair();
+      std::string preprocess( const std::string& source );
 
       GLuint compileVertex( const std::string& source );
       GLuint compileFragment( const std::string& source );

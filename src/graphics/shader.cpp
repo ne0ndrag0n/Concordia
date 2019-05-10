@@ -2,6 +2,7 @@
 #include "tools/opengl.hpp"
 #include "eventmanager.hpp"
 #include "log.hpp"
+#include <regex>
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -20,35 +21,57 @@ namespace BlueBear {
     GLint Shader::CURRENT_PROGRAM = -1;
     BasicEvent< void*, const Shader& > Shader::SHADER_CHANGE;
 
-    Shader::FilePackage Shader::getFilePair() {
-      FilePackage package;
-
-      std::ifstream vertexFile;
-      vertexFile.exceptions( std::ifstream::badbit );
-
-      std::ifstream fragmentFile;
-      fragmentFile.exceptions( std::ifstream::badbit );
+    std::string Shader::getFile( const std::string& path ) {
+      std::ifstream stream;
+      stream.exceptions( std::ifstream::badbit );
 
       try {
-        vertexFile.open( vPath );
-        fragmentFile.open( fPath );
+        stream.open( path );
 
-        std::stringstream vertexStream;
-        std::stringstream fragmentStream;
+        if( !stream.is_open() ) {
+          Log::getInstance().error( "Shader::getFile", "File not found: " + path );
+          throw InvalidShaderFileException();
+        }
 
-        vertexStream << vertexFile.rdbuf();
-        fragmentStream << fragmentFile.rdbuf();
+        std::stringstream stringStream;
+        stringStream << stream.rdbuf();
 
-        vertexFile.close();
-        fragmentFile.close();
+        stream.close();
 
-        package.vertex = vertexStream.str();
-        package.fragment = fragmentStream.str();
-      } catch ( std::ifstream::failure e ) {
-        Log::getInstance().error( "Shader::getFilePair", "Error opening one or more shader files: " + vPath + " " + fPath );
+        return stringStream.str();
+      } catch( std::ifstream::failure e ) {
+        Log::getInstance().error( "Shader::getFile", "Error loading shader file: " + path );
+        throw InvalidShaderFileException();
+      }
+    }
+
+    Shader::FilePackage Shader::getFilePair() {
+      return FilePackage{
+        preprocess( getFile( vPath ) ),
+        preprocess( getFile( fPath ) )
+      };
+    }
+
+    std::string Shader::preprocess( const std::string& source ) {
+      std::string result = source;
+      std::regex includeStatement( "#include(?: |\\t)+\"(.+)\"\\n" );
+
+      // Each match will have:
+      // 1. the include line itself
+      // 2. the captured filename
+      std::smatch match;
+      while( std::regex_search( result, match, includeStatement ) ) {
+        const std::string& filename = match[ 1 ];
+        if( visitedFiles.find( filename ) == visitedFiles.end() ) {
+          visitedFiles.insert( filename );
+          result = match.format( "$`" + preprocess( getFile( filename ) ) +  "$'" );
+        } else {
+          // Remove match
+          result = match.format( "$`$'" );
+        }
       }
 
-      return package;
+      return result;
     }
 
     GLuint Shader::compileVertex( const std::string& source ) {
