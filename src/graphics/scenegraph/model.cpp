@@ -200,12 +200,11 @@ namespace BlueBear {
         }
       }
 
-      void Model::sendBones( const Mesh::Mesh& mesh, const std::map< std::string, glm::mat4 >& bones ) {
+      void Model::configureBones( const Mesh::Mesh& mesh, const std::map< std::string, glm::mat4 >& bones ) {
         auto it = mesh.meshUniforms.find( "bone" );
         if( it != mesh.meshUniforms.end() ) {
           Mesh::BoneUniform* boneUniform = ( Mesh::BoneUniform* ) it->second.get();
           boneUniform->configure( bones );
-          boneUniform->send();
         }
       }
 
@@ -213,10 +212,8 @@ namespace BlueBear {
         for( const auto& pair : uniforms ) {
           pair.second->update();
           Graphics::Shader::SHADER_CHANGE.listen( pair.second.get(), [ ptr = pair.second.get() ]( const Shader& shader ) {
-            ptr->send();
+            ptr->send( shader );
           } );
-
-          pair.second->send();
         }
       }
 
@@ -351,11 +348,11 @@ namespace BlueBear {
           if( drawable ) {
             drawable.shader->use();
             if( parentAnimator ) {
-              sendBones( *drawable.mesh, parentAnimator->getComputedMatrices() );
+              configureBones( *drawable.mesh, parentAnimator->getComputedMatrices() );
             }
             drawable.shader->sendData( getTransformUniform( drawable.shader.get() ), getHierarchicalTransform() );
             drawable.material->send( *drawable.shader );
-            drawable.mesh->drawElements();
+            drawable.mesh->drawElements( *drawable.shader );
             drawable.material->releaseTextureUnits();
           }
         }

@@ -20,8 +20,8 @@ namespace BlueBear::Graphics::SceneGraph::Light {
     counter--;
   }
 
-  void PointLight::sendLightCount() {
-    Tools::OpenGL::setUniform( "numPointLights", counter.load() );
+  void PointLight::sendLightCount( const Shader& shader, const Shader::Uniform uniform ) {
+    shader.sendData( uniform, counter.load() );
   }
 
   std::string PointLight::getPreamble() {

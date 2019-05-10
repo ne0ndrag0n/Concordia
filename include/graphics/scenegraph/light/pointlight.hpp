@@ -33,7 +33,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
     void send( const Shader& shader ) override;
 
   public:
-    static void sendLightCount();
+    static void sendLightCount( const Shader& shader, const Shader::Uniform uniform );
 
     PointLight(
       glm::vec3 position,

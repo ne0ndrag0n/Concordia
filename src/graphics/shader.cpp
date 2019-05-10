@@ -208,6 +208,16 @@ namespace BlueBear {
       }
     }
 
+    void Shader::sendData( Uniform uniform, unsigned int size, const GLfloat* value ) const {
+      if( this->Program == Shader::CURRENT_PROGRAM ) {
+        if( uniform != -1 ) {
+          glUniformMatrix4fv( uniform, size, GL_FALSE, value );
+        }
+      } else {
+        Log::getInstance().warn( "Shader::getUniform", "Shader was not set before sendData was called." );
+      }
+    }
+
     void Shader::use( bool silent ) {
       if( Shader::CURRENT_PROGRAM != this->Program ) {
         glUseProgram( this->Program );

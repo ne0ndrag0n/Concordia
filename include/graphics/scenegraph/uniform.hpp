@@ -3,12 +3,14 @@
 
 namespace BlueBear {
   namespace Graphics {
+    class Shader;
+
     namespace SceneGraph {
 
         class Uniform {
         public:
           virtual void update();
-          virtual void send() = 0;
+          virtual void send( const Shader& shader ) = 0;
         };
 
     }

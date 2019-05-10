@@ -7,7 +7,6 @@
 #include "graphics/scenegraph/modelloader/filemodelloader.hpp"
 #include "graphics/scenegraph/modelloader/assimpmodelloader.hpp"
 #include "graphics/scenegraph/uniforms/highlight_uniform.hpp"
-#include "graphics/shader.hpp"
 #include "tools/objectpool.hpp"
 #include "tools/utility.hpp"
 #include "scripting/luakit/utility.hpp"
@@ -494,7 +493,17 @@ namespace BlueBear {
           }
 
           void WorldRenderer::onShaderChange( const Graphics::Shader& shader ) {
-            Graphics::SceneGraph::Light::PointLight::sendLightCount();
+            Graphics::Shader::Uniform uniform;
+
+            auto it = pointLightUniforms.find( &shader );
+            if( it != pointLightUniforms.end() ) {
+              uniform = it->second;
+            } else {
+              // it sucks, shut up
+              uniform = pointLightUniforms[ &shader ] = shader.getUniform( "numPointLights" );
+            }
+
+            Graphics::SceneGraph::Light::PointLight::sendLightCount( shader, uniform );
           }
 
           /**

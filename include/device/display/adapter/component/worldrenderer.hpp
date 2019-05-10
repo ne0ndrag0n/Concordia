@@ -6,6 +6,7 @@
 #include "device/display/adapter/adapter.hpp"
 #include "geometry/ray.hpp"
 #include "geometry/triangle.hpp"
+#include "graphics/shader.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/scenegraph/resourcebank.hpp"
 #include "graphics/utilities/shader_manager.hpp"
@@ -28,8 +29,6 @@
 
 namespace BlueBear {
   namespace Graphics {
-    class Shader;
-
     namespace SceneGraph {
       class Model;
       class Illuminator;
@@ -73,6 +72,8 @@ namespace BlueBear {
             std::unordered_map< std::string, std::shared_ptr< Graphics::SceneGraph::Illuminator > > illuminators;
             std::vector< std::unique_ptr< ModelRegistration > > models;
             Tools::AsyncTable asyncTasks;
+
+            std::unordered_map< const void*, Graphics::Shader::Uniform > pointLightUniforms;
 
             std::unique_ptr< Graphics::SceneGraph::ModelLoader::FileModelLoader > getFileModelLoader( bool deferGLOperations );
 

@@ -14,6 +14,15 @@ namespace BlueBear {
         BoneUniform::BoneUniform( const std::vector< std::string >& boneIDs ) :
           boneIDs( boneIDs ) {}
 
+        Shader::Uniform BoneUniform::getUniform( const Shader* shader ) {
+          auto it = uniforms.find( shader );
+          if( it != uniforms.end() ) {
+            return it->second;
+          }
+
+          return uniforms[ shader ] = shader->getUniform( "bones" );
+        }
+
         void BoneUniform::configure( const std::map< std::string, glm::mat4 >& computedBones ) {
           boneUniform.clear();
 
@@ -29,8 +38,12 @@ namespace BlueBear {
           return boneUniform;
         }
 
-        void BoneUniform::send() {
-          Tools::OpenGL::setUniform( "bones", boneUniform.size(), glm::value_ptr( boneUniform[ 0 ] ) );
+        void BoneUniform::send( const Shader& shader ) {
+          shader.sendData(
+            getUniform( &shader ),
+            boneUniform.size(),
+            glm::value_ptr( boneUniform[ 0 ] )
+          );
         }
 
       }

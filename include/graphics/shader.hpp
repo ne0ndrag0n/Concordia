@@ -34,6 +34,7 @@ namespace BlueBear {
       void sendData( Uniform uniform, const int value ) const;
       void sendData( Uniform uniform, const unsigned int value ) const;
       void sendData( Uniform uniform, const float value ) const;
+      void sendData( Uniform uniform, unsigned int size, const GLfloat* value ) const;
 
       void use( bool silent = false );
     };

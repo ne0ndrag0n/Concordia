@@ -29,7 +29,7 @@ namespace BlueBear {
           virtual ~Mesh() = default;
 
           virtual void sendDeferred() = 0;
-          virtual void drawElements() = 0;
+          virtual void drawElements( const Shader& ) = 0;
 
           virtual std::vector< Geometry::Triangle > getTriangles() = 0;
         };

@@ -165,9 +165,9 @@ namespace BlueBear {
             }
           }
 
-          void drawElements() override {
+          void drawElements( const Shader& shader ) override {
             for( auto& pair : meshUniforms ) {
-              pair.second->send();
+              pair.second->send( shader );
             }
 
             glBindVertexArray( VAO );

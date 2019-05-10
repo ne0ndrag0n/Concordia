@@ -49,7 +49,7 @@ namespace BlueBear {
         Model( const Model& other );
 
         void generateBoundingVolume();
-        void sendBones( const Mesh::Mesh& mesh, const std::map< std::string, glm::mat4 >& bones );
+        void configureBones( const Mesh::Mesh& mesh, const std::map< std::string, glm::mat4 >& bones );
         void sendUniforms() const;
         void removeUniformEvents() const;
         glm::mat4 getHierarchicalTransform();

@@ -2,6 +2,7 @@
 #define HIGHLIGHT_UNIFORM
 
 #include "graphics/scenegraph/uniform.hpp"
+#include "graphics/shader.hpp"
 #include <glm/glm.hpp>
 #include <map>
 #include <string>
@@ -20,6 +21,9 @@ namespace BlueBear::Graphics::SceneGraph::Uniforms {
 		glm::vec4 toColor;
 		int currentFrame;
 
+		std::unordered_map< const void*, Shader::Uniform > uniforms;
+		Shader::Uniform getUniform( const Shader* shader );
+
 	public:
 		HighlightUniform( const std::string& uniformId, float animDuration );
 
@@ -29,7 +33,7 @@ namespace BlueBear::Graphics::SceneGraph::Uniforms {
 		void fadeTo( const glm::vec4& color );
 
 		void update() override;
-		void send() override;
+		void send( const Shader& shader ) override;
 	};
 
 }
