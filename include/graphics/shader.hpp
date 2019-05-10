@@ -1,10 +1,11 @@
 #ifndef SHADER_H
 #define SHADER_H
 
+#include "exceptions/genexc.hpp"
+#include "eventmanager.hpp"
 #include <GL/glew.h>
 #include <string>
 #include <glm/glm.hpp>
-#include "eventmanager.hpp"
 
 namespace BlueBear {
   namespace Graphics {
@@ -12,11 +13,25 @@ namespace BlueBear {
       std::string vPath;
       std::string fPath;
 
+      struct FilePackage {
+        std::string vertex;
+        std::string fragment;
+      };
+
+      FilePackage getFilePair();
+
+      GLuint compileVertex( const std::string& source );
+      GLuint compileFragment( const std::string& source );
+
     public:
+      EXCEPTION_TYPE( InvalidShaderFileException, "Could not open shader file" );
+      EXCEPTION_TYPE( ShaderCompilationFailure, "Failed to compile shader" );
+      EXCEPTION_TYPE( ShaderLinkFailure, "Failed to link shader" );
+
       using Uniform = GLint;
       static constexpr const Uniform UNDEFINED_UNIFORM = -1;
 
-      GLuint Program;
+      GLuint program;
       static GLint CURRENT_PROGRAM;
       static BasicEvent< void*, const Shader& > SHADER_CHANGE;
 

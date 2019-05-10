@@ -20,100 +20,121 @@ namespace BlueBear {
     GLint Shader::CURRENT_PROGRAM = -1;
     BasicEvent< void*, const Shader& > Shader::SHADER_CHANGE;
 
-    void Shader::sendDeferred() {
-      if( vPath.empty() && fPath.empty() ) {
-        return;
+    Shader::FilePackage Shader::getFilePair() {
+      FilePackage package;
+
+      std::ifstream vertexFile;
+      vertexFile.exceptions( std::ifstream::badbit );
+
+      std::ifstream fragmentFile;
+      fragmentFile.exceptions( std::ifstream::badbit );
+
+      try {
+        vertexFile.open( vPath );
+        fragmentFile.open( fPath );
+
+        std::stringstream vertexStream;
+        std::stringstream fragmentStream;
+
+        vertexStream << vertexFile.rdbuf();
+        fragmentStream << fragmentFile.rdbuf();
+
+        vertexFile.close();
+        fragmentFile.close();
+
+        package.vertex = vertexStream.str();
+        package.fragment = fragmentStream.str();
+      } catch ( std::ifstream::failure e ) {
+        Log::getInstance().error( "Shader::getFilePair", "Error opening one or more shader files: " + vPath + " " + fPath );
       }
 
-      const char* vertexPath = vPath.c_str();
-      const char* fragmentPath = fPath.c_str();
+      return package;
+    }
 
-      // 1. Retrieve the vertex/fragment source code from filePath
-      std::string vertexCode;
-      std::string fragmentCode;
-      std::ifstream vShaderFile;
-      std::ifstream fShaderFile;
-      // ensures ifstream objects can throw exceptions:
-      vShaderFile.exceptions (std::ifstream::badbit);
-      fShaderFile.exceptions (std::ifstream::badbit);
-      try
-      {
-          // Open files
-          vShaderFile.open(vertexPath);
-          fShaderFile.open(fragmentPath);
-          std::stringstream vShaderStream, fShaderStream;
-          // Read file's buffer contents into streams
-          vShaderStream << vShaderFile.rdbuf();
-          fShaderStream << fShaderFile.rdbuf();
-          // close file handlers
-          vShaderFile.close();
-          fShaderFile.close();
-          // Convert stream into string
-          vertexCode = vShaderStream.str();
-          fragmentCode = fShaderStream.str();
-      }
-      catch (std::ifstream::failure e) {
-        Log::getInstance().error( "Shader::Shader", "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" );
-      }
-      const GLchar* vShaderCode = vertexCode.c_str();
-      const GLchar * fShaderCode = fragmentCode.c_str();
-      // 2. Compile shaders
+    GLuint Shader::compileVertex( const std::string& source ) {
       GLuint vertex = 0;
-      GLuint fragment = 0;
-      GLint success = 0;
-      GLchar infoLog[512];
-      // Vertex Shader
-      vertex = glCreateShader(GL_VERTEX_SHADER);
+
+      vertex = glCreateShader( GL_VERTEX_SHADER );
       if( !vertex ) {
-        Log::getInstance().error( "Shader::Shader", "Could not create shader object!" );
+        Log::getInstance().error( "Shader::compileVertex", "Could not create vertex shader!" );
+        throw ShaderCompilationFailure();
+      }
+
+      const GLchar* castSource = source.c_str();
+      glShaderSource( vertex, 1, &castSource, NULL );
+
+      glCompileShader( vertex );
+
+      GLint success = 0;
+      glGetShaderiv( vertex, GL_COMPILE_STATUS, &success );
+      if( !success ) {
+        GLchar infoLog[ 512 ];
+        glGetShaderInfoLog( vertex, 512, NULL, infoLog );
+        Log::getInstance().error( "Shader::compileVertex", "Shader compilation failed: " + std::string( infoLog ) );
+        throw ShaderCompilationFailure();
+      }
+
+      return vertex;
+    }
+
+    GLuint Shader::compileFragment( const std::string& source ) {
+      GLuint fragment = 0;
+
+      fragment = glCreateShader( GL_FRAGMENT_SHADER );
+      if( !fragment ) {
+        Log::getInstance().error( "Shader::compileFragment", "Could not create fragment shader!" );
+        throw ShaderCompilationFailure();
+      }
+
+      const GLchar* castSource = source.c_str();
+      glShaderSource( fragment, 1, &castSource, NULL );
+
+      glCompileShader( fragment );
+
+      GLint success = 0;
+      glGetShaderiv( fragment, GL_COMPILE_STATUS, &success );
+      if( !success ) {
+        GLchar infoLog[ 512 ];
+        glGetShaderInfoLog( fragment, 512, NULL, infoLog );
+        Log::getInstance().error( "Shader::compileFragment", "Shader compilation failed: " + std::string( infoLog ) );
+        throw ShaderCompilationFailure();
+      }
+
+      return fragment;
+    }
+
+    void Shader::sendDeferred() {
+      if( vPath.empty() || fPath.empty() ) {
         return;
       }
-      glShaderSource(vertex, 1, &vShaderCode, NULL);
-      glCompileShader(vertex);
-      // Print compile errors if any
-      glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
-      if (!success)
-      {
-          glGetShaderInfoLog(vertex, 512, NULL, infoLog);
-          std::stringstream stream;
-          stream << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog;
-          Log::getInstance().error( "Shader::Shader", stream.str() );
-      }
-      // Fragment Shader
-      fragment = glCreateShader(GL_FRAGMENT_SHADER);
-      glShaderSource(fragment, 1, &fShaderCode, NULL);
-      glCompileShader(fragment);
-      // Print compile errors if any
-      glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
-      if (!success)
-      {
-          glGetShaderInfoLog(fragment, 512, NULL, infoLog);
-          std::stringstream stream;
-          stream << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog;
-          Log::getInstance().error( "Shader::Shader", stream.str() );
-      }
+
+      FilePackage package = getFilePair();
+
+      GLuint vertex = compileVertex( package.vertex );
+      GLuint fragment = compileFragment( package.fragment );
+
       // Shader Program
-      this->Program = glCreateProgram();
-      glAttachShader(this->Program, vertex);
-      glAttachShader(this->Program, fragment);
-      glLinkProgram(this->Program);
-      // Print linking errors if any
-      glGetProgramiv(this->Program, GL_LINK_STATUS, &success);
-      if (!success)
-      {
-          glGetProgramInfoLog(this->Program, 512, NULL, infoLog);
-          std::stringstream stream;
-          stream << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog;
-          Log::getInstance().error( "Shader::Shader", stream.str() );
+      program = glCreateProgram();
+
+      glAttachShader( program, vertex );
+      glAttachShader( program, fragment );
+
+      glLinkProgram( program );
+
+      GLint success = 0;
+      glGetProgramiv( program, GL_LINK_STATUS, &success );
+
+      if ( !success ) {
+          GLchar infoLog[ 512 ];
+          glGetProgramInfoLog( program, 512, NULL, infoLog );
+          Log::getInstance().error( "Shader::sendDeferred", "Shader linkage failed: " + std::string( infoLog ) );
+          throw ShaderLinkFailure();
       }
-      // Delete the shaders as they're linked into our program now and no longer necessery
+
       glDeleteShader(vertex);
       glDeleteShader(fragment);
 
-      Log::getInstance().debug( "Shader::Shader", vPath + ";" + fPath + " loaded successfully" );
-
-      vPath.clear();
-      fPath.clear();
+      Log::getInstance().debug( "Shader::sendDeferred", vPath + ";" + fPath + " loaded successfully" );
     }
 
     Shader::Shader( const std::string& vertexPath, const std::string& fragmentPath, bool defer ) : vPath( vertexPath ), fPath( fragmentPath ) {
@@ -129,8 +150,8 @@ namespace BlueBear {
     Shader::Uniform Shader::getUniform( const std::string& id ) const {
       Uniform result = Shader::UNDEFINED_UNIFORM;
 
-      if( this->Program == Shader::CURRENT_PROGRAM ) {
-        result = glGetUniformLocation( this->Program, id.c_str() );
+      if( program == Shader::CURRENT_PROGRAM ) {
+        result = glGetUniformLocation( program, id.c_str() );
       } else {
         Log::getInstance().warn( "Shader::getUniform", "Shader was not set before getUniform was called." );
       }
@@ -139,7 +160,7 @@ namespace BlueBear {
     }
 
     void Shader::sendData( Uniform uniform, const glm::vec2& value ) const {
-      if( this->Program == Shader::CURRENT_PROGRAM ) {
+      if( program == Shader::CURRENT_PROGRAM ) {
         if( uniform != -1 ) {
           glUniform2f( uniform, value.x, value.y );
         }
@@ -149,7 +170,7 @@ namespace BlueBear {
     }
 
     void Shader::sendData( Uniform uniform, const glm::vec3& value ) const {
-      if( this->Program == Shader::CURRENT_PROGRAM ) {
+      if( program == Shader::CURRENT_PROGRAM ) {
         if( uniform != -1 ) {
           glUniform3f( uniform, value.x, value.y, value.z );
         }
@@ -159,7 +180,7 @@ namespace BlueBear {
     }
 
     void Shader::sendData( Uniform uniform, const glm::vec4& value ) const {
-      if( this->Program == Shader::CURRENT_PROGRAM ) {
+      if( program == Shader::CURRENT_PROGRAM ) {
         if( uniform != -1 ) {
           glUniform4f( uniform, value.x, value.y, value.z, value.w );
         }
@@ -169,7 +190,7 @@ namespace BlueBear {
     }
 
     void Shader::sendData( Uniform uniform, const glm::mat4& value ) const {
-      if( this->Program == Shader::CURRENT_PROGRAM ) {
+      if( program == Shader::CURRENT_PROGRAM ) {
         if( uniform != -1 ) {
           glUniformMatrix4fv( uniform, 1, GL_FALSE, glm::value_ptr( value ) );
         }
@@ -179,7 +200,7 @@ namespace BlueBear {
     }
 
     void Shader::sendData( Uniform uniform, const int value ) const {
-      if( this->Program == Shader::CURRENT_PROGRAM ) {
+      if( program == Shader::CURRENT_PROGRAM ) {
         if( uniform != -1 ) {
           glUniform1i( uniform, value );
         }
@@ -189,7 +210,7 @@ namespace BlueBear {
     }
 
     void Shader::sendData( Uniform uniform, const unsigned int value ) const {
-      if( this->Program == Shader::CURRENT_PROGRAM ) {
+      if( program == Shader::CURRENT_PROGRAM ) {
         if( uniform != -1 ) {
           glUniform1ui( uniform, value );
         }
@@ -199,7 +220,7 @@ namespace BlueBear {
     }
 
     void Shader::sendData( Uniform uniform, const float value ) const {
-      if( this->Program == Shader::CURRENT_PROGRAM ) {
+      if( program == Shader::CURRENT_PROGRAM ) {
         if( uniform != -1 ) {
           glUniform1f( uniform, value );
         }
@@ -209,7 +230,7 @@ namespace BlueBear {
     }
 
     void Shader::sendData( Uniform uniform, unsigned int size, const GLfloat* value ) const {
-      if( this->Program == Shader::CURRENT_PROGRAM ) {
+      if( program == Shader::CURRENT_PROGRAM ) {
         if( uniform != -1 ) {
           glUniformMatrix4fv( uniform, size, GL_FALSE, value );
         }
@@ -219,9 +240,9 @@ namespace BlueBear {
     }
 
     void Shader::use( bool silent ) {
-      if( Shader::CURRENT_PROGRAM != this->Program ) {
-        glUseProgram( this->Program );
-        Shader::CURRENT_PROGRAM = this->Program;
+      if( Shader::CURRENT_PROGRAM != program ) {
+        glUseProgram( program );
+        Shader::CURRENT_PROGRAM = program;
       }
 
       if( !silent ) {
