@@ -16,7 +16,7 @@ namespace BlueBear {
       namespace ModelLoader {
 
         FloorModelLoader::FloorModelLoader( const std::vector< Models::Infrastructure::FloorLevel >& levels, Utilities::ShaderManager& shaderManager ) :
-          shader( shaderManager.getShader( "system/shaders/infr/vertex.glsl", "system/shaders/infr/fragment.glsl" ) ), levels( levels ) {}
+          shader( shaderManager.getShader( "system/shaders/infr_floor/vertex.glsl", "system/shaders/infr_floor/fragment.glsl" ) ), levels( levels ) {}
 
         sf::Image FloorModelLoader::generateTexture( const Models::Infrastructure::FloorLevel& currentLevel ) {
           sf::Image result;

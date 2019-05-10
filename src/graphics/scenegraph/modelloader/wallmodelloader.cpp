@@ -5,13 +5,14 @@
 #include "graphics/texture.hpp"
 #include "graphics/shader.hpp"
 #include "graphics/utilities/shader_manager.hpp"
+#include "graphics/scenegraph/uniforms/level_uniform.hpp"
 #include "exceptions/nullpointerexception.hpp"
 #include "tools/utility.hpp"
 
 namespace BlueBear::Graphics::SceneGraph::ModelLoader {
 
   WallModelLoader::WallModelLoader( const std::vector< Models::Infrastructure::FloorLevel >& floorLevels, Vector::Renderer& renderer, Utilities::ShaderManager& shaderManager )
-    : floorLevels( floorLevels ), shader( shaderManager.getShader( "system/shaders/infr/vertex.glsl", "system/shaders/infr/fragment.glsl" ) ) {
+    : floorLevels( floorLevels ), shader( shaderManager.getShader( "system/shaders/infr_wall/vertex.glsl", "system/shaders/infr_wall/fragment.glsl" ) ) {
       initTopTexture( renderer );
     }
 
@@ -396,33 +397,37 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
           Mesh::IndexedMeshGenerator< Mesh::TexturedVertex> generator;
           addToGenerator( generator, corner.horizontal.stagedMesh );
 
-          result->addChild(
-            Model::create( "__horizontal_" + std::to_string( y ) + "," + std::to_string( x ), { { generator.generateMesh(), shader, generatedMaterial } } )
-          );
+          auto model = Model::create( "__horizontal_" + std::to_string( y ) + "," + std::to_string( x ), { { generator.generateMesh(), shader, generatedMaterial } } );
+          model->setUniform( "level", std::make_unique< Uniforms::LevelUniform >( 0.0f ) );
+
+          result->addChild( model );
         }
         if( corner.vertical.model ) {
           Mesh::IndexedMeshGenerator< Mesh::TexturedVertex> generator;
           addToGenerator( generator, corner.vertical.stagedMesh );
 
-          result->addChild(
-            Model::create( "__vertical_" + std::to_string( y ) + "," + std::to_string( x ), { { generator.generateMesh(), shader, generatedMaterial } } )
-          );
+          auto model = Model::create( "__vertical_" + std::to_string( y ) + "," + std::to_string( x ), { { generator.generateMesh(), shader, generatedMaterial } } );
+          model->setUniform( "level", std::make_unique< Uniforms::LevelUniform >( 0.0f ) );
+
+          result->addChild( model );
         };
         if( corner.diagonal.model ) {
           Mesh::IndexedMeshGenerator< Mesh::TexturedVertex> generator;
           addToGenerator( generator, corner.diagonal.stagedMesh );
 
-          result->addChild(
-            Model::create( "__diagonal_" + std::to_string( y ) + "," + std::to_string( x ), { { generator.generateMesh(), shader, generatedMaterial } } )
-          );
+          auto model = Model::create( "__diagonal_" + std::to_string( y ) + "," + std::to_string( x ), { { generator.generateMesh(), shader, generatedMaterial } } );
+          model->setUniform( "level", std::make_unique< Uniforms::LevelUniform >( 0.0f ) );
+
+          result->addChild( model );
         }
         if( corner.reverseDiagonal.model ) {
           Mesh::IndexedMeshGenerator< Mesh::TexturedVertex> generator;
           addToGenerator( generator, corner.reverseDiagonal.stagedMesh );
 
-          result->addChild(
-            Model::create( "__reverseDiagonal_" + std::to_string( y ) + "," + std::to_string( x ), { { generator.generateMesh(), shader, generatedMaterial } } )
-          );
+          auto model = Model::create( "__reverseDiagonal_" + std::to_string( y ) + "," + std::to_string( x ), { { generator.generateMesh(), shader, generatedMaterial } } );
+          model->setUniform( "level", std::make_unique< Uniforms::LevelUniform >( 0.0f ) );
+
+          result->addChild( model );
         }
       }
     }
