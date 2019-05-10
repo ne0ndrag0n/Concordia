@@ -1,3 +1,5 @@
+#include "system/shaders/common/directional_light.glsl"
+
 struct Sector {
   vec2 origin;
   vec2 dimensions;

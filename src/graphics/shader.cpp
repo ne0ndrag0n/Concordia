@@ -158,6 +158,8 @@ namespace BlueBear {
       glDeleteShader(fragment);
 
       Log::getInstance().debug( "Shader::sendDeferred", vPath + ";" + fPath + " loaded successfully" );
+
+      visitedFiles.clear();
     }
 
     Shader::Shader( const std::string& vertexPath, const std::string& fragmentPath, bool defer ) : vPath( vertexPath ), fPath( fragmentPath ) {
