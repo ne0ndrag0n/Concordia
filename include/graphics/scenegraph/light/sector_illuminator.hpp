@@ -38,8 +38,8 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		};
 
 		struct ShaderUniformSet {
-			std::vector< Shader::Uniform > sectorsOrigin;
-			std::vector< Shader::Uniform > sectorsDimensions;
+			std::vector< Shader::Uniform > levelsOrigin;
+			std::vector< Shader::Uniform > levelsDimensions;
 			std::vector< Shader::Uniform > sectorMaps;
 			std::vector< Shader::Uniform > sectorLightsDirection;
 			std::vector< Shader::Uniform > sectorLightsAmbient;

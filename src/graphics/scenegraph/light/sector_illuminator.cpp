@@ -81,14 +81,10 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 
 		ShaderUniformSet& newSet = shaderUniformSets[ address ];
 
-		int numSectors = ConfigManager::getInstance().getIntValue( "shader_num_rooms" );
-		for( int i = 0; i != numSectors; i++ ) {
-			newSet.sectorsOrigin.emplace_back( address->getUniform( "sectors[" + std::to_string( i ) + "].origin" ) );
-			newSet.sectorsDimensions.emplace_back( address->getUniform( "sectors[" + std::to_string( i ) + "].dimensions" ) );
-		}
-
 		int numSectorLevels = ConfigManager::getInstance().getIntValue( "shader_num_sector_levels" );
 		for( int i = 0; i != numSectorLevels; i++ ) {
+			newSet.levelsOrigin.emplace_back( address->getUniform( "levels[" + std::to_string( i ) + "].origin" ) );
+			newSet.levelsDimensions.emplace_back( address->getUniform( "levels[" + std::to_string( i ) + "].dimensions" ) );
 			newSet.sectorMaps.emplace_back( address->getUniform( "sectorMap" + std::to_string( i ) ) );
 		}
 
@@ -117,8 +113,8 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 
 		int item = 0;
 		for( const auto& [ origin, dimensions ] : levelData ) {
-			shader.sendData( uniforms.sectorsOrigin[ item ], glm::vec2( origin ) );
-			shader.sendData( uniforms.sectorsDimensions[ item ], dimensions );
+			shader.sendData( uniforms.levelsOrigin[ item ], glm::vec2( origin ) );
+			shader.sendData( uniforms.levelsDimensions[ item ], dimensions );
 
 			item++;
 			if( item == 8 ) {
