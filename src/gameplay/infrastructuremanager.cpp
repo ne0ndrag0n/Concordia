@@ -5,10 +5,13 @@
 #include "graphics/scenegraph/light/sector_illuminator.hpp"
 #include "graphics/vector/renderer.hpp"
 #include "state/householdgameplaystate.hpp"
-#include "tools/intersection_map.hpp"
 #include "application.hpp"
 
 namespace BlueBear::Gameplay {
+
+	static glm::vec2 correctByOrigin( const glm::ivec2& value, const glm::vec2& origin ) {
+		return { origin.x + value.x, origin.y - value.y };
+	}
 
 	InfrastructureManager::InfrastructureManager( State::State& state ) : State::Substate( state ) {
 		sectorLights = std::make_shared< Graphics::SceneGraph::Light::SectorIlluminator >();
@@ -32,41 +35,97 @@ namespace BlueBear::Gameplay {
 		generateRooms();
 	}
 
+	std::vector< glm::vec2 > InfrastructureManager::generateRoomNodes( const Tools::Sector& sector, const glm::uvec2& dimensions ) {
+		std::vector< glm::vec2 > result;
+
+		for( const Tools::SectorDiscoveryNode* node : sector ) {
+			// Add origin-transformed node to room
+			result.emplace_back( correctByOrigin( node->position, glm::vec2{ -( dimensions.x * 0.5f ), dimensions.y * 0.5f } ) );
+		}
+
+		// Determine winding direction - ensure it is CW and not CCW
+		// (next_x - current_x)(next_y + current_y)
+		// Result is positive - Clockwise (else counterclockwise)
+		int windingDirection = 0;
+		for( int i = 0; i != result.size(); i++ ) {
+			glm::vec2 currentItem = result[ i ];
+			glm::vec2 nextItem;
+
+			if( i == ( result.size() - 1 ) ) {
+				nextItem = result[ 0 ];
+			} else {
+				nextItem = result[ i + 1 ];
+			}
+
+			windingDirection += ( nextItem.x - currentItem.x ) * ( nextItem.y + currentItem.y );
+		}
+
+		if( windingDirection < 0 ) {
+			std::vector< glm::vec2 > newResult;
+			for( auto it = result.rbegin(); it != result.rend(); ++it ) {
+				newResult.emplace_back( *it );
+			}
+
+			return newResult;
+		}
+
+		return result;
+	}
+
+	Tools::Intersection::IntersectionList InfrastructureManager::getIntersections( const std::vector< Models::WallSegment >& wallSegments ) {
+		Tools::Intersection::IntersectionList intersectionList;
+		for( const auto& wallSegment : wallSegments ) {
+			Log::getInstance().debug( "InfrastructureManager::getIntersections", glm::to_string( wallSegment.start ) + " - " + glm::to_string( wallSegment.end ) );
+			intersectionList.emplace_back( Tools::Intersection::IntersectionLineSegment{ wallSegment.start, wallSegment.end } );
+		}
+
+		return Tools::Intersection::generateIntersectionalList( std::move( intersectionList ) );
+	}
+
 	/**
-	 * Heavy TODO
+	 * Refactoring TODO
 	 */
 	void InfrastructureManager::generateRooms() {
 		float currentLevel = 0.0f;
 
 		for( const auto& level : model.getLevels() ) {
-			// Generate intersection map from existing intersections/crossovers
-			Tools::Intersection::IntersectionList intersectionList;
-			for( const auto& wallSegment : level.wallSegments ) {
-				Log::getInstance().debug( "test 1", glm::to_string( wallSegment.start ) + " - " + glm::to_string( wallSegment.end ) );
-				intersectionList.emplace_back( Tools::Intersection::IntersectionLineSegment{ wallSegment.start, wallSegment.end } );
-			}
-			intersectionList = Tools::Intersection::generateIntersectionalList( std::move( intersectionList ) );
+			std::vector< Room > roomsForLevel;
 
-			Log::getInstance().debug( "---", "---" );
+			// Generate intersection map from existing intersections/crossovers
+			Tools::Intersection::IntersectionList intersectionList = getIntersections( level.wallSegments );
+
+			Log::getInstance().debug( "InfrastructureManager::generateRooms", "---" );
 
 			Tools::SectorIdentifier sectorIdentifier;
 			for( const auto& computedSegment : intersectionList ) {
-				Log::getInstance().debug( "test 2", glm::to_string( computedSegment.start ) + " - " + glm::to_string( computedSegment.end ) );
+				Log::getInstance().debug( "InfrastructureManager::generateRooms", glm::to_string( computedSegment.start ) + " - " + glm::to_string( computedSegment.end ) );
 				sectorIdentifier.addEdge( computedSegment.start, computedSegment.end );
 			}
 
 			auto sectors = sectorIdentifier.getSectors();
 
-			Log::getInstance().debug( "---", "---" );
+			Log::getInstance().debug( "InfrastructureManager::generateRooms", "---" );
 
 			for( const Tools::Sector& sector : sectors ) {
-				Log::getInstance().debug( "test 3", "Identified sector:" );
+				// Room object for sector
+				Room room{
+					{
+						{ 0.5, 0.5, -0.1 },
+						{ 0.1, 0.1, 0.1 },
+						{ 0.3, 0.3, 0.3 },
+						{ 0.1, 0.1, 0.1 }
+					},
+					generateRoomNodes( sector, level.dimensions )
+				};
+
+				// SectorIlluminator requires legacy format we didn't have time to refactor
+				Log::getInstance().debug( "InfrastructureManager::generateRooms", "Identified sector:" );
 
 				const Tools::SectorDiscoveryNode* from = nullptr;
 				const Tools::SectorDiscoveryNode* to = nullptr;
 				std::vector< std::pair< glm::vec3, glm::vec3 > > sides;
 				for( const Tools::SectorDiscoveryNode* node : sector ) {
-					Log::getInstance().debug( "test 3", glm::to_string( node->position ) );
+					Log::getInstance().debug( "InfrastructureManager::generateRooms", glm::to_string( node->position ) );
 
 					if( from == nullptr ) {
 						from = node;
@@ -81,14 +140,15 @@ namespace BlueBear::Gameplay {
 				}
 				sides.emplace_back( glm::vec3{ sector.back()->position.x, sector.back()->position.y, currentLevel }, glm::vec3{ sector.front()->position.x, sector.front()->position.y, currentLevel } );
 
-				// TODO: actual lighting in sectors
 				sectorLights->insert( {
-					{ 0.5, 0.5, -0.1 },
-					{ 0.1, 0.1, 0.1 },
-					{ 0.3, 0.3, 0.3 },
-					{ 0.1, 0.1, 0.1 },
+					room.backgroundLight.getDirection(),
+					room.backgroundLight.getAmbient(),
+					room.backgroundLight.getDiffuse(),
+					room.backgroundLight.getSpecular(),
 					sides
 				} );
+
+				roomsForLevel.emplace_back( std::move( room ) );
 			}
 
 			glm::ivec2 dimensions = level.dimensions;

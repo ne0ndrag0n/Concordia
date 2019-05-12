@@ -30,4 +30,8 @@ namespace BlueBear::Graphics::SceneGraph::Light {
     shader.sendData( uniforms[ &shader ], direction );
   }
 
+  glm::vec3 DirectionalLight::getDirection() const {
+    return direction;
+  }
+
 }

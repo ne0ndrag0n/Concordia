@@ -25,6 +25,8 @@ namespace BlueBear::Graphics::SceneGraph::Light {
       glm::vec3 diffuseComponent,
       glm::vec3 specularComponent
     );
+
+    glm::vec3 getDirection() const;
   };
 
 }
