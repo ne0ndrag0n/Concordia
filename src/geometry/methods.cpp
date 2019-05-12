@@ -70,4 +70,36 @@ namespace BlueBear::Geometry {
 		};
 	}
 
+	bool segmentsIntersect( const LineSegment< glm::vec2 >& line1, const LineSegment< glm::vec2 >& line2 ) {
+		// ta = (y3−y4)(x1−x3)+(x4−x3)(y1−y3)
+		//      -----------------------------
+		//      (x4−x3)(y1−y2)−(x1−x2)(y4−y3)
+
+		// tb = (y1−y2)(x1−x3)+(x2−x1)(y1−y3)
+		//      -----------------------------
+		//      (x4−x3)(y1−y2)−(x1−x2)(y4−y3)
+
+		// first - odd
+		// second - even
+
+		float denominator = ( ( line2.to.x - line2.from.x ) * ( line1.from.y - line1.to.y ) ) -
+							( ( line1.from.x - line1.to.x ) * ( line2.to.y - line2.from.y ) );
+
+		// collinear
+		if( denominator == 0.0f ) {
+			return false;
+		}
+
+		float ta_numerator = ( ( line2.from.y - line2.to.y ) * ( line1.from.x - line2.from.x ) ) +
+							 ( ( line2.to.x - line2.from.x ) * ( line1.from.y - line2.from.y ) );
+
+		float tb_numerator = ( ( line1.from.y - line1.to.y ) * ( line1.from.x - line2.from.x ) ) +
+							 ( ( line1.to.x - line1.from.x ) * ( line1.from.y - line2.from.y ) );
+
+		float ta = ta_numerator / denominator;
+		float tb = tb_numerator / denominator;
+
+		return ( ta >= 0.0f && ta <= 1.0f && tb >= 0.0f && tb <= 1.0f );
+	}
+
 }
