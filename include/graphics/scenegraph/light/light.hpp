@@ -34,9 +34,9 @@ namespace BlueBear::Graphics::SceneGraph::Light {
         glm::vec3 specularComponent
       );
 
-      glm::vec3 getAmbient();
-      glm::vec3 getDiffuse();
-      glm::vec3 getSpecular();
+      const glm::vec3& getAmbient() const;
+      const glm::vec3& getDiffuse() const;
+      const glm::vec3& getSpecular() const;
 
       void setAmbient( glm::vec3 ambientComponent );
       void setDiffuse( glm::vec3 diffuseComponent );

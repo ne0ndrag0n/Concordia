@@ -89,7 +89,7 @@ namespace BlueBear::Gameplay {
 		float currentLevel = 0.0f;
 
 		for( const auto& level : model.getLevels() ) {
-			std::vector< Room > roomsForLevel;
+			std::vector< Models::Room > roomsForLevel;
 
 			// Generate intersection map from existing intersections/crossovers
 			Tools::Intersection::IntersectionList intersectionList = getIntersections( level.wallSegments );
@@ -108,7 +108,7 @@ namespace BlueBear::Gameplay {
 
 			for( const Tools::Sector& sector : sectors ) {
 				// Room object for sector
-				Room room{
+				Models::Room room(
 					{
 						{ 0.5, 0.5, -0.1 },
 						{ 0.1, 0.1, 0.1 },
@@ -116,7 +116,7 @@ namespace BlueBear::Gameplay {
 						{ 0.1, 0.1, 0.1 }
 					},
 					generateRoomNodes( sector, level.dimensions )
-				};
+				);
 
 				// SectorIlluminator requires legacy format we didn't have time to refactor
 				Log::getInstance().debug( "InfrastructureManager::generateRooms", "Identified sector:" );
@@ -141,10 +141,10 @@ namespace BlueBear::Gameplay {
 				sides.emplace_back( glm::vec3{ sector.back()->position.x, sector.back()->position.y, currentLevel }, glm::vec3{ sector.front()->position.x, sector.front()->position.y, currentLevel } );
 
 				sectorLights->insert( {
-					room.backgroundLight.getDirection(),
-					room.backgroundLight.getAmbient(),
-					room.backgroundLight.getDiffuse(),
-					room.backgroundLight.getSpecular(),
+					room.getBackgroundLight().getDirection(),
+					room.getBackgroundLight().getAmbient(),
+					room.getBackgroundLight().getDiffuse(),
+					room.getBackgroundLight().getSpecular(),
 					sides
 				} );
 
