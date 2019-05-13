@@ -504,6 +504,10 @@ namespace BlueBear {
             }
 
             Graphics::SceneGraph::Light::PointLight::sendLightCount( shader, uniform );
+
+            for( const auto& pair : illuminators ) {
+              pair.second->send( shader );
+            }
           }
 
           /**

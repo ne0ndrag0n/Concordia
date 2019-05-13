@@ -8,9 +8,6 @@ namespace BlueBear::Graphics::SceneGraph {
 
 	class Illuminator {
 	public:
-		Illuminator();
-		virtual ~Illuminator();
-
 		virtual std::string getPreamble() = 0;
 		virtual void send( const Shader& shader ) = 0;
 	};
