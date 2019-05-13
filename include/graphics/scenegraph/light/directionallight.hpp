@@ -14,7 +14,6 @@ namespace BlueBear::Graphics::SceneGraph::Light {
     std::unordered_map< const void*, Shader::Uniform > uniforms;
 
   protected:
-    std::string getPreamble() override;
     void generateUniformBundles( const Shader* shader ) override;
     void send( const Shader& shader ) override;
 
@@ -25,6 +24,8 @@ namespace BlueBear::Graphics::SceneGraph::Light {
       glm::vec3 diffuseComponent,
       glm::vec3 specularComponent
     );
+
+    std::string getPreamble() override;
 
     glm::vec3 getDirection() const;
   };

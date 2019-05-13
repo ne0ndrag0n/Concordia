@@ -23,7 +23,6 @@ namespace BlueBear::Graphics::SceneGraph::Light {
       std::unordered_map< const void*, LightUniformBundle > bundles;
 
     protected:
-      virtual std::string getPreamble() = 0;
       virtual void generateUniformBundles( const Shader* shader );
       void send( const Shader& shader ) override;
 

@@ -28,7 +28,6 @@ namespace BlueBear::Graphics::SceneGraph::Light {
     std::unordered_map< const void*, PointLightUniformBundle > pointBundles;
 
   protected:
-    std::string getPreamble() override;
     void generateUniformBundles( const Shader* shader ) override;
     void send( const Shader& shader ) override;
 
@@ -45,6 +44,8 @@ namespace BlueBear::Graphics::SceneGraph::Light {
       float quadratic
     );
     ~PointLight();
+
+    std::string getPreamble() override;
   };
 
 }
