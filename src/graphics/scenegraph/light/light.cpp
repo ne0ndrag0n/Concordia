@@ -1,5 +1,6 @@
 #include "graphics/scenegraph/light/light.hpp"
 #include "tools/opengl.hpp"
+#include "configmanager.hpp"
 #include "eventmanager.hpp"
 #include <GL/glew.h>
 #include "log.hpp"
@@ -36,25 +37,29 @@ namespace BlueBear::Graphics::SceneGraph::Light {
     void Light::generateUniformBundles( const Shader* shader ) {
       auto it = bundles.find( shader );
       if( it == bundles.end() ) {
-        std::string preamble = getPreamble() + ".";
         auto& bundle = bundles[ shader ];
 
-        bundle.ambientUniform = shader->getUniform( preamble + "ambient" );
-        bundle.diffuseUniform = shader->getUniform( preamble + "diffuse" );
-        bundle.specularUniform = shader->getUniform( preamble + "specular" );
+        static int maxLights = ConfigManager::getInstance().getIntValue( "shader_max_lights" );
+        for( int i = 0; i != maxLights; i++ ) {
+          std::string prefix = getPreamble() + "[" + std::to_string( i ) + "].";
+
+          bundle.ambientUniform.emplace_back( shader->getUniform( prefix + "ambient" ) );
+          bundle.diffuseUniform.emplace_back( shader->getUniform( prefix + "diffuse" ) );
+          bundle.specularUniform.emplace_back( shader->getUniform( prefix + "specular" ) );
+        }
       }
     }
 
     /**
      * All light locations can be sent before drawing all potentially lit components
      */
-    void Light::send( const Shader& shader ) {
+    void Light::send( const Shader& shader, unsigned int arrayIndex ) {
       generateUniformBundles( &shader );
       const auto& bundle = bundles[ &shader ];
 
-      shader.sendData( bundle.ambientUniform, ambientComponent );
-      shader.sendData( bundle.diffuseUniform, diffuseComponent );
-      shader.sendData( bundle.specularUniform, specularComponent );
+      shader.sendData( bundle.ambientUniform[ arrayIndex ], ambientComponent );
+      shader.sendData( bundle.diffuseUniform[ arrayIndex ], diffuseComponent );
+      shader.sendData( bundle.specularUniform[ arrayIndex ], specularComponent );
     }
 
 }

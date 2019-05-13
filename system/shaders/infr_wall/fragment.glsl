@@ -6,7 +6,6 @@ out vec4 color;
 
 #include "system/shaders/common/material.glsl"
 #include "system/shaders/common/directional_light.glsl"
-#include "system/shaders/common/sector.glsl"
 
 uniform Material material;
 uniform float wallBaseline;
@@ -16,7 +15,7 @@ void main() {
     discard;
   }
 
-  DirectionalLight light = getDirectionalLightBySector( fragPos );
+  DirectionalLight light = directionalLights[ 0 ];
 
   vec3 texResult = texture( material.diffuse0, fragTexture ).rgb;
 

@@ -493,20 +493,13 @@ namespace BlueBear {
           }
 
           void WorldRenderer::onShaderChange( const Graphics::Shader& shader ) {
-            Graphics::Shader::Uniform uniform;
-
-            auto it = pointLightUniforms.find( &shader );
-            if( it != pointLightUniforms.end() ) {
-              uniform = it->second;
-            } else {
-              // it sucks, shut up
-              uniform = pointLightUniforms[ &shader ] = shader.getUniform( "numPointLights" );
+            std::unordered_map< std::string, unsigned int > map;
+            for( const auto& pair : illuminators ) {
+              pair.second->send( shader, map[ pair.second->getPreamble() ]++ );
             }
 
-            Graphics::SceneGraph::Light::PointLight::sendLightCount( shader, uniform );
-
-            for( const auto& pair : illuminators ) {
-              pair.second->send( shader );
+            for( const auto& pair : map ) {
+              shader.sendData( shader.getUniform( "num" + pair.first ), pair.second );
             }
           }
 

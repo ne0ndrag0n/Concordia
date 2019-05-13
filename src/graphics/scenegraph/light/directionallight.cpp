@@ -1,5 +1,6 @@
 #include "graphics/scenegraph/light/directionallight.hpp"
 #include "tools/opengl.hpp"
+#include "configmanager.hpp"
 
 namespace BlueBear::Graphics::SceneGraph::Light {
 
@@ -9,7 +10,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
     }
 
   std::string DirectionalLight::getPreamble() {
-    return "directionalLight";
+    return "directionalLights";
   }
 
   void DirectionalLight::generateUniformBundles( const Shader* shader ) {
@@ -17,17 +18,19 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 
     auto it = uniforms.find( shader );
     if( it == uniforms.end() ) {
-      std::string preamble = getPreamble() + ".";
       auto& uniform = uniforms[ shader ];
 
-      uniform = shader->getUniform( preamble + "direction" );
+      static int maxLights = ConfigManager::getInstance().getIntValue( "shader_max_lights" );
+      for( int i = 0; i != maxLights; i++ ) {
+        uniform.emplace_back( shader->getUniform( getPreamble() + "[" + std::to_string( i ) + "].direction" ) );
+      }
     }
   }
 
-  void DirectionalLight::send( const Shader& shader ) {
-    Light::send( shader );
+  void DirectionalLight::send( const Shader& shader, unsigned int arrayIndex ) {
+    Light::send( shader, arrayIndex );
 
-    shader.sendData( uniforms[ &shader ], direction );
+    shader.sendData( uniforms[ &shader ][ arrayIndex ], direction );
   }
 
   glm::vec3 DirectionalLight::getDirection() const {

@@ -43,6 +43,7 @@ namespace BlueBear {
     configRoot[ "shader_num_room_lights" ] = 16;
     configRoot[ "shader_max_diffuse_textures" ] = 4;
     configRoot[ "shader_max_specular_textures" ] = 4;
+    configRoot[ "shader_max_lights" ] = 16;
 
     // Load settings.json from file
     std::ifstream settingsFile( SETTINGS_PATH );

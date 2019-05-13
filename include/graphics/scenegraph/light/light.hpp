@@ -15,16 +15,16 @@ namespace BlueBear::Graphics::SceneGraph::Light {
       glm::vec3 specularComponent;
 
       struct LightUniformBundle {
-        Shader::Uniform ambientUniform;
-        Shader::Uniform diffuseUniform;
-        Shader::Uniform specularUniform;
+        std::vector< Shader::Uniform > ambientUniform;
+        std::vector< Shader::Uniform > diffuseUniform;
+        std::vector< Shader::Uniform > specularUniform;
       };
 
       std::unordered_map< const void*, LightUniformBundle > bundles;
 
     protected:
       virtual void generateUniformBundles( const Shader* shader );
-      void send( const Shader& shader ) override;
+      void send( const Shader& shader, unsigned int arrayIndex ) override;
 
     public:
       Light(

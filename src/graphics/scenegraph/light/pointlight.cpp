@@ -1,9 +1,9 @@
 #include "graphics/scenegraph/light/pointlight.hpp"
 #include "tools/opengl.hpp"
+#include "configmanager.hpp"
 
 namespace BlueBear::Graphics::SceneGraph::Light {
 
-  std::atomic< unsigned int > PointLight::counter{ 0 };
 
   PointLight::PointLight( glm::vec3 position, glm::vec3 ambientComponent, glm::vec3 diffuseComponent, glm::vec3 specularComponent, float constant, float linear, float quadratic ) :
     Light::Light( ambientComponent, diffuseComponent, specularComponent ) {
@@ -11,21 +11,10 @@ namespace BlueBear::Graphics::SceneGraph::Light {
       this->constant = constant;
       this->linear = linear;
       this->quadratic = quadratic;
-
-      id = counter.load();
-      counter++;
     }
 
-  PointLight::~PointLight() {
-    counter--;
-  }
-
-  void PointLight::sendLightCount( const Shader& shader, const Shader::Uniform uniform ) {
-    shader.sendData( uniform, counter.load() );
-  }
-
   std::string PointLight::getPreamble() {
-    return "pointLights[" + std::to_string( id ) + "]";
+    return "pointLights";
   }
 
   void PointLight::generateUniformBundles( const Shader* shader ) {
@@ -33,24 +22,29 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 
     auto it = pointBundles.find( shader );
     if( it == pointBundles.end() ) {
-      std::string preamble = getPreamble() + ".";
       auto& bundle = pointBundles[ shader ];
 
-      bundle.positionUniform = shader->getUniform( preamble + "position" );
-      bundle.constantUniform = shader->getUniform( preamble + "constant" );
-      bundle.linearUniform   = shader->getUniform( preamble + "linear" );
-      bundle.quadraticUniform = shader->getUniform( preamble + "quadratic" );
+      static int maxLights = ConfigManager::getInstance().getIntValue( "shader_max_lights" );
+      for( int i = 0; i != maxLights; i++ ) {
+        std::string prefix = getPreamble() + "[" + std::to_string( i ) + "].";
+
+        bundle.positionUniform.emplace_back( shader->getUniform( prefix + "position" ) );
+        bundle.constantUniform.emplace_back( shader->getUniform( prefix + "constant" ) );
+        bundle.linearUniform.emplace_back( shader->getUniform( prefix + "linear" ) );
+        bundle.quadraticUniform.emplace_back( shader->getUniform( prefix + "quadratic" ) );
+      }
+
     }
   }
 
-  void PointLight::send( const Shader& shader ) {
-    Light::send( shader );
+  void PointLight::send( const Shader& shader, unsigned int arrayIndex ) {
+    Light::send( shader, arrayIndex );
 
     const auto& bundle = pointBundles[ &shader ];
-    shader.sendData( bundle.positionUniform, position );
-    shader.sendData( bundle.constantUniform, constant );
-    shader.sendData( bundle.linearUniform, linear );
-    shader.sendData( bundle.quadraticUniform, quadratic );
+    shader.sendData( bundle.positionUniform[ arrayIndex ], position );
+    shader.sendData( bundle.constantUniform[ arrayIndex ], constant );
+    shader.sendData( bundle.linearUniform[ arrayIndex ], linear );
+    shader.sendData( bundle.quadraticUniform[ arrayIndex ], quadratic );
   }
 
 }

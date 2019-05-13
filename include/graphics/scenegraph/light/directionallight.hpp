@@ -11,11 +11,11 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 
     glm::vec3 direction;
 
-    std::unordered_map< const void*, Shader::Uniform > uniforms;
+    std::unordered_map< const void*, std::vector< Shader::Uniform > > uniforms;
 
   protected:
     void generateUniformBundles( const Shader* shader ) override;
-    void send( const Shader& shader ) override;
+    void send( const Shader& shader, unsigned int arrayIndex ) override;
 
   public:
     DirectionalLight(

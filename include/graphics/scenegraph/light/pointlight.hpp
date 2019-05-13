@@ -9,9 +9,6 @@
 namespace BlueBear::Graphics::SceneGraph::Light {
 
   class PointLight : public Light {
-    static std::atomic< unsigned int > counter;
-
-    int id;
 
     glm::vec3 position;
     float constant = 0.0f;
@@ -19,21 +16,19 @@ namespace BlueBear::Graphics::SceneGraph::Light {
     float quadratic = 0.0f;
 
     struct PointLightUniformBundle {
-      Shader::Uniform positionUniform;
-      Shader::Uniform constantUniform;
-      Shader::Uniform linearUniform;
-      Shader::Uniform quadraticUniform;
+      std::vector< Shader::Uniform > positionUniform;
+      std::vector< Shader::Uniform > constantUniform;
+      std::vector< Shader::Uniform > linearUniform;
+      std::vector< Shader::Uniform > quadraticUniform;
     };
 
     std::unordered_map< const void*, PointLightUniformBundle > pointBundles;
 
   protected:
     void generateUniformBundles( const Shader* shader ) override;
-    void send( const Shader& shader ) override;
+    void send( const Shader& shader, unsigned int arrayIndex ) override;
 
   public:
-    static void sendLightCount( const Shader& shader, const Shader::Uniform uniform );
-
     PointLight(
       glm::vec3 position,
       glm::vec3 ambientComponent,
@@ -43,7 +38,6 @@ namespace BlueBear::Graphics::SceneGraph::Light {
       float linear,
       float quadratic
     );
-    ~PointLight();
 
     std::string getPreamble() override;
   };

@@ -32,7 +32,7 @@ namespace BlueBear::Gameplay {
 		worldRenderer.placeObject( "__floorrig", {} );
 		worldRenderer.placeObject( "__wallrig", {} );
 
-		generateRooms();
+		//generateRooms();
 	}
 
 	std::vector< glm::vec2 > InfrastructureManager::generateRoomNodes( const Tools::Sector& sector, const glm::uvec2& dimensions ) {
