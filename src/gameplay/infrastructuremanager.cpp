@@ -155,9 +155,6 @@ namespace BlueBear::Gameplay {
 			sectorLights->setLevelData( glm::vec3{ -( dimensions.x * 0.5f ), dimensions.y * 0.5f, currentLevel }, dimensions );
 			currentLevel += 4.0f;
 		}
-
-		// Falls through if already added
-		state.as< State::HouseholdGameplayState >().getWorldRenderer().addIlluminator( "__sector_illuminator", sectorLights );
 	}
 
 	bool InfrastructureManager::update() {

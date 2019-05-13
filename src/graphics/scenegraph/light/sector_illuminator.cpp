@@ -12,7 +12,13 @@
 
 namespace BlueBear::Graphics::SceneGraph::Light {
 
+	SectorIlluminator::SectorIlluminator() {
+		Graphics::Shader::SHADER_CHANGE.listen( this, std::bind( &SectorIlluminator::send, this, std::placeholders::_1 ) );
+	}
+
 	SectorIlluminator::~SectorIlluminator() {
+		Graphics::Shader::SHADER_CHANGE.stopListening( this );
+
 		for( const auto& pair : textureData ) {
 			if( pair.textureUnit ) {
 				Tools::OpenGL::returnTextureUnits( { *pair.textureUnit } );

@@ -2,7 +2,6 @@
 #define SG_SECTOR_ILLUMINATOR
 
 #include "exceptions/genexc.hpp"
-#include "graphics/scenegraph/illuminator.hpp"
 #include "graphics/texture.hpp"
 #include "graphics/shader.hpp"
 #include <glm/glm.hpp>
@@ -16,7 +15,7 @@
 
 namespace BlueBear::Graphics::SceneGraph::Light {
 
-	class SectorIlluminator : public Illuminator {
+	class SectorIlluminator {
 	public:
 		struct Sector {
 			glm::vec3 direction;
@@ -26,7 +25,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 			std::vector< std::pair< glm::vec3, glm::vec3 > > sides;
 		};
 
-		SectorIlluminator() = default;
+		SectorIlluminator();
 		~SectorIlluminator();
 
 		EXCEPTION_TYPE( InvalidStateException, "Invalid state encountered!" );
@@ -73,7 +72,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 	public:
 		void insert( const Sector& value );
 		void setLevelData( const glm::vec3& topLeft, const glm::uvec2& dimensions );
-		void send( const Shader& shader ) override;
+		void send( const Shader& shader );
 	};
 
 }
