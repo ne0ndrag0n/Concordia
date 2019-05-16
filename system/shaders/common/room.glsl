@@ -2,22 +2,20 @@
 #include "system/shaders/common/cond.glsl"
 
 #define MAX_ROOMS 16
+#define MAP_RESOLUTION 100
 
 struct Room {
 	vec2 lowerLeft;
 	vec2 upperRight;
-	uint level;
-	uint samplerId; // object is invalid if this is 0
+	ivec2 mapLocation;
+	int level; // -1 for invalid room
 };
 
 uniform Room rooms[ MAX_ROOMS ];
-uniform int availableRooms;
 
-uniform sampler2D sector0;
-uniform sampler2D sector1;
-uniform sampler2D sector2;
-uniform sampler2D sector3;
-// TODO
+// roomData shall be a 2d array flipped vertically for opengl
+// Pack these in a manner that is space-efficient
+uniform sampler2D roomData;
 
 float fragmentInBox( const Room room, const vec2 fragment ) {
 	vec2 stp = step( room.lowerLeft, fragment ) - step( room.upperRight, fragment );
@@ -25,34 +23,9 @@ float fragmentInBox( const Room room, const vec2 fragment ) {
 }
 
 float lookupFragment( const Room room, const vec2 fragment ) {
-	vec2 textureCoordinates = ( fragment - room.lowerLeft ) / ( room.upperRight - room.lowerLeft );
+	ivec2 regionCoords = ( fragment - room.lowerLeft ) * MAP_RESOLUTION;
 
-	float lightIndex = 0.0f;
-
-	// does this break the universe?
-	switch( room.samplerId ) {
-		default:
-		case 0:
-			lightIndex = texture( sector0, textureCoordinates ).r;
-			break;
-		case 1:
-			lightIndex = texture( sector1, textureCoordinates ).r;
-			break;
-		case 2:
-			lightIndex = texture( sector2, textureCoordinates ).r;
-			break;
-		case 3:
-			lightIndex = texture( sector3, textureCoordinates ).r;
-			break;
-		// TODO
-	}
-
-	return
-		whenGreaterEqual( textureCoordinates.x, 0.0f ) *
-		whenGreaterEqual( textureCoordinates.y, 0.0f ) *
-		whenLessEqual( textureCoordinates.x, 1.0f ) *
-		whenLessEqual( textureCoordinates.y, 1.0f ) *
-		lightIndex;
+	return texelFetch( roomData, room.mapLocation + regionCoords, 0 );
 }
 
 DirectionalLight getRoomLight( const vec3 fragment ) {
