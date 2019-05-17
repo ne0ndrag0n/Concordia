@@ -14,7 +14,8 @@ namespace BlueBear::Models {
 	public:
 		Room( const Graphics::SceneGraph::Light::DirectionalLight backgroundLight, const std::vector< glm::vec2 >& points );
 
-		const Graphics::SceneGraph::Light::DirectionalLight& getBackgroundLight() const;
+		Graphics::SceneGraph::Light::DirectionalLight& getBackgroundLight();
+		const std::vector< glm::vec2 >& getPoints() const;
 	};
 
 }

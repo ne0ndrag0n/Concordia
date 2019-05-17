@@ -25,7 +25,7 @@ float fragmentInBox( const Room room, const vec2 fragment ) {
 float lookupFragment( const Room room, const vec2 fragment ) {
 	ivec2 regionCoords = ( fragment - room.lowerLeft ) * MAP_RESOLUTION;
 
-	return texelFetch( roomData, room.mapLocation + regionCoords, 0 );
+	return texelFetch( roomData, room.mapLocation + regionCoords, 0 ).r;
 }
 
 DirectionalLight getRoomLight( const vec3 fragment ) {

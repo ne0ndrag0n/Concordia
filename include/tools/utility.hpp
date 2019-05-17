@@ -154,6 +154,7 @@ namespace BlueBear {
 				static glm::ivec2 normalize( const glm::ivec2& candidate );
 				static int distance( const glm::ivec2& start, const glm::ivec2& end );
 				static float distance( const glm::vec3& start, const glm::vec3& end );
+				static float cross( const glm::vec2& a, const glm::vec2& b );
 
 				template < typename T >
 				static void runParallel( const std::vector< T >& collection, const std::function< void( const T& ) >& functor ) {

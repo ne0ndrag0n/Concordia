@@ -2,6 +2,7 @@
 #define INFRASTRUCTUREMANAGER
 
 #include "state/substate.hpp"
+#include "graphics/scenegraph/light/lightmap_manager.hpp"
 #include "graphics/scenegraph/light/directionallight.hpp"
 #include "models/infrastructure.hpp"
 #include "models/wallsegment.hpp"
@@ -15,12 +16,11 @@
 
 namespace BlueBear::State { class HouseholdGameplayState; }
 namespace BlueBear::Graphics::Utilities{ class ShaderManager; }
-namespace BlueBear::Graphics::SceneGraph::Light { class SectorIlluminator; }
 namespace BlueBear::Gameplay {
 
 	class InfrastructureManager : public State::Substate {
 		Models::Infrastructure model;
-		std::shared_ptr< Graphics::SceneGraph::Light::SectorIlluminator > sectorLights;
+		Graphics::SceneGraph::Light::LightmapManager lightmapManager;
 		std::vector< std::vector< Models::Room > > rooms;
 
 		std::vector< glm::vec2 > generateRoomNodes( const Tools::Sector& sector, const glm::uvec2& dimensions );
