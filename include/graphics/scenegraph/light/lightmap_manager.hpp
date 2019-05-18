@@ -2,6 +2,7 @@
 #define LIGHTMAP_MANAGER
 
 #include "graphics/scenegraph/light/directionallight.hpp"
+#include "containers/bounded_object.hpp"
 #include "models/room.hpp"
 #include "graphics/texture.hpp"
 #include "geometry/linesegment.hpp"
@@ -32,6 +33,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 
 		std::vector< Geometry::LineSegment< glm::vec2 > > getEdges( const Models::Room& room );
 		ShaderRoom getFragmentData( const Models::Room& room, int level, int lightIndex );
+		std::vector< Containers::BoundedObject< float* > > getBoundedObjects( const std::vector< ShaderRoom >& shaderRooms );
 
 	public:
 		LightmapManager();

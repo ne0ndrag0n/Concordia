@@ -1,5 +1,7 @@
 #include "graphics/scenegraph/light/lightmap_manager.hpp"
+#include "containers/packed_cell.hpp"
 #include "geometry/methods.hpp"
+#include "configmanager.hpp"
 #include "log.hpp"
 #include <glm/gtx/string_cast.hpp>
 
@@ -36,6 +38,24 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		}
 
 		return edges;
+	}
+
+	std::vector< Containers::BoundedObject< float* > > LightmapManager::getBoundedObjects( const std::vector< LightmapManager::ShaderRoom >& shaderRooms ) {
+		std::vector< Containers::BoundedObject< float* > > result;
+
+		for( const auto& shaderRoom : shaderRooms ) {
+			glm::vec2 start{ shaderRoom.lowerLeft.x, shaderRoom.upperRight.y };
+			glm::vec2 end{ shaderRoom.upperRight.x, shaderRoom.lowerLeft.y };
+
+			glm::ivec2 dims{
+				( ( end.x - start.x ) * LIGHTMAP_SECTOR_RESOLUTION ),
+				( ( start.y - end.y ) * LIGHTMAP_SECTOR_RESOLUTION )
+			};
+
+			result.emplace_back( Containers::BoundedObject< float* >{ dims.x, dims.y, shaderRoom.mapData.get() } );
+		}
+
+		return result;
 	}
 
 	LightmapManager::ShaderRoom LightmapManager::getFragmentData( const Models::Room& room, int level, int lightIndex ) {
@@ -111,6 +131,11 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 
 			level++;
 		}
+
+		static int textureWidth = ConfigManager::getInstance().getIntValue( "shader_room_map_min_width" );
+		static int textureHeight = ConfigManager::getInstance().getIntValue( "shader_room_map_min_height" );
+
+		auto packedCells = Containers::packCells( getBoundedObjects( shaderRooms ), textureWidth, textureHeight );
 	}
 
 }
