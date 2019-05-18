@@ -10,6 +10,10 @@ namespace BlueBear::Models {
 		return backgroundLight;
 	}
 
+	const Graphics::SceneGraph::Light::DirectionalLight& Room::getBackgroundLight() const {
+		return backgroundLight;
+	}
+
 	const std::vector< glm::vec2 >& Room::getPoints() const {
 		return points;
 	}
