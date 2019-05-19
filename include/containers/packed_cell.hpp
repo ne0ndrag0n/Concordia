@@ -72,7 +72,7 @@ namespace BlueBear::Containers {
 				packed.emplace_back( std::move( newCell ) );
 			} else {
 				// Must add new cell to right of previous region
-				PackedCell< T > newCell{ totalWidth, 0, boundedObject.width, boundedObject.height };
+				PackedCell< T > newCell{ totalWidth, 0, boundedObject.width, boundedObject.height, boundedObject.object };
 
 				// New cell goes underneath
 				PackedCell< T > bottomEmpty{

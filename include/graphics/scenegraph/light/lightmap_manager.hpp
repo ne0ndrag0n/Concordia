@@ -3,12 +3,14 @@
 
 #include "graphics/scenegraph/light/directionallight.hpp"
 #include "containers/bounded_object.hpp"
+#include "containers/packed_cell.hpp"
 #include "models/room.hpp"
 #include "graphics/texture.hpp"
 #include "geometry/linesegment.hpp"
 #include <glm/glm.hpp>
 #include <vector>
 #include <memory>
+#include <optional>
 
 #define LIGHTMAP_SECTOR_RESOLUTION 100
 #define LIGHTMAP_SECTOR_STEP	   0.01f
@@ -28,12 +30,13 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		std::vector< std::vector< Models::Room > > roomLevels;
 		DirectionalLight outdoorLight;
 
-		std::shared_ptr< Graphics::Texture > generatedRoomData;
+		std::optional< Graphics::Texture > generatedRoomData;
 		std::vector< const DirectionalLight* > generatedLightList;
 
 		std::vector< Geometry::LineSegment< glm::vec2 > > getEdges( const Models::Room& room );
 		ShaderRoom getFragmentData( const Models::Room& room, int level, int lightIndex );
-		std::vector< Containers::BoundedObject< float* > > getBoundedObjects( const std::vector< ShaderRoom >& shaderRooms );
+		std::vector< Containers::BoundedObject< ShaderRoom* > > getBoundedObjects( std::vector< ShaderRoom >& shaderRooms );
+		void setTexture( const std::vector< Containers::PackedCell< ShaderRoom* > >& packedCells );
 
 	public:
 		LightmapManager();

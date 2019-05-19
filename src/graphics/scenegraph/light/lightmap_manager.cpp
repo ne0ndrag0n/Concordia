@@ -1,5 +1,4 @@
 #include "graphics/scenegraph/light/lightmap_manager.hpp"
-#include "containers/packed_cell.hpp"
 #include "geometry/methods.hpp"
 #include "configmanager.hpp"
 #include "log.hpp"
@@ -40,10 +39,10 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		return edges;
 	}
 
-	std::vector< Containers::BoundedObject< float* > > LightmapManager::getBoundedObjects( const std::vector< LightmapManager::ShaderRoom >& shaderRooms ) {
-		std::vector< Containers::BoundedObject< float* > > result;
+	std::vector< Containers::BoundedObject< LightmapManager::ShaderRoom* > > LightmapManager::getBoundedObjects( std::vector< LightmapManager::ShaderRoom >& shaderRooms ) {
+		std::vector< Containers::BoundedObject< ShaderRoom* > > result;
 
-		for( const auto& shaderRoom : shaderRooms ) {
+		for( auto& shaderRoom : shaderRooms ) {
 			glm::vec2 start{ shaderRoom.lowerLeft.x, shaderRoom.upperRight.y };
 			glm::vec2 end{ shaderRoom.upperRight.x, shaderRoom.lowerLeft.y };
 
@@ -52,10 +51,34 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 				( ( start.y - end.y ) * LIGHTMAP_SECTOR_RESOLUTION )
 			};
 
-			result.emplace_back( Containers::BoundedObject< float* >{ dims.x, dims.y, shaderRoom.mapData.get() } );
+			result.emplace_back( Containers::BoundedObject< ShaderRoom* >{ dims.x, dims.y, &shaderRoom } );
 		}
 
 		return result;
+	}
+
+	void LightmapManager::setTexture( const std::vector< Containers::PackedCell< LightmapManager::ShaderRoom* > >& packedCells ) {
+		// Get the dimensions of the board
+		glm::ivec2 totalDimensions;
+		for( const auto& cell : packedCells ) {
+			totalDimensions.x += cell.width;
+			totalDimensions.y += cell.height;
+		}
+
+		// Place all the submaps in the map
+		std::unique_ptr< float[] > data = std::make_unique< float[] >( totalDimensions.x * totalDimensions.y );
+		for( const auto& cell : packedCells ) {
+			ShaderRoom* room = *cell.object;
+			room->mapLocation = glm::ivec2{ cell.x, cell.y + cell.height };
+
+			for( int y = cell.y; y != cell.y + cell.height; y++ ) {
+				for( int x = cell.x; x != cell.x + cell.width; x++ ) {
+					data[ ( y * totalDimensions.y ) + x ] = room->mapData[ ( y * totalDimensions.y ) + x ];
+				}
+			}
+		}
+
+		generatedRoomData.emplace( totalDimensions, data.get() );
 	}
 
 	LightmapManager::ShaderRoom LightmapManager::getFragmentData( const Models::Room& room, int level, int lightIndex ) {
@@ -116,7 +139,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 	 * This should be called any time rooms are modified. Room nodes are immutable, so entire levels will be resent after user does something like modify a wall.
 	 */
 	void LightmapManager::calculateLightmaps() {
-		generatedRoomData = nullptr;
+		generatedRoomData.reset();
 		generatedLightList.clear();
 
 		generatedLightList.emplace_back( &outdoorLight );
@@ -135,7 +158,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		static int textureWidth = ConfigManager::getInstance().getIntValue( "shader_room_map_min_width" );
 		static int textureHeight = ConfigManager::getInstance().getIntValue( "shader_room_map_min_height" );
 
-		//auto packedCells = Containers::packCells( getBoundedObjects( shaderRooms ), textureWidth, textureHeight );
+		auto packedCells = Containers::packCells( getBoundedObjects( shaderRooms ), textureWidth, textureHeight );
 		// Iterate packed cells and overlay them onto a texture
 	}
 
