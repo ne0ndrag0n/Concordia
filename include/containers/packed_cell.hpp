@@ -65,6 +65,8 @@ namespace BlueBear::Containers {
 					nextFreeBox->height - boundedObject.height
 				};
 
+				unpacked.erase( nextFreeBox );
+
 				// Do not place either new box if width/height is entirely used up
 				if( rightEmpty.width > 0 && rightEmpty.height > 0 ) { unpacked.emplace_back( std::move( rightEmpty ) ); }
 				if( bottomEmpty.width > 0 && bottomEmpty.height > 0 ) { unpacked.emplace_back( std::move( bottomEmpty ) ); }

@@ -71,9 +71,11 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 			ShaderRoom* room = *cell.object;
 			room->mapLocation = glm::ivec2{ cell.x, cell.y + cell.height };
 
-			for( int y = cell.y; y != cell.y + cell.height; y++ ) {
-				for( int x = cell.x; x != cell.x + cell.width; x++ ) {
-					data[ ( y * totalDimensions.y ) + x ] = room->mapData[ ( y * totalDimensions.y ) + x ];
+			for( int y = 0; y != cell.height; y++ ) {
+				for( int x = 0; x != cell.width; x++ ) {
+					glm::ivec2 mapCoordinates = { cell.x + x, cell.y + y };
+
+					data[ ( mapCoordinates.y * totalDimensions.y ) + mapCoordinates.x ] = room->mapData[ ( y * cell.width ) + x ];
 				}
 			}
 		}
@@ -158,8 +160,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		static int textureWidth = ConfigManager::getInstance().getIntValue( "shader_room_map_min_width" );
 		static int textureHeight = ConfigManager::getInstance().getIntValue( "shader_room_map_min_height" );
 
-		auto packedCells = Containers::packCells( getBoundedObjects( shaderRooms ), textureWidth, textureHeight );
-		// Iterate packed cells and overlay them onto a texture
+		setTexture( Containers::packCells( getBoundedObjects( shaderRooms ), textureWidth, textureHeight ) );
 	}
 
 }
