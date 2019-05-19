@@ -135,7 +135,8 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		static int textureWidth = ConfigManager::getInstance().getIntValue( "shader_room_map_min_width" );
 		static int textureHeight = ConfigManager::getInstance().getIntValue( "shader_room_map_min_height" );
 
-		auto packedCells = Containers::packCells( getBoundedObjects( shaderRooms ), textureWidth, textureHeight );
+		//auto packedCells = Containers::packCells( getBoundedObjects( shaderRooms ), textureWidth, textureHeight );
+		// Iterate packed cells and overlay them onto a texture
 	}
 
 }
