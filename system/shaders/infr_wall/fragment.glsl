@@ -6,6 +6,7 @@ out vec4 color;
 
 #include "system/shaders/common/material.glsl"
 #include "system/shaders/common/directional_light.glsl"
+#include "system/shaders/common/room.glsl"
 
 uniform Material material;
 uniform float wallBaseline;

@@ -2,7 +2,7 @@
 #include "system/shaders/common/cond.glsl"
 
 #define MAX_ROOMS 16
-#define MAP_RESOLUTION 100
+#define MAP_RESOLUTION 100.0f
 
 struct Room {
 	vec2 lowerLeft;
@@ -23,7 +23,8 @@ float fragmentInBox( const Room room, const vec2 fragment ) {
 }
 
 float lookupFragment( const Room room, const vec2 fragment ) {
-	ivec2 regionCoords = ( fragment - room.lowerLeft ) * MAP_RESOLUTION;
+	vec2 multiplier = round( ( fragment - room.lowerLeft ) * MAP_RESOLUTION );
+	ivec2 regionCoords = ivec2( multiplier );
 
 	return texelFetch( roomData, room.mapLocation + regionCoords, 0 ).r;
 }
@@ -41,5 +42,5 @@ DirectionalLight getRoomLight( const vec3 fragment ) {
 			lookupFragment( rooms[ i ], fragment.xy );				// Lookup conducted on fragment returns actual index
 	}
 
-	return directionalLights[ lightIndex ];							// If we truly don't hit on a sector, return the outdoor light at position 0
+	return directionalLights[ int( lightIndex ) ];					// If we truly don't hit on a sector, return the outdoor light at position 0
 }

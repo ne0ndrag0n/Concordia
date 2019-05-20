@@ -88,6 +88,7 @@ namespace BlueBear {
         GLchar infoLog[ 512 ];
         glGetShaderInfoLog( vertex, 512, NULL, infoLog );
         Log::getInstance().error( "Shader::compileVertex", "Shader compilation failed: " + std::string( infoLog ) );
+        Log::getInstance().error( "Shader::compileVertex", "Source\n" + source );
         throw ShaderCompilationFailure();
       }
 
@@ -114,6 +115,7 @@ namespace BlueBear {
         GLchar infoLog[ 512 ];
         glGetShaderInfoLog( fragment, 512, NULL, infoLog );
         Log::getInstance().error( "Shader::compileFragment", "Shader compilation failed: " + std::string( infoLog ) );
+        Log::getInstance().error( "Shader::compileFragment", "Source\n" + source );
         throw ShaderCompilationFailure();
       }
 
