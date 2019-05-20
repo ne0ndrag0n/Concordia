@@ -6,17 +6,15 @@
 
 namespace BlueBear::Graphics::SceneGraph::Light {
 
-	// DEBUG - TEST code
-	/*
-	Log::getInstance().debug( "LightmapManager::getFragmentData", "Room: (dimensions) " + glm::to_string( dimensions ) );
-	for( const glm::vec2& point : room.getPoints() ) {
-		Log::getInstance().debug( "LightmapManager::getFragmentData", glm::to_string( point ) );
-	}
-	*/
-
 	static const glm::vec2 LIGHTMAP_SECTOR_MULTIPLIER{ LIGHTMAP_SECTOR_RESOLUTION, LIGHTMAP_SECTOR_RESOLUTION };
 
-	LightmapManager::LightmapManager() : outdoorLight( { 0.5, 0.5, -0.1 }, { 0.6, 0.6, 0.6 }, { 1.0, 1.0, 1.0 }, { 0.1, 0.1, 0.1 } ) {}
+	LightmapManager::LightmapManager() : outdoorLight( { 0.5, 0.5, -0.1 }, { 0.6, 0.6, 0.6 }, { 1.0, 1.0, 1.0 }, { 0.1, 0.1, 0.1 } ) {
+		Shader::SHADER_CHANGE.listen( this, std::bind( &LightmapManager::send, this, std::placeholders::_1 ) );
+	}
+
+	LightmapManager::~LightmapManager() {
+		Shader::SHADER_CHANGE.stopListening( this );
+	}
 
 	void LightmapManager::setRooms( const std::vector< std::vector< Models::Room > >& roomLevels ) {
 		this->roomLevels = roomLevels;
@@ -161,6 +159,33 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		static int textureHeight = ConfigManager::getInstance().getIntValue( "shader_room_map_min_height" );
 
 		setTexture( Containers::packCells( getBoundedObjects( shaderRooms ), textureWidth, textureHeight ) );
+	}
+
+	void LightmapManager::send( const Shader& shader ) {
+		const UniformBundle& bundle = uniforms.getUniforms( shader );
+
+		// TODO
+	}
+
+	LightmapManager::UniformBundle::UniformBundle( const Shader& shader ) {
+		static int numLights = ConfigManager::getInstance().getIntValue( "shader_max_lights" );
+		static int numRooms = ConfigManager::getInstance().getIntValue( "shader_max_rooms" );
+
+		for( int i = 0; i != numLights; i++ ) {
+			directionalLightsDirection.emplace_back( shader.getUniform( "directionalLights[" + std::to_string( i ) + "].direction" ) );
+			directionalLightsAmbient.emplace_back( shader.getUniform( "directionalLights[" + std::to_string( i ) + "].ambient" ) );
+			directionalLightsDiffuse.emplace_back( shader.getUniform( "directionalLights[" + std::to_string( i ) + "].diffuse" ) );
+			directionalLightsSpecular.emplace_back( shader.getUniform( "directionalLights[" + std::to_string( i ) + "].specular" ) );
+		}
+
+		for( int i = 0; i != numRooms; i++ ) {
+			roomsLowerLeft.emplace_back( shader.getUniform( "rooms[" + std::to_string( i ) + "].lowerLeft" ) );
+			roomsUpperRight.emplace_back( shader.getUniform( "rooms[" + std::to_string( i ) + "].upperRight" ) );
+			roomsMapLocation.emplace_back( shader.getUniform( "rooms[" + std::to_string( i ) + "].mapLocation" ) );
+			roomsLevel.emplace_back( shader.getUniform( "rooms[" + std::to_string( i ) + "].level" ) );
+		}
+
+		roomData = shader.getUniform( "roomData" );
 	}
 
 }

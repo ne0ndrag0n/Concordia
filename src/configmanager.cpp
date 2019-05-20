@@ -39,11 +39,10 @@ namespace BlueBear {
     configRoot[ "wall_texture_size" ] = 48;
     configRoot[ "sector_resolution" ] = 1;
     configRoot[ "bounding_volume_method" ] = "aabb";
-    configRoot[ "shader_num_sector_levels" ] = 8;
-    configRoot[ "shader_num_room_lights" ] = 16;
     configRoot[ "shader_max_diffuse_textures" ] = 4;
     configRoot[ "shader_max_specular_textures" ] = 4;
     configRoot[ "shader_max_lights" ] = 16;
+    configRoot[ "shader_max_rooms" ] = 16;
     configRoot[ "shader_room_map_min_width" ] = 1000;
     configRoot[ "shader_room_map_min_height"] = 1000;
 
