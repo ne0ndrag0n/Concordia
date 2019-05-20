@@ -35,11 +35,16 @@ DirectionalLight getRoomLight( const vec3 fragment ) {
 
 	float lightIndex = 0.0f;
 	for( int i = 0; i != MAX_ROOMS; i++ ) {
+		float lightIndexSet = whenEqual( lightIndex, 0.0f );				// lightIndex must not have been set before
+		float bounded = fragmentInBox( rooms[ i ], fragment.xy );			// fragPos intersects room bounding box
+		float sameLevel = whenEqual( float( rooms[ i ].level ), level );	// room is on the same level as this fragment
+
+		float useValue = lightIndexSet * bounded * sameLevel;				// Just one zero ruins the whole "true"
+
+		float fragLookup = lookupFragment( rooms[ i ], fragment.xy );
+
 		lightIndex =
-			whenEqual( lightIndex, 0.0f ) *							// lightIndex must not have been set before
-			fragmentInBox( rooms[ i ], fragment.xy ) *				// fragPos intersects room bounding box
-			whenEqual( float( rooms[ i ].level ), level ) *			// room is on the same level as this fragment
-			lookupFragment( rooms[ i ], fragment.xy );				// Lookup conducted on fragment returns actual index
+			( useValue * fragLookup ) + ( ( 1.0f - useValue ) * lightIndex );
 	}
 
 	return directionalLights[ int( lightIndex ) ];					// If we truly don't hit on a sector, return the outdoor light at position 0
