@@ -17,7 +17,14 @@ namespace BlueBear::Containers {
 	};
 
 	template< typename T >
-	std::vector< PackedCell< T > > packCells( std::vector< BoundedObject< T > > items, int defaultWidth, int defaultHeight ) {
+	struct PackedCellMap {
+		std::vector< PackedCell< T > > cells;
+		int totalWidth;
+		int totalHeight;
+	};
+
+	template< typename T >
+	PackedCellMap< T > packCells( std::vector< BoundedObject< T > > items, int defaultWidth, int defaultHeight ) {
 		int totalWidth = defaultWidth;
 		int totalHeight = defaultHeight;
 		std::vector< PackedCell< T > > packed;
@@ -92,7 +99,7 @@ namespace BlueBear::Containers {
 			}
 		}
 
-		return packed;
+		return { packed, totalWidth, totalHeight };
 	};
 
 }

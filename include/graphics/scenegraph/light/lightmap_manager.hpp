@@ -54,7 +54,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		std::vector< Geometry::LineSegment< glm::vec2 > > getEdges( const Models::Room& room );
 		ShaderRoom getFragmentData( const Models::Room& room, int level, int lightIndex );
 		std::vector< Containers::BoundedObject< ShaderRoom* > > getBoundedObjects( std::vector< ShaderRoom >& shaderRooms );
-		void setTexture( const std::vector< Containers::PackedCell< ShaderRoom* > >& packedCells );
+		void setTexture( const Containers::PackedCellMap< ShaderRoom* >& packedCells );
 
 	public:
 		LightmapManager();

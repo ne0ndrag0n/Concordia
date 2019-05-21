@@ -61,17 +61,13 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		return result;
 	}
 
-	void LightmapManager::setTexture( const std::vector< Containers::PackedCell< LightmapManager::ShaderRoom* > >& packedCells ) {
+	void LightmapManager::setTexture( const Containers::PackedCellMap< LightmapManager::ShaderRoom* >& packedCells ) {
 		// Get the dimensions of the board
-		glm::ivec2 totalDimensions;
-		for( const auto& cell : packedCells ) {
-			totalDimensions.x += cell.width;
-			totalDimensions.y += cell.height;
-		}
+		glm::ivec2 totalDimensions = { packedCells.totalWidth, packedCells.totalHeight };
 
 		// Place all the submaps in the map
 		std::unique_ptr< float[] > data = std::make_unique< float[] >( totalDimensions.x * totalDimensions.y );
-		for( const auto& cell : packedCells ) {
+		for( const auto& cell : packedCells.cells ) {
 			ShaderRoom* room = *cell.object;
 			room->mapLocation = glm::ivec2{ cell.x, totalDimensions.y - ( cell.y + cell.height ) };
 
