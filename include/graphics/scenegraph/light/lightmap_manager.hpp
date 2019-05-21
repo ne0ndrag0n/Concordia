@@ -48,7 +48,9 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 
 		UniformCache< UniformBundle > uniforms;
 		std::optional< Graphics::Texture > generatedRoomData;
+		std::vector< ShaderRoom > generatedRooms;
 		std::vector< const DirectionalLight* > generatedLightList;
+		std::optional< unsigned int > claimedTextureUnit;
 
 		std::vector< Geometry::LineSegment< glm::vec2 > > getEdges( const Models::Room& room );
 		ShaderRoom getFragmentData( const Models::Room& room, int level, int lightIndex );

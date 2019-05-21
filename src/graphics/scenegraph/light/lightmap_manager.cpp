@@ -1,7 +1,9 @@
 #include "graphics/scenegraph/light/lightmap_manager.hpp"
 #include "geometry/methods.hpp"
 #include "configmanager.hpp"
+#include "tools/opengl.hpp"
 #include "log.hpp"
+#include <GL/glew.h>
 #include <glm/gtx/string_cast.hpp>
 
 namespace BlueBear::Graphics::SceneGraph::Light {
@@ -14,6 +16,10 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 
 	LightmapManager::~LightmapManager() {
 		Shader::SHADER_CHANGE.stopListening( this );
+
+		if( claimedTextureUnit ) {
+			Tools::OpenGL::returnTextureUnits( { *claimedTextureUnit } );
+		}
 	}
 
 	void LightmapManager::setRooms( const std::vector< std::vector< Models::Room > >& roomLevels ) {
@@ -140,16 +146,16 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 	 */
 	void LightmapManager::calculateLightmaps() {
 		generatedRoomData.reset();
+		generatedRooms.clear();
 		generatedLightList.clear();
 
 		generatedLightList.emplace_back( &outdoorLight );
 
-		std::vector< ShaderRoom > shaderRooms;
 		int level = 0;
 		for( const auto& roomLevel : roomLevels ) {
 			for( const auto& room : roomLevel ) {
 				generatedLightList.emplace_back( &room.getBackgroundLight() );
-				shaderRooms.emplace_back( getFragmentData( room, level, generatedLightList.size() - 1 ) );
+				generatedRooms.emplace_back( getFragmentData( room, level, generatedLightList.size() - 1 ) );
 			}
 
 			level++;
@@ -158,13 +164,42 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		static int textureWidth = ConfigManager::getInstance().getIntValue( "shader_room_map_min_width" );
 		static int textureHeight = ConfigManager::getInstance().getIntValue( "shader_room_map_min_height" );
 
-		setTexture( Containers::packCells( getBoundedObjects( shaderRooms ), textureWidth, textureHeight ) );
+		setTexture( Containers::packCells( getBoundedObjects( generatedRooms ), textureWidth, textureHeight ) );
 	}
 
 	void LightmapManager::send( const Shader& shader ) {
 		const UniformBundle& bundle = uniforms.getUniforms( shader );
 
 		// TODO
+		return;
+
+		for( int i = 0; i != generatedLightList.size(); i++ ) {
+			shader.sendData( bundle.directionalLightsDirection[ i ], generatedLightList[ i ]->getDirection() );
+			shader.sendData( bundle.directionalLightsAmbient[ i ], generatedLightList[ i ]->getAmbient() );
+			shader.sendData( bundle.directionalLightsDiffuse[ i ], generatedLightList[ i ]->getDiffuse() );
+			shader.sendData( bundle.directionalLightsSpecular[ i ], generatedLightList[ i ]->getSpecular() );
+		}
+
+		for( int i = 0; i != generatedRooms.size(); i++ ) {
+			shader.sendData( bundle.roomsLowerLeft[ i ], generatedRooms[ i ].lowerLeft );
+			shader.sendData( bundle.roomsUpperRight[ i ], generatedRooms[ i ].upperRight );
+			shader.sendData2i( bundle.roomsMapLocation[ i ], generatedRooms[ i ].mapLocation );
+			shader.sendData( bundle.roomsLevel[ i ], generatedRooms[ i ].level );
+		}
+
+		if( generatedRoomData ) {
+			if( !claimedTextureUnit ) {
+				claimedTextureUnit = Tools::OpenGL::getTextureUnit();
+				if ( !claimedTextureUnit ) {
+					Log::getInstance().error( "LightmapManager::send", "Failed to obtain texture unit!" );
+					return;
+				}
+			}
+
+			glActiveTexture( GL_TEXTURE0 + *claimedTextureUnit );
+			glBindTexture( GL_TEXTURE_2D, generatedRoomData->id );
+			shader.sendData( bundle.roomData, ( int ) *claimedTextureUnit );
+		}
 	}
 
 	LightmapManager::UniformBundle::UniformBundle( const Shader& shader ) {

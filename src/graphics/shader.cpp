@@ -186,7 +186,17 @@ namespace BlueBear {
           glUniform2f( uniform, value.x, value.y );
         }
       } else {
-        Log::getInstance().warn( "Shader::getUniform", "Shader was not set before sendData was called." );
+        Log::getInstance().warn( "Shader::sendData", "Shader was not set before sendData was called." );
+      }
+    }
+
+    void Shader::sendData2i( Uniform uniform, const glm::ivec2& value ) const {
+      if( program == Shader::CURRENT_PROGRAM ) {
+        if( uniform != -1 ) {
+          glUniform2i( uniform, value.x, value.y );
+        }
+      } else {
+        Log::getInstance().warn( "Shader::sendData", "Shader was not set before sendData was called." );
       }
     }
 
@@ -196,7 +206,7 @@ namespace BlueBear {
           glUniform3f( uniform, value.x, value.y, value.z );
         }
       } else {
-        Log::getInstance().warn( "Shader::getUniform", "Shader was not set before sendData was called." );
+        Log::getInstance().warn( "Shader::sendData", "Shader was not set before sendData was called." );
       }
     }
 
@@ -206,7 +216,7 @@ namespace BlueBear {
           glUniform4f( uniform, value.x, value.y, value.z, value.w );
         }
       } else {
-        Log::getInstance().warn( "Shader::getUniform", "Shader was not set before sendData was called." );
+        Log::getInstance().warn( "Shader::sendData", "Shader was not set before sendData was called." );
       }
     }
 
@@ -216,7 +226,7 @@ namespace BlueBear {
           glUniformMatrix4fv( uniform, 1, GL_FALSE, glm::value_ptr( value ) );
         }
       } else {
-        Log::getInstance().warn( "Shader::getUniform", "Shader was not set before sendData was called." );
+        Log::getInstance().warn( "Shader::sendData", "Shader was not set before sendData was called." );
       }
     }
 
@@ -226,7 +236,7 @@ namespace BlueBear {
           glUniform1i( uniform, value );
         }
       } else {
-        Log::getInstance().warn( "Shader::getUniform", "Shader was not set before sendData was called." );
+        Log::getInstance().warn( "Shader::sendData", "Shader was not set before sendData was called." );
       }
     }
 
@@ -236,7 +246,7 @@ namespace BlueBear {
           glUniform1ui( uniform, value );
         }
       } else {
-        Log::getInstance().warn( "Shader::getUniform", "Shader was not set before sendData was called." );
+        Log::getInstance().warn( "Shader::sendData", "Shader was not set before sendData was called." );
       }
     }
 
@@ -246,7 +256,7 @@ namespace BlueBear {
           glUniform1f( uniform, value );
         }
       } else {
-        Log::getInstance().warn( "Shader::getUniform", "Shader was not set before sendData was called." );
+        Log::getInstance().warn( "Shader::sendData", "Shader was not set before sendData was called." );
       }
     }
 
@@ -256,7 +266,7 @@ namespace BlueBear {
           glUniformMatrix4fv( uniform, size, GL_FALSE, value );
         }
       } else {
-        Log::getInstance().warn( "Shader::getUniform", "Shader was not set before sendData was called." );
+        Log::getInstance().warn( "Shader::sendData", "Shader was not set before sendData was called." );
       }
     }
 
