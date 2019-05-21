@@ -170,9 +170,6 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 	void LightmapManager::send( const Shader& shader ) {
 		const UniformBundle& bundle = uniforms.getUniforms( shader );
 
-		// TODO
-		return;
-
 		for( int i = 0; i != generatedLightList.size(); i++ ) {
 			shader.sendData( bundle.directionalLightsDirection[ i ], generatedLightList[ i ]->getDirection() );
 			shader.sendData( bundle.directionalLightsAmbient[ i ], generatedLightList[ i ]->getAmbient() );

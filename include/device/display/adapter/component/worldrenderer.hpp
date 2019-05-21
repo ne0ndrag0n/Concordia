@@ -69,7 +69,6 @@ namespace BlueBear {
             Graphics::SceneGraph::ResourceBank cache;
             const ModelRegistration* previousMove = nullptr;
             std::unordered_map< std::string, std::shared_ptr< Graphics::SceneGraph::Model > > originals;
-            std::unordered_map< std::string, std::shared_ptr< Graphics::SceneGraph::Illuminator > > illuminators;
             std::vector< std::unique_ptr< ModelRegistration > > models;
             Tools::AsyncTable asyncTasks;
 
@@ -108,11 +107,6 @@ namespace BlueBear {
             std::vector< std::shared_ptr< Graphics::SceneGraph::Model > > findObjectsByClass( const std::set< std::string >& classes );
             void removeObject( std::shared_ptr< Graphics::SceneGraph::Model > model );
 
-            std::vector< std::shared_ptr< Graphics::SceneGraph::Illuminator > > findIlluminators( const std::regex& regex );
-            std::shared_ptr< Graphics::SceneGraph::Illuminator > getIlluminator( const std::string& id );
-            void addIlluminator( const std::string& id, std::shared_ptr< Graphics::SceneGraph::Illuminator > illuminator );
-            void removeIlluminator( const std::string& id );
-
             unsigned int registerEvent(
               std::shared_ptr< Graphics::SceneGraph::Model > instance,
               const std::string& eventTag,
@@ -128,7 +122,6 @@ namespace BlueBear {
             void loadPathsParallel( const std::vector< std::pair< std::string, std::string > >& paths );
             void loadPaths( const std::vector< std::pair< std::string, std::string > >& paths );
             void loadDirect( const std::string& id, const std::shared_ptr< Graphics::SceneGraph::Model >& model );
-            void onShaderChange( const Graphics::Shader& shader );
             void nextFrame() override;
           };
 

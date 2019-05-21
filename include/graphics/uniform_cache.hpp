@@ -17,7 +17,7 @@ namespace BlueBear::Graphics {
 				return it->second;
 			}
 
-			bundles[ &shader ] = Bundle( shader );
+			return bundles[ &shader ] = Bundle( shader );
 		};
 	};
 

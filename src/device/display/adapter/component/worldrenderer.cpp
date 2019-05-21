@@ -27,14 +27,12 @@ namespace BlueBear {
             Adapter::Adapter( display ), shaderManager( shaderManager ), cache( shaderManager ),
             camera( Graphics::Camera( ConfigManager::getInstance().getIntValue( "viewport_x" ), ConfigManager::getInstance().getIntValue( "viewport_y" ) ) ) {
               eventManager.LUA_STATE_READY.listen( this, std::bind( &WorldRenderer::submitLuaContributions, this, std::placeholders::_1 ) );
-              Graphics::Shader::SHADER_CHANGE.listen( this, std::bind( &WorldRenderer::onShaderChange, this, std::placeholders::_1 ) );
 
               asyncTasks.setAmountPerFrame( 333 );
             }
 
           WorldRenderer::~WorldRenderer() {
             eventManager.LUA_STATE_READY.stopListening( this );
-            Graphics::Shader::SHADER_CHANGE.stopListening( this );
           }
 
           Json::Value WorldRenderer::save() {
@@ -42,29 +40,7 @@ namespace BlueBear {
           }
 
           void WorldRenderer::load( const Json::Value& data ) {
-            if( data != Json::Value::null ) {
-              // Load illuminators
-              const Json::Value& savedLights = data[ "illuminators" ];
-
-              for( auto it = savedLights.begin(); it != savedLights.end(); ++it ) {
-                auto pair = Tools::Utility::jsonIteratorToPair( it );
-                const Json::Value& lightDefinition = pair.second.get();
-
-                switch( Tools::Utility::hash( lightDefinition[ "type" ].asCString() ) ) {
-                  case Tools::Utility::hash( "directionalLight" ): {
-                    illuminators[ pair.first ] = std::make_shared< Graphics::SceneGraph::Light::DirectionalLight >(
-                      glm::vec3{ lightDefinition[ "direction" ][ 0 ].asDouble(), lightDefinition[ "direction" ][ 1 ].asDouble(), lightDefinition[ "direction" ][ 2 ].asDouble() },
-                      glm::vec3{ lightDefinition[ "ambient" ][ 0 ].asDouble(), lightDefinition[ "ambient" ][ 1 ].asDouble(), lightDefinition[ "ambient" ][ 2 ].asDouble() },
-                      glm::vec3{ lightDefinition[ "diffuse" ][ 0 ].asDouble(), lightDefinition[ "diffuse" ][ 1 ].asDouble(), lightDefinition[ "diffuse" ][ 2 ].asDouble() },
-                      glm::vec3{ lightDefinition[ "specular" ][ 0 ].asDouble(), lightDefinition[ "specular" ][ 1 ].asDouble(), lightDefinition[ "specular" ][ 2 ].asDouble() }
-                    );
-                    break;
-                  }
-                  default:
-                    Log::getInstance().error( "WorldRenderer::load", "Invalid light type specified: " + lightDefinition[ "type" ].asString() + " (valid types are: directionalLight)" );
-                }
-              }
-            }
+            // TODO
           }
 
           void WorldRenderer::submitLuaContributions( sol::state& lua ) {
@@ -326,35 +302,6 @@ namespace BlueBear {
             return result;
           }
 
-          std::vector< std::shared_ptr< Graphics::SceneGraph::Illuminator > > WorldRenderer::findIlluminators( const std::regex& regex ) {
-            std::vector< std::shared_ptr< Graphics::SceneGraph::Illuminator > > result;
-
-            for( const auto& pair : illuminators ) {
-              if( std::regex_match( pair.first, regex ) ) {
-                result.push_back( pair.second );
-              }
-            }
-
-            return result;
-          }
-
-          std::shared_ptr< Graphics::SceneGraph::Illuminator > WorldRenderer::getIlluminator( const std::string& id ) {
-            auto it = illuminators.find( id );
-            if( it != illuminators.end() ) {
-              return it->second;
-            }
-
-            return nullptr;
-          }
-
-          void WorldRenderer::addIlluminator( const std::string& id, std::shared_ptr< Graphics::SceneGraph::Illuminator > illuminator ) {
-            illuminators.emplace( id, illuminator );
-          }
-
-          void WorldRenderer::removeIlluminator( const std::string& id ) {
-            illuminators.erase( id );
-          }
-
           void WorldRenderer::removeObject( std::shared_ptr< Graphics::SceneGraph::Model > model ) {
             for( auto it = models.begin(); it != models.end(); ) {
               if( ( *it )->instance == model ) {
@@ -490,17 +437,6 @@ namespace BlueBear {
             }
 
             originals[ id ] = model;
-          }
-
-          void WorldRenderer::onShaderChange( const Graphics::Shader& shader ) {
-            std::unordered_map< std::string, unsigned int > map;
-            for( const auto& pair : illuminators ) {
-              pair.second->send( shader, map[ pair.second->getPreamble() ]++ );
-            }
-
-            for( const auto& pair : map ) {
-              shader.sendData( shader.getUniform( "num" + pair.first ), pair.second );
-            }
           }
 
           /**
