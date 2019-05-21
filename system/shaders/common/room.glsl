@@ -1,5 +1,4 @@
 #include "system/shaders/common/directional_light.glsl"
-#include "system/shaders/common/cond.glsl"
 
 #define MAX_ROOMS 16
 #define MAP_RESOLUTION 100.0f
@@ -17,15 +16,18 @@ uniform Room rooms[ MAX_ROOMS ];
 // Pack these in a manner that is space-efficient
 uniform sampler2D roomData;
 
-float fragmentInBox( const Room room, const vec2 fragment ) {
-	vec2 stp = step( room.lowerLeft, fragment ) - step( room.upperRight, fragment );
-	return stp.x * stp.y;
+bool fragmentInBox( const Room room, const vec2 fragment ) {
+	return fragment.x >= room.lowerLeft.x &&
+		fragment.x <= room.upperRight.x &&
+		fragment.y <= room.lowerLeft.y &&
+		fragment.y >= room.upperRight.y;
 }
 
 float lookupFragment( const Room room, const vec2 fragment ) {
 	vec2 multiplier = round( ( fragment - room.lowerLeft ) * MAP_RESOLUTION );
-	ivec2 regionCoords = ivec2( multiplier );
+	multiplier.y = 1000.0f - multiplier.y;
 
+	ivec2 regionCoords = ivec2( multiplier );
 	return texelFetch( roomData, room.mapLocation + regionCoords, 0 ).r;
 }
 
@@ -35,16 +37,16 @@ DirectionalLight getRoomLight( const vec3 fragment ) {
 
 	float lightIndex = 0.0f;
 	for( int i = 0; i != MAX_ROOMS; i++ ) {
-		float lightUnset = whenEqual( lightIndex, 0.0f );					// lightIndex must not have been set before
-		float bounded = fragmentInBox( rooms[ i ], fragment.xy );			// fragPos intersects room bounding box
-		float sameLevel = whenEqual( float( rooms[ i ].level ), level );	// room is on the same level as this fragment
+		float lookup = lookupFragment( rooms[ i ], fragment.xy );
 
-		float fragLookup = lookupFragment( rooms[ i ], fragment.xy );
-
-		float useValue = lightUnset * bounded * sameLevel * ( 1.0f - whenEqual( fragLookup, 0.0f ) );
-
-		lightIndex =
-			( useValue * fragLookup ) + ( ( 1.0f - useValue ) * lightIndex );
+		if(
+			lightIndex == 0.0f &&
+			fragmentInBox( rooms[ i ], fragment.xy ) == true &&
+			float( rooms[ i ].level ) == level &&
+			lookup != 0.0f
+		) {
+			lightIndex = lookup;
+		}
 	}
 
 	return directionalLights[ int( lightIndex ) ];					// If we truly don't hit on a sector, return the outdoor light at position 0
