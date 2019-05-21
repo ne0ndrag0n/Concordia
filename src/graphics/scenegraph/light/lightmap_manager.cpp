@@ -184,6 +184,12 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 			shader.sendData( bundle.roomsLevel[ i ], generatedRooms[ i ].level );
 		}
 
+		int lastUnsetRoom = generatedRooms.size();
+		int numRoomSlots  = bundle.roomsLowerLeft.size() - lastUnsetRoom;
+		for( int i = 0; i != numRoomSlots; i++ ) {
+			shader.sendData( bundle.roomsLevel[ lastUnsetRoom + i ], ( int ) -1 );
+		}
+
 		if( generatedRoomData ) {
 			if( !claimedTextureUnit ) {
 				claimedTextureUnit = Tools::OpenGL::getTextureUnit();
