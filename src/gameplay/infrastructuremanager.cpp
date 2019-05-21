@@ -2,7 +2,6 @@
 #include "device/display/adapter/component/worldrenderer.hpp"
 #include "graphics/scenegraph/modelloader/floormodelloader.hpp"
 #include "graphics/scenegraph/modelloader/wallmodelloader.hpp"
-#include "graphics/scenegraph/light/sector_illuminator.hpp"
 #include "graphics/vector/renderer.hpp"
 #include "state/householdgameplaystate.hpp"
 #include "tools/utility.hpp"
