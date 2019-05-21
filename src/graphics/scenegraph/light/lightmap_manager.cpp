@@ -73,11 +73,11 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		std::unique_ptr< float[] > data = std::make_unique< float[] >( totalDimensions.x * totalDimensions.y );
 		for( const auto& cell : packedCells ) {
 			ShaderRoom* room = *cell.object;
-			room->mapLocation = glm::ivec2{ cell.x, cell.y + cell.height };
+			room->mapLocation = glm::ivec2{ cell.x, totalDimensions.y - ( cell.y + cell.height ) };
 
 			for( int y = 0; y != cell.height; y++ ) {
 				for( int x = 0; x != cell.width; x++ ) {
-					glm::ivec2 mapCoordinates = { cell.x + x, cell.y + y };
+					glm::ivec2 mapCoordinates = { cell.x + x, totalDimensions.y - ( cell.y + y ) };
 
 					data[ ( mapCoordinates.y * totalDimensions.y ) + mapCoordinates.x ] = room->mapData[ ( y * cell.width ) + x ];
 				}

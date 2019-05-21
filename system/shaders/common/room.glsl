@@ -19,13 +19,16 @@ uniform sampler2D roomData;
 bool fragmentInBox( const Room room, const vec2 fragment ) {
 	return fragment.x >= room.lowerLeft.x &&
 		fragment.x <= room.upperRight.x &&
-		fragment.y <= room.lowerLeft.y &&
-		fragment.y >= room.upperRight.y;
+		fragment.y >= room.lowerLeft.y &&
+		fragment.y <= room.upperRight.y;
 }
 
 float lookupFragment( const Room room, const vec2 fragment ) {
-	vec2 multiplier = round( ( fragment - room.lowerLeft ) * MAP_RESOLUTION );
-	multiplier.y = 1000.0f - multiplier.y;
+	if( fragmentInBox( room, fragment ) == false ) {
+		return 0.0f;
+	}
+
+	vec2 multiplier = floor( ( fragment - room.lowerLeft ) * MAP_RESOLUTION );
 
 	ivec2 regionCoords = ivec2( multiplier );
 	return texelFetch( roomData, room.mapLocation + regionCoords, 0 ).r;
@@ -33,19 +36,16 @@ float lookupFragment( const Room room, const vec2 fragment ) {
 
 DirectionalLight getRoomLight( const vec3 fragment ) {
 	// Clamp z to all positive values
-	float level = clamp( fragment.z, 0.0f, 3.402823466e+38 ) / 4.0f;
+	int level = int( clamp( fragment.z, 0.0f, 3.402823466e+38 ) / 4.0f );
 
 	float lightIndex = 0.0f;
 	for( int i = 0; i != MAX_ROOMS; i++ ) {
-		float lookup = lookupFragment( rooms[ i ], fragment.xy );
-
-		if(
-			lightIndex == 0.0f &&
-			fragmentInBox( rooms[ i ], fragment.xy ) == true &&
-			float( rooms[ i ].level ) == level &&
-			lookup != 0.0f
-		) {
-			lightIndex = lookup;
+		if( rooms[ i ].level == level ) {
+			float lookupResult = lookupFragment( rooms[ i ], fragment.xy );
+			if( lookupResult != 0.0f ) {
+				lightIndex = lookupResult;
+				break;
+			}
 		}
 	}
 
