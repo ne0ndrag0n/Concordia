@@ -39,9 +39,9 @@ DirectionalLight getRoomLight( const vec3 fragment ) {
 		float bounded = fragmentInBox( rooms[ i ], fragment.xy );			// fragPos intersects room bounding box
 		float sameLevel = whenEqual( float( rooms[ i ].level ), level );	// room is on the same level as this fragment
 
-		float useValue = lightUnset * bounded * sameLevel;					// Just one zero ruins the whole "true"
-
 		float fragLookup = lookupFragment( rooms[ i ], fragment.xy );
+
+		float useValue = lightUnset * bounded * sameLevel * ( 1.0f - whenEqual( fragLookup, 0.0f ) );
 
 		lightIndex =
 			( useValue * fragLookup ) + ( ( 1.0f - useValue ) * lightIndex );

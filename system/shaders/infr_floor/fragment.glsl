@@ -11,7 +11,7 @@ out vec4 color;
 uniform Material material;
 
 void main() {
-  DirectionalLight light = directionalLights[ 0 ];
+  DirectionalLight light = getRoomLight( fragPos );
 
   vec3 texResult = texture( material.diffuse0, fragTexture ).rgb;
 
