@@ -107,21 +107,22 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		result.upperRight = max;
 
 		// Build the fragment list
-		glm::vec2 start{ result.lowerLeft.x, result.upperRight.y };
-		glm::vec2 end{ result.upperRight.x, result.lowerLeft.y };
+		glm::ivec2 start{ std::floor( result.lowerLeft.x * LIGHTMAP_SECTOR_RESOLUTION ), std::floor( result.upperRight.y * LIGHTMAP_SECTOR_RESOLUTION ) };
+		glm::ivec2 end{ std::floor( result.upperRight.x * LIGHTMAP_SECTOR_RESOLUTION ), std::floor( result.lowerLeft.y * LIGHTMAP_SECTOR_RESOLUTION ) };
 
 		result.mapData = std::make_unique< float[] >(
-			( ( end.x - start.x ) * LIGHTMAP_SECTOR_RESOLUTION ) *
-			( ( start.y - end.y ) * LIGHTMAP_SECTOR_RESOLUTION )
+			( ( end.x - start.x ) ) *
+			( ( start.y - end.y ) )
 		);
 
 		auto edges = getEdges( room );
-		float epsilon = end.x - start.x;
-		int arrayWidth = ( end.x - start.x ) * LIGHTMAP_SECTOR_RESOLUTION;
+		int arrayWidth = ( end.x - start.x );
 
-		for( float y = start.y; y >= end.y; y -= LIGHTMAP_SECTOR_STEP ) {
-			for( float x = start.x; x <= end.x; x += LIGHTMAP_SECTOR_STEP ) {
-				Geometry::LineSegment< glm::vec2 > needle{ { x, y }, { x + epsilon, y } };
+		for( int y = start.y; y > end.y; y-- ) {
+			for( int x = start.x; x < end.x; x++ ) {
+				glm::vec2 asFloat{ x / ( float ) LIGHTMAP_SECTOR_RESOLUTION, y / ( float ) LIGHTMAP_SECTOR_RESOLUTION };
+
+				Geometry::LineSegment< glm::vec2 > needle{ { asFloat.x, asFloat.y }, { asFloat.x + arrayWidth, asFloat.y } };
 
 				unsigned int intersections = 0;
 				for( const auto& edge : edges ) {
@@ -131,7 +132,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 				}
 
 				if( ( intersections % 2 ) != 0 ) {
-					glm::ivec2 indices{ ( x - start.x ) * LIGHTMAP_SECTOR_RESOLUTION, ( start.y - y ) * LIGHTMAP_SECTOR_RESOLUTION };
+					glm::ivec2 indices{ ( x - start.x ), ( start.y - y ) };
 
 					result.mapData[ ( indices.y * arrayWidth ) + indices.x ] = lightIndex;
 				}

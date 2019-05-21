@@ -15,7 +15,6 @@
 #include <optional>
 
 #define LIGHTMAP_SECTOR_RESOLUTION 100
-#define LIGHTMAP_SECTOR_STEP	   0.01f
 
 namespace BlueBear::Graphics{ class Shader; }
 namespace BlueBear::Graphics::SceneGraph::Light {
