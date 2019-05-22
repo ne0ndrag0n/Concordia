@@ -3,5 +3,8 @@
   "fps_overview": 60,
   "min_log_level": 0,
   "viewport_x": 1152,
-  "viewport_y": 864
+  "viewport_y": 864,
+
+  "shader_room_map_min_width": 1000,
+  "shadder_room_map_min_height": 1000
 }

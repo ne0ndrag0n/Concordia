@@ -83,18 +83,30 @@ namespace BlueBear::Containers {
 				// Must add new cell to right of previous region
 				PackedCell< T > newCell{ totalWidth, 0, boundedObject.width, boundedObject.height, boundedObject.object };
 
-				// New cell goes underneath
-				PackedCell< T > bottomEmpty{
-					totalWidth,
-					boundedObject.height,
-					boundedObject.width,
-					totalHeight - boundedObject.height
-				};
+				int difference = boundedObject.height - totalHeight;
+				if( difference > 0 ) {
+					// Need to add new region to the left instead of underneath
+					PackedCell< T > leftEmpty { 0, totalHeight, totalWidth, difference };
 
-				// This is at risk of continuously growing to the right!
-				totalWidth += boundedObject.width;
+					totalWidth += boundedObject.width;
+					totalHeight += difference;
 
-				unpacked.emplace_back( std::move( bottomEmpty ) );
+					unpacked.emplace_back( std::move( leftEmpty ) );
+				} else {
+					// Empty box below us needs to match totalHeight
+					// New cell goes underneath
+					PackedCell< T > bottomEmpty{
+						totalWidth,
+						boundedObject.height,
+						boundedObject.width,
+						totalHeight - boundedObject.height
+					};
+
+					totalWidth += boundedObject.width;
+
+					unpacked.emplace_back( std::move( bottomEmpty ) );
+				}
+
 				packed.emplace_back( std::move( newCell ) );
 			}
 		}

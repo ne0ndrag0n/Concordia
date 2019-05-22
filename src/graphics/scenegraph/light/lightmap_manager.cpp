@@ -22,6 +22,20 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		}
 	}
 
+	static std::unique_ptr< float[] > verticalFlip( std::unique_ptr< float[] > original, int width, int height ) {
+		std::unique_ptr< float[] > result = std::make_unique< float[] >( width * height );
+
+		for( int y = 0; y != height; y++ ) {
+			for( int x = 0; x != width; x++ ) {
+				int adjustedY = height - 1 - y;
+
+				result[ ( y * width ) + x ] = original[ ( adjustedY * width ) + x ];
+			}
+		}
+
+		return result;
+	}
+
 	void LightmapManager::setRooms( const std::vector< std::vector< Models::Room > >& roomLevels ) {
 		this->roomLevels = roomLevels;
 	}
@@ -69,18 +83,18 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 		std::unique_ptr< float[] > data = std::make_unique< float[] >( totalDimensions.x * totalDimensions.y );
 		for( const auto& cell : packedCells.cells ) {
 			ShaderRoom* room = *cell.object;
-			room->mapLocation = glm::ivec2{ cell.x, totalDimensions.y - ( cell.y + cell.height ) };
+			room->mapLocation = glm::ivec2{ cell.x, totalDimensions.y - 1 - ( cell.y + cell.height ) };
 
 			for( int y = 0; y != cell.height; y++ ) {
 				for( int x = 0; x != cell.width; x++ ) {
-					glm::ivec2 mapCoordinates = { cell.x + x, totalDimensions.y - ( cell.y + y ) };
+					glm::ivec2 mapCoordinates = { cell.x + x, cell.y + y };
 
 					data[ ( mapCoordinates.y * totalDimensions.y ) + mapCoordinates.x ] = room->mapData[ ( y * cell.width ) + x ];
 				}
 			}
 		}
 
-		generatedRoomData.emplace( totalDimensions, data.get() );
+		generatedRoomData.emplace( totalDimensions, verticalFlip( std::move( data ), totalDimensions.x, totalDimensions.y ).get() );
 	}
 
 	LightmapManager::ShaderRoom LightmapManager::getFragmentData( const Models::Room& room, int level, int lightIndex ) {
