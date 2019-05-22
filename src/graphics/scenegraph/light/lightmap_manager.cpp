@@ -89,7 +89,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 				for( int x = 0; x != cell.width; x++ ) {
 					glm::ivec2 mapCoordinates = { cell.x + x, cell.y + y };
 
-					data[ ( mapCoordinates.y * totalDimensions.y ) + mapCoordinates.x ] = room->mapData[ ( y * cell.width ) + x ];
+					data[ ( mapCoordinates.y * totalDimensions.x ) + mapCoordinates.x ] = room->mapData[ ( y * cell.width ) + x ];
 				}
 			}
 		}
