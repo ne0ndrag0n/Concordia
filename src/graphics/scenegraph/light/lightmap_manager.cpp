@@ -81,6 +81,7 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 
 		// Place all the submaps in the map
 		std::unique_ptr< float[] > data = std::make_unique< float[] >( totalDimensions.x * totalDimensions.y );
+		Log::getInstance().debug( "LightmapManager::setTexture", "Room boxpack texture is " + std::to_string( totalDimensions.x ) + " by " + std::to_string( totalDimensions.y ) );
 		for( const auto& cell : packedCells.cells ) {
 			ShaderRoom* room = *cell.object;
 			room->mapLocation = glm::ivec2{ cell.x, totalDimensions.y - 1 - ( cell.y + cell.height ) };
