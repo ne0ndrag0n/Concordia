@@ -76,6 +76,10 @@ namespace BlueBear {
         return parent.lock();
       }
 
+      const std::vector< std::shared_ptr< Model > >& Model::getChildren() const {
+        return submodels;
+      }
+
       void Model::detach() {
         if( std::shared_ptr< Model > realParent = getParent() ) {
           realParent->submodels.erase(

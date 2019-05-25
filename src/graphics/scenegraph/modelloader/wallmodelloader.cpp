@@ -397,8 +397,8 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
           Mesh::IndexedMeshGenerator< Mesh::TexturedVertex> generator;
           addToGenerator( generator, corner.horizontal.stagedMesh );
 
-          auto model = Model::create( "__horizontal_" + std::to_string( y ) + "," + std::to_string( x ), { { generator.generateMesh(), shader, generatedMaterial } } );
-          model->setUniform( "level", std::make_unique< Uniforms::LevelUniform >( 0.0f ) );
+          auto model = Model::create( "__horizontal", { { generator.generateMesh(), shader, generatedMaterial } } );
+          model->setUniform( "level", std::make_unique< Uniforms::LevelUniform >( indexToLocation( { x, y } ), currentLevel ) );
 
           result->addChild( model );
         }
@@ -406,8 +406,8 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
           Mesh::IndexedMeshGenerator< Mesh::TexturedVertex> generator;
           addToGenerator( generator, corner.vertical.stagedMesh );
 
-          auto model = Model::create( "__vertical_" + std::to_string( y ) + "," + std::to_string( x ), { { generator.generateMesh(), shader, generatedMaterial } } );
-          model->setUniform( "level", std::make_unique< Uniforms::LevelUniform >( 0.0f ) );
+          auto model = Model::create( "__vertical", { { generator.generateMesh(), shader, generatedMaterial } } );
+          model->setUniform( "level", std::make_unique< Uniforms::LevelUniform >( indexToLocation( { x, y } ), currentLevel ) );
 
           result->addChild( model );
         };
@@ -415,8 +415,8 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
           Mesh::IndexedMeshGenerator< Mesh::TexturedVertex> generator;
           addToGenerator( generator, corner.diagonal.stagedMesh );
 
-          auto model = Model::create( "__diagonal_" + std::to_string( y ) + "," + std::to_string( x ), { { generator.generateMesh(), shader, generatedMaterial } } );
-          model->setUniform( "level", std::make_unique< Uniforms::LevelUniform >( 0.0f ) );
+          auto model = Model::create( "__diagonal", { { generator.generateMesh(), shader, generatedMaterial } } );
+          model->setUniform( "level", std::make_unique< Uniforms::LevelUniform >( indexToLocation( { x, y } ), currentLevel ) );
 
           result->addChild( model );
         }
@@ -424,8 +424,8 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
           Mesh::IndexedMeshGenerator< Mesh::TexturedVertex> generator;
           addToGenerator( generator, corner.reverseDiagonal.stagedMesh );
 
-          auto model = Model::create( "__reverseDiagonal_" + std::to_string( y ) + "," + std::to_string( x ), { { generator.generateMesh(), shader, generatedMaterial } } );
-          model->setUniform( "level", std::make_unique< Uniforms::LevelUniform >( 0.0f ) );
+          auto model = Model::create( "__reverseDiagonal", { { generator.generateMesh(), shader, generatedMaterial } } );
+          model->setUniform( "level", std::make_unique< Uniforms::LevelUniform >( indexToLocation( { x, y } ), currentLevel ) );
 
           result->addChild( model );
         }
@@ -437,6 +437,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
 
   std::shared_ptr< Model > WallModelLoader::get() {
     std::shared_ptr< Model > result = Model::create( "__wallrig", {} );
+    currentLevel = 0;
 
     for( const auto& level : floorLevels ) {
       // If there are no segments, return null pointer and don't waste any time
@@ -460,6 +461,8 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
       generateDeferredMeshes();
 
       result->addChild( getLevel() );
+
+      currentLevel++;
     }
 
     return result;

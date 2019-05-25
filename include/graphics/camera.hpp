@@ -58,6 +58,7 @@ namespace BlueBear {
         void setRotationDirect( GLuint rotation );
 
         Geometry::Ray getPickingRay( glm::ivec2 mouseLocation, const glm::uvec2& screenDimensions );
+        float getRotationAngle() const;
     };
   }
 }

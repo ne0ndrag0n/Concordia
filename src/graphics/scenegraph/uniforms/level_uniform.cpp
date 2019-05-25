@@ -2,7 +2,11 @@
 
 namespace BlueBear::Graphics::SceneGraph::Uniforms {
 
-	LevelUniform::LevelUniform( float level ) : level( level ) {}
+	LevelUniform::LevelUniform( const glm::vec2& position, float level ) : position( position ), level( level ) {}
+
+	const glm::vec2& LevelUniform::getPosition() const {
+		return position;
+	}
 
 	void LevelUniform::setLevel( float level ) {
 		this->level = level;

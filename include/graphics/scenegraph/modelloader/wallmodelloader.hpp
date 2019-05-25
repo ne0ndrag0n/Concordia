@@ -42,6 +42,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     };
 
     glm::uvec2 dimensions;
+    int currentLevel = 0;
     const std::vector< Models::Infrastructure::FloorLevel >& floorLevels;
     std::vector< std::vector< Corner > > cornerMap;
     std::shared_ptr< Shader > shader;

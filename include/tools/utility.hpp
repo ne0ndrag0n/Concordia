@@ -188,6 +188,13 @@ namespace BlueBear {
 					// Block on bucketised, parallel task
 					group.wait();
 				};
+
+				template< typename T >
+				static inline T& getCircularIndex( std::vector< T >& list, int i ) {
+					int size = list.size();
+
+					return list[ ( i + size ) % size ];
+				};
 		};
 	}
 }

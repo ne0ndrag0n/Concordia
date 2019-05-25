@@ -70,6 +70,7 @@ namespace BlueBear {
         std::shared_ptr< Model > getParent() const;
         void addChild( std::shared_ptr< Model > child );
         void detach();
+        const std::vector< std::shared_ptr< Model > >& getChildren() const;
 
         Drawable& getDrawable( unsigned int index );
         std::vector< Drawable >& getDrawableList();

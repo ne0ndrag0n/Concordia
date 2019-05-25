@@ -24,13 +24,15 @@ namespace BlueBear::Gameplay {
 		Graphics::Vector::Renderer vectorRenderer( state.as< State::HouseholdGameplayState >().getApplication().getDisplayDevice() );
 		Graphics::SceneGraph::ModelLoader::WallModelLoader wallModelLoader( model.getLevels(), vectorRenderer, state.as< State::HouseholdGameplayState >().getShaderManager() );
 
-		worldRenderer.loadDirect( "__floorrig", floorModelLoader.get() );
-		worldRenderer.loadDirect( "__wallrig", wallModelLoader.get() );
+		worldRenderer.loadDirect( "__floorrig", floorModel = floorModelLoader.get() );
+		worldRenderer.loadDirect( "__wallrig", wallModel = wallModelLoader.get() );
 
 		worldRenderer.placeObject( "__floorrig", {} );
 		worldRenderer.placeObject( "__wallrig", {} );
 
 		generateRooms();
+
+		cutawayManager.emplace( wallModel, rooms, worldRenderer.getCamera() );
 	}
 
 	std::vector< glm::vec2 > InfrastructureManager::generateRoomNodes( const Tools::Sector& sector, const glm::uvec2& dimensions ) {

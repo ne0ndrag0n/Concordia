@@ -187,5 +187,9 @@ namespace BlueBear {
       return ray;
     }
 
+    float Camera::getRotationAngle() const {
+      return orthoRotationAngle;
+    }
+
   }
 }

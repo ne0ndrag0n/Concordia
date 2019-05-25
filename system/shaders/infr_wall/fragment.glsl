@@ -12,7 +12,7 @@ uniform Material material;
 uniform float wallBaseline;
 
 void main() {
-  if( fragPos.z < wallBaseline ) {
+  if( fragPos.z < ( wallBaseline * 4.0f ) ) {
     discard;
   }
 
