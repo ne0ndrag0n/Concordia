@@ -13,6 +13,15 @@ namespace std {
 			return res;
 		}
 	};
+
+	template <> struct hash< glm::vec2 > {
+		size_t operator()( const glm::vec2& vec ) const {
+			size_t res = 17;
+			res = res * 31 + hash< float >()( vec.x );
+			res = res * 31 + hash< float >()( vec.y );
+			return res;
+		}
+	};
 }
 
 #endif

@@ -147,6 +147,7 @@ namespace BlueBear {
 					return glm::to_string( type );
 				};
 
+				static bool equalEpsilon( float a, float b );
 				static bool equalEpsilon( const glm::vec2& a, const glm::vec2& b );
 				static bool equalEpsilon( const glm::vec3& a, const glm::vec3& b );
 				static bool equalEpsilon( const glm::vec4& a, const glm::vec4& b );

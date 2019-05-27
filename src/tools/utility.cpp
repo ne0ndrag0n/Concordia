@@ -533,6 +533,10 @@ namespace BlueBear {
 			}
 		}
 
+		bool Utility::equalEpsilon( float a, float b ) {
+			return compareFloat( a, b );
+		}
+
 		bool Utility::equalEpsilon( const glm::vec2& a, const glm::vec2& b ) {
 			return compareFloat( a.x, b.x ) && compareFloat( a.y, b.y );
 		}

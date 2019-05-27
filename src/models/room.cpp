@@ -6,7 +6,7 @@
 namespace BlueBear::Models {
 
 	Room::Room( const Graphics::SceneGraph::Light::DirectionalLight backgroundLight, const std::vector< glm::vec2 >& points )
-		: backgroundLight( backgroundLight ), points( points ) { computeDirections(); }
+		: backgroundLight( backgroundLight ), points( points ) {}
 
 	Graphics::SceneGraph::Light::DirectionalLight& Room::getBackgroundLight() {
 		return backgroundLight;
@@ -20,8 +20,20 @@ namespace BlueBear::Models {
 		return points;
 	}
 
-	const std::vector< glm::vec2 >& Room::getWallNormals() const {
+	const std::vector< glm::vec2 >& Room::getWallNormals() {
+		if( computedDirections.empty() ) {
+			computeDirections();
+		}
+
 		return computedDirections;
+	}
+
+	const std::vector< std::pair< glm::vec2, glm::vec2 > >& Room::getLineSegments() {
+		if( computedLineSegments.empty() ) {
+			computeLineSegments();
+		}
+
+		return computedLineSegments;
 	}
 
 	void Room::computeDirections() {
@@ -32,6 +44,15 @@ namespace BlueBear::Models {
 			);
 
 			computedDirections.emplace_back( -direction.y, direction.x );
+		}
+	}
+
+	void Room::computeLineSegments() {
+		for( int i = 0; i != points.size(); i++ ) {
+			computedLineSegments.emplace_back(
+				Tools::Utility::getCircularIndex( points, i ),
+				Tools::Utility::getCircularIndex( points, i + 1 )
+			);
 		}
 	}
 
