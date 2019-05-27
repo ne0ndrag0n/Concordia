@@ -5,7 +5,6 @@
 #include "graphics/scenegraph/light/lightmap_manager.hpp"
 #include "graphics/scenegraph/light/directionallight.hpp"
 #include "graphics/scenegraph/model.hpp"
-#include "gameplay/cutawaymanager.hpp"
 #include "models/infrastructure.hpp"
 #include "models/wallsegment.hpp"
 #include "models/room.hpp"
@@ -24,14 +23,17 @@ namespace BlueBear::Gameplay {
 	class InfrastructureManager : public State::Substate {
 		Models::Infrastructure model;
 
+		int currentLevel = 0;
+
 		Graphics::SceneGraph::Light::LightmapManager lightmapManager;
-		std::optional< Gameplay::CutawayManager > cutawayManager;
 
 		std::shared_ptr< Graphics::SceneGraph::Model > floorModel;
 		std::shared_ptr< Graphics::SceneGraph::Model > wallModel;
 
 		std::vector< std::vector< Models::Room > > rooms;
 
+		void generateWallRig();
+		void generateFloorRig();
 		std::vector< glm::vec2 > generateRoomNodes( const Tools::Sector& sector, const glm::uvec2& dimensions );
 		Tools::Intersection::IntersectionList getIntersections( const std::vector< Models::WallSegment >& wallSegments );
 
@@ -39,8 +41,10 @@ namespace BlueBear::Gameplay {
 		InfrastructureManager( State::State& state );
 
 		void loadInfrastructure( const Json::Value& infrastructure );
-
 		void generateRooms();
+
+		int getCurrentLevel() const;
+		void setCurrentLevel( int currentLevel );
 
 		bool update() override;
 	};

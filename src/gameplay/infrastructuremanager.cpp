@@ -18,21 +18,34 @@ namespace BlueBear::Gameplay {
 	void InfrastructureManager::loadInfrastructure( const Json::Value& infrastructure ) {
 		model.load( infrastructure, state.as< State::HouseholdGameplayState >().getWorldCache() );
 
+		generateWallRig();
+		generateFloorRig();
+
 		auto& worldRenderer = state.as< State::HouseholdGameplayState >().getWorldRenderer();
 
-		Graphics::SceneGraph::ModelLoader::FloorModelLoader floorModelLoader( model.getLevels(), state.as< State::HouseholdGameplayState >().getShaderManager() );
-		Graphics::Vector::Renderer vectorRenderer( state.as< State::HouseholdGameplayState >().getApplication().getDisplayDevice() );
-		Graphics::SceneGraph::ModelLoader::WallModelLoader wallModelLoader( model.getLevels(), vectorRenderer, state.as< State::HouseholdGameplayState >().getShaderManager() );
-
-		worldRenderer.loadDirect( "__floorrig", floorModel = floorModelLoader.get() );
-		worldRenderer.loadDirect( "__wallrig", wallModel = wallModelLoader.get() );
+		worldRenderer.loadDirect( "__floorrig", floorModel );
+		worldRenderer.loadDirect( "__wallrig", wallModel );
 
 		worldRenderer.placeObject( "__floorrig", {} );
 		worldRenderer.placeObject( "__wallrig", {} );
 
 		generateRooms();
+	}
 
-		cutawayManager.emplace( wallModel, rooms, worldRenderer.getCamera() );
+	void InfrastructureManager::generateWallRig() {
+		Graphics::Vector::Renderer vectorRenderer( state.as< State::HouseholdGameplayState >().getApplication().getDisplayDevice() );
+
+		Graphics::SceneGraph::ModelLoader::WallModelLoader wallModelLoader(
+			model.getLevels(),
+			vectorRenderer,
+			state.as< State::HouseholdGameplayState >().getShaderManager()
+		);
+		wallModel = wallModelLoader.get();
+	}
+
+	void InfrastructureManager::generateFloorRig() {
+		Graphics::SceneGraph::ModelLoader::FloorModelLoader floorModelLoader( model.getLevels(), state.as< State::HouseholdGameplayState >().getShaderManager() );
+		floorModel = floorModelLoader.get();
 	}
 
 	std::vector< glm::vec2 > InfrastructureManager::generateRoomNodes( const Tools::Sector& sector, const glm::uvec2& dimensions ) {
@@ -125,6 +138,15 @@ namespace BlueBear::Gameplay {
 
 		lightmapManager.setRooms( roomLevels );
 		lightmapManager.calculateLightmaps();
+	}
+
+	int InfrastructureManager::getCurrentLevel() const {
+		return currentLevel;
+	}
+
+
+	void InfrastructureManager::setCurrentLevel( int currentLevel ) {
+		this->currentLevel = currentLevel;
 	}
 
 	bool InfrastructureManager::update() {
