@@ -10,6 +10,10 @@ namespace BlueBear::Graphics::SceneGraph::Uniforms {
 
 	HighlightUniform::HighlightUniform( const std::string& uniformId, float animDuration ) : uniformId( uniformId ), animDuration( ConfigManager::getInstance().getIntValue( "fps_overview" ) * animDuration ), animating( false ), currentFrame( 0 ) {}
 
+	std::unique_ptr< Uniform > HighlightUniform::copy() {
+		return std::make_unique< HighlightUniform >( uniformId, animDuration );
+	}
+
 	Shader::Uniform HighlightUniform::getUniform( const Shader* shader ) {
 		auto it = uniforms.find( shader );
 		if( it != uniforms.end() ) {

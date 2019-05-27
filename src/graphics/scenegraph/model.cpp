@@ -61,6 +61,10 @@ namespace BlueBear {
           copy->addChild( child->copy() );
         }
 
+        for( const auto& pair : uniforms ) {
+          copy->uniforms.emplace( pair.first, pair.second->copy() );
+        }
+
         return copy;
       }
 

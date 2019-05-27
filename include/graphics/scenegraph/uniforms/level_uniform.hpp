@@ -16,6 +16,7 @@ namespace BlueBear::Graphics::SceneGraph::Uniforms {
 
 	public:
 		LevelUniform( const glm::vec2& position, float level );
+		std::unique_ptr< Uniform > copy() override;
 
 		const glm::vec2& getPosition() const;
 

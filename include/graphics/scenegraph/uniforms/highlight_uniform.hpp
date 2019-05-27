@@ -26,6 +26,7 @@ namespace BlueBear::Graphics::SceneGraph::Uniforms {
 
 	public:
 		HighlightUniform( const std::string& uniformId, float animDuration );
+		std::unique_ptr< Uniform > copy() override;
 
 		double getAnimDuration() const;
 		void setAnimDuration( float animDuration );

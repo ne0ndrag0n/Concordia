@@ -120,6 +120,8 @@ namespace BlueBear {
     }
 
     void HouseholdGameplayState::update() {
+      infrastructureManager.update();
+
       engine.update();
 
       auto& display = application.getDisplayDevice();

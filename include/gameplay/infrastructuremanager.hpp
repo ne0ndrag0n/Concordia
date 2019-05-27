@@ -23,10 +23,13 @@ namespace BlueBear::Gameplay {
 
 	class InfrastructureManager : public State::Substate {
 		Models::Infrastructure model;
+
 		Graphics::SceneGraph::Light::LightmapManager lightmapManager;
 		std::optional< Gameplay::CutawayManager > cutawayManager;
+
 		std::shared_ptr< Graphics::SceneGraph::Model > floorModel;
 		std::shared_ptr< Graphics::SceneGraph::Model > wallModel;
+
 		std::vector< std::vector< Models::Room > > rooms;
 
 		std::vector< glm::vec2 > generateRoomNodes( const Tools::Sector& sector, const glm::uvec2& dimensions );

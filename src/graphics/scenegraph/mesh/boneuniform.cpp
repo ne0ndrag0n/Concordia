@@ -14,6 +14,10 @@ namespace BlueBear {
         BoneUniform::BoneUniform( const std::vector< std::string >& boneIDs ) :
           boneIDs( boneIDs ) {}
 
+        std::unique_ptr< Uniform > BoneUniform::copy() {
+          return std::make_unique< BoneUniform >( boneIDs );
+        }
+
         Shader::Uniform BoneUniform::getUniform( const Shader* shader ) {
           auto it = uniforms.find( shader );
           if( it != uniforms.end() ) {
