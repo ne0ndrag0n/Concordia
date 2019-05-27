@@ -68,7 +68,7 @@ namespace BlueBear {
         void setId( const std::string& id );
 
         std::shared_ptr< Model > getParent() const;
-        void addChild( std::shared_ptr< Model > child );
+        void addChild( std::shared_ptr< Model > child, std::optional< int > index = {} );
         void detach();
         const std::vector< std::shared_ptr< Model > >& getChildren() const;
 

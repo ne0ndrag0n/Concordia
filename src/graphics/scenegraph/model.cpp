@@ -95,9 +95,16 @@ namespace BlueBear {
         }
       }
 
-      void Model::addChild( std::shared_ptr< Model > child ) {
+      void Model::addChild( std::shared_ptr< Model > child, std::optional< int > index ) {
         child->detach();
-        submodels.emplace_back( child );
+
+        if( index ) {
+          auto it = std::next( submodels.begin(), *index );
+          submodels.insert( it, child );
+        } else {
+          submodels.emplace_back( child );
+        }
+
         child->parent = shared_from_this();
       }
 
