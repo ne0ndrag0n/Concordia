@@ -41,14 +41,14 @@ namespace BlueBear {
           orthoRotationAngle = 45.0f;
           break;
         case 1:
-          orthoRotationAngle = -45.0f;
+          orthoRotationAngle = 315.0f;
           break;
         case 2:
-          orthoRotationAngle = -135.0f;
+          orthoRotationAngle = 225.0f;
           break;
         case 3:
         default:
-          orthoRotationAngle = -225.0f;
+          orthoRotationAngle = 135.0f;
           break;
       }
 

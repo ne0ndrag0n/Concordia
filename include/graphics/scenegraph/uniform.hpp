@@ -11,6 +11,7 @@ namespace BlueBear {
 
         class Uniform {
         public:
+          virtual ~Uniform() = default;
           virtual void update();
           virtual void send( const Shader& shader ) = 0;
           virtual std::unique_ptr< Uniform > copy() = 0;

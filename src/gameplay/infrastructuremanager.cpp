@@ -6,6 +6,8 @@
 #include "state/householdgameplaystate.hpp"
 #include "tools/utility.hpp"
 #include "application.hpp"
+#include "configmanager.hpp"
+#include <bezier.hpp>
 
 namespace BlueBear::Gameplay {
 
@@ -30,6 +32,9 @@ namespace BlueBear::Gameplay {
 		worldRenderer.placeObject( "__wallrig", {} );
 
 		generateRooms();
+
+		hideUpperLevels();
+		setWallCutaways();
 	}
 
 	void InfrastructureManager::generateWallRig() {
@@ -41,11 +46,76 @@ namespace BlueBear::Gameplay {
 			state.as< State::HouseholdGameplayState >().getShaderManager()
 		);
 		wallModel = wallModelLoader.get();
+
+		activeWallAnims.clear();
 	}
 
 	void InfrastructureManager::generateFloorRig() {
 		Graphics::SceneGraph::ModelLoader::FloorModelLoader floorModelLoader( model.getLevels(), state.as< State::HouseholdGameplayState >().getShaderManager() );
 		floorModel = floorModelLoader.get();
+	}
+
+	/**
+	 * Cycle through and play animations in activeWallAnims
+	 */
+	void InfrastructureManager::updateAnimations() {
+		static Bezier::Bezier< 3 > cubicBezier( { { 0.0f, 0.0f }, { 0.42f, 0.0f }, { 0.58f, 1.0f }, { 1.0f, 1.0f } } );
+
+		for( auto it = activeWallAnims.begin(); it != activeWallAnims.end(); ) {
+			auto& pair = *it;
+
+			if( pair.second.currentFrame < pair.second.maxFrames ) {
+				float step = ( float ) pair.second.currentFrame / ( float ) pair.second.maxFrames;
+				pair.first->getLocalTransform().setPosition( { 0.0f, 0.0f, pair.second.destination * cubicBezier.valueAt( step ).y } );
+				pair.second.currentFrame++;
+
+				++it;
+			} else {
+				it = activeWallAnims.erase( it );
+			}
+		}
+	}
+
+	/**
+	 * Hide upper levels by sinking them all the way into their floor - the shader will cut them off using the discard functionality
+	 *
+	 * Event to be run:
+	 * - When level is modified using setCurrentLevel
+	 */
+	void InfrastructureManager::hideUpperLevels() {
+		static int numFrames = ConfigManager::getInstance().getIntValue( "fps_overview" ) * ( ( float ) ConfigManager::getInstance().getIntValue( "wall_cutaway_animation_speed" ) / 1000.0f );
+
+		const auto& levels = wallModel->getChildren();
+
+		for( int i = currentLevel + 1; i < levels.size(); i++ ) {
+			const auto& level = levels[ i ];
+			auto it = activeWallAnims.find( level.get() );
+			if( it == activeWallAnims.end() ) {
+				activeWallAnims[ level.get() ] = { 0, numFrames, -4.0f };
+			} else {
+				it->second.destination = -4.0f;
+			}
+		}
+	}
+
+	/**
+	 * Sink wall segments 90% of the way into the floor if their face vector falls within 135 and 225 degrees of the camera vector
+	 *
+	 * Event to be run:
+	 * - When level is modified using setCurrentLevel
+	 * - When camera angle changes
+	 */
+	void InfrastructureManager::setWallCutaways() {
+		static int numFrames = ConfigManager::getInstance().getIntValue( "fps_overview" ) * ( ( float ) ConfigManager::getInstance().getIntValue( "wall_cutaway_animation_speed" ) / 1000.0f );
+
+		auto& roomLevel = rooms[ currentLevel ];
+		auto& segments = wallModel->getChildren()[ currentLevel ];
+		// For each room on the current level, walk its walls in the winding direction and set the walls to animate down to -z3.75
+		// if the angle of the wall is between 135 and 225 relative to the camera.
+		for( auto& room : roomLevel ) {
+			const auto& normals = room.getWallNormals();
+			// TODO
+		}
 	}
 
 	std::vector< glm::vec2 > InfrastructureManager::generateRoomNodes( const Tools::Sector& sector, const glm::uvec2& dimensions ) {
@@ -105,7 +175,7 @@ namespace BlueBear::Gameplay {
 	 * Refactoring TODO
 	 */
 	void InfrastructureManager::generateRooms() {
-		std::vector< std::vector< Models::Room > > roomLevels;
+		rooms.clear();
 
 		for( const auto& level : model.getLevels() ) {
 			std::vector< Models::Room > roomsForLevel;
@@ -133,10 +203,10 @@ namespace BlueBear::Gameplay {
 				roomsForLevel.emplace_back( std::move( room ) );
 			}
 
-			roomLevels.emplace_back( std::move( roomsForLevel ) );
+			rooms.emplace_back( std::move( roomsForLevel ) );
 		}
 
-		lightmapManager.setRooms( roomLevels );
+		lightmapManager.setRooms( rooms );
 		lightmapManager.calculateLightmaps();
 	}
 

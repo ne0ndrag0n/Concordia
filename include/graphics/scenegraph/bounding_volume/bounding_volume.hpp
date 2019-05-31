@@ -9,6 +9,7 @@ namespace BlueBear::Graphics::SceneGraph::BoundingVolume {
 
 	class BoundingVolume {
 	public:
+		virtual ~BoundingVolume() = default;
 		virtual void generate( const std::vector< ModelTriangle >& triangles ) = 0;
 		virtual bool intersects( const Geometry::Ray& ray ) const = 0;
 	};

@@ -20,7 +20,7 @@ namespace BlueBear::Models {
 		return points;
 	}
 
-	const std::vector< glm::vec2 >& Room::getWallNormals() {
+	const std::vector< Room::Normal >& Room::getWallNormals() {
 		if( computedDirections.empty() ) {
 			computeDirections();
 		}
@@ -28,31 +28,13 @@ namespace BlueBear::Models {
 		return computedDirections;
 	}
 
-	const std::vector< std::pair< glm::vec2, glm::vec2 > >& Room::getLineSegments() {
-		if( computedLineSegments.empty() ) {
-			computeLineSegments();
-		}
-
-		return computedLineSegments;
-	}
-
 	void Room::computeDirections() {
 		for( int i = 0; i != points.size(); i++ ) {
-			glm::vec2 direction = glm::normalize(
-				Tools::Utility::getCircularIndex( points, i + 1 ) -
-				Tools::Utility::getCircularIndex( points, i )
-			);
+			const glm::vec2& first = Tools::Utility::getCircularIndex( points, i );
+			const glm::vec2& second = Tools::Utility::getCircularIndex( points, i + 1 );
 
-			computedDirections.emplace_back( -direction.y, direction.x );
-		}
-	}
-
-	void Room::computeLineSegments() {
-		for( int i = 0; i != points.size(); i++ ) {
-			computedLineSegments.emplace_back(
-				Tools::Utility::getCircularIndex( points, i ),
-				Tools::Utility::getCircularIndex( points, i + 1 )
-			);
+			glm::vec2 direction = glm::normalize( second - first );
+			computedDirections.emplace_back( Normal{ { first, second }, { -direction.y, direction.x } } );
 		}
 	}
 

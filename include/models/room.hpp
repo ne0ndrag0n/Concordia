@@ -8,14 +8,16 @@
 namespace BlueBear::Models {
 
 	class Room {
+	public:
+		struct Normal { std::pair< glm::vec2, glm::vec2 > segment; glm::vec2 direction; };
+
+	private:
 		Graphics::SceneGraph::Light::DirectionalLight backgroundLight;
 		std::vector< glm::vec2 > points;
 
-		std::vector< glm::vec2 > computedDirections;
-		std::vector< std::pair< glm::vec2, glm::vec2 > > computedLineSegments;
+		std::vector< Normal > computedDirections;
 
 		void computeDirections();
-		void computeLineSegments();
 
 	public:
 		Room( const Graphics::SceneGraph::Light::DirectionalLight backgroundLight, const std::vector< glm::vec2 >& points );
@@ -23,8 +25,7 @@ namespace BlueBear::Models {
 		Graphics::SceneGraph::Light::DirectionalLight& getBackgroundLight();
 		const Graphics::SceneGraph::Light::DirectionalLight& getBackgroundLight() const;
 		const std::vector< glm::vec2 >& getPoints() const;
-		const std::vector< glm::vec2 >& getWallNormals();
-		const std::vector< std::pair< glm::vec2, glm::vec2 > >& getLineSegments();
+		const std::vector< Normal >& getWallNormals();
 	};
 
 }
