@@ -196,6 +196,14 @@ namespace BlueBear {
 
 					return list[ ( i + size ) % size ];
 				};
+
+				static inline float positiveAngle( float angle ) {
+					if( angle < 0.0f ) {
+						return 360.0f - angle;
+					}
+
+					return angle;
+				}
 		};
 	}
 }

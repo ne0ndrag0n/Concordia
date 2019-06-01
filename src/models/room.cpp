@@ -34,7 +34,7 @@ namespace BlueBear::Models {
 			const glm::vec2& second = Tools::Utility::getCircularIndex( points, i + 1 );
 
 			glm::vec2 direction = glm::normalize( second - first );
-			computedDirections.emplace_back( Normal{ { first, second }, { -direction.y, direction.x } } );
+			computedDirections.emplace_back( Normal{ { first, second }, direction, { -direction.y, direction.x } } );
 		}
 	}
 

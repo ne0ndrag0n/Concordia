@@ -44,6 +44,7 @@ namespace BlueBear::Gameplay {
 		void generateWallRig();
 		void generateFloorRig();
 
+		void enqueueAnimation( Graphics::SceneGraph::Model* key, const Animation&& animation );
 		void updateAnimations();
 
 		// To be run any time currentLevel changes

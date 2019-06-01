@@ -9,7 +9,7 @@ namespace BlueBear::Models {
 
 	class Room {
 	public:
-		struct Normal { std::pair< glm::vec2, glm::vec2 > segment; glm::vec2 direction; };
+		struct Normal { std::pair< glm::vec2, glm::vec2 > segment; glm::vec2 direction; glm::vec2 perpendicular; };
 
 	private:
 		Graphics::SceneGraph::Light::DirectionalLight backgroundLight;

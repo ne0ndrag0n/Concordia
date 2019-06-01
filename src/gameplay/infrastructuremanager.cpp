@@ -1,5 +1,6 @@
 #include "gameplay/infrastructuremanager.hpp"
 #include "device/display/adapter/component/worldrenderer.hpp"
+#include "graphics/scenegraph/uniforms/level_uniform.hpp"
 #include "graphics/scenegraph/modelloader/floormodelloader.hpp"
 #include "graphics/scenegraph/modelloader/wallmodelloader.hpp"
 #include "graphics/vector/renderer.hpp"
@@ -59,7 +60,7 @@ namespace BlueBear::Gameplay {
 	 * Cycle through and play animations in activeWallAnims
 	 */
 	void InfrastructureManager::updateAnimations() {
-		static Bezier::Bezier< 3 > cubicBezier( { { 0.0f, 0.0f }, { 0.42f, 0.0f }, { 0.58f, 1.0f }, { 1.0f, 1.0f } } );
+		static Bezier::Bezier< 3 > cubicBezier( { { 0.0f, 0.0f }, { 0.33f, -0.66f }, { 0.66f, 1.33f }, { 1.0f, 1.0f } } );
 
 		for( auto it = activeWallAnims.begin(); it != activeWallAnims.end(); ) {
 			auto& pair = *it;
@@ -76,6 +77,15 @@ namespace BlueBear::Gameplay {
 		}
 	}
 
+	void InfrastructureManager::enqueueAnimation( Graphics::SceneGraph::Model* key, const InfrastructureManager::Animation&& animation ) {
+		auto it = activeWallAnims.find( key );
+		if( it == activeWallAnims.end() ) {
+			activeWallAnims[ key ] = animation;
+		} else {
+			it->second.destination = animation.destination;
+		}
+	}
+
 	/**
 	 * Hide upper levels by sinking them all the way into their floor - the shader will cut them off using the discard functionality
 	 *
@@ -84,16 +94,13 @@ namespace BlueBear::Gameplay {
 	 */
 	void InfrastructureManager::hideUpperLevels() {
 		static int numFrames = ConfigManager::getInstance().getIntValue( "fps_overview" ) * ( ( float ) ConfigManager::getInstance().getIntValue( "wall_cutaway_animation_speed" ) / 1000.0f );
-
-		const auto& levels = wallModel->getChildren();
+		std::shared_ptr< Graphics::SceneGraph::Model > wallRigInstance = state.as< State::HouseholdGameplayState >().getWorldRenderer().findObjectsByType( "__wallrig" )[ 0 ];
+		const auto& levels = wallRigInstance->getChildren();
 
 		for( int i = currentLevel + 1; i < levels.size(); i++ ) {
-			const auto& level = levels[ i ];
-			auto it = activeWallAnims.find( level.get() );
-			if( it == activeWallAnims.end() ) {
-				activeWallAnims[ level.get() ] = { 0, numFrames, -4.0f };
-			} else {
-				it->second.destination = -4.0f;
+			const auto& level = levels[ i ]->getChildren();
+			for( const auto& wall : level ) {
+				enqueueAnimation( wall.get(), { 0, numFrames, -4.0f } );
 			}
 		}
 	}
@@ -107,14 +114,51 @@ namespace BlueBear::Gameplay {
 	 */
 	void InfrastructureManager::setWallCutaways() {
 		static int numFrames = ConfigManager::getInstance().getIntValue( "fps_overview" ) * ( ( float ) ConfigManager::getInstance().getIntValue( "wall_cutaway_animation_speed" ) / 1000.0f );
-
+		std::shared_ptr< Graphics::SceneGraph::Model > wallRigInstance = state.as< State::HouseholdGameplayState >().getWorldRenderer().findObjectsByType( "__wallrig" )[ 0 ];
+		const auto& camera = state.as< State::HouseholdGameplayState >().getWorldRenderer().getCamera();
 		auto& roomLevel = rooms[ currentLevel ];
-		auto& segments = wallModel->getChildren()[ currentLevel ];
+		auto& segments = wallRigInstance->getChildren()[ currentLevel ]->getChildren();
+
 		// For each room on the current level, walk its walls in the winding direction and set the walls to animate down to -z3.75
 		// if the angle of the wall is between 135 and 225 relative to the camera.
 		for( auto& room : roomLevel ) {
 			const auto& normals = room.getWallNormals();
-			// TODO
+			for( const auto& wall : normals ) {
+				float angle = std::abs(
+					Tools::Utility::positiveAngle( glm::degrees( glm::atan( wall.perpendicular.y, wall.perpendicular.x ) ) ) -
+					Tools::Utility::positiveAngle( camera.getRotationAngle() )
+				);
+
+				if( angle >= 135.0f && angle <= 225.0f ) {
+					glm::vec2 start;
+					glm::vec2 finish;
+					glm::vec2 direction;
+					if( wall.direction == glm::vec2{ -1.0f, 0.0f } || wall.direction == glm::vec2{ 0.0f, 1.0f } || wall.direction == glm::vec2{ -1.0f, -1.0f } || wall.direction == glm::vec2{ -1.0f, 1.0f } ) {
+						start = wall.segment.second;
+						finish = wall.segment.first;
+						direction = glm::vec2{ -wall.direction.x, -wall.direction.y };
+					} else {
+						start = wall.segment.first;
+						finish = wall.segment.second;
+						direction = wall.direction;
+					}
+
+					int totalSteps = std::abs( glm::distance( finish, start ) ) - 1;
+					glm::vec2 cursor = start;
+					for( int i = 0; i < totalSteps; i++ ) {
+						auto it = std::find_if( segments.begin(), segments.end(), [ cursor, currentLevel = this->currentLevel ]( const std::shared_ptr< Graphics::SceneGraph::Model >& model ) {
+							Graphics::SceneGraph::Uniforms::LevelUniform* uniform = ( Graphics::SceneGraph::Uniforms::LevelUniform* ) model->getUniform( "level" );
+
+							return uniform->getLevel() == currentLevel && uniform->getPosition() == cursor;
+						} );
+						if( it != segments.end() ) {
+							enqueueAnimation( it->get(), { 0, numFrames, -3.75f } );
+						}
+
+						cursor += direction;
+					}
+				}
+			}
 		}
 	}
 
@@ -220,7 +264,7 @@ namespace BlueBear::Gameplay {
 	}
 
 	bool InfrastructureManager::update() {
-
+		updateAnimations();
 	}
 
 }
