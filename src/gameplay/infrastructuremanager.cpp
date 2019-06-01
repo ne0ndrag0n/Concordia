@@ -16,6 +16,34 @@ namespace BlueBear::Gameplay {
 		return { origin.x + value.x, origin.y - value.y };
 	}
 
+	static std::vector< std::shared_ptr< Graphics::SceneGraph::Model > > findByCell(
+		const std::vector< std::shared_ptr< Graphics::SceneGraph::Model > >& list,
+		const glm::vec2& direction,
+		const glm::vec2& cell,
+		int currentLevel
+	) {
+		std::vector< std::shared_ptr< Graphics::SceneGraph::Model > > result;
+		std::string match;
+
+		if( direction == glm::vec2{ 1.0f, 0.0f } ) {
+			match = "__horizontal";
+		} else if ( direction == glm::vec2{ 0.0f, -1.0f } ) {
+			match = "__vertical";
+		} else if ( direction == glm::vec2{ 1.0f, -1.0f } ) {
+			match = "__diagonal";
+		} else if ( direction == glm::vec2{ 1.0f, 1.0f } ) {
+			match = "__reverseDiagonal";
+		}
+
+		std::copy_if( list.begin(), list.end(), std::back_inserter( result ), [ & ]( const std::shared_ptr< Graphics::SceneGraph::Model >& model ) {
+			Graphics::SceneGraph::Uniforms::LevelUniform* uniform = ( Graphics::SceneGraph::Uniforms::LevelUniform* ) model->getUniform( "level" );
+
+			return model->getId() == match && uniform->getLevel() == currentLevel && uniform->getPosition() == cell;
+		} );
+
+		return result;
+	}
+
 	InfrastructureManager::InfrastructureManager( State::State& state ) : State::Substate( state ) {}
 
 	void InfrastructureManager::loadInfrastructure( const Json::Value& infrastructure ) {
@@ -143,16 +171,12 @@ namespace BlueBear::Gameplay {
 						direction = wall.direction;
 					}
 
-					int totalSteps = std::abs( glm::distance( finish, start ) ) - 1;
+					int totalSteps = std::abs( glm::distance( finish, start ) );
 					glm::vec2 cursor = start;
 					for( int i = 0; i < totalSteps; i++ ) {
-						auto it = std::find_if( segments.begin(), segments.end(), [ cursor, currentLevel = this->currentLevel ]( const std::shared_ptr< Graphics::SceneGraph::Model >& model ) {
-							Graphics::SceneGraph::Uniforms::LevelUniform* uniform = ( Graphics::SceneGraph::Uniforms::LevelUniform* ) model->getUniform( "level" );
-
-							return uniform->getLevel() == currentLevel && uniform->getPosition() == cursor;
-						} );
-						if( it != segments.end() ) {
-							enqueueAnimation( it->get(), { 0, numFrames, -3.75f } );
+						auto matchingSides = findByCell( segments, direction, cursor, currentLevel );
+						for( const auto& match : matchingSides ) {
+							enqueueAnimation( match.get(), { 0, numFrames, -3.75f } );
 						}
 
 						cursor += direction;
