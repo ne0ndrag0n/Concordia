@@ -199,7 +199,7 @@ namespace BlueBear {
 
 				static inline float positiveAngle( float angle ) {
 					if( angle < 0.0f ) {
-						return 360.0f - angle;
+						return angle + 360.0f;
 					}
 
 					return angle;
