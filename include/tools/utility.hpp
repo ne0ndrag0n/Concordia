@@ -202,7 +202,7 @@ namespace BlueBear {
 						return angle + 360.0f;
 					}
 
-					return angle;
+					return ( int ) angle % 360;
 				}
 		};
 	}

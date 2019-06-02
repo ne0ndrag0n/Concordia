@@ -9,6 +9,7 @@
 #include "application.hpp"
 #include "configmanager.hpp"
 #include <bezier.hpp>
+#include <unordered_set>
 
 namespace BlueBear::Gameplay {
 
@@ -46,6 +47,10 @@ namespace BlueBear::Gameplay {
 
 	InfrastructureManager::InfrastructureManager( State::State& state ) : State::Substate( state ) {}
 
+	InfrastructureManager::~InfrastructureManager() {
+		state.as< State::HouseholdGameplayState >().getWorldRenderer().getCamera().CAMERA_ROTATED.stopListening( this );
+	}
+
 	void InfrastructureManager::loadInfrastructure( const Json::Value& infrastructure ) {
 		model.load( infrastructure, state.as< State::HouseholdGameplayState >().getWorldCache() );
 
@@ -64,6 +69,8 @@ namespace BlueBear::Gameplay {
 
 		hideUpperLevels();
 		setWallCutaways();
+
+		state.as< State::HouseholdGameplayState >().getWorldRenderer().getCamera().CAMERA_ROTATED.listen( this, std::bind( &InfrastructureManager::setWallCutaways, this ) );
 	}
 
 	void InfrastructureManager::generateWallRig() {
@@ -88,14 +95,15 @@ namespace BlueBear::Gameplay {
 	 * Cycle through and play animations in activeWallAnims
 	 */
 	void InfrastructureManager::updateAnimations() {
-		static Bezier::Bezier< 3 > cubicBezier( { { 0.0f, 0.0f }, { 0.33f, -0.66f }, { 0.66f, 1.33f }, { 1.0f, 1.0f } } );
+		static Bezier::Bezier< 3 > cubicBezier( { { 0.0f, 0.0f }, { 0.33f, -0.33f }, { 0.66f, 1.33f }, { 1.0f, 1.0f } } );
 
 		for( auto it = activeWallAnims.begin(); it != activeWallAnims.end(); ) {
 			auto& pair = *it;
 
 			if( pair.second.currentFrame < pair.second.maxFrames ) {
 				float step = ( float ) pair.second.currentFrame / ( float ) pair.second.maxFrames;
-				pair.first->getLocalTransform().setPosition( { 0.0f, 0.0f, pair.second.destination * cubicBezier.valueAt( step ).y } );
+				float span = pair.second.destination - pair.second.source;
+				pair.first->getLocalTransform().setPosition( { 0.0f, 0.0f, pair.second.source + ( span * cubicBezier.valueAt( step ).y ) } );
 				pair.second.currentFrame++;
 
 				++it;
@@ -106,11 +114,15 @@ namespace BlueBear::Gameplay {
 	}
 
 	void InfrastructureManager::enqueueAnimation( Graphics::SceneGraph::Model* key, const InfrastructureManager::Animation&& animation ) {
+		float source = key->getLocalTransform().getPosition().z;
+
 		auto it = activeWallAnims.find( key );
 		if( it == activeWallAnims.end() ) {
 			activeWallAnims[ key ] = animation;
+			activeWallAnims[ key ].source = source;
 		} else {
 			it->second.destination = animation.destination;
+			it->second.source = source;
 		}
 	}
 
@@ -147,17 +159,19 @@ namespace BlueBear::Gameplay {
 		auto& roomLevel = rooms[ currentLevel ];
 		auto& segments = wallRigInstance->getChildren()[ currentLevel ]->getChildren();
 
+		std::unordered_set< Graphics::SceneGraph::Model* > selectedSegments;
+
 		// For each room on the current level, walk its walls in the winding direction and set the walls to animate down to -z3.75
 		// if the angle of the wall is between 135 and 225 relative to the camera.
 		for( auto& room : roomLevel ) {
 			const auto& normals = room.getWallNormals();
 			for( const auto& wall : normals ) {
-				float angle = std::abs(
-					Tools::Utility::positiveAngle( glm::degrees( glm::atan( wall.perpendicular.y, wall.perpendicular.x ) ) ) -
-					Tools::Utility::positiveAngle( camera.getRotationAngle() )
+				float angle = Tools::Utility::positiveAngle(
+					Tools::Utility::positiveAngle( glm::degrees( glm::atan( wall.perpendicular.y, wall.perpendicular.x ) ) ) +
+					camera.getRotationAngle()
 				);
 
-				if( angle >= 135.0f && angle <= 225.0f ) {
+				if( angle >= 225.0f && angle <= 315.0f ) {
 					glm::vec2 start;
 					glm::vec2 finish;
 					glm::vec2 direction;
@@ -176,11 +190,23 @@ namespace BlueBear::Gameplay {
 					for( int i = 0; i < totalSteps; i++ ) {
 						auto matchingSides = findByCell( segments, direction, cursor, currentLevel );
 						for( const auto& match : matchingSides ) {
+							selectedSegments.insert( match.get() );
 							enqueueAnimation( match.get(), { 0, numFrames, -3.75f } );
 						}
 
 						cursor += direction;
 					}
+				}
+			}
+		}
+
+		// For all wall panels that were not selected in the process above, and are lower than their default configuration
+		// Set an animation to return them back to z+0
+		for( const auto& segment : segments ) {
+			if( selectedSegments.find( segment.get() ) == selectedSegments.end() ) {
+				auto& segmentTransform = segment->getLocalTransform();
+				if( segmentTransform.getPosition() != glm::vec3{ 0.0f, 0.0f, 0.0f } ) {
+					enqueueAnimation( segment.get(), { 0, numFrames, 0.0f } );
 				}
 			}
 		}

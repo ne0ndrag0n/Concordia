@@ -26,6 +26,7 @@ namespace BlueBear::Gameplay {
 			int currentFrame = 0;
 			int maxFrames = 0;
 			float destination = 0.0f;
+			float source = 0.0f;
 		};
 
 		Models::Infrastructure model;
@@ -57,6 +58,7 @@ namespace BlueBear::Gameplay {
 
 	public:
 		InfrastructureManager( State::State& state );
+		~InfrastructureManager();
 
 		void loadInfrastructure( const Json::Value& infrastructure );
 		void generateRooms();

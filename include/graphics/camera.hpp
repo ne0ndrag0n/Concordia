@@ -3,6 +3,7 @@
 
 #include "geometry/ray.hpp"
 #include "graphics/shader.hpp"
+#include "eventmanager.hpp"
 #include <unordered_map>
 #include <string>
 #include <glm/glm.hpp>
@@ -42,6 +43,8 @@ namespace BlueBear {
         void sendToShader( const Shader& shader );
 
       public:
+        BasicEvent< void* > CAMERA_ROTATED;
+
         Camera( int screenWidth, int screenHeight );
         const glm::vec3& getPosition() const;
         void move( GLfloat x, GLfloat y, GLfloat z );

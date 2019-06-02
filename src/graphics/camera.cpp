@@ -53,6 +53,8 @@ namespace BlueBear {
       }
 
       dirty = true;
+
+      CAMERA_ROTATED.trigger();
     }
 
     float Camera::zoomIn() {
