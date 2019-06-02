@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -std=c++17 -g -rdynamic -pipe #-fsanitize=address
+CFLAGS = -std=c++17 -g #-fsanitize=address
 DFLAGS = -DSOL_SAFE_FUNCTION=1
 INCLUDES = -Iinclude -Ilib -Ilib/nanovg
 LIBPATHS = -Llib -Llib/nanovg
