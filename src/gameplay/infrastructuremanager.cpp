@@ -100,7 +100,7 @@ namespace BlueBear::Gameplay {
 		for( auto it = activeWallAnims.begin(); it != activeWallAnims.end(); ) {
 			auto& pair = *it;
 
-			if( pair.second.currentFrame < pair.second.maxFrames ) {
+			if( pair.second.currentFrame <= pair.second.maxFrames ) {
 				float step = ( float ) pair.second.currentFrame / ( float ) pair.second.maxFrames;
 				float span = pair.second.destination - pair.second.source;
 				pair.first->getLocalTransform().setPosition( { 0.0f, 0.0f, pair.second.source + ( span * cubicBezier.valueAt( step ).y ) } );
