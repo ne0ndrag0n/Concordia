@@ -95,7 +95,7 @@ namespace BlueBear::Gameplay {
 	 * Cycle through and play animations in activeWallAnims
 	 */
 	void InfrastructureManager::updateAnimations() {
-		static Bezier::Bezier< 3 > cubicBezier( { { 0.0f, 0.0f }, { 0.33f, -0.33f }, { 0.66f, 1.33f }, { 1.0f, 1.0f } } );
+		static Bezier::Bezier< 3 > cubicBezier( { { 0.0f, 0.0f }, { 0.23f, 1.00f }, { 0.32f, 1.00f }, { 1.0f, 1.0f } } );
 
 		for( auto it = activeWallAnims.begin(); it != activeWallAnims.end(); ) {
 			auto& pair = *it;
