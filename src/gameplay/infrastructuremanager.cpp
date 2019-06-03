@@ -207,6 +207,10 @@ namespace BlueBear::Gameplay {
 				auto& segmentTransform = segment->getLocalTransform();
 				if( segmentTransform.getPosition() != glm::vec3{ 0.0f, 0.0f, 0.0f } ) {
 					enqueueAnimation( segment.get(), { 0, numFrames, 0.0f } );
+				} else {
+					// Element has been queued for animation previously, but it has not yet moved,
+					// and has not been selected for this run. Remove the animation in its entirety.
+					activeWallAnims.erase( segment.get() );
 				}
 			}
 		}
