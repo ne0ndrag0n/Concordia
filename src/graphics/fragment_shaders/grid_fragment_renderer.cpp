@@ -3,7 +3,7 @@
 
 namespace BlueBear::Graphics::FragmentRenderers {
 
-	GridFragmentRenderer::GridFragmentRenderer() {
+	GridFragmentRenderer::GridFragmentRenderer() : lineSize( ConfigManager::getInstance().getIntValue( "shader_grid_line_size" ) / 1000.0f ) {
 		Shader::SHADER_CHANGE.listen( this, std::bind( &GridFragmentRenderer::send, this, std::placeholders::_1 ) );
 	}
 

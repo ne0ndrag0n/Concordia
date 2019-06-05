@@ -20,7 +20,7 @@ namespace BlueBear::Graphics::FragmentRenderers {
 		glm::vec2 origin = glm::vec2{ -5.0f, 5.0f };
 		glm::vec2 dimensions = glm::vec2{ 10.0f, 10.0f };
 		glm::vec4 gridColor = glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f };
-		float lineSize = 0.025f;
+		float lineSize;
 		bool activated = false;
 
 		std::unordered_map< glm::vec2, glm::vec4 > selectedRegions;

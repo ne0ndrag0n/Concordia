@@ -47,6 +47,7 @@ namespace BlueBear {
     configRoot[ "shader_room_map_min_height"] = 1000;
     configRoot[ "wall_cutaway_animation_speed" ] = 1000;
     configRoot[ "shader_grid_selectable_tiles" ] = 32;
+    configRoot[ "shader_grid_line_size" ] = 25;
 
     // Load settings.json from file
     std::ifstream settingsFile( SETTINGS_PATH );
