@@ -72,6 +72,11 @@ namespace BlueBear::Gameplay {
 
 		const glm::ivec2& dimensions = model.getLevels()[ currentLevel ].dimensions;
 		grid.setParams( { -( dimensions.x * 0.5f ), -( dimensions.y * 0.5f ) }, { dimensions.x, dimensions.y } );
+		grid.setSelected( { { 1.0f, 1.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } } );
+		grid.setSelected( { { 2.0f, 1.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } } );
+		grid.setSelected( { { 1.0f, 2.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } } );
+		grid.setSelected( { { 2.0f, 2.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } } );
+		grid.setActivated( true );
 
 		state.as< State::HouseholdGameplayState >().getWorldRenderer().getCamera().CAMERA_ROTATED.listen( this, std::bind( &InfrastructureManager::setWallCutaways, this ) );
 	}

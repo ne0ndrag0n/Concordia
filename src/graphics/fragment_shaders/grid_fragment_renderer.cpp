@@ -1,4 +1,5 @@
 #include "graphics/fragment_renderers/grid_fragment_renderer.hpp"
+#include "configmanager.hpp"
 
 namespace BlueBear::Graphics::FragmentRenderers {
 
@@ -36,6 +37,19 @@ namespace BlueBear::Graphics::FragmentRenderers {
 		return activated;
 	}
 
+	std::vector< GridFragmentRenderer::SelectedRegion > GridFragmentRenderer::getSelectedRegions() const {
+		std::vector< GridFragmentRenderer::SelectedRegion > result;
+
+		for( const auto& pair : selectedRegions ) {
+			result.emplace_back( SelectedRegion{ pair.first, pair.second } );
+		}
+
+		return result;
+	}
+
+	void GridFragmentRenderer::setSelected( const GridFragmentRenderer::SelectedRegion& region ) {
+		selectedRegions[ region.region ] = region.color;
+	}
 
 	void GridFragmentRenderer::send( const Shader& shader ) {
 		const GridUniformBundle& bundle = uniforms.getUniforms( shader );
@@ -45,6 +59,15 @@ namespace BlueBear::Graphics::FragmentRenderers {
 		shader.sendData( bundle.gridColor, gridColor );
 		shader.sendData( bundle.lineSize, lineSize );
 		shader.sendData( bundle.activated, activated ? 1.0f : 0.0f );
+
+		int i = 0;
+		for( const auto& selectedRegion : selectedRegions ) {
+			shader.sendData( bundle.selectedRegionsRegion[ i ], selectedRegion.first );
+			shader.sendData( bundle.selectedRegionsColor[ i ], selectedRegion.second );
+			i++;
+		}
+
+		shader.sendData( bundle.numSelectedRegions, i );
 	}
 
 	GridFragmentRenderer::GridUniformBundle::GridUniformBundle( const Shader& shader ) {
@@ -53,6 +76,14 @@ namespace BlueBear::Graphics::FragmentRenderers {
 		gridColor = shader.getUniform( "grid.gridColor" );
 		lineSize = shader.getUniform( "grid.lineSize" );
 		activated = shader.getUniform( "grid.activated" );
+
+		static int selectableTiles = ConfigManager::getInstance().getIntValue( "shader_grid_selectable_tiles" );
+		for( int i = 0; i != selectableTiles; i++ ) {
+			selectedRegionsRegion.emplace_back( shader.getUniform( "selectedRegions[" + std::to_string( i ) + "].region" ) );
+			selectedRegionsColor.emplace_back( shader.getUniform( "selectedRegions[" + std::to_string( i ) + "].color" ) );
+		}
+
+		numSelectedRegions = shader.getUniform( "numSelectedRegions" );
 	}
 
 }

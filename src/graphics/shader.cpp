@@ -58,7 +58,7 @@ namespace BlueBear {
         const std::string& filename = match[ 1 ];
         if( visitedFiles.find( filename ) == visitedFiles.end() ) {
           visitedFiles.insert( filename );
-          result = match.format( "$`" + preprocess( getFile( filename ) ) +  "$'" );
+          result = match.format( "$`" + preprocess( getFile( filename ) ) +  "\n$'" );
         } else {
           // Remove match
           result = match.format( "$`$'" );
