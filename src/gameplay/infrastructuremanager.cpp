@@ -70,6 +70,9 @@ namespace BlueBear::Gameplay {
 		hideUpperLevels();
 		setWallCutaways();
 
+		const glm::ivec2& dimensions = model.getLevels()[ currentLevel ].dimensions;
+		grid.setParams( { -( dimensions.x * 0.5f ), -( dimensions.y * 0.5f ) }, { dimensions.x, dimensions.y } );
+
 		state.as< State::HouseholdGameplayState >().getWorldRenderer().getCamera().CAMERA_ROTATED.listen( this, std::bind( &InfrastructureManager::setWallCutaways, this ) );
 	}
 

@@ -2,6 +2,7 @@
 #define INFRASTRUCTUREMANAGER
 
 #include "state/substate.hpp"
+#include "graphics/fragment_renderers/grid_fragment_renderer.hpp"
 #include "graphics/scenegraph/light/lightmap_manager.hpp"
 #include "graphics/scenegraph/light/directionallight.hpp"
 #include "graphics/scenegraph/model.hpp"
@@ -34,6 +35,7 @@ namespace BlueBear::Gameplay {
 		int currentLevel = 0;
 
 		Graphics::SceneGraph::Light::LightmapManager lightmapManager;
+		Graphics::FragmentRenderers::GridFragmentRenderer grid;
 
 		std::shared_ptr< Graphics::SceneGraph::Model > floorModel;
 		std::shared_ptr< Graphics::SceneGraph::Model > wallModel;

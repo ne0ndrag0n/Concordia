@@ -7,6 +7,7 @@ out vec4 color;
 #include "system/shaders/common/material.glsl"
 #include "system/shaders/common/directional_light.glsl"
 #include "system/shaders/common/room.glsl"
+#include "system/shaders/common/grid.glsl"
 
 uniform Material material;
 
@@ -22,5 +23,5 @@ void main() {
   vec3 ambient = light.ambient * texResult;
   vec3 diffuse = light.diffuse * diffTheta * texResult;
 
-  color = vec4( ambient + diffuse, material.opacity );
+  color = vec4( ambient + diffuse, material.opacity ) + getGridPixel( fragPos.xy );
 }
