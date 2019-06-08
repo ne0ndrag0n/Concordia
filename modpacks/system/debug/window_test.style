@@ -1,31 +1,12 @@
-.-bb-scroll-test {
+.-bb-floating-test {
   left: 10;
   top: 10;
   width: 300;
   height: 200;
 
+  placement: Placement::FREE;
+
   Layout {
     gravity: Gravity::TOP;
   }
-}
-
-.context-menu-test {
-  placement: Placement::FREE;
-  left: 5;
-  top: 5;
-  width: 150;
-
-  Text {
-    font-size: 24.0;
-    padding: 3;
-    text-alignment: Orientation::LEFT;
-
-    fade: true;
-    fade-in-color: rgbaString( "848a94ff" );
-    fade-out-color: rgbaString( "36393Eff" );
-
-    background-color: rgbaString( "36393Eff" );
-    color: rgbaString( "FFFFFFFF" );
-  }
-
 }

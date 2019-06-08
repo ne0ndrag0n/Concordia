@@ -1,25 +1,3 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Window id="test-scroll-window" class="-bb-scroll-test" window-title="Scroll Test">
-  <Scroll id="test-scroll-scroll" class="-bb-scroll-test-widget">
-    <Layout>
-      <Text>abc</Text>
-      <Text>def</Text>
-      <Text>ghi</Text>
-      <Text>jkl</Text>
-      <Text>mno</Text>
-      <Text>pqr</Text>
-      <Text>stu</Text>
-      <Text>vwx</Text>
-      <Text>yz0</Text>
-	    <Text>abcMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM</Text>
-      <Text>def</Text>
-      <Text>ghi</Text>
-      <Text>jkl</Text>
-      <Text>mno</Text>
-      <Text>pqr</Text>
-      <Text>stu</Text>
-      <Text>vwx</Text>
-      <Text>yz0</Text>
-    </Layout>
-  </Scroll>
-</Window>
+<FloatingPane class="-bb-floating-test">
+</FloatingPane>

@@ -66,3 +66,7 @@ ContextMenu {
     color: rgbaString( "FFFFFFFF" );
   }
 }
+
+FloatingPane {
+  background-color: rgbaString( "36393Eff" );
+}

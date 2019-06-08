@@ -12,6 +12,7 @@
 #include "models/infrastructure.hpp"
 #include "gameplay/entitymanager.hpp"
 #include "gameplay/infrastructuremanager.hpp"
+#include "gameplay/household/userinterface.hpp"
 #include "graphics/utilities/shader_manager.hpp"
 #include "serializable.hpp"
 #include <memory>
@@ -42,6 +43,8 @@ namespace BlueBear {
 
       Gameplay::InfrastructureManager infrastructureManager;
       Gameplay::EntityManager entityManager;
+
+      Gameplay::Household::UserInterface userInterface;
 
       void setupDisplayDevice();
       void setupInputDevice();

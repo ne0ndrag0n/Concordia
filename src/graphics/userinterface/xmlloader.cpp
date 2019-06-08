@@ -10,6 +10,7 @@
 #include "graphics/userinterface/widgets/pane.hpp"
 #include "graphics/userinterface/widgets/scroll.hpp"
 #include "graphics/userinterface/widgets/context_menu.hpp"
+#include "graphics/userinterface/widgets/floating_pane.hpp"
 #include "tools/utility.hpp"
 #include "log.hpp"
 
@@ -110,6 +111,13 @@ namespace BlueBear::Graphics::UserInterface {
       }
       case Tools::Utility::hash( "ContextMenu" ): {
         result = Widgets::ContextMenu::create(
+          Tools::Utility::safeString( element->Attribute( "id" ) ),
+          Tools::Utility::split( Tools::Utility::safeString( element->Attribute( "class" ) ), ' ' )
+        );
+        break;
+      }
+      case Tools::Utility::hash( "FloatingPane" ): {
+        result = Widgets::FloatingPane::create(
           Tools::Utility::safeString( element->Attribute( "id" ) ),
           Tools::Utility::split( Tools::Utility::safeString( element->Attribute( "class" ) ), ' ' )
         );
