@@ -1,3 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FloatingPane class="-bb-floating-test">
+	<Layout>
+		<Button>World Mode</Button>
+		<Button>Const Mode</Button>
+		<Button>House+Budget</Button>
+		<Spacer></Spacer>
+		<Layout class="-bb-ui-clock">
+			<Spacer></Spacer>
+			<Text>12:00 am Jan 1</Text>
+		</Layout>
+		<Spacer></Spacer>
+		<Button>PAUSE</Button>
+		<Button>PLAY</Button>
+		<Button>PLAY2x</Button>
+		<Button>Walls Roof</Button>
+		<Button>Walls Up</Button>
+		<Button>Walls Peek</Button>
+		<Button>Walls Down</Button>
+	</Layout>
 </FloatingPane>

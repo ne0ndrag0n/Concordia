@@ -2,11 +2,29 @@
   left: 10;
   top: subtract( getIntSetting( "viewport_y" ), 60 );
   width: subtract( getIntSetting( "viewport_x" ), 20 );
-  height: 50;
+  height: 45;
 
   placement: Placement::FREE;
 
+  Text {
+    font-size: 26.0;
+    color: rgbaString( "ffffffff" );
+    background-color: rgbaString( "00000000" );
+  }
+
   Layout {
-    gravity: Gravity::TOP;
+    gravity: Gravity::LEFT;
+
+    Spacer {
+      width: 30;
+    }
+
+    Layout.-bb-ui-clock {
+      gravity: Gravity::TOP;
+
+      Spacer {
+        height: 5;
+      }
+    }
   }
 }
