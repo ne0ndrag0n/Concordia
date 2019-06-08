@@ -63,6 +63,38 @@ namespace BlueBear {
                 throw TypeMismatchException();
               }
             }
+            case Tools::Utility::hash( "add" ): {
+              CallResult argument1 = resolveValue( functionCall.arguments.at( 0 ) );
+              CallResult argument2 = resolveValue( functionCall.arguments.at( 1 ) );
+
+              if( std::holds_alternative< int >( argument1 ) && std::holds_alternative< int >( argument2 ) ) {
+                return add( std::get< int >( argument1 ), std::get< int >( argument2 ) );
+              }
+            }
+            case Tools::Utility::hash( "subtract" ): {
+              CallResult argument1 = resolveValue( functionCall.arguments.at( 0 ) );
+              CallResult argument2 = resolveValue( functionCall.arguments.at( 1 ) );
+
+              if( std::holds_alternative< int >( argument1 ) && std::holds_alternative< int >( argument2 ) ) {
+                return subtract( std::get< int >( argument1 ), std::get< int >( argument2 ) );
+              }
+            }
+            case Tools::Utility::hash( "multiply" ): {
+              CallResult argument1 = resolveValue( functionCall.arguments.at( 0 ) );
+              CallResult argument2 = resolveValue( functionCall.arguments.at( 1 ) );
+
+              if( std::holds_alternative< int >( argument1 ) && std::holds_alternative< int >( argument2 ) ) {
+                return multiply( std::get< int >( argument1 ), std::get< int >( argument2 ) );
+              }
+            }
+            case Tools::Utility::hash( "divide" ): {
+              CallResult argument1 = resolveValue( functionCall.arguments.at( 0 ) );
+              CallResult argument2 = resolveValue( functionCall.arguments.at( 1 ) );
+
+              if( std::holds_alternative< int >( argument1 ) && std::holds_alternative< int >( argument2 ) ) {
+                return divide( std::get< int >( argument1 ), std::get< int >( argument2 ) );
+              }
+            }
             default:
               throw UndefinedSymbolException();
           }
@@ -85,6 +117,22 @@ namespace BlueBear {
           }
 
           return result;
+        }
+
+        int StyleApplier::add( int first, int last ) {
+          return first + last;
+        }
+
+        int StyleApplier::subtract( int first, int last ) {
+          return first - last;
+        }
+
+        int StyleApplier::multiply( int first, int last ) {
+          return first * last;
+        }
+
+        int StyleApplier::divide( int first, int last ) {
+          return first / last;
         }
 
         std::variant< Gravity, Requisition, Placement, Orientation, int > StyleApplier::identifier( const AST::Identifier& identifier ) {

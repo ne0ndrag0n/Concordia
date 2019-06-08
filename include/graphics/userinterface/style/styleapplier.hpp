@@ -37,6 +37,10 @@ namespace BlueBear {
 
           int getIntSetting( const std::string& key );
           glm::uvec4 rgbaString( const std::string& format );
+          int add( int first, int last );
+          int subtract( int first, int last );
+          int multiply( int first, int last );
+          int divide( int first, int last );
 
           std::vector< AST::PropertyList > desugar( AST::PropertyList propertyList, std::vector< AST::SelectorQuery > parentQueries = {} );
           bool elementMatches( std::shared_ptr< Element > element, const AST::PropertyList& propertyList );

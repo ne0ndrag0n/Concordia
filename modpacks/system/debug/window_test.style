@@ -1,8 +1,8 @@
 .-bb-floating-test {
   left: 10;
-  top: 10;
-  width: 300;
-  height: 200;
+  top: subtract( getIntSetting( "viewport_y" ), 60 );
+  width: subtract( getIntSetting( "viewport_x" ), 20 );
+  height: 50;
 
   placement: Placement::FREE;
 
