@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
 <FloatingPane class="-bb-floating-test">
 	<Layout>
 		<Button>World Mode</Button>
@@ -19,3 +20,12 @@
 		<Button>Walls Down</Button>
 	</Layout>
 </FloatingPane>
+-->
+
+<Window class="-bb-window-test">
+	<GridLayout>
+		<Text class="text-block-1">Text Block 1</Text>
+		<Text class="text-block-2">Text Block 2</Text>
+		<Text class="text-block-3">Text Block 3</Text>
+	</GridLayout>
+</Window>

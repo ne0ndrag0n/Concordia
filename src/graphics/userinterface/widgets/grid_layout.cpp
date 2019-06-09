@@ -22,15 +22,7 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 		for( const auto& column : columns ) { totalColumns += column; }
 		for( const auto& row : rows ) { totalRows += row; }
 
-		return { totalRows, totalColumns };
-	}
-
-	void GridLayout::reflow( bool selectorsInvalidated ) {
-		if( auto parent = getParent() ) {
-			parent->reflow( selectorsInvalidated );
-		} else {
-			Element::reflow( selectorsInvalidated );
-		}
+		return { totalColumns, totalRows };
 	}
 
 	// Heavy TODO
@@ -48,7 +40,7 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 		std::vector< int > rowSizes;
 		for( int rowSize : rows ) {
 			float factor = ( float ) rowSize / ( float ) gridDimensions.y;
-			columnSizes.emplace_back( std::round( ( float ) allocation[ 3 ] * factor ) );
+			rowSizes.emplace_back( std::round( ( float ) allocation[ 3 ] * factor ) );
 		}
 
 		auto it = children.begin();
@@ -62,13 +54,13 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 				// TODO: vertical-orientation/horizontal-orientation on grid elements
 				glm::ivec2 childPosition{ 0, 0 };
 				for( int ySub = 0; ySub != y; ySub++ ) {
-					for( int xSub = 0; xSub != x; xSub++ ) {
-						childPosition.x += columnSizes[ xSub ];
-						childPosition.y += rowSizes[ ySub ];
-					}
+					childPosition.y += rowSizes[ ySub ];
+				}
+				for( int xSub = 0; xSub != x; xSub++ ) {
+					childPosition.x += columnSizes[ xSub ];
 				}
 
-				( *it )->setAllocation( { childPosition.x, childPosition.y, columnSizes[ x ], columnSizes[ y ] }, false );
+				( *it )->setAllocation( { childPosition.x, childPosition.y, columnSizes[ x ], rowSizes[ y ] }, false );
 
 				++it;
 			}

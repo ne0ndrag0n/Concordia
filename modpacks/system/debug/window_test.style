@@ -28,3 +28,30 @@
     }
   }
 }
+
+.-bb-window-test {
+  left: 10;
+  top: 10;
+  width: 600;
+  height: 600;
+
+  GridLayout {
+    grid-columns: createLayout( 1, 2, 1 );
+
+    Text.text-block-1 {
+      background-color: rgbaString( "0000AAFF" );
+    }
+
+    Text.text-block-2 {
+      background-color: rgbaString( "00AA00FF" );
+    }
+
+    Text.text-block-3 {
+      background-color: rgbaString( "AA0000FF" );
+    }
+
+    Text.text-block-4 {
+      background-color: rgbaString( "AA00AAFF" );
+    }
+  }
+}

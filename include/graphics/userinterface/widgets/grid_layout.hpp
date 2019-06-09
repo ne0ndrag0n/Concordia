@@ -17,7 +17,6 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 		glm::ivec2 getGridDimensions() const;
 
 	public:
-		void reflow( bool selectorsInvalidated = true ) override;
 		void positionAndSizeChildren() override;
 		bool drawableDirty() override;
 		void generateDrawable() override;
