@@ -48,6 +48,8 @@ namespace BlueBear::Graphics::UserInterface {
           properties[ Scripting::LuaKit::Utility::cast< std::string >( frame.first ) ] = frame.second.as< std::string >();
         } else if( frame.second.is< glm::uvec4 >() ) {
           properties[ Scripting::LuaKit::Utility::cast< std::string >( frame.first ) ] = frame.second.as< glm::uvec4 >();
+        } else if( frame.second.is< LayoutProportions >() ) {
+          properties[ Scripting::LuaKit::Utility::cast< std::string >( frame.first ) ] = frame.second.as< LayoutProportions >();
         } else {
           throw LuaRegistrant::InvalidTypeException();
         }

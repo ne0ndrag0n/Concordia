@@ -38,8 +38,6 @@ namespace BlueBear {
         }
 
         StyleApplier::CallResult StyleApplier::call( const AST::Call& functionCall ) {
-          CallResult result;
-
           if( functionCall.identifier.scope.size() > 0 ) {
             throw UndefinedSymbolException();
           }
@@ -61,6 +59,29 @@ namespace BlueBear {
                 return rgbaString( std::get< std::string >( argument ) );
               } else {
                 throw TypeMismatchException();
+              }
+            }
+            case Tools::Utility::hash( "createLayout" ): {
+              std::vector< int > args;
+
+              for( const auto& argument : functionCall.arguments ) {
+                CallResult value = resolveValue( argument );
+
+                if( std::holds_alternative< int >( value ) ) {
+                  args.emplace_back( std::get< int >( value ) );
+                } else {
+                  throw TypeMismatchException();
+                }
+              }
+
+              return createLayout( args );
+            }
+            case Tools::Utility::hash( "getPlacement" ): {
+              CallResult argument1 = resolveValue( functionCall.arguments.at( 0 ) );
+              CallResult argument2 = resolveValue( functionCall.arguments.at( 1 ) );
+
+              if( std::holds_alternative< int >( argument1 ) && std::holds_alternative< int >( argument2 ) ) {
+                return getPlacement( std::get< int >( argument1 ), std::get< int >( argument2 ) );
               }
             }
             case Tools::Utility::hash( "add" ): {
@@ -117,6 +138,14 @@ namespace BlueBear {
           }
 
           return result;
+        }
+
+        LayoutProportions StyleApplier::createLayout( const std::vector< int >& proportions ) {
+          return proportions;
+        }
+
+        glm::uvec4 StyleApplier::getPlacement( int x, int y ) {
+          return { x, y, 1, 1 };
         }
 
         int StyleApplier::add( int first, int last ) {

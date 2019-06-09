@@ -22,7 +22,7 @@ namespace BlueBear {
         }
 
         class StyleApplier {
-          using CallResult = std::variant< int, double, std::string, bool, Gravity, Requisition, Placement, Orientation, glm::uvec4 >;
+          using CallResult = std::variant< int, double, std::string, bool, Gravity, Requisition, Placement, Orientation, glm::uvec4, LayoutProportions >;
           struct AppliedStyle {
             int specificity = -1;
             std::vector< AST::PropertyList > lists;
@@ -37,6 +37,8 @@ namespace BlueBear {
 
           int getIntSetting( const std::string& key );
           glm::uvec4 rgbaString( const std::string& format );
+          LayoutProportions createLayout( const std::vector< int >& proportions );
+          glm::uvec4 getPlacement( int x, int y );
           int add( int first, int last );
           int subtract( int first, int last );
           int multiply( int first, int last );

@@ -43,6 +43,8 @@ namespace BlueBear {
         RIGHT
       };
 
+      using LayoutProportions = std::vector< int >;
+
       // luaregistrant.cpp manually enumerates these due to a sol2 bug
       using PropertyListType = std::variant<
         bool,
@@ -53,7 +55,8 @@ namespace BlueBear {
         Placement,
         Orientation,
         std::string,
-        glm::uvec4
+        glm::uvec4,
+        LayoutProportions
       >;
 
       class PropertyList {
