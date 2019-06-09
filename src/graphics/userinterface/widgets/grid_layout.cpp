@@ -43,27 +43,39 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 			rowSizes.emplace_back( std::round( ( float ) allocation[ 3 ] * factor ) );
 		}
 
-		auto it = children.begin();
-		for( int y = 0; y != rowSizes.size(); y++ ) {
-			for( int x = 0; x != columnSizes.size(); x++ ) {
-				if( it == children.end() ) {
-					Log::getInstance().warn( "GridLayout::positionAndSizeChildren", "Out of children to place in grid" );
-					return;
-				}
+		int i = 0;
+		for( auto& child : children ) {
+			glm::ivec2 gridCell{ i % gridDimensions.x, i / gridDimensions.x };
 
-				// TODO: vertical-orientation/horizontal-orientation on grid elements
-				glm::ivec2 childPosition{ 0, 0 };
-				for( int ySub = 0; ySub != y; ySub++ ) {
-					childPosition.y += rowSizes[ ySub ];
-				}
-				for( int xSub = 0; xSub != x; xSub++ ) {
-					childPosition.x += columnSizes[ xSub ];
-				}
+			glm::ivec2 childPosition{
+				[ & ] {
+					int total = 0;
 
-				( *it )->setAllocation( { childPosition.x, childPosition.y, columnSizes[ x ], rowSizes[ y ] }, false );
+					for( int x = 0; x != gridCell.x; x++ ) {
+						total += columnSizes[ x % columnSizes.size() ];
+					}
 
-				++it;
-			}
+					return total;
+				}(),
+				[ & ] {
+					int total = 0;
+
+					for( int y = 0; y != gridCell.y; y++ ) {
+						total += rowSizes[ y % rowSizes.size() ];
+					}
+
+					return total;
+				}()
+			};
+
+			child->setAllocation( {
+				childPosition.x,
+				childPosition.y,
+				columnSizes[ gridCell.x % columnSizes.size() ],
+				rowSizes[ gridCell.y % rowSizes.size() ]
+			}, false );
+
+			i++;
 		}
 	}
 
