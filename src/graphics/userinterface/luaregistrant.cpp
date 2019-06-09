@@ -120,6 +120,8 @@ namespace BlueBear::Graphics::UserInterface {
       return newPointer;
     } else if( auto newPointer = std::dynamic_pointer_cast< Widgets::FloatingPane >( self ) ) {
       return newPointer;
+    } else if( auto newPointer = std::dynamic_pointer_cast< Widgets::GridLayout >( self ) ) {
+      return newPointer;
     } else {
       // You tried and failed
       return std::shared_ptr< Element >( nullptr );
@@ -357,6 +359,15 @@ namespace BlueBear::Graphics::UserInterface {
       "new", sol::no_constructor,
       "create", []( const std::string& id, sol::table classes ) {
         return Widgets::FloatingPane::create( id, Scripting::LuaKit::Utility::tableToVector< std::string >( classes ) );
+      },
+      sol::base_classes, sol::bases< Element >()
+    );
+
+    types.new_usertype< Widgets::GridLayout >(
+      "GridLayout",
+      "new", sol::no_constructor,
+      "create", []( const std::string& id, sol::table classes ) {
+        return Widgets::GridLayout::create( id, Scripting::LuaKit::Utility::tableToVector< std::string >( classes ) );
       },
       sol::base_classes, sol::bases< Element >()
     );

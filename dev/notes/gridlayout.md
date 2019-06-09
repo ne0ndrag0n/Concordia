@@ -9,6 +9,7 @@ GridLayout control will be a more coherent version of the current Layout control
 
 ### Applied to GridLayout
 `grid-columns` - Specify a number and proportion of columns.
+
 `grid-rows` - Specify a number and proportion of rows.
 
 ### Applied to children
@@ -19,6 +20,7 @@ GridLayout control will be a more coherent version of the current Layout control
 
 ## New Functions
 `LayoutProportions createLayout( ... )` - Specify a total number of rows/columns and a proportion in a layout.
+
 `glm::uvec4 getPlacement( x, y )` - Specify the cell coordinates of a manual child element grid placement.
 
 ## Existing Properties
