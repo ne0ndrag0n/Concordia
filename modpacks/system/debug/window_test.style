@@ -36,7 +36,9 @@
   height: 600;
 
   GridLayout {
-    grid-columns: createLayout( 1, 2, 1 );
+    grid-columns: createLayout( 1, 1 );
+    grid-rows: createLayout( 1, 1 );
+    padding: 10;
 
     Text.text-block-1 {
       background-color: rgbaString( "0000AAFF" );

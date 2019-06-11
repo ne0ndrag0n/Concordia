@@ -29,6 +29,8 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 		const auto& columns = localStyle.get< LayoutProportions >( "grid-columns" );
 		std::vector< int > result;
 
+		int availableSpace = allocation[ 2 ] - ( std::max( 0, ( int ) columns.size() - 1 ) * localStyle.get< int >( "padding" ) );
+
 		int total = 0;
 		for( const int column : columns ) {
 			total += column;
@@ -36,7 +38,7 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 
 		for( const int column : columns ) {
 			float percent = ( float ) column / ( float ) total;
-			result.emplace_back( percent * allocation[ 2 ] );
+			result.emplace_back( percent * availableSpace );
 		}
 
 		return result;
@@ -61,10 +63,12 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 			denominator += row;
 		}
 
-		std::vector< int > result( total, ( 1.0f / ( float ) denominator ) * allocation[ 3 ] );
+		int availableSpace = allocation[ 3 ] - ( std::max( 0, ( int ) rows.size() - 1 ) * localStyle.get< int >( "padding" ) );
+
+		std::vector< int > result( total, ( 1.0f / ( float ) denominator ) * availableSpace );
 		for( int i = 0; i < rows.size() && i < result.size(); i++ ) {
 			float percent = ( float ) rows[ i ] / ( float ) denominator;
-			result[ i ] = percent * allocation[ 3 ];
+			result[ i ] = percent * availableSpace;
 		}
 
 		return result;
@@ -74,6 +78,7 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 	void GridLayout::positionAndSizeChildren() {
 		auto columnSizes = getColumnSizes();
 		auto rowSizes = getRowSizes( columnSizes.size() );
+		int padding = localStyle.get< int >( "padding" );
 
 		glm::ivec2 gridDimensions = { columnSizes.size(), rowSizes.size() };
 
@@ -87,6 +92,7 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 
 					for( int x = 0; x != gridCell.x; x++ ) {
 						total += columnSizes[ x ];
+						if( x != gridDimensions.x - 1 ) { total += padding; }
 					}
 
 					return total;
@@ -96,6 +102,7 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 
 					for( int y = 0; y != gridCell.y; y++ ) {
 						total += rowSizes[ y ];
+						if( y != gridDimensions.y - 1 ) { total += padding; }
 					}
 
 					return total;
