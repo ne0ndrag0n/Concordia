@@ -48,10 +48,22 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 			total++;
 		}
 
-		std::vector< int > result( total, ( 1.0f / ( float ) total ) * allocation[ 3 ] );
-		const auto& rows = localStyle.get< LayoutProportions >( "grid-rows" );
+		// Pad grid-rows such that it's equal to the number of rows required
+		LayoutProportions rows = localStyle.get< LayoutProportions >( "grid-rows" );
+		int difference = std::max( 0, ( int ) ( total - rows.size() ) );
+		for( int i = 0; i != difference; i++ ) {
+			rows.emplace_back( 1 );
+		}
+
+		// Calculate denominator
+		int denominator = 0;
+		for( const int row : rows ) {
+			denominator += row;
+		}
+
+		std::vector< int > result( total, ( 1.0f / ( float ) denominator ) * allocation[ 3 ] );
 		for( int i = 0; i < rows.size() && i < result.size(); i++ ) {
-			float percent = ( float ) rows[ i ] / ( float ) total;
+			float percent = ( float ) rows[ i ] / ( float ) denominator;
 			result[ i ] = percent * allocation[ 3 ];
 		}
 

@@ -27,5 +27,6 @@
 		<Text class="text-block-1">Text Block 1</Text>
 		<Text class="text-block-2">Text Block 2</Text>
 		<Text class="text-block-3">Text Block 3</Text>
+		<Text class="text-block-4">Text Block 4</Text>
 	</GridLayout>
 </Window>
