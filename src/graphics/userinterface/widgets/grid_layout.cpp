@@ -14,34 +14,56 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 
 	glm::ivec2 GridLayout::getGridDimensions() const {
 		LayoutProportions columns = localStyle.get< LayoutProportions >( "grid-columns" );
-		LayoutProportions rows    = localStyle.get< LayoutProportions >( "grid-rows" );
 
-		int totalColumns = 0;
-		int totalRows = 0;
+		// Number of children / columns = rows
+		// Add an extra row for any nonzero remainder
+		int calculatedRows = children.size() / columns.size();
+		if( children.size() % columns.size() ) {
+			calculatedRows++;
+		}
 
-		for( const auto& column : columns ) { totalColumns += column; }
-		for( const auto& row : rows ) { totalRows += row; }
+		return { columns.size(), calculatedRows };
+	}
 
-		return { totalColumns, totalRows };
+	std::vector< int > GridLayout::getColumnSizes() const {
+		const auto& columns = localStyle.get< LayoutProportions >( "grid-columns" );
+		std::vector< int > result;
+
+		int total = 0;
+		for( const int column : columns ) {
+			total += column;
+		}
+
+		for( const int column : columns ) {
+			float percent = ( float ) column / ( float ) total;
+			result.emplace_back( percent * allocation[ 2 ] );
+		}
+
+		return result;
+	}
+
+	std::vector< int > GridLayout::getRowSizes( int numColumns ) const {
+		int total = children.size() / numColumns;
+		if( children.size() % numColumns ) {
+			total++;
+		}
+
+		std::vector< int > result( total, ( 1.0f / ( float ) total ) * allocation[ 3 ] );
+		const auto& rows = localStyle.get< LayoutProportions >( "grid-rows" );
+		for( int i = 0; i < rows.size() && i < result.size(); i++ ) {
+			float percent = ( float ) rows[ i ] / ( float ) total;
+			result[ i ] = percent * allocation[ 3 ];
+		}
+
+		return result;
 	}
 
 	// Heavy TODO
 	void GridLayout::positionAndSizeChildren() {
-		glm::ivec2 gridDimensions = getGridDimensions();
-		LayoutProportions columns = localStyle.get< LayoutProportions >( "grid-columns" );
-		LayoutProportions rows = localStyle.get< LayoutProportions >( "grid-rows" );
+		auto columnSizes = getColumnSizes();
+		auto rowSizes = getRowSizes( columnSizes.size() );
 
-		std::vector< int > columnSizes;
-		for( int columnSize : columns ) {
-			float factor = ( float ) columnSize / ( float ) gridDimensions.x;
-			columnSizes.emplace_back( std::round( ( float ) allocation[ 2 ] * factor ) );
-		}
-
-		std::vector< int > rowSizes;
-		for( int rowSize : rows ) {
-			float factor = ( float ) rowSize / ( float ) gridDimensions.y;
-			rowSizes.emplace_back( std::round( ( float ) allocation[ 3 ] * factor ) );
-		}
+		glm::ivec2 gridDimensions = { columnSizes.size(), rowSizes.size() };
 
 		int i = 0;
 		for( auto& child : children ) {
@@ -52,7 +74,7 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 					int total = 0;
 
 					for( int x = 0; x != gridCell.x; x++ ) {
-						total += columnSizes[ x % columnSizes.size() ];
+						total += columnSizes[ x ];
 					}
 
 					return total;
@@ -61,7 +83,7 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 					int total = 0;
 
 					for( int y = 0; y != gridCell.y; y++ ) {
-						total += rowSizes[ y % rowSizes.size() ];
+						total += rowSizes[ y ];
 					}
 
 					return total;
@@ -71,8 +93,8 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 			child->setAllocation( {
 				childPosition.x,
 				childPosition.y,
-				columnSizes[ gridCell.x % columnSizes.size() ],
-				rowSizes[ gridCell.y % rowSizes.size() ]
+				columnSizes[ gridCell.x ],
+				rowSizes[ gridCell.y ]
 			}, false );
 
 			i++;

@@ -16,6 +16,9 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 		GridLayout( const std::string& id, const std::vector< std::string >& classes );
 		glm::ivec2 getGridDimensions() const;
 
+		std::vector< int > getColumnSizes() const;
+		std::vector< int > getRowSizes( int numColumns ) const;
+
 	public:
 		void positionAndSizeChildren() override;
 		bool drawableDirty() override;
