@@ -1,32 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
 <FloatingPane class="-bb-floating-test">
-	<Layout>
-		<Button>World Mode</Button>
-		<Button>Const Mode</Button>
-		<Button>House+Budget</Button>
-		<Spacer></Spacer>
-		<Layout class="-bb-ui-clock">
+	<GridLayout class="-bb-parent-layout">
+		<GridLayout class="-bb-button-rig">
+			<Button>World Mode</Button>
+			<Button>Construct Mode</Button>
+			<Button>House+Budget</Button>
+		</GridLayout>
+		<GridLayout class="-bb-ui-clock">
 			<Spacer></Spacer>
 			<Text>12:00 am Jan 1</Text>
-		</Layout>
-		<Spacer></Spacer>
-		<Button>PAUSE</Button>
-		<Button>PLAY</Button>
-		<Button>PLAY2x</Button>
-		<Button>Walls Roof</Button>
-		<Button>Walls Up</Button>
-		<Button>Walls Peek</Button>
-		<Button>Walls Down</Button>
-	</Layout>
-</FloatingPane>
--->
-
-<Window class="-bb-window-test">
-	<GridLayout>
-		<Text class="text-block-1">Text Block 1</Text>
-		<Text class="text-block-2">Text Block 2</Text>
-		<Text class="text-block-3">Text Block 3</Text>
-		<Text class="text-block-4">Text Block 4</Text>
+		</GridLayout>
+		<GridLayout class="-bb-ui-speed">
+			<Button>&#xF04C;</Button>
+			<Button>&#xF04B;</Button>
+			<Button>&#xF050;</Button>
+		</GridLayout>
+		<GridLayout class="-bb-wall-buttons">
+			<Button>Walls Roof</Button>
+			<Button>Walls Up</Button>
+			<Button>Walls Peek</Button>
+			<Button>Walls Down</Button>
+		</GridLayout>
 	</GridLayout>
-</Window>
+</FloatingPane>

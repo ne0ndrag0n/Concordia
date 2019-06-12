@@ -5,6 +5,7 @@
   height: 45;
 
   placement: Placement::FREE;
+  background-color: rgbaString( "000000FF" );
 
   Text {
     font-size: 26.0;
@@ -12,21 +13,36 @@
     background-color: rgbaString( "00000000" );
   }
 
-  Layout {
-    gravity: Gravity::LEFT;
+  GridLayout.-bb-parent-layout {
+    grid-columns: createLayout( 2, 1, 1, 2 );
 
-    Spacer {
-      width: 30;
+    GridLayout.-bb-button-rig {
+      grid-columns: createLayout( 1, 1, 1 );
     }
 
-    Layout.-bb-ui-clock {
-      gravity: Gravity::TOP;
+    GridLayout.-bb-ui-clock {
+      grid-columns: createLayout( 1 );
+      grid-rows: createLayout( 1, 5 );
 
-      Spacer {
-        height: 5;
+      Text {
+        color: rgbaString( "3ED9F8ff" );
       }
     }
+
+    GridLayout.-bb-ui-speed {
+      grid-columns: createLayout( 1, 1, 1 );
+
+      Button {
+        font: "fontawesome";
+      }
+    }
+
+    GridLayout.-bb-wall-buttons {
+      grid-columns: createLayout( 1, 1, 1, 1 );
+    }
+
   }
+
 }
 
 .-bb-window-test {
