@@ -164,6 +164,12 @@ namespace BlueBear {
         // abstract !
       }
 
+      void Element::calculate() {
+        for( auto& child : children ) {
+          child->calculate();
+        }
+      }
+
       std::vector< std::shared_ptr< Element > > Element::getChildren() const {
         return children;
       }

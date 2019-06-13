@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-->
 <FloatingPane class="-bb-floating-test">
 	<GridLayout class="-bb-parent-layout">
 		<GridLayout class="-bb-button-rig">
@@ -23,3 +24,13 @@
 		</GridLayout>
 	</GridLayout>
 </FloatingPane>
+-->
+
+<Window class="-bb-window-test" window-title="FixedLayout">
+	<FixedLayout>
+		<Text class="text-block-1">bread</Text>
+		<Text class="text-block-2">spam</Text>
+		<Text class="text-block-3">eggs</Text>
+		<Text class="text-block-4">milk</Text>
+	</FixedLayout>
+</Window>

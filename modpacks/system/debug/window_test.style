@@ -51,25 +51,45 @@
   width: 600;
   height: 600;
 
+  Text.text-block-1 {
+    left: 10;
+    top: 10;
+    width: 300;
+    height: 300;
+
+    background-color: rgbaString( "0000AAFF" );
+  }
+
+  Text.text-block-2 {
+    left: 30;
+    top: 30;
+    width: 300;
+    height: 300;
+
+    background-color: rgbaString( "00AA00FF" );
+  }
+
+  Text.text-block-3 {
+    left: 50;
+    top: 50;
+    width: 300;
+    height: 300;
+
+    background-color: rgbaString( "AA0000FF" );
+  }
+
+  Text.text-block-4 {
+    left: 70;
+    top: 70;
+    width: 300;
+    height: 300;
+
+    background-color: rgbaString( "AA00AAFF" );
+  }
+
   GridLayout {
     grid-columns: createLayout( 1, 1 );
     grid-rows: createLayout( 1, 1 );
     padding: 10;
-
-    Text.text-block-1 {
-      background-color: rgbaString( "0000AAFF" );
-    }
-
-    Text.text-block-2 {
-      background-color: rgbaString( "00AA00FF" );
-    }
-
-    Text.text-block-3 {
-      background-color: rgbaString( "AA0000FF" );
-    }
-
-    Text.text-block-4 {
-      background-color: rgbaString( "AA00AAFF" );
-    }
   }
 }

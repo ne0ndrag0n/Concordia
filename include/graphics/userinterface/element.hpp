@@ -79,7 +79,7 @@ namespace BlueBear {
         virtual void positionAndSizeChildren();
         virtual void setChildrenZOrder();
         virtual void render( Graphics::Vector::Renderer& renderer );
-        virtual void calculate() = 0;
+        virtual void calculate();
 
         const std::string& getTag() const;
         const std::string& getId() const;
