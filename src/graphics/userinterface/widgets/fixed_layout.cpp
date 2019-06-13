@@ -14,6 +14,10 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 	}
 
 	void FixedLayout::positionAndSizeChildren() {
+          if( getParent() == nullptr ) {
+            calculate();
+          }
+
 		for( auto& child : children ) {
 			int width = child->getPropertyList().get< int >( "width" );
 			int height = child->getPropertyList().get< int >( "height" );

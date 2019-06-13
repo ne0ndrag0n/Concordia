@@ -2,7 +2,7 @@
 #include "device/display/display.hpp"
 #include "device/input/input.hpp"
 #include "graphics/userinterface/element.hpp"
-#include "graphics/userinterface/widgets/layout.hpp"
+#include "graphics/userinterface/widgets/fixed_layout.hpp"
 #include "graphics/userinterface/propertylist.hpp"
 #include "graphics/userinterface/drawable.hpp"
 #include "graphics/userinterface/draghelper.hpp"
@@ -30,7 +30,7 @@ namespace BlueBear {
             Adapter::Adapter( display ),
             vector( display ),
             guiShader( shaderManager.getShader( "system/shaders/gui/vertex.glsl", "system/shaders/gui/fragment.glsl" ) ),
-            rootElement( Graphics::UserInterface::Widgets::Layout::create( "", {} ) ),
+            rootElement( Graphics::UserInterface::Widgets::FixedLayout::create( "", {} ) ),
             styleManager( rootElement ) {
               Graphics::UserInterface::Element::manager = this;
 

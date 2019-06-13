@@ -1,9 +1,8 @@
 .-bb-terminal-pane {
-  placement: Placement::FREE;
   drop-shadow-bottom: true;
   top: 0;
   left: 0;
-  width: Requisition::FILL_PARENT;
+  width: getIntSetting( "viewport_x" );
   height: 450;
   background-color: rgbaString( "00000066" );
 
