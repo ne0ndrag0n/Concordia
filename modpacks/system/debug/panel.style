@@ -61,7 +61,7 @@
       Image {
         placement: Placement::FREE;
         top: 50;
-        left: 426;
+        left: subtract( divide( getIntSetting( "viewport_x" ), 2 ), 150 );
       }
     }
 
