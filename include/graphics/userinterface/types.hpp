@@ -15,6 +15,7 @@
 #include "graphics/userinterface/widgets/floating_pane.hpp"
 #include "graphics/userinterface/widgets/grid_layout.hpp"
 #include "graphics/userinterface/widgets/fixed_layout.hpp"
+#include "graphics/userinterface/widgets/composite_layout.hpp"
 #include <memory>
 #include <variant>
 
@@ -37,7 +38,8 @@ namespace BlueBear::Graphics::UserInterface {
     std::shared_ptr< Widgets::ContextMenu >,
     std::shared_ptr< Widgets::FloatingPane >,
     std::shared_ptr< Widgets::GridLayout >,
-    std::shared_ptr< Widgets::FixedLayout >
+    std::shared_ptr< Widgets::FixedLayout >,
+    std::shared_ptr< Widgets::CompositeLayout >
   >;
 
 }
