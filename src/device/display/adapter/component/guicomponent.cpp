@@ -38,7 +38,6 @@ namespace BlueBear {
               rootElement->getPropertyList().set< int >( "left", 0, false );
               rootElement->getPropertyList().set< int >( "width", ConfigManager::getInstance().getIntValue( "viewport_x" ), false );
               rootElement->getPropertyList().set< int >( "height", ConfigManager::getInstance().getIntValue( "viewport_y" ), false );
-              rootElement->getPropertyList().set< Graphics::UserInterface::Gravity >( "gravity", Graphics::UserInterface::Gravity::TOP, false );
               rootElement->setAllocation( {
                 0,
                 0,
