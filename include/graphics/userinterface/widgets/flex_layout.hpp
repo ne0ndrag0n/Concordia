@@ -15,10 +15,9 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 
 		bool isHorizontal() const;
 		bool isForward() const;
-		glm::ivec2 getDirection() const;
-		glm::ivec2 getElementsSize() const;
-		glm::ivec2 getLiteralSize( const std::shared_ptr< Element >& child ) const;
+
 		glm::ivec2 getOrigin() const;
+		glm::ivec2 getDirection() const;
 
 	public:
 		void positionAndSizeChildren() override;
