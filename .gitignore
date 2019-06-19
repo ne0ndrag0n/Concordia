@@ -3,3 +3,7 @@ bluebear.log
 *.o
 test/test
 .vscode/ipch
+cncrda64
+CMakeCache.txt
+cmake_install.cmake
+CMakeFiles/
