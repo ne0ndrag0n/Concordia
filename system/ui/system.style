@@ -1,4 +1,5 @@
 Window {
+  placement: Placement::FREE;
   background-color: rgbaString( "36393Eff" );
   draggable: true;
 

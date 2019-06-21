@@ -85,6 +85,7 @@ namespace BlueBear::Scripting::EntityKit::Components {
 
 			menu->getPropertyList().set< int >( "left", event.mouseLocation.x );
 			menu->getPropertyList().set< int >( "top", event.mouseLocation.y );
+			menu->getPropertyList().set< Graphics::UserInterface::Placement >( "placement", Graphics::UserInterface::Placement::FREE );
 
 			menuModel = model;
 		}
