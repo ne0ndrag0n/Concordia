@@ -4,44 +4,57 @@ project(
     VERSION 0.0.4
 )
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_BUILD_TYPE Debug)
+
+find_package(Threads REQUIRED)
+find_package(Lua 5.3 EXACT REQUIRED)
+find_package(GLEW REQUIRED)
+set(OpenGL_GL_PREFERENCE LEGACY)
+find_package(OpenGL REQUIRED)
+find_package(assimp 4.1 REQUIRED)
+find_package(TBB 2017.0 REQUIRED)
+find_package(SFML 2.4 REQUIRED COMPONENTS graphics window system)
+find_package(jsoncpp REQUIRED)
 
 add_definitions(-DSOL_SAFE_FUNCTION=1)
 
 file(GLOB_RECURSE CONCORDIA_SRC ${CMAKE_SOURCE_DIR}/src/*.cpp)
 add_executable(cncrda64 ${CONCORDIA_SRC})
 
-target_include_directories(cncrda64 PUBLIC ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/lib ${CMAKE_SOURCE_DIR}/lib/nanovg)
+find_path(TINYXML2_INCLUDE_DIR "tinyxml2.h")
 
-find_library(LIB_PTHREAD pthread)
-find_library(LIB_TBB tbb)
-find_library(LIB_ASSIMP assimp)
-find_library(LIB_GLEW GLEW)
-find_library(LIB_GL GL)
-find_library(LIB_SFML_GRAPHICS sfml-graphics)
-find_library(LIB_SFML_WINDOW sfml-window)
-find_library(LIB_SFML_SYSTEM sfml-system)
+find_library(LIB_ASSIMP ${ASSIMP_LIBRARIES})
 find_library(LIB_TINYXML2 tinyxml2)
-find_library(LIB_JSONCPP jsoncpp)
-find_library(LIB_LUA lua)
-find_library(LIB_DL dl)
 find_library(LIB_NANOVG nanovg PATHS ${CMAKE_SOURCE_DIR}/lib/nanovg)
+
+get_target_property(JSON_INC_PATH jsoncpp_lib INTERFACE_INCLUDE_DIRECTORIES)
+
+target_include_directories(cncrda64 PUBLIC
+    ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/lib ${CMAKE_SOURCE_DIR}/lib/nanovg
+    ${LUA_INCLUDE_DIR}
+    ${GLEW_INCLUDE_DIRS}
+    ${OPENGL_INCLUDE_DIR}
+    ${ASSIMP_INCLUDE_DIRS}
+    ${TBB_INCLUDE_DIRS}
+    ${TINYXML2_INCLUDE_DIR}
+    ${SFML_INCLUDE_DIR}
+    ${JSON_INC_PATH}
+)
 
 target_link_libraries(
     cncrda64
-    ${LIB_PTHREAD}
-    ${LIB_TBB}
+    ${CMAKE_THREAD_LIBS_INIT}
+    ${TBB_LIBRARIES}
     ${LIB_ASSIMP}
-    ${LIB_GLEW}
-    ${LIB_GL}
-    ${LIB_SFML_GRAPHICS}
-    ${LIB_SFML_WINDOW}
-    ${LIB_SFML_SYSTEM}
+    ${GLEW_LIBRARIES}
+    ${OPENGL_LIBRARIES}
+    ${SFML_LIBRARIES}
     ${LIB_TINYXML2}
-    ${LIB_JSONCPP}
-    ${LIB_LUA}
-    ${LIB_DL}
+    jsoncpp_lib
+    ${LUA_LIBRARIES}
     ${LIB_NANOVG}
 )
