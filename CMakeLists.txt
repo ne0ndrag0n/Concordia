@@ -20,7 +20,7 @@ find_package(TBB 2017.0 REQUIRED)
 find_package(SFML 2.4 REQUIRED COMPONENTS graphics window system)
 find_package(jsoncpp REQUIRED)
 
-add_definitions(-DSOL_SAFE_FUNCTION=1)
+add_definitions(-DSOL_SAFE_FUNCTION=1 -DGLM_FORCE_COMPILER_UNKNOWN)
 
 file(GLOB_RECURSE CONCORDIA_SRC ${CMAKE_SOURCE_DIR}/src/*.cpp)
 add_executable(cncrda64 ${CONCORDIA_SRC})
