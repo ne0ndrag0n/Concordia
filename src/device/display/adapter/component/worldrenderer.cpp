@@ -24,8 +24,9 @@ namespace BlueBear {
         namespace Component {
 
           WorldRenderer::WorldRenderer( Device::Display::Display& display, Graphics::Utilities::ShaderManager& shaderManager ) :
-            Adapter::Adapter( display ), shaderManager( shaderManager ), cache( shaderManager ),
-            camera( Graphics::Camera( ConfigManager::getInstance().getIntValue( "viewport_x" ), ConfigManager::getInstance().getIntValue( "viewport_y" ) ) ) {
+            Adapter::Adapter( display ),
+            camera( Graphics::Camera( ConfigManager::getInstance().getIntValue( "viewport_x" ), ConfigManager::getInstance().getIntValue( "viewport_y" ) ) ),
+            shaderManager( shaderManager ), cache( shaderManager ) {
               eventManager.LUA_STATE_READY.listen( this, std::bind( &WorldRenderer::submitLuaContributions, this, std::placeholders::_1 ) );
 
               asyncTasks.setAmountPerFrame( 333 );
@@ -36,7 +37,7 @@ namespace BlueBear {
           }
 
           Json::Value WorldRenderer::save() {
-
+            return Json::Value::null;
           }
 
           void WorldRenderer::load( const Json::Value& data ) {
@@ -256,7 +257,7 @@ namespace BlueBear {
             if( it != originals.end() ) {
               std::shared_ptr< Graphics::SceneGraph::Model > copy = it->second->copy();
 
-              std::unique_ptr< ModelRegistration > registration = std::make_unique< ModelRegistration >( ModelRegistration{ objectId, classes, copy } );
+              std::unique_ptr< ModelRegistration > registration = std::make_unique< ModelRegistration >( ModelRegistration{ objectId, classes, copy, {} } );
 
               models.emplace_back( std::move( registration ) );
               MODEL_ADDED.trigger( copy );

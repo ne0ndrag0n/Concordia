@@ -47,9 +47,7 @@ namespace BlueBear {
                 specificity += 100;
               }
 
-              for( auto& clss : classes ) {
-                specificity += 10;
-              }
+              specificity += 10 * classes.size();
 
               if( tag.length() ) {
                 specificity += 1;

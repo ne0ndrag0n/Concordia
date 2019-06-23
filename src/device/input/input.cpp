@@ -571,7 +571,7 @@ namespace BlueBear {
       unsigned int Input::registerInputEvent( sf::Event::EventType type, std::function< void( Metadata ) > callback ) {
         auto& collection = events[ type ];
 
-        for( int i = 0; i != collection.size(); i++ ) {
+        for( size_t i = 0; i != collection.size(); i++ ) {
           if( !collection[ i ] ) {
             collection[ i ] = callback;
             return i;
@@ -585,7 +585,7 @@ namespace BlueBear {
       void Input::unregisterInputEvent( sf::Event::EventType type, int id ) {
         if( events.find( type ) != events.end() ) {
           std::vector< std::function< void( Metadata ) > >& vector = events[ type ];
-          if( id < vector.size() ) {
+          if( id < ( int ) vector.size() ) {
             vector[ id ] = std::function< void( Metadata ) >();
           }
         }
@@ -607,6 +607,7 @@ namespace BlueBear {
               if( eatKeyEvents ) {
                 break;
               }
+              [[fallthrough]];
             }
             default:
               handleEvent( event );

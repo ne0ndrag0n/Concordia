@@ -11,6 +11,7 @@ namespace BlueBear::Gameplay {
 
 	Json::Value EntityManager::save() {
 		// TODO
+		return Json::Value::null;
 	}
 
 	void EntityManager::load( const Json::Value& data ) {
