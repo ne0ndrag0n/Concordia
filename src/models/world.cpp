@@ -73,7 +73,7 @@ namespace BlueBear::Models {
   }
 
   Json::Value World::save() {
-
+    return Json::Value::null;
   }
 
   void World::load( const Json::Value& data ) {

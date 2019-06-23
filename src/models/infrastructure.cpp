@@ -6,7 +6,7 @@
 namespace BlueBear::Models {
 
   Json::Value Infrastructure::save() {
-
+    return Json::Value::null;
   }
 
   void Infrastructure::load( const Json::Value& data, Utilities::WorldCache& worldCache ) {

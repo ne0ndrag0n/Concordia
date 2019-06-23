@@ -6,7 +6,9 @@ namespace BlueBear::Scripting::EntityKit {
 
   Component::Component( const std::string& componentId ) : componentId( componentId ) {}
 
-  Json::Value Component::save() {}
+  Json::Value Component::save() {
+    return Json::Value::null;
+  }
 
   void Component::load( const Json::Value& data ) {}
 

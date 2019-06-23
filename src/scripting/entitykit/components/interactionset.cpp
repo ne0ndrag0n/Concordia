@@ -25,6 +25,7 @@ namespace BlueBear::Scripting::EntityKit::Components {
 
 	Json::Value InteractionSet::save() {
 		// TODO
+		return Json::Value::null;
 	}
 
   void InteractionSet::load( const Json::Value& data ) {
