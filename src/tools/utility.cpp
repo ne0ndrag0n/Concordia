@@ -17,16 +17,13 @@
 #include <sstream>
 #include <limits>
 
-// Not X-Platform
-#ifndef _WIN32
-	#include <dirent.h>
-	#include <unistd.h>
-	#include <sys/stat.h>
+#if defined(_WIN32) || defined(FS_EXPERIMENTAL)
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+#else
+#include <filesystem>
+namespace fs = std::filesystem;
 #endif
-
-// Not X-Platform
-#define likely(x)      __builtin_expect(!!(x), 1)
-#define unlikely(x)    __builtin_expect(!!(x), 0)
 
 namespace BlueBear {
 	namespace Tools {
@@ -80,161 +77,15 @@ namespace BlueBear {
 		}
 
 		/**
-		 * @noxplatform
-		 *
 		 * Gets a collection of subdirectories for the given directory
 		 */
 		std::vector< std::string > Utility::getSubdirectoryList( const char* rootSubDirectory ) {
-			std::vector< std::string > directories;
-
-			#ifndef _WIN32
-			DIR *dir = opendir( rootSubDirectory );
-
-			if( !dir ) {
-				Log::getInstance().error( "Utility::getSubdirectoryList", "Directory not found! " + std::string( rootSubDirectory ) );
-				return directories;
+			std::vector< std::string > result;
+			for( const auto& entry : fs::directory_iterator( rootSubDirectory ) ) {
+				result.emplace_back( entry.path().filename() );
 			}
 
-			struct dirent* entry = readdir( dir );
-
-			while ( entry != NULL ) {
-				if ( strcmp( entry->d_name, "." ) != 0 && strcmp( entry->d_name, ".." ) != 0 ) {
-
-					// the unix API for this is FUCKING TERRIBLE!
-					if( entry->d_type == DT_DIR ) {
-						directories.push_back( entry->d_name );
-					} else if( entry->d_type == DT_UNKNOWN ) {
-						// avoid those garbage C methods for strings
-						std::string buffer = std::string( "" ) + rootSubDirectory + entry->d_name;
-						const char* path = buffer.c_str();
-
-						// black magic sourced from unix API docs
-						struct stat status;
-						if( stat( path, &status ) != -1 && S_ISDIR( status.st_mode ) ) {
-							directories.push_back( entry->d_name );
-						}
-					}
-				}
-
-				entry = readdir( dir );
-			}
-			#else
-				// STUB !!
-				// TODO: Windows directory listing
-			#endif
-
-			closedir( dir );
-			return directories;
-		}
-
-		/**
-		 * Returns not only a list of subdirectories, but also files included. This really should be combined
-		 * with the older function above.
-		 */
-		std::vector< Utility::DirectoryEntry > Utility::getFileList( const std::string& parent ) {
-			std::vector< Utility::DirectoryEntry > files;
-
-			#ifndef _WIN32
-
-			DIR* dir = opendir( parent.c_str() );
-			struct dirent* entry = readdir( dir );
-
-			while( entry != NULL ) {
-				// exclude current directory and parent directory
-				if( strcmp( entry->d_name, "." ) != 0 && strcmp( entry->d_name, ".." ) != 0 ) {
-
-					Utility::FilesystemType fsType;
-					switch( entry->d_type ) {
-						case DT_DIR:
-							fsType = Utility::FilesystemType::DIRECTORY;
-							break;
-						case DT_REG:
-							fsType = Utility::FilesystemType::FILE;
-							break;
-						default:
-							// Set it unknown for now. If you get problems, a check will need to be done similar above
-							// because some network-mounted filesystems may report DT_UNKNOWN as the file type.
-							//
-							// TODO: Enter this as a task now! Symlinks will fall back to FileystemType::UNKNOWN!!
-							break;
-					}
-
-					files.push_back( Utility::DirectoryEntry{ fsType, std::string( entry->d_name ) } );
-				}
-
-				entry = readdir( dir );
-			}
-			#else
-				// STUB !!
-				// TODO: Windows file listing
-			#endif
-
-			closedir( dir );
-			return files;
-		}
-
-		/**
-		 * Create the file list for lua. Lua changes things a bit:
-		 * The returned array will be a table of tables, each table containing two fields
-		 * type -> "directory" or "file". Unknowns will not be added.
-		 * name -> Straight rip of the name from the Utility::DirectoryEntry
-		 */
-		int Utility::lua_getFileList( lua_State* L ) {
-
-			// String shall be the first argument
-			if( lua_isstring( L, -1 ) ) {
-				// string
-				std::string path = lua_tostring( L, -1 );
-				auto fileList = Utility::getFileList( path );
-
-				// EMPTY
-				lua_pop( L, 1 );
-
-				// array
-				lua_newtable( L );
-
-				int currentIndex = 1;
-				for( auto directoryEntry : fileList ) {
-
-					if( directoryEntry.type != Utility::FilesystemType::UNKNOWN ) {
-
-						// entrytable array
-						lua_newtable( L );
-
-						// "type" entrytable array
-						lua_pushstring( L, "type" );
-
-						// type "type" entrytable array
-						switch( directoryEntry.type ) {
-							case Utility::FilesystemType::DIRECTORY:
-								lua_pushstring( L, Utility::DIRECTORY_STRING );
-								break;
-							case Utility::FilesystemType::FILE:
-								lua_pushstring( L, Utility::FILE_STRING );
-								break;
-						}
-
-						// entrytable array
-						lua_settable( L, -3 );
-
-						// "name" entrytable array
-						lua_pushstring( L, "name" );
-
-						// name "name" entrytable array
-						lua_pushstring( L, directoryEntry.name.c_str() );
-
-						// entrytable array
-						lua_settable( L, -3 );
-
-						// array
-						lua_rawseti( L, -2, currentIndex++ );
-
-					}
-				}
-			}
-
-			// array
-			return 1;
+			return result;
 		}
 
 		/**

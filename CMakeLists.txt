@@ -10,6 +10,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_BUILD_TYPE Debug)
 
+option(GCC7_BUILD "Link filesystem with GCC7" ON)
+
 find_package(Threads REQUIRED)
 find_package(Lua 5.3 EXACT REQUIRED)
 find_package(GLEW REQUIRED)
@@ -58,3 +60,8 @@ target_link_libraries(
     ${LUA_LIBRARIES}
     ${LIB_NANOVG}
 )
+
+if(GCC7_BUILD)
+    target_link_libraries(cncrda64 stdc++fs)
+    add_definitions(-DFS_EXPERIMENTAL)
+endif()

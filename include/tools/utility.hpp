@@ -29,12 +29,6 @@ namespace BlueBear {
 			static constexpr const char* FILE_STRING = "file";
 
 			public:
-				enum class FilesystemType : int { UNKNOWN, DIRECTORY, FILE };
-				struct DirectoryEntry {
-					FilesystemType type;
-					std::string name;
-				};
-
 				EXCEPTION_TYPE( InvalidJSONException, "Invalid JSON string!" );
 
 				static void stackDump( lua_State* L );
@@ -42,10 +36,6 @@ namespace BlueBear {
 				static void stackDumpAt( lua_State* L, int pos );
 
 				static std::vector< std::string > getSubdirectoryList( const char* rootSubDirectory );
-
-				static std::vector< DirectoryEntry > getFileList( const std::string& parent );
-
-				static int lua_getFileList( lua_State* L );
 
 				static int lua_getPointer( lua_State* L );
 
