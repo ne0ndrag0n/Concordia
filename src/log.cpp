@@ -22,17 +22,17 @@ namespace BlueBear {
   }
 
   std::map< Log::LogLevel, std::string > Log::Colors = {
-    { LogLevel::DEBUG, std::string( Log::ANSI_GREEN ) },
-    { LogLevel::INFO, std::string( Log::ANSI_BLUE ) },
-    { LogLevel::WARN, std::string( Log::ANSI_YELLOW ) },
-    { LogLevel::ERROR, std::string( Log::ANSI_RED ) }
+    { LogLevel::LEVEL_DEBUG, std::string( Log::ANSI_GREEN ) },
+    { LogLevel::LEVEL_INFO, std::string( Log::ANSI_BLUE ) },
+    { LogLevel::LEVEL_WARN, std::string( Log::ANSI_YELLOW ) },
+    { LogLevel::LEVEL_ERROR, std::string( Log::ANSI_RED ) }
   };
 
   std::map< Log::LogLevel, std::string > Log::StringTypes = {
-    { LogLevel::DEBUG, "d" },
-    { LogLevel::INFO, "i" },
-    { LogLevel::WARN, "w" },
-    { LogLevel::ERROR, "e" }
+    { LogLevel::LEVEL_DEBUG, "d" },
+    { LogLevel::LEVEL_INFO, "i" },
+    { LogLevel::LEVEL_WARN, "w" },
+    { LogLevel::LEVEL_ERROR, "e" }
   };
 
   void Log::out( const LogMessage& message ) {
@@ -82,18 +82,18 @@ namespace BlueBear {
   }
 
   void Log::debug( const std::string& tag, const std::string& message ) {
-    out( LogMessage { tag, message, LogLevel::DEBUG } );
+    out( LogMessage { tag, message, LogLevel::LEVEL_DEBUG } );
   }
 
   void Log::info( const std::string& tag, const std::string& message ) {
-    out( LogMessage { tag, message, LogLevel::INFO } );
+    out( LogMessage { tag, message, LogLevel::LEVEL_INFO } );
   }
 
   void Log::warn( const std::string& tag, const std::string& message ) {
-    out( LogMessage { tag, message, LogLevel::WARN } );
+    out( LogMessage { tag, message, LogLevel::LEVEL_WARN } );
   }
 
   void Log::error( const std::string& tag, const std::string& message ) {
-    out( LogMessage { tag, message, LogLevel::ERROR } );
+    out( LogMessage { tag, message, LogLevel::LEVEL_ERROR } );
   }
 }

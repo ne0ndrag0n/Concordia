@@ -22,7 +22,7 @@ namespace BlueBear {
       static constexpr const char* ANSI_GREEN = "\033[32m";
 
       enum class LogMode : int { BOTH, CONSOLE, FILE };
-      enum class LogLevel : int { DEBUG, INFO, WARN, ERROR };
+      enum class LogLevel : int { LEVEL_DEBUG, LEVEL_INFO, LEVEL_WARN, LEVEL_ERROR };
       static std::map< LogLevel, std::string > Colors;
       static std::map< LogLevel, std::string > StringTypes;
 
