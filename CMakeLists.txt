@@ -11,6 +11,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_BUILD_TYPE Debug)
 
 option(GCC7_BUILD "Link filesystem with GCC7" ON)
+set(JSONCPP_INCLUDE_PATH "" CACHE STRING "")
 
 find_package(Threads REQUIRED)
 find_package(Lua 5.3 EXACT REQUIRED)
@@ -20,7 +21,6 @@ find_package(OpenGL REQUIRED)
 find_package(assimp 4.1 REQUIRED)
 find_package(TBB 2017.0 REQUIRED)
 find_package(SFML 2.4 REQUIRED COMPONENTS graphics window system)
-find_package(jsoncpp REQUIRED)
 
 add_definitions(-DSOL_SAFE_FUNCTION=1 -DGLM_FORCE_COMPILER_UNKNOWN)
 
@@ -32,8 +32,7 @@ find_path(TINYXML2_INCLUDE_DIR "tinyxml2.h")
 find_library(LIB_ASSIMP ${ASSIMP_LIBRARIES})
 find_library(LIB_TINYXML2 tinyxml2)
 find_library(LIB_NANOVG nanovg PATHS ${CMAKE_SOURCE_DIR}/lib/nanovg)
-
-get_target_property(JSON_INC_PATH jsoncpp_lib INTERFACE_INCLUDE_DIRECTORIES)
+find_library(LIB_JSONCPP jsoncpp)
 
 target_include_directories(cncrda64 PUBLIC
     ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/lib ${CMAKE_SOURCE_DIR}/lib/nanovg
@@ -44,7 +43,7 @@ target_include_directories(cncrda64 PUBLIC
     ${TBB_INCLUDE_DIRS}
     ${TINYXML2_INCLUDE_DIR}
     ${SFML_INCLUDE_DIR}
-    ${JSON_INC_PATH}
+    ${JSONCPP_INCLUDE_PATH}
 )
 
 target_link_libraries(
@@ -56,7 +55,7 @@ target_link_libraries(
     ${OPENGL_LIBRARIES}
     ${SFML_LIBRARIES}
     ${LIB_TINYXML2}
-    jsoncpp_lib
+    ${LIB_JSONCPP}
     ${LUA_LIBRARIES}
     ${LIB_NANOVG}
 )
