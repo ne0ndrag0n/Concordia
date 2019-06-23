@@ -1,7 +1,7 @@
 #ifndef WALLPAPER
 #define WALLPAPER
 
-#include <SFGUI/Image.hpp>
+#include <SFML/Graphics/Image.hpp>
 #include <memory>
 
 namespace BlueBear::Models {
