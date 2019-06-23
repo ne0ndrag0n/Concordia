@@ -11,7 +11,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_BUILD_TYPE Debug)
 
 option(GCC7_BUILD "Link filesystem with GCC7" ON)
-set(JSONCPP_INCLUDE_PATH "" CACHE STRING "")
+set(JSONCPP_INCLUDE_PATH "" CACHE PATH "")
 
 find_package(Threads REQUIRED)
 find_package(Lua 5.3 EXACT REQUIRED)
