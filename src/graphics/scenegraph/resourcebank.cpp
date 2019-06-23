@@ -25,7 +25,7 @@ namespace BlueBear {
 
       std::shared_ptr< Shader > ResourceBank::getOrCreateShader( const std::string& vertexPath, const std::string& fragmentPath, bool defer ) {
         std::lock_guard< std::mutex > lock( shadersMutex );
-        shaderManager.getShader( vertexPath, fragmentPath, defer );
+        return shaderManager.getShader( vertexPath, fragmentPath, defer );
       }
 
       std::shared_ptr< Texture > ResourceBank::getOrCreateTexture( const std::string& path, bool defer ) {

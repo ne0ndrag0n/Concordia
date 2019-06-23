@@ -319,7 +319,7 @@ namespace BlueBear {
             }
           }
 
-          unsigned int WorldRenderer::registerEvent(
+          std::optional< unsigned int > WorldRenderer::registerEvent(
             std::shared_ptr< Graphics::SceneGraph::Model > instance,
             const std::string& eventTag,
             const ModelEventCallback& callback
@@ -345,10 +345,13 @@ namespace BlueBear {
 
               if( !found ) {
                 bucket.push_back( callback );
+                return bucket.size() - 1;
               }
             } else {
               Log::getInstance().warn( "WorldRenderer::registerEvent", "Instance not registered" );
             }
+
+            return {};
           }
 
           void WorldRenderer::unregisterEvent( std::shared_ptr< Graphics::SceneGraph::Model > instance, const std::string& eventTag, unsigned int item ) {

@@ -61,12 +61,11 @@ namespace BlueBear::Scripting {
       std::vector< sol::object > newunpacked( newargs.begin(), newargs.end() );
 
       auto result = f( sol::as_args( Tools::Utility::concatArrays( unpacked, newunpacked ) ) );
-      if( result.valid() ) {
-        return result;
-      } else {
+      if( !result.valid() ) {
         sol::error error = result;
         Log::getInstance().error( "CoreEngine::bind", error.what() );
       }
+      return result;
     } );
 
     return temp[ "__closure" ];
@@ -138,6 +137,8 @@ namespace BlueBear::Scripting {
     for( int removal : removalIndices ) {
       queuedCallbacks.remove( removal );
     }
+
+    return true;
   }
 
 }

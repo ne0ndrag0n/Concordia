@@ -322,6 +322,7 @@ namespace BlueBear::Gameplay {
 
 	bool InfrastructureManager::update() {
 		updateAnimations();
+		return true;
 	}
 
 }

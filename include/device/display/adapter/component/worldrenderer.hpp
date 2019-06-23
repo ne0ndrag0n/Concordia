@@ -26,6 +26,7 @@
 #include <vector>
 #include <utility>
 #include <regex>
+#include <optional>
 
 namespace BlueBear {
   namespace Graphics {
@@ -107,7 +108,7 @@ namespace BlueBear {
             std::vector< std::shared_ptr< Graphics::SceneGraph::Model > > findObjectsByClass( const std::set< std::string >& classes );
             void removeObject( std::shared_ptr< Graphics::SceneGraph::Model > model );
 
-            unsigned int registerEvent(
+            std::optional< unsigned int > registerEvent(
               std::shared_ptr< Graphics::SceneGraph::Model > instance,
               const std::string& eventTag,
               const ModelEventCallback& callback

@@ -46,6 +46,8 @@ namespace BlueBear {
         rotation = rhs.rotation;
         result = rhs.result;
         dirty = rhs.dirty;
+
+        return *this;
       }
 
       Transform Transform::operator*( const Transform& rhs ) const {

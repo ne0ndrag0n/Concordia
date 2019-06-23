@@ -61,6 +61,9 @@ namespace BlueBear::Graphics::Utilities {
         currentIndex += size.x;
       }
     }
+
+    Log::getInstance().warn( "TextureAtlas::getTextureData", "Could not find texture id " + id + " in this atlas!" );
+    throw IdNotFoundException();
   }
 
   std::shared_ptr< sf::Image > TextureAtlas::generateAtlas() {
