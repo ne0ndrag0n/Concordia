@@ -56,7 +56,7 @@ namespace BlueBear::Gameplay {
 		void setWallCutaways();
 
 		std::vector< glm::vec2 > generateRoomNodes( const Tools::Sector& sector, const glm::uvec2& dimensions );
-		Tools::Intersection::IntersectionList getIntersections( const std::vector< Models::WallSegment >& wallSegments );
+		Tools::Intersection::IntersectionList getIntersections( const std::vector< Models::WallSegment >& wallSegments, const glm::ivec2& dimensions );
 
 	public:
 		InfrastructureManager( State::State& state );

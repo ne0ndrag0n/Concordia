@@ -262,14 +262,14 @@ namespace BlueBear::Gameplay {
 		return result;
 	}
 
-	Tools::Intersection::IntersectionList InfrastructureManager::getIntersections( const std::vector< Models::WallSegment >& wallSegments ) {
+	Tools::Intersection::IntersectionList InfrastructureManager::getIntersections( const std::vector< Models::WallSegment >& wallSegments, const glm::ivec2& dimensions ) {
 		Tools::Intersection::IntersectionList intersectionList;
 		for( const auto& wallSegment : wallSegments ) {
 			Log::getInstance().debug( "InfrastructureManager::getIntersections", glm::to_string( wallSegment.start ) + " - " + glm::to_string( wallSegment.end ) );
 			intersectionList.emplace_back( Tools::Intersection::IntersectionLineSegment{ wallSegment.start, wallSegment.end } );
 		}
 
-		return Tools::Intersection::generateIntersectionalList( std::move( intersectionList ) );
+		return Tools::Intersection::generateIntersectionalList( std::move( intersectionList ), dimensions );
 	}
 
 	/**
@@ -282,7 +282,7 @@ namespace BlueBear::Gameplay {
 			std::vector< Models::Room > roomsForLevel;
 
 			// Generate intersection map from existing intersections/crossovers
-			Tools::Intersection::IntersectionList intersectionList = getIntersections( level.wallSegments );
+			Tools::Intersection::IntersectionList intersectionList = getIntersections( level.wallSegments, level.dimensions + glm::uvec2{ 1, 1 } );
 			Tools::SectorIdentifier sectorIdentifier;
 			for( const auto& computedSegment : intersectionList ) {
 				sectorIdentifier.addEdge( computedSegment.start, computedSegment.end );

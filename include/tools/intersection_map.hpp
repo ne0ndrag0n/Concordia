@@ -20,7 +20,7 @@ namespace BlueBear::Tools::Intersection {
 	using IntersectionList = std::vector< IntersectionLineSegment >;
 	using IntersectionMap = std::unordered_map< glm::ivec2, IntersectionList >;
 
-	IntersectionList generateIntersectionalList( IntersectionList lineSegments );
+	IntersectionList generateIntersectionalList( IntersectionList lineSegments, const glm::ivec2& totalDimensions );
 
 }
 

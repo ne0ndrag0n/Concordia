@@ -7,39 +7,13 @@
 
 namespace BlueBear::Tools::Intersection {
 
-	// cheap hack to get comparator to take direction into account
-	static float getDirectionFactor( const glm::ivec2 direction ) {
-		if( direction == glm::ivec2{ 0, -1 } ) {
-			return 1.0f;
-		} else if( direction == glm::ivec2{ 1, -1 } ) {
-			return 2.0f;
-		} else if( direction == glm::ivec2{ 1, 0 } ) {
-			return 3.0f;
-		} else if( direction == glm::ivec2{ 1, 1 } ) {
-			return 4.0f;
-		} else if( direction == glm::ivec2{ 0, 1 } ) {
-			return 5.0f;
-		} else if( direction == glm::ivec2{ -1, 1 } ) {
-			return 6.0f;
-		} else if( direction == glm::ivec2{ -1, 0 } ) {
-			return 7.0f;
-		} else if( direction == glm::ivec2{ -1, -1 } ) {
-			return 8.0f;
-		}
-	}
-
-	IntersectionList generateIntersectionalList( IntersectionList lineSegments ) {
+	IntersectionList generateIntersectionalList( IntersectionList lineSegments, const glm::ivec2& totalDimensions ) {
 
 		// Step 1: Get all intersections for each line segment
-		struct comparator {
-			bool operator()( const glm::ivec2& left, const glm::ivec2& right ) const {
-				return
-					glm::distance( glm::vec2{ 0, 0 }, glm::vec2( left ) ) + getDirectionFactor( glm::normalize( glm::vec2( left ) ) )
-						<
-					glm::distance( glm::vec2{ 0, 0 }, glm::vec2( right ) ) + getDirectionFactor( glm::normalize( glm::vec2( right ) ) );
-			}
+		auto comp = [ &totalDimensions ]( const glm::ivec2& left, const glm::ivec2& right ) -> bool {
+			return ( ( left.y * totalDimensions.x ) + left.x ) < ( ( right.y * totalDimensions.x ) + right.x );
 		};
-		std::map< glm::ivec2, std::unordered_set< IntersectionLineSegment* >, comparator > crossedVertices;
+		std::map< glm::ivec2, std::unordered_set< IntersectionLineSegment* >, decltype( comp ) > crossedVertices( comp );
 
 		for( auto& lineSegment : lineSegments ) {
 			glm::ivec2 direction = glm::ivec2( glm::normalize( glm::vec2( lineSegment.end ) - glm::vec2( lineSegment.start ) ) );
