@@ -35,6 +35,11 @@
 #define BEZIER_DEFAULT_INTERVALS 10
 #define BEZIER_DEFAULT_MAX_ITERATIONS 15
 
+// hack added by me
+#ifndef M_PI
+    #define M_PI 3.14159265358979323846
+#endif
+
 namespace Bezier
 {
     namespace Math
