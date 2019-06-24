@@ -4,6 +4,7 @@
 #include "containers/bounded_object.hpp"
 #include <vector>
 #include <algorithm>
+#include <optional>
 
 namespace BlueBear::Containers {
 
