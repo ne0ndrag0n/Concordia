@@ -210,16 +210,16 @@ namespace BlueBear {
           Log::getInstance().warn( "Renderer::generateBitmap", "Stack size allocated to this bitmap will exceed 1MB" );
         }
 
-        unsigned char array[ size ] = { 0 };
+        std::unique_ptr< unsigned char[] > array = std::make_unique< unsigned char[] >( size );
         device.executeOnSecondaryContext( secondaryGLContext, [ & ]() {
           currentTexture = std::make_shared< Renderer::Texture >( *this, dimensions );
           render( functor, [ & ]() {
             glReadBuffer( GL_COLOR_ATTACHMENT0 );
-            glReadPixels( 0, 0, dimensions.x, dimensions.y, GL_RGBA, GL_UNSIGNED_BYTE, array );
+            glReadPixels( 0, 0, dimensions.x, dimensions.y, GL_RGBA, GL_UNSIGNED_BYTE, array.get() );
           } );
         } );
 
-        resultOperation( array );
+        resultOperation( array.get() );
 
         currentTexture = nullptr;
       }
