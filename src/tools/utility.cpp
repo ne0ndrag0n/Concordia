@@ -82,8 +82,7 @@ namespace BlueBear {
 		std::vector< std::string > Utility::getSubdirectoryList( const char* rootSubDirectory ) {
 			std::vector< std::string > result;
 			for( const auto& entry : fs::directory_iterator( rootSubDirectory ) ) {
-				std::string pathname = entry.path().filename();
-				result.emplace_back( std::move( pathname ) );
+				result.emplace_back( entry.path().filename().string() );
 			}
 
 			return result;
