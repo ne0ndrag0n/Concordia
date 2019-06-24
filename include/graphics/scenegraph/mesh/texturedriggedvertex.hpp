@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <memory>
 #include <utility>
+#include <string>
 
 namespace BlueBear {
   namespace Graphics {
