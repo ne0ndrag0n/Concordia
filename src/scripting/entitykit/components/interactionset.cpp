@@ -1,4 +1,5 @@
 #include "scripting/entitykit/components/interactionset.hpp"
+#include "graphics/userinterface/event/eventbundle.hpp"
 #include "graphics/userinterface/widgets/context_menu.hpp"
 #include "graphics/userinterface/widgets/text.hpp"
 #include "device/display/adapter/component/worldrenderer.hpp"
