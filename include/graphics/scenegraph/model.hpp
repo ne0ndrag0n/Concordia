@@ -9,9 +9,6 @@
 #include "geometry/triangle.hpp"
 #include "geometry/ray.hpp"
 #include "graphics/shader.hpp"
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
 #include <sol.hpp>
 #include <string>
 #include <vector>

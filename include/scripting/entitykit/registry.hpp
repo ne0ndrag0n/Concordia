@@ -5,9 +5,6 @@
 #include "exceptions/genexc.hpp"
 #include "scripting/entitykit/entity.hpp"
 #include "scripting/entitykit/component.hpp"
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
 #include <sol.hpp>
 #include <string>
 #include <optional>

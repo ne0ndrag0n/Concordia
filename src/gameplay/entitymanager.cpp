@@ -2,9 +2,6 @@
 #include "tools/utility.hpp"
 #include "log.hpp"
 #include <jsoncpp/json/json.h>
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
 #include <sol.hpp>
 
 namespace BlueBear::Gameplay {

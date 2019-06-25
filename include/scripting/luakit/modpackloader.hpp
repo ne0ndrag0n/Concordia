@@ -2,9 +2,6 @@
 #define NEW_MODPACK_LOADER
 
 #include "bbtypes.hpp"
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
 #include <sol.hpp>
 #include <string>
 #include <map>

@@ -3,9 +3,6 @@
 
 #include "containers/reusableobjectvector.hpp"
 #include "scripting/luakit/eventbridge.hpp"
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
 #include <sol.hpp>
 #include <unordered_map>
 #include <string>

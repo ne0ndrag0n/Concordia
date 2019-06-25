@@ -3,9 +3,6 @@
 
 #include "exceptions/genexc.hpp"
 #include "scripting/entitykit/systemcomponent.hpp"
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
 #include <sol.hpp>
 #include <string>
 #include <memory>

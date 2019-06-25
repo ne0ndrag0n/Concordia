@@ -3,9 +3,6 @@
 
 #include "exceptions/genexc.hpp"
 #include "log.hpp"
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
 #include <sol.hpp>
 #include <functional>
 #include <string>

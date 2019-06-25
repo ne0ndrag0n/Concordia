@@ -1,9 +1,6 @@
 #ifndef CONFIGMANAGER
 #define CONFIGMANAGER
 
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
 #include <jsoncpp/json/json.h>
 #include <string>
 #include <map>
@@ -22,7 +19,6 @@ namespace BlueBear {
       std::string getValue( const std::string& key );
       int getIntValue( const std::string& key );
       bool getBoolValue( const std::string& key );
-      static int lua_getValue( lua_State* L );
 
       void each( std::function< void( std::string, Json::Value& ) > func );
 

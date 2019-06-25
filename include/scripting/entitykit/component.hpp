@@ -3,9 +3,6 @@
 
 #include "exceptions/genexc.hpp"
 #include "serializable.hpp"
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
 #include <sol.hpp>
 
 namespace BlueBear::Scripting::EntityKit {

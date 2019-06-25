@@ -6,9 +6,6 @@
 #include "scripting/entitykit/components/componentcast.hpp"
 #include "eventmanager.hpp"
 #include "serializable.hpp"
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
 #include <sol.hpp>
 #include <string>
 #include <memory>

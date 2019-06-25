@@ -2,9 +2,6 @@
 #define LUA_EVENT_BRIDGE
 
 #include "containers/reusableobjectvector.hpp"
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
 #include <sol.hpp>
 #include <map>
 #include <string>

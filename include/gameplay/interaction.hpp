@@ -2,9 +2,6 @@
 #define GAMEPLAY_INTERACTION
 
 #include "scripting/coreengine.hpp"
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
 #include <sol.hpp>
 #include <string>
 

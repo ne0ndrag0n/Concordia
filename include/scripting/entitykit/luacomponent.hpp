@@ -3,9 +3,6 @@
 
 #include "scripting/entitykit/component.hpp"
 #include <string>
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
 #include <sol.hpp>
 
 namespace BlueBear::Scripting::EntityKit {

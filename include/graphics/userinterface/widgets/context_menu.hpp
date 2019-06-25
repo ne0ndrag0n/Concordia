@@ -2,9 +2,6 @@
 #define CONCORDIA_GUI_CONTEXT_MENU
 
 #include "graphics/userinterface/element.hpp"
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
 #include <sol.hpp>
 #include <variant>
 #include <vector>

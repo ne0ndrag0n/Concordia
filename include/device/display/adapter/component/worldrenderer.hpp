@@ -15,9 +15,6 @@
 #include "eventmanager.hpp"
 #include "serializable.hpp"
 #include <tbb/concurrent_unordered_map.h>
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
 #include <sol.hpp>
 #include <memory>
 #include <string>

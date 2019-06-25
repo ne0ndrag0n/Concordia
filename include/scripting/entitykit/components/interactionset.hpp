@@ -6,9 +6,6 @@
 #include "graphics/scenegraph/model.hpp"
 #include "gameplay/interaction.hpp"
 #include "device/input/input.hpp"
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
 #include <sol.hpp>
 #include <memory>
 #include <set>

@@ -1,9 +1,6 @@
 #ifndef SG_TRANSFORM
 #define SG_TRANSFORM
 
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
 #include <sol.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>

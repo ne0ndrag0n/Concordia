@@ -5,9 +5,6 @@
 #include <map>
 #include <functional>
 #include <memory>
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
 #include <sol.hpp>
 
 namespace BlueBear {

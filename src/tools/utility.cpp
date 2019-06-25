@@ -1,9 +1,6 @@
 #include "tools/utility.hpp"
 #include "eventmanager.hpp"
 #include "log.hpp"
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
 #include <cstdint>
 #include <cstddef>
 #include <cstdio>
@@ -27,54 +24,6 @@ namespace fs = std::filesystem;
 
 namespace BlueBear {
 	namespace Tools {
-		/**
-		 * Dump the Lua stack out to terminal
-		 */
-		void Utility::stackDump( lua_State* L ) {
-			  int i;
-			  int top = lua_gettop(L);
-			  for (i = 1; i <= top; i++) {  /* repeat for each level */
-					Utility::stackDumpAt( L, -i );
-					printf("  ");  /* put a separator */
-			  }
-
-			  printf("\n");  /* end the listing */
-		}
-
-		void Utility::stackDumpAt( lua_State* L, int pos ) {
-			int t = lua_type(L, pos);
-			switch (t) {
-
-				case LUA_TSTRING:  /* strings */
-				printf("`%s'", lua_tostring(L, pos));
-				break;
-
-				case LUA_TBOOLEAN:  /* booleans */
-				printf(lua_toboolean(L, pos) ? "true" : "false");
-				break;
-
-				case LUA_TNUMBER:  /* numbers */
-				printf("%g", lua_tonumber(L, pos));
-				break;
-
-				case LUA_TNIL: /* nils */
-				printf("nil");
-				break;
-
-				case LUA_TTABLE: /* table */
-				printf("table");
-				break;
-
-				case LUA_TFUNCTION: /* function */
-				printf("function");
-				break;
-
-				default:  /* other values */
-				printf("other type:%s", lua_typename(L, t));
-				break;
-
-			}
-		}
 
 		/**
 		 * Gets a collection of subdirectories for the given directory
@@ -86,45 +35,6 @@ namespace BlueBear {
 			}
 
 			return result;
-		}
-
-		/**
-		 * Don't use this in your mods.
-		 */
-		int Utility::lua_getPointer( lua_State* L ) {
-			lua_pushstring( L, Tools::Utility::pointerToString( lua_topointer( L, -1 ) ).c_str() );
-
-			return 1;
-		}
-
-		void Utility::clearLuaStack( lua_State* L ) {
-			lua_settop( L, 0 );
-		}
-
-		void Utility::getTableValue( lua_State* L, const char* key ) {
-			// Push the desired key onto the stack
-			lua_pushstring( L, key );
-
-			// Push table[key] onto the stack
-			lua_gettable( L, -2 );
-		}
-
-		void Utility::setTableIntValue( lua_State* L, const char* key, int value ) {
-			lua_pushstring( L, key );
-			lua_pushnumber( L, (double) value );
-			lua_settable( L, -3 );
-		}
-
-		void Utility::setTableStringValue( lua_State* L, const char* key, const char* value ) {
-			lua_pushstring( L, key );
-			lua_pushstring( L, value );
-			lua_settable( L, -3 );
-		}
-
-		void Utility::setTableFunctionValue( lua_State* L, const char* key, lua_CFunction value ) {
-			lua_pushstring( L, key );
-			lua_pushcfunction( L, value );
-			lua_settable( L, -3 );
 		}
 
 		/**
@@ -156,41 +66,6 @@ namespace BlueBear {
 			}
 
 			return result;
-		}
-
-		/**
-		 * Traverse and retrieve a value stored in a Lua table as a tree structure.
-		 * Leaves the found value on the top of the stack; leaves nil if the value was not found.
-		 * Always pops the original table.
-		 */
-		void Utility::getTableTreeValue( lua_State* L, const std::string& treeValue ) {
-			// start with <table>
-
-			// Get tokens
-			auto treeTokens = Utility::split( treeValue, '.' );
-
-			for( const auto& token : treeTokens ) {
-				// <subtable> <table> if subtable found
-				Utility::getTableValue( L, token.c_str() );
-
-				// If this is not a table, we cannot continue
-				if( !lua_istable( L, -1 ) ) {
-					// Pop what's on top and whatever's underneath
-					// EMPTY
-					lua_pop( L, 2 );
-
-					// nil
-					lua_pushnil( L );
-
-					return;
-				}
-
-				// Pop the table under this table
-				// <subtable>
-				lua_remove( L, -2 );
-			}
-
-			// <desired table>
 		}
 
 		/**

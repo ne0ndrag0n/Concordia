@@ -2,7 +2,6 @@
 #include "tools/ctvalidators.hpp"
 #include "tools/utility.hpp"
 #include "log.hpp"
-#include "scripting/luastate.hpp"
 #include "state/state.hpp"
 #include "application.hpp"
 #include <SFML/Graphics/RenderWindow.hpp>

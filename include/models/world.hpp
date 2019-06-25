@@ -2,9 +2,6 @@
 #define WORLD_MODEL
 
 #include "serializable.hpp"
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
 #include <sol.hpp>
 #include <glm/glm.hpp>
 #include <memory>

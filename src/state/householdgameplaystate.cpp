@@ -1,7 +1,6 @@
 #include "state/householdgameplaystate.hpp"
 #include "log.hpp"
 #include "application.hpp"
-#include "scripting/luastate.hpp"
 #include "scripting/entitykit/systemcomponent.hpp"
 #include "configmanager.hpp"
 #include "eventmanager.hpp"

@@ -7,9 +7,6 @@
 #include "graphics/userinterface/style/styleapplier.hpp"
 #include "graphics/shader.hpp"
 #include "eventmanager.hpp"
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
 #include <sol.hpp>
 #include <vector>
 #include <memory>
