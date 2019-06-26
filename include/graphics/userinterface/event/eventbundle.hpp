@@ -9,7 +9,7 @@
 namespace BlueBear {
   namespace Device {
     namespace Input {
-      class Metadata;
+      struct Metadata;
     }
   }
 

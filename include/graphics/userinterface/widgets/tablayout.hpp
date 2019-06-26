@@ -7,7 +7,7 @@
 #include <string>
 #include <memory>
 
-namespace BlueBear::Device::Input { class Metadata; }
+namespace BlueBear::Device::Input { struct Metadata; }
 namespace BlueBear::Graphics::Vector { class Renderer; }
 namespace BlueBear::Graphics::UserInterface::Widgets {
 

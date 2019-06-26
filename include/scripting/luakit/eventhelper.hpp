@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <string>
 
-namespace BlueBear::Device::Input { class Metadata; class Input; }
+namespace BlueBear::Device::Input { struct Metadata; class Input; }
 namespace BlueBear::Scripting { class CoreEngine; }
 namespace BlueBear::Scripting::LuaKit {
 

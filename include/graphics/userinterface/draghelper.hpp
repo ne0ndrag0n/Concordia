@@ -6,7 +6,7 @@
 
 namespace BlueBear {
   namespace Device::Input {
-    class Metadata;
+    struct Metadata;
   }
 
   namespace Graphics {
