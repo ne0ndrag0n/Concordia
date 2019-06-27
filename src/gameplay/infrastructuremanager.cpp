@@ -10,6 +10,7 @@
 #include "configmanager.hpp"
 #include <bezier.hpp>
 #include <unordered_set>
+#include <glm/gtx/string_cast.hpp>
 
 namespace BlueBear::Gameplay {
 
@@ -187,6 +188,8 @@ namespace BlueBear::Gameplay {
 						finish = wall.segment.second;
 						direction = wall.direction;
 					}
+
+					Log::getInstance().debug( "InfrastructureManager::setWallCutaways", "Selected for lowering: " + glm::to_string( start ) + " to " + glm::to_string( finish ) );
 
 					int totalSteps = std::abs( glm::distance( finish, start ) );
 					glm::vec2 cursor = start;
