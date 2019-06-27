@@ -265,7 +265,6 @@ namespace BlueBear::Gameplay {
 	Tools::Intersection::IntersectionList InfrastructureManager::getIntersections( const std::vector< Models::WallSegment >& wallSegments, const glm::ivec2& dimensions ) {
 		Tools::Intersection::IntersectionList intersectionList;
 		for( const auto& wallSegment : wallSegments ) {
-			Log::getInstance().debug( "InfrastructureManager::getIntersections", glm::to_string( wallSegment.start ) + " - " + glm::to_string( wallSegment.end ) );
 			intersectionList.emplace_back( Tools::Intersection::IntersectionLineSegment{ wallSegment.start, wallSegment.end } );
 		}
 

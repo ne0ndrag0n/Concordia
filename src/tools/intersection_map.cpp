@@ -15,7 +15,10 @@ namespace BlueBear::Tools::Intersection {
 		};
 		std::map< glm::ivec2, std::unordered_set< IntersectionLineSegment* >, decltype( comp ) > crossedVertices( comp );
 
+
+		Log::getInstance().debug( "intersection_map.cpp:generateIntersectionalList", "List of input line segments" );
 		for( auto& lineSegment : lineSegments ) {
+			Log::getInstance().debug( "intersection_map.cpp:generateIntersectionalList", glm::to_string( lineSegment.start ) + " " + glm::to_string( lineSegment.end ) );
 			glm::ivec2 direction = glm::ivec2( glm::normalize( glm::vec2( lineSegment.end ) - glm::vec2( lineSegment.start ) ) );
 			glm::ivec2 cursor = lineSegment.start;
 
@@ -45,7 +48,9 @@ namespace BlueBear::Tools::Intersection {
 		}
 
 		// Step 2: Subdivide lines at intersection points, top-to-bottom, left-to-right
+		Log::getInstance().debug( "intersection_map.cpp:generateIntersectionalList", "List of crossed vertices, sorted" );
 		for( auto& pair : crossedVertices ) {
+			Log::getInstance().debug( "intersection_map.cpp:generateIntersectionalList", glm::to_string( pair.first ) );
 			for( IntersectionLineSegment* lineSegment : pair.second ) {
 				// Do not subdivide if the point is identical to either start or end
 				if( pair.first != lineSegment->start && pair.first != lineSegment->end ) {
