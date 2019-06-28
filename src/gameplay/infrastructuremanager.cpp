@@ -175,6 +175,12 @@ namespace BlueBear::Gameplay {
 					camera.getRotationAngle()
 				);
 
+				Log::getInstance().debug(
+					"InfrastructureManager::setWallCutaways",
+					"segment from " + glm::to_string( wall.segment.first ) + " to " + glm::to_string( wall.segment.second ) +
+					" direction: " + glm::to_string( wall.direction ) + " perpendicular: " + glm::to_string( wall.perpendicular ) + " // angle: " + std::to_string( angle )
+				);
+
 				if( angle >= 225.0f && angle <= 315.0f ) {
 					glm::vec2 start;
 					glm::vec2 finish;
