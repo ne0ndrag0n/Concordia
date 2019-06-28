@@ -11,7 +11,7 @@ namespace BlueBear {
 
       bool ResourceBank::listsCongruent( const TextureList& list1, const TextureList& list2 ) {
         if( list1.size() == list2.size() ) {
-          for( int i = 0; i != list1.size(); i++ ) {
+          for( size_t i = 0; i != list1.size(); i++ ) {
             if( list1.at( i ) != list2.at( i ) ) {
               return false;
             }

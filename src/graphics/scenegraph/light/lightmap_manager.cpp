@@ -182,14 +182,14 @@ namespace BlueBear::Graphics::SceneGraph::Light {
 	void LightmapManager::send( const Shader& shader ) {
 		const UniformBundle& bundle = uniforms.getUniforms( shader );
 
-		for( int i = 0; i != generatedLightList.size(); i++ ) {
+		for( size_t i = 0; i != generatedLightList.size(); i++ ) {
 			shader.sendData( bundle.directionalLightsDirection[ i ], generatedLightList[ i ]->getDirection() );
 			shader.sendData( bundle.directionalLightsAmbient[ i ], generatedLightList[ i ]->getAmbient() );
 			shader.sendData( bundle.directionalLightsDiffuse[ i ], generatedLightList[ i ]->getDiffuse() );
 			shader.sendData( bundle.directionalLightsSpecular[ i ], generatedLightList[ i ]->getSpecular() );
 		}
 
-		for( int i = 0; i != generatedRooms.size(); i++ ) {
+		for( size_t i = 0; i != generatedRooms.size(); i++ ) {
 			shader.sendData( bundle.roomsLowerLeft[ i ], generatedRooms[ i ].lowerLeft );
 			shader.sendData( bundle.roomsUpperRight[ i ], generatedRooms[ i ].upperRight );
 			shader.sendData2i( bundle.roomsMapLocation[ i ], generatedRooms[ i ].mapLocation );

@@ -389,8 +389,8 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     std::shared_ptr< Material > generatedMaterial = std::make_shared< Material >( std::vector< std::shared_ptr< Texture > >{ generatedTexture }, std::vector< std::shared_ptr< Texture > >{}, 0.0f, 1.0f );
     std::shared_ptr< Model > result = Model::create( "__wall_level", {} );
 
-    for( auto y = 0; y != cornerMap.size(); y++ ) {
-      for( auto x = 0; x != cornerMap[ 0 ].size(); x++ ) {
+    for( size_t y = 0; y != cornerMap.size(); y++ ) {
+      for( size_t x = 0; x != cornerMap[ 0 ].size(); x++ ) {
         const Corner& corner = cornerMap[ y ][ x ];
 
         if( corner.horizontal.model ) {

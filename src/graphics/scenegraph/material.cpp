@@ -38,7 +38,7 @@ namespace BlueBear {
         }
 
       Material::Material( glm::vec3 ambientColor, TextureList diffuseTextures, glm::vec3 specularColor, float shininess, float opacity ) :
-        ambientColor( ambientColor ), diffuseTextures( diffuseTextures ), specularColor( specularColor ), shininess( shininess ), opacity( opacity ), useAmbient( true ) {
+        ambientColor( ambientColor ), specularColor( specularColor ), diffuseTextures( diffuseTextures ), shininess( shininess ), opacity( opacity ), useAmbient( true ) {
           checkTextureUnits();
 
           maxDiffuseTextures = ConfigManager::getInstance().getIntValue( "shader_max_diffuse_textures" );
@@ -134,7 +134,7 @@ namespace BlueBear {
         if( diffuseTextures.empty() ) {
           shader.sendData( uniform.diffuse, diffuseColor );
         } else {
-          for( int i = 0; i != diffuseTextures.size() && i < maxDiffuseTextures; i++ ) {
+          for( size_t i = 0; i != diffuseTextures.size() && i < ( size_t ) maxDiffuseTextures; i++ ) {
             auto textureUnit = Tools::OpenGL::getTextureUnit();
             if( !textureUnit ) {
               throw Material::TextureUnitUnavailableException();
@@ -150,7 +150,7 @@ namespace BlueBear {
         if( specularTextures.empty() ) {
           shader.sendData( uniform.specular, specularColor );
         } else {
-          for( int i = 0; i != specularTextures.size() && i < maxSpecularTextures; i++ ) {
+          for( size_t i = 0; i != specularTextures.size() && i < ( size_t ) maxSpecularTextures; i++ ) {
             auto textureUnit = Tools::OpenGL::getTextureUnit();
             if( !textureUnit ) {
               throw Material::TextureUnitUnavailableException();

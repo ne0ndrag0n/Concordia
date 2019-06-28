@@ -123,7 +123,7 @@ namespace BlueBear {
           if( result ) {
             glm::mat4 matrix = result->matrix;
 
-            while( result = result->parent ) {
+            while( ( result = result->parent ) ) {
               matrix = result->matrix * matrix;
             }
 

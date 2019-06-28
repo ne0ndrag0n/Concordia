@@ -207,6 +207,7 @@ namespace BlueBear {
         switch( Tools::Utility::hash( method.c_str() ) ) {
           default: {
             Log::getInstance().warn( "Model::generateBoundingVolume", "Unknown bounding volume method: " + method + ", defaulting to \"aabb\"" );
+            [[fallthrough]];
           }
           case Tools::Utility::hash( "aabb" ): {
             boundingVolume = std::make_unique< BoundingVolume::AxisAlignedBoundingVolume >();

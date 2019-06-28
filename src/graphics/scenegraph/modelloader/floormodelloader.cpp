@@ -39,8 +39,8 @@ namespace BlueBear {
             glm::vec2 dims = floorLevel.dimensions;
             glm::vec2 origin = { -( dims.x * 0.5 ), dims.y * 0.5 };
             glm::vec2 last = { floorLevel.dimensions.x, floorLevel.dimensions.y };
-            for( int y = 0; y != floorLevel.dimensions.y; y++ ) {
-              for( int x = 0; x != floorLevel.dimensions.x; x++ ) {
+            for( size_t y = 0; y != floorLevel.dimensions.y; y++ ) {
+              for( size_t x = 0; x != floorLevel.dimensions.x; x++ ) {
                 glm::vec2 current = { x, y };
 
                 if( floorLevel.tiles[ y ][ x ] ) {

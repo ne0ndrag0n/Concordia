@@ -81,7 +81,8 @@ namespace BlueBear {
         public:
           MeshDefinition( const std::vector< VertexType >& vertices, const std::vector< GLuint >& indices, bool defer = false ) :
             size( indices.size() ), indexed( true ), drawMethod( std::bind( &MeshDefinition::drawIndexed, this ) ),
-            vertices( vertices ), indices( indices ), genericTransformMethod( std::bind( &MeshDefinition::defaultGenericTransform, this, std::placeholders::_1 ) ) {
+            genericTransformMethod( std::bind( &MeshDefinition::defaultGenericTransform, this, std::placeholders::_1 ) ),
+            vertices( vertices ), indices( indices ) {
             getDefaultShader = VertexType::getDefaultShader;
 
             if( !defer ) {
@@ -91,7 +92,8 @@ namespace BlueBear {
 
           MeshDefinition( const std::vector< VertexType >& vertices, bool defer = false ) :
             size( vertices.size() ), indexed( false ), drawMethod( std::bind( &MeshDefinition::drawVertices, this ) ),
-            vertices( vertices ), genericTransformMethod( std::bind( &MeshDefinition::defaultGenericTransform, this, std::placeholders::_1 ) ) {
+            genericTransformMethod( std::bind( &MeshDefinition::defaultGenericTransform, this, std::placeholders::_1 ) ),
+            vertices( vertices ) {
             getDefaultShader = VertexType::getDefaultShader;
 
             if( !defer ) {
@@ -115,7 +117,7 @@ namespace BlueBear {
             if( indices.size() ) {
               bool check = indices.size() % 3 == 0;
               if( check ) {
-                for( int i = 0; i < indices.size(); i += 3 ) {
+                for( size_t i = 0; i < indices.size(); i += 3 ) {
                   genericTriangles.emplace_back( Geometry::Triangle{
                     genericTransformMethod( vertices[ indices[ i ] ] ),
                     genericTransformMethod( vertices[ indices[ i + 1 ] ] ),
@@ -128,7 +130,7 @@ namespace BlueBear {
             } else {
               bool check = vertices.size() % 3 == 0;
               if( check ) {
-                for( int i = 0; i < vertices.size(); i += 3 ) {
+                for( size_t i = 0; i < vertices.size(); i += 3 ) {
                   genericTriangles.emplace_back( Geometry::Triangle{
                     genericTransformMethod( vertices[ i ] ),
                     genericTransformMethod( vertices[ i + 1 ] ),

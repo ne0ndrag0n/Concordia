@@ -31,7 +31,7 @@ namespace BlueBear {
         void AssimpModelLoader::log( const std::string& tag, const std::string& message ) {
           std::string indents;
 
-          for( int i = 0; i != context.logIndentation; i++ ) {
+          for( size_t i = 0; i != context.logIndentation; i++ ) {
             indents += "\t";
           }
 
@@ -76,9 +76,9 @@ namespace BlueBear {
         std::vector< GLuint > AssimpModelLoader::getIndices( aiMesh* mesh ) {
           std::vector< GLuint > indices;
 
-          for( int i = 0; i < mesh->mNumFaces; i++ ) {
+          for( size_t i = 0; i < mesh->mNumFaces; i++ ) {
             aiFace face = mesh->mFaces[ i ];
-            for( int j = 0; j < face.mNumIndices; j++ ) {
+            for( size_t j = 0; j < face.mNumIndices; j++ ) {
               indices.push_back( face.mIndices[ j ] );
             }
           }
@@ -89,7 +89,7 @@ namespace BlueBear {
         std::vector< std::string > AssimpModelLoader::getBoneIds( aiBone** bones, unsigned int numBones ) {
           std::vector< std::string > boneIDs;
 
-          for( int boneIndex = 0; boneIndex < numBones; boneIndex++ ) {
+          for( size_t boneIndex = 0; boneIndex < numBones; boneIndex++ ) {
             boneIDs.push_back( bones[ boneIndex ]->mName.C_Str() );
           }
 
@@ -113,10 +113,10 @@ namespace BlueBear {
           // Max 4 bones per vertex
           unsigned int vertexBoneNumber = 0;
 
-          for( int boneIndex = 0; boneIndex < numBones; boneIndex++ ) {
+          for( size_t boneIndex = 0; boneIndex < numBones; boneIndex++ ) {
             aiBone* bone = bones[ boneIndex ];
 
-            for( int weightIndex = 0; weightIndex < bone->mNumWeights; weightIndex++ ) {
+            for( size_t weightIndex = 0; weightIndex < bone->mNumWeights; weightIndex++ ) {
               aiVertexWeight& vertexWeight = bone->mWeights[ weightIndex ];
 
               if( vertexWeight.mVertexId == vertexIndex ) {
@@ -140,7 +140,7 @@ namespace BlueBear {
         std::shared_ptr< Mesh::Mesh > AssimpModelLoader::getMesh( aiMesh* mesh, aiMatrix4x4 transform ) {
           bool usesBones = useBones && mesh->HasBones();
           bool usesTextures = (
-            mesh->mMaterialIndex >= 0 && (
+            (
               context.scene->mMaterials[ mesh->mMaterialIndex ]->GetTextureCount( aiTextureType_DIFFUSE ) > 0 ||
               context.scene->mMaterials[ mesh->mMaterialIndex ]->GetTextureCount( aiTextureType_SPECULAR ) > 0
             )
@@ -156,7 +156,7 @@ namespace BlueBear {
             if( usesTextures ) {
               // usesBones && usesTextures - TexturedRiggedVertex (textured material, bones)
               std::vector< Mesh::TexturedRiggedVertex > vertices;
-              for( int i = 0; i < mesh->mNumVertices; i++ ) {
+              for( size_t i = 0; i < mesh->mNumVertices; i++ ) {
                 Mesh::TexturedRiggedVertex vertex = getVertex< Mesh::TexturedRiggedVertex >( transform * mesh->mVertices[ i ], transform * mesh->mNormals[ i ] );
                 vertex.textureCoordinates = glm::vec2( mesh->mTextureCoords[ 0 ][ i ].x, mesh->mTextureCoords[ 0 ][ i ].y );
                 assignBonesToVertex( vertex, i, mesh->mBones, mesh->mNumBones );
@@ -173,7 +173,7 @@ namespace BlueBear {
             } else {
               // usesBones && !usesTextures - RiggedVertex (solid material, bones)
               std::vector< Mesh::RiggedVertex > vertices;
-              for( int i = 0; i < mesh->mNumVertices; i++ ) {
+              for( size_t i = 0; i < mesh->mNumVertices; i++ ) {
                 Mesh::RiggedVertex vertex = getVertex< Mesh::RiggedVertex >( transform * mesh->mVertices[ i ], transform * mesh->mNormals[ i ] );
                 assignBonesToVertex( vertex, i, mesh->mBones, mesh->mNumBones );
                 vertices.push_back( vertex );
@@ -191,7 +191,7 @@ namespace BlueBear {
             if( usesTextures ) {
               // !usesBones && usesTextures - TexturedVertex (textured material, no bones)
               std::vector< Mesh::TexturedVertex > vertices;
-              for( int i = 0; i < mesh->mNumVertices; i++ ) {
+              for( size_t i = 0; i < mesh->mNumVertices; i++ ) {
                 Mesh::TexturedVertex vertex = getVertex< Mesh::TexturedVertex >( transform * mesh->mVertices[ i ], transform * mesh->mNormals[ i ] );
                 vertex.textureCoordinates = glm::vec2( mesh->mTextureCoords[ 0 ][ i ].x, mesh->mTextureCoords[ 0 ][ i ].y );
                 vertices.push_back( vertex );
@@ -204,7 +204,7 @@ namespace BlueBear {
             } else {
               // !usesBones && !usesTextures - BasicVertex (solid material, no bones)
               std::vector< Mesh::BasicVertex > vertices;
-              for( int i = 0; i < mesh->mNumVertices; i++ ) {
+              for( size_t i = 0; i < mesh->mNumVertices; i++ ) {
                 vertices.push_back( getVertex< Mesh::BasicVertex >( transform * mesh->mVertices[ i ], transform * mesh->mNormals[ i ] ) );
               }
 
@@ -221,7 +221,7 @@ namespace BlueBear {
           std::vector< std::shared_ptr< Texture > > textures;
 
           unsigned int texCount = material->GetTextureCount( type );
-          for( int i = 0; i < texCount; i++ ) {
+          for( size_t i = 0; i < texCount; i++ ) {
             aiString filename;
             material->GetTexture( type, i, &filename );
             textures.push_back( getTexture( context.directory + "/" + filename.C_Str() ) );
@@ -301,17 +301,17 @@ namespace BlueBear {
             std::map< double, Triplet > triplets;
 
             // Spray keyframes into a triplet map; missing keyframes will be substituited with the one before
-            for( int i = 0; i < nodeAnim->mNumPositionKeys; i++ ) {
+            for( size_t i = 0; i < nodeAnim->mNumPositionKeys; i++ ) {
               aiVectorKey& key = nodeAnim->mPositionKeys[ i ];
               triplets[ key.mTime ].position = &( key.mValue );
             }
 
-            for( int i = 0; i < nodeAnim->mNumRotationKeys; i++ ) {
+            for( size_t i = 0; i < nodeAnim->mNumRotationKeys; i++ ) {
               aiQuatKey& key = nodeAnim->mRotationKeys[ i ];
               triplets[ key.mTime ].rotation = &( key.mValue );
             }
 
-            for( int i = 0; i < nodeAnim->mNumScalingKeys; i++ ) {
+            for( size_t i = 0; i < nodeAnim->mNumScalingKeys; i++ ) {
               aiVectorKey& key = nodeAnim->mScalingKeys[ i ];
               triplets[ key.mTime ].scale = &( key.mValue );
             }
@@ -342,10 +342,10 @@ namespace BlueBear {
           if( context.scene->HasAnimations() ) {
             std::shared_ptr< Animation::Bone::AnimationMap > animationMap = std::make_shared< Animation::Bone::AnimationMap >();
 
-            for( int i = 0; i < context.scene->mNumAnimations; i++ ) {
+            for( size_t i = 0; i < context.scene->mNumAnimations; i++ ) {
               aiAnimation* animation = context.scene->mAnimations[ i ];
 
-              for( int j = 0; j < animation->mNumChannels; j++ ) {
+              for( size_t j = 0; j < animation->mNumChannels; j++ ) {
                 aiNodeAnim* nodeAnim = animation->mChannels[ j ];
                 if( std::string( nodeAnim->mNodeName.C_Str() ) == boneId ) {
 
@@ -372,7 +372,7 @@ namespace BlueBear {
           std::string boneId = node->mName.C_Str();
           Animation::Bone result( boneId, Tools::AssimpTools::aiToGLMmat4( node->mTransformation ), getAnimationMapForBone( boneId ) );
 
-          for( int i = 0; i < node->mNumChildren; i++ ) {
+          for( size_t i = 0; i < node->mNumChildren; i++ ) {
             result.addChild( getBoneFromNode( node->mChildren[ i ] ) );
           }
 
@@ -382,7 +382,7 @@ namespace BlueBear {
         std::map< std::string, Animation::Animation > AssimpModelLoader::getAnimationList() {
           std::map< std::string, Animation::Animation > animList;
 
-          for( int i = 0; i < context.scene->mNumAnimations; i++ ) {
+          for( size_t i = 0; i < context.scene->mNumAnimations; i++ ) {
             aiAnimation* animation = context.scene->mAnimations[ i ];
 
             log( "AssimpModelLoader::getAnimationList",
@@ -432,16 +432,16 @@ namespace BlueBear {
 
             std::shared_ptr< Material > material;
             unsigned int materialIndex = rawMesh->mMaterialIndex;
-            if( materialIndex >= 0 ) {
-              material = getMaterial( context.scene->mMaterials[ materialIndex ] );
-            }
+
+            material = getMaterial( context.scene->mMaterials[ materialIndex ] );
+
 
             drawables.push_back( Drawable{ mesh, shader, material } );
           }
 
           std::shared_ptr< Model > model = Model::create( node->mName.C_Str(), drawables );
 
-          for( int i = 0; i < node->mNumChildren; i++ ) {
+          for( size_t i = 0; i < node->mNumChildren; i++ ) {
             aiNode* assimpChild = node->mChildren[ i ];
             // A skeleton is contained within a node called "Armature", with a single root bone as its child
             if( std::string( assimpChild->mName.C_Str() ) == "Armature" && assimpChild->mNumChildren == 1 ) {

@@ -141,7 +141,7 @@ namespace BlueBear::Gameplay {
 		std::shared_ptr< Graphics::SceneGraph::Model > wallRigInstance = state.as< State::HouseholdGameplayState >().getWorldRenderer().findObjectsByType( "__wallrig" )[ 0 ];
 		const auto& levels = wallRigInstance->getChildren();
 
-		for( int i = currentLevel + 1; i < levels.size(); i++ ) {
+		for( size_t i = currentLevel + 1; i < levels.size(); i++ ) {
 			const auto& level = levels[ i ]->getChildren();
 			for( const auto& wall : level ) {
 				enqueueAnimation( wall.get(), { 0, numFrames, -4.0f } );

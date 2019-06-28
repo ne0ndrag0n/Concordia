@@ -2,7 +2,7 @@
 
 namespace BlueBear::Graphics::SceneGraph::Uniforms {
 
-	LevelUniform::LevelUniform( const glm::vec2& position, float level ) : position( position ), level( level ) {}
+	LevelUniform::LevelUniform( const glm::vec2& position, float level ) : level( level ), position( position ) {}
 
 	std::unique_ptr< Uniform > LevelUniform::copy() {
 		return std::make_unique< LevelUniform >( position, level );

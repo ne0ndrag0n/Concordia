@@ -62,7 +62,8 @@ namespace BlueBear::Containers {
 					nextFreeBox->x + boundedObject.width,
 					nextFreeBox->y,
 					nextFreeBox->width - boundedObject.width,
-					boundedObject.height
+					boundedObject.height,
+					{}
 				};
 
 				// New empty box is created to the bottom
@@ -70,7 +71,8 @@ namespace BlueBear::Containers {
 					nextFreeBox->x,
 					nextFreeBox->y + boundedObject.height,
 					nextFreeBox->width,
-					nextFreeBox->height - boundedObject.height
+					nextFreeBox->height - boundedObject.height,
+					{}
 				};
 
 				unpacked.erase( nextFreeBox );
@@ -87,7 +89,7 @@ namespace BlueBear::Containers {
 				int difference = boundedObject.height - totalHeight;
 				if( difference > 0 ) {
 					// Need to add new region to the left instead of underneath
-					PackedCell< T > leftEmpty { 0, totalHeight, totalWidth, difference };
+					PackedCell< T > leftEmpty { 0, totalHeight, totalWidth, difference, {} };
 
 					totalWidth += boundedObject.width;
 					totalHeight += difference;
@@ -100,7 +102,8 @@ namespace BlueBear::Containers {
 						totalWidth,
 						boundedObject.height,
 						boundedObject.width,
-						totalHeight - boundedObject.height
+						totalHeight - boundedObject.height,
+						{}
 					};
 
 					totalWidth += boundedObject.width;
