@@ -195,8 +195,6 @@ namespace BlueBear::Gameplay {
 						direction = wall.direction;
 					}
 
-					Log::getInstance().debug( "InfrastructureManager::setWallCutaways", "Selected for lowering: " + glm::to_string( start ) + " to " + glm::to_string( finish ) );
-
 					int totalSteps = std::abs( glm::distance( finish, start ) );
 					glm::vec2 cursor = start;
 					for( int i = 0; i < totalSteps; i++ ) {
