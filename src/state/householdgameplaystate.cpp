@@ -6,16 +6,12 @@
 #include "eventmanager.hpp"
 #include "graphics/scenegraph/animation/animator.hpp"
 #include "tools/utility.hpp"
+#include "gameplay/household/userinterface.hpp"
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Event.hpp>
 #include <functional>
 #include <queue>
 #include <map>
-
-// Remove these after dev
-#include "graphics/scenegraph/transform.hpp"
-#include "graphics/scenegraph/model.hpp"
-#include "graphics/vector/renderer.hpp"
 
 namespace BlueBear {
   namespace State {
@@ -26,7 +22,8 @@ namespace BlueBear {
       guiComponent( application.getDisplayDevice(), shaderManager ),
       engine( *this ),
       luaEventHelper( engine ),
-      infrastructureManager( *this )
+      infrastructureManager( *this ),
+      userInterface( *this )
     {
       Scripting::EntityKit::SystemComponent::relevantState = this;
 

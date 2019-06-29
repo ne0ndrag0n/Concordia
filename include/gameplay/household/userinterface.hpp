@@ -1,19 +1,28 @@
 #ifndef GAMEPLAY_HOUSEHOLD_UI
 #define GAMEPLAY_HOUSEHOLD_UI
 
+#include "serializable.hpp"
 #include <memory>
 
-namespace BlueBear::Graphics::UserInterface { class Element; }
+namespace BlueBear::State{ class HouseholdGameplayState; }
+namespace BlueBear::Graphics::UserInterface::Widgets {
+	class FloatingPane;
+	class GridLayout;
+	class Text;
+}
 namespace BlueBear::Gameplay::Household {
 
-	class UserInterface {
-		std::shared_ptr< Graphics::UserInterface::Element > sidePane;
-		std::shared_ptr< Graphics::UserInterface::Element > controlPanel;
+	class UserInterface : public Serializable {
+		State::HouseholdGameplayState& parentState;
 
-		void setupControlPanel();
+		std::shared_ptr< Graphics::UserInterface::Widgets::FloatingPane > controlPanel;
 
 	public:
-		UserInterface();
+		UserInterface( State::HouseholdGameplayState& parentState );
+		void setup();
+
+		Json::Value save() override;
+		void load( const Json::Value& data ) override;
 	};
 
 }
