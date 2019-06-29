@@ -363,6 +363,24 @@ namespace BlueBear {
           rootElement->reflow();
         }
 
+        void StyleApplier::applySnippet( const std::string& snippet ) {
+          std::vector< AST::PropertyList > stylesheet;
+
+          try {
+            Parser parser( snippet, true );
+            stylesheet = parser.getStylesheet();
+          } catch( std::exception e ) {
+            Log::getInstance().warn( "StyleApplier::applySnippet", "Failed to load style snippet!" );
+            return;
+          }
+
+          for( const AST::PropertyList& propertyList : stylesheet ) {
+            propertyLists = Tools::Utility::concatArrays( propertyLists, desugar( propertyList ) );
+          }
+
+          rootElement->reflow();
+        }
+
       }
     }
   }

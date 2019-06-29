@@ -56,6 +56,7 @@ namespace BlueBear {
 
           void update( std::shared_ptr< Element > element );
           void applyStyles( std::vector< std::string > paths );
+          void applySnippet( const std::string& snippet );
         };
 
       }

@@ -112,6 +112,10 @@ namespace BlueBear {
             styleManager.applyStyles( paths );
           }
 
+          void GuiComponent::loadStylesheetSnippet( const std::string& snippet ) {
+            styleManager.applySnippet( snippet );
+          }
+
           std::vector< std::shared_ptr< Graphics::UserInterface::Element > > GuiComponent::addElementsFromXML( const std::string& xmlPath, bool file ) {
             Graphics::UserInterface::XMLLoader loader( xmlPath, file );
             return loader.getElements();

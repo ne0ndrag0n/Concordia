@@ -1,23 +1,37 @@
 #include "graphics/userinterface/style/parser.hpp"
 #include "log.hpp"
+#include <fstream>
+#include <sstream>
 
 namespace BlueBear {
   namespace Graphics {
     namespace UserInterface {
       namespace Style {
 
-        Parser::Parser( const std::string& path ) : path( path ) {
-          file.exceptions( std::ios::failbit | std::ios::badbit );
-          file.open( path );
-          file.exceptions( std::ios::goodbit );
+        Parser::Parser( const std::string& path, bool isSnippet ) : path( path ) {
+          if( isSnippet ) {
+            auto file = std::make_unique< std::stringstream >( path );
+
+            file->exceptions( std::ios::failbit | std::ios::badbit | std::ios::goodbit );
+
+            this->file = std::move( file );
+          } else {
+            auto file = std::make_unique< std::fstream >();
+
+            file->exceptions( std::ios::failbit | std::ios::badbit );
+            file->open( path );
+            file->exceptions( std::ios::goodbit );
+
+            this->file = std::move( file );
+          }
 
           getTokens();
         }
 
         bool Parser::checkAndAdvanceChar( char expect ) {
-          char peek = ( char ) file.peek();
+          char peek = ( char ) file->peek();
           if( peek == expect ) {
-            file.get();
+            file->get();
             currentColumn++;
             return true;
           }
@@ -43,9 +57,9 @@ namespace BlueBear {
           std::string result;
 
           while( true ) {
-            char c = ( char ) file.peek();
+            char c = ( char ) file->peek();
             if( predicate( c ) ) {
-              file.get();
+              file->get();
               currentColumn++;
               result += c;
             } else {
@@ -63,7 +77,7 @@ namespace BlueBear {
 
           char current;
           bool negative = false;
-          while( file.get( current ) ) {
+          while( file->get( current ) ) {
             switch( current ) {
               case '#':
                 tokens.push_back( { currentRow, currentColumn, TokenType::POUND } );
@@ -110,17 +124,17 @@ namespace BlueBear {
                 } );
 
                 // Next token was peeked as a " so swallow it and increment the counter
-                file.get();
+                file->get();
                 currentColumn++;
 
                 tokens.push_back( { currentRow, currentColumn, TokenType::STRING, literal } );
                 break;
               }
               case '-': {
-                if( isNumeric( ( char ) file.peek() ) ) {
+                if( isNumeric( ( char ) file->peek() ) ) {
                   currentColumn++;
                   negative = true;
-                  file.get( current );
+                  file->get( current );
                   // Fall through to number case; we know it's the next one up.
                 } // else, we fall through to the isAlpha case
               }

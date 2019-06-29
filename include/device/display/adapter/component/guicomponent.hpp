@@ -66,6 +66,7 @@ namespace BlueBear {
             BasicEvent< void*, std::shared_ptr< Graphics::UserInterface::Element > > GUI_OBJECT_MOUSE_UP;
 
             void loadStylesheets( const std::vector< std::string >& paths );
+            void loadStylesheetSnippet( const std::string& snippet );
             std::vector< std::shared_ptr< Graphics::UserInterface::Element > > addElementsFromXML( const std::string& xmlPath, bool file = true );
             void addElement( std::shared_ptr< Graphics::UserInterface::Element > element );
             std::vector< std::shared_ptr< Graphics::UserInterface::Element > > query( sol::table queries );

@@ -10,9 +10,10 @@
 #include "exceptions/genexc.hpp"
 #include <functional>
 #include <string>
-#include <fstream>
+#include <istream>
 #include <list>
 #include <vector>
+#include <memory>
 
 namespace BlueBear {
   namespace Graphics {
@@ -21,7 +22,7 @@ namespace BlueBear {
 
         class Parser {
           std::string path;
-          std::ifstream file;
+          std::unique_ptr< std::istream > file;
           std::list< Token > tokens;
           unsigned int currentRow;
           unsigned int currentColumn;
@@ -49,7 +50,7 @@ namespace BlueBear {
           EXCEPTION_TYPE( LexException, "Invalid character while parsing" );
           EXCEPTION_TYPE( ParseException, "Invalid token while parsing" );
 
-          Parser( const std::string& path );
+          Parser( const std::string& path, bool isSnippet = false );
 
           std::vector< AST::PropertyList > getStylesheet();
         };
