@@ -45,7 +45,7 @@ namespace BlueBear::Graphics::UserInterface::Widgets {
 
 		if( !children.empty() ) {
 			std::shared_ptr< Element > child = children[ 0 ];
-			children[ 0 ]->setAllocation( { 5, 5, allocation[ 2 ] - 7, allocation[ 3 ] - 10 }, false );
+			children[ 0 ]->setAllocation( { 5, 5, allocation[ 2 ] - 10, allocation[ 3 ] - 10 }, false );
 		}
 	}
 
