@@ -30,20 +30,21 @@ static const std::string UI_CSS = R"(
 		left: subtract( getIntSetting( "viewport_x" ), 310 );
 		top: 10;
 		width: 300;
-		height: 200;
+		height: 150;
 
 		.-bb-syspanel-layout {
 			grid-rows: createLayout( 3, 1 );
 			padding: 3;
 
 			.-bb-syspanel-timedate-layout {
-				grid-rows: createLayout( 2, 1 );
+				grid-rows: createLayout( 1, 1 );
 
 				Text {
 					font: "lcd-italic";
 					font-size: 20.0;
 					background-color: rgbaString( "000000FF" );
 					color: rgbaString( "00FFFFFF" );
+					text-orientation-vertical: Orientation::MIDDLE;
 				}
 			}
 		}

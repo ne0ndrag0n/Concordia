@@ -47,7 +47,9 @@ namespace BlueBear {
         { "tab-inactive-accent-color", glm::uvec4{ 128, 128, 128, 255 } },
         { "grid-columns", LayoutProportions{ 1 } },
         { "grid-rows", LayoutProportions{ 1 } },
-        { "grid-placement", glm::uvec4{ 0, 0, 1, 1 } }
+        { "grid-placement", glm::uvec4{ 0, 0, 1, 1 } },
+        { "text-orientation-vertical", Orientation::TOP },
+        { "text-orientation-horizontal", Orientation::MIDDLE }
       } );
 
       const PropertyList& PropertyList::rootPropertyList = _default;

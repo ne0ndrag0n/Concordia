@@ -84,6 +84,21 @@ namespace BlueBear {
           return text;
         }
 
+        glm::uvec2 Text::getPosition() const {
+          double fontSize = localStyle.get< double >( "font-size" );
+
+          // Assumes
+          //  text-orientation-vertical: Orientation::TOP
+          //  text-orientation-horizontal: Orientation::MIDDLE;
+          glm::uvec2 position{ ( allocation[ 2 ] / 2 ) - ( textSpan / 2 ), fontSize / 2 };
+
+          if( localStyle.get< Orientation >( "text-orientation-vertical" ) == Orientation::MIDDLE ) {
+            position.y = ( allocation[ 3 ] / 2 ) - 5;
+          }
+
+          return position;
+        }
+
         void Text::render( Graphics::Vector::Renderer& renderer ) {
           double fontSize = localStyle.get< double >( "font-size" );
 
@@ -92,7 +107,7 @@ namespace BlueBear {
             localStyle.get< glm::uvec4 >( "background-color" )
           );
 
-          glm::uvec2 position{ ( allocation[ 2 ] / 2 ) - ( textSpan / 2 ), fontSize / 2 };
+          glm::uvec2 position = getPosition();
 
           if( localStyle.get< Orientation >( "text-alignment" ) == Orientation::LEFT ) {
             position.x = localStyle.get< int >( "padding" );

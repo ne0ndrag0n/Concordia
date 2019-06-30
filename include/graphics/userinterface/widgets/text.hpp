@@ -25,6 +25,8 @@ namespace BlueBear {
           void onMouseIn( Device::Input::Metadata event );
           void onMouseOut( Device::Input::Metadata event );
 
+          glm::uvec2 getPosition() const;
+
         public:
           virtual void render( Graphics::Vector::Renderer& renderer ) override;
           virtual void calculate() override;
