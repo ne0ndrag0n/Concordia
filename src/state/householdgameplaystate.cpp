@@ -60,6 +60,8 @@ namespace BlueBear {
       application.getDisplayDevice().pushAdapter( &guiComponent );
 
       worldRenderer.getCamera().setRotationDirect( 0 );
+
+      userInterface.setup();
     }
 
     void HouseholdGameplayState::setupInputDevice() {

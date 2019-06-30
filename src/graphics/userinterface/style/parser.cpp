@@ -12,8 +12,6 @@ namespace BlueBear {
           if( isSnippet ) {
             auto file = std::make_unique< std::stringstream >( path );
 
-            file->exceptions( std::ios::failbit | std::ios::badbit | std::ios::goodbit );
-
             this->file = std::move( file );
           } else {
             auto file = std::make_unique< std::fstream >();

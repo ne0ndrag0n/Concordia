@@ -3,5 +3,7 @@
   "fontawesome": "system/ui/fontawesome.ttf",
   "terminus": "system/ui/terminus.ttf",
   "dosvga": "system/ui/dosvga.ttf",
-  "purisa": "system/ui/purisa-bold.ttf"
+  "purisa": "system/ui/purisa-bold.ttf",
+  "lcd": "system/ui/lcd.ttf",
+  "lcd-italic": "system/ui/lcd-italic.ttf"
 }

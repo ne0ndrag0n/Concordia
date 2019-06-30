@@ -8,7 +8,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bbexec",
+            "program": "${workspaceFolder}/build/cncrda64",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
