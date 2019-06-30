@@ -70,3 +70,7 @@ ContextMenu {
 FloatingPane {
   background-color: rgbaString( "36393Eff" );
 }
+
+.symbol-font {
+  font: "fontawesome";
+}

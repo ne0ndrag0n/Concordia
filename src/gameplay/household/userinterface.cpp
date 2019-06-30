@@ -16,10 +16,10 @@ static const std::string UI_XML = R"(
 				<Text class="-bb-syspanel-date">Thu Jan 1</Text>
 			</GridLayout>
 			<GridLayout class="-bb-syspanel-rotate-zoom">
-				<Button>LR</Button>
-				<Button>RR</Button>
-				<Button>+</Button>
-				<Button>-</Button>
+				<Button class="symbol-font">&#xf01e;</Button>
+				<Button class="symbol-font">&#xf0e2;</Button>
+				<Button class="symbol-font">&#xf00e;</Button>
+				<Button class="symbol-font">&#xf010;</Button>
 			</GridLayout>
 		</GridLayout>
 	</FloatingPane>
