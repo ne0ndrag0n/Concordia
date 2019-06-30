@@ -5,10 +5,12 @@
 #include <memory>
 
 namespace BlueBear::State{ class HouseholdGameplayState; }
+namespace BlueBear::Graphics::UserInterface{ class Element; }
 namespace BlueBear::Graphics::UserInterface::Widgets {
 	class FloatingPane;
 	class GridLayout;
 	class Text;
+	class Button;
 }
 namespace BlueBear::Gameplay::Household {
 
@@ -16,6 +18,10 @@ namespace BlueBear::Gameplay::Household {
 		State::HouseholdGameplayState& parentState;
 
 		std::shared_ptr< Graphics::UserInterface::Widgets::FloatingPane > controlPanel;
+		std::shared_ptr< Graphics::UserInterface::Widgets::Button > rotateRight;
+		std::shared_ptr< Graphics::UserInterface::Widgets::Button > rotateLeft;
+		std::shared_ptr< Graphics::UserInterface::Widgets::Button > zoomIn;
+		std::shared_ptr< Graphics::UserInterface::Widgets::Button > zoomOut;
 
 	public:
 		UserInterface( State::HouseholdGameplayState& parentState );
