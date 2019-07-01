@@ -257,13 +257,18 @@ namespace BlueBear::Gameplay {
 			// Clockwise if area is negative
 			float sign = Tools::Utility::cross( a * b, a * c );
 			if( sign > 0.0f ) {
+				Log::getInstance().debug( "InfrastructureManager::generateRoomNodes", "Counterclockwise" );
 				// Reverse
 				std::vector< glm::vec2 > newResult;
 				for( auto it = result.rbegin(); it != result.rend(); ++it ) {
 					newResult.emplace_back( *it );
 				}
 				return newResult;
+			} else {
+				Log::getInstance().debug( "InfrastructureManager::generateRoomNodes", "Clockwise" );
 			}
+		} else {
+			Log::getInstance().debug( "InfrastructureManager::generateRoomNodes", "Target was -1" );
 		}
 
 		return result;
