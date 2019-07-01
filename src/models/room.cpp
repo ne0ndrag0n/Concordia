@@ -29,11 +29,19 @@ namespace BlueBear::Models {
 	}
 
 	void Room::computeDirections() {
-		for( int i = 0; i != points.size(); i++ ) {
+		for( size_t i = 0; i != points.size(); i++ ) {
 			const glm::vec2& first = Tools::Utility::getCircularIndex( points, i );
 			const glm::vec2& second = Tools::Utility::getCircularIndex( points, i + 1 );
 
 			glm::vec2 direction = glm::normalize( second - first );
+
+			Log::getInstance().debug( "Room::computeDirections",
+				"index: " + std::to_string( i ) + " " +
+				"first: " + glm::to_string( first ) + " " +
+				"second: " + glm::to_string( second ) + " " +
+				"direction: " + glm::to_string( direction )
+			);
+
 			computedDirections.emplace_back( Normal{ { first, second }, direction, { -direction.y, direction.x } } );
 		}
 	}
