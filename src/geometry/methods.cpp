@@ -102,4 +102,44 @@ namespace BlueBear::Geometry {
 		return ( ta >= 0.0f && ta <= 1.0f && tb >= 0.0f && tb <= 1.0f );
 	}
 
+	/**
+	 * mit-licenced polygon area
+	 * https://github.com/tmpvar/polygon.js
+	 */
+	float polygonArea( const Polygon2D& polygon ) {
+		float area = 0.0f;
+
+		if( polygon.empty() ) {
+			return 0.0f;
+		}
+
+		const glm::vec2& first = polygon[ 0 ];
+		for( size_t i = 0; i != polygon.size(); i++ ) {
+			if( i < 2 ) {
+				continue;
+			}
+
+			const glm::vec2& edge1 = first - polygon[ i ];
+			const glm::vec2& edge2 = first - polygon[ i - 1 ];
+
+			area += ( ( edge1.x * edge2.y ) - ( edge1.y * edge2.x ) );
+		}
+
+		return area / 2.0f;
+	}
+
+	bool polygonClockwise( const Polygon2D& polygon ) {
+		return polygonArea( polygon ) > 0.0f;
+	}
+
+	Polygon2D polygonReverse( const Polygon2D& polygon ) {
+		Polygon2D result;
+
+		for( auto it = polygon.rbegin(); it != polygon.rend(); ++it ) {
+			result.emplace_back( *it );
+		}
+
+		return result;
+	}
+
 }

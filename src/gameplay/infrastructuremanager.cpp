@@ -4,6 +4,7 @@
 #include "graphics/scenegraph/modelloader/floormodelloader.hpp"
 #include "graphics/scenegraph/modelloader/wallmodelloader.hpp"
 #include "graphics/vector/renderer.hpp"
+#include "geometry/methods.hpp"
 #include "state/householdgameplaystate.hpp"
 #include "tools/utility.hpp"
 #include "application.hpp"
@@ -234,41 +235,12 @@ namespace BlueBear::Gameplay {
 			result.emplace_back( correctByOrigin( node->position, glm::vec2{ -( dimensions.x * 0.5f ), dimensions.y * 0.5f } ) );
 		}
 
-		// Determine winding direction
-		int size = result.size();
-		int target = -1;
-		glm::vec2 last{ std::numeric_limits< float >::max(), std::numeric_limits< float >::lowest() };
-		for( int i = 0; i != size; i++ ) {
-			if( result[ i ].y < last.y ) {
-				last = result[ i ];
-				target = i;
-			} else if( result[ i ].y == last.y && result[ i ].x > last.x ) {
-				// Highest X wins
-				last = result[ i ];
-				target = i;
-			}
-		}
-
-		if( target != -1 ) {
-			const glm::vec2& b = result[ ( ( target - 1 ) + size ) % size ];
-			const glm::vec2& a = result[ ( target + size ) % size ];
-			const glm::vec2& c = result[ ( ( target + 1 ) + size ) % size ];
-
-			// Clockwise if area is negative
-			float sign = Tools::Utility::cross( a * b, a * c );
-			if( sign > 0.0f ) {
-				Log::getInstance().debug( "InfrastructureManager::generateRoomNodes", "Counterclockwise" );
-				// Reverse
-				std::vector< glm::vec2 > newResult;
-				for( auto it = result.rbegin(); it != result.rend(); ++it ) {
-					newResult.emplace_back( *it );
-				}
-				return newResult;
-			} else {
-				Log::getInstance().debug( "InfrastructureManager::generateRoomNodes", "Clockwise" );
-			}
+		// TODO: Geometry methods to determine winding direction of polygon
+		if( Geometry::polygonClockwise( result ) ) {
+			Log::getInstance().debug( "InfrastructureManager::generateRoomNodes", "Clockwise" );
 		} else {
-			Log::getInstance().debug( "InfrastructureManager::generateRoomNodes", "Target was -1" );
+			Log::getInstance().debug( "InfrastructureManager::generateRoomNodes", "Counterclockwise - reversing" );
+			return Geometry::polygonReverse( result );
 		}
 
 		return result;
