@@ -19,11 +19,11 @@ Concordia
 
 ## Dependencies
 * SFML 2.3.x
-* TinyXML2
+* TinyXML2 6.0.0
 * Lua 5.3.x
 * JsonCpp 1.7.x
 * GLM
-* GLEW
-* Assimp
-* Intel Threading Building Blocks (TBB) 4.4
-* Sol Lua bindings
+* GLEW 2.0.0-5
+* Assimp 4.1.0
+* Intel Threading Building Blocks (TBB) 2017~U7~8
+* Sol Lua bindings 3
