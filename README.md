@@ -19,6 +19,7 @@ Concordia
 
 ## Dependencies
 * SFML 2.3.x
+    * OpenGL 4.5
 * TinyXML2 6.0.0
 * Lua 5.3.x
 * JsonCpp 1.7.x

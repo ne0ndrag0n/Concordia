@@ -54,11 +54,11 @@ namespace BlueBear {
         glGetIntegerv( GL_MAX_VERTEX_UNIFORM_COMPONENTS, &maxUniformVertexComponents );
         int maxUniformFragmentComponents;
         glGetIntegerv( GL_MAX_FRAGMENT_UNIFORM_COMPONENTS, &maxUniformFragmentComponents );
-        Log::getInstance().debug( "Display::Display", "Created OpenGL 3.3 Context (" + std::to_string( maxUniformVertexComponents ) + "V/" + std::to_string( maxUniformFragmentComponents ) + "F)" );
+        Log::getInstance().debug( "Display::Display", "Created OpenGL 4.5 Context (" + std::to_string( maxUniformVertexComponents ) + "V/" + std::to_string( maxUniformFragmentComponents ) + "F)" );
       }
 
       sf::ContextSettings Display::getDefaultContextSettings() const {
-        return sf::ContextSettings( 24, 8, 0, 3, 3, sf::ContextSettings::Core );
+        return sf::ContextSettings( 24, 8, 0, 4, 5, sf::ContextSettings::Core );
       }
 
       sf::RenderWindow& Display::getRenderWindow() {

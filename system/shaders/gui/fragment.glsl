@@ -1,4 +1,4 @@
-#version 330 core
+#version 450 core
 in vec2 fragTexture;
 out vec4 color;
 
