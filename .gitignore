@@ -5,6 +5,7 @@ test/test
 .vscode/ipch
 cncrda64
 CMakeCache.txt
+CMakeSettings.json
 cmake_install.cmake
 CMakeFiles/
 Makefile
