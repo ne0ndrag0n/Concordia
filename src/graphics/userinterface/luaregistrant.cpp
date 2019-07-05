@@ -186,7 +186,7 @@ namespace BlueBear::Graphics::UserInterface {
         std::vector< std::shared_ptr< Graphics::UserInterface::Element > > pointers;
 
         for( auto& pair : elements ) {
-          pointers.push_back(
+          pointers.emplace_back(
             Scripting::LuaKit::Utility::cast< Element& >( pair.second ).shared_from_this()
           );
         }

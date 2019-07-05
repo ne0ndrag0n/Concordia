@@ -2,6 +2,7 @@
 #define CONFIGMANAGER
 
 #include <jsoncpp/json/json.h>
+#include <sol.hpp>
 #include <string>
 #include <map>
 #include <functional>
@@ -21,6 +22,8 @@ namespace BlueBear {
       bool getBoolValue( const std::string& key );
 
       void each( std::function< void( std::string, Json::Value& ) > func );
+
+      void submitLuaContributions( sol::state& lua );
 
     private:
       static constexpr const char* SETTINGS_PATH = "settings.json";

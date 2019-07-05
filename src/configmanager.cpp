@@ -44,6 +44,7 @@ namespace BlueBear {
     configRoot[ "wall_cutaway_animation_speed" ] = 1000;
     configRoot[ "shader_grid_selectable_tiles" ] = 32;
     configRoot[ "shader_grid_line_size" ] = 25;
+    configRoot[ "debug_console_trim" ] = 50;
 
     // Load settings.json from file
     std::ifstream settingsFile( SETTINGS_PATH );
@@ -62,6 +63,14 @@ namespace BlueBear {
         configRoot[ key.asString() ] = value;
       }
     }
+  }
+
+  void ConfigManager::submitLuaContributions( sol::state& lua ) {
+    sol::table config = lua[ "bluebear" ][ "config" ] = lua.create_table();
+
+    config.set_function( "get_string_value", &ConfigManager::getValue, this );
+    config.set_function( "get_int_value", &ConfigManager::getIntValue, this );
+    config.set_function( "get_bool_value", &ConfigManager::getBoolValue, this );
   }
 
   void ConfigManager::each( std::function< void( std::string, Json::Value& ) > func ) {

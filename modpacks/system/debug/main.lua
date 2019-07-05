@@ -164,11 +164,29 @@ function Panel:insert_queue()
   self.scrollback_bin:add_child( self.message_queue )
   self.message_queue = {}
 
+  self:trim_elements()
+
   -- Restore
   self.system_event = bluebear.event.register_system_event(
     'message-logged',
     bluebear.util.bind( self.receive_message, self )
   )
+end
+
+function Panel:trim_elements()
+  local cap = bluebear.config.get_int_value( "debug_console_trim" )
+  local children = self.scrollback_bin:get_children()
+  local difference = #children - cap
+
+  if difference > 0 then
+    -- remove items at the beginning of the array
+    local to_remove = {}
+    for i = 1, difference do
+      table.insert( to_remove, children[ i ] )
+    end
+
+    self.scrollback_bin:remove( to_remove )
+  end
 end
 
 function Panel:toggle()

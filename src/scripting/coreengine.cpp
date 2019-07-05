@@ -53,6 +53,7 @@ namespace BlueBear::Scripting {
     Gameplay::Interaction::submitLuaContributions( types );
     LuaKit::DynamicUsertype::submitLuaContributions( types );
     LuaKit::Utility::submitLuaContributions( lua );
+    ConfigManager::getInstance().submitLuaContributions( lua );
   }
 
   sol::function CoreEngine::bind( sol::function f, sol::variadic_args args ) {
