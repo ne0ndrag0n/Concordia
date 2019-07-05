@@ -381,11 +381,11 @@ namespace BlueBear {
 
         glm::vec2 upperCorner = { scissor.x + scissor.z, scissor.y + scissor.w };
         if( upperCorner.x > parentUpperCorner.x ) {
-          scissor.z = parentUpperCorner.x - scissor.x;
+          scissor.z = std::max( 0.0f, parentUpperCorner.x - scissor.x );
         }
 
         if( upperCorner.y > parentUpperCorner.y ) {
-          scissor.w = parentUpperCorner.y - scissor.y;
+          scissor.w = std::max( 0.0f, parentUpperCorner.y - scissor.y );
         }
 
         return scissor;
