@@ -12,11 +12,17 @@ struct Material {
   float opacity;
 };
 
-uniform vec3 cameraPos;
+layout (std140) uniform Camera {
+  vec4 cameraPos;
+  mat4 view;
+  mat4 projection;
+};
 uniform Material material;
 uniform vec4 highlight;
 
 void main() {
+  vec3 cameraPos = cameraPos.xyz;
+
   vec3 texResult = texture( material.diffuse0, fragTexture ).xyz;
 
   vec3 norm = normalize( fragNormal );

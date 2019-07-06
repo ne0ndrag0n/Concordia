@@ -10,8 +10,11 @@ out vec3 fragNormal;
 out vec3 fragPos;
 
 uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
+layout (std140) uniform Camera {
+  vec4 cameraPos;
+  mat4 view;
+  mat4 projection;
+};
 
 uniform mat4 bones[ 16 ];
 

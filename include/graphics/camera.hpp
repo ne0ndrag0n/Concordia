@@ -1,6 +1,7 @@
 #ifndef CAMERA
 #define CAMERA
 
+#include "graphics/shader_tools/shader_global.hpp"
 #include "geometry/ray.hpp"
 #include "graphics/shader.hpp"
 #include "eventmanager.hpp"
@@ -14,11 +15,16 @@
 namespace BlueBear {
   namespace Graphics {
     class Camera {
+        struct Std140Camera {
+          glm::vec4 cameraPos;
+          glm::mat4 view;
+          glm::mat4 projection;
+        };
 
-      private:
+        ShaderTools::ShaderGlobal< Std140Camera > shaderCamera;
+
         glm::mat4 view;
         glm::mat4 projection;
-
         glm::vec3 camera = glm::vec3( 0, 0, 0.0f );
         GLuint currentRotation = 0;
 
@@ -40,7 +46,7 @@ namespace BlueBear {
 
         const CameraUniformBundle& getUniforms( const Shader* shader );
         void doRotate();
-        void sendToShader( const Shader& shader );
+        void sendToShader();
 
       public:
         BasicEvent< void* > CAMERA_ROTATED;

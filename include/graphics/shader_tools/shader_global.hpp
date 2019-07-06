@@ -4,19 +4,22 @@
 #include <GL/glew.h>
 #include <functional>
 
-namespace BlueBear::Graphics::Shader {
+namespace BlueBear::Graphics::ShaderTools {
 
     template< typename Std140Struct >
     class ShaderGlobal {
         Std140Struct data;
+        GLuint bufferBase;
         GLuint ubo;
 
     public:
-        ShaderGlobal( const Std140Struct& data ) : data( data ) {
+        ShaderGlobal( GLuint bufferBase ) : bufferBase( bufferBase ) {
             glGenBuffers( 1, &ubo );
             glBindBuffer( GL_UNIFORM_BUFFER, ubo );
                 glBufferData( GL_UNIFORM_BUFFER, sizeof( Std140Struct ), &data, GL_DYNAMIC_DRAW );
             glBindBuffer( GL_UNIFORM_BUFFER, 0 );
+
+            glBindBufferBase( GL_UNIFORM_BUFFER, bufferBase, ubo );
         }
 
         ~ShaderGlobal() {

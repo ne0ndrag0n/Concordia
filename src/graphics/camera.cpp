@@ -15,13 +15,9 @@
 namespace BlueBear {
   namespace Graphics {
 
-    Camera::Camera( int screenWidth, int screenHeight ) {
+    Camera::Camera( int screenWidth, int screenHeight ) : shaderCamera( 0 ) {
       widthHalf = ( (float)screenWidth / 2 );
       heightHalf = ( (float)screenHeight / 2 );
-
-      Graphics::Shader::SHADER_CHANGE.listen( this, [ this ]( const Shader& shader ) {
-        sendToShader( shader );
-      } );
     }
 
     const glm::vec3& Camera::getPosition() const {
@@ -86,6 +82,8 @@ namespace BlueBear {
         view = getOrthoView();
         projection = getOrthoMatrix();
 
+        sendToShader();
+
         dirty = false;
       }
     }
@@ -103,11 +101,13 @@ namespace BlueBear {
       return bundle;
     }
 
-    void Camera::sendToShader( const Shader& shader ) {
-      const auto& bundle = getUniforms( &shader );
-      shader.sendData( bundle.cameraPosUniform, camera );
-      shader.sendData( bundle.viewUniform, view );
-      shader.sendData( bundle.projectionUniform, projection );
+    void Camera::sendToShader() {
+      // new stuff
+      shaderCamera.update( [ & ]( Std140Camera& camera ) {
+        camera.cameraPos = glm::vec4( this->camera, 0.0f );
+        camera.view = view;
+        camera.projection = projection;
+      } );
     }
 
     glm::mat4 Camera::getOrthoView() {
