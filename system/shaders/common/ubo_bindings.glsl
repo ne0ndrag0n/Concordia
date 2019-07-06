@@ -1,0 +1,1 @@
+#define		BLUEBEAR_CAMERA_BINDING		0

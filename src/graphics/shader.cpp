@@ -275,10 +275,10 @@ namespace BlueBear {
       if( Shader::CURRENT_PROGRAM != program ) {
         glUseProgram( program );
         Shader::CURRENT_PROGRAM = program;
-      }
 
-      if( !silent ) {
-        SHADER_CHANGE.trigger( *this );
+        if( !silent ) {
+          SHADER_CHANGE.trigger( *this );
+        }
       }
     }
 
