@@ -2,20 +2,12 @@
 #define SG_DIRECTIONAL_LIGHT
 
 #include "graphics/scenegraph/light/light.hpp"
-#include "graphics/shader.hpp"
 #include <unordered_map>
 
 namespace BlueBear::Graphics::SceneGraph::Light {
 
   class DirectionalLight : public Light {
-
     glm::vec3 direction;
-
-    std::unordered_map< const void*, std::vector< Shader::Uniform > > uniforms;
-
-  protected:
-    void generateUniformBundles( const Shader* shader ) override;
-    void send( const Shader& shader, unsigned int arrayIndex ) override;
 
   public:
     DirectionalLight(
@@ -24,8 +16,6 @@ namespace BlueBear::Graphics::SceneGraph::Light {
       glm::vec3 diffuseComponent,
       glm::vec3 specularComponent
     );
-
-    std::string getPreamble() override;
 
     glm::vec3 getDirection() const;
   };

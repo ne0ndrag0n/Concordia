@@ -70,8 +70,6 @@ namespace BlueBear {
             std::vector< std::unique_ptr< ModelRegistration > > models;
             Tools::AsyncTable asyncTasks;
 
-            std::unordered_map< const void*, Graphics::Shader::Uniform > pointLightUniforms;
-
             std::unique_ptr< Graphics::SceneGraph::ModelLoader::FileModelLoader > getFileModelLoader( bool deferGLOperations );
 
             void getModelAtMouse(

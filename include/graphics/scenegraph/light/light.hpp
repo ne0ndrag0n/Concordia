@@ -1,30 +1,16 @@
 #ifndef SG_LIGHT
 #define SG_LIGHT
 
-#include "graphics/scenegraph/illuminator.hpp"
-#include "graphics/shader.hpp"
 #include <glm/glm.hpp>
 #include <unordered_map>
 #include <string>
 
 namespace BlueBear::Graphics::SceneGraph::Light {
 
-    class Light : public Illuminator {
+    class Light {
       glm::vec3 ambientComponent;
       glm::vec3 diffuseComponent;
       glm::vec3 specularComponent;
-
-      struct LightUniformBundle {
-        std::vector< Shader::Uniform > ambientUniform;
-        std::vector< Shader::Uniform > diffuseUniform;
-        std::vector< Shader::Uniform > specularUniform;
-      };
-
-      std::unordered_map< const void*, LightUniformBundle > bundles;
-
-    protected:
-      virtual void generateUniformBundles( const Shader* shader );
-      void send( const Shader& shader, unsigned int arrayIndex ) override;
 
     public:
       Light(

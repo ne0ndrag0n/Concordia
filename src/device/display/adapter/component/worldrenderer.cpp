@@ -1,8 +1,6 @@
 #include "device/display/adapter/component/worldrenderer.hpp"
 #include "device/display/display.hpp"
 #include "geometry/methods.hpp"
-#include "graphics/scenegraph/light/pointlight.hpp"
-#include "graphics/scenegraph/light/directionallight.hpp"
 #include "graphics/scenegraph/model.hpp"
 #include "graphics/scenegraph/modelloader/filemodelloader.hpp"
 #include "graphics/scenegraph/modelloader/assimpmodelloader.hpp"

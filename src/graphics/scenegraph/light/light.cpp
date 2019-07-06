@@ -34,32 +34,4 @@ namespace BlueBear::Graphics::SceneGraph::Light {
       this->specularComponent = specularComponent;
     }
 
-    void Light::generateUniformBundles( const Shader* shader ) {
-      auto it = bundles.find( shader );
-      if( it == bundles.end() ) {
-        auto& bundle = bundles[ shader ];
-
-        static int maxLights = ConfigManager::getInstance().getIntValue( "shader_max_lights" );
-        for( int i = 0; i != maxLights; i++ ) {
-          std::string prefix = getPreamble() + "[" + std::to_string( i ) + "].";
-
-          bundle.ambientUniform.emplace_back( shader->getUniform( prefix + "ambient" ) );
-          bundle.diffuseUniform.emplace_back( shader->getUniform( prefix + "diffuse" ) );
-          bundle.specularUniform.emplace_back( shader->getUniform( prefix + "specular" ) );
-        }
-      }
-    }
-
-    /**
-     * All light locations can be sent before drawing all potentially lit components
-     */
-    void Light::send( const Shader& shader, unsigned int arrayIndex ) {
-      generateUniformBundles( &shader );
-      const auto& bundle = bundles[ &shader ];
-
-      shader.sendData( bundle.ambientUniform[ arrayIndex ], ambientComponent );
-      shader.sendData( bundle.diffuseUniform[ arrayIndex ], diffuseComponent );
-      shader.sendData( bundle.specularUniform[ arrayIndex ], specularComponent );
-    }
-
 }

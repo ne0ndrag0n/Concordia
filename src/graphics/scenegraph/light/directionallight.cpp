@@ -9,30 +9,6 @@ namespace BlueBear::Graphics::SceneGraph::Light {
       this->direction = direction;
     }
 
-  std::string DirectionalLight::getPreamble() {
-    return "directionalLights";
-  }
-
-  void DirectionalLight::generateUniformBundles( const Shader* shader ) {
-    Light::generateUniformBundles( shader );
-
-    auto it = uniforms.find( shader );
-    if( it == uniforms.end() ) {
-      auto& uniform = uniforms[ shader ];
-
-      static int maxLights = ConfigManager::getInstance().getIntValue( "shader_max_lights" );
-      for( int i = 0; i != maxLights; i++ ) {
-        uniform.emplace_back( shader->getUniform( getPreamble() + "[" + std::to_string( i ) + "].direction" ) );
-      }
-    }
-  }
-
-  void DirectionalLight::send( const Shader& shader, unsigned int arrayIndex ) {
-    Light::send( shader, arrayIndex );
-
-    shader.sendData( uniforms[ &shader ][ arrayIndex ], direction );
-  }
-
   glm::vec3 DirectionalLight::getDirection() const {
     return direction;
   }
