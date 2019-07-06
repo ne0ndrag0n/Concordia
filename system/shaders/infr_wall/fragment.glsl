@@ -21,11 +21,11 @@ void main() {
   vec3 texResult = texture( material.diffuse0, fragTexture ).rgb;
 
   vec3 norm = normalize( fragNormal );
-  vec3 lightDirection = normalize( -light.direction );
+  vec3 lightDirection = normalize( -light.direction.xyz );
   float diffTheta = max( dot( norm, lightDirection ), 0.0 );
 
-  vec3 ambient = light.ambient * texResult;
-  vec3 diffuse = light.diffuse * diffTheta * texResult;
+  vec3 ambient = light.ambient.xyz * texResult;
+  vec3 diffuse = light.diffuse.xyz * diffTheta * texResult;
 
   color = vec4( ambient + diffuse, material.opacity );
 }

@@ -3,6 +3,7 @@ in vec3 fragNormal;
 in vec3 fragPos;
 out vec4 color;
 
+/*
 struct Material {
   vec3 ambient;
   vec3 diffuse;
@@ -21,8 +22,10 @@ struct DirectionalLight {
 #include "system/shaders/common/camera.glsl"
 uniform Material material;
 uniform DirectionalLight directionalLight;
+*/
 
 void main() {
+  /*
   vec3 cameraPos = cameraPos.xyz;
 
   vec3 norm = normalize( fragNormal );
@@ -39,4 +42,6 @@ void main() {
   vec3 specular = directionalLight.specular * specTheta * material.specular;
 
   color = vec4( ambient + diffuse + specular, material.opacity );
+  */
+  color = vec4( 0.0f, 0.0f, 0.0f, 1.0f );
 }
