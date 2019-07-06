@@ -10,11 +10,7 @@ out vec3 fragNormal;
 out vec3 fragPos;
 
 uniform mat4 model;
-layout (std140) uniform Camera {
-  vec4 cameraPos;
-  mat4 view;
-  mat4 projection;
-};
+#include "system/shaders/common/camera.glsl"
 
 uniform mat4 bones[ 16 ];
 

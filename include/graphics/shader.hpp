@@ -13,7 +13,6 @@ namespace BlueBear {
     class Shader {
       std::string vPath;
       std::string fPath;
-      std::unordered_set< std::string > visitedFiles;
 
       struct FilePackage {
         std::string vertex;
@@ -22,7 +21,7 @@ namespace BlueBear {
 
       std::string getFile( const std::string& path );
       FilePackage getFilePair();
-      std::string preprocess( const std::string& source );
+      std::string preprocess( const std::string& source, std::unordered_set< std::string >& visitedFiles );
 
       GLuint compileVertex( const std::string& source );
       GLuint compileFragment( const std::string& source );

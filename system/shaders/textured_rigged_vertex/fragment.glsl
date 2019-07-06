@@ -5,18 +5,9 @@ in vec3 fragPos;
 out vec4 color;
 
 #include "system/shaders/common/directional_light.glsl"
+#include "system/shaders/common/material.glsl"
+#include "system/shaders/common/camera.glsl"
 
-struct Material {
-  sampler2D diffuse0;
-  float shininess;
-  float opacity;
-};
-
-layout (std140) uniform Camera {
-  vec4 cameraPos;
-  mat4 view;
-  mat4 projection;
-};
 uniform Material material;
 uniform vec4 highlight;
 

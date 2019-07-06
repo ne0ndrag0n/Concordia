@@ -40,13 +40,16 @@ namespace BlueBear {
     }
 
     Shader::FilePackage Shader::getFilePair() {
+      std::unordered_set< std::string > visitedVertex;
+      std::unordered_set< std::string > visitedFragment;
+
       return FilePackage{
-        preprocess( getFile( vPath ) ),
-        preprocess( getFile( fPath ) )
+        preprocess( getFile( vPath ), visitedVertex ),
+        preprocess( getFile( fPath ), visitedFragment )
       };
     }
 
-    std::string Shader::preprocess( const std::string& source ) {
+    std::string Shader::preprocess( const std::string& source, std::unordered_set< std::string >& visitedFiles ) {
       std::string result = source;
       std::regex includeStatement( "#include(?: |\\t)+\"(.+)\"\\n" );
 
@@ -58,7 +61,7 @@ namespace BlueBear {
         const std::string& filename = match[ 1 ];
         if( visitedFiles.find( filename ) == visitedFiles.end() ) {
           visitedFiles.insert( filename );
-          result = match.format( "$`" + preprocess( getFile( filename ) ) +  "\n$'" );
+          result = match.format( "$`" + preprocess( getFile( filename ), visitedFiles ) +  "\n$'" );
         } else {
           // Remove match
           result = match.format( "$`$'" );
@@ -154,8 +157,6 @@ namespace BlueBear {
       glDeleteShader(fragment);
 
       Log::getInstance().debug( "Shader::sendDeferred", vPath + ";" + fPath + " loaded successfully" );
-
-      visitedFiles.clear();
     }
 
     Shader::Shader( const std::string& vertexPath, const std::string& fragmentPath, bool defer ) : vPath( vertexPath ), fPath( fragmentPath ) {
