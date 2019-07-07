@@ -177,6 +177,7 @@ namespace BlueBear {
       }
 
       void Model::setLocalTransform( Transform transform ) {
+        boundingVolume = nullptr;
         this->transform = transform;
       }
 
