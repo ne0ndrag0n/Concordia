@@ -2,6 +2,11 @@
 #include "device/display/display.hpp"
 #include "geometry/methods.hpp"
 #include "graphics/scenegraph/model.hpp"
+#include "graphics/scenegraph/drawable.hpp"
+#include "graphics/scenegraph/transform.hpp"
+#include "graphics/scenegraph/mesh/mesh.hpp"
+#include "graphics/scenegraph/mesh/boneuniform.hpp"
+#include "graphics/scenegraph/animation/animator.hpp"
 #include "graphics/scenegraph/modelloader/filemodelloader.hpp"
 #include "graphics/scenegraph/modelloader/assimpmodelloader.hpp"
 #include "graphics/scenegraph/uniforms/highlight_uniform.hpp"
@@ -10,6 +15,7 @@
 #include "scripting/luakit/utility.hpp"
 #include "configmanager.hpp"
 #include "log.hpp"
+#include <tbb/concurrent_unordered_map.h>
 #include <tbb/task_group.h>
 #include <tbb/concurrent_queue.h>
 #include <functional>
@@ -441,6 +447,43 @@ namespace BlueBear {
             originals[ id ] = model;
           }
 
+          void WorldRenderer::drawTree( const Graphics::SceneGraph::Model* model, WorldRenderer::ModelPushdown pushdown ) {
+            pushdown.levelTransform *= model->getLocalTransform().getMatrix();
+
+            // Do the draw
+            for( const auto& pair : model->getUniforms() ) {
+              pair.second->update();
+              Graphics::Shader::SHADER_CHANGE.listen( pair.second.get(), [ ptr = pair.second.get() ]( const Graphics::Shader& shader ) {
+                ptr->send( shader );
+              } );
+            }
+
+            for( const Graphics::SceneGraph::Drawable& drawable : model->getDrawableList() ) {
+              if( drawable ) {
+                drawable.shader->use();
+                if( pushdown.bones ) {
+                  auto it = drawable.mesh->meshUniforms.find( "bone" );
+                  if( it != drawable.mesh->meshUniforms.end() ) {
+                    Graphics::SceneGraph::Mesh::BoneUniform* boneUniform = ( Graphics::SceneGraph::Mesh::BoneUniform* ) it->second.get();
+                    boneUniform->configure( *pushdown.bones );
+                  }
+                }
+                drawable.shader->sendData( modelUniforms.getUniforms( *drawable.shader ).transformUniform, pushdown.levelTransform );
+                drawable.material->send( *drawable.shader );
+                drawable.mesh->drawElements( *drawable.shader );
+                drawable.material->releaseTextureUnits();
+              }
+            }
+
+            for( const auto& child : model->getChildren() ) {
+              drawTree( child.get(), pushdown );
+            }
+
+            for( const auto& pair : model->getUniforms() ) {
+              Graphics::Shader::SHADER_CHANGE.stopListening( pair.second.get() );
+            }
+          }
+
           /**
            * TODO: Optimized renderer that sorts by shader to minimize shader changes
            */
@@ -452,7 +495,18 @@ namespace BlueBear {
 
             for( auto& registration : models ) {
               if( registration ) {
-                registration->instance->draw();
+                //registration->instance->draw();
+                ModelPushdown pushdown{ nullptr, glm::mat4( 1.0f ) };
+                if( const auto& animator = registration->instance->getAnimator() ) {
+                  if( animator->updating() ) {
+                    registration->instance->invalidateBoundingVolume();
+                  }
+
+                  animator->update();
+                  pushdown.bones = &animator->getComputedMatrices();
+                }
+
+                drawTree( registration->instance.get(), pushdown );
               }
             }
           }

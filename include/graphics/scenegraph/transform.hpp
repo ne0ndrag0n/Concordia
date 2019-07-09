@@ -32,6 +32,7 @@ namespace BlueBear {
         Transform& operator*=( const Transform& rhs );
 
         glm::mat4 getMatrix();
+        glm::mat4 getMatrix() const;
 
         glm::vec3 getPosition() const;
         void setPosition( const glm::vec3& position );

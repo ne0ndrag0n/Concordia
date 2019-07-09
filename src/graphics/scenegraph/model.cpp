@@ -34,7 +34,9 @@ namespace BlueBear {
 
         types.new_usertype< Model >( "GFXModel",
           "new", sol::no_constructor,
-          "get_transform", &Model::getLocalTransform,
+          "get_transform", []( Model& self ) -> Transform& {
+            return self.getLocalTransform();
+          },
           "set_current_animation", []( Model& self, const std::string& animation ) {
             auto animator = self.getAnimator();
 
@@ -84,6 +86,10 @@ namespace BlueBear {
         return submodels;
       }
 
+      const std::map< std::string, std::unique_ptr< Uniform > >& Model::getUniforms() const {
+        return uniforms;
+      }
+
       void Model::detach() {
         if( std::shared_ptr< Model > realParent = getParent() ) {
           realParent->submodels.erase(
@@ -112,7 +118,7 @@ namespace BlueBear {
         return drawables.at( index );
       }
 
-      std::vector< Drawable >& Model::getDrawableList() {
+      const std::vector< Drawable >& Model::getDrawableList() const {
         return drawables;
       }
 
@@ -176,6 +182,10 @@ namespace BlueBear {
         return transform;
       }
 
+      const Transform& Model::getLocalTransform() const {
+        return transform;
+      }
+
       void Model::setLocalTransform( Transform transform ) {
         boundingVolume = nullptr;
         this->transform = transform;
@@ -214,29 +224,6 @@ namespace BlueBear {
             boundingVolume = std::make_unique< BoundingVolume::AxisAlignedBoundingVolume >();
             boundingVolume->generate( getModelTriangles( animator.get() ) );
           }
-        }
-      }
-
-      void Model::configureBones( const Mesh::Mesh& mesh, const std::map< std::string, glm::mat4 >& bones ) {
-        auto it = mesh.meshUniforms.find( "bone" );
-        if( it != mesh.meshUniforms.end() ) {
-          Mesh::BoneUniform* boneUniform = ( Mesh::BoneUniform* ) it->second.get();
-          boneUniform->configure( bones );
-        }
-      }
-
-      void Model::sendUniforms() const {
-        for( const auto& pair : uniforms ) {
-          pair.second->update();
-          Graphics::Shader::SHADER_CHANGE.listen( pair.second.get(), [ ptr = pair.second.get() ]( const Shader& shader ) {
-            ptr->send( shader );
-          } );
-        }
-      }
-
-      void Model::removeUniformEvents() const {
-        for( const auto& pair : uniforms ) {
-          Graphics::Shader::SHADER_CHANGE.stopListening( pair.second.get() );
         }
       }
 
@@ -347,38 +334,8 @@ namespace BlueBear {
         return boundingVolume->intersects( ray );
       }
 
-      void Model::draw( Animation::Animator* parentAnimator ) {
-
-        if( animator ) {
-          // Invalidate bounding volume if animator morphs the mesh
-          if( animator->updating() ) {
-            boundingVolume = nullptr;
-          }
-
-          animator->update();
-          parentAnimator = animator.get();
-        }
-
-        sendUniforms();
-
-        for( const Drawable& drawable : drawables ) {
-          if( drawable ) {
-            drawable.shader->use();
-            if( parentAnimator ) {
-              configureBones( *drawable.mesh, parentAnimator->getComputedMatrices() );
-            }
-            drawable.shader->sendData( getTransformUniform( drawable.shader.get() ), getHierarchicalTransform() );
-            drawable.material->send( *drawable.shader );
-            drawable.mesh->drawElements( *drawable.shader );
-            drawable.material->releaseTextureUnits();
-          }
-        }
-
-        for( std::shared_ptr< Model >& model : submodels ) {
-          model->draw( parentAnimator );
-        }
-
-        removeUniformEvents();
+      void Model::invalidateBoundingVolume() {
+        boundingVolume = nullptr;
       }
 
     }

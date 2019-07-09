@@ -99,6 +99,14 @@ namespace BlueBear {
         return result;
       }
 
+      glm::mat4 Transform::getMatrix() const {
+        if( dirty ) {
+          return getMatrixImmediate();
+        }
+
+        return result;
+      }
+
       glm::vec3 Transform::getPosition() const {
         return position;
       }

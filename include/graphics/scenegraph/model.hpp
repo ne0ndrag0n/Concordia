@@ -46,9 +46,6 @@ namespace BlueBear {
         Model( const Model& other );
 
         void generateBoundingVolume();
-        void configureBones( const Mesh::Mesh& mesh, const std::map< std::string, glm::mat4 >& bones );
-        void sendUniforms() const;
-        void removeUniformEvents() const;
         glm::mat4 getHierarchicalTransform();
         Shader::Uniform getTransformUniform( const Shader* shader );
 
@@ -68,9 +65,10 @@ namespace BlueBear {
         void addChild( std::shared_ptr< Model > child, std::optional< int > index = {} );
         void detach();
         const std::vector< std::shared_ptr< Model > >& getChildren() const;
+        const std::map< std::string, std::unique_ptr< Uniform > >& getUniforms() const;
 
         Drawable& getDrawable( unsigned int index );
-        std::vector< Drawable >& getDrawableList();
+        const std::vector< Drawable >& getDrawableList() const;
 
         Uniform* getUniform( const std::string& id );
         void setUniform( const std::string& id, std::unique_ptr< Uniform > uniform );
@@ -78,6 +76,8 @@ namespace BlueBear {
 
         Transform getComputedTransform() const;
         Transform& getLocalTransform();
+        const Transform& getLocalTransform() const;
+
         void setLocalTransform( Transform transform );
 
         std::shared_ptr< Animation::Animator > getAnimator() const;
@@ -89,8 +89,7 @@ namespace BlueBear {
 
         std::vector< ModelTriangle > getModelTriangles( Animation::Animator* parentAnimator = nullptr ) const;
         bool intersectsBoundingVolume( const Geometry::Ray& ray );
-
-        void draw( Animation::Animator* parentAnimator = nullptr );
+        void invalidateBoundingVolume();
       };
 
     }

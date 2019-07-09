@@ -8,16 +8,18 @@
 #include "geometry/triangle.hpp"
 #include "graphics/shader.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/uniform_cache.hpp"
 #include "graphics/scenegraph/resourcebank.hpp"
 #include "graphics/utilities/shader_manager.hpp"
 #include "exceptions/genexc.hpp"
 #include "tools/async_table.hpp"
 #include "eventmanager.hpp"
 #include "serializable.hpp"
-#include <tbb/concurrent_unordered_map.h>
+#include <glm/glm.hpp>
 #include <sol.hpp>
 #include <memory>
 #include <string>
+#include <map>
 #include <unordered_map>
 #include <set>
 #include <vector>
@@ -30,6 +32,10 @@ namespace BlueBear {
     namespace SceneGraph {
       class Model;
       class Illuminator;
+
+      namespace Animation {
+        class Animator;
+      }
 
       namespace ModelLoader {
         class FileModelLoader;
@@ -51,6 +57,11 @@ namespace BlueBear {
             BasicEvent< void*, std::shared_ptr< Graphics::SceneGraph::Model > > MODEL_REMOVED;
 
           private:
+            struct ModelPushdown {
+              const std::map< std::string, glm::mat4 >* bones = nullptr;
+              glm::mat4 levelTransform;
+            };
+
             struct ModelRegistration {
               const std::string originalId;
               const std::set< std::string > instanceClasses;
@@ -69,6 +80,14 @@ namespace BlueBear {
             std::unordered_map< std::string, std::shared_ptr< Graphics::SceneGraph::Model > > originals;
             std::vector< std::unique_ptr< ModelRegistration > > models;
             Tools::AsyncTable asyncTasks;
+
+            struct ModelUniforms {
+              Graphics::Shader::Uniform transformUniform;
+
+              ModelUniforms() = default;
+              ModelUniforms( const Graphics::Shader& shader ) : transformUniform( shader.getUniform( "model" ) ) {}
+            };
+            Graphics::UniformCache< ModelUniforms > modelUniforms;
 
             std::unique_ptr< Graphics::SceneGraph::ModelLoader::FileModelLoader > getFileModelLoader( bool deferGLOperations );
 
@@ -118,6 +137,7 @@ namespace BlueBear {
             void loadPathsParallel( const std::vector< std::pair< std::string, std::string > >& paths );
             void loadPaths( const std::vector< std::pair< std::string, std::string > >& paths );
             void loadDirect( const std::string& id, const std::shared_ptr< Graphics::SceneGraph::Model >& model );
+            void drawTree( const Graphics::SceneGraph::Model* model, ModelPushdown pushdown );
             void nextFrame() override;
           };
 
