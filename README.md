@@ -18,11 +18,11 @@ Concordia
 * Extensive and flexible mod framework helps advanced users make Concordia their very own
 
 ## Dependencies
-* SFML 2.3.x
+* SFML 2.4.2
     * OpenGL 4.5
 * TinyXML2 6.0.0
-* Lua 5.3.x
-* JsonCpp 1.7.x
+* Lua 5.3.3
+* JsonCpp 1.7.4
 * GLM
 * GLEW 2.0.0-5
 * Assimp 4.1.0
