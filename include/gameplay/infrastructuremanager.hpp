@@ -2,6 +2,7 @@
 #define INFRASTRUCTUREMANAGER
 
 #include "state/substate.hpp"
+#include "serializable.hpp"
 #include "graphics/fragment_renderers/grid_fragment_renderer.hpp"
 #include "graphics/scenegraph/light/lightmap_manager.hpp"
 #include "graphics/scenegraph/light/directionallight.hpp"
@@ -22,7 +23,11 @@ namespace BlueBear::State { class HouseholdGameplayState; }
 namespace BlueBear::Graphics::Utilities{ class ShaderManager; }
 namespace BlueBear::Gameplay {
 
-	class InfrastructureManager : public State::Substate {
+	class InfrastructureManager : public State::Substate, public Serializable {
+	public:
+		enum class WallMode { WALLS_DOWN, WALLS_CUT, WALLS_UP, WALLS_ROOF };
+
+	private:
 		struct Animation {
 			int currentFrame = 0;
 			int maxFrames = 0;
@@ -33,6 +38,7 @@ namespace BlueBear::Gameplay {
 		Models::Infrastructure model;
 
 		int currentLevel = 0;
+		WallMode wallMode = WallMode::WALLS_CUT;
 
 		Graphics::SceneGraph::Light::LightmapManager lightmapManager;
 		Graphics::FragmentRenderers::GridFragmentRenderer grid;
@@ -50,10 +56,12 @@ namespace BlueBear::Gameplay {
 		void enqueueAnimation( Graphics::SceneGraph::Model* key, const Animation&& animation );
 		void updateAnimations();
 
+		void updateWallMode();
 		// To be run any time currentLevel changes
 		void hideUpperLevels();
-		// To be run any time currentLevel changes, or on mouse move
+		// To be run any time currentLevel changes, or on camera move
 		void setWallCutaways();
+		void setWallsDown();
 
 		std::vector< glm::vec2 > generateRoomNodes( const Tools::Sector& sector, const glm::uvec2& dimensions );
 		Tools::Intersection::IntersectionList getIntersections( const std::vector< Models::WallSegment >& wallSegments, const glm::ivec2& dimensions );
@@ -62,11 +70,15 @@ namespace BlueBear::Gameplay {
 		InfrastructureManager( State::State& state );
 		~InfrastructureManager();
 
-		void loadInfrastructure( const Json::Value& infrastructure );
+		Json::Value save() override;
+		void load( const Json::Value& data ) override;
+
 		void generateRooms();
 
 		int getCurrentLevel() const;
 		void setCurrentLevel( int currentLevel );
+
+		void setWallMode( WallMode mode );
 
 		bool update() override;
 	};

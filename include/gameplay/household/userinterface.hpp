@@ -23,6 +23,9 @@ namespace BlueBear::Gameplay::Household {
 		std::shared_ptr< Graphics::UserInterface::Widgets::Button > zoomIn;
 		std::shared_ptr< Graphics::UserInterface::Widgets::Button > zoomOut;
 
+		std::shared_ptr< Graphics::UserInterface::Widgets::Button > noWalls;
+		std::shared_ptr< Graphics::UserInterface::Widgets::Button > cutaway;
+
 	public:
 		UserInterface( State::HouseholdGameplayState& parentState );
 		void setup();

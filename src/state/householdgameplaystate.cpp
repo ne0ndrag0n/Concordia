@@ -50,7 +50,7 @@ namespace BlueBear {
     void HouseholdGameplayState::load( const Json::Value& data ) {
       if( data != Json::Value::null ) {
         entityManager.load( data[ "entityManager" ] );
-        infrastructureManager.loadInfrastructure( data[ "infrastructure" ] );
+        infrastructureManager.load( data[ "infrastructure" ] );
         worldRenderer.load( data[ "renderer" ] );
       }
     }
@@ -115,6 +115,10 @@ namespace BlueBear {
 
     Graphics::Utilities::ShaderManager& HouseholdGameplayState::getShaderManager() {
       return shaderManager;
+    }
+
+    Gameplay::InfrastructureManager& HouseholdGameplayState::getInfrastructureManager() {
+      return infrastructureManager;
     }
 
     void HouseholdGameplayState::update() {

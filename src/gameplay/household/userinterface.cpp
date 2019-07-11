@@ -5,6 +5,7 @@
 #include "graphics/userinterface/widgets/grid_layout.hpp"
 #include "graphics/userinterface/widgets/text.hpp"
 #include "graphics/camera.hpp"
+#include "gameplay/infrastructuremanager.hpp"
 #include "state/householdgameplaystate.hpp"
 #include "log.hpp"
 #include <string>
@@ -114,9 +115,11 @@ namespace BlueBear::Gameplay::Household {
 		controlPanel = std::static_pointer_cast< Graphics::UserInterface::Widgets::FloatingPane >( resultArray[ 0 ] );
 
 		std::shared_ptr< Graphics::UserInterface::Element > rootLayout = controlPanel->getChildren()[ 0 ];
+		std::shared_ptr< Graphics::UserInterface::Element > wallSettingsLayout = rootLayout->getChildren()[ 1 ];
 		std::shared_ptr< Graphics::UserInterface::Element > rotateZoomLayout = rootLayout->getChildren()[ 2 ];
 
 		Graphics::Camera& camera = parentState.getWorldRenderer().getCamera();
+		Gameplay::InfrastructureManager& InfrastructureManager = parentState.getInfrastructureManager();
 
 		rotateRight = std::static_pointer_cast< Graphics::UserInterface::Widgets::Button >( rotateZoomLayout->getChildren()[ 0 ] );
 		rotateRight->getEventBundle().registerInputEvent( "mouse-up", std::bind( &Graphics::Camera::rotateRight, &camera ) );
@@ -129,6 +132,12 @@ namespace BlueBear::Gameplay::Household {
 
 		zoomOut = std::static_pointer_cast< Graphics::UserInterface::Widgets::Button >( rotateZoomLayout->getChildren()[ 3 ] );
 		zoomOut->getEventBundle().registerInputEvent( "mouse-up", std::bind( &Graphics::Camera::zoomOut, &camera ) );
+
+		noWalls = std::static_pointer_cast< Graphics::UserInterface::Widgets::Button >( wallSettingsLayout->getChildren()[ 0 ] );
+		noWalls->getEventBundle().registerInputEvent( "mouse-up", std::bind( &Gameplay::InfrastructureManager::setWallMode, &InfrastructureManager, Gameplay::InfrastructureManager::WallMode::WALLS_DOWN ) );
+
+		cutaway = std::static_pointer_cast< Graphics::UserInterface::Widgets::Button >( wallSettingsLayout->getChildren()[ 1 ] );
+		cutaway->getEventBundle().registerInputEvent( "mouse-up", std::bind( &Gameplay::InfrastructureManager::setWallMode, &InfrastructureManager, Gameplay::InfrastructureManager::WallMode::WALLS_CUT ) );
 	}
 
 	Json::Value UserInterface::save() {

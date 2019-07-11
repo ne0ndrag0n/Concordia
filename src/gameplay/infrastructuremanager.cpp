@@ -53,8 +53,26 @@ namespace BlueBear::Gameplay {
 		state.as< State::HouseholdGameplayState >().getWorldRenderer().getCamera().CAMERA_ROTATED.stopListening( this );
 	}
 
-	void InfrastructureManager::loadInfrastructure( const Json::Value& infrastructure ) {
+	Json::Value InfrastructureManager::save() {
+		return Json::Value::null;
+	}
+
+	void InfrastructureManager::load( const Json::Value& infrastructure ) {
 		model.load( infrastructure, state.as< State::HouseholdGameplayState >().getWorldCache() );
+
+		switch( Tools::Utility::hash( infrastructure[ "wallMode" ].asCString() ) ) {
+			default:
+				Log::getInstance().warn( "InfrastructureManager::load", "Invalid value given for infrastructure.wallMode given: " + infrastructure[ "wallMode" ].asString() + ", defaulting to \"cutaway\"." );
+				[[fallthrough]];
+			case Tools::Utility::hash( "cutaway" ): {
+				wallMode = WallMode::WALLS_CUT;
+				break;
+			}
+			case Tools::Utility::hash( "down" ): {
+				wallMode = WallMode::WALLS_DOWN;
+				break;
+			}
+		}
 
 		generateWallRig();
 		generateFloorRig();
@@ -70,12 +88,12 @@ namespace BlueBear::Gameplay {
 		generateRooms();
 
 		hideUpperLevels();
-		setWallCutaways();
+		updateWallMode();
 
 		const glm::ivec2& dimensions = model.getLevels()[ currentLevel ].dimensions;
 		grid.setParams( { -( dimensions.x * 0.5f ), -( dimensions.y * 0.5f ) }, { dimensions.x, dimensions.y } );
 
-		state.as< State::HouseholdGameplayState >().getWorldRenderer().getCamera().CAMERA_ROTATED.listen( this, std::bind( &InfrastructureManager::setWallCutaways, this ) );
+		state.as< State::HouseholdGameplayState >().getWorldRenderer().getCamera().CAMERA_ROTATED.listen( this, std::bind( &InfrastructureManager::updateWallMode, this ) );
 	}
 
 	void InfrastructureManager::generateWallRig() {
@@ -128,6 +146,20 @@ namespace BlueBear::Gameplay {
 		} else {
 			it->second.destination = animation.destination;
 			it->second.source = source;
+		}
+	}
+
+	void InfrastructureManager::updateWallMode() {
+		// TODO!
+		switch( wallMode ) {
+			case WallMode::WALLS_DOWN:
+				setWallsDown();
+				break;
+			default:
+				[[fallthrough]];
+			case WallMode::WALLS_CUT:
+				setWallCutaways();
+				break;
 		}
 	}
 
@@ -227,6 +259,17 @@ namespace BlueBear::Gameplay {
 		}
 	}
 
+	void InfrastructureManager::setWallsDown() {
+		static int numFrames = ConfigManager::getInstance().getIntValue( "fps_overview" ) * ( ( float ) ConfigManager::getInstance().getIntValue( "wall_cutaway_animation_speed" ) / 1000.0f );
+		std::shared_ptr< Graphics::SceneGraph::Model > wallRigInstance = state.as< State::HouseholdGameplayState >().getWorldRenderer().findObjectsByType( "__wallrig" )[ 0 ];
+		auto& segments = wallRigInstance->getChildren()[ currentLevel ]->getChildren();
+		//std::unordered_set< Graphics::SceneGraph::Model* > selectedSegments;
+
+		for( const auto& segment : segments ) {
+			enqueueAnimation( segment.get(), { 0, numFrames, -3.75f } );
+		}
+	}
+
 	std::vector< glm::vec2 > InfrastructureManager::generateRoomNodes( const Tools::Sector& sector, const glm::uvec2& dimensions ) {
 		std::vector< glm::vec2 > result;
 
@@ -301,6 +344,11 @@ namespace BlueBear::Gameplay {
 
 	void InfrastructureManager::setCurrentLevel( int currentLevel ) {
 		this->currentLevel = currentLevel;
+	}
+
+	void InfrastructureManager::setWallMode( WallMode mode ) {
+		wallMode = mode;
+		updateWallMode();
 	}
 
 	bool InfrastructureManager::update() {

@@ -63,6 +63,7 @@ namespace BlueBear {
       Device::Display::Adapter::Component::GuiComponent& getGuiComponent();
       Models::Utilities::WorldCache& getWorldCache();
       Graphics::Utilities::ShaderManager& getShaderManager();
+      Gameplay::InfrastructureManager& getInfrastructureManager();
 
       void update() override;
     };

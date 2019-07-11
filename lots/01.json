@@ -33,6 +33,7 @@
   },
   "renderer": {},
   "infrastructure": {
+    "wallMode": "cutaway",
     "levels": [
       {
         "dimensions": [ 20, 20 ],
