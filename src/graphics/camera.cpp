@@ -135,13 +135,13 @@ namespace BlueBear {
     }
 
     unsigned int Camera::rotateRight() {
-      currentRotation = ( currentRotation + 1 ) % 4;
+      currentRotation = ( currentRotation - 1 ) % 4;
       doRotate();
       return currentRotation;
     }
 
     unsigned int Camera::rotateLeft() {
-      currentRotation = ( currentRotation - 1 ) % 4;
+      currentRotation = ( currentRotation + 1 ) % 4;
       doRotate();
       return currentRotation;
     }
