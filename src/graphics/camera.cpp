@@ -113,10 +113,10 @@ namespace BlueBear {
     glm::mat4 Camera::getOrthoView() {
       glm::mat4 view;
 
-      view = glm::translate( view, camera );
-
       view = glm::rotate( view, glm::radians( -60.0f ), glm::vec3( 1.0f, 0.0f, 0.0f ) );
       view = glm::rotate( view, glm::radians( orthoRotationAngle ), glm::vec3( 0.0f, 0.0f, 1.0f ) );
+
+      view = glm::translate( view, camera );
 
       return view;
     }
@@ -135,13 +135,13 @@ namespace BlueBear {
     }
 
     unsigned int Camera::rotateRight() {
-      currentRotation = ( currentRotation - 1 ) % 4;
+      currentRotation = ( currentRotation + 1 ) % 4;
       doRotate();
       return currentRotation;
     }
 
     unsigned int Camera::rotateLeft() {
-      currentRotation = ( currentRotation + 1 ) % 4;
+      currentRotation = ( currentRotation - 1 ) % 4;
       doRotate();
       return currentRotation;
     }

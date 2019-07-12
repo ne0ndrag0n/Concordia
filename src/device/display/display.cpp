@@ -54,7 +54,13 @@ namespace BlueBear {
         glGetIntegerv( GL_MAX_VERTEX_UNIFORM_COMPONENTS, &maxUniformVertexComponents );
         int maxUniformFragmentComponents;
         glGetIntegerv( GL_MAX_FRAGMENT_UNIFORM_COMPONENTS, &maxUniformFragmentComponents );
-        Log::getInstance().debug( "Display::Display", "Created OpenGL 4.5 Context (" + std::to_string( maxUniformVertexComponents ) + "V/" + std::to_string( maxUniformFragmentComponents ) + "F)" );
+        Log::getInstance().debug( "Display::printWelcomeMessage", "Created OpenGL 4.5 Context (" + std::to_string( maxUniformVertexComponents ) + "V/" + std::to_string( maxUniformFragmentComponents ) + "F)" );
+
+        if( GLEW_EXT_texture_filter_anisotropic ) {
+          Log::getInstance().debug( "Display::printWelcomeMessage", "Anisotropic filtering extension found" );
+        } else {
+          Log::getInstance().warn( "Display::printWelcomeMessage", "Anisotropic filtering extension not found" );
+        }
       }
 
       sf::ContextSettings Display::getDefaultContextSettings() const {
