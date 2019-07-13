@@ -22,5 +22,9 @@
   "wood_paneling": {
     "image": "wood_paneling.png",
     "price": 0.0
+  },
+  "grid": {
+    "image": "grid.png",
+    "price": 0.0
   }
 }

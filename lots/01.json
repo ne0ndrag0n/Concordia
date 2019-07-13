@@ -191,27 +191,27 @@
             "end": [ 1, 16 ],
             "faces": [
               {
-                "front": "wood_paneling",
+                "front": "grid",
                 "back": "bricks"
               },
               {
-                "front": "wood_paneling",
+                "front": "grid",
                 "back": "bricks"
               },
               {
-                "front": "wood_paneling",
+                "front": "grid",
                 "back": "bricks"
               },
               {
-                "front": "wood_paneling",
+                "front": "grid",
                 "back": "bricks"
               },
               {
-                "front": "wood_paneling",
+                "front": "grid",
                 "back": "bricks"
               },
               {
-                "front": "wood_paneling",
+                "front": "grid",
                 "back": "bricks"
               }
             ]
@@ -222,27 +222,27 @@
             "faces": [
               {
                 "front": "drywall",
-                "back": "wood_paneling"
+                "back": "grid"
               },
               {
                 "front": "drywall",
-                "back": "wood_paneling"
+                "back": "grid"
               },
               {
                 "front": "drywall",
-                "back": "wood_paneling"
+                "back": "grid"
               },
               {
                 "front": "drywall",
-                "back": "wood_paneling"
+                "back": "grid"
               },
               {
                 "front": "drywall",
-                "back": "wood_paneling"
+                "back": "grid"
               },
               {
                 "front": "drywall",
-                "back": "wood_paneling"
+                "back": "grid"
               }
             ]
           },
@@ -252,27 +252,27 @@
             "faces": [
               {
                 "front": "drywall",
-                "back": "wood_paneling"
+                "back": "grid"
               },
               {
                 "front": "drywall",
-                "back": "wood_paneling"
+                "back": "grid"
               },
               {
                 "front": "drywall",
-                "back": "wood_paneling"
+                "back": "grid"
               },
               {
                 "front": "drywall",
-                "back": "wood_paneling"
+                "back": "grid"
               },
               {
                 "front": "drywall",
-                "back": "wood_paneling"
+                "back": "grid"
               },
               {
                 "front": "drywall",
-                "back": "wood_paneling"
+                "back": "grid"
               }
             ]
           },
