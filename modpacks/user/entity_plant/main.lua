@@ -39,7 +39,7 @@ end
 
 function Demo:move_object()
   if self.instance then
-    self.instance:get_transform():set_position( bluebear.util.types.Vec3.new( 0.0, 5.0, 0.0 ) )
+    self.instance:get_transform():set_position( bluebear.util.types.Vec3.new( -5.0, 0.0, 0.0 ) )
   end
 end
 
