@@ -54,8 +54,8 @@ namespace BlueBear {
     }
 
     float Camera::zoomIn() {
-      if( zoom != 1.0f ) {
-        zoom -= zoomIncrement;
+      if( zoom != 2.0f ) {
+        zoom += zoomIncrement;
         dirty = true;
       }
 
@@ -63,8 +63,8 @@ namespace BlueBear {
     }
 
     float Camera::zoomOut() {
-      if( zoom != 3.0f ) {
-        zoom += zoomIncrement;
+      if( zoom != 0.25f ) {
+        zoom -= zoomIncrement;
         dirty = true;
       }
 
@@ -118,6 +118,8 @@ namespace BlueBear {
       view = glm::rotate( view, glm::radians( -60.0f ), glm::vec3( 1.0f, 0.0f, 0.0f ) );
       view = glm::rotate( view, glm::radians( orthoRotationAngle ), glm::vec3( 0.0f, 0.0f, 1.0f ) );
 
+      view = glm::scale( view, glm::vec3{ zoom * 100.0f, zoom * 100.0f, zoom * 100.0f } );
+
       return view;
     }
 
@@ -125,13 +127,13 @@ namespace BlueBear {
       glm::mat4 ortho;
       glm::vec2 scaledCoordinates = getScaledCoordinates();
 
-      ortho = glm::ortho( -scaledCoordinates.x, scaledCoordinates.x, -scaledCoordinates.y, scaledCoordinates.y, -100.0f, 100.0f );
+      ortho = glm::ortho( -scaledCoordinates.x, scaledCoordinates.x, -scaledCoordinates.y, scaledCoordinates.y, -10000.0f, 10000.0f );
 
       return ortho;
     }
 
     glm::vec2 Camera::getScaledCoordinates() const {
-      return { ( widthHalf * zoom ) / 100.0f, ( heightHalf * zoom ) / 100.0f };
+      return { widthHalf, heightHalf };
     }
 
     unsigned int Camera::rotateRight() {
