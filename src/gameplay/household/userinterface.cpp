@@ -138,6 +138,9 @@ namespace BlueBear::Gameplay::Household {
 
 		cutaway = std::static_pointer_cast< Graphics::UserInterface::Widgets::Button >( wallSettingsLayout->getChildren()[ 1 ] );
 		cutaway->getEventBundle().registerInputEvent( "mouse-up", std::bind( &Gameplay::InfrastructureManager::setWallMode, &InfrastructureManager, Gameplay::InfrastructureManager::WallMode::WALLS_CUT ) );
+
+		wallsUp = std::static_pointer_cast< Graphics::UserInterface::Widgets::Button >( wallSettingsLayout->getChildren()[ 2 ] );
+		wallsUp->getEventBundle().registerInputEvent( "mouse-up", std::bind( &Gameplay::InfrastructureManager::setWallMode, &InfrastructureManager, Gameplay::InfrastructureManager::WallMode::WALLS_UP ) );
 	}
 
 	Json::Value UserInterface::save() {

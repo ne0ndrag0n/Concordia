@@ -25,6 +25,8 @@ namespace BlueBear::Gameplay::Household {
 
 		std::shared_ptr< Graphics::UserInterface::Widgets::Button > noWalls;
 		std::shared_ptr< Graphics::UserInterface::Widgets::Button > cutaway;
+		std::shared_ptr< Graphics::UserInterface::Widgets::Button > wallsUp;
+
 
 	public:
 		UserInterface( State::HouseholdGameplayState& parentState );

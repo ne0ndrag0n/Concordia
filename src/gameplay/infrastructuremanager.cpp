@@ -72,6 +72,10 @@ namespace BlueBear::Gameplay {
 				wallMode = WallMode::WALLS_DOWN;
 				break;
 			}
+			case Tools::Utility::hash( "up" ): {
+				wallMode = WallMode::WALLS_UP;
+				break;
+			}
 		}
 
 		generateWallRig();
@@ -159,6 +163,9 @@ namespace BlueBear::Gameplay {
 				[[fallthrough]];
 			case WallMode::WALLS_CUT:
 				setWallCutaways();
+				break;
+			case WallMode::WALLS_UP:
+				setWallsUp();
 				break;
 		}
 	}
@@ -263,10 +270,19 @@ namespace BlueBear::Gameplay {
 		static int numFrames = ConfigManager::getInstance().getIntValue( "fps_overview" ) * ( ( float ) ConfigManager::getInstance().getIntValue( "wall_cutaway_animation_speed" ) / 1000.0f );
 		std::shared_ptr< Graphics::SceneGraph::Model > wallRigInstance = state.as< State::HouseholdGameplayState >().getWorldRenderer().findObjectsByType( "__wallrig" )[ 0 ];
 		auto& segments = wallRigInstance->getChildren()[ currentLevel ]->getChildren();
-		//std::unordered_set< Graphics::SceneGraph::Model* > selectedSegments;
 
 		for( const auto& segment : segments ) {
 			enqueueAnimation( segment.get(), { 0, numFrames, -3.75f } );
+		}
+	}
+
+	void InfrastructureManager::setWallsUp() {
+		static int numFrames = ConfigManager::getInstance().getIntValue( "fps_overview" ) * ( ( float ) ConfigManager::getInstance().getIntValue( "wall_cutaway_animation_speed" ) / 1000.0f );
+		std::shared_ptr< Graphics::SceneGraph::Model > wallRigInstance = state.as< State::HouseholdGameplayState >().getWorldRenderer().findObjectsByType( "__wallrig" )[ 0 ];
+		auto& segments = wallRigInstance->getChildren()[ currentLevel ]->getChildren();
+
+		for( const auto& segment : segments ) {
+			enqueueAnimation( segment.get(), { 0, numFrames, 0.0f } );
 		}
 	}
 

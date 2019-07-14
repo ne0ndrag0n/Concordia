@@ -62,6 +62,7 @@ namespace BlueBear::Gameplay {
 		// To be run any time currentLevel changes, or on camera move
 		void setWallCutaways();
 		void setWallsDown();
+		void setWallsUp();
 
 		std::vector< glm::vec2 > generateRoomNodes( const Tools::Sector& sector, const glm::uvec2& dimensions );
 		Tools::Intersection::IntersectionList getIntersections( const std::vector< Models::WallSegment >& wallSegments, const glm::ivec2& dimensions );
