@@ -8,7 +8,7 @@ local Demo = {
 function Demo:init()
   bluebear.event.register_key( 'x', function()
     if not self.instance then
-      self.instance = self:get_model_manager():place_object( 'armaturebox', {} )
+      self.instance = self:get_model_manager():place_object( 'bgb', {} )
 
      local interaction = bluebear.util.types.Interaction.new( "animate", "Animate", bluebear.util.bind( self.play_animation, self ) )
      local interaction2 = bluebear.util.types.Interaction.new( "move", "Move", bluebear.util.bind( self.move_object, self ) )
@@ -26,7 +26,7 @@ end
 
 function Demo:play_animation()
   if self.instance then
-    self.instance:set_current_animation( 'Armature|ArmatureAction' )
+    self.instance:set_current_animation( 'Armature|ArmatureAction.002' )
   end
 end
 
@@ -39,7 +39,7 @@ end
 
 function Demo:move_object()
   if self.instance then
-    self.instance:get_transform():set_position( bluebear.util.types.Vec3.new( -5.0, 0.0, 0.0 ) )
+    self.instance:get_transform():set_position( bluebear.util.types.Vec3.new( -3.0, -1.0, 0.0 ) )
   end
 end
 

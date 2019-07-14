@@ -2,6 +2,7 @@
 in vec2 fragTexture;
 in vec3 fragNormal;
 in vec3 fragPos;
+in mat4 boneTransform;
 out vec4 color;
 
 #include "system/shaders/common/directional_light.glsl"
@@ -13,7 +14,8 @@ uniform Material material;
 uniform vec4 highlight;
 
 void main() {
-  DirectionalLight light = getRoomLight( fragPos );
+  vec3 newFragPos = ( boneTransform * vec4( fragPos, 0.0f ) ).xyz;
+  DirectionalLight light = getRoomLight( newFragPos );
   vec3 cameraPos = cameraPos.xyz;
 
   vec3 texResult = texture( material.diffuse0, fragTexture ).xyz;

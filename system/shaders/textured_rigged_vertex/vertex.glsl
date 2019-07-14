@@ -8,6 +8,7 @@ layout (location = 4) in vec4 boneWeights;
 out vec2 fragTexture;
 out vec3 fragNormal;
 out vec3 fragPos;
+out mat4 boneTransform;
 
 uniform mat4 model;
 #include "system/shaders/common/camera.glsl"
@@ -15,7 +16,7 @@ uniform mat4 model;
 uniform mat4 bones[ 16 ];
 
 void main() {
-  mat4 boneTransform =
+  boneTransform =
     ( bones[ boneIDs[ 0 ] ] * boneWeights[ 0 ] ) +
     ( bones[ boneIDs[ 1 ] ] * boneWeights[ 1 ] ) +
     ( bones[ boneIDs[ 2 ] ] * boneWeights[ 2 ] ) +

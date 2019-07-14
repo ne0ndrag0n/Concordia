@@ -16,6 +16,7 @@
             "id": "system.component.model_manager",
             "data": {
               "armaturebox": "dev/box/armaturebox.fbx",
+              "bgb": "dev/box/cylinder.fbx",
               "lamp": "dev/box/3rdparty/lamp/lamp.obj"
             }
           },
