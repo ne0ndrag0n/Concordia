@@ -1,0 +1,54 @@
+# Blender MTL File: 'None'
+# Material Count: 5
+
+newmtl CTO_Lighting_Heron_Floor_01_mtl_1
+Ns 10.000002
+Ka 1.000000 1.000000 1.000000
+Kd 0.702000 0.502000 0.286300
+Ks 0.000000 0.000000 0.000000
+Ke 0.0 0.0 0.0
+Ni 1.500000
+d 1.000000
+illum 1
+map_Bump Lighting_Heron_bump.jpg
+
+newmtl CTO_Lighting_Heron_Floor_01_mtl_2
+Ns 10.000002
+Ka 1.000000 1.000000 1.000000
+Kd 0.702000 0.502000 0.286300
+Ks 0.000000 0.000000 0.000000
+Ke 0.0 0.0 0.0
+Ni 1.500000
+d 1.000000
+illum 1
+map_Bump Lighting_Heron_bump(1).jpg
+
+newmtl CTO_Lighting_Heron_Floor_01_mtl_3
+Ns 10.000002
+Ka 1.000000 1.000000 1.000000
+Kd 0.000000 0.000000 0.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.0 0.0 0.0
+Ni 1.500000
+d 1.000000
+illum 1
+
+newmtl CTO_Lighting_Heron_Floor_01_mtl_4
+Ns 10.000002
+Ka 1.000000 1.000000 1.000000
+Kd 0.000000 0.000000 0.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.0 0.0 0.0
+Ni 1.500000
+d 0.019600
+illum 1
+
+newmtl CTO_Lighting_Heron_Floor_01_mtl_5
+Ns 10.000002
+Ka 1.000000 1.000000 1.000000
+Kd 0.176500 0.176500 0.176500
+Ks 0.000000 0.000000 0.000000
+Ke 0.0 0.0 0.0
+Ni 1.500000
+d 1.000000
+illum 1

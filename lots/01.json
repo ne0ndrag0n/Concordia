@@ -15,7 +15,8 @@
           {
             "id": "system.component.model_manager",
             "data": {
-              "armaturebox": "dev/box/armaturebox.fbx"
+              "armaturebox": "dev/box/armaturebox.fbx",
+              "lamp": "dev/box/3rdparty/lamp/lamp.obj"
             }
           },
           {

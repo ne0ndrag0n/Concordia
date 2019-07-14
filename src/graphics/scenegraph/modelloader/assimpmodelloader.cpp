@@ -275,11 +275,11 @@ namespace BlueBear {
             );
           } else {
             // Solid colours only
-            log( "assert", "colours" );
-            log( "ambient", std::to_string( ambient.r ) + " " + std::to_string( ambient.g ) + " " + std::to_string( ambient.b ) );
-            log( "diffuse", std::to_string( diffuse.r ) + " " + std::to_string( diffuse.g ) + " " + std::to_string( diffuse.b ) );
-            log( "specular", std::to_string( specular.r ) + " " + std::to_string( specular.g ) + " " + std::to_string( specular.b ) );
-            log( "opacity", std::to_string( opacity ) );
+            log( "AssimpModelLoader::getMaterial", "colours" );
+            log( "AssimpModelLoader::getMaterial", "Ambient: " + std::to_string( ambient.r ) + " " + std::to_string( ambient.g ) + " " + std::to_string( ambient.b ) );
+            log( "AssimpModelLoader::getMaterial", "Diffuse: " + std::to_string( diffuse.r ) + " " + std::to_string( diffuse.g ) + " " + std::to_string( diffuse.b ) );
+            log( "AssimpModelLoader::getMaterial", "Specular: " + std::to_string( specular.r ) + " " + std::to_string( specular.g ) + " " + std::to_string( specular.b ) );
+            log( "AssimpModelLoader::getMaterial", "Opacity: " + std::to_string( opacity ) );
             result = getMaterial(
               Tools::AssimpTools::aiColorToGLMvec3( ambient ),
               Tools::AssimpTools::aiColorToGLMvec3( diffuse ),
