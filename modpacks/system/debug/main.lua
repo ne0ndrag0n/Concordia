@@ -1,6 +1,8 @@
 local path = ...
 local fps = bluebear.util.get_fps()
 
+dofile( path..'/profiler.lua' )
+
 local Panel = {
   animation_in_progress = false,
   ANIMATIONS = {

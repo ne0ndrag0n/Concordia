@@ -10,6 +10,20 @@
         ]
       },
       {
+        "id": "system.entity.profiler",
+        "components": [
+          {
+            "id": "system.component.model_profiler"
+          },
+          {
+            "id": "system.component.model_manager",
+            "data": {
+              "bgb": "dev/box/cylinder.fbx"
+            }
+          }
+        ]
+      },
+      {
         "id": "game.entity.plant",
         "components": [
           {
