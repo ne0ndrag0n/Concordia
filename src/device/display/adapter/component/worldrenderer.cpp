@@ -70,7 +70,7 @@ namespace BlueBear {
                 }
               }
 
-              loadPathsParallel( models );
+              loadPaths( models );
             } );
 
             Graphics::SceneGraph::Model::submitLuaContributions( lua );

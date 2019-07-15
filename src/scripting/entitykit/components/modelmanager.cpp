@@ -44,7 +44,7 @@ namespace BlueBear::Scripting::EntityKit::Components {
     }
 
     if( paths.size() ) {
-      relevantState->getWorldRenderer().loadPathsParallel( paths );
+      relevantState->getWorldRenderer().loadPaths( paths );
     }
   }
 

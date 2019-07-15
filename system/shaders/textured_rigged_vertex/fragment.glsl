@@ -5,7 +5,7 @@ in vec3 fragPos;
 out vec4 color;
 
 #include "system/shaders/common/directional_light.glsl"
-#include "system/shaders/common/material.glsl"
+#include "system/shaders/common/material_texture.glsl"
 #include "system/shaders/common/camera.glsl"
 #include "system/shaders/common/room.glsl"
 
