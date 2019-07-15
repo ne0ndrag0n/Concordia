@@ -40,7 +40,7 @@ namespace BlueBear {
             throw AnimationNotFoundException();
           }
 
-          std::map< double, glm::mat4 > keyframes = ksIterator->second;
+          const std::map< double, glm::mat4 >& keyframes = ksIterator->second;
           auto keyframePair = keyframes.find( animationTick );
           if( keyframePair != keyframes.end() ) {
             // Keyframe directly exists: replace the matrix directly

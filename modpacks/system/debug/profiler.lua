@@ -11,6 +11,11 @@ function Profiler:init()
 	self.instances = {}
 	bluebear.profiler = self
 	print( 'system.component.model_profiler', 'Profiler attached at bluebear.profiler' )
+
+	bluebear.event.register_key( '1', bluebear.util.bind( self.position, self ) )
+	bluebear.event.register_key( '2', function()
+		bluebear.engine.queue_callback( 1, bluebear.util.bind( self.animate_all, self ) )
+	end )
 end
 
 function Profiler:position()
@@ -28,6 +33,8 @@ function Profiler:animate_all()
 	for i, model in ipairs( self.instances ) do
 		model:set_current_animation( TEST_ANIMATION )
 	end
+
+	bluebear.engine.queue_callback( bluebear.util.seconds_to_ticks( 10 ), bluebear.util.bind( self.animate_all, self ) )
 end
 
 function Profiler:get_model_manager()
