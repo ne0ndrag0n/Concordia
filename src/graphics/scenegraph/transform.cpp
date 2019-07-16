@@ -60,7 +60,7 @@ namespace BlueBear {
       Transform& Transform::operator*=( const Transform& rhs ) {
         recalculate();
 
-        result *= rhs.getMatrixImmediate();
+        result *= rhs.getMatrix();
         decompose();
 
         return *this;
