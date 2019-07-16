@@ -77,6 +77,7 @@ namespace BlueBear {
         Transform getComputedTransform() const;
         Transform& getLocalTransform();
         const Transform& getLocalTransform() const;
+        void optimizeTransform();
 
         void setLocalTransform( Transform transform );
 

@@ -8,7 +8,7 @@ local Demo = {
 function Demo:init()
   bluebear.event.register_key( 'x', function()
     if not self.instance then
-      self.instance = self:get_model_manager():place_object( 'bgb', {} )
+      self.instance = self:get_model_manager():place_object( 'lamp', {} )
 
      local interaction = bluebear.util.types.Interaction.new( "animate", "Animate", bluebear.util.bind( self.play_animation, self ) )
      local interaction2 = bluebear.util.types.Interaction.new( "move", "Move", bluebear.util.bind( self.move_object, self ) )

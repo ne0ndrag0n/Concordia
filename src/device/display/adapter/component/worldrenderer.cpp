@@ -33,7 +33,7 @@ namespace BlueBear {
             shaderManager( shaderManager ), cache( shaderManager ) {
               eventManager.LUA_STATE_READY.listen( this, std::bind( &WorldRenderer::submitLuaContributions, this, std::placeholders::_1 ) );
 
-              asyncTasks.setAmountPerFrame( 333 );
+              asyncTasks.setAmountPerFrame( 3000 );
             }
 
           WorldRenderer::~WorldRenderer() {
@@ -447,7 +447,7 @@ namespace BlueBear {
             originals[ id ] = model;
           }
 
-          void WorldRenderer::drawTree( Graphics::SceneGraph::Model* model, WorldRenderer::ModelPushdown pushdown ) {
+          void WorldRenderer::drawTree( const Graphics::SceneGraph::Model* model, WorldRenderer::ModelPushdown pushdown ) {
             pushdown.levelTransform *= model->getLocalTransform().getMatrix();
 
             // Do the draw
@@ -506,6 +506,7 @@ namespace BlueBear {
                   pushdown.bones = &animator->getComputedMatrices();
                 }
 
+                registration->instance->optimizeTransform();
                 drawTree( registration->instance.get(), pushdown );
               }
             }

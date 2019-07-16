@@ -17,7 +17,6 @@ namespace BlueBear {
         bool dirty = true;
 
         glm::mat4 getMatrixImmediate() const;
-        void recalculate();
         void decompose();
 
       public:
@@ -30,6 +29,8 @@ namespace BlueBear {
         Transform& operator=( const Transform& rhs );
         Transform operator*( const Transform& rhs ) const;
         Transform& operator*=( const Transform& rhs );
+
+        void recalculate();
 
         glm::mat4 getMatrix();
         glm::mat4 getMatrix() const;

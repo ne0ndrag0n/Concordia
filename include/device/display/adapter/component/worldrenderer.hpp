@@ -137,7 +137,7 @@ namespace BlueBear {
             void loadPathsParallel( const std::vector< std::pair< std::string, std::string > >& paths );
             void loadPaths( const std::vector< std::pair< std::string, std::string > >& paths );
             void loadDirect( const std::string& id, const std::shared_ptr< Graphics::SceneGraph::Model >& model );
-            void drawTree( Graphics::SceneGraph::Model* model, ModelPushdown pushdown );
+            void drawTree( const Graphics::SceneGraph::Model* model, ModelPushdown pushdown );
             void nextFrame() override;
           };
 

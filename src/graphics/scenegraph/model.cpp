@@ -191,6 +191,10 @@ namespace BlueBear {
         this->transform = transform;
       }
 
+      void Model::optimizeTransform() {
+        this->transform.recalculate();
+      }
+
       std::shared_ptr< Animation::Animator > Model::getAnimator() const {
         return animator;
       }
