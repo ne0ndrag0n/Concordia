@@ -137,12 +137,20 @@ namespace BlueBear {
     }
 
     unsigned int Camera::rotateRight() {
+      glm::mat4 transform;
+      transform = glm::rotate( transform, glm::radians( 90.0f ), glm::vec3{ 0.0f, 0.0f, 1.0f } );
+      camera = transform * glm::vec4( camera, 0.0f );
+
       currentRotation = ( currentRotation - 1 ) % 4;
       doRotate();
       return currentRotation;
     }
 
     unsigned int Camera::rotateLeft() {
+      glm::mat4 transform;
+      transform = glm::rotate( transform, glm::radians( -90.0f ), glm::vec3{ 0.0f, 0.0f, 1.0f } );
+      camera = transform * glm::vec4( camera, 0.0f );
+
       currentRotation = ( currentRotation + 1 ) % 4;
       doRotate();
       return currentRotation;
