@@ -20,6 +20,11 @@ namespace BlueBear {
       heightHalf = ( (float)screenHeight / 2 );
     }
 
+    void Camera::setPosition( const glm::vec3& position ) {
+      camera = position;
+      dirty = true;
+    }
+
     const glm::vec3& Camera::getPosition() const {
       return camera;
     }

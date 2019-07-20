@@ -121,6 +121,11 @@ namespace BlueBear {
           }
 
           void WorldRenderer::onMouseDown( Device::Input::Metadata metadata ) {
+            if( metadata.rightMouse ) {
+              mouseNavigator.emplace( camera, metadata.mouseLocation );
+              return;
+            }
+
             Geometry::Ray ray = camera.getPickingRay( metadata.mouseLocation, display.getDimensions() );
 
             std::vector< const ModelRegistration* > candidates = getModels();
@@ -144,6 +149,11 @@ namespace BlueBear {
           }
 
           void WorldRenderer::onMouseUp( Device::Input::Metadata metadata ) {
+            if( mouseNavigator ) {
+              mouseNavigator.reset();
+              return;
+            }
+
             Geometry::Ray ray = camera.getPickingRay( metadata.mouseLocation, display.getDimensions() );
 
             std::vector< const ModelRegistration* > candidates = getModels();
@@ -167,6 +177,11 @@ namespace BlueBear {
           }
 
           void WorldRenderer::onMouseMoved( Device::Input::Metadata metadata ) {
+            if( mouseNavigator ) {
+              mouseNavigator->setVector( metadata.mouseLocation );
+              return;
+            }
+
             static bool inProgress = false;
             if( inProgress ) {
               return;
@@ -489,6 +504,10 @@ namespace BlueBear {
            */
           void WorldRenderer::nextFrame() {
             asyncTasks.update();
+
+            if( mouseNavigator ) {
+              mouseNavigator->updateCamera();
+            }
 
             // Position camera
             camera.position();

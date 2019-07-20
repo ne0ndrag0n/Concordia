@@ -11,6 +11,7 @@
 #include "graphics/uniform_cache.hpp"
 #include "graphics/scenegraph/resourcebank.hpp"
 #include "graphics/utilities/shader_manager.hpp"
+#include "graphics/utilities/mouse_navigator.hpp"
 #include "exceptions/genexc.hpp"
 #include "tools/async_table.hpp"
 #include "eventmanager.hpp"
@@ -88,6 +89,8 @@ namespace BlueBear {
               ModelUniforms( const Graphics::Shader& shader ) : transformUniform( shader.getUniform( "model" ) ) {}
             };
             Graphics::UniformCache< ModelUniforms > modelUniforms;
+
+            std::optional< Graphics::Utilities::MouseNavigator > mouseNavigator;
 
             std::unique_ptr< Graphics::SceneGraph::ModelLoader::FileModelLoader > getFileModelLoader( bool deferGLOperations );
 
