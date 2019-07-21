@@ -45,7 +45,7 @@ namespace BlueBear {
     configRoot[ "shader_grid_selectable_tiles" ] = 32;
     configRoot[ "shader_grid_line_size" ] = 25;
     configRoot[ "debug_console_trim" ] = 50;
-    configRoot[ "camera_scroll_snap" ] = 33;
+    configRoot[ "camera_scroll_snap" ] = 20;
 
     // Load settings.json from file
     std::ifstream settingsFile( SETTINGS_PATH );
