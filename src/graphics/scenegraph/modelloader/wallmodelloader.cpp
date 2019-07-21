@@ -189,7 +189,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
   }
 
   void WallModelLoader::insertCornerMapSegment( const Models::WallSegment& segment ) {
-    glm::ivec2 direction = glm::normalize( glm::vec2( segment.end - segment.start ) );
+    glm::ivec2 direction = glm::sign( glm::vec2( segment.end - segment.start ) );
     glm::ivec2 cursor = segment.start;
     int distance = std::abs( glm::distance( glm::vec2( segment.start ), glm::vec2( segment.end ) ) );
 
@@ -335,7 +335,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
 
   WallModelLoader::PlaneGroup WallModelLoader::sideToStagedMesh( const Models::Sides& sides, const glm::vec3& origin, const glm::vec3& width ) {
     glm::vec3 bottomRight = origin + width;
-    glm::vec3 wallDirection = glm::normalize( bottomRight - origin );
+    glm::vec3 wallDirection = glm::sign( bottomRight - origin );
     glm::vec3 wallPerpDirection = { -wallDirection.y, wallDirection.x, 0.0f };
     glm::vec3 inverseWallDirection = -1.0f * wallDirection;
     glm::vec3 inverseWallPerpDirection = -1.0f * wallPerpDirection;
@@ -371,6 +371,13 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
         }
 
         // TODO: Diagonal pieces, non-trivial
+        if( corner.diagonal.model ) {
+          Log::getInstance().warn( "WallModelLoader::generateDeferredMeshes", "Diagonal wall corner not yet implemented" );
+        }
+
+        if( corner.reverseDiagonal.model ) {
+          Log::getInstance().warn( "WallModelLoader::generateDeferredMeshes", "Reverse diagonal wall corner not yet implemented" );
+        }
 
         fixCorners( cursor );
       }

@@ -19,7 +19,7 @@ namespace BlueBear::Tools::Intersection {
 		Log::getInstance().debug( "intersection_map.cpp:generateIntersectionalList", "List of input line segments" );
 		for( auto& lineSegment : lineSegments ) {
 			Log::getInstance().debug( "intersection_map.cpp:generateIntersectionalList", glm::to_string( lineSegment.start ) + " " + glm::to_string( lineSegment.end ) );
-			glm::ivec2 direction = glm::ivec2( glm::normalize( glm::vec2( lineSegment.end ) - glm::vec2( lineSegment.start ) ) );
+			glm::ivec2 direction = glm::ivec2( glm::sign( glm::vec2( lineSegment.end ) - glm::vec2( lineSegment.start ) ) );
 			glm::ivec2 cursor = lineSegment.start;
 
 			while( cursor.x <= lineSegment.end.x && cursor.y <= lineSegment.end.y ) {
@@ -28,7 +28,7 @@ namespace BlueBear::Tools::Intersection {
 				// Hide this garbage behind a thread/future and design the user experience around paitence
 				for( auto& otherLineSegment : lineSegments ) {
 					if( &lineSegment != &otherLineSegment ) {
-						glm::ivec2 otherDirection = glm::ivec2( glm::normalize( glm::vec2( otherLineSegment.end ) - glm::vec2( otherLineSegment.start ) ) );
+						glm::ivec2 otherDirection = glm::ivec2( glm::sign( glm::vec2( otherLineSegment.end ) - glm::vec2( otherLineSegment.start ) ) );
 						glm::ivec2 otherCursor = otherLineSegment.start;
 
 						while( otherCursor.x <= otherLineSegment.end.x && otherCursor.y <= otherLineSegment.end.y ) {

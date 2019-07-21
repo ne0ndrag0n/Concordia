@@ -318,6 +318,30 @@
                 "back": "bricks"
               }
             ]
+          },
+          {
+            "start": [ 10, 7 ],
+            "end": [ 10, 9 ],
+            "faces": [
+              {
+                "front": "drywall",
+                "back": "drywall"
+              },
+              {
+                "front": "drywall",
+                "back": "drywall"
+              }
+            ]
+          },
+          {
+            "start": [ 10, 9 ],
+            "end": [ 11, 10 ],
+            "faces": [
+              {
+                "front": "drywall",
+                "back": "drywall"
+              }
+            ]
           }
         ]
       }
