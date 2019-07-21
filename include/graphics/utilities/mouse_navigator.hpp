@@ -11,6 +11,8 @@ namespace BlueBear::Graphics::Utilities {
         glm::vec2 originalPoint;
         glm::vec2 updatedPoint;
 
+        glm::vec2 getDirection() const;
+
     public:
         MouseNavigator( Camera& camera, const glm::vec2& originalPoint );
 

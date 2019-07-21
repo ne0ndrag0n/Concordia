@@ -173,6 +173,11 @@ namespace BlueBear {
 
 					return ( int ) angle % 360;
 				}
+
+				template< typename ValueType >
+				static inline bool rangeInclusive( ValueType value, ValueType lbound, ValueType ubound ) {
+					return value >= lbound && value <= ubound;
+				};
 		};
 	}
 }
