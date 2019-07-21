@@ -1,6 +1,7 @@
 #include "graphics/utilities/mouse_navigator.hpp"
 #include "graphics/camera.hpp"
 #include "tools/utility.hpp"
+#include "configmanager.hpp"
 
 namespace BlueBear::Graphics::Utilities {
 
@@ -24,17 +25,20 @@ namespace BlueBear::Graphics::Utilities {
             )
         );
 
+        float scrollSnap = ConfigManager::getInstance().getIntValue( "camera_scroll_snap" );
+        float scrollSnapHalf = scrollSnap * 0.5f;
+
         if(
-            Tools::Utility::rangeInclusive( angle, 0.0f, 22.5f ) ||
-            Tools::Utility::rangeInclusive( angle, 157.5f, 202.5f ) ||
-            Tools::Utility::rangeInclusive( angle, 337.5f, 360.0f )
+            Tools::Utility::rangeInclusive( angle, 0.0f, scrollSnapHalf ) ||
+            Tools::Utility::rangeInclusive( angle, 180.0f - scrollSnapHalf, 180.0f + scrollSnapHalf ) ||
+            Tools::Utility::rangeInclusive( angle, 360.0f - scrollSnapHalf, 360.0f )
         ) {
             direction.y = 0.0f;
         }
 
         if(
-            Tools::Utility::rangeInclusive( angle, 67.5f, 112.5f ) ||
-            Tools::Utility::rangeInclusive( angle, 247.5f, 292.5f )
+            Tools::Utility::rangeInclusive( angle, 90.0f - scrollSnapHalf, 90.0f + scrollSnapHalf ) ||
+            Tools::Utility::rangeInclusive( angle, 270.0f - scrollSnapHalf, 270.0f + scrollSnapHalf )
         ) {
             direction.x = 0.0f;
         }
