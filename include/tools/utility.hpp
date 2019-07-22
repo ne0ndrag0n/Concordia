@@ -14,6 +14,7 @@
 #include <thread>
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <tbb/task_group.h>
 #include <tbb/task.h>
 
@@ -177,6 +178,13 @@ namespace BlueBear {
 				template< typename ValueType >
 				static inline bool rangeInclusive( ValueType value, ValueType lbound, ValueType ubound ) {
 					return value >= lbound && value <= ubound;
+				};
+
+				static inline glm::vec3 quickRotate( const glm::vec3& vector, float angle ) {
+					glm::mat4 transform;
+					transform = glm::rotate( transform, glm::radians( angle ), glm::vec3( 0.0f, 0.0f, 1.0f ) );
+
+					return transform * glm::vec4( vector, 0.0f );
 				};
 		};
 	}

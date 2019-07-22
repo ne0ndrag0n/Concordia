@@ -334,21 +334,24 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
   }
 
   WallModelLoader::PlaneGroup WallModelLoader::sideToStagedMesh( const Models::Sides& sides, const glm::vec3& origin, const glm::vec3& width ) {
-    glm::vec3 bottomRight = origin + width;
-    glm::vec3 wallDirection = glm::sign( bottomRight - origin );
-    glm::vec3 wallPerpDirection = { -wallDirection.y, wallDirection.x, 0.0f };
+    glm::vec3 wallDirection = glm::sign( width );
+    glm::vec3 wallPerpDirection = Tools::Utility::quickRotate( wallDirection, 90.0f );
     glm::vec3 inverseWallDirection = -1.0f * wallDirection;
     glm::vec3 inverseWallPerpDirection = -1.0f * wallPerpDirection;
+
+    glm::vec3 bottomRight = origin + width;
     glm::vec3 topRight = bottomRight + ( 0.1f * wallPerpDirection );
     glm::vec3 topLeft = origin + ( 0.1f * wallPerpDirection );
     glm::vec3 upperOrigin = origin + glm::vec3{ 0.0f, 0.0f, 4.0f };
 
+    float magnitude = glm::length( width );
+
     PlaneGroup planeGroup;
     planeGroup.emplace( "back", getPlane( origin, width, { 0.0f, 0.0f, 4.0f }, -wallPerpDirection, sides.back.first ) );
     planeGroup.emplace( "right", getPlane( bottomRight, 0.1f * wallPerpDirection, { 0.0f, 0.0f, 4.0f }, wallDirection, "__top_side" ) );
-    planeGroup.emplace( "front", getPlane( topRight, 1.0f * inverseWallDirection, { 0.0f, 0.0f, 4.0f }, wallPerpDirection, sides.front.first ) );
+    planeGroup.emplace( "front", getPlane( topRight, magnitude * inverseWallDirection, { 0.0f, 0.0f, 4.0f }, wallPerpDirection, sides.front.first ) );
     planeGroup.emplace( "left", getPlane( topLeft, 0.1f * inverseWallPerpDirection, { 0.0f, 0.0f, 4.0f }, -wallDirection, "__top_side" ) );
-    planeGroup.emplace( "top", getPlane( upperOrigin, wallDirection, 0.1f * wallPerpDirection, { 0.0f, 0.0f, 1.0f }, "__top_side" ) );
+    planeGroup.emplace( "top", getPlane( upperOrigin, magnitude * wallDirection, 0.1f * wallPerpDirection, { 0.0f, 0.0f, 1.0f }, "__top_side" ) );
     return planeGroup;
   }
 
