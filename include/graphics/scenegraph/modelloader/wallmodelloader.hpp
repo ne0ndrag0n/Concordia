@@ -49,13 +49,14 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     Utilities::TextureAtlas atlas;
 
     Corner* getCorner( const glm::ivec2& location );
-    void updateStagedMesh( PlaneGroup& group, const glm::vec3& position, const glm::vec3& addValue );
+    void updateStagedMesh( PlaneGroup& group, const glm::vec3& position, const glm::vec3& addValue, bool replace = false );
     glm::vec3 indexToLocation( const glm::ivec2& position );
 
     bool adjustTopLeft( const glm::ivec2& index );
     bool adjustTopRight( const glm::ivec2& index );
     bool adjustBottomLeft( const glm::ivec2& index );
     bool adjustBottomRight( const glm::ivec2& index );
+    bool adjustDiagonalTop12( const glm::ivec2& index );
 
     void fixCorners( const glm::ivec2& startingIndex );
     void initTopTexture( Vector::Renderer& renderer );
@@ -65,7 +66,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     void insertIntoAtlas( const std::vector< Models::Sides >& sides, Utilities::TextureAtlas& atlas );
 
     std::array< Mesh::TexturedVertex, 6 > getPlane( const glm::vec3& origin, const glm::vec3& width, const glm::vec3& height, const glm::vec3& normal, const std::string& wallpaperId );
-    PlaneGroup sideToStagedMesh( const Models::Sides& sides, const glm::vec3& origin, const glm::vec3& width );
+    PlaneGroup sideToStagedMesh( const Models::Sides& sides, const glm::vec3& origin, const glm::vec3& width, float thickness = 0.1f );
     void generateDeferredMeshes();
     void addToGenerator( Mesh::IndexedMeshGenerator< Mesh::TexturedVertex >& generator, const PlaneGroup& planeGroup );
     std::shared_ptr< Model > getLevel();

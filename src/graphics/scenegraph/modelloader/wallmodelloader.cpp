@@ -108,6 +108,18 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     return isSingleHorizontal && rightClear && upperRightVertical;
   }
 
+  bool WallModelLoader::adjustDiagonalTop12( const glm::ivec2& index ) {
+    Corner* corner = getCorner( index );
+    if( !corner ) {
+      return false;
+    }
+
+    Corner* upper = getCorner( index + glm::ivec2{ 0, -1 } );
+    bool upperVertical = upper && upper->vertical.model;
+
+    return corner->diagonal.model && upperVertical;
+  }
+
   glm::vec3 WallModelLoader::indexToLocation( const glm::ivec2& position ) {
     // TODO: Elevation per vertex
     return { -( dimensions.x * 0.5f ) + position.x, ( dimensions.y * 0.5f ) - position.y, 0.0f };
@@ -164,6 +176,31 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
       updateStagedMesh( upperRight->vertical.stagedMesh, indexToLocation( startingIndex + glm::ivec2{ 1, -1 } ) + glm::vec3{ 0.05f, -1.0f, 0.0f }, { 0.0f, -0.05f, 0.0f } );
       updateStagedMesh( upperRight->vertical.stagedMesh, indexToLocation( startingIndex + glm::ivec2{ 1, -1 } ) + glm::vec3{ 0.05f, -1.0f, 4.0f }, { 0.0f, -0.05f, 0.0f } );
     }
+
+    if( adjustDiagonalTop12( startingIndex ) ) {
+      Corner* corner;
+      Corner* top;
+      Exceptions::NullPointerException::check( "WallModelLoader::fixCorners", corner = getCorner( startingIndex ) );
+      Exceptions::NullPointerException::check( "WallModelLoader::fixCorners", top = getCorner( startingIndex + glm::ivec2{ 0, -1 } ) );
+
+      updateStagedMesh( top->vertical.stagedMesh, indexToLocation( startingIndex + glm::ivec2{ 0, -1 } ) + glm::vec3{ -0.05f, -1.0f, 0.0f }, { 0.04f, -0.05f, 0.0f } );
+      updateStagedMesh( top->vertical.stagedMesh, indexToLocation( startingIndex + glm::ivec2{ 0, -1 } ) + glm::vec3{ -0.05f, -1.0f, 4.0f }, { 0.04f, -0.05f, 0.0f } );
+
+      updateStagedMesh(
+        corner->diagonal.stagedMesh,
+        indexToLocation( startingIndex ) + Tools::Utility::quickRotate( { -0.05f, 0.0f, 0.0f }, 45.0f ),
+        indexToLocation( startingIndex + glm::ivec2{ 0, -1 } ) + glm::vec3{ -0.01f, -1.05f, 0.0f },
+        true
+      );
+
+      updateStagedMesh(
+        corner->diagonal.stagedMesh,
+        indexToLocation( startingIndex ) + Tools::Utility::quickRotate( { -0.05f, 0.0f, 4.0f }, 45.0f ),
+        indexToLocation( startingIndex + glm::ivec2{ 0, -1 } ) + glm::vec3{ -0.01f, -1.05f, 4.0f },
+        true
+      );
+
+    }
   }
 
   WallModelLoader::Corner* WallModelLoader::getCorner( const glm::ivec2& location ) {
@@ -178,11 +215,21 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     return &cornerMap[ location.y ][ location.x ];
   }
 
-  void WallModelLoader::updateStagedMesh( PlaneGroup& group, const glm::vec3& position, const glm::vec3& addValue ) {
-    for( auto& pair : group ) {
-      for( auto& vertex : pair.second ) {
-        if( Tools::Utility::equalEpsilon( vertex.position, position ) ) {
-          vertex.position += addValue;
+  void WallModelLoader::updateStagedMesh( PlaneGroup& group, const glm::vec3& position, const glm::vec3& addValue, bool replace ) {
+    if( replace ) {
+      for( auto& pair : group ) {
+        for( auto& vertex : pair.second ) {
+          if( Tools::Utility::equalEpsilon( vertex.position, position ) ) {
+            vertex.position = addValue;
+          }
+        }
+      }
+    } else {
+      for( auto& pair : group ) {
+        for( auto& vertex : pair.second ) {
+          if( Tools::Utility::equalEpsilon( vertex.position, position ) ) {
+            vertex.position += addValue;
+          }
         }
       }
     }
@@ -333,25 +380,25 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     return plane;
   }
 
-  WallModelLoader::PlaneGroup WallModelLoader::sideToStagedMesh( const Models::Sides& sides, const glm::vec3& origin, const glm::vec3& width ) {
+  WallModelLoader::PlaneGroup WallModelLoader::sideToStagedMesh( const Models::Sides& sides, const glm::vec3& origin, const glm::vec3& width, float thickness ) {
     glm::vec3 wallDirection = glm::sign( width );
     glm::vec3 wallPerpDirection = Tools::Utility::quickRotate( wallDirection, 90.0f );
     glm::vec3 inverseWallDirection = -1.0f * wallDirection;
     glm::vec3 inverseWallPerpDirection = -1.0f * wallPerpDirection;
 
     glm::vec3 bottomRight = origin + width;
-    glm::vec3 topRight = bottomRight + ( 0.1f * wallPerpDirection );
-    glm::vec3 topLeft = origin + ( 0.1f * wallPerpDirection );
+    glm::vec3 topRight = bottomRight + ( thickness * wallPerpDirection );
+    glm::vec3 topLeft = origin + ( thickness * wallPerpDirection );
     glm::vec3 upperOrigin = origin + glm::vec3{ 0.0f, 0.0f, 4.0f };
 
     float magnitude = glm::length( width );
 
     PlaneGroup planeGroup;
     planeGroup.emplace( "back", getPlane( origin, width, { 0.0f, 0.0f, 4.0f }, -wallPerpDirection, sides.back.first ) );
-    planeGroup.emplace( "right", getPlane( bottomRight, 0.1f * wallPerpDirection, { 0.0f, 0.0f, 4.0f }, wallDirection, "__top_side" ) );
+    planeGroup.emplace( "right", getPlane( bottomRight, thickness * wallPerpDirection, { 0.0f, 0.0f, 4.0f }, wallDirection, "__top_side" ) );
     planeGroup.emplace( "front", getPlane( topRight, inverseWallDirection, { 0.0f, 0.0f, 4.0f }, wallPerpDirection, sides.front.first ) );
-    planeGroup.emplace( "left", getPlane( topLeft, 0.1f * inverseWallPerpDirection, { 0.0f, 0.0f, 4.0f }, -wallDirection, "__top_side" ) );
-    planeGroup.emplace( "top", getPlane( upperOrigin, wallDirection, 0.1f * wallPerpDirection, { 0.0f, 0.0f, 1.0f }, "__top_side" ) );
+    planeGroup.emplace( "left", getPlane( topLeft, thickness * inverseWallPerpDirection, { 0.0f, 0.0f, 4.0f }, -wallDirection, "__top_side" ) );
+    planeGroup.emplace( "top", getPlane( upperOrigin, wallDirection, thickness * wallPerpDirection, { 0.0f, 0.0f, 1.0f }, "__top_side" ) );
     return planeGroup;
   }
 

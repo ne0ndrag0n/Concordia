@@ -320,8 +320,8 @@
             ]
           },
           {
-            "start": [ 10, 7 ],
-            "end": [ 10, 9 ],
+            "start": [ 15, 16 ],
+            "end": [ 17, 18 ],
             "faces": [
               {
                 "front": "drywall",
@@ -334,18 +334,8 @@
             ]
           },
           {
-            "start": [ 10, 9 ],
-            "end": [ 11, 10 ],
-            "faces": [
-              {
-                "front": "drywall",
-                "back": "drywall"
-              }
-            ]
-          },
-          {
-            "start": [ 11, 10 ],
-            "end": [ 11, 11 ],
+            "start": [ 15, 15 ],
+            "end": [ 15, 16 ],
             "faces": [
               {
                 "front": "drywall",
