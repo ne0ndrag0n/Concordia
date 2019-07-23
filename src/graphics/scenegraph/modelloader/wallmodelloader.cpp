@@ -349,9 +349,9 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     PlaneGroup planeGroup;
     planeGroup.emplace( "back", getPlane( origin, width, { 0.0f, 0.0f, 4.0f }, -wallPerpDirection, sides.back.first ) );
     planeGroup.emplace( "right", getPlane( bottomRight, 0.1f * wallPerpDirection, { 0.0f, 0.0f, 4.0f }, wallDirection, "__top_side" ) );
-    planeGroup.emplace( "front", getPlane( topRight, magnitude * inverseWallDirection, { 0.0f, 0.0f, 4.0f }, wallPerpDirection, sides.front.first ) );
+    planeGroup.emplace( "front", getPlane( topRight, inverseWallDirection, { 0.0f, 0.0f, 4.0f }, wallPerpDirection, sides.front.first ) );
     planeGroup.emplace( "left", getPlane( topLeft, 0.1f * inverseWallPerpDirection, { 0.0f, 0.0f, 4.0f }, -wallDirection, "__top_side" ) );
-    planeGroup.emplace( "top", getPlane( upperOrigin, magnitude * wallDirection, 0.1f * wallPerpDirection, { 0.0f, 0.0f, 1.0f }, "__top_side" ) );
+    planeGroup.emplace( "top", getPlane( upperOrigin, wallDirection, 0.1f * wallPerpDirection, { 0.0f, 0.0f, 1.0f }, "__top_side" ) );
     return planeGroup;
   }
 
@@ -376,6 +376,9 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
         // TODO: Diagonal pieces, non-trivial
         if( corner.diagonal.model ) {
           Log::getInstance().warn( "WallModelLoader::generateDeferredMeshes", "Diagonal wall corner not yet implemented" );
+          glm::vec3 leftOrigin = Tools::Utility::quickRotate( { -0.05f, 0.0f, 0.0f }, 45.0f );
+          glm::vec3 direction = Tools::Utility::quickRotate( { 1.41421356237f, 0.0f, 0.0f }, -45.0f );
+          corner.diagonal.stagedMesh = sideToStagedMesh( *corner.diagonal.model, topLeftCorner + leftOrigin, direction );
         }
 
         if( corner.reverseDiagonal.model ) {

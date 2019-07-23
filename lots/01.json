@@ -342,6 +342,16 @@
                 "back": "drywall"
               }
             ]
+          },
+          {
+            "start": [ 11, 10 ],
+            "end": [ 11, 11 ],
+            "faces": [
+              {
+                "front": "drywall",
+                "back": "drywall"
+              }
+            ]
           }
         ]
       }
