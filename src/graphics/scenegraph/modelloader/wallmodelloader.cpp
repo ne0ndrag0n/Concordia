@@ -183,23 +183,16 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
       Exceptions::NullPointerException::check( "WallModelLoader::fixCorners", corner = getCorner( startingIndex ) );
       Exceptions::NullPointerException::check( "WallModelLoader::fixCorners", top = getCorner( startingIndex + glm::ivec2{ 0, -1 } ) );
 
-      updateStagedMesh( top->vertical.stagedMesh, indexToLocation( startingIndex + glm::ivec2{ 0, -1 } ) + glm::vec3{ -0.05f, -1.0f, 0.0f }, { 0.04f, -0.05f, 0.0f } );
-      updateStagedMesh( top->vertical.stagedMesh, indexToLocation( startingIndex + glm::ivec2{ 0, -1 } ) + glm::vec3{ -0.05f, -1.0f, 4.0f }, { 0.04f, -0.05f, 0.0f } );
+      glm::vec3 cornerLeft     = getPositionById( corner->diagonal.stagedMesh, "back", 0 );
+      glm::vec3 cornerLeftTop  = getPositionById( corner->diagonal.stagedMesh, "back", 2 );
+      glm::vec3 cornerRight    = getPositionById( corner->diagonal.stagedMesh, "front", 1 );
+      glm::vec3 cornerRightTop = getPositionById( corner->diagonal.stagedMesh, "front", 4 );
 
-      updateStagedMesh(
-        corner->diagonal.stagedMesh,
-        indexToLocation( startingIndex ) + Tools::Utility::quickRotate( { -0.05f, 0.0f, 0.0f }, 45.0f ),
-        indexToLocation( startingIndex + glm::ivec2{ 0, -1 } ) + glm::vec3{ -0.01f, -1.05f, 0.0f },
-        true
-      );
+      updateStagedMesh( corner->diagonal.stagedMesh, cornerLeft,    getPositionById( top->vertical.stagedMesh, "back", 1 ), true );
+      updateStagedMesh( corner->diagonal.stagedMesh, cornerLeftTop, getPositionById( top->vertical.stagedMesh, "back", 4 ), true );
 
-      updateStagedMesh(
-        corner->diagonal.stagedMesh,
-        indexToLocation( startingIndex ) + Tools::Utility::quickRotate( { -0.05f, 0.0f, 4.0f }, 45.0f ),
-        indexToLocation( startingIndex + glm::ivec2{ 0, -1 } ) + glm::vec3{ -0.01f, -1.05f, 4.0f },
-        true
-      );
-
+      updateStagedMesh( corner->diagonal.stagedMesh, cornerRight,    getPositionById( top->vertical.stagedMesh, "front", 0 ), true );
+      updateStagedMesh( corner->diagonal.stagedMesh, cornerRightTop, getPositionById( top->vertical.stagedMesh, "front", 2 ), true );
     }
   }
 
@@ -213,6 +206,12 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     }
 
     return &cornerMap[ location.y ][ location.x ];
+  }
+
+  glm::vec3 WallModelLoader::getPositionById( const PlaneGroup& group, const std::string& face, int index ) const {
+    const auto& array = group.at( face );
+
+    return array.at( index ).position;
   }
 
   void WallModelLoader::updateStagedMesh( PlaneGroup& group, const glm::vec3& position, const glm::vec3& addValue, bool replace ) {
@@ -425,7 +424,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
           Log::getInstance().warn( "WallModelLoader::generateDeferredMeshes", "Diagonal wall corner not yet implemented" );
           glm::vec3 leftOrigin = Tools::Utility::quickRotate( { -0.05f, 0.0f, 0.0f }, 45.0f );
           glm::vec3 direction = Tools::Utility::quickRotate( { 1.41421356237f, 0.0f, 0.0f }, -45.0f );
-          corner.diagonal.stagedMesh = sideToStagedMesh( *corner.diagonal.model, topLeftCorner + leftOrigin, direction );
+          corner.diagonal.stagedMesh = sideToStagedMesh( *corner.diagonal.model, topLeftCorner + leftOrigin, direction, 0.055f );
         }
 
         if( corner.reverseDiagonal.model ) {

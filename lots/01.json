@@ -340,6 +340,10 @@
               {
                 "front": "drywall",
                 "back": "drywall"
+              },
+              {
+                "front": "drywall",
+                "back": "drywall"
               }
             ]
           }

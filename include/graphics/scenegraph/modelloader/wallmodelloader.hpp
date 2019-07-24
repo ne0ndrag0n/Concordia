@@ -49,6 +49,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     Utilities::TextureAtlas atlas;
 
     Corner* getCorner( const glm::ivec2& location );
+    glm::vec3 getPositionById( const PlaneGroup& group, const std::string& face, int index ) const;
     void updateStagedMesh( PlaneGroup& group, const glm::vec3& position, const glm::vec3& addValue, bool replace = false );
     glm::vec3 indexToLocation( const glm::ivec2& position );
 
