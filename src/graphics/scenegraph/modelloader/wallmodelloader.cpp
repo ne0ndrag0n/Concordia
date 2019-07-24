@@ -314,7 +314,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
           switch( direction.y ) {
             case -1: {
               //( 1, -1 ) case
-              if( Corner* corner = getCorner( cursor - glm::ivec2{ 0, -1 } ) ) {
+              if( Corner* corner = getCorner( cursor - glm::ivec2{ 0, 1 } ) ) {
                 corner->reverseDiagonal.model = segment.faces[ i ];
               } else {
                 // Advance to termination event
@@ -421,14 +421,15 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
 
         // TODO: Diagonal pieces, non-trivial
         if( corner.diagonal.model ) {
-          Log::getInstance().warn( "WallModelLoader::generateDeferredMeshes", "Diagonal wall corner not yet implemented" );
           glm::vec3 leftOrigin = Tools::Utility::quickRotate( { -0.05f, 0.0f, 0.0f }, 45.0f );
           glm::vec3 direction = Tools::Utility::quickRotate( { 1.41421356237f, 0.0f, 0.0f }, -45.0f );
           corner.diagonal.stagedMesh = sideToStagedMesh( *corner.diagonal.model, topLeftCorner + leftOrigin, direction, 0.055f );
         }
 
         if( corner.reverseDiagonal.model ) {
-          Log::getInstance().warn( "WallModelLoader::generateDeferredMeshes", "Reverse diagonal wall corner not yet implemented" );
+          glm::vec3 direction = Tools::Utility::quickRotate( { 1.41421356237f, 0.0f, 0.0f }, 45.0f );
+          glm::vec3 leftOrigin = glm::vec3{ 0.0f, -1.0f, 0.0f } + Tools::Utility::quickRotate( { 0.05f, 0.0f, 0.0f }, -45.0f );
+          corner.reverseDiagonal.stagedMesh = sideToStagedMesh( *corner.reverseDiagonal.model, topLeftCorner + leftOrigin, direction, 0.055f );
         }
 
         fixCorners( cursor );
