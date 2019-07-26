@@ -134,6 +134,20 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     return corner->diagonal.model && upperClear && upperReverse;
   }
 
+  bool WallModelLoader::adjustDiagonalTop3( const glm::ivec2& index ) {
+    Corner* corner = getCorner( index );
+    if( !corner ) {
+      return false;
+    }
+
+    Corner* left = getCorner( index + glm::ivec2{ -1, 0 } );
+
+    bool isSingleHorizontal = !corner->vertical.model && corner->horizontal.model && corner->diagonal.model;
+    bool leftHorizontalClear = !left || !left->horizontal.model;
+
+    return !adjustDiagonalTop12( index ) && isSingleHorizontal && leftHorizontalClear;
+  }
+
   glm::vec3 WallModelLoader::indexToLocation( const glm::ivec2& position ) {
     // TODO: Elevation per vertex
     return { -( dimensions.x * 0.5f ) + position.x, ( dimensions.y * 0.5f ) - position.y, 0.0f };
@@ -231,6 +245,23 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
 
       updateStagedMesh( corner->diagonal.stagedMesh, frontTopLeftCorner, newTop, true );
       updateStagedMesh( corner->diagonal.stagedMesh, frontBottomLeftCorner, newBottom, true );
+    }
+
+    if( adjustDiagonalTop3( startingIndex ) ) {
+      Corner* corner;
+      Exceptions::NullPointerException::check( "WallModelLoader::fixCorners", corner = getCorner( startingIndex ) );
+
+      glm::vec3 diagonalBackTopLeft     = getPositionById( corner->diagonal.stagedMesh, "back", 2 );
+      glm::vec3 diagonalBackBottomLeft  = getPositionById( corner->diagonal.stagedMesh, "back", 0 );
+
+      glm::vec3 horizontalFrontTopRight    = getPositionById( corner->horizontal.stagedMesh, "front", 4 );
+      glm::vec3 horizontalFrontBottomRight = getPositionById( corner->horizontal.stagedMesh, "front", 3 );
+
+      updateStagedMesh( corner->horizontal.stagedMesh, horizontalFrontTopRight, horizontalFrontTopRight + glm::vec3{ -0.1f, 0.0f, 0.0f }, true );
+      updateStagedMesh( corner->horizontal.stagedMesh, horizontalFrontBottomRight, horizontalFrontBottomRight + glm::vec3{ -0.1f, 0.0f, 0.0f }, true );
+
+      updateStagedMesh( corner->diagonal.stagedMesh, diagonalBackTopLeft, horizontalFrontTopRight + glm::vec3{ -0.1f, 0.0f, 0.0f }, true );
+      updateStagedMesh( corner->diagonal.stagedMesh, diagonalBackBottomLeft, horizontalFrontBottomRight + glm::vec3{ -0.1f, 0.0f, 0.0f }, true );
     }
   }
 
