@@ -58,6 +58,7 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     bool adjustBottomLeft( const glm::ivec2& index );
     bool adjustBottomRight( const glm::ivec2& index );
     bool adjustDiagonalTop12( const glm::ivec2& index );
+    bool adjustDiagonalTop1( const glm::ivec2& index );
 
     void fixCorners( const glm::ivec2& startingIndex );
     void initTopTexture( Vector::Renderer& renderer );
