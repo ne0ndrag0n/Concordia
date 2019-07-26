@@ -148,6 +148,22 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
     return !adjustDiagonalTop12( index ) && isSingleHorizontal && leftHorizontalClear;
   }
 
+  bool WallModelLoader::adjustDiagonalTop6( const glm::ivec2& index ) {
+    Corner* corner = getCorner( index );
+    if( !corner ) {
+      return false;
+    }
+
+    Corner* upper = getCorner( index + glm::ivec2( 0, -1 ) );
+    Corner* left = getCorner( index + glm::ivec2( -1, 0 ) );
+
+    bool forms6 = corner->vertical.model && corner->diagonal.model && !corner->horizontal.model;
+    bool upperClear = !upper || !upper->vertical.model;
+    bool leftClear = !left || !left->horizontal.model;
+
+    return !adjustTopLeft( index ) && forms6 && upperClear && leftClear;
+  }
+
   glm::vec3 WallModelLoader::indexToLocation( const glm::ivec2& position ) {
     // TODO: Elevation per vertex
     return { -( dimensions.x * 0.5f ) + position.x, ( dimensions.y * 0.5f ) - position.y, 0.0f };
@@ -262,6 +278,32 @@ namespace BlueBear::Graphics::SceneGraph::ModelLoader {
 
       updateStagedMesh( corner->diagonal.stagedMesh, diagonalBackTopLeft, horizontalFrontTopRight + glm::vec3{ -0.1f, 0.0f, 0.0f }, true );
       updateStagedMesh( corner->diagonal.stagedMesh, diagonalBackBottomLeft, horizontalFrontBottomRight + glm::vec3{ -0.1f, 0.0f, 0.0f }, true );
+    }
+
+    if( adjustDiagonalTop6( startingIndex ) ) {
+      Corner* corner;
+      Exceptions::NullPointerException::check( "WallModelLoader::fixCorners", corner = getCorner( startingIndex ) );
+
+      // Push these y+0.1
+      glm::vec3 verticalBackTopLeft      = getPositionById( corner->vertical.stagedMesh, "back", 2 );
+      glm::vec3 verticalBackBottomLeft   = getPositionById( corner->vertical.stagedMesh, "back", 0 );
+
+      // Push these y-0.1
+      glm::vec3 verticalFrontTopRight    = getPositionById( corner->vertical.stagedMesh, "front", 4 );
+      glm::vec3 verticalFrontBottomRight = getPositionById( corner->vertical.stagedMesh, "front", 1 );
+
+      // Set these equivalent to new position by id for vertical back
+      glm::vec3 diagonalFrontTopRight    = getPositionById( corner->diagonal.stagedMesh, "front", 4 );
+      glm::vec3 diagonalFrontBottomRight = getPositionById( corner->diagonal.stagedMesh, "front", 1 );
+
+      updateStagedMesh( corner->vertical.stagedMesh, verticalBackTopLeft, verticalBackTopLeft + glm::vec3{ 0.0f, 0.1f, 0.0f }, true );
+      updateStagedMesh( corner->vertical.stagedMesh, verticalBackBottomLeft, verticalBackBottomLeft + glm::vec3{ 0.0f, 0.1f, 0.0f }, true );
+
+      updateStagedMesh( corner->vertical.stagedMesh, verticalFrontTopRight, { 0.0f, -0.1f, 0.0f } );
+      updateStagedMesh( corner->vertical.stagedMesh, verticalFrontBottomRight, { 0.0f, -0.1f, 0.0f } );
+
+      updateStagedMesh( corner->diagonal.stagedMesh, diagonalFrontTopRight, verticalBackTopLeft + glm::vec3{ 0.0f, 0.1f, 0.0f }, true );
+      updateStagedMesh( corner->diagonal.stagedMesh, diagonalFrontBottomRight, verticalBackBottomLeft + glm::vec3{ 0.0f, 0.1f, 0.0f }, true );
     }
   }
 
